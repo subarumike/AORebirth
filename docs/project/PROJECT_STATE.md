@@ -4,6 +4,15 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Finalized captures `20260720-051714`, `20260720-053542`, and
+  `20260720-053802` were audited. The whole-subway survey adds no new
+  ordinary hostile archetype; Bureaucrat Worker and Wrath Incarnation are
+  player-owned pets. Vergil's follow-up adds a captured `54` critical. The
+  Abmouth follow-up proves nano `286237` and the matching `N3Teleport`/pet
+  `SetPos` sequence; Abmouth now performs that player-and-owned-pet warp once
+  per fight at the captured approximately `21.8` seconds. Evidence:
+  `docs/evidence/SUBWAY_20260720_REST_MISSING_ENEMIES_AND_BOSS_FOLLOWUPS.md`.
+
 - Finalized Subway captures `20260720-042205`, `20260720-043018`,
   `20260720-044358`, and `20260720-044610` are integrated into the generated
   PF127 ordinary provider. The corpus now has `351` exact identity-linked,

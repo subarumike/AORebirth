@@ -764,7 +764,7 @@ namespace AORebirth.Core.Playfields
                         requiresDamageLineOfSight: true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260712-232711/234401: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 23-25 player damage, 23-34 all-target damage, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
+                        "20260712-232711/234401 and 20260720-053542: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 22-25 normal player damage with one captured 54 critical, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
                         NpcCombatAttackRules.CapturedSubwayVergilWeaponTemplate,
                         NpcCombatAttackRules.CapturedSubwayVergilWeaponTemplate,
                         NpcCombatAttackRules.CapturedSubwayVergilWeaponQuality,
@@ -814,7 +814,7 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayAbmouthDenwTag,
                             true);
                     return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
-                        "20260712-224840/232137: Abmouth XOPZ paired stream, DENW stream, and captured SIW context",
+                        "20260712-224840/232137 and 20260720-053802: Abmouth XOPZ paired stream, DENW stream, captured SIW context, and one 21.8-second combat warp cast (nano 286237) that teleports the engaged player and owned pets to Abmouth",
                         new CapturedEnemyParallelAttackSequenceDefinition(
                             new[]
                             {

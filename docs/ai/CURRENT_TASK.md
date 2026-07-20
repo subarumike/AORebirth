@@ -10,6 +10,14 @@ projections no longer require repeat gameplay captures. The active work is to
 promote recovered exact evidence and validate the `322` active PF127 population
 in bounded runtime batches; no population rows remain quarantined.
 
+The finalized `20260720-051714` whole-subway survey adds no new ordinary
+hostile archetype; its Bureaucrat Worker and Wrath Incarnation rows are
+player-owned pets. Vergil follow-up `20260720-053542` records a normal `22..25`
+weapon roll and one `54` critical. Abmouth follow-up `20260720-053802` proves
+the one-per-fight nano `286237` player/pet warp and is now implemented in the
+named encounter runtime. See
+`docs/evidence/SUBWAY_20260720_REST_MISSING_ENEMIES_AND_BOSS_FOLLOWUPS.md`.
+
 ## Subway enemy captures (2026-07-20)
 
 - Finalized official-live captures `20260720-042205`, `20260720-043018`,

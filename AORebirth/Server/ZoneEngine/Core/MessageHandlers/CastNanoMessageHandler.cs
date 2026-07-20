@@ -80,6 +80,11 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(npc, this.PetCastFiller(npc, nanoId, target), announceToPlayfield);
         }
 
+        public void SendCapturedNpcCast(ICharacter npc, int nanoId, Identity target, bool announceToPlayfield = true)
+        {
+            this.Send(npc, this.CapturedNpcCastFiller(npc, nanoId, target), announceToPlayfield);
+        }
+
         /// <summary>
         /// Captured triggered self-casts use Identity=Caster=Target and Unknown1=1.
         /// </summary>
@@ -127,6 +132,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.NanoId = nanoId;
                 x.Unknown = 0;
                 x.Unknown1 = 0;
+            };
+        }
+
+        private MessageDataFiller CapturedNpcCastFiller(ICharacter npc, int nanoId, Identity target)
+        {
+            return x =>
+            {
+                x.Identity = npc.Identity;
+                x.Caster = npc.Identity;
+                x.Target = target;
+                x.NanoId = nanoId;
+                x.Unknown = 0;
+                x.Unknown1 = 1;
             };
         }
 

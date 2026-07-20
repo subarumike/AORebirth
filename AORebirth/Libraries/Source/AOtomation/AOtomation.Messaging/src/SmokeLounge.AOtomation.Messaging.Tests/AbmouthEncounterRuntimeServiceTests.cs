@@ -159,7 +159,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinator = ReadPlayfieldSource(root, "NpcCombatTickCoordinator.cs");
 
             Assert.IsTrue(
-                rules.Contains("CapturedSubwayAbmouthXopzMinimumDamage = 74")
+                rules.Contains("CapturedSubwayAbmouthXopzMinimumDamage = 73")
                 && rules.Contains("CapturedSubwayAbmouthXopzMaximumDamage = 96")
                 && rules.Contains("CapturedSubwayAbmouthXopzTag = 0x584F505A")
                 && rules.Contains("CapturedSubwayAbmouthDenwMinimumDamage = 115")
@@ -708,16 +708,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 analyzer.Contains("\"20260716-034433\": frozenset({\"Vergil Aeneid\"})")
+                && analyzer.Contains("\"20260720-053542\": frozenset({\"Vergil Aeneid\"})")
                 && analyzer.Contains("\"20260716-034433\": frozenset({\"(SimpleChar:796D400B)\"})")
-                && analyzer.Contains("CADENCE_UNRESOLVED_ENEMIES = frozenset({\"Vergil Aeneid\"})"),
+                && analyzer.Contains("CADENCE_STATUS_BY_ENEMY = {")
+                && analyzer.Contains("\"Vergil Aeneid\": \"unresolved-mixed-target-fight\""),
                 "Capture 034433 must stay Vergil-only, explicitly classify Killer as a player-owned pet, and leave cadence unresolved.");
             Assert.IsTrue(
                 vergil.Contains("\"20260716-034433\"")
-                && vergil.Contains("\"retaliationRows\": 4")
-                && vergil.Contains("\"attackInfoRows\": 5")
+                && vergil.Contains("\"20260720-053542\"")
+                && vergil.Contains("\"retaliationRows\": 8")
+                && vergil.Contains("\"attackInfoRows\": 9")
                 && vergil.Contains("\"minDamage\": 22")
-                && vergil.Contains("\"maxDamage\": 23")
-                && vergil.Contains("\"intervalRows\": 0")
+                && vergil.Contains("\"maxDamage\": 54")
+                && vergil.Contains("\"normalAttackInfoRows\": 8")
                 && vergil.Contains("\"cadenceStatus\": \"unresolved-mixed-target-fight\"")
                 && vergil.Contains("\"equippedWeaponTemplateId\": 122123")
                 && vergil.Contains("\"equippedWeaponQuality\": 23"),
@@ -760,19 +763,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ? analyzer.Substring(targetRoleStart, targetRoleEnd - targetRoleStart)
                 : string.Empty;
 
+            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
+
             Assert.IsTrue(
                 analyzer.Contains("\"20260716-220400\": frozenset({\"Abmouth Supremus\"})")
+                && analyzer.Contains("\"20260720-053802\": frozenset({\"Abmouth Supremus\"})")
                 && targetRoleSet.Contains("\"Abmouth Supremus\"")
                 && analyzer.Contains("\"(SimpleChar:7970253A)\", \"(SimpleChar:7970253C)\""),
-                "Capture 220400 must stay Abmouth-only and classify Healer plus Wrath Incarnation as player-owned pets.");
+                "Abmouth captures must stay Abmouth-only and classify Healer plus Wrath Incarnation as player-owned pets.");
             Assert.IsTrue(
                 abmouth.Contains("\"20260716-220400\"")
-                && abmouth.Contains("\"attackInfoRows\": 4")
-                && abmouth.Contains("\"minDamage\": 74")
+                && abmouth.Contains("\"20260720-053802\"")
+                && abmouth.Contains("\"attackInfoRows\": 9")
+                && abmouth.Contains("\"minDamage\": 73")
                 && abmouth.Contains("\"maxDamage\": 125")
                 && abmouth.Contains("\"weaponInstance\": 1145392727")
                 && abmouth.Contains("\"weaponInstance\": 1481592922"),
-                "Top-level Abmouth evidence must retain only the four local-player hits and both independent attack shapes.");
+                "Top-level Abmouth evidence must retain local-player hits and both independent attack shapes.");
+            Assert.IsTrue(
+                encounter.Contains("AbmouthWarpNanoId = 286237")
+                && encounter.Contains("AbmouthWarpDelaySeconds = 21.8")
+                && encounter.Contains("SendCapturedNpcCast")
+                && encounter.Contains("TeleportMessageHandler.Default.SendLocal")
+                && encounter.Contains("StatIds.petmaster"),
+                "Abmouth must replay the captured one-per-fight warp and reposition the player-owned pets with the player.");
             Assert.IsTrue(
                 petStart >= 0
                 && abmouth.Substring(petStart).Contains("\"(SimpleChar:7970253A)\"")
