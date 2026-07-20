@@ -139,9 +139,10 @@ Subway evidence into 26 reusable type profiles and 322 exact spawn rows:
   Rebuild, Fragmented Soul, Redundant Scan, Uncontrollable Anger, Infected
   Attendant, Lost Thought, Empty Shell, and Premature Pattern.
 
-The configured activation boundary is 322 active rows. The 16 accepted-profile
-rows activated in this slice require bounded private-client validation before
-this can be called the safe runtime boundary. All 22 Violent Vagabond rows are
+The configured activation boundary is 322 active rows across 26 accepted
+profiles. The newly promoted Infected Attendant, Lost Thought, Empty Shell,
+Premature Pattern, and Violent Vagabond rows require bounded private-client
+validation before this can be called the safe runtime boundary. All 22 Violent Vagabond rows are
 active under the explicit same-level Subway damage policy because the official
 family repeatedly missed the test character and cannot supply a landed roll.
 Exact landed-damage parity and reset boundaries remain unresolved; profile or
@@ -296,20 +297,20 @@ gate fails closed if the focused capture or seven normal `21..34` hit boundary
 drifts. No special-attack context or critical behavior is inferred, and the
 profile is accepted by the whole-enemy gate with those exclusions preserved.
 
-Reviewed first-open evidence now supplies strict item denominators for 18
+Reviewed first-open evidence now supplies strict item denominators for 20
 ordinary profiles through one reusable raw-generation validator. In addition
 to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
 recovered set is Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
 Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected Attendant
-`5/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete Rebuild `2/0`,
-Redundant Scan `2/1`, Uncontrollable Anger `3/0`, Lost Thought `1/0`, and Neural
-Burnout `4/2`. Each reviewed source is capture-allowlisted and its complete set
+`6/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete Rebuild `2/0`,
+Redundant Scan `2/1`, Uncontrollable Anger `4/0`, Lost Thought `5/2`, Neural
+Burnout `6/2`, Empty Shell `5/1`, and Premature Pattern `5/1`. Each reviewed source is capture-allowlisted and its complete set
 of exact corpse/dead-NPC/first-raw-inventory generations is fingerprinted;
 capture allocations and declared overlap projections also fail closed. Unopened
 and snapshot-only corpses remain excluded, as does the known false Stim Fiend
 attribution. Runtime consumes generated strict-loot summary metadata, uses
 `IndependentEntries`, preserves observed empty counts, and keeps
-`ItemPoolComplete=false`; Empty Shell and Premature Pattern receive no table.
+`ItemPoolComplete=false`.
 
 Shadow, ordinary Infector, Architect Striker, and Melded Patterns are the sixth
 through ninth accepted ordinary profiles. Their gate coverage binds exact
@@ -521,8 +522,11 @@ established by evidence or decision, and random roam behavior not proven by
 movement evidence. No Violent Vagabond row remains quarantined. Exact patrols
 do not resolve the missing landed-damage evidence, so the `9..12` runtime range
 remains explicitly policy-backed rather than capture-proven.
-The whole-enemy gate still accepts 21 of 26 profiles. Infected Attendant, Lost
-Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 43
-active rows and require the next
-corpus-backed completion pass; active disposition is not a claim that those
-five profiles are complete.
+The whole-enemy gate now lists all 26 profiles. Capture `20260720-051714`
+promotes additional local-player damage rolls and strict first-open loot for
+Infected Attendant, Lost Thought, Empty Shell, and Premature Pattern. Lost
+Thought uses its observed `5.428348`-second cadence; the other three use an
+explicit shared five-second private-server cadence because the corpus has no
+trustworthy same-source landed-hit interval. Violent Vagabond retains its
+documented same-level Mugger damage policy and captured miss cadence. These are
+playability policies, not claims of exact official-server parity.

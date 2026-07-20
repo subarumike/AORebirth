@@ -2761,11 +2761,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Incomplete Rebuild|203728|148",
                     "Fragmented Soul|203729|148",
                     "Redundant Scan|204178|148",
-                    "Uncontrollable Anger|96195|138"
+                    "Uncontrollable Anger|96195|138",
+                    "Empty Shell|203731|148",
+                    "Infected Attendant|96056|138",
+                    "Lost Thought|96193|138",
+                    "Premature Pattern|203727|148",
+                    "Violent Vagabond|203733|138"
                 };
 
             Assert.AreEqual(
-                21,
+                26,
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
@@ -2924,28 +2929,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .Where(value => value.ProfileKey == infectedAttendant.ProfileKey)
                 .ToArray();
             Assert.AreEqual(5, infectedAttendantSpawns.Length);
-            Assert.IsFalse(infectedAttendant.Combat.Contract.IsCombatReady);
+            Assert.IsTrue(infectedAttendant.Combat.Contract.IsCombatReady);
             Assert.AreEqual(
-                CapturedEnemyAttackModel.Unresolved,
+                CapturedEnemyAttackModel.FixedAttackInfo,
                 infectedAttendant.Combat.Contract.AttackModel);
-            Assert.AreEqual(5, infectedAttendant.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(11, infectedAttendant.Combat.Contract.MinDamage);
+            Assert.AreEqual(15, infectedAttendant.Combat.Contract.MaxDamage);
+            Assert.AreEqual(5.0, infectedAttendant.Combat.Contract.RechargeSeconds);
+            Assert.AreEqual(6, infectedAttendant.Loot.ObservedCompleteInventories);
             Assert.AreEqual(1, infectedAttendant.Loot.ObservedEmptyInventories);
             Assert.IsFalse(infectedAttendant.Loot.ItemPoolComplete);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 96056, 96024,") == 7
-                && infectedAttendantCombatReport.Contains("\"retaliationRows\": 3")
-                && infectedAttendantCombatReport.Contains("\"normalAttackInfoRows\": 1")
+                CountOccurrences(ordinaryProviderText, ", 96056, 96024,") == 8
+                && infectedAttendantCombatReport.Contains("\"retaliationRows\": 4")
+                && infectedAttendantCombatReport.Contains("\"normalAttackInfoRows\": 2")
                 && infectedAttendantCombatReport.Contains("\"normalMinDamage\": 11")
-                && infectedAttendantCombatReport.Contains("\"normalMaxDamage\": 11")
+                && infectedAttendantCombatReport.Contains("\"normalMaxDamage\": 15")
                 && infectedAttendantCombatReport.Contains("\"criticalAttackInfoRows\": 0")
                 && infectedAttendantCombatReport.Contains("\"missedAttackInfoRows\": 0")
-                && infectedAttendantCombatReport.Contains("\"specialAttackWeaponRows\": 1")
+                && infectedAttendantCombatReport.Contains("\"specialAttackWeaponRows\": 2")
                 && CountOccurrences(infectedAttendantCombatReport, "\"unknown1\": 65") == 1
                 && CountOccurrences(infectedAttendantCombatReport, "\"unknown2\": 65") == 1
                 && CountOccurrences(infectedAttendantCombatReport, "\"unknown3\": 65") == 1
                 && CountOccurrences(infectedAttendantCombatReport, "\"unknown4\": 65") == 1
-                && CountOccurrences(infectedAttendantCombatReport, "\"unknown5\": 0") == 1,
-                "Infected Attendant must retain three local retaliation starts, one 11-point hit, and its 65/65/65/65/0 empty-SIW shape as report-only evidence until cadence is captured.");
+                && CountOccurrences(infectedAttendantCombatReport, "\"unknown1\": 120") == 1
+                && CountOccurrences(infectedAttendantCombatReport, "\"unknown2\": 120") == 1
+                && CountOccurrences(infectedAttendantCombatReport, "\"unknown3\": 120") == 1
+                && CountOccurrences(infectedAttendantCombatReport, "\"unknown4\": 120") == 1
+                && CountOccurrences(infectedAttendantCombatReport, "\"unknown5\": 0") == 2,
+                "Infected Attendant must retain both captured local-player hits and use the explicit five-second private cadence policy.");
 
             Assert.IsTrue(
                 strikeForemanCombatReport.Contains("\"normalAttackInfoRows\": 6")

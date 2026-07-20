@@ -246,7 +246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(351, evidence.Length);
+            Assert.AreEqual(366, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -268,7 +268,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "20260720-042205:8",
                         "20260720-043018:9",
                         "20260720-044358:4",
-                        "20260720-044610:16"
+                        "20260720-044610:16",
+                        "20260720-051714:15"
                     },
                 evidence
                     .Where(
@@ -289,7 +290,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                   || value.Capture == "20260720-042205"
                                   || value.Capture == "20260720-043018"
                                   || value.Capture == "20260720-044358"
-                                  || value.Capture == "20260720-044610")
+                                  || value.Capture == "20260720-044610"
+                                  || value.Capture == "20260720-051714")
                     .GroupBy(value => value.Capture)
                     .OrderBy(value => value.Key, StringComparer.Ordinal)
                     .Select(value => value.Key + ":" + value.Count())
@@ -687,7 +689,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void RecoveredFirstOpenCorpusSuppliesFourteenIncompleteIndependentLootPools()
+        public void RecoveredFirstOpenCorpusSuppliesSixteenIncompleteIndependentLootPools()
         {
             AssertRecoveredStrictLoot(
                 "Mugger",
@@ -759,12 +761,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { "42640:42641:30:1" });
             AssertRecoveredStrictLoot(
                 "Infected Attendant",
-                5,
+                6,
                 1,
                 new[]
                     {
-                        "101695:101696:24:1", "109194:109195:12:1", "112823:112824:17:1",
-                        "234875:234875:1:1", "290619:202727:12:1", "290619:202727:13:1"
+                        "101695:101696:24:1", "109194:109195:12:1", "112560:112561:27:1",
+                        "112823:112824:17:1", "202727:202728:25:1", "234875:234875:1:1",
+                        "290619:202727:12:1", "290619:202727:13:1"
                     });
             AssertRecoveredStrictLoot(
                 "Fragmented Soul",
@@ -806,12 +809,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     });
             AssertRecoveredStrictLoot(
                 "Lost Thought",
-                3,
-                0,
+                5,
+                2,
                 new[]
                     {
                         "101675:101676:25:1", "111347:111348:21:1",
                         "290619:202727:19:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Empty Shell",
+                5,
+                1,
+                new[]
+                    {
+                        "26541:26541:10:1", "27263:27263:10:1", "122850:122851:23:1",
+                        "124505:124506:21:1", "128916:128917:18:1", "163426:163427:17:1",
+                        "301711:301711:1:1"
+                    });
+            AssertRecoveredStrictLoot(
+                "Premature Pattern",
+                5,
+                1,
+                new[]
+                    {
+                        "26541:26541:10:1", "27199:27199:10:1", "85590:27396:17:1",
+                        "234877:234877:1:2", "301711:301711:1:1"
                     });
             AssertRecoveredStrictLoot(
                 "Neural Burnout",
@@ -844,14 +866,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(112863, angerOutcome.LowId);
             Assert.AreEqual(112864, angerOutcome.HighId);
             Assert.AreEqual(13, angerOutcome.Quality);
-
-            foreach (string excludedName in new[] { "Empty Shell" })
-            {
-                CapturedSubwayOrdinaryArchetypeDefinition archetype = provider.GetArchetypes()
-                    .Single(value => value.Name == excludedName);
-                Assert.IsNull(provider.GetStrictLootProfile(archetype.MonsterData), excludedName);
-                Assert.AreEqual(0, Profile(excludedName).Loot.Entries.Length, excludedName);
-            }
 
             CapturedSubwayStrictLootProfileDefinition mugger =
                 provider.GetStrictLootProfile(203734);
@@ -977,8 +991,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Empty Shell",
                 5941,
-                "19:118:118:1",
-                "21:131:131:1");
+                "17:105:105:1",
+                "19:118:118:3",
+                "20:124:124:1",
+                "21:131:131:3");
             AssertCorpseAndLevelCredits(
                 "Fragmented Soul",
                 5921,
@@ -998,6 +1014,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "11:14:14:2",
                 "12:15:15:3",
                 "15:19:19:1",
+                "22:28:28:1",
                 "23:29:29:1");
             AssertCorpseAndLevelCredits(
                 "Infector",
@@ -1019,8 +1036,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "16:20:20:1",
                 "18:23:23:2",
                 "19:24:24:1",
-                "21:26:26:1",
-                "22:28:28:1");
+                "21:26:26:2",
+                "22:28:28:2");
             AssertCorpseAndLevelCredits(
                 "Melded Patterns",
                 23368,
@@ -1057,8 +1074,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Premature Pattern",
                 5941,
+                "16:98:98:1",
                 "17:105:105:1",
-                "18:111:111:2",
+                "18:111:111:5",
+                "19:118:118:1",
+                "22:137:137:1",
                 "23:144:144:2");
             AssertCorpseAndLevelCredits(
                 "Redundant Scan",

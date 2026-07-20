@@ -247,7 +247,10 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayLootOutcomeEvidenceDefinition("20260719-020104", "2026-07-19T07:03:04.999505Z", "(Corpse:00F74003)", "(SimpleChar:797B885C)", 203733, 2339, 1, 273381, 204397, 5),
             new CapturedSubwayLootOutcomeEvidenceDefinition("20260719-020104", "2026-07-19T07:03:04.999505Z", "(Corpse:00F74003)", "(SimpleChar:797B885C)", 203733, 2339, 2, 124016, 124017, 6),
             new CapturedSubwayLootOutcomeEvidenceDefinition("20260719-020104", "2026-07-19T07:03:07.113175Z", "(Corpse:00F74004)", "(SimpleChar:797AD6E4)", 17649, 2383, 0, 113398, 113399, 7),
-            new CapturedSubwayLootOutcomeEvidenceDefinition("20260719-021022", "2026-07-19T07:13:41.373431Z", "(Corpse:00F74005)", "(SimpleChar:797B889D)", 203734, 3848, 0, 123495, 123496, 5)
+            new CapturedSubwayLootOutcomeEvidenceDefinition("20260719-021022", "2026-07-19T07:13:41.373431Z", "(Corpse:00F74005)", "(SimpleChar:797B889D)", 203734, 3848, 0, 123495, 123496, 5),
+            new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:25:20.131249Z", "(Corpse:00F74001)", "(SimpleChar:79803506)", 17657, 8531, 0, 26489, 26489, 10),
+            new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:25:20.131249Z", "(Corpse:00F74001)", "(SimpleChar:79803506)", 17657, 8531, 1, 301709, 301709, 1),
+            new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:28:12.377880Z", "(Corpse:00F74007)", "(SimpleChar:79803504)", 17657, 10772, 0, 126757, 126757, 1)
         };
 
         private static readonly CapturedSubwaySourceWeaponProfileDefinition[] SupportedSourceWeaponProfiles =
@@ -459,42 +462,46 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayStrictLootProfileDefinition(
                 "Infected Attendant",
                 96056,
+                6,
                 5,
-                4,
                 1,
                 false,
                 new string[]
                 {
                     "20260709-220439",
                     "20260709-225408",
-                    "20260720-033749"
+                    "20260720-033749",
+                    "20260720-051714"
                 },
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(101695, 101696, 24, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(109194, 109195, 12, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(112823, 112824, 17, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 12, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 13, 1, 5, 2000)
+                    new CapturedSubwayLootEvidenceDefinition(101695, 101696, 24, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(109194, 109195, 12, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(112560, 112561, 27, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(112823, 112824, 17, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(202727, 202728, 25, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 12, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 13, 1, 6, 1667)
                 }),
             new CapturedSubwayStrictLootProfileDefinition(
                 "Lost Thought",
                 96193,
+                5,
                 3,
-                3,
-                0,
+                2,
                 false,
                 new string[]
                 {
                     "20260709-225408",
-                    "20260720-044610"
+                    "20260720-044610",
+                    "20260720-051714"
                 },
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(101675, 101676, 25, 1, 3, 3333),
-                    new CapturedSubwayLootEvidenceDefinition(111347, 111348, 21, 1, 3, 3333),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 19, 1, 3, 3333)
+                    new CapturedSubwayLootEvidenceDefinition(101675, 101676, 25, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(111347, 111348, 21, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 19, 1, 5, 2000)
                 }),
             new CapturedSubwayStrictLootProfileDefinition(
                 "Uncontrollable Anger",
@@ -517,6 +524,25 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayLootEvidenceDefinition(112863, 112864, 13, 1, 4, 2500),
                     new CapturedSubwayLootEvidenceDefinition(234877, 234877, 1, 1, 4, 2500),
                     new CapturedSubwayLootEvidenceDefinition(290619, 202727, 19, 1, 4, 2500)
+                }),
+            new CapturedSubwayStrictLootProfileDefinition(
+                "Premature Pattern",
+                203727,
+                5,
+                4,
+                1,
+                false,
+                new string[]
+                {
+                    "20260720-051714"
+                },
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(26541, 26541, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(85590, 27396, 17, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(234877, 234877, 1, 2, 5, 4000),
+                    new CapturedSubwayLootEvidenceDefinition(301711, 301711, 1, 1, 5, 2000)
                 }),
             new CapturedSubwayStrictLootProfileDefinition(
                 "Incomplete Rebuild",
@@ -577,6 +603,27 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayLootEvidenceDefinition(123021, 123021, 21, 1, 6, 1667),
                     new CapturedSubwayLootEvidenceDefinition(124409, 124410, 18, 1, 6, 1667),
                     new CapturedSubwayLootEvidenceDefinition(124560, 124561, 16, 1, 6, 1667)
+                }),
+            new CapturedSubwayStrictLootProfileDefinition(
+                "Empty Shell",
+                203731,
+                5,
+                4,
+                1,
+                false,
+                new string[]
+                {
+                    "20260720-051714"
+                },
+                new CapturedSubwayLootEvidenceDefinition[]
+                {
+                    new CapturedSubwayLootEvidenceDefinition(26541, 26541, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(27263, 27263, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(122850, 122851, 23, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(124505, 124506, 21, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(128916, 128917, 18, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(163426, 163427, 17, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(301711, 301711, 1, 1, 5, 2000)
                 }),
             new CapturedSubwayStrictLootProfileDefinition(
                 "Violent Vagabond",
@@ -1322,22 +1369,24 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    false,
+                    true,
                     11,
-                    11,
-                    0.000000,
+                    15,
+                    5.000000,
                     0,
                     0,
                     1397315377,
-                    1),
+                    2),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(101695, 101696, 24, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(109194, 109195, 12, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(112823, 112824, 17, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 12, 1, 5, 2000),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 13, 1, 5, 2000)
+                    new CapturedSubwayLootEvidenceDefinition(101695, 101696, 24, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(109194, 109195, 12, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(112560, 112561, 27, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(112823, 112824, 17, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(202727, 202728, 25, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 12, 1, 6, 1667),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 13, 1, 6, 1667)
                 },
                 new CapturedSubwayLootOutcomeEvidenceDefinition[]
                 {
@@ -1346,7 +1395,9 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260709-220439", "2026-07-10T03:13:47.740262Z", "(Corpse:00F6E002)", "(SimpleChar:7953AA32)", 96056, 12557, 1, 112823, 112824, 17),
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260709-225408", "2026-07-10T04:04:32.692834Z", "(Corpse:00F6E023)", "(SimpleChar:795451AC)", 96056, 15073, 0, 234875, 234875, 1),
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260709-225408", "2026-07-10T04:04:32.692834Z", "(Corpse:00F6E023)", "(SimpleChar:795451AC)", 96056, 15073, 1, 101695, 101696, 24),
-                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-033749", "2026-07-20T08:38:25.965224Z", "(Corpse:00F74006)", "(SimpleChar:798033F3)", 96056, 476, 0, 290619, 202727, 13)
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-033749", "2026-07-20T08:38:25.965224Z", "(Corpse:00F74006)", "(SimpleChar:798033F3)", 96056, 476, 0, 290619, 202727, 13),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:27:32.520797Z", "(Corpse:00F74005)", "(SimpleChar:7980F0F8)", 96056, 10058, 0, 202727, 202728, 25),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:27:32.520797Z", "(Corpse:00F74005)", "(SimpleChar:7980F0F8)", 96056, 10058, 1, 112560, 112561, 27)
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
@@ -1356,7 +1407,8 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-220439", "2026-07-10T03:13:43.3390132Z", "(Corpse:00F6E002)", "(SimpleChar:7953AA32)", 15, 96056, 96024, 19),
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T03:56:03.0128144Z", "(Corpse:00F6E005)", "(SimpleChar:79545319)", 12, 96056, 96024, 15),
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T04:02:56.6662429Z", "(Corpse:00F6E023)", "(SimpleChar:795451AC)", 23, 96056, 96024, 29),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260720-033749", "2026-07-20T08:38:22.6848225Z", "(Corpse:00F74006)", "(SimpleChar:798033F3)", 12, 96056, 96024, 15)
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-033749", "2026-07-20T08:38:22.6848225Z", "(Corpse:00F74006)", "(SimpleChar:798033F3)", 12, 96056, 96024, 15),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:27:30.4392602Z", "(Corpse:00F74005)", "(SimpleChar:7980F0F8)", 22, 96056, 96024, 28)
                 },
                 new string[]
                 {
@@ -1368,7 +1420,8 @@ namespace AORebirth.Core.Playfields
                     "20260710-211430",
                     "20260716-033326",
                     "20260716-034104",
-                    "20260720-033749"
+                    "20260720-033749",
+                    "20260720-051714"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "slum_runner",
@@ -1708,25 +1761,28 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    false,
+                    true,
                     14,
-                    14,
-                    0.000000,
+                    19,
+                    5.428348,
                     0,
                     0,
                     1397315377,
-                    2),
+                    9),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(101675, 101676, 25, 1, 3, 3333),
-                    new CapturedSubwayLootEvidenceDefinition(111347, 111348, 21, 1, 3, 3333),
-                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 19, 1, 3, 3333)
+                    new CapturedSubwayLootEvidenceDefinition(101675, 101676, 25, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(111347, 111348, 21, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(290619, 202727, 19, 1, 5, 2000)
                 },
                 new CapturedSubwayLootOutcomeEvidenceDefinition[]
                 {
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260709-225408", "2026-07-10T04:02:45.868434Z", "(Corpse:00F6E002)", "(SimpleChar:795451C0)", 96193, 12282, 0, 101675, 101676, 25),
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:48:53.701277Z", "(Corpse:00F74003)", "(SimpleChar:798036C7)", 96193, 2062, 0, 111347, 111348, 21),
-                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:48:54.814792Z", "(Corpse:00F7400B)", "(SimpleChar:798037EF)", 96193, 2075, 0, 290619, 202727, 19)
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:48:54.814792Z", "(Corpse:00F7400B)", "(SimpleChar:798037EF)", 96193, 2075, 0, 290619, 202727, 19),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:26:38.034683Z", "(Corpse:00F74004)", "(SimpleChar:7980F0F4)", 96193, 9324, 0, 26471, 26471, 14),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:26:38.034683Z", "(Corpse:00F74004)", "(SimpleChar:7980F0F4)", 96193, 9324, 1, 85562, 85561, 24),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:26:38.034683Z", "(Corpse:00F74004)", "(SimpleChar:7980F0F4)", 96193, 9324, 2, 301718, 301718, 1)
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
@@ -1735,7 +1791,9 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T04:02:33.8281797Z", "(Corpse:00F6E002)", "(SimpleChar:795451C0)", 21, 96193, 96179, 26),
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T04:02:43.0439879Z", "(Corpse:00F6E022)", "(SimpleChar:795451B7)", 22, 96193, 96179, 28),
                     new CapturedSubwayCorpseEvidenceDefinition("20260720-044610", "2026-07-20T09:48:03.4204883Z", "(Corpse:00F74003)", "(SimpleChar:798036C7)", 18, 96193, 96179, 23),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260720-044610", "2026-07-20T09:48:28.8121114Z", "(Corpse:00F7400B)", "(SimpleChar:798037EF)", 19, 96193, 96179, 24)
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-044610", "2026-07-20T09:48:28.8121114Z", "(Corpse:00F7400B)", "(SimpleChar:798037EF)", 19, 96193, 96179, 24),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:26:25.7591027Z", "(Corpse:00F74004)", "(SimpleChar:7980F0F4)", 22, 96193, 96179, 28),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:27:15.2623098Z", "(Corpse:00F74005)", "(SimpleChar:7980F0FC)", 21, 96193, 96179, 26)
                 },
                 new string[]
                 {
@@ -1744,7 +1802,8 @@ namespace AORebirth.Core.Playfields
                     "20260709-225408",
                     "20260710-211430",
                     "20260716-034104",
-                    "20260720-044610"
+                    "20260720-044610",
+                    "20260720-051714"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "neural_burnout",
@@ -1974,31 +2033,56 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    false,
+                    true,
                     15,
-                    15,
-                    0.000000,
+                    18,
+                    5.000000,
                     0,
                     0,
                     1397315377,
-                    1),
+                    4),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
+                    new CapturedSubwayLootEvidenceDefinition(26541, 26541, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(27263, 27263, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(122850, 122851, 23, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(124505, 124506, 21, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(128916, 128917, 18, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(163426, 163427, 17, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(301711, 301711, 1, 1, 5, 2000)
                 },
                 new CapturedSubwayLootOutcomeEvidenceDefinition[]
                 {
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:21:12.826516Z", "(Corpse:00F74016)", "(SimpleChar:7980F12E)", 203731, 4663, 0, 122850, 122851, 23),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:21:40.091681Z", "(Corpse:00F7400A)", "(SimpleChar:7980F128)", 203731, 5147, 0, 163426, 163427, 17),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:21:57.344264Z", "(Corpse:00F74003)", "(SimpleChar:7980F12A)", 203731, 5487, 0, 26503, 26503, 14),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:21:57.344264Z", "(Corpse:00F74003)", "(SimpleChar:7980F12A)", 203731, 5487, 1, 122275, 122276, 23),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:22:24.019809Z", "(Corpse:00F7400B)", "(SimpleChar:7980F114)", 203731, 5960, 0, 26541, 26541, 10),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:22:24.019809Z", "(Corpse:00F7400B)", "(SimpleChar:7980F114)", 203731, 5960, 1, 128916, 128917, 18),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:22:24.019809Z", "(Corpse:00F7400B)", "(SimpleChar:7980F114)", 203731, 5960, 2, 301711, 301711, 1),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:23:01.795812Z", "(Corpse:00F74004)", "(SimpleChar:7980F11B)", 203731, 6472, 0, 27263, 27263, 10),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:23:01.795812Z", "(Corpse:00F74004)", "(SimpleChar:7980F11B)", 203731, 6472, 1, 124505, 124506, 21),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:30:31.129810Z", "(Corpse:00F7400F)", "(SimpleChar:7980F141)", 203731, 13059, 0, 234874, 234874, 1),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:30:31.129810Z", "(Corpse:00F7400F)", "(SimpleChar:7980F141)", 203731, 13059, 1, 128741, 128742, 26)
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
                     new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T03:59:43.9712983Z", "(Corpse:00F6E008)", "(SimpleChar:7954519B)", 21, 203731, 5941, 131),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T03:59:50.7870978Z", "(Corpse:00F6E00F)", "(SimpleChar:79545179)", 19, 203731, 5941, 118)
+                    new CapturedSubwayCorpseEvidenceDefinition("20260709-225408", "2026-07-10T03:59:50.7870978Z", "(Corpse:00F6E00F)", "(SimpleChar:79545179)", 19, 203731, 5941, 118),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:21:06.8762041Z", "(Corpse:00F74016)", "(SimpleChar:7980F12E)", 19, 203731, 5941, 118),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:21:29.9296943Z", "(Corpse:00F7400A)", "(SimpleChar:7980F128)", 17, 203731, 5941, 105),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:21:34.0452494Z", "(Corpse:00F74003)", "(SimpleChar:7980F12A)", 19, 203731, 5941, 118),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:22:18.1768972Z", "(Corpse:00F7400B)", "(SimpleChar:7980F114)", 21, 203731, 5941, 131),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:22:55.8362037Z", "(Corpse:00F74004)", "(SimpleChar:7980F11B)", 20, 203731, 5941, 124),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:23:16.7739603Z", "(Corpse:00F7400F)", "(SimpleChar:7980F141)", 21, 203731, 5941, 131)
                 },
                 new string[]
                 {
                     "20260709-222339",
                     "20260709-225408",
                     "20260716-033326",
-                    "20260716-034104"
+                    "20260716-034104",
+                    "20260720-051714"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "fragmented_soul",
@@ -2348,25 +2432,33 @@ namespace AORebirth.Core.Playfields
                 },
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
-                    false,
+                    true,
                     17,
                     22,
-                    0.000000,
+                    5.000000,
                     0,
                     0,
                     1397315377,
-                    2),
+                    3),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(26503, 26503, 14, 1, 1, 10000),
-                    new CapturedSubwayLootEvidenceDefinition(122216, 122217, 14, 1, 1, 10000),
-                    new CapturedSubwayLootEvidenceDefinition(204396, 204396, 20, 1, 1, 10000)
+                    new CapturedSubwayLootEvidenceDefinition(26541, 26541, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(85590, 27396, 17, 1, 5, 2000),
+                    new CapturedSubwayLootEvidenceDefinition(234877, 234877, 1, 2, 5, 4000),
+                    new CapturedSubwayLootEvidenceDefinition(301711, 301711, 1, 1, 5, 2000)
                 },
                 new CapturedSubwayLootOutcomeEvidenceDefinition[]
                 {
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:46:57.181417Z", "(Corpse:00F74004)", "(SimpleChar:7980F0BA)", 203727, 681, 0, 204396, 204396, 20),
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:46:57.181417Z", "(Corpse:00F74004)", "(SimpleChar:7980F0BA)", 203727, 681, 1, 26503, 26503, 14),
-                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:46:57.181417Z", "(Corpse:00F74004)", "(SimpleChar:7980F0BA)", 203727, 681, 2, 122216, 122217, 14)
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-044610", "2026-07-20T09:46:57.181417Z", "(Corpse:00F74004)", "(SimpleChar:7980F0BA)", 203727, 681, 2, 122216, 122217, 14),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:19:11.549856Z", "(Corpse:00F74008)", "(SimpleChar:7980F121)", 203727, 2269, 0, 301711, 301711, 1),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:19:24.047827Z", "(Corpse:00F7400D)", "(SimpleChar:7980F0B7)", 203727, 2514, 0, 234877, 234877, 1),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:19:24.047827Z", "(Corpse:00F7400D)", "(SimpleChar:7980F0B7)", 203727, 2514, 1, 27199, 27199, 10),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:19:24.047827Z", "(Corpse:00F7400D)", "(SimpleChar:7980F0B7)", 203727, 2514, 2, 85590, 27396, 17),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:19:42.029142Z", "(Corpse:00F74010)", "(SimpleChar:7980F140)", 203727, 2951, 0, 234877, 234877, 1),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-051714", "2026-07-20T10:19:46.226732Z", "(Corpse:00F74011)", "(SimpleChar:7980F142)", 203727, 3044, 0, 26541, 26541, 10)
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
@@ -2374,7 +2466,13 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayCorpseEvidenceDefinition("20260712-223719", "2026-07-13T03:37:53.5679637Z", "(Corpse:00F6C001)", "(SimpleChar:795F9516)", 23, 203727, 5941, 144),
                     new CapturedSubwayCorpseEvidenceDefinition("20260712-224608", "2026-07-13T03:47:23.8937503Z", "(Corpse:00F6C004)", "(SimpleChar:796079C3)", 18, 203727, 5941, 111),
                     new CapturedSubwayCorpseEvidenceDefinition("20260716-215947", "2026-07-17T03:01:36.7896724Z", "(Corpse:00F69009)", "(SimpleChar:79702236)", 23, 203727, 5941, 144),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260720-044610", "2026-07-20T09:46:52.6873088Z", "(Corpse:00F74004)", "(SimpleChar:7980F0BA)", 18, 203727, 5941, 111)
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-044610", "2026-07-20T09:46:52.6873088Z", "(Corpse:00F74004)", "(SimpleChar:7980F0BA)", 18, 203727, 5941, 111),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:18:42.1265709Z", "(Corpse:00F74008)", "(SimpleChar:7980F0BB)", 18, 203727, 5941, 111),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:19:08.3020205Z", "(Corpse:00F74008)", "(SimpleChar:7980F121)", 18, 203727, 5941, 111),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:19:17.0142689Z", "(Corpse:00F7400D)", "(SimpleChar:7980F0B7)", 19, 203727, 5941, 118),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:19:36.2167158Z", "(Corpse:00F74010)", "(SimpleChar:7980F140)", 18, 203727, 5941, 111),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:19:43.2766710Z", "(Corpse:00F74011)", "(SimpleChar:7980F142)", 16, 203727, 5941, 98),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-051714", "2026-07-20T10:31:02.1783624Z", "(Corpse:00F74006)", "(SimpleChar:79803723)", 22, 203727, 5941, 137)
                 },
                 new string[]
                 {
@@ -2388,7 +2486,8 @@ namespace AORebirth.Core.Playfields
                     "20260716-033326",
                     "20260716-034104",
                     "20260716-215947",
-                    "20260720-044610"
+                    "20260720-044610",
+                    "20260720-051714"
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "redundant_scan",
