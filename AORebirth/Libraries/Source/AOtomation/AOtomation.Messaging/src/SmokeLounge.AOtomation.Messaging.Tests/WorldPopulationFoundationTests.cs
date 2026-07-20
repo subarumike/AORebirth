@@ -453,38 +453,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "private-project playability policy"));
             Assert.IsTrue(violentVagabond.Combat.Contract.Evidence.Contains("Red Wine"));
 
-            var reportOnlyCombatExpectations = new[]
+            var promotedCombatExpectations = new[]
                 {
-                    new { Name = "Empty Shell", Observed = true, RuntimeReady = false, MinDamage = 15, MaxDamage = 15, ObservedRows = 1 },
-                    new { Name = "Infected Attendant", Observed = true, RuntimeReady = false, MinDamage = 11, MaxDamage = 11, ObservedRows = 1 },
-                    new { Name = "Lost Thought", Observed = true, RuntimeReady = false, MinDamage = 14, MaxDamage = 14, ObservedRows = 2 },
-                    new { Name = "Premature Pattern", Observed = true, RuntimeReady = false, MinDamage = 17, MaxDamage = 22, ObservedRows = 2 }
+                    new { Name = "Empty Shell", MinDamage = 15, MaxDamage = 18, ObservedRows = 4, RechargeSeconds = 5.0 },
+                    new { Name = "Infected Attendant", MinDamage = 11, MaxDamage = 15, ObservedRows = 2, RechargeSeconds = 5.0 },
+                    new { Name = "Lost Thought", MinDamage = 14, MaxDamage = 19, ObservedRows = 9, RechargeSeconds = 5.428348 },
+                    new { Name = "Premature Pattern", MinDamage = 17, MaxDamage = 22, ObservedRows = 3, RechargeSeconds = 5.0 }
                 };
-            foreach (var expected in reportOnlyCombatExpectations)
+            foreach (var expected in promotedCombatExpectations)
             {
                 CapturedSubwayOrdinaryArchetypeDefinition archetype = ordinaryContent
                     .GetArchetypes()
                     .Single(value => value.Name == expected.Name);
-                OrdinaryEnemyProfile reportOnlyProfile = profiles.Single(
+                OrdinaryEnemyProfile profile = profiles.Single(
                     value => value.DisplayName == expected.Name);
-                Assert.AreEqual(expected.Observed, archetype.Combat.Observed, expected.Name);
-                Assert.AreEqual(expected.RuntimeReady, archetype.Combat.RuntimeReady, expected.Name);
+                Assert.IsTrue(archetype.Combat.Observed, expected.Name);
+                Assert.IsTrue(archetype.Combat.RuntimeReady, expected.Name);
                 Assert.AreEqual(expected.MinDamage, archetype.Combat.MinDamage, expected.Name);
                 Assert.AreEqual(expected.MaxDamage, archetype.Combat.MaxDamage, expected.Name);
                 Assert.AreEqual(expected.ObservedRows, archetype.Combat.ObservedRows, expected.Name);
-                Assert.AreEqual(
-                    expected.Observed
-                        ? OrdinaryEnemyEvidenceState.Observed
-                        : OrdinaryEnemyEvidenceState.Unresolved,
-                    reportOnlyProfile.Combat.EvidenceState,
-                    expected.Name);
-                Assert.IsFalse(
-                    reportOnlyProfile.Combat.Contract.IsCombatReady,
-                    expected.Name
-                    + " must not promote incomplete evidence to fixed runtime combat; model="
-                    + reportOnlyProfile.Combat.Contract.AttackModel
-                    + "; evidence="
-                    + reportOnlyProfile.Combat.Contract.Evidence);
+                Assert.AreEqual(expected.RechargeSeconds, archetype.Combat.RechargeSeconds, expected.Name);
+                Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, profile.Combat.EvidenceState, expected.Name);
+                Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, profile.Combat.Contract.AttackModel, expected.Name);
+                Assert.IsTrue(profile.Combat.Contract.IsCombatReady, expected.Name);
             }
 
             Assert.AreEqual(24, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Slum Runner"));

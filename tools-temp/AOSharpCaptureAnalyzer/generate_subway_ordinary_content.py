@@ -44,6 +44,7 @@ CAPTURES = (
     "20260720-043018",
     "20260720-044358",
     "20260720-044610",
+    "20260720-051714",
 )
 SPAWN_CAPTURES = (
     "20260709-212336",
@@ -92,6 +93,9 @@ CAPTURE_ARCHETYPE_FILTERS = {
             "Slum Runner",
             "Uncontrollable Anger",
         )
+    ),
+    "20260720-051714": frozenset(
+        ("Empty Shell", "Infected Attendant", "Lost Thought", "Premature Pattern")
     ),
 }
 CAPTURE_IDENTITY_NAME_OVERRIDES = {
@@ -253,11 +257,14 @@ SUPPORTED_SOURCE_WEAPON_MONSTER_DATA = {
     "Mugger": 203734,
 }
 NON_COMBAT_HELD_ITEM_TEMPLATES = frozenset({130590})
-RUNTIME_INCOMPLETE_FIXED_COMBAT = {
-    "Empty Shell": 1,
-    "Infected Attendant": 1,
-    "Lost Thought": 2,
-    "Premature Pattern": 2,
+RUNTIME_POLICY_FIXED_COMBAT_RECHARGE = {
+    # These profiles now have multiple capture-backed local-player damage
+    # outcomes but no trustworthy same-source landed-hit interval. Keep the
+    # observed damage rolls and use one explicit shared private-server cadence
+    # instead of the unrelated global two-second fallback.
+    "Empty Shell": 5.0,
+    "Infected Attendant": 5.0,
+    "Premature Pattern": 5.0,
 }
 
 # Reviewed complete SCFU + owner WeaponItemFullUpdate pairs for every safe
@@ -971,9 +978,10 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 "20260709-220439": 3,
                 "20260709-225408": 1,
                 "20260720-033749": 1,
+                "20260720-051714": 1,
             },
+            6,
             5,
-            4,
             1,
             "fdb5d85aaf0db8316be5a969b4e8f759ea1cd1ae71080ecd0688579b487314b0",
             {
@@ -983,6 +991,8 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
                 (234875, 234875, 1): 1,
                 (290619, 202727, 12): 1,
                 (290619, 202727, 13): 1,
+                (202727, 202728, 25): 1,
+                (112560, 112561, 27): 1,
             },
         ),
         "Fragmented Soul": reviewed_strict_loot_definition(
@@ -1064,15 +1074,49 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
         "Lost Thought": reviewed_strict_loot_definition(
             96193,
             ("20260709-225408",),
-            {"20260709-225408": 1, "20260720-044610": 2},
+            {"20260709-225408": 1, "20260720-044610": 2, "20260720-051714": 2},
+            5,
             3,
-            3,
-            0,
+            2,
             "6b2e02b3c2587fdfebf627159930d52fbd2e66855f6c173e6569e8aba2dd20ad",
             {
                 (101675, 101676, 25): 1,
                 (111347, 111348, 21): 1,
                 (290619, 202727, 19): 1,
+            },
+        ),
+        "Empty Shell": reviewed_strict_loot_definition(
+            203731,
+            (),
+            {"20260720-051714": 5},
+            5,
+            4,
+            1,
+            "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            {
+                (122850, 122851, 23): 1,
+                (163426, 163427, 17): 1,
+                (26541, 26541, 10): 1,
+                (128916, 128917, 18): 1,
+                (301711, 301711, 1): 1,
+                (27263, 27263, 10): 1,
+                (124505, 124506, 21): 1,
+            },
+        ),
+        "Premature Pattern": reviewed_strict_loot_definition(
+            203727,
+            (),
+            {"20260720-051714": 5},
+            5,
+            4,
+            1,
+            "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            {
+                (301711, 301711, 1): 1,
+                (234877, 234877, 1): 2,
+                (27199, 27199, 10): 1,
+                (85590, 27396, 17): 1,
+                (26541, 26541, 10): 1,
             },
         ),
         "Neural Burnout": reviewed_strict_loot_definition(
@@ -1136,6 +1180,8 @@ REVIEWED_DIRECT_STRICT_LOOT_GENERATIONS = {
     "Lost Thought": (
         ("20260720-044610", "2026-07-20T09:48:53.7012774Z", "(Corpse:00F74003)", "(SimpleChar:798036C7)", 96193, 18, 23, ((111347, 111348, 21),)),
         ("20260720-044610", "2026-07-20T09:48:54.8147921Z", "(Corpse:00F7400B)", "(SimpleChar:798037EF)", 96193, 19, 24, ((290619, 202727, 19),)),
+        ("20260720-051714", "2026-07-20T10:26:27.5126201Z", "(Corpse:00F74004)", "(SimpleChar:7980F0F4)", 96193, 22, 28, ()),
+        ("20260720-051714", "2026-07-20T10:27:17.5384581Z", "(Corpse:00F74005)", "(SimpleChar:7980F0FC)", 96193, 21, 26, ()),
     ),
     "Neural Burnout": (
         ("20260720-044610", "2026-07-20T09:47:26.1169329Z", "(Corpse:00F7400D)", "(SimpleChar:798036C0)", 203730, 17, 105, ((124409, 124410, 18),)),
@@ -1143,6 +1189,23 @@ REVIEWED_DIRECT_STRICT_LOOT_GENERATIONS = {
     ),
     "Uncontrollable Anger": (
         ("20260720-044610", "2026-07-20T09:47:08.0281549Z", "(Corpse:00F74004)", "(SimpleChar:798036BE)", 96195, 19, 24, ((234877, 234877, 1),)),
+    ),
+    "Empty Shell": (
+        ("20260720-051714", "2026-07-20T10:21:12.8265166Z", "(Corpse:00F74016)", "(SimpleChar:7980F12E)", 203731, 19, 118, ((122850, 122851, 23),)),
+        ("20260720-051714", "2026-07-20T10:21:36.9667784Z", "(Corpse:00F74003)", "(SimpleChar:7980F12A)", 203731, 19, 118, ()),
+        ("20260720-051714", "2026-07-20T10:21:40.0916819Z", "(Corpse:00F7400A)", "(SimpleChar:7980F128)", 203731, 17, 105, ((163426, 163427, 17),)),
+        ("20260720-051714", "2026-07-20T10:22:24.0198094Z", "(Corpse:00F7400B)", "(SimpleChar:7980F114)", 203731, 21, 131, ((26541, 26541, 10), (128916, 128917, 18), (301711, 301711, 1))),
+        ("20260720-051714", "2026-07-20T10:23:01.7958124Z", "(Corpse:00F74004)", "(SimpleChar:7980F11B)", 203731, 20, 124, ((27263, 27263, 10), (124505, 124506, 21))),
+    ),
+    "Premature Pattern": (
+        ("20260720-051714", "2026-07-20T10:18:49.0871105Z", "(Corpse:00F74008)", "(SimpleChar:7980F0BB)", 203727, 18, 111, ()),
+        ("20260720-051714", "2026-07-20T10:19:11.5498568Z", "(Corpse:00F74008)", "(SimpleChar:7980F121)", 203727, 18, 111, ((301711, 301711, 1),)),
+        ("20260720-051714", "2026-07-20T10:19:24.0478279Z", "(Corpse:00F7400D)", "(SimpleChar:7980F0B7)", 203727, 19, 118, ((234877, 234877, 1), (27199, 27199, 10), (85590, 27396, 17))),
+        ("20260720-051714", "2026-07-20T10:19:42.0291426Z", "(Corpse:00F74010)", "(SimpleChar:7980F140)", 203727, 18, 111, ((234877, 234877, 1),)),
+        ("20260720-051714", "2026-07-20T10:19:46.2267325Z", "(Corpse:00F74011)", "(SimpleChar:7980F142)", 203727, 16, 98, ((26541, 26541, 10),)),
+    ),
+    "Infected Attendant": (
+        ("20260720-051714", "2026-07-20T10:27:32.5207976Z", "(Corpse:00F74005)", "(SimpleChar:7980F0F8)", 96056, 22, 28, ((202727, 202728, 25), (112560, 112561, 27))),
     ),
 }
 CAPTURE_CORPSE_EVIDENCE_FILTERS = {
@@ -1309,6 +1372,9 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
             "Slum Runner",
             "Uncontrollable Anger",
         )
+    ),
+    "20260720-051714": frozenset(
+        ("Empty Shell", "Infected Attendant", "Lost Thought", "Premature Pattern")
     ),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
@@ -3315,10 +3381,11 @@ def combat_profiles() -> dict[str, dict[str, object]]:
         recharge = intervals[(len(intervals) - 1) // 2] if intervals else None
         if name == "Uncontrollable Anger":
             recharge = uncontrollable_anger_recharge
+        if recharge is None and name in RUNTIME_POLICY_FIXED_COMBAT_RECHARGE:
+            recharge = RUNTIME_POLICY_FIXED_COMBAT_RECHARGE[name]
         result[name] = {
             "observed": bool(normal_rows),
-            "runtimeReady": bool(normal_rows)
-            and name not in RUNTIME_INCOMPLETE_FIXED_COMBAT,
+            "runtimeReady": bool(normal_rows),
             "min": min((row["amount"] for row in normal_rows), default=None),
             "max": max((row["amount"] for row in normal_rows), default=None),
             "recharge": recharge,
@@ -4527,15 +4594,14 @@ def validate_content(
             for field in ("min", "max", "recharge", "slot", "unknown", "instance")
         ):
             raise ValueError("unobserved combat contains invented values: " + name)
-    for name, expected_rows in RUNTIME_INCOMPLETE_FIXED_COMBAT.items():
+    for name, expected_recharge in RUNTIME_POLICY_FIXED_COMBAT_RECHARGE.items():
         evidence = combat[name]
         if (
             not evidence["observed"]
-            or evidence["runtimeReady"]
-            or evidence["rows"] != expected_rows
-            or evidence["recharge"] is not None
+            or not evidence["runtimeReady"]
+            or evidence["recharge"] != expected_recharge
         ):
-            raise ValueError(name + " incomplete fixed-combat boundary drifted")
+            raise ValueError(name + " fixed-combat cadence policy drifted")
 
     expected_level_credits = {
         "Architect Striker": Counter(
@@ -4549,7 +4615,9 @@ def validate_content(
         "Disobedient Bot": Counter(
             {(5, 6): 2, (6, 8): 3, (8, 10): 4, (9, 11): 3, (10, 12): 2}
         ),
-        "Empty Shell": Counter({(19, 118): 1, (21, 131): 1}),
+        "Empty Shell": Counter(
+            {(17, 105): 1, (19, 118): 3, (20, 124): 1, (21, 131): 3}
+        ),
         "Filth Flea": Counter(
             {
                 (4, 23): 9,
@@ -4574,7 +4642,7 @@ def validate_content(
             {(17, 105): 1, (18, 111): 1, (19, 118): 3, (21, 131): 2}
         ),
         "Infected Attendant": Counter(
-            {(11, 14): 2, (12, 15): 3, (15, 19): 1, (23, 29): 1}
+            {(11, 14): 2, (12, 15): 3, (15, 19): 1, (22, 28): 1, (23, 29): 1}
         ),
         "Infector": Counter(
             {
@@ -4592,8 +4660,8 @@ def validate_content(
                 (16, 20): 1,
                 (18, 23): 2,
                 (19, 24): 1,
-                (21, 26): 1,
-                (22, 28): 1,
+                (21, 26): 2,
+                (22, 28): 2,
             }
         ),
         "Melded Patterns": Counter(
@@ -4621,7 +4689,14 @@ def validate_content(
             }
         ),
         "Premature Pattern": Counter(
-            {(17, 105): 1, (18, 111): 2, (23, 144): 2}
+            {
+                (16, 98): 1,
+                (17, 105): 1,
+                (18, 111): 5,
+                (19, 118): 1,
+                (22, 137): 1,
+                (23, 144): 2,
+            }
         ),
         "Redundant Scan": Counter(
             {(19, 118): 1, (20, 124): 1, (21, 131): 1, (22, 137): 1}
@@ -4714,7 +4789,13 @@ def validate_content(
         records = corpses[name]
         actual = Counter((row["enemyLevel"], row["credits"]) for row in records)
         if actual != expected:
-            raise ValueError(name + " level-credit corpse evidence drifted")
+            raise ValueError(
+                name
+                + " level-credit corpse evidence drifted actual="
+                + repr(actual)
+                + " expected="
+                + repr(expected)
+            )
         if {row["monsterData"] for row in records} != {
             EXPECTED_CORPSE_MONSTER_DATA[name]
         }:

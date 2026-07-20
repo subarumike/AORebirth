@@ -21,7 +21,16 @@ combat, movement/aggro/leash, loot membership, or appearance evidence.
 
 The finalized `20260720-051714` whole-subway survey adds no new ordinary
 hostile archetype; its Bureaucrat Worker and Wrath Incarnation rows are
-player-owned pets. Vergil follow-up `20260720-053542` records a normal `22..25`
+player-owned pets. Its exact identity-linked evidence is now promoted for the
+four remaining ordinary profiles: Infected Attendant adds a second local hit
+and a sixth strict first-open sample; Lost Thought adds seven local hits and two
+empty first opens; Empty Shell adds three normal hits, one critical, five
+strict first opens, and six credit corpses; Premature Pattern adds a third
+normal hit, five strict first opens, and six credit corpses. All 26 ordinary
+profiles now have runtime combat and loot tables. Lost Thought uses its observed
+`5.428348`-second cadence; Infected Attendant, Empty Shell, and Premature Pattern
+use an explicit five-second private-server cadence pending bounded playability
+validation. Vergil follow-up `20260720-053542` records a normal `22..25`
 weapon roll and one `54` critical. Abmouth follow-up `20260720-053802` proves
 the one-per-fight nano `286237` player/pet warp and is now implemented in the
 named encounter runtime. See
@@ -71,10 +80,12 @@ named encounter runtime. See
   credit corpses, and two atomic positive loot outcomes. QL17 versus QL19 weapon
   selection, respawn, leash/reset, exact aggro threshold, and loot-bearing
   lifetime remain unresolved and are not guessed.
-- Ordinary generation/check, combat-report generation, WorldPopulation
-  `39/39`, Subway loot `22/22`, the accepted whole-enemy gate, and the Debug
-  build pass. Chat, Login, and Zone were restarted on ports `6996`, `7012`,
-  `7500`, and `7501`; no AO client was launched.
+- Ordinary generation/check, combat-report generation, Subway loot `22/22`,
+  the focused promoted-profile test, and the Debug build pass. WorldPopulation
+  is `38/39`; its only failure is the pre-existing Workman source
+  `0x7953A84F` atomic weapon-resolution guard. Chat, Login, and Zone were
+  restarted on ports `6996`, `7012`, `7500`, and `7501`; no AO client was
+  launched.
 
 ## Subway Tailor and vendors (2026-07-19)
 
@@ -473,18 +484,18 @@ named encounter runtime. See
   Incidental Mugger evidence adds one miss and SIW context without changing
   the captured Mugger landed-damage range. This capture proves neither respawn
   timing nor corpse lifetime.
-- One reusable reviewed first-open validator now owns 18 strict item tables.
+- One reusable reviewed first-open validator now owns 20 strict item tables.
   In addition to Shadow, ordinary Infector, Architect Striker, and Melded
   Patterns, it recovers Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend
   `13/0`, Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected
-  Attendant `5/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete
-  Rebuild `2/0`, Redundant Scan `2/1`, Uncontrollable Anger `3/0`, Lost Thought
-  `1/0`, and Neural Burnout `4/2`. Exact source/allocation allowlists and
+  Attendant `6/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete
+  Rebuild `2/0`, Redundant Scan `2/1`, Uncontrollable Anger `4/0`, Lost Thought
+  `5/2`, Neural Burnout `6/2`, Empty Shell `5/1`, and Premature Pattern `5/1`.
+  Exact source/allocation allowlists and
   generation fingerprints fail closed; declared overlaps deduplicate, while
   unopened and snapshot-only corpses remain excluded. Generated summary
   metadata drives `IndependentEntries`, observed empty counts, and
-  `ItemPoolComplete=false` without a catalog MonsterData hardcode list. Empty
-  Shell and Premature Pattern still have no item table.
+  `ItemPoolComplete=false` without a catalog MonsterData hardcode list.
 - Shadow, ordinary Infector, Architect Striker, and Melded Patterns are now the
   sixth through ninth accepted ordinary profiles. Coverage binds their exact
   spawns, appearance, capture-backed normal combat, shared chase, strict
@@ -589,17 +600,19 @@ named encounter runtime. See
   regeneration: PASS.
 - Current inventory/content-ledger regression suites: `27/27` PASS.
 - Subway loot/corpse evidence: `22/22` PASS.
-- Twenty-one-profile whole-enemy gate now includes Discarded Pet, Fragmented Soul,
-  Redundant Scan, and Incomplete Rebuild after Deranged Shopper, Mugger, Looter,
-  Bloodcreeper, Stim Fiend, and Neural Burnout
-  joined the previously confirmed ten. Ordinary generation check, expanded
-  gate, WorldPopulation `39/39`, and Subway loot `22/22` pass.
+- Twenty-six-profile whole-enemy gate now includes the five formerly incomplete
+  ordinary profiles after existing-corpus combat and strict-loot promotion.
+  Ordinary generation check, expanded
+  gate-focused profile checks and Subway loot `22/22` pass. WorldPopulation is
+  `38/39` because of the existing Workman `0x7953A84F` atomic-generation
+  resolution failure.
 - Playfield lifecycle class: `56/63`; every Subway and ordinary-enemy test
   passes. The seven remaining failures are the existing session lifecycle,
   teleport sequencing, and visibility ownership guardrails outside this slice.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
-- World population foundation: `39/39` PASS.
+- World population foundation: `38/39`; only the existing Workman source
+  `0x7953A84F` atomic weapon-resolution guard fails.
 - Subway merchant/Tailor content: `6/6` PASS; dialogue bootstrap: `5/5` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
@@ -620,12 +633,13 @@ named encounter runtime. See
 
 ## Next Runtime Check
 
-The existing-corpus implementation pass for the five incomplete ordinary
-profiles is complete. Do not request duplicate captures for any evidence now
-indexed below. Their spawn, corpse, cleanup, and respawn lifecycle is resolved
-by the shared PF127 policy above. Remaining review is limited to the actual
-combat, movement/aggro/leash, and strict-loot evidence already present in the
-captures; missing per-archetype respawn observations are no longer blockers.
+The existing-corpus implementation pass for the five formerly incomplete
+ordinary profiles is complete. Do not request duplicate captures. The next
+check is a bounded private-client smoke of Infected Attendant, Lost Thought,
+Empty Shell, Premature Pattern, and Violent Vagabond: confirm they retaliate,
+chase, roll damage, leave reopenable loot corpses, and respawn under the shared
+PF127 policy. Exact official parity is not required for the three documented
+five-second cadence policies.
 
 ## Remaining Capture-Backed Work
 
@@ -636,19 +650,18 @@ captures; missing per-archetype respawn observations are no longer blockers.
    validation: 6 Stim Fiends, 5 Muggers, 2 Disobedient Bots, 2 Looters, and 1
    Deranged Shopper. All 322 ordinary population rows are active; none remain
    quarantined. The 22 Vagabonds require a private-client playability smoke.
-3. Five of the 26 ordinary profiles remain outside the whole-enemy accepted
-   set. Their 43 rows are active: Infected Attendant
-   `5/0`, Lost Thought `4/0`, Empty Shell `5/0`, Premature Pattern `7/0`, and
-   Violent Vagabond `22/0`. The combat report now separates every reviewed
-   target role: Infected retains one local `11` outcome plus local, other-player,
-   and pet attack starts; Lost retains 11 other-player hits at `15..20` with a
-   `4.5320703`-second median; Empty retains local `15`, two misses, other-player
-   `19`, and nanos `26414`, `81998`, and `82482`; Premature retains local normal
-   `22`, critical `41`, other-player `16`, and pet `38`. These incomplete
-   outcomes remain report-only instead of becoming constant fixed attacks.
-   Premature source `79545356` now has its two exact stat-only generations and
-   complete captured out-and-back patrol, but combat, strict loot, and
-   leash/reset remain incomplete. Self-cast nano `81829` remains
+3. All 26 ordinary profiles now pass the documented runtime-content boundary.
+   Their 43 formerly incomplete rows remain active: Infected Attendant `5/0`,
+   Lost Thought `4/0`, Empty Shell `5/0`, Premature Pattern `7/0`, and Violent
+   Vagabond `22/0`. Capture `20260720-051714` raises the local combat evidence
+   to Infected `2` normal hits at `11..15`, Lost `9` at `14..19`, Empty `4` at
+   `15..18` plus a report-only `38` critical, and Premature `3` at `17..22`
+   plus a report-only `41` critical. Lost retains its observed `5.428348`
+   cadence. Infected, Empty, and Premature use the explicit shared five-second
+   private cadence. Empty and Premature now each have strict `5/1 empty` loot;
+   Infected is `6/1` and Lost is `5/2`. Premature source `79545356` retains its
+   two exact stat-only generations and complete captured out-and-back patrol.
+   Self-cast nano `81829` remains
    report-only because current runtime support cannot safely represent its
    captured multi-effect/ChangeVariable behavior.
    Vagabond now has 26 distinct local misses after overlap deduplication, a
