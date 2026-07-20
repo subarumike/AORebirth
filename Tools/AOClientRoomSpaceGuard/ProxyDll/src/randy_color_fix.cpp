@@ -21,9 +21,8 @@ namespace
     uintptr_t DwordColorFaultAddress = 0;
     uintptr_t DwordColorResumeAddress = 0;
     uintptr_t GuiRenderBatchAddress = 0;
-    uintptr_t GuiConvertToScreenRectAddReturnAddress = 0;
+    uintptr_t GuiConvertToScreenNullRectResumeAddress = 0;
     uintptr_t GuiNullDynamicVbFaultAddress = 0;
-    uintptr_t UtilsRectAddNullFaultAddress = 0;
     uintptr_t GuiDynamicVbGetAddress = 0;
     uintptr_t GuiDynamicVbGetVbAddress = 0;
     uintptr_t GuiResetMaterialAddress = 0;
@@ -39,7 +38,6 @@ namespace
     LONG DriverDrawInputSkipCount = 0;
     LONG DriverDrawExceptionSkipCount = 0;
     LONG GuiBatchExceptionSkipCount = 0;
-    LONG GuiConvertToScreenNullRectRecoverCount = 0;
     LONG GuiTreeInvalidKeySkipCount = 0;
 
     constexpr uintptr_t RenderStateVectorStartRva = 0x25110;
@@ -1040,6 +1038,21 @@ namespace
         }
     }
 
+    __declspec(naked) void GuardedGuiConvertToScreenRectAddSetupThunk()
+    {
+        __asm
+        {
+            mov ecx, dword ptr [ebp + 0Ch]
+            test ecx, ecx
+            jnz hasScaledRect
+            lea ecx, [ebp - 58h]
+        hasScaledRect:
+            push eax
+            lea eax, [ebp - 48h]
+            jmp dword ptr [GuiConvertToScreenNullRectResumeAddress]
+        }
+    }
+
     __declspec(naked) void GuiTreeFindOriginalTrampoline()
     {
         __asm
@@ -1532,6 +1545,118 @@ namespace
         }
     }
 
+    bool PatchGuiConvertToScreenNullRect(uint8_t* entry)
+    {
+        constexpr uint8_t ExpectedSetup[] =
+        {
+            0x8B, 0x4D, 0x0C,
+            0x50,
+            0x8D, 0x45, 0xB8
+        };
+        if (std::memcmp(entry, ExpectedSetup, sizeof(ExpectedSetup)) != 0)
+        {
+            return false;
+        }
+
+        uint8_t patchedJump[sizeof(ExpectedSetup)] =
+        {
+            0xE9, 0, 0, 0, 0,
+            0x90, 0x90
+        };
+        uint32_t nextInstruction = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(entry + 5));
+        uint32_t destination = static_cast<uint32_t>(
+            reinterpret_cast<uintptr_t>(
+                &GuardedGuiConvertToScreenRectAddSetupThunk));
+        int32_t displacement = static_cast<int32_t>(destination - nextInstruction);
+        std::memcpy(patchedJump + 1, &displacement, sizeof(displacement));
+
+        DWORD oldProtection = 0;
+        if (!VirtualProtect(
+                entry,
+                sizeof(patchedJump),
+                PAGE_EXECUTE_READWRITE,
+                &oldProtection))
+        {
+            return false;
+        }
+
+        std::memcpy(entry, patchedJump, sizeof(patchedJump));
+        bool flushed = FlushInstructionCache(
+            GetCurrentProcess(),
+            entry,
+            sizeof(patchedJump)) != FALSE;
+        bool verified = std::memcmp(
+            entry,
+            patchedJump,
+            sizeof(patchedJump)) == 0;
+        if (!flushed || !verified)
+        {
+            RestorePatchedBytesOrTerminate(
+                entry,
+                ExpectedSetup,
+                sizeof(ExpectedSetup),
+                oldProtection,
+                "GUI ConvertToScreen null-rectangle patch");
+            return false;
+        }
+
+        DWORD ignored = 0;
+        if (!VirtualProtect(
+                entry,
+                sizeof(patchedJump),
+                oldProtection,
+                &ignored))
+        {
+            RestorePatchedBytesOrTerminate(
+                entry,
+                ExpectedSetup,
+                sizeof(ExpectedSetup),
+                oldProtection,
+                "GUI ConvertToScreen null-rectangle patch");
+            return false;
+        }
+        return true;
+    }
+
+    void RestoreGuiConvertToScreenNullRect(uint8_t* entry)
+    {
+        constexpr uint8_t OriginalSetup[] =
+        {
+            0x8B, 0x4D, 0x0C,
+            0x50,
+            0x8D, 0x45, 0xB8
+        };
+        DWORD oldProtection = 0;
+        if (!VirtualProtect(
+                entry,
+                sizeof(OriginalSetup),
+                PAGE_EXECUTE_READWRITE,
+                &oldProtection))
+        {
+            FailFastPatchRollback("GUI ConvertToScreen null-rectangle patch");
+        }
+        std::memcpy(entry, OriginalSetup, sizeof(OriginalSetup));
+        bool flushed = FlushInstructionCache(
+            GetCurrentProcess(),
+            entry,
+            sizeof(OriginalSetup)) != FALSE;
+        bool verified = std::memcmp(
+            entry,
+            OriginalSetup,
+            sizeof(OriginalSetup)) == 0;
+        DWORD ignored = 0;
+        bool restored = VirtualProtect(
+            entry,
+            sizeof(OriginalSetup),
+            oldProtection,
+            &ignored) != FALSE;
+        if (!flushed || !verified || !restored)
+        {
+            FailFastPatchRollback("GUI ConvertToScreen null-rectangle patch");
+        }
+    }
+
     bool PatchGuiTreeFindEntry(uint8_t* entry)
     {
         constexpr uint8_t ExpectedPrologue[] =
@@ -1651,88 +1776,6 @@ namespace
             exception->ExceptionRecord->ExceptionInformation[0] != 0)
         {
             return EXCEPTION_CONTINUE_SEARCH;
-        }
-
-        if (exception->ExceptionRecord->ExceptionAddress ==
-                reinterpret_cast<void*>(UtilsRectAddNullFaultAddress) &&
-            exception->ExceptionRecord->ExceptionInformation[1] == 0 &&
-            exception->ContextRecord->Ecx == 0)
-        {
-            DWORD operatorFrame = exception->ContextRecord->Ebp;
-            if (operatorFrame != exception->ContextRecord->Esp ||
-                operatorFrame < 0x10000 ||
-                operatorFrame > 0xFFFFFFFFUL - 16 ||
-                !IsReadableRange(
-                    reinterpret_cast<const void*>(operatorFrame),
-                    16))
-            {
-                return EXCEPTION_CONTINUE_SEARCH;
-            }
-
-            DWORD callerFrame = 0;
-            DWORD returnAddress = 0;
-            DWORD outputAddress = 0;
-            DWORD offsetAddress = 0;
-            std::memcpy(
-                &callerFrame,
-                reinterpret_cast<const void*>(operatorFrame),
-                sizeof(callerFrame));
-            std::memcpy(
-                &returnAddress,
-                reinterpret_cast<const void*>(operatorFrame + 4),
-                sizeof(returnAddress));
-            std::memcpy(
-                &outputAddress,
-                reinterpret_cast<const void*>(operatorFrame + 8),
-                sizeof(outputAddress));
-            std::memcpy(
-                &offsetAddress,
-                reinterpret_cast<const void*>(operatorFrame + 12),
-                sizeof(offsetAddress));
-
-            if (returnAddress != GuiConvertToScreenRectAddReturnAddress ||
-                callerFrame <= operatorFrame ||
-                callerFrame - operatorFrame <= 0x58 ||
-                callerFrame - operatorFrame > 0x1000)
-            {
-                return EXCEPTION_CONTINUE_SEARCH;
-            }
-
-            DWORD recoveredRectAddress = callerFrame - 0x58;
-            DWORD expectedOutputAddress = callerFrame - 0x48;
-            if (outputAddress != expectedOutputAddress ||
-                exception->ContextRecord->Eax != outputAddress ||
-                exception->ContextRecord->Edx != offsetAddress ||
-                !IsReadableRange(
-                    reinterpret_cast<const void*>(recoveredRectAddress),
-                    16) ||
-                !IsReadableRange(
-                    reinterpret_cast<const void*>(offsetAddress),
-                    8) ||
-                !IsWritableRange(
-                    reinterpret_cast<void*>(outputAddress),
-                    16))
-            {
-                return EXCEPTION_CONTINUE_SEARCH;
-            }
-
-            LONG count = InterlockedIncrement(
-                &GuiConvertToScreenNullRectRecoverCount);
-            if (count <= 16 || count % 100 == 0)
-            {
-                aorf::Log(
-                    "PATCH HIT GUI ConvertToScreen null scaled rectangle recovered "
-                    "view=0x%08lX rect=0x%08lX output=0x%08lX offset=0x%08lX "
-                    "count=%ld",
-                    static_cast<unsigned long>(exception->ContextRecord->Esi),
-                    static_cast<unsigned long>(recoveredRectAddress),
-                    static_cast<unsigned long>(outputAddress),
-                    static_cast<unsigned long>(offsetAddress),
-                    static_cast<long>(count));
-            }
-
-            exception->ContextRecord->Ecx = recoveredRectAddress;
-            return EXCEPTION_CONTINUE_EXECUTION;
         }
 
         if (exception->ExceptionRecord->ExceptionAddress ==
@@ -2227,12 +2270,10 @@ namespace aorf
         DwordColorFaultAddress = reinterpret_cast<uintptr_t>(base + 0x6C51D);
         DwordColorResumeAddress = reinterpret_cast<uintptr_t>(base + 0x6C51F);
         GuiRenderBatchAddress = reinterpret_cast<uintptr_t>(guiBase + 0x150E17);
-        GuiConvertToScreenRectAddReturnAddress = reinterpret_cast<uintptr_t>(
-            guiBase + 0x14C4AF);
+        GuiConvertToScreenNullRectResumeAddress = reinterpret_cast<uintptr_t>(
+            guiBase + 0x14C4A8);
         GuiNullDynamicVbFaultAddress = reinterpret_cast<uintptr_t>(
             guiBase + 0x150F22);
-        UtilsRectAddNullFaultAddress = reinterpret_cast<uintptr_t>(
-            utilsBase + 0x82F1);
         GuiDynamicVbGetAddress = guiDynamicVbGetFunction;
         GuiDynamicVbGetVbAddress = guiDynamicVbGetVbFunction;
         GuiResetMaterialAddress = guiResetMaterialFunction;
@@ -2323,6 +2364,15 @@ namespace aorf
                 if (contextsRead)
                 {
                     contextsRead = suspension.IsAnyThreadExecutingInRange(
+                        reinterpret_cast<uintptr_t>(guiBase + 0x14C442),
+                        reinterpret_cast<uintptr_t>(guiBase + 0x14C576),
+                        &executing);
+                    unsafeRendererExecution =
+                        unsafeRendererExecution || executing;
+                }
+                if (contextsRead)
+                {
+                    contextsRead = suspension.IsAnyThreadExecutingInRange(
                         reinterpret_cast<uintptr_t>(guiBase + 0x4F2EF),
                         reinterpret_cast<uintptr_t>(guiBase + 0x4F2F4),
                         &executing);
@@ -2389,8 +2439,15 @@ namespace aorf
                         RestoreDriverDrawCall(base + 0x219B4);
                         patchFailure = "GUI render-batch patch failed";
                     }
+                    else if (!PatchGuiConvertToScreenNullRect(guiBase + 0x14C4A1))
+                    {
+                        RestoreGuiRenderBatchCall(guiBase + 0x152E49);
+                        RestoreDriverDrawCall(base + 0x219B4);
+                        patchFailure = "GUI ConvertToScreen null-rectangle patch failed";
+                    }
                     else if (!PatchGuiTreeFindEntry(guiBase + 0x4F2EF))
                     {
+                        RestoreGuiConvertToScreenNullRect(guiBase + 0x14C4A1);
                         RestoreGuiRenderBatchCall(guiBase + 0x152E49);
                         RestoreDriverDrawCall(base + 0x219B4);
                         patchFailure = "GUI tree-find patch failed";
@@ -2416,9 +2473,8 @@ namespace aorf
             DwordColorFaultAddress = 0;
             DwordColorResumeAddress = 0;
             GuiRenderBatchAddress = 0;
-            GuiConvertToScreenRectAddReturnAddress = 0;
+            GuiConvertToScreenNullRectResumeAddress = 0;
             GuiNullDynamicVbFaultAddress = 0;
-            UtilsRectAddNullFaultAddress = 0;
             GuiDynamicVbGetAddress = 0;
             GuiDynamicVbGetVbAddress = 0;
             GuiResetMaterialAddress = 0;
@@ -2434,7 +2490,7 @@ namespace aorf
 
         Log("PATCH PASS randy31 renderer/color/driver guards "
             "deviceSelector=preserved drawCallRva=0x219B4 "
-            "guiConvertNullRect=Utils+0x82F1/GUI+0x14C4AF "
+            "guiConvertNullRect=normalPathFallback@GUI+0x14C4A1 "
             "guiBatchCallRva=0x152E49 guiNullDynamicVbRva=0x150F22 "
             "guiTreeFindRva=0x4F2EF "
             "faultRvas=0x21A94,0x25118,0x2511A,0x6C3A1,0x6C476,0x6C51D");
