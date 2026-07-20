@@ -47,6 +47,10 @@ CAPTURES = (
     "20260719-020104",
     "20260719-021022",
     "20260720-031025",
+    "20260720-031855",
+    "20260720-032106",
+    "20260720-033513",
+    "20260720-033749",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -75,6 +79,12 @@ CAPTURE_ENEMY_FILTERS = {
     ),
     "20260719-021022": frozenset({"Mugger"}),
     "20260720-031025": frozenset({"Deranged Shopper", "Looter"}),
+    "20260720-031855": frozenset({"Workman Striker"}),
+    "20260720-032106": frozenset({"Architect Striker", "Strike Foreman"}),
+    "20260720-033513": frozenset({"Strike Foreman"}),
+    "20260720-033749": frozenset(
+        {"Infected Attendant", "Uncontrollable Anger"}
+    ),
 }
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
@@ -678,7 +688,10 @@ REVIEWED_RAW_TARGET_ROLE_PACKETS = {
         },
     ),
 }
-CADENCE_UNRESOLVED_ENEMIES = frozenset({"Vergil Aeneid"})
+CADENCE_STATUS_BY_ENEMY = {
+    "Vergil Aeneid": "unresolved-mixed-target-fight",
+    "Infected Attendant": "unresolved-single-landed-hit",
+}
 OUTPUT = REPO / "docs" / "generated" / "subway_enemy_combat_contracts.json"
 
 # These directories are overlapping projections of the same running official
@@ -1042,8 +1055,8 @@ def validate_workman_striker_distinct_combat(
     report_entry: dict[str, object],
 ) -> None:
     expected_counts = {
-        "attackInfoRows": 53,
-        "normalAttackInfoRows": 47,
+        "attackInfoRows": 62,
+        "normalAttackInfoRows": 56,
         "criticalAttackInfoRows": 6,
     }
     for field, expected in expected_counts.items():
@@ -1052,14 +1065,65 @@ def validate_workman_striker_distinct_combat(
                 f"Workman Striker distinct {field} drifted: "
                 f"expected={expected} actual={report_entry[field]}"
             )
-    if report_entry["medianRechargeSeconds"] != 5.092328:
+    if report_entry["medianRechargeSeconds"] != 5.139163:
         raise ValueError("Workman Striker distinct cadence drifted")
+    if (
+        report_entry["normalMinDamage"] != 9
+        or report_entry["normalMaxDamage"] != 23
+        or report_entry["criticalMinDamage"] != 36
+        or report_entry["criticalMaxDamage"] != 42
+        or report_entry["weaponSlot"] != 6
+        or report_entry["attackInfoUnknown"] != 0
+        or report_entry["attackInfoWeaponInstance"] != 0
+        or report_entry["missedAttackInfoRows"] != 4
+        or report_entry["missedAttackShapes"]
+        != [
+            {
+                "ammoCount": -1,
+                "weaponSlot": 6,
+                "unknown": 0,
+                "rows": 4,
+                "captures": [
+                    "20260709-212115",
+                    "20260709-212336",
+                    "20260720-031855",
+                ],
+            }
+        ]
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 100,
+                "unknown2": 100,
+                "unknown3": 100,
+                "unknown4": 100,
+                "unknown5": 0,
+                "rows": 2,
+                "captures": ["20260720-031855"],
+                "owners": [
+                    "(SimpleChar:798033F9)",
+                    "(SimpleChar:79803401)",
+                ],
+            },
+            {
+                "unknown1": 72,
+                "unknown2": 72,
+                "unknown3": 72,
+                "unknown4": 72,
+                "unknown5": 0,
+                "rows": 1,
+                "captures": ["20260720-031855"],
+                "owners": ["(SimpleChar:79803402)"],
+            },
+        ]
+    ):
+        raise ValueError("Workman Striker damage/miss/SIW evidence drifted")
     shapes = report_entry["attackShapes"]
     if (
         len(shapes) != 1
-        or shapes[0]["rows"] != 53
-        or shapes[0]["intervalRows"] != 41
-        or shapes[0]["medianIntervalSeconds"] != 5.092328
+        or shapes[0]["rows"] != 62
+        or shapes[0]["intervalRows"] != 46
+        or shapes[0]["medianIntervalSeconds"] != 5.139163
     ):
         raise ValueError("Workman Striker distinct attack-shape cadence drifted")
     canonical_critical = [
@@ -1089,6 +1153,9 @@ def validate_workman_striker_distinct_combat(
         )
     ):
         raise ValueError("non-overlapping Workman Striker combat rows changed")
+    validate_target_role(report_entry, "Workman Striker", "localPlayer", (27, 62, 9, 42))
+    validate_target_role(report_entry, "Workman Striker", "playerOwnedPet", (3, 2, 21, 25))
+    validate_target_role(report_entry, "Workman Striker", "otherPlayer", (2, 7, 23, 52))
 
 
 def validate_discarded_pet_combat(report_entry: dict[str, object]) -> None:
@@ -1288,35 +1355,39 @@ def reviewed_uncontrollable_anger_cadence(
 
 def validate_uncontrollable_anger_combat(report_entry: dict[str, object]) -> None:
     if (
-        report_entry["normalAttackInfoRows"] != 2
-        or report_entry["normalMinDamage"] != 11
+        report_entry["normalAttackInfoRows"] != 4
+        or report_entry["normalMinDamage"] != 9
         or report_entry["normalMaxDamage"] != 18
-        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["criticalAttackInfoRows"] != 1
+        or report_entry["criticalMinDamage"] != 19
+        or report_entry["criticalMaxDamage"] != 19
         or report_entry["weaponSlot"] != 0
         or report_entry["attackInfoUnknown"] != 0
         or report_entry["attackInfoWeaponInstance"] != 0x53495731
         or report_entry["medianRechargeSeconds"] != 5.167153
+        or report_entry["missedAttackInfoRows"] != 3
+        or report_entry["missedAttackShapes"]
+        != [
+            {
+                "ammoCount": -1,
+                "weaponSlot": 0,
+                "unknown": 0,
+                "rows": 3,
+                "captures": ["20260720-033749"],
+            }
+        ]
+        or report_entry["specialAttackWeaponShapes"] != []
     ):
         raise ValueError("Uncontrollable Anger local-player combat evidence drifted")
-    target_roles = report_entry["targetRoleEvidence"]
-    role_expectations = {
-        "localPlayer": (2, 11, 18),
-        "playerOwnedPet": (4, 25, 42),
-        "otherPlayer": (1, 19, 19),
-    }
-    for role, expected in role_expectations.items():
-        evidence = target_roles[role]
-        actual = (
-            evidence["attackInfoRows"],
-            evidence["minDamage"],
-            evidence["maxDamage"],
-        )
-        if actual != expected:
-            raise ValueError(
-                "Uncontrollable Anger target-role evidence drifted role={0} actual={1}".format(
-                    role, actual
-                )
-            )
+    validate_target_role(
+        report_entry, "Uncontrollable Anger", "localPlayer", (11, 5, 9, 19)
+    )
+    validate_target_role(
+        report_entry, "Uncontrollable Anger", "playerOwnedPet", (1, 4, 25, 42)
+    )
+    validate_target_role(
+        report_entry, "Uncontrollable Anger", "otherPlayer", (3, 1, 19, 19)
+    )
     cadence = report_entry["reviewedTargetCadence"]
     if (
         cadence["capture"] != "20260709-222339"
@@ -1350,6 +1421,56 @@ def validate_target_role(
                 enemy_name, role, actual
             )
         )
+
+
+def validate_architect_striker_combat(report_entry: dict[str, object]) -> None:
+    if (
+        report_entry["retaliationRows"] != 8
+        or report_entry["attackInfoRows"] != 19
+        or report_entry["normalAttackInfoRows"] != 18
+        or report_entry["normalMinDamage"] != 10
+        or report_entry["normalMaxDamage"] != 17
+        or report_entry["criticalAttackInfoRows"] != 1
+        or report_entry["criticalMinDamage"] != 38
+        or report_entry["criticalMaxDamage"] != 38
+        or report_entry["weaponSlot"] != 0
+        or report_entry["attackInfoUnknown"] != 0
+        or report_entry["attackInfoWeaponInstance"] != 0x53495731
+        or report_entry["missedAttackInfoRows"] != 1
+        or report_entry["missedAttackShapes"]
+        != [
+            {
+                "ammoCount": -1,
+                "weaponSlot": 0,
+                "unknown": 0,
+                "rows": 1,
+                "captures": ["20260709-212115", "20260709-213711"],
+            }
+        ]
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 87,
+                "unknown2": 87,
+                "unknown3": 87,
+                "unknown4": 87,
+                "unknown5": 0,
+                "rows": 2,
+                "captures": ["20260720-032106"],
+                "owners": [
+                    "(SimpleChar:798033F7)",
+                    "(SimpleChar:798033FD)",
+                ],
+            }
+        ]
+    ):
+        raise ValueError("Architect Striker combat/miss/SIW evidence drifted")
+    validate_target_role(
+        report_entry, "Architect Striker", "localPlayer", (8, 19, 10, 38)
+    )
+    validate_target_role(
+        report_entry, "Architect Striker", "playerOwnedPet", (0, 0, 0, 0)
+    )
 
 
 def proactive_local_acquisition_key(row: dict[str, object]) -> tuple[str, ...]:
@@ -1421,15 +1542,31 @@ def validate_proactive_local_acquisition(
 
 def validate_infected_attendant_combat(report_entry: dict[str, object]) -> None:
     if (
-        report_entry["retaliationRows"] != 2
+        report_entry["retaliationRows"] != 3
         or report_entry["normalAttackInfoRows"] != 1
         or report_entry["normalMinDamage"] != 11
         or report_entry["normalMaxDamage"] != 11
         or report_entry["criticalAttackInfoRows"] != 0
         or report_entry["medianRechargeSeconds"] != 0.0
+        or report_entry.get("cadenceStatus") != "unresolved-single-landed-hit"
+        or report_entry["missedAttackInfoRows"] != 0
+        or report_entry["missedAttackShapes"] != []
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 65,
+                "unknown2": 65,
+                "unknown3": 65,
+                "unknown4": 65,
+                "unknown5": 0,
+                "rows": 1,
+                "captures": ["20260720-033749"],
+                "owners": ["(SimpleChar:798033F3)"],
+            }
+        ]
     ):
         raise ValueError("Infected Attendant local-player evidence drifted")
-    validate_target_role(report_entry, "Infected Attendant", "localPlayer", (2, 1, 11, 11))
+    validate_target_role(report_entry, "Infected Attendant", "localPlayer", (3, 1, 11, 11))
     validate_target_role(report_entry, "Infected Attendant", "playerOwnedPet", (2, 0, 0, 0))
     validate_target_role(report_entry, "Infected Attendant", "otherPlayer", (4, 0, 0, 0))
 
@@ -1609,6 +1746,7 @@ def validate_violent_vagabond_combat(report_entry: dict[str, object]) -> None:
 def validate_strike_foreman_combat(report_entry: dict[str, object]) -> None:
     behavior = report_entry["reviewedBehaviorEvidence"]
     weapon = report_entry["reviewedLifecycleBoundWeaponEvidence"]
+    loot = report_entry["reviewedLootEvidence"]
     other_player = report_entry["targetRoleEvidence"]["otherPlayer"]
     cadence = other_player.get("landedHitCadence")
     weapon_shapes = {
@@ -1661,12 +1799,101 @@ def validate_strike_foreman_combat(report_entry: dict[str, object]) -> None:
         "bindingStatus": "exact-source-identity-across-captures",
         "runtimeSelectionStatus": "unresolved-report-only",
     }
+    loot_outcomes = {
+        (
+            outcome["capture"],
+            outcome["lootCorpseIdentity"],
+            outcome["corpseIdentity"],
+            outcome["deadNpcIdentity"],
+            tuple(
+                (
+                    item["lowId"],
+                    item["highId"],
+                    item["quality"],
+                    item["count"],
+                )
+                for item in outcome["items"]
+            ),
+        )
+        for outcome in loot["outcomes"]
+    }
+    expected_loot_outcomes = {
+        (
+            "20260720-032106",
+            "(Corpse:F74014)",
+            "Corpse:00F74014",
+            "SimpleChar:798033FB",
+            (
+                (27199, 27199, 10, 1),
+                (123744, 123745, 20, 1),
+                (301713, 301713, 1, 1),
+            ),
+        ),
+        (
+            "20260720-033513",
+            "(Corpse:F74003)",
+            "Corpse:00F74003",
+            "SimpleChar:798037CF",
+            ((85676, 22072, 15, 1), (301707, 301707, 1, 1)),
+        ),
+    }
     if (
-        report_entry["attackInfoRows"] != 0
+        report_entry["attackInfoRows"] != 6
+        or report_entry["normalAttackInfoRows"] != 6
+        or report_entry["normalMinDamage"] != 13
+        or report_entry["normalMaxDamage"] != 13
+        or report_entry["criticalAttackInfoRows"] != 0
+        or report_entry["weaponSlot"] != 6
+        or report_entry["attackInfoUnknown"] != 0
+        or report_entry["attackInfoWeaponInstance"] != 0
+        or report_entry["missedAttackInfoRows"] != 2
+        or report_entry["missedAttackShapes"]
+        != [
+            {
+                "ammoCount": 13,
+                "weaponSlot": 6,
+                "unknown": 0,
+                "rows": 1,
+                "captures": ["20260720-032106"],
+            },
+            {
+                "ammoCount": 18,
+                "weaponSlot": 6,
+                "unknown": 0,
+                "rows": 1,
+                "captures": ["20260720-032106"],
+            },
+        ]
+        or report_entry["specialAttackWeaponShapes"]
+        != [
+            {
+                "unknown1": 154,
+                "unknown2": 154,
+                "unknown3": 154,
+                "unknown4": 117,
+                "unknown5": 0,
+                "rows": 2,
+                "captures": ["20260720-032106", "20260720-033513"],
+                "owners": [
+                    "(SimpleChar:798033FB)",
+                    "(SimpleChar:798037CF)",
+                ],
+            }
+        ]
         or report_entry["equippedWeaponAggregateResolved"]
         or weapon_shapes != expected_weapon_shapes
         or behavior != expected_behavior
         or weapon != expected_lifecycle_bound_weapon
+        or loot["observationStatus"]
+        != "atomic-outcomes-not-guaranteed-drops"
+        or loot["runtimeStatus"] != "report-only-dormant"
+        or loot["initialSnapshots"] != 2
+        or loot["positiveSnapshots"] != 2
+        or loot["emptySnapshots"] != 0
+        or loot["enemyLevel"] != 19
+        or loot["corpseCatMesh"] != 17870
+        or loot["corpseCredits"] != 176
+        or loot_outcomes != expected_loot_outcomes
         or cadence is None
         or cadence["intervalRows"] != 2
         or cadence["minIntervalSeconds"] != 4.849144
@@ -1684,11 +1911,12 @@ def validate_strike_foreman_combat(report_entry: dict[str, object]) -> None:
                     "weaponShapes": report_entry["equippedWeaponShapes"],
                     "behavior": behavior,
                     "lifecycleBoundWeapon": weapon,
+                    "loot": loot,
                     "otherPlayerCadence": cadence,
                 }
             )
         )
-    validate_target_role(report_entry, "Strike Foreman", "localPlayer", (0, 0, 0, 0))
+    validate_target_role(report_entry, "Strike Foreman", "localPlayer", (2, 6, 13, 13))
     validate_target_role(
         report_entry, "Strike Foreman", "playerOwnedPet", (0, 0, 0, 0)
     )
@@ -2051,6 +2279,111 @@ def reviewed_strike_foreman_evidence() -> tuple[dict[str, object], dict[str, obj
         "runtimeSelectionStatus": "unresolved-report-only",
     }
     return behavior, lifecycle_bound_weapon
+
+
+def reviewed_strike_foreman_loot_evidence() -> dict[str, object]:
+    expected_outcomes = (
+        {
+            "capture": "20260720-032106",
+            "lootCorpseIdentity": "(Corpse:F74014)",
+            "corpseIdentity": "Corpse:00F74014",
+            "deadNpcIdentity": "SimpleChar:798033FB",
+            "items": [
+                {"lowId": 27199, "highId": 27199, "quality": 10, "count": 1},
+                {
+                    "lowId": 123744,
+                    "highId": 123745,
+                    "quality": 20,
+                    "count": 1,
+                },
+                {
+                    "lowId": 301713,
+                    "highId": 301713,
+                    "quality": 1,
+                    "count": 1,
+                },
+            ],
+        },
+        {
+            "capture": "20260720-033513",
+            "lootCorpseIdentity": "(Corpse:F74003)",
+            "corpseIdentity": "Corpse:00F74003",
+            "deadNpcIdentity": "SimpleChar:798037CF",
+            "items": [
+                {"lowId": 85676, "highId": 22072, "quality": 15, "count": 1},
+                {
+                    "lowId": 301707,
+                    "highId": 301707,
+                    "quality": 1,
+                    "count": 1,
+                },
+            ],
+        },
+    )
+    outcomes = []
+    for expected in expected_outcomes:
+        capture = expected["capture"]
+        folder = CAPTURE_ROOT / capture
+        expected_items = expected["items"]
+        expected_items_text = ";".join(
+            "{lowId}:{highId}:{quality}:{count}".format(**item)
+            for item in expected_items
+        )
+        loot_rows = [
+            row
+            for row in read_csv(folder / "corpse-loot-observations.csv")
+            if row.get("EnemyName") == "Strike Foreman"
+            and row.get("CorpseIdentity") == expected["lootCorpseIdentity"]
+            and row.get("DeadNpcIdentity") == expected["deadNpcIdentity"]
+            and row.get("MonsterData") == "203744"
+            and row.get("EnemyLevel") == "19"
+            and row.get("CorpseCredits") == "176"
+            and row.get("PlayfieldId") == "1419333"
+            and row.get("OpenOrdinal") == "1"
+            and row.get("InitialSnapshot") == "true"
+            and row.get("CorrelationStatus") == "linked"
+            and row.get("ItemCount") == str(len(expected_items))
+            and row.get("Items") == expected_items_text
+        ]
+        if len(loot_rows) != 1:
+            raise ValueError(
+                "Strike Foreman atomic loot evidence drifted capture=" + capture
+            )
+        corpse_rows = [
+            row
+            for row in read_csv(folder / "corpse-full-updates.csv")
+            if row.get("CorpseIdentity") == expected["corpseIdentity"]
+            and row.get("CorpseName") == "Remains of Strike Foreman"
+            and row.get("DeadNpcIdentity") == expected["deadNpcIdentity"]
+            and row.get("DeadNpcName") == "Strike Foreman"
+            and row.get("CorpseMonsterData") == "203744"
+            and row.get("CorpseCatMesh") == "17870"
+            and row.get("CorpseCredits") == "176"
+            and row.get("PlayfieldId") == "1419333"
+        ]
+        if len(corpse_rows) != 1:
+            raise ValueError(
+                "Strike Foreman corpse evidence drifted capture=" + capture
+            )
+        outcomes.append(dict(expected))
+    return {
+        "observationStatus": "atomic-outcomes-not-guaranteed-drops",
+        "runtimeStatus": "report-only-dormant",
+        "initialSnapshots": 2,
+        "positiveSnapshots": 2,
+        "emptySnapshots": 0,
+        "enemyLevel": 19,
+        "corpseCatMesh": 17870,
+        "corpseCredits": 176,
+        "outcomes": outcomes,
+        "unresolved": [
+            "loot-pool-frequencies",
+            "respawn-timing",
+            "loot-bearing-corpse-lifetime",
+            "leash-reset-threshold",
+            "weapon-generation-selection",
+        ],
+    }
 
 
 def add_reviewed_raw_target_role_evidence(
@@ -2520,7 +2853,7 @@ def main():
         shape_attacks = normal_attacks if name == "Filth Flea" else attacks
         intervals = []
         by_identity_shape = defaultdict(list)
-        if name not in CADENCE_UNRESOLVED_ENEMIES:
+        if name not in CADENCE_STATUS_BY_ENEMY:
             for attack in shape_attacks:
                 by_identity_shape[
                     (
@@ -2591,7 +2924,7 @@ def main():
                 == (shape_slot, shape_unknown, shape_instance)
             ]
             shape_intervals = []
-            if name not in CADENCE_UNRESOLVED_ENEMIES:
+            if name not in CADENCE_STATUS_BY_ENEMY:
                 matching_by_identity = defaultdict(list)
                 for row in matching:
                     matching_by_identity[(row["capture"], row["identity"])].append(
@@ -2890,8 +3223,8 @@ def main():
                     role_entry["landedHitCadence"] = landed_cadence
                 target_role_evidence[evidence_role] = role_entry
             report_entry["targetRoleEvidence"] = target_role_evidence
-        if name in CADENCE_UNRESOLVED_ENEMIES:
-            report_entry["cadenceStatus"] = "unresolved-mixed-target-fight"
+        if name in CADENCE_STATUS_BY_ENEMY:
+            report_entry["cadenceStatus"] = CADENCE_STATUS_BY_ENEMY[name]
         report_entry.update(
             {
                 "equippedWeaponObserved": bool(weapon_shapes),
@@ -2916,6 +3249,9 @@ def main():
             report_entry["reviewedLifecycleBoundWeaponEvidence"] = (
                 lifecycle_bound_weapon
             )
+            report_entry["reviewedLootEvidence"] = (
+                reviewed_strike_foreman_loot_evidence()
+            )
         if name == "Workman Striker":
             validate_workman_striker_distinct_combat(attacks, report_entry)
         if name == "Discarded Pet":
@@ -2926,6 +3262,8 @@ def main():
             validate_mugger_combat(report_entry)
         if name == "Uncontrollable Anger":
             validate_uncontrollable_anger_combat(report_entry)
+        if name == "Architect Striker":
+            validate_architect_striker_combat(report_entry)
         if name == "Infected Attendant":
             validate_infected_attendant_combat(report_entry)
         if name == "Lost Thought":
