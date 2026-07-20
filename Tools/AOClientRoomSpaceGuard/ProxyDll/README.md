@@ -83,13 +83,15 @@ The null-destination path additionally releases its heap index buffer when one
 was allocated. The caller then advances normally. These scoped guards contain
 the verified deferred failures without changing AO's selected renderer.
 
-The guard also contains the first-chance null rectangle read captured in
-`Utils.dll +0x82F1` from `GUI!View::ConvertToScreen`. Recovery requires the
-exact supported `Utils::Rect::operator+` bytes, the exact GUI call sequence and
-return address at `GUI.dll +0x14C4AF`, the observed stack-frame relationship,
-and readable/writable rectangle operands. Only then does it restore `ECX` to
-the already-computed scaled rectangle local and retry the faulting instruction.
-All other `Utils.dll` access violations retain the normal crash path.
+The guard also prevents the null rectangle read captured in `Utils.dll +0x82F1`
+from `GUI!View::ConvertToScreen`. It byte-verifies the exact supported GUI and
+`Utils::Rect::operator+` sequence, then patches the normal path at
+`GUI.dll +0x14C4A1`. A null scaled-rectangle input is replaced with the
+already-computed scaled rectangle local before `operator+` is called. This
+avoids exception dispatch entirely; the previous exception-resume recovery was
+removed because a contained first fault could be followed immediately by
+control-flow corruption. All other `Utils.dll` failures retain the normal crash
+path.
 
 This is deliberately not a process-wide "continue every exception" handler.
 Unknown access violations retain the normal crash/dump path because an
