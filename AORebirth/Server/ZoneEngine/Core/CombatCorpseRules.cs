@@ -286,11 +286,11 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3);
+        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(3);
+        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
 
-        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(4);
+        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(2);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 

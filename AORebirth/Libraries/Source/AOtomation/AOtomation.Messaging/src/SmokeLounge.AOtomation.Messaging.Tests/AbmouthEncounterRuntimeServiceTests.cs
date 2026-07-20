@@ -210,8 +210,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("CapturedScfuFlags2")
                 && encounter.Contains("CapturedScfuUnknown1")
                 && encounter.Contains("CapturedScfuUnknown2")
-                && encounter.Contains("155548,\n                1800.0,\n                3.0,")
-                && encounter.Contains("31868,\n                300.0,\n                3.0,"),
+                && encounter.Contains("155548,\n                1800.0,\n                1800.0,")
+                && encounter.Contains("31868,\n                120.0,\n                30.0,"),
                 "Runtime SCFU and corpse definitions must retain captured boss/summon constants and corpse lifetimes.");
             Assert.IsTrue(
                 scfu.Contains("CapturedEncounterRuntimeRegistry.TryGet")
@@ -411,7 +411,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("-0.96801883f")
                 && encounter.Contains("1643u,\n                unchecked((int)0x020A4ACB)")
                 && encounter.Contains("HexToBytes(\"80000000000000000000000002010001000100010001000000020000\")")
-                && encounter.Contains("17905,\n                1800.0,\n                3.0,")
+                && encounter.Contains("17905,\n                1800.0,\n                1800.0,")
                 && encounter.Contains("npcFamily: 148")
                 && encounter.Contains("breed: 3")
                 && encounter.Contains("sex: 2")
@@ -546,7 +546,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && membershipLoot.Contains("\"unlinked\""),
                 "The later capture must retain exact item membership while remaining unlinked to credits, dead-NPC identity, and playfield context.");
             Assert.IsTrue(
-                encounter.Contains("17905,\n                1800.0,\n                3.0,")
+                encounter.Contains("17905,\n                1800.0,\n                1800.0,")
                 && corpse.Contains("CapturedSubwayEumenidesPacketLength = 416")
                 && corpse.Contains("CapturedSubwayEumenidesMonsterDataOffset = 332")
                 && corpse.Contains("CapturedSubwayEumenidesTailDeadNpcInstanceOffset = 344")
@@ -608,7 +608,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayVergilRechargeOverrideSeconds"),
                 "Vergil must equip captured weapon 122123 QL23 while damage and recharge remain weapon-owned.");
             Assert.IsTrue(
-                encounter.Contains("5921,\n                1800.0,\n                3.0,")
+                encounter.Contains("5921,\n                1800.0,\n                1800.0,")
                 && corpse.Contains("CapturedSubwayVergilPacketLength = 420")
                 && corpse.Contains("CapturedSubwayVergilTemplate")
                 && corpse.Contains("BuildCapturedSubwayVergil(")

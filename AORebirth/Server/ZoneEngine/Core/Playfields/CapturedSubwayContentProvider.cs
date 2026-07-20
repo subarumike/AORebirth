@@ -124,7 +124,7 @@ namespace ZoneEngine.Core.Playfields
             CapturedSurveySpawn(Mugger(0x7957E5CA, 10, 182, 267.640045f, 107.611687f, 287.824371f, 95, 36)),
             // Capture 20260717-012651: current health regenerated from 115 to the
             // confirmed full-health ceiling of 146 before the fight began.
-            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, respawnDelaySeconds: 60.0, healthDamage: 31)),
+            CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, healthDamage: 31)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AA4A, 10, 182, 198.0572f, 108.416405f, 191.596924f, 95, 27)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD40, 6, 110, 148.6321f, 107.6164f, 189.491272f, 93, 18)),
             CapturedSurveySpawn(ViolentVagabond(0x7953AD48, 7, 128, 190.403168f, 107.6164f, 164.9011f, 94, 20)),
@@ -789,8 +789,7 @@ namespace ZoneEngine.Core.Playfields
                 x,
                 y,
                 z,
-                useSpawnAsPatrolStart: useSpawnAsPatrolStart,
-                respawnDelaySeconds: 240.0);
+                useSpawnAsPatrolStart: useSpawnAsPatrolStart);
         }
 
         private static CapturedSubwaySpawnDefinition DiscardedPet(
@@ -835,8 +834,6 @@ namespace ZoneEngine.Core.Playfields
             int runSpeed = 33,
             bool useSpawnAsPatrolStart = false)
         {
-            // Official capture 20260708-143600 records 449.953427 seconds from
-            // dead-NPC despawn to same-position replacement (0.190-unit delta).
             return new CapturedSubwaySpawnDefinition(
                 sourceInstance,
                 "A120",
@@ -854,8 +851,7 @@ namespace ZoneEngine.Core.Playfields
                 x,
                 y,
                 z,
-                useSpawnAsPatrolStart: useSpawnAsPatrolStart,
-                respawnDelaySeconds: 450.0);
+                useSpawnAsPatrolStart: useSpawnAsPatrolStart);
         }
 
         private static CapturedSubwaySpawnDefinition Mugger(
