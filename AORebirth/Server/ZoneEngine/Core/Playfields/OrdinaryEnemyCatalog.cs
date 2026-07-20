@@ -366,7 +366,6 @@ namespace AORebirth.Core.Playfields
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
                     archetype.MonsterData == DerangedShopperMonsterData
-                    || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
@@ -376,7 +375,8 @@ namespace AORebirth.Core.Playfields
                         : null;
                 Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
                     sourceVariantContractResolver =
-                        archetype.MonsterData == IncompleteRebuildMonsterData
+                        archetype.MonsterData == WorkmanStrikerMonsterData
+                        || archetype.MonsterData == IncompleteRebuildMonsterData
                         || archetype.MonsterData == RedundantScanMonsterData
                         || archetype.MonsterData == FragmentedSoulMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
@@ -627,26 +627,31 @@ namespace AORebirth.Core.Playfields
         {
             int expectedMonsterData = string.Equals(
                 source.ArchetypeKey,
-                "incomplete_rebuild",
+                "workman_striker",
                 StringComparison.Ordinal)
-                ? IncompleteRebuildMonsterData
+                ? WorkmanStrikerMonsterData
                 : string.Equals(
                     source.ArchetypeKey,
-                    "redundant_scan",
+                    "incomplete_rebuild",
                     StringComparison.Ordinal)
-                    ? RedundantScanMonsterData
+                    ? IncompleteRebuildMonsterData
                     : string.Equals(
                         source.ArchetypeKey,
-                        "fragmented_soul",
+                        "redundant_scan",
                         StringComparison.Ordinal)
-                        ? FragmentedSoulMonsterData
+                        ? RedundantScanMonsterData
                         : string.Equals(
                             source.ArchetypeKey,
-                            "premature_pattern",
+                            "fragmented_soul",
                             StringComparison.Ordinal)
-                          && source.SourceInstance == PrematurePatternVariantSource
-                            ? PrematurePatternMonsterData
-                            : 0;
+                            ? FragmentedSoulMonsterData
+                            : string.Equals(
+                                source.ArchetypeKey,
+                                "premature_pattern",
+                                StringComparison.Ordinal)
+                              && source.SourceInstance == PrematurePatternVariantSource
+                                ? PrematurePatternMonsterData
+                                : 0;
             CapturedSubwayGenerationVariantDefinition[] capturedVariants =
                 expectedMonsterData == 0
                     ? new CapturedSubwayGenerationVariantDefinition[0]

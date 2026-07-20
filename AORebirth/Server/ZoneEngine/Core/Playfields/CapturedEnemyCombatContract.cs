@@ -1120,7 +1120,68 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
-            return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Workman Striker");
+            return CapturedEnemyCombatContract.Unresolved(
+                string.Format(
+                    "Workman Striker source 0x{0:X8} requires a selected capture-reviewed atomic generation variant",
+                    sourceInstance),
+                archetype != null && archetype.Combat != null && archetype.Combat.Observed);
+        }
+
+        private static CapturedEnemyCombatContract ForWorkmanStriker(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            bool hasExactCombatEvidence = combat != null
+                                          && combat.Observed
+                                          && combat.RuntimeReady
+                                          && combat.ObservedRows == 56
+                                          && combat.MinDamage == 9
+                                          && combat.MaxDamage == 23
+                                          && combat.WeaponSlot == (int)WeaponSlots.Righthand
+                                          && combat.AttackInfoUnknown == 0
+                                          && combat.WeaponInstance == 0;
+            if (!hasExactCombatEvidence
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    WorkmanStrikerMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation for the selected source: "
+                    + (hasExactCombatEvidence
+                        ? atomicFailure
+                        : "combat evidence drifted"),
+                    combat != null && combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Workman Striker source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; 56 distinct normal local-player hits span 9..23, six criticals remain report-only, and captured AttackInfo uses ammo -1, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; captured SIW shapes remain report-only",
+                    weapon.Evidence,
+                    sourceInstance,
+                    variant.Level,
+                    weapon.Quality,
+                    weapon.LowId,
+                    weapon.HighId),
+                weapon.LowId,
+                weapon.HighId,
+                weapon.Quality,
+                (int)WeaponSlots.Righthand,
+                -1,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
         }
 
         private static CapturedEnemyCombatContract ForLooter(
@@ -1859,6 +1920,16 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
+            if (archetype != null
+                && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return ForWorkmanStriker(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
+            }
+
             if (archetype != null
                 && archetype.MonsterData == IncompleteRebuildMonsterData)
             {

@@ -246,7 +246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(307, evidence.Length);
+            Assert.AreEqual(314, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -261,7 +261,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "20260716-221358:2",
                         "20260716-222007:4",
                         "20260716-222201:2",
-                        "20260720-031025:1"
+                        "20260720-031025:1",
+                        "20260720-031855:3",
+                        "20260720-032106:2",
+                        "20260720-033749:2"
                     },
                 evidence
                     .Where(
@@ -275,7 +278,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  || value.Capture == "20260716-221358"
                                  || value.Capture == "20260716-222007"
                                  || value.Capture == "20260716-222201"
-                                 || value.Capture == "20260720-031025")
+                                  || value.Capture == "20260720-031025"
+                                  || value.Capture == "20260720-031855"
+                                  || value.Capture == "20260720-032106"
+                                  || value.Capture == "20260720-033749")
                     .GroupBy(value => value.Capture)
                     .OrderBy(value => value.Key, StringComparer.Ordinal)
                     .Select(value => value.Key + ":" + value.Count())
@@ -392,34 +398,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void WorkmanStrikerUsesTenDeduplicatedCompleteCorpseOpens()
+        public void WorkmanStrikerUsesThirteenDeduplicatedCompleteCorpseOpens()
         {
             OrdinaryEnemyLootProfile loot = Profile("Workman Striker").Loot;
 
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, loot.PoolMode);
             Assert.IsFalse(loot.ItemPoolComplete);
-            Assert.AreEqual(10, loot.ObservedCompleteInventories);
+            Assert.AreEqual(13, loot.ObservedCompleteInventories);
             Assert.AreEqual(2, loot.ObservedEmptyInventories);
-            Assert.AreEqual(10, loot.Entries.Length);
+            Assert.AreEqual(15, loot.Entries.Length);
             Assert.IsTrue(
                 loot.Entries.All(
                     value => value.Evidence == OrdinaryEnemyLootEvidence.ObservedAvailableLoot
                              && value.ProbabilityEvidence
                              == OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy
-                             && value.ObservedCorpses == 10));
+                             && value.ObservedCorpses == 13));
             CollectionAssert.AreEqual(
                 new[]
                     {
-                        "85562:85561:14:1:10:1000",
-                        "124025:124026:12:1:10:1000",
-                        "124263:124264:13:1:10:1000",
-                        "130087:130088:16:1:10:1000",
-                        "202719:202720:12:1:10:1000",
-                        "202719:202720:14:2:10:2000",
-                        "202719:202720:17:1:10:1000",
-                        "234874:234874:1:1:10:1000",
-                        "234877:234877:1:1:10:1000",
-                        "301714:301714:1:2:10:2000"
+                        "70562:85597:14:1:13:769",
+                        "85562:85561:14:1:13:769",
+                        "123774:123775:10:1:13:769",
+                        "124025:124026:12:1:13:769",
+                        "124263:124264:13:1:13:769",
+                        "128603:128604:15:1:13:769",
+                        "130087:130088:16:1:13:769",
+                        "202719:202720:11:1:13:769",
+                        "202719:202720:12:1:13:769",
+                        "202719:202720:14:2:13:1538",
+                        "202719:202720:17:1:13:769",
+                        "202719:202720:21:1:13:769",
+                        "234874:234874:1:1:13:769",
+                        "234877:234877:1:1:13:769",
+                        "301714:301714:1:2:13:1538"
                     },
                 loot.Entries
                     .OrderBy(value => value.LowId)
@@ -437,15 +448,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             CapturedSubwayLootOutcomeEvidenceDefinition[] outcomes =
                 new CapturedSubwayOrdinaryContentProvider().GetLootOutcomeEvidence(203854);
-            Assert.AreEqual(12, outcomes.Length);
+            Assert.AreEqual(17, outcomes.Length);
             Assert.IsFalse(outcomes.Any(value => value.Capture == "20260709-212115"));
+            Assert.IsFalse(outcomes.Any(value => value.Capture == "20260720-033513"));
+            CollectionAssert.AreEquivalent(
+                new[]
+                    {
+                        "441:202719:202720:11",
+                        "441:123774:123775:10",
+                        "779:202719:202720:21",
+                        "779:128603:128604:15",
+                        "901:70562:85597:14"
+                    },
+                outcomes
+                    .Where(value => value.Capture == "20260720-031855")
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}",
+                        value.Sequence,
+                        value.LowId,
+                        value.HighId,
+                        value.Quality))
+                    .ToArray());
 
             OrdinaryEnemyLootTableAdapterResult adapted = OrdinaryEnemyLootTableAdapter.Build(
                 Profile("Workman Striker"),
                 "subway.test.workman-striker",
                 "subway.test.workman-striker.assignment");
             Assert.IsTrue(adapted.Table.ItemPoolUnresolved);
-            Assert.AreEqual(10, adapted.Table.RollGroups.Length);
+            Assert.AreEqual(15, adapted.Table.RollGroups.Length);
             Assert.IsTrue(
                 adapted.Table.RollGroups.All(value => value.RollMode == LootRollMode.Independent));
         }
@@ -567,14 +597,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     });
             AssertReviewedLegacyStrictLoot(
                 "Architect Striker",
-                4,
+                6,
                 1,
                 new[]
                     {
-                        "122482:122483:14:1:4:2500",
-                        "124422:124423:13:1:4:2500",
-                        "128890:128891:14:1:4:2500",
-                        "234877:234877:1:1:4:2500"
+                        "85755:21921:18:1:6:1667",
+                        "122482:122483:14:1:6:1667",
+                        "124276:124277:17:1:6:1667",
+                        "124422:124423:13:1:6:1667",
+                        "128890:128891:14:1:6:1667",
+                        "234877:234877:1:1:6:1667"
                     });
             AssertReviewedLegacyStrictLoot(
                 "Melded Patterns",
@@ -612,6 +644,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 meldedOutcomes
                     .Where(value => value.Capture == "20260712-223719")
                     .Select(value => value.Sequence + ":" + value.LowId)
+                    .ToArray());
+
+            CapturedSubwayLootOutcomeEvidenceDefinition[] architectOutcomes = source
+                .Single(value => value.Name == "Architect Striker")
+                .LootOutcomeEvidence;
+            CollectionAssert.AreEquivalent(
+                new[] { "99:85755:21921:18", "365:124276:124277:17" },
+                architectOutcomes
+                    .Where(value => value.Capture == "20260720-032106")
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}",
+                        value.Sequence,
+                        value.LowId,
+                        value.HighId,
+                        value.Quality))
+                    .ToArray());
+            CollectionAssert.AreEquivalent(
+                new[]
+                    {
+                        "99:(Corpse:00F74020):(SimpleChar:798033F7)",
+                        "365:(Corpse:00F74021):(SimpleChar:798033FD)"
+                    },
+                architectOutcomes
+                    .Where(value => value.Capture == "20260720-032106")
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}",
+                        value.Sequence,
+                        value.CorpseIdentity,
+                        value.DeadNpcIdentity))
                     .ToArray());
         }
 
@@ -688,12 +749,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { "42640:42641:30:1" });
             AssertRecoveredStrictLoot(
                 "Infected Attendant",
-                4,
+                5,
                 1,
                 new[]
                     {
                         "101695:101696:24:1", "109194:109195:12:1", "112823:112824:17:1",
-                        "234875:234875:1:1", "290619:202727:12:1"
+                        "234875:234875:1:1", "290619:202727:12:1", "290619:202727:13:1"
                     });
             AssertRecoveredStrictLoot(
                 "Fragmented Soul",
@@ -725,11 +786,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { "27263:27263:10:1" });
             AssertRecoveredStrictLoot(
                 "Uncontrollable Anger",
-                2,
+                3,
                 0,
                 new[]
                     {
-                        "101809:101810:24:1", "109366:109367:9:1", "290619:202727:19:1"
+                        "101809:101810:24:1", "109366:109367:9:1",
+                        "112863:112864:13:1", "290619:202727:19:1"
                     });
             AssertRecoveredStrictLoot(
                 "Lost Thought",
@@ -746,6 +808,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     });
 
             var provider = new CapturedSubwayOrdinaryContentProvider();
+            CapturedSubwayLootOutcomeEvidenceDefinition infectedOutcome = provider
+                .GetLootOutcomeEvidence(96056)
+                .Single(value => value.Capture == "20260720-033749");
+            Assert.AreEqual("(Corpse:00F74006)", infectedOutcome.CorpseIdentity);
+            Assert.AreEqual("(SimpleChar:798033F3)", infectedOutcome.DeadNpcIdentity);
+            Assert.AreEqual(476, infectedOutcome.Sequence);
+            Assert.AreEqual(290619, infectedOutcome.LowId);
+            Assert.AreEqual(202727, infectedOutcome.HighId);
+            Assert.AreEqual(13, infectedOutcome.Quality);
+
+            CapturedSubwayLootOutcomeEvidenceDefinition angerOutcome = provider
+                .GetLootOutcomeEvidence(96195)
+                .Single(value => value.Capture == "20260720-033749");
+            Assert.AreEqual("(Corpse:00F74007)", angerOutcome.CorpseIdentity);
+            Assert.AreEqual("(SimpleChar:798037FD)", angerOutcome.DeadNpcIdentity);
+            Assert.AreEqual(497, angerOutcome.Sequence);
+            Assert.AreEqual(112863, angerOutcome.LowId);
+            Assert.AreEqual(112864, angerOutcome.HighId);
+            Assert.AreEqual(13, angerOutcome.Quality);
+
             foreach (string excludedName in new[] { "Empty Shell", "Premature Pattern" })
             {
                 CapturedSubwayOrdinaryArchetypeDefinition archetype = provider.GetArchetypes()
@@ -857,7 +939,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 17870,
                 "13:79:79:2",
                 "14:85:85:1",
-                "15:92:92:1");
+                "15:92:92:1",
+                "16:98:98:2");
             AssertCorpseAndLevelCredits("Bloodcreeper", 26978, "24:150:150:3");
             AssertCorpseAndLevelCredits(
                 "Deranged Shopper",
@@ -895,7 +978,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Infected Attendant",
                 96024,
                 "11:14:14:2",
-                "12:15:15:2",
+                "12:15:15:3",
                 "15:19:19:1",
                 "23:29:29:1");
             AssertCorpseAndLevelCredits(
@@ -989,7 +1072,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Uncontrollable Anger",
                 96177,
                 "11:14:14:1",
-                "12:15:15:1",
+                "12:15:15:2",
                 "13:16:16:2",
                 "20:25:25:1",
                 "21:26:26:1");
@@ -1002,12 +1085,68 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Workman Striker",
                 17899,
-                "13:79:79:2",
+                "13:79:79:3",
                 "14:85:85:7",
                 "15:92:92:3",
                 "16:98:98:4",
                 "17:105:105:3",
+                "18:111:111:2",
                 "25:156:156:1");
+
+            var provider = new CapturedSubwayOrdinaryContentProvider();
+            CollectionAssert.AreEquivalent(
+                new[]
+                    {
+                        "(Corpse:00F74018):(SimpleChar:79803402):13:79",
+                        "(Corpse:00F74004):(SimpleChar:79803401):18:111",
+                        "(Corpse:00F74019):(SimpleChar:798033F9):18:111"
+                    },
+                provider
+                    .GetCorpseEvidence(203854)
+                    .Where(value => value.Capture == "20260720-031855")
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}",
+                        value.CorpseIdentity,
+                        value.DeadNpcIdentity,
+                        value.EnemyLevel,
+                        value.Credits))
+                    .ToArray());
+            Assert.IsFalse(
+                provider.GetCorpseEvidence(203854)
+                    .Any(value => value.Capture == "20260720-033513"));
+
+            CollectionAssert.AreEquivalent(
+                new[]
+                    {
+                        "(Corpse:00F74020):(SimpleChar:798033F7):16:98",
+                        "(Corpse:00F74021):(SimpleChar:798033FD):16:98"
+                    },
+                provider
+                    .GetCorpseEvidence(203743)
+                    .Where(value => value.Capture == "20260720-032106")
+                    .Select(value => string.Format(
+                        "{0}:{1}:{2}:{3}",
+                        value.CorpseIdentity,
+                        value.DeadNpcIdentity,
+                        value.EnemyLevel,
+                        value.Credits))
+                    .ToArray());
+
+            CapturedSubwayCorpseEvidenceDefinition infectedCorpse = provider
+                .GetCorpseEvidence(96056)
+                .Single(value => value.Capture == "20260720-033749");
+            Assert.AreEqual("(Corpse:00F74006)", infectedCorpse.CorpseIdentity);
+            Assert.AreEqual("(SimpleChar:798033F3)", infectedCorpse.DeadNpcIdentity);
+            Assert.AreEqual(12, infectedCorpse.EnemyLevel);
+            Assert.AreEqual(15, infectedCorpse.Credits);
+
+            CapturedSubwayCorpseEvidenceDefinition angerCorpse = provider
+                .GetCorpseEvidence(96195)
+                .Single(value => value.Capture == "20260720-033749");
+            Assert.AreEqual("(Corpse:00F74007)", angerCorpse.CorpseIdentity);
+            Assert.AreEqual("(SimpleChar:798037FD)", angerCorpse.DeadNpcIdentity);
+            Assert.AreEqual(12, angerCorpse.EnemyLevel);
+            Assert.AreEqual(15, angerCorpse.Credits);
         }
 
         [TestMethod]
