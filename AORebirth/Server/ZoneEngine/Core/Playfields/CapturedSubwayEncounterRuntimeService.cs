@@ -1012,7 +1012,7 @@ namespace AORebirth.Core.Playfields
                 0,
                 155548,
                 1800.0,
-                3.0,
+                1800.0,
                 "20260712-224840 SCFU #1808; 20260712-232137 fight/corpse/loot; "
                 + "20260716-220400 spawn/fight/death/corpse; "
                 + "20260720-053802 captured nano 286237 warp at approximately 21.8 seconds, "
@@ -1058,7 +1058,7 @@ namespace AORebirth.Core.Playfields
                 0,
                 5921,
                 1800.0,
-                3.0,
+                1800.0,
                 variant.Evidence
                 + "; exact spawn/appearance 20260709-222339 SCFU #5445; "
                 + "Mike 20260716 30-minute loot corpse and 10-minute respawn; "
@@ -1122,12 +1122,12 @@ namespace AORebirth.Core.Playfields
                 0,
                 17905,
                 1800.0,
-                3.0,
+                1800.0,
                 "20260716-034559 atomic SCFU; 20260709-222339 plus 20260717-214612/214751/215250 weapon/combat/chase; "
                 + "20260716-222007 exact 416-byte corpse CATMesh 17905/MonsterData 203726/scale 130; "
                 + "20260717-214751/215250 two exact 186-credit item-plus-credit corpse snapshots; "
                 + "20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse; "
-                + "confirmed 3-second empty cleanup and shared 100-unit leash; active nano refresh unresolved and omitted",
+                + "confirmed 30-minute boss corpse and shared 100-unit leash; active nano refresh unresolved and omitted",
                 npcFamily: 148,
                 npcLosHeight: 0,
                 fatness: 1,
@@ -1218,8 +1218,8 @@ namespace AORebirth.Core.Playfields
                 HexToBytes(capturedScfuUnknown1),
                 0,
                 31868,
-                300.0,
-                3.0,
+                120.0,
+                30.0,
                 "20260712-224840 SCFU #1835/#1870; 20260712-232137 two-slot refill");
         }
 

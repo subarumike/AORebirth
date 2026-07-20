@@ -10,6 +10,15 @@ projections no longer require repeat gameplay captures. The active work is to
 promote recovered exact evidence and validate the `322` active PF127 population
 in bounded runtime batches; no population rows remain quarantined.
 
+Authoritative PF127 lifecycle policy: every regular Subway mob uses the shared
+`240`-second post-NPC-despawn respawn schedule. Regular corpses remain for
+`120` seconds while loot or credits remain and `30` seconds when born empty or
+after becoming empty. Subway boss corpses remain for `30` minutes and Subway
+bosses respawn `10` minutes after death. There are no per-archetype regular-mob
+respawn exceptions. This shared policy satisfies the lifecycle portion of all
+26 ordinary profiles; profile-specific capture gaps must now be limited to
+combat, movement/aggro/leash, loot membership, or appearance evidence.
+
 The finalized `20260720-051714` whole-subway survey adds no new ordinary
 hostile archetype; its Bureaucrat Worker and Wrath Incarnation rows are
 player-owned pets. Vergil follow-up `20260720-053542` records a normal `22..25`
@@ -320,7 +329,7 @@ named encounter runtime. See
   items own runtime damage/recharge while captured AttackInfo preserves
   `ammo=24`, slot `6`, unknown `0`, and instance `0`. The profile remains
   retaliatory with shared chase, inherits the private four-minute ordinary
-  respawn, retains strict `4/0 empty` loot, CATMesh `5921`, standard `3/240/3`
+  respawn, retains strict `4/0 empty` loot, CATMesh `5921`, standard `30/120/30`
   corpse lifetimes, observed L17/L18/L21 credits, and policy-only L19/L20
   credit progression. Nano `95447` uses its exact nanos.dat target Skill effect
   (NanoRange `+42`), four-hour duration, cost `44`, NCU `7`, 20-unit range,
@@ -338,7 +347,7 @@ named encounter runtime. See
   SpecialAttackWeapon fifth field varies without a proven rule and is not
   synthesized. Retaliatory acquisition and an explicit 8.153-unit chase are
   preserved without inventing proactive aggro, leash, reset, or return-home
-  boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard `3/240/3`
+  boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard `30/120/30`
   corpse lifetimes, and 25 exact positive-credit corpses now include recovered
   L6 and L10 records from `20260709-205921` and `20260708-004038`.
 - Uncontrollable Anger is now the twenty-first whole-enemy accepted ordinary
@@ -351,7 +360,7 @@ named encounter runtime. See
   dividing the doubled interval; runtime uses the six-decimal median
   `5.167153`. Retaliatory shared chase, strict `3/0 empty` loot, CATMesh
   `96177`, seven exact positive-credit corpses, inherited private respawn, and
-  standard `3/240/3` corpse rules pass together. Credits remain unresolved for
+  standard `30/120/30` corpse rules pass together. Credits remain unresolved for
   active L19 and L23 rows because no exact level-credit observation exists.
 - Reviewed raw first opens and strict `corpse-loot-observations.csv` snapshots
   contribute explicit empty corpses to denominators. Redundant Scan's observed
@@ -519,7 +528,7 @@ named encounter runtime. See
   evidence-only. Strict `3/0 empty` loot now includes the third positive
   first-open item `234876` QL1 with L8 CATMesh `5927` and `47` credits. The
   capture proves neither respawn timing nor corpse lifetime, so the inherited
-  four-minute respawn and `3/240/3` corpse policies are unchanged.
+  four-minute respawn and `30/120/30` corpse policies are unchanged.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection retains 14 local-player hits at
@@ -553,7 +562,7 @@ named encounter runtime. See
   evidence rather than a fabricated item-plus-credit outcome. Mike observed the
   live ten-minute respawn and 30-minute loot-bearing corpse timer during that
   session; the folder does not packet-encode those UI/timing boundaries. Runtime
-  already uses those values, plus three-second empty cleanup.
+  already uses those values, superseded by the authoritative 30-second empty cleanup.
 - Capture `20260709-212115` now supplies six exact Subway merchant appearances.
   Tailor, Weaponsdealer, Armorer, Pharmacist, Tools, and Container Supplier now
   expose six owner-linked shop endpoints with all `202` stock rows in exact
@@ -613,12 +622,10 @@ named encounter runtime. See
 
 The existing-corpus implementation pass for the five incomplete ordinary
 profiles is complete. Do not request duplicate captures for any evidence now
-indexed below. The whole-enemy gate remains 21 of 26 because the remaining
-gaps are genuinely absent from the currently indexed capture corpus: reset/leash boundaries
-for all five; respawn cycles for Infected Attendant, Lost Thought, Empty Shell,
-and Premature Pattern; usable weapon and repeated local cadence/range evidence;
-local landed damage for Lost Thought; landed damage semantics for Violent
-Vagabond; and strict Empty Shell/Premature Pattern loot.
+indexed below. Their spawn, corpse, cleanup, and respawn lifecycle is resolved
+by the shared PF127 policy above. Remaining review is limited to the actual
+combat, movement/aggro/leash, and strict-loot evidence already present in the
+captures; missing per-archetype respawn observations are no longer blockers.
 
 ## Remaining Capture-Backed Work
 
@@ -640,8 +647,8 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    `22`, critical `41`, other-player `16`, and pet `38`. These incomplete
    outcomes remain report-only instead of becoming constant fixed attacks.
    Premature source `79545356` now has its two exact stat-only generations and
-   complete captured out-and-back patrol, but combat, strict loot, respawn
-   timing, and leash/reset remain incomplete. Self-cast nano `81829` remains
+   complete captured out-and-back patrol, but combat, strict loot, and
+   leash/reset remain incomplete. Self-cast nano `81829` remains
    report-only because current runtime support cannot safely represent its
    captured multi-effect/ChangeVariable behavior.
    Vagabond now has 26 distinct local misses after overlap deduplication, a
@@ -650,8 +657,9 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    a guaranteed `16.606338`-unit lower bound but remains report-only while
    landed damage is unresolved; runtime stays retaliatory with shared chase and
    no automatic radius. Runtime damage is the explicit same-level Mugger
-   `9..12` playability policy, not a capture-parity claim. Its `450`-second post-NPC-despawn policy is derived from
-   the exact `449.759588` interval. QL1 template `130590` is Red Wine, is
+   `9..12` playability policy, not a capture-parity claim. The exact
+   `449.759588` observed interval remains evidence but no longer overrides the
+   shared `240`-second regular-mob policy. QL1 template `130590` is Red Wine, is
    rejected as combat input, and all 22 rows are active.
 4. Strike Foreman has usable exact L19/736 HP appearance, QL19 weapon, raw
    `SpecialAttackWeapon` plus `Attack` initiation against the non-local player
@@ -660,8 +668,9 @@ Vagabond; and strict Empty Shell/Premature Pattern loot.
    CATMesh `17870`, and `176` corpse credits. Killed source `7954512E` is bound
    to QL19 WeaponInstance `25713A73` and corpse `00F6E017`; exact source/target
    positions prove proactive acquisition at `20.250672` units. Local-player
-   outcomes remain unobserved, and item loot, respawn timing, leash/reset, and
-   the exact acquisition threshold/upper bound remain unresolved. Do not
+   outcomes remain unobserved, and item loot, leash/reset, and the exact
+   acquisition threshold/upper bound remain unresolved. Its eventual runtime
+   uses the shared Subway-boss 10-minute respawn and 30-minute corpse. Do not
    activate the encounter by guessing those missing boundaries; weapon-owned
    rolls must remain distinct from the observed post-mitigation other-player
    outcomes.

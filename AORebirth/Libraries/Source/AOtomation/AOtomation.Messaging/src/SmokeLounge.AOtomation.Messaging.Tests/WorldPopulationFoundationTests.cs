@@ -371,19 +371,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                              || value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Explicit
                              || value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.NoRespawn));
 
-            OrdinaryEnemySpawnDefinition thief = spawns.Single(value => value.SourceIdentity == 0x7953AEA5);
-            OrdinaryEnemySpawnDefinition flea = spawns.First(value => profiles.Single(profile => profile.ProfileKey == value.ProfileKey).MonsterData == 17657);
             OrdinaryEnemySpawnDefinition bloodcreeper = spawns.Single(value => value.SourceIdentity == 0x795451C5);
-            OrdinaryEnemySpawnDefinition slumRunner = spawns.First(
-                value => profiles.Single(profile => profile.ProfileKey == value.ProfileKey).DisplayName == "Slum Runner");
-            AssertExplicitDelay(thief, 60);
-            AssertExplicitDelay(flea, 240);
-            AssertExplicitDelay(bloodcreeper, 240);
-            AssertExplicitDelay(slumRunner, 60);
             Assert.IsTrue(
-                slumRunner.RespawnPolicy.ExplicitPolicy.Evidence.Contains("20260716-215947"));
-            Assert.IsTrue(
-                slumRunner.RespawnPolicy.ExplicitPolicy.Evidence.Contains("death-to-respawn=59.433"));
+                spawns.All(
+                    value => value.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy
+                             && value.RespawnDelaySeconds == 240.0
+                             && value.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(OrdinaryEnemySpawnLevelMode.InclusiveRange, bloodcreeper.LevelDefinition.Mode);
             Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeper.LevelDefinition.RerollPolicy);
 
@@ -419,12 +413,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 violentVagabondSpawns.All(
                     value => value.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy
-                             && value.RespawnDelaySeconds == 450.0
+                             && value.RespawnDelaySeconds == 240.0
                              && value.RespawnPolicy.Mode
-                                == WorldRespawnPolicyAssignmentMode.Explicit
-                             && value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds == 450.0
-                             && value.RespawnPolicy.ExplicitPolicy.Evidence.Contains(
-                                 "449.759588-seconds-after-npc-despawn")));
+                                == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(
                 OrdinaryEnemyAggressionMode.Retaliate,
                 violentVagabond.Aggression.Mode);
@@ -1306,9 +1297,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(17534, mugger.Corpse.CapturedCatMesh);
-            Assert.AreEqual(3.0, mugger.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(240.0, mugger.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(30.0, mugger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(120.0, mugger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(30.0, mugger.Corpse.LootedCleanupSeconds);
         }
 
         [TestMethod]
@@ -1453,11 +1444,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 spawns.All(
                     value => value.RespawnPolicy.Mode
-                             == WorldRespawnPolicyAssignmentMode.Explicit
-                             && value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds == 240.0));
-            Assert.AreEqual(3.0, profile.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(240.0, profile.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(3.0, profile.Corpse.LootedCleanupSeconds);
+                             == WorldRespawnPolicyAssignmentMode.Inherit
+                             && value.RespawnDelaySeconds == 240.0));
+            Assert.AreEqual(30.0, profile.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(120.0, profile.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(30.0, profile.Corpse.LootedCleanupSeconds);
 
             CollectionAssert.AreEqual(
                 new[]
@@ -2130,9 +2121,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(5927, shopper.Corpse.CapturedCatMesh);
-            Assert.AreEqual(3.0, shopper.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(240.0, shopper.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(3.0, shopper.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(30.0, shopper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(120.0, shopper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(30.0, shopper.Corpse.LootedCleanupSeconds);
         }
 
         [TestMethod]
