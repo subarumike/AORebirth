@@ -609,19 +609,21 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayStrictLootProfileDefinition(
                 "Deranged Shopper",
                 203736,
-                2,
-                2,
+                3,
+                3,
                 0,
                 false,
                 new string[]
                 {
                     "20260708-143600",
-                    "20260709-210452"
+                    "20260709-210452",
+                    "20260720-031025"
                 },
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(123019, 123020, 6, 1, 2, 5000),
-                    new CapturedSubwayLootEvidenceDefinition(124465, 124466, 10, 1, 2, 5000)
+                    new CapturedSubwayLootEvidenceDefinition(123019, 123020, 6, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(124465, 124466, 10, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(234876, 234876, 1, 1, 3, 3333)
                 }),
             new CapturedSubwayStrictLootProfileDefinition(
                 "Stim Fiend",
@@ -1437,7 +1439,8 @@ namespace AORebirth.Core.Playfields
                     "20260709-210452",
                     "20260709-212115",
                     "20260709-212336",
-                    "20260710-202132"
+                    "20260710-202132",
+                    "20260720-031025"
                 },
                 new CapturedSubwaySourceWeaponEvidenceDefinition[]
                 {
@@ -1743,33 +1746,37 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayCombatEvidenceDefinition(
                     true,
                     true,
-                    9,
+                    7,
                     9,
                     0.000000,
                     6,
                     0,
                     0,
-                    1),
+                    3),
                 new CapturedSubwayLootEvidenceDefinition[]
                 {
-                    new CapturedSubwayLootEvidenceDefinition(123019, 123020, 6, 1, 2, 5000),
-                    new CapturedSubwayLootEvidenceDefinition(124465, 124466, 10, 1, 2, 5000)
+                    new CapturedSubwayLootEvidenceDefinition(123019, 123020, 6, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(124465, 124466, 10, 1, 3, 3333),
+                    new CapturedSubwayLootEvidenceDefinition(234876, 234876, 1, 1, 3, 3333)
                 },
                 new CapturedSubwayLootOutcomeEvidenceDefinition[]
                 {
                     new CapturedSubwayLootOutcomeEvidenceDefinition("20260708-143600", "2026-07-08T19:49:42.3304212Z", "(Corpse:00F6E002)", "(SimpleChar:794DF0F5)", 203736, 14646, 0, 123019, 123020, 6),
-                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260709-210452", "2026-07-10T02:11:23.4907664Z", "(Corpse:00F6E01D)", "(SimpleChar:7953AD91)", 203736, 7929, 0, 124465, 124466, 10)
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260709-210452", "2026-07-10T02:11:23.4907664Z", "(Corpse:00F6E01D)", "(SimpleChar:7953AD91)", 203736, 7929, 0, 124465, 124466, 10),
+                    new CapturedSubwayLootOutcomeEvidenceDefinition("20260720-031025", "2026-07-20T08:15:14.688009Z", "(Corpse:00F7400E)", "(SimpleChar:79803651)", 203736, 1846, 0, 234876, 234876, 1)
                 },
                 new CapturedSubwayCorpseEvidenceDefinition[]
                 {
                     new CapturedSubwayCorpseEvidenceDefinition("20260708-143600", "2026-07-08T19:49:35.7577116Z", "(Corpse:00F6E002)", "(SimpleChar:794DF0F5)", 8, 203736, 5927, 47),
-                    new CapturedSubwayCorpseEvidenceDefinition("20260709-210452", "2026-07-10T02:11:16.4763853Z", "(Corpse:00F6E01D)", "(SimpleChar:7953AD91)", 9, 203736, 5927, 53)
+                    new CapturedSubwayCorpseEvidenceDefinition("20260709-210452", "2026-07-10T02:11:16.4763853Z", "(Corpse:00F6E01D)", "(SimpleChar:7953AD91)", 9, 203736, 5927, 53),
+                    new CapturedSubwayCorpseEvidenceDefinition("20260720-031025", "2026-07-20T08:15:11.1424242Z", "(Corpse:00F7400E)", "(SimpleChar:79803651)", 8, 203736, 5927, 47)
                 },
                 new string[]
                 {
                     "20260708-143600",
                     "20260709-210452",
-                    "20260710-202132"
+                    "20260710-202132",
+                    "20260720-031025"
                 },
                 new CapturedSubwaySourceWeaponEvidenceDefinition[]
                 {
@@ -2527,7 +2534,89 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayWaypointDefinition[]
                 {
                     new CapturedSubwayWaypointDefinition(255.7054f, 107.611687f, 285.020325f),
-                    new CapturedSubwayWaypointDefinition(254.4f, 107.601685f, 287.899963f)
+                    new CapturedSubwayWaypointDefinition(256.300018f, 107.601685f, 284.699951f),
+                    new CapturedSubwayWaypointDefinition(256.200012f, 107.601685f, 282.0f),
+                    new CapturedSubwayWaypointDefinition(256.300018f, 107.601685f, 284.699951f),
+                    new CapturedSubwayWaypointDefinition(254.399994f, 107.601685f, 287.899963f),
+                    new CapturedSubwayWaypointDefinition(253.899994f, 107.601685f, 296.299988f),
+                    new CapturedSubwayWaypointDefinition(249.600006f, 107.601685f, 293.599976f),
+                    new CapturedSubwayWaypointDefinition(243.600006f, 107.701683f, 291.899994f),
+                    new CapturedSubwayWaypointDefinition(240.300018f, 107.601685f, 292.5f),
+                    new CapturedSubwayWaypointDefinition(235.899994f, 107.601685f, 294.699982f),
+                    new CapturedSubwayWaypointDefinition(230.399994f, 107.601685f, 290.5f),
+                    new CapturedSubwayWaypointDefinition(230.200012f, 107.601685f, 289.799988f),
+                    new CapturedSubwayWaypointDefinition(230.899994f, 107.601685f, 297.599976f),
+                    new CapturedSubwayWaypointDefinition(228.0f, 107.601685f, 299.899963f),
+                    new CapturedSubwayWaypointDefinition(226.800018f, 107.701683f, 302.799988f),
+                    new CapturedSubwayWaypointDefinition(227.5f, 107.601685f, 304.599976f),
+                    new CapturedSubwayWaypointDefinition(226.700012f, 107.601685f, 304.0f),
+                    new CapturedSubwayWaypointDefinition(222.600006f, 107.601685f, 302.299988f),
+                    new CapturedSubwayWaypointDefinition(218.899994f, 107.601685f, 301.899963f),
+                    new CapturedSubwayWaypointDefinition(218.5f, 107.601685f, 302.599976f),
+                    new CapturedSubwayWaypointDefinition(219.300018f, 107.601685f, 299.999969f),
+                    new CapturedSubwayWaypointDefinition(218.399994f, 107.601685f, 298.299988f),
+                    new CapturedSubwayWaypointDefinition(217.5f, 107.601685f, 297.199982f),
+                    new CapturedSubwayWaypointDefinition(217.100006f, 107.701683f, 296.399963f),
+                    new CapturedSubwayWaypointDefinition(217.200012f, 107.601685f, 296.799988f),
+                    new CapturedSubwayWaypointDefinition(216.0f, 107.601685f, 297.899963f),
+                    new CapturedSubwayWaypointDefinition(213.399994f, 107.601685f, 299.899963f),
+                    new CapturedSubwayWaypointDefinition(211.0f, 107.601685f, 301.699982f),
+                    new CapturedSubwayWaypointDefinition(208.100006f, 107.601685f, 305.099976f),
+                    new CapturedSubwayWaypointDefinition(209.0f, 107.601685f, 306.599976f),
+                    new CapturedSubwayWaypointDefinition(208.200012f, 107.601685f, 306.099976f),
+                    new CapturedSubwayWaypointDefinition(206.300018f, 107.601685f, 306.199982f),
+                    new CapturedSubwayWaypointDefinition(204.100006f, 107.601685f, 306.5f),
+                    new CapturedSubwayWaypointDefinition(196.700012f, 107.701683f, 304.199982f),
+                    new CapturedSubwayWaypointDefinition(189.899994f, 107.601685f, 300.699982f),
+                    new CapturedSubwayWaypointDefinition(187.0f, 107.601685f, 295.799988f),
+                    new CapturedSubwayWaypointDefinition(187.100006f, 107.601685f, 295.0f),
+                    new CapturedSubwayWaypointDefinition(187.5f, 107.601685f, 295.799988f),
+                    new CapturedSubwayWaypointDefinition(188.5f, 107.601685f, 295.899963f),
+                    new CapturedSubwayWaypointDefinition(190.0f, 107.601685f, 296.599976f),
+                    new CapturedSubwayWaypointDefinition(195.200012f, 107.601486f, 297.20105f),
+                    new CapturedSubwayWaypointDefinition(196.229126f, 107.601334f, 303.059479f),
+                    new CapturedSubwayWaypointDefinition(200.800018f, 107.601685f, 304.051819f),
+                    new CapturedSubwayWaypointDefinition(202.942245f, 107.600975f, 301.614502f),
+                    new CapturedSubwayWaypointDefinition(200.800018f, 107.601685f, 304.051819f),
+                    new CapturedSubwayWaypointDefinition(196.229126f, 107.601334f, 303.059479f),
+                    new CapturedSubwayWaypointDefinition(195.200012f, 107.601486f, 297.20105f),
+                    new CapturedSubwayWaypointDefinition(190.0f, 107.601685f, 296.599976f),
+                    new CapturedSubwayWaypointDefinition(188.5f, 107.601685f, 295.899963f),
+                    new CapturedSubwayWaypointDefinition(187.5f, 107.601685f, 295.799988f),
+                    new CapturedSubwayWaypointDefinition(187.100006f, 107.601685f, 295.0f),
+                    new CapturedSubwayWaypointDefinition(187.0f, 107.601685f, 295.799988f),
+                    new CapturedSubwayWaypointDefinition(189.899994f, 107.601685f, 300.699982f),
+                    new CapturedSubwayWaypointDefinition(196.700012f, 107.701683f, 304.199982f),
+                    new CapturedSubwayWaypointDefinition(204.100006f, 107.601685f, 306.5f),
+                    new CapturedSubwayWaypointDefinition(206.300018f, 107.601685f, 306.199982f),
+                    new CapturedSubwayWaypointDefinition(208.200012f, 107.601685f, 306.099976f),
+                    new CapturedSubwayWaypointDefinition(209.0f, 107.601685f, 306.599976f),
+                    new CapturedSubwayWaypointDefinition(208.100006f, 107.601685f, 305.099976f),
+                    new CapturedSubwayWaypointDefinition(211.0f, 107.601685f, 301.699982f),
+                    new CapturedSubwayWaypointDefinition(213.399994f, 107.601685f, 299.899963f),
+                    new CapturedSubwayWaypointDefinition(216.0f, 107.601685f, 297.899963f),
+                    new CapturedSubwayWaypointDefinition(217.200012f, 107.601685f, 296.799988f),
+                    new CapturedSubwayWaypointDefinition(217.100006f, 107.701683f, 296.399963f),
+                    new CapturedSubwayWaypointDefinition(217.5f, 107.601685f, 297.199982f),
+                    new CapturedSubwayWaypointDefinition(218.399994f, 107.601685f, 298.299988f),
+                    new CapturedSubwayWaypointDefinition(219.300018f, 107.601685f, 299.999969f),
+                    new CapturedSubwayWaypointDefinition(218.5f, 107.601685f, 302.599976f),
+                    new CapturedSubwayWaypointDefinition(218.899994f, 107.601685f, 301.899963f),
+                    new CapturedSubwayWaypointDefinition(222.600006f, 107.601685f, 302.299988f),
+                    new CapturedSubwayWaypointDefinition(226.700012f, 107.601685f, 304.0f),
+                    new CapturedSubwayWaypointDefinition(227.5f, 107.601685f, 304.599976f),
+                    new CapturedSubwayWaypointDefinition(226.800018f, 107.701683f, 302.799988f),
+                    new CapturedSubwayWaypointDefinition(228.0f, 107.601685f, 299.899963f),
+                    new CapturedSubwayWaypointDefinition(230.899994f, 107.601685f, 297.599976f),
+                    new CapturedSubwayWaypointDefinition(230.200012f, 107.601685f, 289.799988f),
+                    new CapturedSubwayWaypointDefinition(230.399994f, 107.601685f, 290.5f),
+                    new CapturedSubwayWaypointDefinition(235.899994f, 107.601685f, 294.699982f),
+                    new CapturedSubwayWaypointDefinition(240.300018f, 107.601685f, 292.5f),
+                    new CapturedSubwayWaypointDefinition(243.600006f, 107.701683f, 291.899994f),
+                    new CapturedSubwayWaypointDefinition(249.600006f, 107.601685f, 293.599976f),
+                    new CapturedSubwayWaypointDefinition(254.0f, 107.601685f, 296.799988f),
+                    new CapturedSubwayWaypointDefinition(253.899994f, 107.601685f, 296.299988f),
+                    new CapturedSubwayWaypointDefinition(254.399994f, 107.601685f, 287.899963f)
                 },
                 "",
                 "20260710-202132",
@@ -3463,6 +3552,15 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayWaypointDefinition[]
                 {
                     new CapturedSubwayWaypointDefinition(222.926041f, 107.611687f, 304.151062f),
+                    new CapturedSubwayWaypointDefinition(222.503265f, 108.601967f, 304.151306f),
+                    new CapturedSubwayWaypointDefinition(227.316345f, 107.611687f, 304.24353f),
+                    new CapturedSubwayWaypointDefinition(228.374115f, 107.611687f, 297.205536f),
+                    new CapturedSubwayWaypointDefinition(230.70578f, 107.611687f, 290.920227f),
+                    new CapturedSubwayWaypointDefinition(240.230774f, 107.611687f, 294.185669f),
+                    new CapturedSubwayWaypointDefinition(253.004242f, 107.611687f, 297.701233f),
+                    new CapturedSubwayWaypointDefinition(240.230774f, 107.611687f, 294.185669f),
+                    new CapturedSubwayWaypointDefinition(230.70578f, 107.611687f, 290.920227f),
+                    new CapturedSubwayWaypointDefinition(228.374115f, 107.611687f, 297.205536f),
                     new CapturedSubwayWaypointDefinition(227.316345f, 107.611687f, 304.24353f)
                 },
                 "",
@@ -3505,7 +3603,18 @@ namespace AORebirth.Core.Playfields
                 new CapturedSubwayWaypointDefinition[]
                 {
                     new CapturedSubwayWaypointDefinition(263.857849f, 107.715f, 285.410522f),
-                    new CapturedSubwayWaypointDefinition(259.6285f, 107.611687f, 285.432f)
+                    new CapturedSubwayWaypointDefinition(259.62851f, 107.611687f, 285.432007f),
+                    new CapturedSubwayWaypointDefinition(255.350464f, 107.611687f, 295.588074f),
+                    new CapturedSubwayWaypointDefinition(259.62851f, 107.611687f, 285.432007f),
+                    new CapturedSubwayWaypointDefinition(270.079346f, 107.611687f, 285.489746f),
+                    new CapturedSubwayWaypointDefinition(276.021362f, 107.611687f, 286.755951f),
+                    new CapturedSubwayWaypointDefinition(281.641541f, 107.611687f, 286.83609f),
+                    new CapturedSubwayWaypointDefinition(287.588104f, 107.611687f, 288.004486f),
+                    new CapturedSubwayWaypointDefinition(287.600006f, 108.601685f, 294.5f),
+                    new CapturedSubwayWaypointDefinition(287.588104f, 107.611687f, 288.004486f),
+                    new CapturedSubwayWaypointDefinition(281.641541f, 107.611687f, 286.83609f),
+                    new CapturedSubwayWaypointDefinition(276.021362f, 107.611687f, 286.755951f),
+                    new CapturedSubwayWaypointDefinition(270.079346f, 107.611687f, 285.489746f)
                 },
                 "",
                 "20260709-212336",

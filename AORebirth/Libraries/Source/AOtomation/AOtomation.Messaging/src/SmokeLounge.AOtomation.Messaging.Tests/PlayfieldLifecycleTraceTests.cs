@@ -3088,10 +3088,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(derangedShopperUnknownSource.IsCombatReady);
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, derangedShopper.Loot.PoolMode);
             Assert.IsFalse(derangedShopper.Loot.ItemPoolComplete);
-            Assert.AreEqual(2, derangedShopper.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, derangedShopper.Loot.ObservedCompleteInventories);
             Assert.AreEqual(0, derangedShopper.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
-                new[] { "123019:123020:6:1:2", "124465:124466:10:1:2" },
+                new[]
+                    {
+                        "123019:123020:6:1:3", "124465:124466:10:1:3",
+                        "234876:234876:1:1:3"
+                    },
                 derangedShopper.Loot.Entries
                     .Select(
                         value => string.Format(
@@ -3103,7 +3107,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "8:47:47:1", "9:53:53:1" },
+                new[] { "8:47:47:2", "9:53:53:1" },
                 derangedShopper.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(
@@ -3124,37 +3128,47 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && derangedShopperCombatContract.Contains("125454")
                 && derangedShopperCombatContract.Contains("125455")
                 && derangedShopperCombatContract.Contains("EquippedWeaponWithCapturedAttackInfo")
-                && derangedShopperCombatContract.Contains("eight normal local-player hits span 9..15")
+                && derangedShopperCombatContract.Contains("ten normal local-player hits span 7..15")
                 && derangedShopperCombatContract.Contains("one 27-point critical is report-only")
-                && derangedShopperCombatContract.Contains("one captured miss")
+                && derangedShopperCombatContract.Contains("six captured misses")
+                && derangedShopperCombatContract.Contains("empty SpecialAttackWeapon 56/45/45/45/0")
+                && derangedShopperCombatContract.Contains("attack-start, StopFight, and death context")
                 && derangedShopperCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
-                && derangedShopperCombatContract.Contains("no empty SIW or captured attack-start/stop context")
+                && derangedShopperCombatContract.Contains("runtime behavior is unchanged")
                 && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
-                && derangedShopperCombatReport.Contains("\"normalAttackInfoRows\": 8")
-                && derangedShopperCombatReport.Contains("\"normalMinDamage\": 9")
+                && derangedShopperCombatReport.Contains("\"normalAttackInfoRows\": 10")
+                && derangedShopperCombatReport.Contains("\"normalMinDamage\": 7")
                 && derangedShopperCombatReport.Contains("\"normalMaxDamage\": 15")
                 && derangedShopperCombatReport.Contains("\"criticalAttackInfoRows\": 1")
                 && derangedShopperCombatReport.Contains("\"criticalMinDamage\": 27")
                 && derangedShopperCombatReport.Contains("\"criticalMaxDamage\": 27")
-                && derangedShopperCombatReport.Contains("\"missedAttackInfoRows\": 2")
+                && derangedShopperCombatReport.Contains("\"missedAttackInfoRows\": 7")
                 && derangedShopperCombatReport.Contains("\"missedAttackShapes\": [")
                 && derangedShopperCombatReport.Contains("\"ammoCount\": -1")
                 && derangedShopperCombatReport.Contains("\"weaponSlot\": 6")
                 && derangedShopperCombatReport.Contains("\"unknown\": 0")
-                && derangedShopperCombatReport.Contains("\"rows\": 2")
+                && derangedShopperCombatReport.Contains("\"rows\": 7")
+                && derangedShopperCombatReport.Contains("\"specialAttackWeaponRows\": 1")
+                && derangedShopperCombatReport.Contains("\"unknown1\": 56")
+                && derangedShopperCombatReport.Contains("\"unknown2\": 45")
+                && derangedShopperCombatReport.Contains("\"unknown3\": 45")
+                && derangedShopperCombatReport.Contains("\"unknown4\": 45")
+                && derangedShopperCombatReport.Contains("\"unknown5\": 0")
                 && derangedShopperCombatReport.Contains("\"equippedWeaponShapes\": [")
                 && derangedShopperCombatReport.Contains("\"lowId\": 125454")
                 && derangedShopperCombatReport.Contains("\"highId\": 125455")
                 && derangedShopperCombatReport.Contains("\"quality\": 8")
                 && derangedShopperCombatReport.Contains("20260710-202132")
                 && derangedShopperCombatReport.Contains("(SimpleChar:79574527)")
+                && derangedShopperCombatReport.Contains("20260720-031025")
+                && derangedShopperCombatReport.Contains("(SimpleChar:79803651)")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(3)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(4)"),
-                "Accepted Subway Deranged Shopper must keep its one active source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, report-only critical, one captured miss shape, strict two-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
+                "Accepted Subway Deranged Shopper must keep its one active source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, ten normal hits at 7..15, report-only critical, seven aggregate misses, evidence-only SIW/start/stop/death context, strict three-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile discardedPet = ordinaryProfiles.Single(
                 value => value.DisplayName == "Discarded Pet");

@@ -1279,8 +1279,8 @@ namespace AORebirth.Core.Playfields
             }
 
             return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
-                evidence[0].EvidenceCaptures
-                + ": Deranged Shopper source 0x79574527 owner-linked QL8 weapon 125454/125455; eight normal local-player hits span 9..15, one 27-point critical is report-only, and one captured miss preserves ammo -1, slot 6, and unknown 0; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; no empty SIW or captured attack-start/stop context",
+                evidence[0].EvidenceCaptures + ",20260720-031025"
+                + ": Deranged Shopper source 0x79574527 owner-linked QL8 weapon 125454/125455; ten normal local-player hits span 7..15, one 27-point critical is report-only, and six captured misses preserve ammo -1, slot 6, unknown 0, and weapon instance 0; capture 20260720-031025 also proves empty SpecialAttackWeapon 56/45/45/45/0 plus attack-start, StopFight, and death context; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; the newly observed SIW/start/stop/death context remains evidence-only so runtime behavior is unchanged",
                 evidence[0].LowId,
                 evidence[0].HighId,
                 evidence[0].Quality,

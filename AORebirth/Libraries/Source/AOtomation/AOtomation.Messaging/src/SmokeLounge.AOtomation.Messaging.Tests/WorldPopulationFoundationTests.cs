@@ -835,6 +835,53 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void Capture20260720031025KeepsPatrolsBoundToTheirExactSources()
+        {
+            OrdinaryEnemySpawnDefinition[] spawns = new OrdinaryEnemyCatalog(
+                    new CapturedSubwayContentProvider(),
+                    new CapturedSubwayOrdinaryContentProvider())
+                .GetSpawns();
+            OrdinaryEnemySpawnDefinition deranged = spawns.Single(
+                value => value.SourceIdentity == 0x79574527);
+            OrdinaryEnemySpawnDefinition looter29 = spawns.Single(
+                value => value.SourceIdentity == 0x79545029);
+            OrdinaryEnemySpawnDefinition looter3C = spawns.Single(
+                value => value.SourceIdentity == 0x7954503C);
+
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, deranged.MovementMode);
+            Assert.AreEqual(84, deranged.Waypoints.Length);
+            AssertWaypoint(deranged, 0, 255.7054f, 107.611687f, 285.020325f);
+            AssertWaypoint(deranged, 2, 256.200012f, 107.601685f, 282.0f);
+            AssertWaypoint(deranged, 5, 253.899994f, 107.601685f, 296.299988f);
+            AssertWaypoint(deranged, 36, 187.100006f, 107.601685f, 295.0f);
+            AssertWaypoint(deranged, 43, 202.942245f, 107.600975f, 301.614502f);
+            AssertWaypoint(deranged, 50, 187.100006f, 107.601685f, 295.0f);
+            AssertWaypoint(deranged, 83, 254.399994f, 107.601685f, 287.899963f);
+
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, looter29.MovementMode);
+            Assert.AreEqual(11, looter29.Waypoints.Length);
+            AssertWaypoint(looter29, 0, 222.926041f, 107.611687f, 304.151062f);
+            AssertWaypoint(looter29, 1, 222.503265f, 108.601967f, 304.151306f);
+            AssertWaypoint(looter29, 6, 253.004242f, 107.611687f, 297.701233f);
+            AssertWaypoint(looter29, 10, 227.316345f, 107.611687f, 304.24353f);
+
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, looter3C.MovementMode);
+            Assert.AreEqual(13, looter3C.Waypoints.Length);
+            AssertWaypoint(looter3C, 0, 263.857849f, 107.715f, 285.410522f);
+            AssertWaypoint(looter3C, 2, 255.350464f, 107.611687f, 295.588074f);
+            AssertWaypoint(looter3C, 8, 287.600006f, 108.601685f, 294.5f);
+            AssertWaypoint(looter3C, 12, 270.079346f, 107.611687f, 285.489746f);
+
+            Assert.AreEqual(
+                0,
+                spawns.Single(value => value.SourceIdentity == 0x795312DC).Waypoints.Length);
+            Assert.AreEqual(
+                1,
+                spawns.Single(value => value.SourceIdentity == 0x7957E5CD).Waypoints.Length,
+                "The unresolved 0x7957E5CD population association must not inherit 0x79545029's patrol.");
+        }
+
+        [TestMethod]
         public void LooterResolvesEveryCapturedSourceWeaponAndFailsClosedWithoutOneExactTuple()
         {
             var expected = new Dictionary<int, int[]>
@@ -1810,18 +1857,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 StringComparison.Ordinal);
             Assert.IsTrue(reportStart >= 0 && reportEnd > reportStart);
             string report = generatedCombatReportText.Substring(reportStart, reportEnd - reportStart);
-            Assert.IsTrue(report.Contains("\"missedAttackInfoRows\": 2"));
+            Assert.IsTrue(report.Contains("\"normalAttackInfoRows\": 10"));
+            Assert.IsTrue(report.Contains("\"normalMinDamage\": 7"));
+            Assert.IsTrue(report.Contains("\"normalMaxDamage\": 15"));
+            Assert.IsTrue(report.Contains("\"missedAttackInfoRows\": 7"));
             Assert.IsTrue(report.Contains("\"missedAttackShapes\": ["));
             Assert.IsTrue(report.Contains("\"ammoCount\": -1"));
             Assert.IsTrue(report.Contains("\"weaponSlot\": 6"));
             Assert.IsTrue(report.Contains("\"unknown\": 0"));
-            Assert.IsTrue(report.Contains("\"rows\": 2"));
+            Assert.IsTrue(report.Contains("\"rows\": 7"));
+            Assert.IsTrue(report.Contains("\"specialAttackWeaponRows\": 1"));
+            Assert.IsTrue(report.Contains("\"unknown1\": 56"));
+            Assert.IsTrue(report.Contains("\"unknown2\": 45"));
+            Assert.IsTrue(report.Contains("\"unknown3\": 45"));
+            Assert.IsTrue(report.Contains("\"unknown4\": 45"));
+            Assert.IsTrue(report.Contains("\"unknown5\": 0"));
             Assert.IsTrue(report.Contains("\"equippedWeaponShapes\": ["));
             Assert.IsTrue(report.Contains("\"lowId\": 125454"));
             Assert.IsTrue(report.Contains("\"highId\": 125455"));
             Assert.IsTrue(report.Contains("\"quality\": 8"));
             Assert.IsTrue(report.Contains("20260710-202132"));
             Assert.IsTrue(report.Contains("(SimpleChar:79574527)"));
+            Assert.IsTrue(report.Contains("20260720-031025"));
+            Assert.IsTrue(report.Contains("(SimpleChar:79803651)"));
 
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
@@ -1869,8 +1927,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
             Assert.IsFalse(contract.HasCapturedAttackStartContext);
             Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+            Assert.IsTrue(contract.Evidence.Contains("20260720-031025"));
+            Assert.IsTrue(contract.Evidence.Contains("ten normal local-player hits span 7..15"));
             Assert.IsTrue(contract.Evidence.Contains("critical is report-only"));
-            Assert.IsTrue(contract.Evidence.Contains("one captured miss"));
+            Assert.IsTrue(contract.Evidence.Contains("six captured misses"));
+            Assert.IsTrue(contract.Evidence.Contains("empty SpecialAttackWeapon 56/45/45/45/0"));
+            Assert.IsTrue(contract.Evidence.Contains("attack-start, StopFight, and death context"));
+            Assert.IsTrue(contract.Evidence.Contains("runtime behavior is unchanged"));
             Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage, damage bonus, and recharge"));
 
             CapturedEnemyCombatContract unknown = shopper.Combat.ResolveContract(
@@ -1896,15 +1959,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, shopper.Loot.PoolMode);
             Assert.IsFalse(shopper.Loot.ItemPoolComplete);
-            Assert.AreEqual(2, shopper.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, shopper.Loot.ObservedCompleteInventories);
             Assert.AreEqual(0, shopper.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
-                new[] { "123019:123020:6:1:2", "124465:124466:10:1:2" },
+                new[]
+                    {
+                        "123019:123020:6:1:3", "124465:124466:10:1:3",
+                        "234876:234876:1:1:3"
+                    },
                 shopper.Loot.Entries
                     .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "8:47:47:1", "9:53:53:1" },
+                new[] { "8:47:47:2", "9:53:53:1" },
                 shopper.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
@@ -2129,7 +2196,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildLooterArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("looter_test", "looter", "Looter", 203745, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 40695, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 11, 11, 5.282358, 6, 0, 0, 15), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-212115" }, sourceWeaponEvidence); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildIncompleteRebuildArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence, int maximumDamage = 35) { return new CapturedSubwayOrdinaryArchetypeDefinition("incomplete_rebuild_test", "incomplete_rebuild", "Incomplete Rebuild", 203728, 148, 0, 268964353, 0, 0, 31, 0, 1643u, 29694, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 17, maximumDamage, 0.0, 6, 0, 0, 2), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-222339", "20260709-225408", "20260710-211430" }, sourceWeaponEvidence); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildRedundantScanArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("redundant_scan_test", "redundant_scan", "Redundant Scan", 204178, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 40660, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 19, 19, 0.0, 6, 0, 0, 1), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-222339", "20260709-225408" }, sourceWeaponEvidence); }
-        private static CapturedSubwayOrdinaryArchetypeDefinition BuildDerangedShopperArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("deranged_shopper_test", "deranged_shopper", "Deranged Shopper", 203736, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 5927, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 9, 15, 5.161083, 6, 0, 0, 8), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260710-202132" }, sourceWeaponEvidence); }
+        private static CapturedSubwayOrdinaryArchetypeDefinition BuildDerangedShopperArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("deranged_shopper_test", "deranged_shopper", "Deranged Shopper", 203736, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 5927, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 7, 15, 5.161083, 6, 0, 0, 10), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260710-202132", "20260720-031025" }, sourceWeaponEvidence); }
+
+        private static void AssertWaypoint(
+            OrdinaryEnemySpawnDefinition spawn,
+            int index,
+            float x,
+            float y,
+            float z)
+        {
+            Assert.AreEqual(x, spawn.Waypoints[index].X);
+            Assert.AreEqual(y, spawn.Waypoints[index].Y);
+            Assert.AreEqual(z, spawn.Waypoints[index].Z);
+        }
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static void AssertThrowsArgument(Action action) { try { action(); Assert.Fail("Expected ArgumentException."); } catch (ArgumentException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }

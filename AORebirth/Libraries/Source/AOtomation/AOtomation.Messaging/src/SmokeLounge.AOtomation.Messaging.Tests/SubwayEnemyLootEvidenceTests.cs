@@ -246,7 +246,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .SelectMany(value => provider.GetCorpseEvidence(value))
                 .ToArray();
 
-            Assert.AreEqual(306, evidence.Length);
+            Assert.AreEqual(307, evidence.Length);
             Assert.AreEqual(26, evidence.Select(value => value.MonsterData).Distinct().Count());
             CollectionAssert.AreEqual(
                 new[]
@@ -260,7 +260,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "20260716-034104:1",
                         "20260716-221358:2",
                         "20260716-222007:4",
-                        "20260716-222201:2"
+                        "20260716-222201:2",
+                        "20260720-031025:1"
                     },
                 evidence
                     .Where(
@@ -273,7 +274,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  || value.Capture == "20260716-034104"
                                  || value.Capture == "20260716-221358"
                                  || value.Capture == "20260716-222007"
-                                 || value.Capture == "20260716-222201")
+                                 || value.Capture == "20260716-222201"
+                                 || value.Capture == "20260720-031025")
                     .GroupBy(value => value.Capture)
                     .OrderBy(value => value.Key, StringComparer.Ordinal)
                     .Select(value => value.Key + ":" + value.Count())
@@ -291,6 +293,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(30379, bloodcreeper.MonsterData);
             Assert.AreEqual(26978, bloodcreeper.CatMesh);
             Assert.AreEqual(150, bloodcreeper.Credits);
+            CapturedSubwayCorpseEvidenceDefinition derangedShopper = evidence.Single(
+                value => value.Capture == "20260720-031025"
+                         && value.DeadNpcIdentity == "(SimpleChar:79803651)");
+            Assert.AreEqual(8, derangedShopper.EnemyLevel);
+            Assert.AreEqual(203736, derangedShopper.MonsterData);
+            Assert.AreEqual(5927, derangedShopper.CatMesh);
+            Assert.AreEqual(47, derangedShopper.Credits);
             CapturedSubwayCorpseEvidenceDefinition legacyDiscardedPet = evidence.Single(
                 value => value.Capture == "20260708-004038"
                          && value.DeadNpcIdentity == "(SimpleChar:794A16EE)");
@@ -697,9 +706,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     });
             AssertRecoveredStrictLoot(
                 "Deranged Shopper",
-                2,
+                3,
                 0,
-                new[] { "123019:123020:6:1", "124465:124466:10:1" });
+                new[]
+                    {
+                        "123019:123020:6:1", "124465:124466:10:1",
+                        "234876:234876:1:1"
+                    });
             AssertRecoveredStrictLoot(
                 "Incomplete Rebuild",
                 2,
@@ -849,7 +862,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCorpseAndLevelCredits(
                 "Deranged Shopper",
                 5927,
-                "8:47:47:1",
+                "8:47:47:2",
                 "9:53:53:1");
             AssertCorpseAndLevelCredits(
                 "Discarded Pet",

@@ -35,6 +35,7 @@ CAPTURES = (
     "20260716-222201",
     "20260719-020104",
     "20260719-021022",
+    "20260720-031025",
 )
 SPAWN_CAPTURES = (
     "20260709-212336",
@@ -63,6 +64,7 @@ CAPTURE_ARCHETYPE_FILTERS = {
         ("Disobedient Bot", "Violent Vagabond")
     ),
     "20260719-021022": frozenset(("Mugger",)),
+    "20260720-031025": frozenset(("Deranged Shopper", "Looter")),
 }
 CAPTURE_IDENTITY_NAME_OVERRIDES = {
     # This combat-only capture has no matching SCFU/name row.  Its two slot-6
@@ -349,6 +351,64 @@ PREMATURE_PATTERN_PATROL_WAYPOINTS = (
     ("247.100006", "81", "87.5"),
     ("247.100052", "80.99999", "108.3"),
     ("247.100052", "80.99999", "111.4"),
+)
+
+# Finalized capture 20260720-031025 records one complete Deranged Shopper
+# patrol and repeated complete patrol cycles for two Looters.  The runtime
+# population remains bound to the established canonical sources below; the
+# later identities contribute movement only and must never become new rows.
+# For the two Looters, FollowTarget unknown/animation 25 is the repeated patrol
+# context in this capture and no combat exchange occurs.  For Deranged Shopper,
+# only the 83 unknown/animation 24 NpcPath rows are patrol evidence; its later
+# ten animation-25 NpcPath rows and one additional non-NpcPath animation-25 row
+# belong to combat chase and are intentionally excluded.
+REVIEWED_PATROL_CAPTURE = "20260720-031025"
+REVIEWED_PATROL_ASSOCIATIONS = (
+    {
+        "source": 0x79574527,
+        "name": "Deranged Shopper",
+        "monster_data": "203736",
+        "identity": "79803651",
+        "animation": "24",
+        "animation_counts": {"24": 83, "25": 10},
+        "rows": 83,
+        "first_sequence": "70",
+        "last_sequence": "1728",
+        "path_sha256": "7e25351b7f8b60f9460ac8c72efd2c221e1321ed012223456d7ebe3158f20324",
+        "period": 0,
+        "max_anchor_distance": 1.0,
+        "existing_waypoints": "255.7054:107.611687:285.020325|254.4:107.601685:287.899963",
+    },
+    {
+        "source": 0x79545029,
+        "name": "Looter",
+        "monster_data": "203745",
+        "identity": "79803346",
+        "animation": "25",
+        "animation_counts": {"25": 54},
+        "rows": 54,
+        "first_sequence": "49",
+        "last_sequence": "2190",
+        "path_sha256": "47683a186e19525e276a81effc5070b9022772abe84559ed9803728cd1411436",
+        "period": 10,
+        "max_anchor_distance": 1.5,
+        "existing_waypoints": "222.926041:107.611687:304.151062|227.316345:107.611687:304.24353",
+    },
+    {
+        "source": 0x7954503C,
+        "name": "Looter",
+        "monster_data": "203745",
+        "identity": "79803625",
+        "animation": "25",
+        "animation_counts": {"25": 94},
+        "rows": 94,
+        "first_sequence": "18",
+        "last_sequence": "2171",
+        "path_sha256": "1829b6baaee814d02d4511c05ed3d566024c435a64faca9869e1c287ce699218",
+        "period": 12,
+        "max_anchor_distance": 4.5,
+        "existing_waypoints": "263.857849:107.715:285.410522|259.6285:107.611687:285.432",
+    },
 )
 
 # Audited complete-open denominator for Workman Striker.  The legacy capture
@@ -762,13 +822,21 @@ REVIEWED_LEGACY_STRICT_LOOT_DEFINITIONS.update(
         ),
         "Deranged Shopper": reviewed_strict_loot_definition(
             203736,
-            ("20260708-143600", "20260709-210452"),
-            {"20260708-143600": 1, "20260709-210452": 1},
-            2,
-            2,
+            ("20260708-143600", "20260709-210452", "20260720-031025"),
+            {
+                "20260708-143600": 1,
+                "20260709-210452": 1,
+                "20260720-031025": 1,
+            },
+            3,
+            3,
             0,
-            "b8b38b0fc4613cb3bcabaa811388e980b8ca63eb5480d4a37900d8959286c7c5",
-            {(123019, 123020, 6): 1, (124465, 124466, 10): 1},
+            "39957537f77c427f2ca44ca9d446f713065e5d51370a4e0caaf648462e96458d",
+            {
+                (123019, 123020, 6): 1,
+                (124465, 124466, 10): 1,
+                (234876, 234876, 1): 1,
+            },
         ),
         "Incomplete Rebuild": reviewed_strict_loot_definition(
             203728,
@@ -986,6 +1054,7 @@ CAPTURE_CORPSE_EVIDENCE_FILTERS = {
         ("Disobedient Bot", "Violent Vagabond")
     ),
     "20260719-021022": frozenset(("Mugger",)),
+    "20260720-031025": frozenset(("Deranged Shopper",)),
 }
 CAPTURE_CORPSE_IDENTITY_FILTERS = {
     "20260709-205921": frozenset(
@@ -1183,6 +1252,7 @@ CAPTURE_CORPSE_IDENTITY_FILTERS = {
         )
     ),
     "20260719-021022": frozenset(("(SimpleChar:797B889D)",)),
+    "20260720-031025": frozenset(("(SimpleChar:79803651)",)),
 }
 CAPTURE_LIFECYCLE_DEATH_LEVEL_FILTERS = {
     "20260712-160257": frozenset(("(SimpleChar:795EC78A)",)),
@@ -1218,7 +1288,9 @@ CROSS_SESSION_CORPSE_LEVEL_EVIDENCE = {
     }
 }
 ARCHETYPE_CAPTURE_FILTERS = {
-    "Deranged Shopper": frozenset(("20260710-202132",)),
+    "Deranged Shopper": frozenset(
+        ("20260710-202132", "20260720-031025")
+    ),
 }
 ARCHETYPE_SPAWN_IDENTITY_FILTERS = {
     "Bloodcreeper": frozenset(("(SimpleChar:795451C5)",)),
@@ -2485,6 +2557,208 @@ def apply_premature_pattern_reviewed_patrol(
     result[index] = reviewed
     if len(result) != len(spawns):
         raise ValueError("Premature Pattern patrol override changed population size")
+    return result
+
+
+def reviewed_patrol_rows(
+    association: dict[str, object],
+) -> list[dict[str, str]]:
+    path = CAPTURE_ROOT / REVIEWED_PATROL_CAPTURE / "movement-packets.csv"
+    identity = "SimpleChar:" + str(association["identity"])
+    identity_rows = [
+        row for row in read_csv(path) if row.get("SourceIdentity") == identity
+    ]
+    npc_path_rows = [
+        row
+        for row in identity_rows
+        if row.get("MessageType") == "FollowTarget"
+        and row.get("FollowKind") == "NpcPath"
+    ]
+    animation_counts = Counter(row.get("Animation", "") for row in npc_path_rows)
+    if animation_counts != Counter(association["animation_counts"]):
+        raise ValueError(
+            "reviewed patrol animation boundary drifted source=0x{0:08X} actual={1}".format(
+                int(association["source"]), dict(sorted(animation_counts.items()))
+            )
+        )
+
+    animation = str(association["animation"])
+    rows = [row for row in npc_path_rows if row.get("Animation") == animation]
+    if (
+        len(rows) != int(association["rows"])
+        or not rows
+        or rows[0].get("Sequence") != association["first_sequence"]
+        or rows[-1].get("Sequence") != association["last_sequence"]
+    ):
+        raise ValueError(
+            "reviewed patrol row boundary drifted source=0x{0:08X}".format(
+                int(association["source"])
+            )
+        )
+
+    expected_shape = {
+        "Direction": "IN",
+        "MessageType": "FollowTarget",
+        "SourceType": "SimpleChar",
+        "SourceInstance": str(association["identity"]),
+        "SourceIdentity": identity,
+        "SourceName": str(association["name"]),
+        "FollowKind": "NpcPath",
+        "Animation": animation,
+        "Flags": "base_unknown=0;follow_type=1;follow_unknown=" + animation,
+        "PathCount": "2",
+        "RawParams": "base_unknown=0;follow_type=1;follow_unknown="
+        + animation
+        + ";path_count=2;decoded_path_count=2",
+        "RawTailHex": "",
+    }
+    for row in rows:
+        if any(row.get(key, "") != value for key, value in expected_shape.items()):
+            raise ValueError(
+                "reviewed patrol packet shape drifted source=0x{0:08X} sequence={1}".format(
+                    int(association["source"]), row.get("Sequence", "")
+                )
+            )
+        if not all(
+            row.get(key, "")
+            for key in (
+                "CurrentX",
+                "CurrentY",
+                "CurrentZ",
+                "DestinationX",
+                "DestinationY",
+                "DestinationZ",
+            )
+        ):
+            raise ValueError(
+                "reviewed patrol coordinates are incomplete source=0x{0:08X} sequence={1}".format(
+                    int(association["source"]), row.get("Sequence", "")
+                )
+            )
+
+    fingerprint = "\n".join(
+        "|".join(
+            (
+                row["Sequence"],
+                row["CurrentX"],
+                row["CurrentY"],
+                row["CurrentZ"],
+                row["DestinationX"],
+                row["DestinationY"],
+                row["DestinationZ"],
+                row["Animation"],
+            )
+        )
+        for row in rows
+    )
+    if hashlib.sha256(fingerprint.encode("utf-8")).hexdigest() != association[
+        "path_sha256"
+    ]:
+        raise ValueError(
+            "reviewed patrol coordinate fingerprint drifted source=0x{0:08X}".format(
+                int(association["source"])
+            )
+        )
+    return rows
+
+
+def repeating_patrol_period(
+    points: list[tuple[str, str, str]],
+) -> int:
+    for period in range(1, len(points) // 2 + 1):
+        if all(points[index] == points[index % period] for index in range(period, len(points))):
+            return period
+    return 0
+
+
+def apply_reviewed_patrol_associations(
+    spawns: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    result = list(spawns)
+    original_identities = [row.get("Identity", "") for row in spawns]
+    for association in REVIEWED_PATROL_ASSOCIATIONS:
+        source = int(association["source"])
+        expected_identity = "(SimpleChar:{0:08X})".format(source)
+        matching_indexes = [
+            index
+            for index, row in enumerate(result)
+            if row.get("Identity") == expected_identity
+        ]
+        if len(matching_indexes) != 1:
+            raise ValueError(
+                "reviewed patrol canonical source drifted source=0x{0:08X} rows={1}".format(
+                    source, len(matching_indexes)
+                )
+            )
+        index = matching_indexes[0]
+        row = result[index]
+        if (
+            row.get("Name") != association["name"]
+            or row.get("MonsterData") != association["monster_data"]
+            or row.get("Waypoints") != association["existing_waypoints"]
+        ):
+            raise ValueError(
+                "reviewed patrol canonical row drifted source=0x{0:08X}".format(source)
+            )
+
+        captured_rows = reviewed_patrol_rows(association)
+        points = [
+            (
+                captured["DestinationX"],
+                captured["DestinationY"],
+                captured["DestinationZ"],
+            )
+            for captured in captured_rows
+        ]
+        period = repeating_patrol_period(points)
+        if period != int(association["period"]):
+            raise ValueError(
+                "reviewed patrol repetition drifted source=0x{0:08X} expected={1} actual={2}".format(
+                    source, association["period"], period
+                )
+            )
+        if period:
+            points = points[:period]
+
+        anchor = (
+            float(row["PositionX"]),
+            float(row["PositionY"]),
+            float(row["PositionZ"]),
+        )
+        nearest_index, nearest_distance = min(
+            enumerate(points),
+            key=lambda value: math.sqrt(
+                sum(
+                    (float(value[1][axis]) - anchor[axis]) ** 2
+                    for axis in range(3)
+                )
+            ),
+        )
+        nearest_distance = math.sqrt(
+            sum(
+                (float(points[nearest_index][axis]) - anchor[axis]) ** 2
+                for axis in range(3)
+            )
+        )
+        if nearest_distance > float(association["max_anchor_distance"]):
+            raise ValueError(
+                "reviewed patrol source association is too distant source=0x{0:08X} distance={1:.6f}".format(
+                    source, nearest_distance
+                )
+            )
+        points = points[nearest_index:] + points[:nearest_index]
+        waypoints = [
+            (row["PositionX"], row["PositionY"], row["PositionZ"])
+        ] + points
+        reviewed = dict(row)
+        reviewed["Waypoints"] = "|".join(":".join(point) for point in waypoints)
+        result[index] = reviewed
+
+    if (
+        len(result) != len(spawns)
+        or [row.get("Identity", "") for row in result] != original_identities
+    ):
+        raise ValueError("reviewed patrol associations changed population identity")
     return result
 
 
@@ -3833,7 +4107,7 @@ def validate_content(
     expected_level_credits = {
         "Architect Striker": Counter({(13, 79): 2, (14, 85): 1, (15, 92): 1}),
         "Bloodcreeper": Counter({(24, 150): 1}),
-        "Deranged Shopper": Counter({(8, 47): 1, (9, 53): 1}),
+        "Deranged Shopper": Counter({(8, 47): 2, (9, 53): 1}),
         "Discarded Pet": Counter(
             {(5, 18): 1, (6, 21): 3, (7, 25): 8, (8, 28): 1, (9, 32): 4, (10, 35): 8}
         ),
@@ -4014,6 +4288,7 @@ def generate() -> str:
     spawns = select_spawns()
     premature_pattern_variants = premature_pattern_generation_variants()
     spawns = apply_premature_pattern_reviewed_patrol(spawns)
+    spawns = apply_reviewed_patrol_associations(spawns)
     source_weapons = source_weapon_evidence_profiles(spawns)
     generation_variants = (
         incomplete_rebuild_generation_variants()
