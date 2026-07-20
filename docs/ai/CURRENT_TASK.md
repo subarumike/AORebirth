@@ -12,6 +12,20 @@ in bounded runtime batches; no population rows remain quarantined.
 
 ## Subway enemy captures (2026-07-20)
 
+- Finalized official-live captures `20260720-042205`, `20260720-043018`,
+  `20260720-044358`, and `20260720-044610` are integrated. Workman now has
+  `30` complete first opens (`22` positive, `8` empty) and `27` observed
+  item/QL entries. Infector now has strict `14/8 empty` loot evidence, while
+  the Burnout, Lost Thought, Uncontrollable Anger, Premature Pattern, and Slum
+  Runner rows gain only their exact linked corpse, loot, and combat evidence.
+  The normal ordinary `240`-second respawn policy is unchanged: these captures
+  do not prove a replacement timer that should override it.
+- New combat evidence expands Workman to `59` normal `9..23` hits and seven
+  report-only criticals `28..42`; Infector to `54` normal `15..36` hits and
+  three report-only criticals `52..75`; Neural Burnout to `15..22`; and Slum
+  Runner cadence to `4.210628` seconds. Workman weapon combat now checks the
+  selected exact source/generation tuple instead of a stale hard-coded corpus
+  row count.
 - Finalized official-live captures `20260720-031855`, `20260720-032106`,
   `20260720-033513`, and `20260720-033749` are complete and integrated without
   requesting another capture pass.

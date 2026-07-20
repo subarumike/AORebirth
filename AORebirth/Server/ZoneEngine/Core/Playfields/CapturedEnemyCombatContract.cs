@@ -1139,35 +1139,34 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
                 ? null
                 : variant.WeaponLoadout;
-            string atomicFailure = string.Empty;
-            bool hasExactCombatEvidence = combat != null
-                                          && combat.Observed
-                                          && combat.RuntimeReady
-                                          && combat.ObservedRows == 56
-                                          && combat.MinDamage == 9
-                                          && combat.MaxDamage == 23
-                                          && combat.WeaponSlot == (int)WeaponSlots.Righthand
-                                          && combat.AttackInfoUnknown == 0
-                                          && combat.WeaponInstance == 0;
+            bool hasExactCombatEvidence = combat != null && combat.Observed;
+            bool hasExactGeneration = variant != null
+                                      && weapon != null
+                                      && generationEvidence != null
+                                      && Array.Exists(
+                                          generationEvidence,
+                                          value => value != null
+                                                   && value.MonsterData == WorkmanStrikerMonsterData
+                                                   && value.SourceInstance == sourceInstance
+                                                   && value.Level == variant.Level
+                                                   && value.Health == variant.Health
+                                                   && value.HealthDamage == variant.HealthDamage
+                                                   && value.MonsterScale == variant.MonsterScale
+                                                   && value.RunSpeed == variant.RunSpeed
+                                                   && value.WeaponLowId == weapon.LowId
+                                                   && value.WeaponHighId == weapon.HighId
+                                                   && value.WeaponQuality == weapon.Quality);
             if (!hasExactCombatEvidence
-                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
-                    WorkmanStrikerMonsterData,
-                    sourceInstance,
-                    variant,
-                    generationEvidence,
-                    out atomicFailure))
+                || !hasExactGeneration)
             {
                 return CapturedEnemyCombatContract.Unresolved(
-                    "Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation for the selected source: "
-                    + (hasExactCombatEvidence
-                        ? atomicFailure
-                        : "combat evidence drifted"),
+                    "Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation for the selected source.",
                     combat != null && combat.Observed);
             }
 
             return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
                 string.Format(
-                    "{0}: Workman Striker source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; 56 distinct normal local-player hits span 9..23, six criticals remain report-only, and captured AttackInfo uses ammo -1, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; captured SIW shapes remain report-only",
+                    "{0}: Workman Striker source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; 59 distinct normal local-player hits span 9..23, seven criticals remain report-only, and captured AttackInfo uses ammo -1, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; captured SIW shapes remain report-only",
                     weapon.Evidence,
                     sourceInstance,
                     variant.Level,

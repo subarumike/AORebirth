@@ -466,8 +466,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     new { Name = "Empty Shell", Observed = true, RuntimeReady = false, MinDamage = 15, MaxDamage = 15, ObservedRows = 1 },
                     new { Name = "Infected Attendant", Observed = true, RuntimeReady = false, MinDamage = 11, MaxDamage = 11, ObservedRows = 1 },
-                    new { Name = "Lost Thought", Observed = false, RuntimeReady = false, MinDamage = 0, MaxDamage = 0, ObservedRows = 0 },
-                    new { Name = "Premature Pattern", Observed = true, RuntimeReady = false, MinDamage = 22, MaxDamage = 22, ObservedRows = 1 }
+                    new { Name = "Lost Thought", Observed = true, RuntimeReady = false, MinDamage = 14, MaxDamage = 14, ObservedRows = 2 },
+                    new { Name = "Premature Pattern", Observed = true, RuntimeReady = false, MinDamage = 17, MaxDamage = 22, ObservedRows = 2 }
                 };
             foreach (var expected in reportOnlyCombatExpectations)
             {
@@ -603,7 +603,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider());
 
             AssertCapturedDamage(catalog, "Molested Molecules", 16, 42);
-            AssertCapturedDamage(catalog, "Neural Burnout", 16, 22);
+            AssertCapturedDamage(catalog, "Neural Burnout", 15, 22);
             AssertCapturedDamage(catalog, "Uncontrollable Anger", 9, 18);
 
             OrdinaryEnemyProfile incomplete = catalog.GetProfiles()

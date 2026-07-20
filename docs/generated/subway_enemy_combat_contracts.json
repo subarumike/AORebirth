@@ -2405,7 +2405,9 @@
       "20260710-211430",
       "20260716-034104",
       "20260716-221358",
-      "20260716-222201"
+      "20260716-222201",
+      "20260720-044358",
+      "20260720-044610"
     ],
     "identities": [
       "(SimpleChar:7953AD64)",
@@ -2429,35 +2431,93 @@
       "(SimpleChar:79702294)",
       "(SimpleChar:797024B5)",
       "(SimpleChar:79702534)",
-      "(SimpleChar:797025DB)"
+      "(SimpleChar:797025DB)",
+      "(SimpleChar:798035B8)",
+      "(SimpleChar:798035FA)",
+      "(SimpleChar:798036B6)",
+      "(SimpleChar:798036B7)",
+      "(SimpleChar:798036BC)",
+      "(SimpleChar:798036BD)",
+      "(SimpleChar:7980371A)",
+      "(SimpleChar:79803754)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 27,
+    "retaliationRows": 33,
     "attackInfoObserved": true,
-    "attackInfoRows": 38,
-    "minDamage": 16,
+    "attackInfoRows": 57,
+    "minDamage": 15,
     "maxDamage": 75,
-    "normalAttackInfoRows": 35,
-    "normalMinDamage": 16,
+    "normalAttackInfoRows": 54,
+    "normalMinDamage": 15,
     "normalMaxDamage": 36,
     "criticalAttackInfoRows": 3,
     "criticalMinDamage": 52,
     "criticalMaxDamage": 75,
-    "missedAttackInfoRows": 2,
+    "missedAttackInfoRows": 24,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 0,
         "unknown": 0,
-        "rows": 2,
+        "rows": 24,
         "captures": [
-          "20260709-222339"
+          "20260709-222339",
+          "20260720-044358",
+          "20260720-044610"
         ]
       }
     ],
-    "specialAttackWeaponRows": 0,
-    "specialAttackWeaponShapes": [],
-    "medianRechargeSeconds": 5.016862,
+    "specialAttackWeaponRows": 6,
+    "specialAttackWeaponShapes": [
+      {
+        "unknown1": 71,
+        "unknown2": 71,
+        "unknown3": 71,
+        "unknown4": 71,
+        "unknown5": 0,
+        "rows": 3,
+        "captures": [
+          "20260720-044358",
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798035B8)",
+          "(SimpleChar:798036B6)",
+          "(SimpleChar:79803754)"
+        ]
+      },
+      {
+        "unknown1": 75,
+        "unknown2": 75,
+        "unknown3": 75,
+        "unknown4": 75,
+        "unknown5": 0,
+        "rows": 2,
+        "captures": [
+          "20260720-044358",
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798035FA)",
+          "(SimpleChar:798036B7)"
+        ]
+      },
+      {
+        "unknown1": 80,
+        "unknown2": 80,
+        "unknown3": 80,
+        "unknown4": 80,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044358"
+        ],
+        "owners": [
+          "(SimpleChar:798036BC)"
+        ]
+      }
+    ],
+    "medianRechargeSeconds": 5.04936,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
     "attackInfoWeaponInstance": 1145919558,
@@ -2466,16 +2526,18 @@
         "weaponSlot": 0,
         "attackInfoUnknown": 0,
         "weaponInstance": 1145919558,
-        "rows": 38,
+        "rows": 57,
         "captures": [
           "20260709-222339",
-          "20260709-225408"
+          "20260709-225408",
+          "20260720-044358",
+          "20260720-044610"
         ],
-        "minDamage": 16,
+        "minDamage": 15,
         "maxDamage": 75,
-        "intervalRows": 28,
+        "intervalRows": 35,
         "minIntervalSeconds": 4.531896,
-        "medianIntervalSeconds": 5.016862,
+        "medianIntervalSeconds": 5.04936,
         "maxIntervalSeconds": 9.816681
       }
     ],
@@ -2670,44 +2732,109 @@
       96193
     ],
     "captures": [
-      "20260709-225408"
+      "20260709-225408",
+      "20260720-044610"
     ],
     "identities": [
       "(SimpleChar:7953AECD)",
       "(SimpleChar:7953AED2)",
       "(SimpleChar:795451B7)",
-      "(SimpleChar:795451C0)"
+      "(SimpleChar:795451C0)",
+      "(SimpleChar:798036C7)",
+      "(SimpleChar:798037EF)"
     ],
-    "retaliationObserved": false,
-    "retaliationRows": 0,
-    "attackInfoObserved": false,
-    "attackInfoRows": 0,
-    "minDamage": 0,
-    "maxDamage": 0,
-    "normalAttackInfoRows": 0,
-    "normalMinDamage": 0,
-    "normalMaxDamage": 0,
+    "retaliationObserved": true,
+    "retaliationRows": 2,
+    "attackInfoObserved": true,
+    "attackInfoRows": 2,
+    "minDamage": 14,
+    "maxDamage": 14,
+    "normalAttackInfoRows": 2,
+    "normalMinDamage": 14,
+    "normalMaxDamage": 14,
     "criticalAttackInfoRows": 0,
     "criticalMinDamage": 0,
     "criticalMaxDamage": 0,
     "missedAttackInfoRows": 0,
     "missedAttackShapes": [],
-    "specialAttackWeaponRows": 0,
-    "specialAttackWeaponShapes": [],
+    "specialAttackWeaponRows": 2,
+    "specialAttackWeaponShapes": [
+      {
+        "unknown1": 98,
+        "unknown2": 98,
+        "unknown3": 98,
+        "unknown4": 98,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798036C7)"
+        ]
+      },
+      {
+        "unknown1": 103,
+        "unknown2": 103,
+        "unknown3": 103,
+        "unknown4": 103,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798037EF)"
+        ]
+      }
+    ],
     "medianRechargeSeconds": 0.0,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
-    "attackInfoWeaponInstance": 0,
-    "attackShapes": [],
+    "attackInfoWeaponInstance": 1397315377,
+    "attackShapes": [
+      {
+        "weaponSlot": 0,
+        "attackInfoUnknown": 0,
+        "weaponInstance": 1397315377,
+        "rows": 2,
+        "captures": [
+          "20260720-044610"
+        ],
+        "minDamage": 14,
+        "maxDamage": 14,
+        "intervalRows": 0,
+        "minIntervalSeconds": null,
+        "medianIntervalSeconds": null,
+        "maxIntervalSeconds": null
+      }
+    ],
     "targetRoleEvidence": {
       "localPlayer": {
-        "captures": [],
-        "targetIdentities": [],
-        "retaliationRows": 0,
-        "attackInfoRows": 0,
-        "minDamage": 0,
-        "maxDamage": 0,
-        "attackShapes": []
+        "captures": [
+          "20260720-044610"
+        ],
+        "targetIdentities": [
+          "(SimpleChar:7944C065)"
+        ],
+        "retaliationRows": 2,
+        "attackInfoRows": 2,
+        "minDamage": 14,
+        "maxDamage": 14,
+        "attackShapes": [
+          {
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 1397315377,
+            "rows": 2,
+            "minDamage": 14,
+            "maxDamage": 14,
+            "captures": [
+              "20260720-044610"
+            ]
+          }
+        ]
       },
       "playerOwnedPet": {
         "captures": [],
@@ -3403,7 +3530,8 @@
       "20260709-225408",
       "20260710-211430",
       "20260716-034104",
-      "20260716-221358"
+      "20260716-221358",
+      "20260720-044610"
     ],
     "identities": [
       "(SimpleChar:795451D5)",
@@ -3416,23 +3544,25 @@
       "(SimpleChar:7957E5FA)",
       "(SimpleChar:7957E656)",
       "(SimpleChar:796CD74A)",
-      "(SimpleChar:79702517)"
+      "(SimpleChar:79702517)",
+      "(SimpleChar:798036BF)",
+      "(SimpleChar:798036C0)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 11,
+    "retaliationRows": 13,
     "attackInfoObserved": true,
-    "attackInfoRows": 6,
-    "minDamage": 16,
+    "attackInfoRows": 8,
+    "minDamage": 15,
     "maxDamage": 51,
-    "normalAttackInfoRows": 5,
-    "normalMinDamage": 16,
+    "normalAttackInfoRows": 7,
+    "normalMinDamage": 15,
     "normalMaxDamage": 22,
     "criticalAttackInfoRows": 1,
     "criticalMinDamage": 51,
     "criticalMaxDamage": 51,
     "missedAttackInfoRows": 0,
     "missedAttackShapes": [],
-    "specialAttackWeaponRows": 4,
+    "specialAttackWeaponRows": 6,
     "specialAttackWeaponShapes": [
       {
         "unknown1": 137,
@@ -3448,6 +3578,34 @@
         "owners": [
           "(SimpleChar:796CD74A)",
           "(SimpleChar:79702517)"
+        ]
+      },
+      {
+        "unknown1": 93,
+        "unknown2": 93,
+        "unknown3": 93,
+        "unknown4": 117,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798036C0)"
+        ]
+      },
+      {
+        "unknown1": 98,
+        "unknown2": 98,
+        "unknown3": 98,
+        "unknown4": 125,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798036BF)"
         ]
       },
       {
@@ -3474,13 +3632,14 @@
         "weaponSlot": 0,
         "attackInfoUnknown": 0,
         "weaponInstance": 1397315377,
-        "rows": 6,
+        "rows": 8,
         "captures": [
           "20260710-211430",
           "20260716-034104",
-          "20260716-221358"
+          "20260716-221358",
+          "20260720-044610"
         ],
-        "minDamage": 16,
+        "minDamage": 15,
         "maxDamage": 51,
         "intervalRows": 1,
         "minIntervalSeconds": 9.929338,
@@ -3504,31 +3663,58 @@
       "20260710-211430",
       "20260716-033326",
       "20260716-034104",
-      "20260716-222201"
+      "20260716-222201",
+      "20260720-044610"
     ],
     "identities": [
       "(SimpleChar:7954516B)",
       "(SimpleChar:7954516C)",
       "(SimpleChar:7957E65A)",
       "(SimpleChar:796D4018)",
-      "(SimpleChar:79702555)"
+      "(SimpleChar:79702555)",
+      "(SimpleChar:7980F0BA)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 2,
+    "retaliationRows": 3,
     "attackInfoObserved": true,
-    "attackInfoRows": 2,
-    "minDamage": 22,
+    "attackInfoRows": 3,
+    "minDamage": 17,
     "maxDamage": 41,
-    "normalAttackInfoRows": 1,
-    "normalMinDamage": 22,
+    "normalAttackInfoRows": 2,
+    "normalMinDamage": 17,
     "normalMaxDamage": 22,
     "criticalAttackInfoRows": 1,
     "criticalMinDamage": 41,
     "criticalMaxDamage": 41,
-    "missedAttackInfoRows": 0,
-    "missedAttackShapes": [],
-    "specialAttackWeaponRows": 0,
-    "specialAttackWeaponShapes": [],
+    "missedAttackInfoRows": 1,
+    "missedAttackShapes": [
+      {
+        "ammoCount": -1,
+        "weaponSlot": 0,
+        "unknown": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ]
+      }
+    ],
+    "specialAttackWeaponRows": 1,
+    "specialAttackWeaponShapes": [
+      {
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 107,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:7980F0BA)"
+        ]
+      }
+    ],
     "medianRechargeSeconds": 0.0,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
@@ -3538,11 +3724,12 @@
         "weaponSlot": 0,
         "attackInfoUnknown": 0,
         "weaponInstance": 1397315377,
-        "rows": 2,
+        "rows": 3,
         "captures": [
-          "20260709-222339"
+          "20260709-222339",
+          "20260720-044610"
         ],
-        "minDamage": 22,
+        "minDamage": 17,
         "maxDamage": 41,
         "intervalRows": 0,
         "minIntervalSeconds": null,
@@ -3570,16 +3757,30 @@
     "targetRoleEvidence": {
       "localPlayer": {
         "captures": [
-          "20260709-222339"
+          "20260709-222339",
+          "20260720-044610"
         ],
         "targetIdentities": [
           "(SimpleChar:7944C065)"
         ],
-        "retaliationRows": 2,
-        "attackInfoRows": 2,
-        "minDamage": 22,
+        "retaliationRows": 3,
+        "attackInfoRows": 3,
+        "minDamage": 17,
         "maxDamage": 41,
         "attackShapes": [
+          {
+            "weaponSlot": 0,
+            "attackInfoUnknown": 0,
+            "hitType": "Normal",
+            "weaponInstance": 1397315377,
+            "rows": 2,
+            "minDamage": 17,
+            "maxDamage": 22,
+            "captures": [
+              "20260709-222339",
+              "20260720-044610"
+            ]
+          },
           {
             "weaponSlot": 0,
             "attackInfoUnknown": 0,
@@ -3588,18 +3789,6 @@
             "rows": 1,
             "minDamage": 41,
             "maxDamage": 41,
-            "captures": [
-              "20260709-222339"
-            ]
-          },
-          {
-            "weaponSlot": 0,
-            "attackInfoUnknown": 0,
-            "hitType": "Normal",
-            "weaponInstance": 1397315377,
-            "rows": 1,
-            "minDamage": 22,
-            "maxDamage": 22,
             "captures": [
               "20260709-222339"
             ]
@@ -3880,7 +4069,8 @@
       "20260709-225408",
       "20260710-211430",
       "20260716-034656",
-      "20260716-222201"
+      "20260716-222201",
+      "20260720-044610"
     ],
     "identities": [
       "(SimpleChar:7953A993)",
@@ -3943,36 +4133,43 @@
       "(SimpleChar:797024D7)",
       "(SimpleChar:797024DA)",
       "(SimpleChar:797024DB)",
-      "(SimpleChar:79702538)"
+      "(SimpleChar:79702538)",
+      "(SimpleChar:798036C2)",
+      "(SimpleChar:798036C3)",
+      "(SimpleChar:79803722)",
+      "(SimpleChar:79803724)",
+      "(SimpleChar:79803763)",
+      "(SimpleChar:798037A0)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 102,
+    "retaliationRows": 108,
     "attackInfoObserved": true,
-    "attackInfoRows": 95,
+    "attackInfoRows": 100,
     "minDamage": 5,
     "maxDamage": 18,
-    "normalAttackInfoRows": 94,
+    "normalAttackInfoRows": 99,
     "normalMinDamage": 5,
     "normalMaxDamage": 11,
     "criticalAttackInfoRows": 1,
     "criticalMinDamage": 18,
     "criticalMaxDamage": 18,
-    "missedAttackInfoRows": 47,
+    "missedAttackInfoRows": 58,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 0,
         "unknown": 0,
-        "rows": 47,
+        "rows": 58,
         "captures": [
           "20260709-222339",
           "20260710-211430",
           "20260716-034656",
-          "20260716-222201"
+          "20260716-222201",
+          "20260720-044610"
         ]
       }
     ],
-    "specialAttackWeaponRows": 81,
+    "specialAttackWeaponRows": 87,
     "specialAttackWeaponShapes": [
       {
         "unknown1": 114,
@@ -4086,6 +4283,22 @@
         ]
       },
       {
+        "unknown1": 92,
+        "unknown2": 92,
+        "unknown3": 92,
+        "unknown4": 92,
+        "unknown5": 0,
+        "rows": 3,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798036C3)",
+          "(SimpleChar:79803722)",
+          "(SimpleChar:798037A0)"
+        ]
+      },
+      {
         "unknown1": 114,
         "unknown2": 114,
         "unknown3": 114,
@@ -4161,6 +4374,48 @@
         ]
       },
       {
+        "unknown1": 87,
+        "unknown2": 87,
+        "unknown3": 87,
+        "unknown4": 87,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:79803763)"
+        ]
+      },
+      {
+        "unknown1": 98,
+        "unknown2": 98,
+        "unknown3": 98,
+        "unknown4": 98,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:79803724)"
+        ]
+      },
+      {
+        "unknown1": 98,
+        "unknown2": 98,
+        "unknown3": 98,
+        "unknown4": 98,
+        "unknown5": 20,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798036C2)"
+        ]
+      },
+      {
         "unknown1": 109,
         "unknown2": 109,
         "unknown3": 109,
@@ -4175,7 +4430,7 @@
         ]
       }
     ],
-    "medianRechargeSeconds": 4.210098,
+    "medianRechargeSeconds": 4.210628,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
     "attackInfoWeaponInstance": 1145196631,
@@ -4184,20 +4439,21 @@
         "weaponSlot": 0,
         "attackInfoUnknown": 0,
         "weaponInstance": 1145196631,
-        "rows": 95,
+        "rows": 100,
         "captures": [
           "20260709-220439",
           "20260709-222339",
           "20260709-225408",
           "20260710-211430",
           "20260716-034656",
-          "20260716-222201"
+          "20260716-222201",
+          "20260720-044610"
         ],
         "minDamage": 5,
         "maxDamage": 18,
-        "intervalRows": 50,
+        "intervalRows": 51,
         "minIntervalSeconds": 3.589338,
-        "medianIntervalSeconds": 4.210098,
+        "medianIntervalSeconds": 4.210628,
         "maxIntervalSeconds": 8.820864
       }
     ],
@@ -4756,7 +5012,8 @@
       "20260709-222339",
       "20260709-225408",
       "20260710-211430",
-      "20260720-033749"
+      "20260720-033749",
+      "20260720-044610"
     ],
     "identities": [
       "(SimpleChar:7953AD65)",
@@ -4767,34 +5024,51 @@
       "(SimpleChar:79545314)",
       "(SimpleChar:7957E630)",
       "(SimpleChar:7957E653)",
+      "(SimpleChar:798036BE)",
       "(SimpleChar:798037FD)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 11,
+    "retaliationRows": 12,
     "attackInfoObserved": true,
-    "attackInfoRows": 5,
+    "attackInfoRows": 8,
     "minDamage": 9,
     "maxDamage": 19,
-    "normalAttackInfoRows": 4,
+    "normalAttackInfoRows": 7,
     "normalMinDamage": 9,
     "normalMaxDamage": 18,
     "criticalAttackInfoRows": 1,
     "criticalMinDamage": 19,
     "criticalMaxDamage": 19,
-    "missedAttackInfoRows": 3,
+    "missedAttackInfoRows": 9,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 0,
         "unknown": 0,
-        "rows": 3,
+        "rows": 9,
         "captures": [
-          "20260720-033749"
+          "20260720-033749",
+          "20260720-044610"
         ]
       }
     ],
-    "specialAttackWeaponRows": 0,
-    "specialAttackWeaponShapes": [],
+    "specialAttackWeaponRows": 1,
+    "specialAttackWeaponShapes": [
+      {
+        "unknown1": 103,
+        "unknown2": 103,
+        "unknown3": 103,
+        "unknown4": 103,
+        "unknown5": 2,
+        "rows": 1,
+        "captures": [
+          "20260720-044610"
+        ],
+        "owners": [
+          "(SimpleChar:798036BE)"
+        ]
+      }
+    ],
     "medianRechargeSeconds": 5.167153,
     "weaponSlot": 0,
     "attackInfoUnknown": 0,
@@ -4804,17 +5078,18 @@
         "weaponSlot": 0,
         "attackInfoUnknown": 0,
         "weaponInstance": 1397315377,
-        "rows": 5,
+        "rows": 8,
         "captures": [
           "20260709-222339",
           "20260709-225408",
-          "20260720-033749"
+          "20260720-033749",
+          "20260720-044610"
         ],
         "minDamage": 9,
         "maxDamage": 19,
-        "intervalRows": 1,
-        "minIntervalSeconds": 6.021701,
-        "medianIntervalSeconds": 6.021701,
+        "intervalRows": 2,
+        "minIntervalSeconds": 5.588566,
+        "medianIntervalSeconds": 5.588566,
         "maxIntervalSeconds": 6.021701
       }
     ],
@@ -4839,13 +5114,14 @@
           "20260709-222339",
           "20260709-225408",
           "20260710-211430",
-          "20260720-033749"
+          "20260720-033749",
+          "20260720-044610"
         ],
         "targetIdentities": [
           "(SimpleChar:7944C065)"
         ],
-        "retaliationRows": 11,
-        "attackInfoRows": 5,
+        "retaliationRows": 12,
+        "attackInfoRows": 8,
         "minDamage": 9,
         "maxDamage": 19,
         "attackShapes": [
@@ -4854,13 +5130,14 @@
             "attackInfoUnknown": 0,
             "hitType": "Normal",
             "weaponInstance": 1397315377,
-            "rows": 4,
+            "rows": 7,
             "minDamage": 9,
             "maxDamage": 18,
             "captures": [
               "20260709-222339",
               "20260709-225408",
-              "20260720-033749"
+              "20260720-033749",
+              "20260720-044610"
             ]
           },
           {
@@ -4877,9 +5154,9 @@
           }
         ],
         "landedHitCadence": {
-          "intervalRows": 1,
-          "minIntervalSeconds": 6.0217019,
-          "medianIntervalSeconds": 6.0217019,
+          "intervalRows": 2,
+          "minIntervalSeconds": 5.5885659,
+          "medianIntervalSeconds": 5.8051339,
           "maxIntervalSeconds": 6.0217019
         }
       },
@@ -5389,7 +5666,9 @@
       "20260709-225408",
       "20260710-211430",
       "20260716-222201",
-      "20260720-031855"
+      "20260720-031855",
+      "20260720-042205",
+      "20260720-043018"
     ],
     "identities": [
       "(SimpleChar:7953A830)",
@@ -5435,44 +5714,117 @@
       "(SimpleChar:79803401)",
       "(SimpleChar:79803402)",
       "(SimpleChar:79803673)",
+      "(SimpleChar:79803680)",
       "(SimpleChar:79803682)",
       "(SimpleChar:79803683)",
       "(SimpleChar:79803685)",
       "(SimpleChar:79803688)",
       "(SimpleChar:79803689)",
+      "(SimpleChar:7980368C)",
       "(SimpleChar:79803694)",
       "(SimpleChar:798036AA)",
       "(SimpleChar:798036B2)",
-      "(SimpleChar:798036F8)"
+      "(SimpleChar:798036F8)",
+      "(SimpleChar:7980F07D)",
+      "(SimpleChar:7980F07E)",
+      "(SimpleChar:7980F088)",
+      "(SimpleChar:7980F089)",
+      "(SimpleChar:7980F08C)",
+      "(SimpleChar:7980F08D)",
+      "(SimpleChar:7980F08F)",
+      "(SimpleChar:7980F094)",
+      "(SimpleChar:7980F096)",
+      "(SimpleChar:7980F099)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 27,
+    "retaliationRows": 44,
     "attackInfoObserved": true,
-    "attackInfoRows": 62,
+    "attackInfoRows": 66,
     "minDamage": 9,
     "maxDamage": 42,
-    "normalAttackInfoRows": 56,
+    "normalAttackInfoRows": 59,
     "normalMinDamage": 9,
     "normalMaxDamage": 23,
-    "criticalAttackInfoRows": 6,
-    "criticalMinDamage": 36,
+    "criticalAttackInfoRows": 7,
+    "criticalMinDamage": 28,
     "criticalMaxDamage": 42,
-    "missedAttackInfoRows": 4,
+    "missedAttackInfoRows": 14,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 6,
         "unknown": 0,
-        "rows": 4,
+        "rows": 14,
         "captures": [
           "20260709-212115",
           "20260709-212336",
-          "20260720-031855"
+          "20260720-031855",
+          "20260720-042205",
+          "20260720-043018"
         ]
       }
     ],
-    "specialAttackWeaponRows": 3,
+    "specialAttackWeaponRows": 20,
     "specialAttackWeaponShapes": [
+      {
+        "unknown1": 83,
+        "unknown2": 83,
+        "unknown3": 83,
+        "unknown4": 83,
+        "unknown5": 0,
+        "rows": 9,
+        "captures": [
+          "20260720-042205",
+          "20260720-043018"
+        ],
+        "owners": [
+          "(SimpleChar:79803680)",
+          "(SimpleChar:79803683)",
+          "(SimpleChar:79803688)",
+          "(SimpleChar:79803689)",
+          "(SimpleChar:7980F07D)",
+          "(SimpleChar:7980F088)",
+          "(SimpleChar:7980F089)",
+          "(SimpleChar:7980F08D)",
+          "(SimpleChar:7980F094)"
+        ]
+      },
+      {
+        "unknown1": 77,
+        "unknown2": 77,
+        "unknown3": 77,
+        "unknown4": 77,
+        "unknown5": 0,
+        "rows": 4,
+        "captures": [
+          "20260720-042205",
+          "20260720-043018"
+        ],
+        "owners": [
+          "(SimpleChar:79803685)",
+          "(SimpleChar:7980368C)",
+          "(SimpleChar:7980F08C)",
+          "(SimpleChar:7980F08F)"
+        ]
+      },
+      {
+        "unknown1": 88,
+        "unknown2": 88,
+        "unknown3": 88,
+        "unknown4": 88,
+        "unknown5": 0,
+        "rows": 4,
+        "captures": [
+          "20260720-042205",
+          "20260720-043018"
+        ],
+        "owners": [
+          "(SimpleChar:79803682)",
+          "(SimpleChar:7980F07E)",
+          "(SimpleChar:7980F096)",
+          "(SimpleChar:7980F099)"
+        ]
+      },
       {
         "unknown1": 100,
         "unknown2": 100,
@@ -5512,13 +5864,15 @@
         "weaponSlot": 6,
         "attackInfoUnknown": 0,
         "weaponInstance": 0,
-        "rows": 62,
+        "rows": 66,
         "captures": [
           "20260709-212115",
           "20260709-212336",
           "20260709-213711",
           "20260709-220439",
-          "20260720-031855"
+          "20260720-031855",
+          "20260720-042205",
+          "20260720-043018"
         ],
         "minDamage": 9,
         "maxDamage": 42,
@@ -5536,13 +5890,15 @@
           "20260709-213711",
           "20260709-220439",
           "20260709-225408",
-          "20260720-031855"
+          "20260720-031855",
+          "20260720-042205",
+          "20260720-043018"
         ],
         "targetIdentities": [
           "(SimpleChar:7944C065)"
         ],
-        "retaliationRows": 27,
-        "attackInfoRows": 62,
+        "retaliationRows": 44,
+        "attackInfoRows": 66,
         "minDamage": 9,
         "maxDamage": 42,
         "attackShapes": [
@@ -5551,7 +5907,7 @@
             "attackInfoUnknown": 0,
             "hitType": "Normal",
             "weaponInstance": 0,
-            "rows": 56,
+            "rows": 59,
             "minDamage": 9,
             "maxDamage": 23,
             "captures": [
@@ -5559,7 +5915,9 @@
               "20260709-212336",
               "20260709-213711",
               "20260709-220439",
-              "20260720-031855"
+              "20260720-031855",
+              "20260720-042205",
+              "20260720-043018"
             ]
           },
           {
@@ -5567,14 +5925,15 @@
             "attackInfoUnknown": 0,
             "hitType": "Critical",
             "weaponInstance": 0,
-            "rows": 6,
-            "minDamage": 36,
+            "rows": 7,
+            "minDamage": 28,
             "maxDamage": 42,
             "captures": [
               "20260709-212115",
               "20260709-212336",
               "20260709-213711",
-              "20260709-220439"
+              "20260709-220439",
+              "20260720-043018"
             ]
           }
         ],
@@ -5694,12 +6053,13 @@
         "lowId": 122905,
         "highId": 122906,
         "quality": 14,
-        "rows": 11,
+        "rows": 12,
         "captures": [
           "20260709-212115",
           "20260709-212336",
           "20260709-220439",
-          "20260709-222339"
+          "20260709-222339",
+          "20260720-043018"
         ],
         "owners": [
           "(SimpleChar:7953AA77)",
@@ -5708,21 +6068,23 @@
           "(SimpleChar:79545137)",
           "(SimpleChar:79545146)",
           "(SimpleChar:79545213)",
-          "(SimpleChar:79545224)"
+          "(SimpleChar:79545224)",
+          "(SimpleChar:7980F099)"
         ]
       },
       {
         "lowId": 122905,
         "highId": 122906,
         "quality": 19,
-        "rows": 10,
+        "rows": 11,
         "captures": [
           "20260709-212115",
           "20260709-212336",
           "20260709-220439",
           "20260709-222339",
           "20260710-211430",
-          "20260720-031855"
+          "20260720-031855",
+          "20260720-043018"
         ],
         "owners": [
           "(SimpleChar:7953A84F)",
@@ -5731,7 +6093,8 @@
           "(SimpleChar:79545216)",
           "(SimpleChar:79545219)",
           "(SimpleChar:7957E629)",
-          "(SimpleChar:79803683)"
+          "(SimpleChar:79803683)",
+          "(SimpleChar:7980F096)"
         ]
       },
       {
@@ -5757,6 +6120,29 @@
       {
         "lowId": 122905,
         "highId": 122906,
+        "quality": 15,
+        "rows": 8,
+        "captures": [
+          "20260709-212115",
+          "20260709-212336",
+          "20260709-220439",
+          "20260709-222339",
+          "20260720-031855",
+          "20260720-042205",
+          "20260720-043018"
+        ],
+        "owners": [
+          "(SimpleChar:7953AA16)",
+          "(SimpleChar:79545108)",
+          "(SimpleChar:7954522E)",
+          "(SimpleChar:79803694)",
+          "(SimpleChar:7980F07D)",
+          "(SimpleChar:7980F094)"
+        ]
+      },
+      {
+        "lowId": 122905,
+        "highId": 122906,
         "quality": 17,
         "rows": 8,
         "captures": [
@@ -5773,25 +6159,6 @@
           "(SimpleChar:79545313)",
           "(SimpleChar:79803688)",
           "(SimpleChar:79803689)"
-        ]
-      },
-      {
-        "lowId": 122905,
-        "highId": 122906,
-        "quality": 15,
-        "rows": 6,
-        "captures": [
-          "20260709-212115",
-          "20260709-212336",
-          "20260709-220439",
-          "20260709-222339",
-          "20260720-031855"
-        ],
-        "owners": [
-          "(SimpleChar:7953AA16)",
-          "(SimpleChar:79545108)",
-          "(SimpleChar:7954522E)",
-          "(SimpleChar:79803694)"
         ]
       },
       {
