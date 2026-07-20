@@ -796,41 +796,59 @@
       "20260708-143600",
       "20260709-210452",
       "20260709-212115",
-      "20260710-202132"
+      "20260710-202132",
+      "20260720-031025"
     ],
     "identities": [
       "(SimpleChar:794DF0F5)",
       "(SimpleChar:7953AD91)",
       "(SimpleChar:79545025)",
-      "(SimpleChar:79574527)"
+      "(SimpleChar:79574527)",
+      "(SimpleChar:79803651)"
     ],
     "retaliationObserved": true,
-    "retaliationRows": 8,
+    "retaliationRows": 9,
     "attackInfoObserved": true,
-    "attackInfoRows": 9,
-    "minDamage": 9,
+    "attackInfoRows": 11,
+    "minDamage": 7,
     "maxDamage": 27,
-    "normalAttackInfoRows": 8,
-    "normalMinDamage": 9,
+    "normalAttackInfoRows": 10,
+    "normalMinDamage": 7,
     "normalMaxDamage": 15,
     "criticalAttackInfoRows": 1,
     "criticalMinDamage": 27,
     "criticalMaxDamage": 27,
-    "missedAttackInfoRows": 2,
+    "missedAttackInfoRows": 7,
     "missedAttackShapes": [
       {
         "ammoCount": -1,
         "weaponSlot": 6,
         "unknown": 0,
-        "rows": 2,
+        "rows": 7,
         "captures": [
           "20260708-143600",
-          "20260710-202132"
+          "20260710-202132",
+          "20260720-031025"
         ]
       }
     ],
-    "specialAttackWeaponRows": 0,
-    "specialAttackWeaponShapes": [],
+    "specialAttackWeaponRows": 1,
+    "specialAttackWeaponShapes": [
+      {
+        "unknown1": 56,
+        "unknown2": 45,
+        "unknown3": 45,
+        "unknown4": 45,
+        "unknown5": 0,
+        "rows": 1,
+        "captures": [
+          "20260720-031025"
+        ],
+        "owners": [
+          "(SimpleChar:79803651)"
+        ]
+      }
+    ],
     "medianRechargeSeconds": 5.161083,
     "weaponSlot": 6,
     "attackInfoUnknown": 0,
@@ -840,14 +858,15 @@
         "weaponSlot": 6,
         "attackInfoUnknown": 0,
         "weaponInstance": 0,
-        "rows": 9,
+        "rows": 11,
         "captures": [
           "20260708-143600",
           "20260709-210452",
           "20260709-212115",
-          "20260710-202132"
+          "20260710-202132",
+          "20260720-031025"
         ],
-        "minDamage": 9,
+        "minDamage": 7,
         "maxDamage": 27,
         "intervalRows": 3,
         "minIntervalSeconds": 5.098162,

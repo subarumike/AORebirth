@@ -406,7 +406,7 @@ population in bounded runtime batches.
   In addition to Shadow, ordinary Infector, Architect Striker, and Melded
   Patterns, it recovers Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend
   `13/0`, Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected
-  Attendant `4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete
+  Attendant `4/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete
   Rebuild `2/0`, Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought
   `1/0`, and Neural Burnout `4/2`. Exact source/allocation allowlists and
   generation fingerprints fail closed; declared overlaps deduplicate, while
@@ -429,7 +429,11 @@ population in bounded runtime batches.
   recharge; aggregate, missing, conflicting, and unknown source selection fails
   closed, and no special-attack body is invented. The whole-enemy gate definition
   now also covers Looter, Bloodcreeper, Stim Fiend, and Neural Burnout, bringing
-  the accepted set to fourteen.
+  the accepted set to fourteen. Finalized capture `20260720-031025` additionally
+  proves repeated patrols for exact Looter sources `0x79545029` (10 segments) and
+  `0x7954503C` (12 segments). Five other observed Looter sources remained
+  stationary. Identity `0x7957E5CD` is a suspected duplicate and remains
+  unchanged because the capture does not prove a safe canonical association.
 - Mugger is the fifteenth accepted ordinary profile. All nine current sources
   resolve exact QL1 `121567/121567` weapons and fail closed for aggregate,
   missing, conflicting, or unknown selection. The item owns damage, damage
@@ -438,14 +442,22 @@ population in bounded runtime batches.
   separate from three report-only `21` criticals; strict 17-open loot, exact
   CATMesh/level credits, chase, respawn, and corpse lifetimes pass together.
 - Deranged Shopper is the sixteenth accepted ordinary profile and its one exact
-  runtime row is active for bounded private validation. Source
-  `0x79574527` resolves only its owner-linked QL8 `125454/125455` weapon; the
-  aggregate, unknown, missing, or conflicting paths fail closed. Eight normal
-  local-player hits span `9..15`, one `27` critical remains report-only, and the
-  corpus retains two misses at ammo `-1`, slot `6`, unknown `0` (one from the
-  current source). Strict `2/0 empty` loot, L8/L9 credits, CATMesh `5927`,
-  chase, inherited four-minute respawn, and `3/240/3` corpse rules pass
-  together.
+  runtime row is active for bounded private validation. Finalized capture
+  `20260720-031025` maps live alias `79803651` to canonical source
+  `0x79574527` through the sole matching profile and patrol anchors, and adds an
+  83-row non-combat flag-24 patrol; ten later flag-25
+  NpcPath rows plus one additional non-NpcPath flag-25 movement row are excluded
+  from the idle route.
+  The source resolves only its owner-linked QL8 `125454/125455` weapon; the
+  aggregate, unknown, missing, or conflicting paths fail closed. Ten normal
+  local-player hits now span `7..15`, one `27` critical remains report-only,
+  and six source-associated misses are preserved at ammo `-1`, slot `6`, unknown
+  `0`; the generated aggregate retains seven misses. Empty SIW values
+  `56/45/45/45/0` and observed attack-start, StopFight, and death context remain
+  evidence-only. Strict `3/0 empty` loot now includes the third positive
+  first-open item `234876` QL1 with L8 CATMesh `5927` and `47` credits. The
+  capture proves neither respawn timing nor corpse lifetime, so the inherited
+  four-minute respawn and `3/240/3` corpse policies are unchanged.
 - The Subway combat-contract analyzer now supplements legacy identity mapping
   from `enemy-dossier.json` and exact corpse dead-NPC links before consuming
   combat rows. Its regenerated Bot projection retains 14 local-player hits at

@@ -299,7 +299,7 @@ ordinary profiles through one reusable raw-generation validator. In addition
 to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
 recovered set is Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
 Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected Attendant
-`4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete Rebuild `2/0`,
+`4/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete Rebuild `2/0`,
 Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought `1/0`, and Neural
 Burnout `4/2`. Each reviewed source is capture-allowlisted and its complete set
 of exact corpse/dead-NPC/first-raw-inventory generations is fingerprinted;
@@ -325,7 +325,10 @@ The gate also includes Looter, Bloodcreeper, Stim Fiend, and Neural
 Burnout. Looter resolves all eight exact owner-linked `123038/123039` tuples by
 source identity and QL; its visible equipped item owns normal damage and
 recharge, while aggregate, missing, conflicting, or unknown source selection
-fails closed. The other three retain their specialized or fixed capture-backed
+fails closed. Capture `20260720-031025` adds repeated exact-source patrols for
+`0x79545029` (10 segments) and `0x7954503C` (12 segments); five other observed
+sources remain stationary, and suspected duplicate `0x7957E5CD` remains
+unresolved and unchanged. The other three retain their specialized or fixed capture-backed
 combat, strict incomplete loot samples, exact observed credit rows, shared chase,
 ordinary corpse lifetimes, and private respawn policy. The ordinary generator and
 Debug build pass, as do the expanded fourteen-profile gate, WorldPopulation,
@@ -343,6 +346,19 @@ shared chase, ordinary respawn, and corpse lifetimes.
 Deranged Shopper is the sixteenth accepted profile, Incomplete Rebuild the
 seventeenth, Redundant Scan the eighteenth, Fragmented Soul the nineteenth,
 Discarded Pet the twentieth, and Uncontrollable Anger the twenty-first.
+Finalized capture `20260720-031025` maps Deranged Shopper live alias `79803651`
+to canonical source `0x79574527` through the sole matching profile and patrol
+anchors. Its idle route uses 83 non-combat flag-24
+NpcPath rows; ten later flag-25 NpcPath rows and one additional non-NpcPath
+flag-25 movement row are excluded. The same capture adds two
+normal `7` hits, bringing the source contract to ten normal `7..15` hits, and
+adds five misses, bringing the source-associated total to six while the generated
+aggregate retains seven. Empty SIW `56/45/45/45/0` and the observed
+attack-start, StopFight, and death context remain evidence-only. The strict loot
+denominator is now `3/0 empty`, with a third positive first-open item `234876`
+QL1 on an L8 CATMesh `5927` corpse carrying `47` credits. No respawn or
+corpse-lifetime result was captured, so the established private lifecycle policy
+is unchanged.
 Discarded Pet activates all 29 exact L5..L10
 rows and keeps 37 normal local-player SIW1 outcomes at `9..18` separate from
 four report-only `30..33` criticals. Its fixed capture contract retains ammo

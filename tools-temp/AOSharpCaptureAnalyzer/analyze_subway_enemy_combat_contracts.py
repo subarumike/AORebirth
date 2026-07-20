@@ -46,6 +46,7 @@ CAPTURES = (
     "20260717-215250",
     "20260719-020104",
     "20260719-021022",
+    "20260720-031025",
 )
 CAPTURE_ENEMY_FILTERS = {
     "20260708-004038": frozenset({"Filth Flea"}),
@@ -73,6 +74,7 @@ CAPTURE_ENEMY_FILTERS = {
         {"Disobedient Bot", "Violent Vagabond"}
     ),
     "20260719-021022": frozenset({"Mugger"}),
+    "20260720-031025": frozenset({"Deranged Shopper", "Looter"}),
 }
 ENEMY_ATTACK_CAPTURE_FILTERS = {
     "Filth Flea": frozenset({"20260708-004038", "20260709-193914"}),
