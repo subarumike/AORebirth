@@ -125,13 +125,17 @@ namespace AORebirth.Core.Playfields
             double? automaticAggroRadius,
             bool chase,
             bool returnToSpawn,
-            OrdinaryEnemyEvidenceState evidenceState)
+            OrdinaryEnemyEvidenceState evidenceState,
+            bool requiresLineOfSight = false,
+            double? socialAggroRadius = null)
         {
             this.Mode = mode;
             this.AutomaticAggroRadius = automaticAggroRadius;
             this.Chase = chase;
             this.ReturnToSpawn = returnToSpawn;
             this.EvidenceState = evidenceState;
+            this.RequiresLineOfSight = requiresLineOfSight;
+            this.SocialAggroRadius = socialAggroRadius;
         }
 
         internal OrdinaryEnemyAggressionMode Mode { get; private set; }
@@ -139,6 +143,10 @@ namespace AORebirth.Core.Playfields
         internal bool Chase { get; private set; }
         internal bool ReturnToSpawn { get; private set; }
         internal OrdinaryEnemyEvidenceState EvidenceState { get; private set; }
+
+        internal bool RequiresLineOfSight { get; private set; }
+
+        internal double? SocialAggroRadius { get; private set; }
     }
 
     internal sealed class OrdinaryEnemySupportNanoProfile
@@ -1841,6 +1849,17 @@ namespace AORebirth.Core.Playfields
                         || profile.Aggression.AutomaticAggroRadius.Value <= 0.0))
                 {
                     throw new InvalidOperationException("Automatic aggression requires a positive captured radius: " + profile.ProfileKey);
+                }
+
+                if ((profile.Aggression.RequiresLineOfSight
+                     && profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Auto)
+                    || (profile.Aggression.SocialAggroRadius.HasValue
+                        && (profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Auto
+                            || profile.Aggression.SocialAggroRadius.Value <= 0.0)))
+                {
+                    throw new InvalidOperationException(
+                        "LOS and social aggression require an automatic aggression profile with a positive social radius: "
+                        + profile.ProfileKey);
                 }
 
                 OrdinaryEnemySupportNanoProfile supportNano = profile.SupportNano;

@@ -2511,6 +2511,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs"));
             string ordinaryRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+            string npcRuntimeText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string heartbeatRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
             string weaponPacketText = File.ReadAllText(
@@ -3248,7 +3250,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.Disposition))
                     .ToArray());
             Assert.IsTrue(muggerSpawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
-            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, mugger.Aggression.Mode);
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, mugger.Aggression.Mode);
+            Assert.AreEqual(7.0, mugger.Aggression.AutomaticAggroRadius.Value);
+            Assert.IsTrue(mugger.Aggression.RequiresLineOfSight);
+            Assert.AreEqual(7.0, mugger.Aggression.SocialAggroRadius.Value);
             Assert.IsTrue(mugger.Aggression.Chase);
             Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, mugger.Combat.Mode);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, mugger.Combat.DamageSource);
@@ -3265,6 +3270,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn.Level);
                 Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
                 Assert.IsTrue(contract.IsCombatReady);
+                Assert.IsTrue(contract.RequiresDamageLineOfSight);
                 Assert.AreEqual(121567, contract.WeaponLowId);
                 Assert.AreEqual(121567, contract.WeaponHighId);
                 Assert.AreEqual(1, contract.WeaponQuality);
@@ -3331,6 +3337,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && muggerCombatContract.Contains("criticals are report-only")
                 && muggerCombatContract.Contains("no empty SIW or captured attack-start/stop context")
                 && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
+                && ordinaryRuntimeText.Contains("FindSocialAggroAllies")
+                && ordinaryRuntimeText.Contains("HasClearAggroLineOfSight")
+                && npcRuntimeText.Contains("this.ordinaryEnemies.FindSocialAggroAllies(")
                 && muggerCombatReport.Contains("\"normalAttackInfoRows\": 38")
                 && muggerCombatReport.Contains("\"normalMinDamage\": 9")
                 && muggerCombatReport.Contains("\"normalMaxDamage\": 12")
@@ -3344,7 +3353,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
-                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; strict 18-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
+                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; LOS-gated automatic and same-profile social aggro; strict 18-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile derangedShopper = ordinaryProfiles.Single(
                 value => value.DisplayName == "Deranged Shopper");

@@ -23,6 +23,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Navigation;
     using ZoneEngine.Core.Playfields;
 
     internal sealed class OrdinaryEnemyRuntimeService
@@ -32,6 +33,8 @@ namespace AORebirth.Core.Playfields
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
+
+        private readonly NpcDamageLineOfSightRuntimeService aggroLineOfSight;
 
         private readonly Action<ICharacter> activateNpc;
 
@@ -61,12 +64,15 @@ namespace AORebirth.Core.Playfields
             NpcPatrolReplayCoordinator patrolReplay,
             PlayfieldDynelRegistry dynelRegistry,
             Action<ICharacter> activateNpc,
+            NpcDamageLineOfSightRuntimeService aggroLineOfSight,
             Func<int, int> levelSelector = null)
         {
             this.catalog = catalog;
             this.patrolReplay = patrolReplay;
             this.dynelRegistry = dynelRegistry;
             this.activateNpc = activateNpc;
+            this.aggroLineOfSight = aggroLineOfSight
+                                    ?? throw new ArgumentNullException("aggroLineOfSight");
             if (levelSelector == null)
             {
                 this.spawnRandom = new Random();
@@ -333,10 +339,77 @@ namespace AORebirth.Core.Playfields
                     candidate => candidate != null
                                  && candidate.Identity != npc.Identity
                                  && candidate.Controller is PlayerController
-                                 && candidate.Stats[StatIds.health].Value > 0)
+                                 && candidate.Stats[StatIds.health].Value > 0
+                                 && (!definition.Profile.Aggression.RequiresLineOfSight
+                                     || this.HasClearAggroLineOfSight(npc, candidate)))
                 .OrderBy(candidate => candidate.Coordinates().coordinate.Distance2D(npc.Coordinates().coordinate))
                 .ThenBy(candidate => candidate.Identity.Instance)
                 .FirstOrDefault();
+        }
+
+        internal ICharacter[] FindSocialAggroAllies(ICharacter npc, ICharacter target)
+        {
+            OrdinaryEnemyRuntimeDefinition sourceDefinition;
+            if (npc == null
+                || target == null
+                || !OrdinaryEnemyRuntimeRegistry.TryGet(
+                    npc.Identity.Instance,
+                    out sourceDefinition)
+                || !sourceDefinition.Profile.Aggression.SocialAggroRadius.HasValue)
+            {
+                return new ICharacter[0];
+            }
+
+            return this.dynelRegistry
+                .FindCharactersInRange(
+                    npc,
+                    (float)sourceDefinition.Profile.Aggression.SocialAggroRadius.Value)
+                .Where(
+                    candidate => this.IsEligibleSocialAggroAlly(
+                        sourceDefinition,
+                        candidate,
+                        npc,
+                        target))
+                .OrderBy(
+                    candidate => candidate.Coordinates().coordinate.Distance2D(
+                        npc.Coordinates().coordinate))
+                .ThenBy(candidate => candidate.Identity.Instance)
+                .ToArray();
+        }
+
+        private bool IsEligibleSocialAggroAlly(
+            OrdinaryEnemyRuntimeDefinition sourceDefinition,
+            ICharacter candidate,
+            ICharacter source,
+            ICharacter target)
+        {
+            OrdinaryEnemyRuntimeDefinition candidateDefinition;
+            return candidate != null
+                   && candidate.Identity != source.Identity
+                   && candidate.Controller is NPCController
+                   && candidate.Stats[StatIds.health].Value > 0
+                   && candidate.FightingTarget.Instance == 0
+                   && OrdinaryEnemyRuntimeRegistry.TryGet(
+                       candidate.Identity.Instance,
+                       out candidateDefinition)
+                   && candidateDefinition.Profile.ProfileKey
+                      == sourceDefinition.Profile.ProfileKey
+                   && this.HasClearAggroLineOfSight(candidate, target);
+        }
+
+        private bool HasClearAggroLineOfSight(ICharacter observer, ICharacter target)
+        {
+            var start = new CollisionPoint3(
+                observer.RawCoordinates.X,
+                observer.RawCoordinates.Y,
+                observer.RawCoordinates.Z);
+            var end = new CollisionPoint3(
+                target.RawCoordinates.X,
+                target.RawCoordinates.Y,
+                target.RawCoordinates.Z);
+            SegmentTriangleHit hit;
+            return this.aggroLineOfSight.EvaluateAttackLine(true, start, end, out hit)
+                   == NpcDamageLineOfSightDecision.AllowedClear;
         }
 
         internal void TryReturnToSpawn(ICharacter npc)

@@ -400,7 +400,8 @@ namespace AORebirth.Core.Playfields
             int attackInfoAmmoCount,
             int attackInfoWeaponSlot,
             int attackInfoUnknown,
-            int attackInfoWeaponInstance)
+            int attackInfoWeaponInstance,
+            bool requiresDamageLineOfSight = false)
         {
             CapturedEnemyCombatContract contract = EquippedWeapon(
                 evidence,
@@ -413,6 +414,7 @@ namespace AORebirth.Core.Playfields
             contract.AttackInfoWeaponSlot = attackInfoWeaponSlot;
             contract.AttackInfoUnknown = attackInfoUnknown;
             contract.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            contract.RequiresDamageLineOfSight = requiresDamageLineOfSight;
             return contract;
         }
 
@@ -1626,7 +1628,8 @@ namespace AORebirth.Core.Playfields
                 -1,
                 (int)WeaponSlots.Righthand,
                 0,
-                0);
+                0,
+                true);
         }
 
         private static bool HasCompleteMuggerSourceWeaponEvidence(
