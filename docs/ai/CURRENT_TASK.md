@@ -19,8 +19,10 @@ Stan Goodman deliver-factory turn-in (`20260721-afgter dog lockpick goodman`).
 ### Upstream (Subway / TOTW)
 
 Construct the Temple of Three Winds as its own PF647 content module. The
-entrance-to-first-boss-room slice retains seven exact regular-Cultist profiles,
-`122` deduplicated spawn anchors, `16` captured patrols, observed `15..32`
+entrance-to-Re-Animator slice now retains eight ordinary profiles and `125`
+deduplicated spawn anchors: the original seven regular-Cultist profiles and
+three exact Eternal Sentinel room spawns. Cultists retain `16` captured patrols,
+observed `15..32`
 normal damage, capture-backed chase/return, strict profile-scoped loot, exact
 level credits, and the captured approximately `310`-second death-to-respawn
 lifecycle. Finalized captures `20260721-035526`, `20260721-040249`, and
@@ -29,11 +31,21 @@ Temple encounter: exact L42/7091-health spawn data, captured `43` weapon damage,
 nanos `205389` and `205561`, two atomic loot snapshots with `1450` credits,
 two-minute unlooted corpse lifetime, and ten-minute post-despawn replacement.
 
+Finalized captures `20260721-041439`, `20260721-042139`, `20260721-042705`,
+`20260721-043204`, and `20260721-044256` activate Windcaller Yatila, Reverend
+Gulard, the exact level-60 Re-Animator generation, and Acolyte Betany. Their
+SCFU appearance, combat streams, nano timing, leash policies, corpses, credits,
+and atomic loot snapshots remain Temple-owned. Re-Animator nano `205604`
+refills one of its two captured Reanimated Corpse slots and living adds are
+removed on boss death/reset. The broader `20260721-052115` survey is retained
+as evidence only; incidental deeper bosses remain inactive.
+
 Temple data is owned by `CapturedTempleOfThreeWindsContentProvider` and uses
 only `totw.*` keys on playfield `647`. Subway remains independently owned by its
 PF127 providers; only generic ordinary-enemy runtime infrastructure is shared.
 See `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md`
-and `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`.
+and `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`,
+plus `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_YATILA_TO_BETANY.md`.
 
 ## Subway enemy captures (2026-07-20)
 
