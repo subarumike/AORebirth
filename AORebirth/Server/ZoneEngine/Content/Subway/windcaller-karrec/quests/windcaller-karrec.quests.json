@@ -1,13 +1,15 @@
 {
   "Identity": {
     "Id": "subway-windcaller-karrec-quests-20260717-223626",
-    "Version": "capture-backed-1",
+    "Version": "capture-backed-2",
     "Source": "docs/evidence/WINDCALLER_KARREC_SUBWAY_ENTRANCE_QUEST_20260717_223626.md"
   },
   "SourceCaptures": [
     "20260717-223626",
     "20260717-232249",
-    "AORebirth/Server/ZoneEngine/Content/Captured/Quests/windcaller_karrec_subway_entrance_20260717_223626.json"
+    "20260721-023942",
+    "AORebirth/Server/ZoneEngine/Content/Captured/Quests/windcaller_karrec_subway_entrance_20260717_223626.json",
+    "AORebirth/Server/ZoneEngine/Content/Captured/Quests/windcaller_karrec_completion_20260721_023942.json"
   ],
   "Quests": [
     {
@@ -44,10 +46,12 @@
                 "creditCardItemId": "297043",
                 "tradeSlotCount": "2",
                 "completionAction": "CharacterAction-59-then-Quest-Delete",
-                "sideTokenDelta": "2",
+                "dailyRewardItemId": "285612",
+                "sideTokenModel": "two-tokens-per-mission-token-level-tier-clan-stat-62-omni-stat-75-neutral-zero",
                 "gatewayIdentity": "Terminal:C004028F",
                 "gatewayDestinationPlayfield": "647",
-                "rewardXpEvidence": "user-observed-5000-personal-research-allocation-plus-PerkUpdate-unknown3-45000",
+                "xpRewardModel": "one-full-Rubika-level-direct-XP-from-XPTable-no-research-diversion",
+                "researchRuntime": "excluded-expansion-system-not-implemented",
                 "evidence": "docs/evidence/WINDCALLER_KARREC_SUBWAY_ENTRANCE_QUEST_20260717_223626.md"
               }
             }
@@ -57,7 +61,7 @@
       "Conditions": [],
       "Actions": [],
       "UnresolvedFields": [
-        "exactTotalXpAndResearchPersistenceSemantics",
+        "officialDirectXpPacketSequence",
         "officialGatewayEligibilityFlagIdentity",
         "gatewayDenialPacketBehavior",
         "alternateDialogueOutcomes",

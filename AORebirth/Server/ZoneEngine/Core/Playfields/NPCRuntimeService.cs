@@ -111,6 +111,7 @@ namespace AORebirth.Core.Playfields
             this.capturedTempleEncounters =
                 new CapturedTempleOfThreeWindsEncounterRuntimeService(
                     this.playfield,
+                    this.dynelRegistry,
                     this.ActivateNpc);
         }
 
@@ -343,7 +344,7 @@ namespace AORebirth.Core.Playfields
             this.capturedSubwayEncounters.ProcessDue(utcNow, this.AcquireAggro);
             this.nascenceCoreHecklers.ProcessDue(utcNow);
             AndromedaIccHqIdleGestureRuntime.ProcessDue(utcNow);
-            this.capturedTempleEncounters.ProcessDue(utcNow);
+            this.capturedTempleEncounters.ProcessDue(utcNow, this.AcquireAggro);
         }
 
         internal void ClearNpcCorpseDespawn(int corpseInstance)
@@ -388,7 +389,10 @@ namespace AORebirth.Core.Playfields
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }
-            this.capturedTempleEncounters.NotifyDeath(target);
+            foreach (ICharacter summon in this.capturedTempleEncounters.NotifyDeath(target))
+            {
+                this.playfield.DespawnNpcImmediately(summon);
+            }
 
             this.ScheduleDeadNpcDespawn(target);
 
@@ -686,6 +690,7 @@ namespace AORebirth.Core.Playfields
             }
 
             ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
+                                         ?? this.capturedTempleEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
                                          ?? LoreleiOasisMobRuntime.FindAutomaticAggroTarget(character)
@@ -841,7 +846,10 @@ namespace AORebirth.Core.Playfields
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }
-            this.capturedTempleEncounters.NotifyCombatReset(npc);
+            foreach (ICharacter summon in this.capturedTempleEncounters.NotifyCombatReset(npc))
+            {
+                this.playfield.DespawnNpcImmediately(summon);
+            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,

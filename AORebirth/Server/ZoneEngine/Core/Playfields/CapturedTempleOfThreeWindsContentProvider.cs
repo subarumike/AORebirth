@@ -10,6 +10,8 @@ namespace AORebirth.Core.Playfields
         internal const int PlayfieldInstance = 647;
         internal const int ExpectedCultistProfileCount = 7;
         internal const int ExpectedCultistSpawnCount = 122;
+        internal const int ExpectedProfileCount = 8;
+        internal const int ExpectedSpawnCount = 125;
         internal const double CapturedDeathToRespawnSeconds = 310.0;
         internal const double RuntimeRespawnAfterNpcDespawnSeconds = 300.0;
         internal const double PolicyAutomaticAggroRadius = 7.0;
@@ -37,6 +39,9 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 -1);
+
+        private static readonly CapturedEnemyCombatContract EternalSentinelCombat =
+            CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel();
 
         private static readonly RespawnPolicyDefinition CultistRespawn =
             new RespawnPolicyDefinition
@@ -237,11 +242,12 @@ namespace AORebirth.Core.Playfields
         {
             OrdinaryEnemyProfile[] profiles = ProfileSeeds
                 .Select(BuildProfile)
+                .Concat(new[] { BuildEternalSentinelProfile() })
                 .OrderBy(value => value.ProfileKey, StringComparer.Ordinal)
                 .ToArray();
-            if (profiles.Length != ExpectedCultistProfileCount)
+            if (profiles.Length != ExpectedProfileCount)
             {
-                throw new InvalidOperationException("Temple cultist profile count changed unexpectedly.");
+                throw new InvalidOperationException("Temple ordinary profile count changed unexpectedly.");
             }
 
             return profiles;
@@ -254,15 +260,180 @@ namespace AORebirth.Core.Playfields
                 StringComparer.Ordinal);
             OrdinaryEnemySpawnDefinition[] spawns = SpawnSeeds
                 .Select(seed => BuildSpawn(seed, profiles[seed.ProfileKey]))
+                .Concat(BuildEternalSentinelSpawns())
                 .OrderBy(value => value.SourceIdentity)
                 .ToArray();
-            if (spawns.Length != ExpectedCultistSpawnCount
+            if (spawns.Length != ExpectedSpawnCount
                 || spawns.Select(value => value.SourceIdentity).Distinct().Count() != spawns.Length)
             {
-                throw new InvalidOperationException("Temple cultist spawn rows are incomplete or duplicated.");
+                throw new InvalidOperationException("Temple ordinary spawn rows are incomplete or duplicated.");
             }
 
             return spawns;
+        }
+
+        private static OrdinaryEnemyProfile BuildEternalSentinelProfile()
+        {
+            const string evidence =
+                "20260721-041439/043204: exact Eternal Sentinel SCFU, 17..18 normal damage, "
+                + "CATMesh 41664, empty observed loot and level-credit outcomes";
+            return new OrdinaryEnemyProfile(
+                "totw.ordinary.eternal-sentinel.41690",
+                "totw.ordinary.eternal-sentinel",
+                "Eternal Sentinel",
+                41690,
+                OrdinaryEnemyConstructionMode.CapturedDirect,
+                string.Empty,
+                new OrdinaryEnemyAppearanceProfile(
+                    3,
+                    1,
+                    6,
+                    0,
+                    1,
+                    268964353,
+                    0,
+                    0,
+                    136,
+                    0,
+                    31,
+                    1,
+                    1227u,
+                    0,
+                    true,
+                    false,
+                    new[]
+                    {
+                        new OrdinaryEnemyTextureProfile(0, 0, 0),
+                        new OrdinaryEnemyTextureProfile(1, 0, 0),
+                        new OrdinaryEnemyTextureProfile(2, 0, 0),
+                        new OrdinaryEnemyTextureProfile(3, 0, 0),
+                        new OrdinaryEnemyTextureProfile(4, 0, 0)
+                    },
+                    new[]
+                    {
+                        new OrdinaryEnemyMeshProfile(1, 81804u, 0, 2)
+                    },
+                    OrdinaryEnemyScfuProfile.CapturedExact),
+                CultistAggression,
+                new OrdinaryEnemyCombatProfile(
+                    OrdinaryEnemyCombatMode.UnarmedMelee,
+                    OrdinaryEnemyDamageSource.CapturedFixed,
+                    false,
+                    EternalSentinelCombat,
+                    OrdinaryEnemyEvidenceState.Observed),
+                BuildEternalSentinelLoot(evidence),
+                new OrdinaryEnemyCorpseProfile(
+                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    30.0,
+                    120.0,
+                    30.0,
+                    41664,
+                    evidence),
+                new[] { evidence },
+                false,
+                false);
+        }
+
+        private static OrdinaryEnemyLootProfile BuildEternalSentinelLoot(string evidence)
+        {
+            return new OrdinaryEnemyLootProfile(
+                OrdinaryEnemyLootEvidence.NoneProven,
+                new OrdinaryEnemyLootEntry[0],
+                OrdinaryEnemyLootPoolMode.IndependentEntries,
+                0,
+                true,
+                5,
+                5,
+                evidence,
+                OrdinaryEnemyEvidenceState.Observed,
+                null,
+                null,
+                new[]
+                {
+                    new OrdinaryEnemyLevelCreditRule(18, 111, 111, 1, evidence, OrdinaryEnemyEvidenceState.Observed),
+                    new OrdinaryEnemyLevelCreditRule(19, 118, 118, 1, evidence, OrdinaryEnemyEvidenceState.Observed),
+                    new OrdinaryEnemyLevelCreditRule(20, 124, 124, 1, evidence, OrdinaryEnemyEvidenceState.Observed)
+                });
+        }
+
+        private static OrdinaryEnemySpawnDefinition[] BuildEternalSentinelSpawns()
+        {
+            return new[]
+            {
+                BuildEternalSentinelSpawn(
+                    unchecked((int)0x7983FA22u),
+                    18,
+                    247,
+                    98,
+                    62,
+                    92.95905f,
+                    12.187273f,
+                    290.411774f),
+                BuildEternalSentinelSpawn(
+                    unchecked((int)0x7983FA26u),
+                    20,
+                    280,
+                    99,
+                    69,
+                    89.83454f,
+                    11.4112511f,
+                    306.880341f),
+                BuildEternalSentinelSpawn(
+                    unchecked((int)0x7983FBC2u),
+                    18,
+                    247,
+                    98,
+                    62,
+                    59.7886162f,
+                    13.16832f,
+                    283.302765f)
+            };
+        }
+
+        private static OrdinaryEnemySpawnDefinition BuildEternalSentinelSpawn(
+            int sourceIdentity,
+            int level,
+            int health,
+            int scale,
+            int runSpeed,
+            float x,
+            float y,
+            float z)
+        {
+            return new OrdinaryEnemySpawnDefinition(
+                "totw.ordinary." + sourceIdentity.ToString("X8", CultureInfo.InvariantCulture),
+                sourceIdentity,
+                "totw.ordinary.eternal-sentinel.41690",
+                PlayfieldInstance,
+                level,
+                health,
+                0,
+                scale,
+                runSpeed,
+                x,
+                y,
+                z,
+                0f,
+                0f,
+                0f,
+                1f,
+                OrdinaryEnemyMovementMode.Static,
+                new OrdinaryEnemyWaypoint[0],
+                false,
+                true,
+                true,
+                0x020A4A43u,
+                0,
+                HexToBytes("80000000000000000000000003010001000100010001000000020000"),
+                0,
+                OrdinaryEnemyEvidenceState.Policy,
+                RuntimeRespawnAfterNpcDespawnSeconds,
+                OrdinaryEnemyRuntimeDisposition.Active,
+                string.Empty,
+                "20260721-041439",
+                string.Empty,
+                null,
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
         }
 
         private static OrdinaryEnemyProfile BuildProfile(ProfileSeed seed)
