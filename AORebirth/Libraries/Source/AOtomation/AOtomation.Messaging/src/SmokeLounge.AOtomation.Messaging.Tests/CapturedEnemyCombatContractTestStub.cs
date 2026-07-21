@@ -92,6 +92,8 @@ namespace AORebirth.Core.Playfields
         internal int AttackInfoAmmoCount { get; set; }
 
         internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; set; }
+
+        internal bool RequiresDamageLineOfSight { get; set; }
     }
 
     internal static class CapturedSubwayCombatCatalog
@@ -284,7 +286,8 @@ namespace AORebirth.Core.Playfields
                 AttackInfoAmmoCount = -1,
                 AttackInfoWeaponSlot = 6,
                 AttackInfoUnknown = 0,
-                AttackInfoWeaponInstance = 0
+                AttackInfoWeaponInstance = 0,
+                RequiresDamageLineOfSight = true
             };
         }
 

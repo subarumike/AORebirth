@@ -1189,7 +1189,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, mugger.Combat.DamageSource);
             Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, mugger.Combat.EvidenceState);
             Assert.IsTrue(mugger.Combat.VisibleWeapon);
-            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, mugger.Aggression.Mode);
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, mugger.Aggression.Mode);
+            Assert.AreEqual(7.0, mugger.Aggression.AutomaticAggroRadius.Value);
+            Assert.IsTrue(mugger.Aggression.RequiresLineOfSight);
+            Assert.AreEqual(7.0, mugger.Aggression.SocialAggroRadius.Value);
             Assert.IsTrue(mugger.Aggression.Chase);
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, mugger.Combat.Contract.AttackModel);
@@ -1206,6 +1209,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn.Level);
                 Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
                 Assert.IsTrue(contract.IsCombatReady);
+                Assert.IsTrue(contract.RequiresDamageLineOfSight);
                 Assert.AreEqual(121567, contract.WeaponLowId);
                 Assert.AreEqual(121567, contract.WeaponHighId);
                 Assert.AreEqual(1, contract.WeaponQuality);

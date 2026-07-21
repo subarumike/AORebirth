@@ -15,7 +15,11 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   five-second private-server cadence because no trustworthy same-source landed
   interval exists. Violent Vagabond retains the accepted same-level Mugger
   damage policy and captured miss cadence. All 26 profiles and 322 rows are
-  active; bounded private-client validation remains pending. Ordinary content
+  active. The full private walkthrough passed; its one discovered gap was
+  Mugger aggression. Muggers now use seven-meter automatic and same-profile
+  social aggro, fail closed without clear PF127 geometry LOS, and retain LOS
+  enforcement for ranged damage after acquisition. Focused validation of that
+  final adjustment remains. Ordinary content
   generation and Subway loot `22/22` pass; WorldPopulation is `39/39` after the
   Workman test stub was aligned with the captured/generated `59` normal hits.
 

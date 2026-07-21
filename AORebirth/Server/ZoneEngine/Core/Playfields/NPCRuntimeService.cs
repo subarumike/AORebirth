@@ -91,7 +91,9 @@ namespace AORebirth.Core.Playfields
                     this.ordinaryEnemyCatalog,
                     this.patrolReplay,
                     this.dynelRegistry,
-                    this.ActivateNpc);
+                    this.ActivateNpc,
+                    new NpcDamageLineOfSightRuntimeService(
+                        this.playfield.Identity.Instance));
             this.worldPopulation =
                 new WorldPopulationController(this.playfield, this.ordinaryEnemyCatalog, this.ordinaryEnemies);
             this.capturedSubwayEncounters =
@@ -351,6 +353,14 @@ namespace AORebirth.Core.Playfields
 
         internal void AcquireAggro(ICharacter attacker, ICharacter target)
         {
+            this.AcquireAggro(attacker, target, true);
+        }
+
+        private void AcquireAggro(
+            ICharacter attacker,
+            ICharacter target,
+            bool allowSocialAggro)
+        {
             NPCController npcController = target.Controller as NPCController;
             if (npcController == null)
             {
@@ -427,6 +437,17 @@ namespace AORebirth.Core.Playfields
             }
 
             this.StartCombatWithAcquiredTarget(attacker, target, capturedContract);
+            if (!allowSocialAggro)
+            {
+                return;
+            }
+
+            foreach (ICharacter ally in this.ordinaryEnemies.FindSocialAggroAllies(
+                target,
+                attacker))
+            {
+                this.AcquireAggro(attacker, ally, false);
+            }
         }
 
         internal void ProcessPatrolTick(ICharacter character)

@@ -8,7 +8,13 @@ are complete. All `74` Subway-bearing sessions with raw packet rows now
 reprocess successfully, so incomplete legacy
 projections no longer require repeat gameplay captures. The active work is to
 promote recovered exact evidence and validate the `322` active PF127 population
-in bounded runtime batches; no population rows remain quarantined.
+in bounded runtime batches; no population rows remain quarantined. The full
+private-server walkthrough passed, except that Muggers were found to require
+proactive social aggression. Muggers now acquire players automatically within
+the shared seven-meter Subway policy radius only with clear PF127 geometry LOS,
+pull nearby same-profile Muggers with their own clear LOS, and retain LOS-gated
+ranged damage after combat begins. Focused private validation of that final
+Mugger adjustment remains.
 
 Authoritative PF127 lifecycle policy: every regular Subway mob uses the shared
 `240`-second post-NPC-despawn respawn schedule. Regular corpses remain for

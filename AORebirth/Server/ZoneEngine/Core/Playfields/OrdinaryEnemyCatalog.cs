@@ -23,6 +23,8 @@ namespace AORebirth.Core.Playfields
 
         private const int LooterMonsterData = 203745;
 
+        private const int MuggerMonsterData = 203734;
+
         private const int RedundantScanMonsterData = 204178;
 
         private const int IncompleteRebuildMonsterData = 203728;
@@ -40,6 +42,10 @@ namespace AORebirth.Core.Playfields
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
 
         private const double IncompleteRebuildAutomaticAggroRadius = 7.0;
+
+        private const double MuggerAutomaticAggroRadius = 7.0;
+
+        private const double MuggerSocialAggroRadius = 7.0;
 
         private const double RedundantScanAutomaticAggroRadius = 7.0;
 
@@ -70,6 +76,16 @@ namespace AORebirth.Core.Playfields
                     true,
                     true,
                     OrdinaryEnemyEvidenceState.Policy);
+
+        private static readonly OrdinaryEnemyAggressionProfile MuggerAutomaticSocialAggression =
+            new OrdinaryEnemyAggressionProfile(
+                OrdinaryEnemyAggressionMode.Auto,
+                MuggerAutomaticAggroRadius,
+                true,
+                false,
+                OrdinaryEnemyEvidenceState.Policy,
+                true,
+                MuggerSocialAggroRadius);
 
         private static readonly OrdinaryEnemyAggressionProfile RedundantScanAutomaticAggression =
             new OrdinaryEnemyAggressionProfile(
@@ -737,6 +753,11 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyAggressionProfile AggressionFor(int monsterData)
         {
+            if (monsterData == MuggerMonsterData)
+            {
+                return MuggerAutomaticSocialAggression;
+            }
+
             if (monsterData == BloodcreeperMonsterData)
             {
                 return BloodcreeperAutomaticAggression;
