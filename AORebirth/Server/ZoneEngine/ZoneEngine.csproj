@@ -370,6 +370,7 @@
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\PerkResetServiceProviderSpawn.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayEncounterRuntimeService.cs" />
