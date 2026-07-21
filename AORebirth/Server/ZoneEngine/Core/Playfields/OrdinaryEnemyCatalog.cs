@@ -14,12 +14,16 @@ namespace AORebirth.Core.Playfields
     {
         internal const int SubwayPlayfieldInstance = 127;
 
+        private const double SubwayOrdinaryRespawnSeconds = 240.0;
+
         private const int BloodcreeperMonsterData =
             NpcCombatAttackRules.CapturedSubwayBloodcreeperMonsterData;
 
         private const int DerangedShopperMonsterData = 203736;
 
         private const int LooterMonsterData = 203745;
+
+        private const int MuggerMonsterData = 203734;
 
         private const int RedundantScanMonsterData = 204178;
 
@@ -38,6 +42,10 @@ namespace AORebirth.Core.Playfields
         private const double BloodcreeperAutomaticAggroRadius = 7.0;
 
         private const double IncompleteRebuildAutomaticAggroRadius = 7.0;
+
+        private const double MuggerAutomaticAggroRadius = 7.0;
+
+        private const double MuggerSocialAggroRadius = 7.0;
 
         private const double RedundantScanAutomaticAggroRadius = 7.0;
 
@@ -69,6 +77,16 @@ namespace AORebirth.Core.Playfields
                     true,
                     OrdinaryEnemyEvidenceState.Policy);
 
+        private static readonly OrdinaryEnemyAggressionProfile MuggerAutomaticSocialAggression =
+            new OrdinaryEnemyAggressionProfile(
+                OrdinaryEnemyAggressionMode.Auto,
+                MuggerAutomaticAggroRadius,
+                true,
+                false,
+                OrdinaryEnemyEvidenceState.Policy,
+                true,
+                MuggerSocialAggroRadius);
+
         private static readonly OrdinaryEnemyAggressionProfile RedundantScanAutomaticAggression =
             new OrdinaryEnemyAggressionProfile(
                 OrdinaryEnemyAggressionMode.Auto,
@@ -80,23 +98,23 @@ namespace AORebirth.Core.Playfields
         private static readonly OrdinaryEnemyCorpseProfile StandardGenericCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.Generic,
-                3.0,
-                240.0,
-                3.0);
+                30.0,
+                120.0,
+                30.0);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedThiefCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedThief,
-                3.0,
-                240.0,
-                3.0);
+                30.0,
+                120.0,
+                30.0);
 
         private static readonly OrdinaryEnemyCorpseProfile CapturedFilthFleaCorpse =
             new OrdinaryEnemyCorpseProfile(
                 OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea,
-                3.0,
-                240.0,
-                3.0);
+                30.0,
+                120.0,
+                30.0);
 
         private readonly Dictionary<string, OrdinaryEnemyProfile> profilesByKey;
 
@@ -107,6 +125,14 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyCatalog(
             CapturedSubwayContentProvider supportedContent,
             CapturedSubwayOrdinaryContentProvider ordinaryContent)
+            : this(supportedContent, ordinaryContent, null)
+        {
+        }
+
+        internal OrdinaryEnemyCatalog(
+            CapturedSubwayContentProvider supportedContent,
+            CapturedSubwayOrdinaryContentProvider ordinaryContent,
+            CapturedTempleOfThreeWindsContentProvider templeContent)
         {
             if (supportedContent == null)
             {
@@ -122,6 +148,11 @@ namespace AORebirth.Core.Playfields
             var spawnRows = new List<OrdinaryEnemySpawnDefinition>();
             BuildSupportedRows(supportedContent, ordinaryContent, profileRows, spawnRows);
             BuildCapturedOrdinaryRows(ordinaryContent, profileRows, spawnRows);
+            if (templeContent != null)
+            {
+                profileRows.AddRange(templeContent.GetProfiles());
+                spawnRows.AddRange(templeContent.GetSpawns());
+            }
 
             this.profiles = profileRows
                 .OrderBy(value => value.ProfileKey, StringComparer.Ordinal)
@@ -302,17 +333,6 @@ namespace AORebirth.Core.Playfields
                         }
                     : new OrdinaryEnemyWaypoint[0];
                 bool patrol = source.HasPatrolWaypoint || replay.Length > 0;
-                bool violentVagabond = source.MonsterData == ViolentVagabondMonsterData;
-                OrdinaryEnemyEvidenceState respawnEvidence = source.HasRespawnDelay
-                    ? OrdinaryEnemyEvidenceState.Observed
-                    : violentVagabond
-                        ? OrdinaryEnemyEvidenceState.Policy
-                        : OrdinaryEnemyEvidenceState.Unresolved;
-                double? respawnDelaySeconds = source.HasRespawnDelay
-                    ? source.RespawnDelaySeconds
-                    : violentVagabond
-                        ? (double?)450.0
-                        : null;
                 spawns.Add(
                     new OrdinaryEnemySpawnDefinition(
                         SpawnKey(source.SourceInstance),
@@ -340,8 +360,8 @@ namespace AORebirth.Core.Playfields
                         0,
                         new byte[0],
                         0,
-                        respawnEvidence,
-                        respawnDelaySeconds,
+                        OrdinaryEnemyEvidenceState.Policy,
+                        SubwayOrdinaryRespawnSeconds,
                         CapturedSubwayContentProvider.IsRuntimeQuarantined(source.SourceInstance)
                             ? OrdinaryEnemyRuntimeDisposition.Quarantined
                             : OrdinaryEnemyRuntimeDisposition.Active,
@@ -349,9 +369,7 @@ namespace AORebirth.Core.Playfields
                         source.ContentSection,
                         string.Empty,
                         null,
-                        violentVagabond
-                            ? ViolentVagabondRespawnPolicy()
-                            : null));
+                        SubwayOrdinaryRespawnPolicy()));
             }
         }
 
@@ -366,7 +384,6 @@ namespace AORebirth.Core.Playfields
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
                     archetype.MonsterData == DerangedShopperMonsterData
-                    || archetype.MonsterData == WorkmanStrikerMonsterData
                     || archetype.MonsterData == LooterMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
@@ -376,7 +393,8 @@ namespace AORebirth.Core.Playfields
                         : null;
                 Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
                     sourceVariantContractResolver =
-                        archetype.MonsterData == IncompleteRebuildMonsterData
+                        archetype.MonsterData == WorkmanStrikerMonsterData
+                        || archetype.MonsterData == IncompleteRebuildMonsterData
                         || archetype.MonsterData == RedundantScanMonsterData
                         || archetype.MonsterData == FragmentedSoulMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
@@ -515,23 +533,14 @@ namespace AORebirth.Core.Playfields
                         source.CapturedFlags2,
                         source.Unknown1,
                         source.Unknown2,
-                        policyConfiguration != null
-                        && policyConfiguration.RespawnPolicy.Mode
-                           == WorldRespawnPolicyAssignmentMode.Explicit
-                            ? OrdinaryEnemyEvidenceState.Policy
-                            : OrdinaryEnemyEvidenceState.Unresolved,
-                        policyConfiguration != null
-                        && policyConfiguration.RespawnPolicy.ExplicitPolicy != null
-                            ? policyConfiguration.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds
-                            : null,
+                        OrdinaryEnemyEvidenceState.Policy,
+                        SubwayOrdinaryRespawnSeconds,
                         OrdinaryEnemyRuntimeDisposition.Active,
                         source.SourceOwnerIdentity,
                         source.EvidenceCapture,
                         source.EvidenceTimestamp,
                         levelDefinition,
-                        policyConfiguration == null
-                            ? null
-                            : policyConfiguration.RespawnPolicy));
+                        SubwayOrdinaryRespawnPolicy()));
             }
         }
 
@@ -559,65 +568,14 @@ namespace AORebirth.Core.Playfields
                         "community-range:docs/generated/enemy_catalog/enemy_catalog.csv;"
                         + "captured-anchor:20260709-222339;"
                         + "focused-combat:20260716-033326,20260716-034104"),
-                    WorldRespawnPolicyAssignment.Explicit(
-                        new RespawnPolicyDefinition
-                        {
-                            RespawnPolicyKey = "ordinary.bloodcreeper.240",
-                            Mode = WorldRespawnMode.FixedDelay,
-                            FixedDelaySeconds = 240.0,
-                            RespawnAtOriginalPosition = true,
-                            ResetHealth = true,
-                            ResetMovementState = true,
-                            ResetAggressionState = true,
-                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
-                            Evidence = "private-regular-enemy-policy;20260716-033326;20260716-034104",
-                            Confidence = "POLICY",
-                            Enabled = true
-                        })));
-            result.Add(
-                "incomplete_rebuild",
-                new OrdinaryEnemySpawnPolicyConfiguration(
-                    null,
-                    WorldRespawnPolicyAssignment.Explicit(
-                        new RespawnPolicyDefinition
-                        {
-                            RespawnPolicyKey = "ordinary.incomplete-rebuild.240",
-                            Mode = WorldRespawnMode.FixedDelay,
-                            FixedDelaySeconds = 240.0,
-                            RespawnAtOriginalPosition = true,
-                            ResetHealth = true,
-                            ResetMovementState = true,
-                            ResetAggressionState = true,
-                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
-                            Evidence = "private-regular-enemy-policy;"
-                                       + "20260709-222339;20260716-034559;"
-                                       + "20260716-222007;20260717-215250",
-                            Confidence = "POLICY",
-                            Enabled = true
-                        })));
-            result.Add(
-                "slum_runner",
-                new OrdinaryEnemySpawnPolicyConfiguration(
-                    null,
-                    WorldRespawnPolicyAssignment.Explicit(
-                        new RespawnPolicyDefinition
-                        {
-                            RespawnPolicyKey = "ordinary.slum-runner.60",
-                            Mode = WorldRespawnMode.FixedDelay,
-                            FixedDelaySeconds = 60.0,
-                            RespawnAtOriginalPosition = true,
-                            ResetHealth = true,
-                            ResetMovementState = true,
-                            ResetAggressionState = true,
-                            DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
-                            Evidence = "official-live:20260716-215947;"
-                                + "enemy-respawns.csv;"
-                                + "death-to-respawn=59.433;"
-                                + "corpse-remained-present",
-                            Confidence = "CAPTURE_BOUNDED",
-                            Enabled = true
-                        })));
+                    SubwayOrdinaryRespawnPolicy()));
             return result;
+        }
+
+        private static WorldRespawnPolicyAssignment SubwayOrdinaryRespawnPolicy()
+        {
+            return WorldRespawnPolicyAssignment.Inherit(
+                "PF127 Subway regular mobs use the shared 240-second respawn policy");
         }
 
         private static OrdinaryEnemySpawnLevelDefinition BuildCapturedLevelDefinition(
@@ -627,26 +585,31 @@ namespace AORebirth.Core.Playfields
         {
             int expectedMonsterData = string.Equals(
                 source.ArchetypeKey,
-                "incomplete_rebuild",
+                "workman_striker",
                 StringComparison.Ordinal)
-                ? IncompleteRebuildMonsterData
+                ? WorkmanStrikerMonsterData
                 : string.Equals(
                     source.ArchetypeKey,
-                    "redundant_scan",
+                    "incomplete_rebuild",
                     StringComparison.Ordinal)
-                    ? RedundantScanMonsterData
+                    ? IncompleteRebuildMonsterData
                     : string.Equals(
                         source.ArchetypeKey,
-                        "fragmented_soul",
+                        "redundant_scan",
                         StringComparison.Ordinal)
-                        ? FragmentedSoulMonsterData
+                        ? RedundantScanMonsterData
                         : string.Equals(
                             source.ArchetypeKey,
-                            "premature_pattern",
+                            "fragmented_soul",
                             StringComparison.Ordinal)
-                          && source.SourceInstance == PrematurePatternVariantSource
-                            ? PrematurePatternMonsterData
-                            : 0;
+                            ? FragmentedSoulMonsterData
+                            : string.Equals(
+                                source.ArchetypeKey,
+                                "premature_pattern",
+                                StringComparison.Ordinal)
+                              && source.SourceInstance == PrematurePatternVariantSource
+                                ? PrematurePatternMonsterData
+                                : 0;
             CapturedSubwayGenerationVariantDefinition[] capturedVariants =
                 expectedMonsterData == 0
                     ? new CapturedSubwayGenerationVariantDefinition[0]
@@ -803,6 +766,11 @@ namespace AORebirth.Core.Playfields
 
         private static OrdinaryEnemyAggressionProfile AggressionFor(int monsterData)
         {
+            if (monsterData == MuggerMonsterData)
+            {
+                return MuggerAutomaticSocialAggression;
+            }
+
             if (monsterData == BloodcreeperMonsterData)
             {
                 return BloodcreeperAutomaticAggression;
@@ -816,28 +784,6 @@ namespace AORebirth.Core.Playfields
             return monsterData == RedundantScanMonsterData
                        ? RedundantScanAutomaticAggression
                        : RetaliateAggression();
-        }
-
-        private static WorldRespawnPolicyAssignment ViolentVagabondRespawnPolicy()
-        {
-            return WorldRespawnPolicyAssignment.Explicit(
-                new RespawnPolicyDefinition
-                {
-                    RespawnPolicyKey = "ordinary.violent-vagabond.450",
-                    Mode = WorldRespawnMode.FixedDelay,
-                    FixedDelaySeconds = 450.0,
-                    RespawnAtOriginalPosition = true,
-                    ResetHealth = true,
-                    ResetMovementState = true,
-                    ResetAggressionState = true,
-                    DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
-                    Evidence = "official-live:20260708-143600;"
-                               + "794CD74B>794DF301;"
-                               + "449.759588-seconds-after-npc-despawn;"
-                               + "1.088-position-delta",
-                    Confidence = "CAPTURE_BOUNDED",
-                    Enabled = true
-                });
         }
 
         private static void ValidateViolentVagabondEvidenceBoundary(
@@ -886,13 +832,9 @@ namespace AORebirth.Core.Playfields
                              != OrdinaryEnemyRuntimeDisposition.Active)
                 || rows.Any(
                     value => value.RespawnEvidence != OrdinaryEnemyEvidenceState.Policy
-                             || value.RespawnDelaySeconds != 450.0
+                             || value.RespawnDelaySeconds != SubwayOrdinaryRespawnSeconds
                              || value.RespawnPolicy.Mode
-                                != WorldRespawnPolicyAssignmentMode.Explicit
-                             || value.RespawnPolicy.ExplicitPolicy == null
-                             || value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds != 450.0
-                             || value.RespawnPolicy.ExplicitPolicy.DelayStartsAt
-                                != RespawnDelayStartsAt.NpcDespawn))
+                                != WorldRespawnPolicyAssignmentMode.Inherit))
             {
                 throw new InvalidOperationException(
                     "Violent Vagabond population/respawn evidence boundary drifted");
@@ -1313,9 +1255,9 @@ namespace AORebirth.Core.Playfields
 
                 return new OrdinaryEnemyCorpseProfile(
                     packetProfile,
-                    3.0,
-                    240.0,
-                    3.0,
+                    30.0,
+                    120.0,
+                    30.0,
                     catMeshes[0],
                     string.Join(
                         ",",

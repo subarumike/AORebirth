@@ -55,6 +55,31 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedEnemyCombatContract
     {
+        internal static CapturedEnemyCombatContract FixedAttack(
+            string evidence,
+            int minDamage,
+            int maxDamage,
+            double rechargeSeconds,
+            int weaponSlot,
+            int attackInfoUnknown,
+            int weaponInstance,
+            int attackInfoAmmoCount = 0)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
+                IsCombatReady = true,
+                Evidence = evidence,
+                MinDamage = minDamage,
+                MaxDamage = maxDamage,
+                RechargeSeconds = rechargeSeconds,
+                AttackInfoWeaponSlot = weaponSlot,
+                AttackInfoUnknown = attackInfoUnknown,
+                AttackInfoWeaponInstance = weaponInstance,
+                AttackInfoAmmoCount = attackInfoAmmoCount
+            };
+        }
+
         internal CapturedEnemyAttackModel AttackModel { get; set; }
 
         internal bool IsCombatReady { get; set; }
@@ -92,6 +117,8 @@ namespace AORebirth.Core.Playfields
         internal int AttackInfoAmmoCount { get; set; }
 
         internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; set; }
+
+        internal bool RequiresDamageLineOfSight { get; set; }
     }
 
     internal static class CapturedSubwayCombatCatalog
@@ -284,7 +311,8 @@ namespace AORebirth.Core.Playfields
                 AttackInfoAmmoCount = -1,
                 AttackInfoWeaponSlot = 6,
                 AttackInfoUnknown = 0,
-                AttackInfoWeaponInstance = 0
+                AttackInfoWeaponInstance = 0,
+                RequiresDamageLineOfSight = true
             };
         }
 
@@ -570,6 +598,65 @@ namespace AORebirth.Core.Playfields
             };
         }
 
+        private static CapturedEnemyCombatContract ForWorkmanStriker(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            string atomicFailure = string.Empty;
+            bool hasExactCombatEvidence = combat != null
+                                          && combat.Observed
+                                          && combat.RuntimeReady
+                                          && combat.ObservedRows == 59
+                                          && combat.MinDamage == 9
+                                          && combat.MaxDamage == 23
+                                          && combat.WeaponSlot == 6
+                                          && combat.AttackInfoUnknown == 0
+                                          && combat.WeaponInstance == 0;
+            if (!hasExactCombatEvidence
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    WorkmanStrikerMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure))
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation for the selected source: "
+                               + atomicFailure
+                };
+            }
+
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                IsCombatReady = true,
+                Evidence = weapon.Evidence
+                           + ": Workman Striker selected one captured atomic level/stat/weapon generation; "
+                           + "59 normal local-player hits span 9..23; item owns runtime damage and recharge; "
+                           + "captured AttackInfo ammo -1, slot 6, unknown 0, and weapon instance 0.",
+                WeaponLowId = weapon.LowId,
+                WeaponHighId = weapon.HighId,
+                WeaponQuality = weapon.Quality,
+                WeaponInventorySlot = 6,
+                HasCapturedEquippedAttackInfo = true,
+                AttackInfoAmmoCount = -1,
+                AttackInfoWeaponSlot = 6,
+                AttackInfoUnknown = 0,
+                AttackInfoWeaponInstance = 0
+            };
+        }
+
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
@@ -598,7 +685,7 @@ namespace AORebirth.Core.Playfields
                 {
                     AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                     IsCombatReady = true,
-                    Evidence = "Deranged Shopper source 0x79574527 QL8 125454/125455; item owns runtime damage, damage bonus, and recharge; one critical is report-only and one captured miss preserves ammo -1, slot 6, and unknown 0.",
+                    Evidence = "20260710-202132,20260720-031025: Deranged Shopper source 0x79574527 QL8 125454/125455; ten normal local-player hits span 7..15, one 27-point critical is report-only, and six captured misses preserve ammo -1, slot 6, unknown 0, and weapon instance 0; capture 20260720-031025 also proves empty SpecialAttackWeapon 56/45/45/45/0 plus attack-start, StopFight, and death context; item owns runtime damage, damage bonus, and recharge; the newly observed SIW/start/stop/death context remains evidence-only so runtime behavior is unchanged.",
                     WeaponLowId = evidence[0].LowId,
                     WeaponHighId = evidence[0].HighId,
                     WeaponQuality = evidence[0].Quality,
@@ -608,6 +695,16 @@ namespace AORebirth.Core.Playfields
                     AttackInfoWeaponSlot = 6,
                     AttackInfoUnknown = 0,
                     AttackInfoWeaponInstance = 0
+                };
+            }
+
+            if (archetype != null && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Evidence = "Workman Striker requires a selected capture-reviewed atomic generation variant."
                 };
             }
 
@@ -741,8 +838,7 @@ namespace AORebirth.Core.Playfields
             }
 
             if (archetype == null
-                || (archetype.MonsterData != WorkmanStrikerMonsterData
-                    && archetype.MonsterData != LooterMonsterData))
+                || archetype.MonsterData != LooterMonsterData)
             {
                 return ForOrdinary(archetype);
             }
@@ -797,11 +893,21 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
             if (archetype == null
-                || (archetype.MonsterData != IncompleteRebuildMonsterData
+                || (archetype.MonsterData != WorkmanStrikerMonsterData
+                    && archetype.MonsterData != IncompleteRebuildMonsterData
                     && archetype.MonsterData != RedundantScanMonsterData
                     && archetype.MonsterData != FragmentedSoulMonsterData))
             {
                 return ForOrdinary(archetype, sourceInstance);
+            }
+
+            if (archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return ForWorkmanStriker(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
             }
 
             if (archetype.MonsterData == FragmentedSoulMonsterData)

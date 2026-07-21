@@ -400,7 +400,8 @@ namespace AORebirth.Core.Playfields
             int attackInfoAmmoCount,
             int attackInfoWeaponSlot,
             int attackInfoUnknown,
-            int attackInfoWeaponInstance)
+            int attackInfoWeaponInstance,
+            bool requiresDamageLineOfSight = false)
         {
             CapturedEnemyCombatContract contract = EquippedWeapon(
                 evidence,
@@ -413,6 +414,7 @@ namespace AORebirth.Core.Playfields
             contract.AttackInfoWeaponSlot = attackInfoWeaponSlot;
             contract.AttackInfoUnknown = attackInfoUnknown;
             contract.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            contract.RequiresDamageLineOfSight = requiresDamageLineOfSight;
             return contract;
         }
 
@@ -764,7 +766,7 @@ namespace AORebirth.Core.Playfields
                         requiresDamageLineOfSight: true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260712-232711/234401: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 23-25 player damage, 23-34 all-target damage, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
+                        "20260712-232711/234401 and 20260720-053542: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 22-25 normal player damage with one captured 54 critical, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
                         NpcCombatAttackRules.CapturedSubwayVergilWeaponTemplate,
                         NpcCombatAttackRules.CapturedSubwayVergilWeaponTemplate,
                         NpcCombatAttackRules.CapturedSubwayVergilWeaponQuality,
@@ -814,7 +816,7 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayAbmouthDenwTag,
                             true);
                     return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
-                        "20260712-224840/232137: Abmouth XOPZ paired stream, DENW stream, and captured SIW context",
+                        "20260712-224840/232137 and 20260720-053802: Abmouth XOPZ paired stream, DENW stream, captured SIW context, and one 21.8-second combat warp cast (nano 286237) that teleports the engaged player and owned pets to Abmouth",
                         new CapturedEnemyParallelAttackSequenceDefinition(
                             new[]
                             {
@@ -1120,7 +1122,67 @@ namespace AORebirth.Core.Playfields
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance)
         {
-            return ForSourceSpecificWeaponArchetype(archetype, sourceInstance, "Workman Striker");
+            return CapturedEnemyCombatContract.Unresolved(
+                string.Format(
+                    "Workman Striker source 0x{0:X8} requires a selected capture-reviewed atomic generation variant",
+                    sourceInstance),
+                archetype != null && archetype.Combat != null && archetype.Combat.Observed);
+        }
+
+        private static CapturedEnemyCombatContract ForWorkmanStriker(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            bool hasExactCombatEvidence = combat != null && combat.Observed;
+            bool hasExactGeneration = variant != null
+                                      && weapon != null
+                                      && generationEvidence != null
+                                      && Array.Exists(
+                                          generationEvidence,
+                                          value => value != null
+                                                   && value.MonsterData == WorkmanStrikerMonsterData
+                                                   && value.SourceInstance == sourceInstance
+                                                   && value.Level == variant.Level
+                                                   && value.Health == variant.Health
+                                                   && value.HealthDamage == variant.HealthDamage
+                                                   && value.MonsterScale == variant.MonsterScale
+                                                   && value.RunSpeed == variant.RunSpeed
+                                                   && value.WeaponLowId == weapon.LowId
+                                                   && value.WeaponHighId == weapon.HighId
+                                                   && value.WeaponQuality == weapon.Quality);
+            if (!hasExactCombatEvidence
+                || !hasExactGeneration)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation for the selected source.",
+                    combat != null && combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
+                string.Format(
+                    "{0}: Workman Striker source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; 59 distinct normal local-player hits span 9..23, seven criticals remain report-only, and captured AttackInfo uses ammo -1, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; captured SIW shapes remain report-only",
+                    weapon.Evidence,
+                    sourceInstance,
+                    variant.Level,
+                    weapon.Quality,
+                    weapon.LowId,
+                    weapon.HighId),
+                weapon.LowId,
+                weapon.HighId,
+                weapon.Quality,
+                (int)WeaponSlots.Righthand,
+                -1,
+                (int)WeaponSlots.Righthand,
+                0,
+                0);
         }
 
         private static CapturedEnemyCombatContract ForLooter(
@@ -1279,8 +1341,8 @@ namespace AORebirth.Core.Playfields
             }
 
             return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
-                evidence[0].EvidenceCaptures
-                + ": Deranged Shopper source 0x79574527 owner-linked QL8 weapon 125454/125455; eight normal local-player hits span 9..15, one 27-point critical is report-only, and one captured miss preserves ammo -1, slot 6, and unknown 0; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; no empty SIW or captured attack-start/stop context",
+                evidence[0].EvidenceCaptures + ",20260720-031025"
+                + ": Deranged Shopper source 0x79574527 owner-linked QL8 weapon 125454/125455; ten normal local-player hits span 7..15, one 27-point critical is report-only, and six captured misses preserve ammo -1, slot 6, unknown 0, and weapon instance 0; capture 20260720-031025 also proves empty SpecialAttackWeapon 56/45/45/45/0 plus attack-start, StopFight, and death context; item owns runtime damage, damage bonus, and recharge; captured AttackInfo carries only ammo -1, slot 6, unknown 0, and weapon instance 0; the newly observed SIW/start/stop/death context remains evidence-only so runtime behavior is unchanged",
                 evidence[0].LowId,
                 evidence[0].HighId,
                 evidence[0].Quality,
@@ -1566,7 +1628,8 @@ namespace AORebirth.Core.Playfields
                 -1,
                 (int)WeaponSlots.Righthand,
                 0,
-                0);
+                0,
+                true);
         }
 
         private static bool HasCompleteMuggerSourceWeaponEvidence(
@@ -1859,6 +1922,16 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
+            if (archetype != null
+                && archetype.MonsterData == WorkmanStrikerMonsterData)
+            {
+                return ForWorkmanStriker(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
+            }
+
             if (archetype != null
                 && archetype.MonsterData == IncompleteRebuildMonsterData)
             {

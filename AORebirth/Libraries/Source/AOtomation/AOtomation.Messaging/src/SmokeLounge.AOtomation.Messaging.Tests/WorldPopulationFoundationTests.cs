@@ -361,8 +361,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryContent);
             OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             OrdinaryEnemyProfile[] profiles = catalog.GetProfiles();
-            Assert.AreEqual(321, spawns.Length);
-            Assert.AreEqual(321, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
+            Assert.AreEqual(322, spawns.Length);
+            Assert.AreEqual(322, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
             Assert.AreEqual(0, spawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined));
             Assert.IsTrue(spawns.All(value => value.LevelDefinition.IsValid));
             Assert.IsTrue(
@@ -371,19 +371,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                              || value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Explicit
                              || value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.NoRespawn));
 
-            OrdinaryEnemySpawnDefinition thief = spawns.Single(value => value.SourceIdentity == 0x7953AEA5);
-            OrdinaryEnemySpawnDefinition flea = spawns.First(value => profiles.Single(profile => profile.ProfileKey == value.ProfileKey).MonsterData == 17657);
             OrdinaryEnemySpawnDefinition bloodcreeper = spawns.Single(value => value.SourceIdentity == 0x795451C5);
-            OrdinaryEnemySpawnDefinition slumRunner = spawns.First(
-                value => profiles.Single(profile => profile.ProfileKey == value.ProfileKey).DisplayName == "Slum Runner");
-            AssertExplicitDelay(thief, 60);
-            AssertExplicitDelay(flea, 240);
-            AssertExplicitDelay(bloodcreeper, 240);
-            AssertExplicitDelay(slumRunner, 60);
             Assert.IsTrue(
-                slumRunner.RespawnPolicy.ExplicitPolicy.Evidence.Contains("20260716-215947"));
-            Assert.IsTrue(
-                slumRunner.RespawnPolicy.ExplicitPolicy.Evidence.Contains("death-to-respawn=59.433"));
+                spawns.All(
+                    value => value.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy
+                             && value.RespawnDelaySeconds == 240.0
+                             && value.RespawnPolicy.Mode
+                                == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(OrdinaryEnemySpawnLevelMode.InclusiveRange, bloodcreeper.LevelDefinition.Mode);
             Assert.AreEqual(OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration, bloodcreeper.LevelDefinition.RerollPolicy);
 
@@ -419,12 +413,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 violentVagabondSpawns.All(
                     value => value.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy
-                             && value.RespawnDelaySeconds == 450.0
+                             && value.RespawnDelaySeconds == 240.0
                              && value.RespawnPolicy.Mode
-                                == WorldRespawnPolicyAssignmentMode.Explicit
-                             && value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds == 450.0
-                             && value.RespawnPolicy.ExplicitPolicy.Evidence.Contains(
-                                 "449.759588-seconds-after-npc-despawn")));
+                                == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(
                 OrdinaryEnemyAggressionMode.Retaliate,
                 violentVagabond.Aggression.Mode);
@@ -462,38 +453,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "private-project playability policy"));
             Assert.IsTrue(violentVagabond.Combat.Contract.Evidence.Contains("Red Wine"));
 
-            var reportOnlyCombatExpectations = new[]
+            var promotedCombatExpectations = new[]
                 {
-                    new { Name = "Empty Shell", Observed = true, RuntimeReady = false, MinDamage = 15, MaxDamage = 15, ObservedRows = 1 },
-                    new { Name = "Infected Attendant", Observed = true, RuntimeReady = false, MinDamage = 11, MaxDamage = 11, ObservedRows = 1 },
-                    new { Name = "Lost Thought", Observed = false, RuntimeReady = false, MinDamage = 0, MaxDamage = 0, ObservedRows = 0 },
-                    new { Name = "Premature Pattern", Observed = true, RuntimeReady = false, MinDamage = 22, MaxDamage = 22, ObservedRows = 1 }
+                    new { Name = "Empty Shell", MinDamage = 15, MaxDamage = 18, ObservedRows = 4, RechargeSeconds = 5.0 },
+                    new { Name = "Infected Attendant", MinDamage = 11, MaxDamage = 15, ObservedRows = 2, RechargeSeconds = 5.0 },
+                    new { Name = "Lost Thought", MinDamage = 14, MaxDamage = 19, ObservedRows = 9, RechargeSeconds = 5.428348 },
+                    new { Name = "Premature Pattern", MinDamage = 17, MaxDamage = 22, ObservedRows = 3, RechargeSeconds = 5.0 }
                 };
-            foreach (var expected in reportOnlyCombatExpectations)
+            foreach (var expected in promotedCombatExpectations)
             {
                 CapturedSubwayOrdinaryArchetypeDefinition archetype = ordinaryContent
                     .GetArchetypes()
                     .Single(value => value.Name == expected.Name);
-                OrdinaryEnemyProfile reportOnlyProfile = profiles.Single(
+                OrdinaryEnemyProfile profile = profiles.Single(
                     value => value.DisplayName == expected.Name);
-                Assert.AreEqual(expected.Observed, archetype.Combat.Observed, expected.Name);
-                Assert.AreEqual(expected.RuntimeReady, archetype.Combat.RuntimeReady, expected.Name);
+                Assert.IsTrue(archetype.Combat.Observed, expected.Name);
+                Assert.IsTrue(archetype.Combat.RuntimeReady, expected.Name);
                 Assert.AreEqual(expected.MinDamage, archetype.Combat.MinDamage, expected.Name);
                 Assert.AreEqual(expected.MaxDamage, archetype.Combat.MaxDamage, expected.Name);
                 Assert.AreEqual(expected.ObservedRows, archetype.Combat.ObservedRows, expected.Name);
-                Assert.AreEqual(
-                    expected.Observed
-                        ? OrdinaryEnemyEvidenceState.Observed
-                        : OrdinaryEnemyEvidenceState.Unresolved,
-                    reportOnlyProfile.Combat.EvidenceState,
-                    expected.Name);
-                Assert.IsFalse(
-                    reportOnlyProfile.Combat.Contract.IsCombatReady,
-                    expected.Name
-                    + " must not promote incomplete evidence to fixed runtime combat; model="
-                    + reportOnlyProfile.Combat.Contract.AttackModel
-                    + "; evidence="
-                    + reportOnlyProfile.Combat.Contract.Evidence);
+                Assert.AreEqual(expected.RechargeSeconds, archetype.Combat.RechargeSeconds, expected.Name);
+                Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, profile.Combat.EvidenceState, expected.Name);
+                Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, profile.Combat.Contract.AttackModel, expected.Name);
+                Assert.IsTrue(profile.Combat.Contract.IsCombatReady, expected.Name);
             }
 
             Assert.AreEqual(24, spawns.Count(value => profilesByKey[value.ProfileKey].DisplayName == "Slum Runner"));
@@ -603,8 +585,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider());
 
             AssertCapturedDamage(catalog, "Molested Molecules", 16, 42);
-            AssertCapturedDamage(catalog, "Neural Burnout", 16, 22);
-            AssertCapturedDamage(catalog, "Uncontrollable Anger", 11, 18);
+            AssertCapturedDamage(catalog, "Neural Burnout", 15, 22);
+            AssertCapturedDamage(catalog, "Uncontrollable Anger", 9, 18);
 
             OrdinaryEnemyProfile incomplete = catalog.GetProfiles()
                 .Single(value => value.DisplayName == "Incomplete Rebuild");
@@ -707,39 +689,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void WorkmanStrikerResolvesEveryCapturedSourceWeaponAndNeverUsesAggregateFallback()
+        public void WorkmanStrikerUsesEveryCapturedAtomicGenerationAndFailsClosedWithoutOne()
         {
-            var expected = new Dictionary<int, int[]>
-            {
-                { 0x7953A84F, new[] { 122905, 122906, 19 } },
-                { 0x7953A9F0, new[] { 122905, 122906, 17 } },
-                { 0x7953AA0D, new[] { 122905, 122906, 18 } },
-                { 0x7953AA16, new[] { 122905, 122906, 15 } },
-                { 0x7953AA77, new[] { 122905, 122906, 14 } },
-                { 0x7953AABE, new[] { 122905, 122906, 13 } },
-                { 0x7953AAE9, new[] { 122905, 122906, 14 } },
-                { 0x7953AB03, new[] { 122905, 122906, 16 } },
-                { 0x7953AF95, new[] { 122905, 122906, 12 } },
-                { 0x7953AFB8, new[] { 122905, 122906, 17 } },
-                { 0x7953AFBC, new[] { 122905, 122906, 19 } },
-                { 0x7953AFDD, new[] { 122905, 122906, 12 } },
-                { 0x7953AFF9, new[] { 122905, 122906, 16 } },
-                { 0x79545000, new[] { 122906, 122906, 20 } },
-                { 0x7954501A, new[] { 122905, 122906, 16 } },
-                { 0x79545108, new[] { 122905, 122906, 15 } },
-                { 0x795451CA, new[] { 122907, 122908, 27 } },
-                { 0x79545205, new[] { 122905, 122906, 11 } },
-                { 0x79545213, new[] { 122905, 122906, 14 } },
-                { 0x79545219, new[] { 122905, 122906, 19 } },
-                { 0x79545224, new[] { 122905, 122906, 14 } }
-            };
+            const int monsterData = 203854;
+            int[] expectedSources =
+                {
+                    0x7953A84F,
+                    0x7953A9F0,
+                    0x7953AA0D,
+                    0x7953AA16,
+                    0x7953AA77,
+                    0x7953AABE,
+                    0x7953AAE9,
+                    0x7953AB03,
+                    0x7953AF95,
+                    0x7953AFB8,
+                    0x7953AFBC,
+                    0x7953AFDD,
+                    0x7953AFF9,
+                    0x79545000,
+                    0x7954501A,
+                    0x79545108,
+                    0x795451CA,
+                    0x79545205,
+                    0x79545213,
+                    0x79545219,
+                    0x79545224,
+                    0x79803673
+                };
             var provider = new CapturedSubwayOrdinaryContentProvider();
-            CapturedSubwayOrdinaryArchetypeDefinition archetype;
-            Assert.IsTrue(provider.TryGetArchetype("workman_striker", out archetype));
-            Assert.AreEqual(21, archetype.SourceWeaponEvidence.Length);
-            CollectionAssert.AreEquivalent(
-                expected.Keys.ToArray(),
-                archetype.SourceWeaponEvidence.Select(value => value.SourceInstance).ToArray());
+            CapturedSubwayOrdinaryArchetypeDefinition workmanArchetype;
+            Assert.IsTrue(provider.TryGetArchetype("workman_striker", out workmanArchetype));
+            Assert.AreEqual(
+                0,
+                workmanArchetype.SourceWeaponEvidence.Length,
+                "Workman weapons must be selected only as part of an atomic generation variant.");
 
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
@@ -748,12 +732,54 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .Single(value => value.DisplayName == "Workman Striker");
             OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns()
                 .Where(value => value.ProfileKey == workman.ProfileKey)
+                .OrderBy(value => value.SourceIdentity)
                 .ToArray();
 
-            Assert.AreEqual(21, spawns.Length);
+            Assert.AreEqual(22, spawns.Length);
             CollectionAssert.AreEquivalent(
-                expected.Keys.ToArray(),
+                expectedSources,
                 spawns.Select(value => value.SourceIdentity).ToArray());
+            Assert.IsTrue(spawns.Any(value => value.SourceIdentity == 0x79803673));
+            var expectedVariantCounts = new Dictionary<int, int>
+            {
+                { 0x7953A84F, 1 }, { 0x7953A9F0, 1 }, { 0x7953AA0D, 1 },
+                { 0x7953AA16, 1 }, { 0x7953AA77, 2 }, { 0x7953AABE, 2 },
+                { 0x7953AAE9, 2 }, { 0x7953AB03, 2 }, { 0x7953AF95, 2 },
+                { 0x7953AFB8, 2 }, { 0x7953AFBC, 1 }, { 0x7953AFDD, 1 },
+                { 0x7953AFF9, 2 }, { 0x79545000, 2 }, { 0x7954501A, 2 },
+                { 0x79545108, 1 }, { 0x795451CA, 1 }, { 0x79545205, 1 },
+                { 0x79545213, 1 }, { 0x79545219, 1 }, { 0x79545224, 1 },
+                { 0x79803673, 1 }
+            };
+            CollectionAssert.AreEquivalent(
+                expectedVariantCounts
+                    .Select(value => value.Key.ToString("X8") + ":" + value.Value)
+                    .ToArray(),
+                spawns
+                    .Select(
+                        value => value.SourceIdentity.ToString("X8") + ":"
+                                 + value.LevelDefinition.GetExplicitVariants().Length)
+                    .ToArray());
+            OrdinaryEnemySpawnDefinition newWorkman = spawns.Single(
+                value => value.SourceIdentity == 0x79803673);
+            Assert.AreEqual(15, newWorkman.Level);
+            Assert.AreEqual(393, newWorkman.Health);
+            Assert.AreEqual(0, newWorkman.HealthDamage);
+            Assert.AreEqual(97, newWorkman.MonsterScale);
+            Assert.AreEqual(52, newWorkman.RunSpeed);
+            Assert.AreEqual(323.360016f, newWorkman.X);
+            Assert.AreEqual(102.8164f, newWorkman.Y);
+            Assert.AreEqual(229.286514f, newWorkman.Z);
+            OrdinaryEnemySpawnVariant newWorkmanVariant = newWorkman.LevelDefinition
+                .GetExplicitVariants()
+                .Single();
+            Assert.AreEqual(15, newWorkmanVariant.Level);
+            Assert.AreEqual(393, newWorkmanVariant.Health);
+            Assert.AreEqual(97, newWorkmanVariant.MonsterScale);
+            Assert.AreEqual(52, newWorkmanVariant.RunSpeed);
+            Assert.AreEqual(122905, newWorkmanVariant.WeaponLoadout.LowId);
+            Assert.AreEqual(122906, newWorkmanVariant.WeaponLoadout.HighId);
+            Assert.AreEqual(18, newWorkmanVariant.WeaponLoadout.Quality);
             Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, workman.Combat.EvidenceState);
             Assert.AreEqual(OrdinaryEnemyCombatMode.EquippedRanged, workman.Combat.Mode);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, workman.Combat.DamageSource);
@@ -764,39 +790,92 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemyAttackModel.Unresolved,
                 workman.Combat.ResolveContract(spawns[0].Level).AttackModel,
                 "A Workman contract without its source identity must fail closed.");
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.Unresolved,
+                workman.Combat.ResolveContract(
+                    spawns[0].SourceIdentity,
+                    spawns[0].Level).AttackModel,
+                "A Workman source without its selected atomic generation must fail closed.");
 
+            int atomicVariantCount = 0;
             foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
             {
-                int[] weapon = expected[spawn.SourceIdentity];
-                CapturedEnemyCombatContract contract = workman.Combat.ResolveContract(
-                    spawn.SourceIdentity,
-                    spawn.Level);
-                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
-                Assert.IsTrue(contract.IsCombatReady);
-                Assert.AreEqual(weapon[0], contract.WeaponLowId);
-                Assert.AreEqual(weapon[1], contract.WeaponHighId);
-                Assert.AreEqual(weapon[2], contract.WeaponQuality);
-                Assert.AreEqual(6, contract.WeaponInventorySlot);
-                Assert.AreEqual(0, contract.MinDamage);
-                Assert.AreEqual(0, contract.MaxDamage);
-                Assert.AreEqual(0.0, contract.RechargeSeconds);
-                Assert.AreEqual(0, contract.AttackInfoWeaponSlot);
-                Assert.AreEqual(0, contract.AttackInfoUnknown);
-                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
-                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
-                Assert.IsFalse(contract.HasCapturedAttackStartContext);
-                Assert.IsFalse(contract.HasCapturedEquippedAttackInfo);
-                Assert.IsTrue(
-                    contract.Evidence.Contains(
-                        "source 0x" + spawn.SourceIdentity.ToString("X8")));
-            }
+                CapturedSubwayGenerationVariantDefinition[] capturedVariants =
+                    provider.GetGenerationVariants(monsterData, spawn.SourceIdentity);
+                OrdinaryEnemySpawnVariant[] variants =
+                    spawn.LevelDefinition.GetExplicitVariants();
+                Assert.AreEqual(
+                    OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants,
+                    spawn.LevelDefinition.Mode);
+                Assert.AreEqual(capturedVariants.Length, variants.Length);
+                Assert.IsTrue(variants.All(value => value.WeaponLoadout != null));
+                atomicVariantCount += variants.Length;
 
+                foreach (OrdinaryEnemySpawnVariant variant in variants)
+                {
+                    CapturedSubwayGenerationVariantDefinition expected = capturedVariants
+                        .Single(
+                            value => value.Level == variant.Level
+                                     && value.Health == variant.Health
+                                     && value.HealthDamage == variant.HealthDamage
+                                     && value.MonsterScale == variant.MonsterScale
+                                     && value.RunSpeed == variant.RunSpeed
+                                     && value.WeaponLowId == variant.WeaponLoadout.LowId
+                                     && value.WeaponHighId == variant.WeaponLoadout.HighId
+                                     && value.WeaponQuality == variant.WeaponLoadout.Quality);
+                    CapturedEnemyCombatContract contract = workman.Combat.ResolveContract(
+                        spawn.SourceIdentity,
+                        variant);
+                    Assert.IsNotNull(expected);
+                    Assert.AreEqual(
+                        CapturedEnemyAttackModel.EquippedWeapon,
+                        contract.AttackModel,
+                        string.Format(
+                            "source=0x{0:X8} level={1} weapon={2}/{3} QL{4} evidence={5}",
+                            spawn.SourceIdentity,
+                            variant.Level,
+                            variant.WeaponLoadout.LowId,
+                            variant.WeaponLoadout.HighId,
+                            variant.WeaponLoadout.Quality,
+                            contract.Evidence));
+                    Assert.IsTrue(contract.IsCombatReady);
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
+                    Assert.AreEqual(6, contract.WeaponInventorySlot);
+                    Assert.AreEqual(0, contract.MinDamage);
+                    Assert.AreEqual(0, contract.MaxDamage);
+                    Assert.AreEqual(0.0, contract.RechargeSeconds);
+                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                    Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
+                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                    Assert.AreEqual(0, contract.AttackInfoUnknown);
+                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                    Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                    Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                    Assert.IsTrue(
+                        contract.Evidence.Contains(
+                            "item owns runtime damage and recharge"));
+                }
+            }
+            Assert.AreEqual(31, atomicVariantCount);
+
+            OrdinaryEnemySpawnVariant firstVariant = spawns[0]
+                .LevelDefinition
+                .GetExplicitVariants()[0];
             CapturedEnemyCombatContract unknown = workman.Combat.ResolveContract(
                 0x7953FFFF,
-                spawns[0].Level);
+                firstVariant);
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, unknown.AttackModel);
             Assert.IsFalse(unknown.IsCombatReady);
+        }
 
+        [TestMethod]
+        public void SourceAwareCombatResolutionPreservesBaseAndLevelResolverFallbacks()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider());
             OrdinaryEnemyProfile melded = catalog.GetProfiles()
                 .Single(value => value.DisplayName == "Melded Patterns");
             Assert.AreSame(
@@ -816,22 +895,125 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 levelResolved,
                 levelAware.ResolveContract(0x7953FFFF, 10),
                 "The source-aware overload must retain the existing level resolver fallback.");
+        }
 
-            string source = Read(FindRepositoryRoot(), "CapturedEnemyCombatContract.cs");
-            int methodStart = source.IndexOf(
-                "private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype",
-                StringComparison.Ordinal);
-            int methodEnd = source.IndexOf(
-                "internal static CapturedEnemyCombatContract ForSupportedSourceWeapon",
-                methodStart,
-                StringComparison.Ordinal);
-            Assert.IsTrue(methodStart >= 0 && methodEnd > methodStart);
-            string implementation = source.Substring(methodStart, methodEnd - methodStart);
-            Assert.IsTrue(implementation.Contains("CapturedEnemyCombatContract.EquippedWeapon("));
-            Assert.IsFalse(implementation.Contains("EquippedWeaponWithEmptySpecialAttackContext"));
-            Assert.IsFalse(implementation.Contains("CapturedEnemyCombatContract.FixedAttack("));
-            Assert.IsFalse(implementation.Contains("MinDamage"));
-            Assert.IsFalse(implementation.Contains("MaxDamage"));
+        [TestMethod]
+        public void Capture20260720031025KeepsPatrolsBoundToTheirExactSources()
+        {
+            OrdinaryEnemySpawnDefinition[] spawns = new OrdinaryEnemyCatalog(
+                    new CapturedSubwayContentProvider(),
+                    new CapturedSubwayOrdinaryContentProvider())
+                .GetSpawns();
+            OrdinaryEnemySpawnDefinition deranged = spawns.Single(
+                value => value.SourceIdentity == 0x79574527);
+            OrdinaryEnemySpawnDefinition looter29 = spawns.Single(
+                value => value.SourceIdentity == 0x79545029);
+            OrdinaryEnemySpawnDefinition looter3C = spawns.Single(
+                value => value.SourceIdentity == 0x7954503C);
+
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, deranged.MovementMode);
+            Assert.AreEqual(84, deranged.Waypoints.Length);
+            AssertWaypoint(deranged, 0, 255.7054f, 107.611687f, 285.020325f);
+            AssertWaypoint(deranged, 2, 256.200012f, 107.601685f, 282.0f);
+            AssertWaypoint(deranged, 5, 253.899994f, 107.601685f, 296.299988f);
+            AssertWaypoint(deranged, 36, 187.100006f, 107.601685f, 295.0f);
+            AssertWaypoint(deranged, 43, 202.942245f, 107.600975f, 301.614502f);
+            AssertWaypoint(deranged, 50, 187.100006f, 107.601685f, 295.0f);
+            AssertWaypoint(deranged, 83, 254.399994f, 107.601685f, 287.899963f);
+
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, looter29.MovementMode);
+            Assert.AreEqual(11, looter29.Waypoints.Length);
+            AssertWaypoint(looter29, 0, 222.926041f, 107.611687f, 304.151062f);
+            AssertWaypoint(looter29, 1, 222.503265f, 108.601967f, 304.151306f);
+            AssertWaypoint(looter29, 6, 253.004242f, 107.611687f, 297.701233f);
+            AssertWaypoint(looter29, 10, 227.316345f, 107.611687f, 304.24353f);
+
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, looter3C.MovementMode);
+            Assert.AreEqual(13, looter3C.Waypoints.Length);
+            AssertWaypoint(looter3C, 0, 263.857849f, 107.715f, 285.410522f);
+            AssertWaypoint(looter3C, 2, 255.350464f, 107.611687f, 295.588074f);
+            AssertWaypoint(looter3C, 8, 287.600006f, 108.601685f, 294.5f);
+            AssertWaypoint(looter3C, 12, 270.079346f, 107.611687f, 285.489746f);
+
+            Assert.AreEqual(
+                0,
+                spawns.Single(value => value.SourceIdentity == 0x795312DC).Waypoints.Length);
+            Assert.AreEqual(
+                1,
+                spawns.Single(value => value.SourceIdentity == 0x7957E5CD).Waypoints.Length,
+                "The unresolved 0x7957E5CD population association must not inherit 0x79545029's patrol.");
+        }
+
+        [TestMethod]
+        public void Capture20260720031855And033749KeepsPatrolsBoundToTheirExactSources()
+        {
+            OrdinaryEnemySpawnDefinition[] spawns = new OrdinaryEnemyCatalog(
+                    new CapturedSubwayContentProvider(),
+                    new CapturedSubwayOrdinaryContentProvider())
+                .GetSpawns();
+
+            AssertExactPatrol(
+                spawns.Single(value => value.SourceIdentity == 0x7953A84F),
+                new[] { 323.120026f, 102.8164f, 188.040512f },
+                new[] { 323.195496f, 102.814827f, 186.768341f },
+                new[] { 323.644104f, 102.814827f, 182.602875f },
+                new[] { 321.470978f, 103.204025f, 176.392441f },
+                new[] { 323.644104f, 102.814827f, 182.602875f },
+                new[] { 323.195496f, 102.814827f, 186.768341f },
+                new[] { 323.050812f, 102.816399f, 189.499908f },
+                new[] { 324.931458f, 102.816399f, 192.818542f },
+                new[] { 327.103821f, 102.816399f, 194.611389f },
+                new[] { 330.659607f, 102.816399f, 194.663483f },
+                new[] { 333.420471f, 102.816399f, 192.589935f },
+                new[] { 333.319458f, 102.816399f, 189.943329f },
+                new[] { 333.420471f, 102.816399f, 192.589935f },
+                new[] { 330.659607f, 102.816399f, 194.663483f },
+                new[] { 327.103821f, 102.816399f, 194.611389f },
+                new[] { 324.931458f, 102.816399f, 192.818542f },
+                new[] { 323.050812f, 102.816399f, 189.499908f });
+            AssertExactPatrol(
+                spawns.Single(value => value.SourceIdentity == 0x7953AA0D),
+                new[] { 345.640839f, 102.814827f, 166.29303f },
+                new[] { 344.449524f, 102.814827f, 164.702286f },
+                new[] { 346.970612f, 102.814827f, 167.92276f },
+                new[] { 344.942627f, 102.814827f, 170.690125f },
+                new[] { 345.129089f, 102.814827f, 172.965836f },
+                new[] { 344.841614f, 102.814827f, 176.021454f },
+                new[] { 344.569794f, 102.814827f, 178.530533f },
+                new[] { 347.621582f, 102.814827f, 179.76799f },
+                new[] { 347.676086f, 102.814827f, 181.723618f },
+                new[] { 344.708771f, 103.204025f, 182.542053f },
+                new[] { 347.676086f, 102.814827f, 181.723618f },
+                new[] { 347.621582f, 102.814827f, 179.76799f },
+                new[] { 344.569794f, 102.814827f, 178.530533f },
+                new[] { 344.841614f, 102.814827f, 176.021454f },
+                new[] { 345.129089f, 102.814827f, 172.965836f },
+                new[] { 344.942627f, 102.814827f, 170.690125f },
+                new[] { 346.970612f, 102.814827f, 167.92276f });
+            AssertExactPatrol(
+                spawns.Single(value => value.SourceIdentity == 0x79545224),
+                new[] { 311.367371f, 102.814827f, 180.921722f },
+                new[] { 311.292358f, 102.814827f, 181.513168f },
+                new[] { 312.168457f, 102.814827f, 184.858871f },
+                new[] { 315.361328f, 102.814827f, 184.470932f },
+                new[] { 315.655945f, 102.814827f, 180.878159f },
+                new[] { 314.835388f, 102.814827f, 178.325058f },
+                new[] { 312.789368f, 103.80481f, 176.146698f },
+                new[] { 314.835388f, 102.814827f, 178.325058f },
+                new[] { 315.655945f, 102.814827f, 180.878159f },
+                new[] { 315.361328f, 102.814827f, 184.470932f },
+                new[] { 312.168457f, 102.814827f, 184.858871f },
+                new[] { 311.292358f, 102.814827f, 181.513168f },
+                new[] { 311.18811f, 102.814827f, 178.178482f },
+                new[] { 311.223816f, 102.814827f, 175.214966f },
+                new[] { 311.18811f, 102.814827f, 178.178482f });
+            AssertExactPatrol(
+                spawns.Single(value => value.SourceIdentity == 0x795451F8),
+                new[] { 318.463043f, 102.8164f, 150.538025f },
+                new[] { 319.550934f, 102.816124f, 151.316193f },
+                new[] { 316.99054f, 102.816399f, 149.298889f },
+                new[] { 319.550934f, 102.816124f, 151.316193f },
+                new[] { 320.100006f, 104.506088f, 154.830444f });
         }
 
         [TestMethod]
@@ -1007,7 +1189,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, mugger.Combat.DamageSource);
             Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, mugger.Combat.EvidenceState);
             Assert.IsTrue(mugger.Combat.VisibleWeapon);
-            Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, mugger.Aggression.Mode);
+            Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, mugger.Aggression.Mode);
+            Assert.AreEqual(7.0, mugger.Aggression.AutomaticAggroRadius.Value);
+            Assert.IsTrue(mugger.Aggression.RequiresLineOfSight);
+            Assert.AreEqual(7.0, mugger.Aggression.SocialAggroRadius.Value);
             Assert.IsTrue(mugger.Aggression.Chase);
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Inherit));
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, mugger.Combat.Contract.AttackModel);
@@ -1024,6 +1209,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn.Level);
                 Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
                 Assert.IsTrue(contract.IsCombatReady);
+                Assert.IsTrue(contract.RequiresDamageLineOfSight);
                 Assert.AreEqual(121567, contract.WeaponLowId);
                 Assert.AreEqual(121567, contract.WeaponHighId);
                 Assert.AreEqual(1, contract.WeaponQuality);
@@ -1106,9 +1292,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(17534, mugger.Corpse.CapturedCatMesh);
-            Assert.AreEqual(3.0, mugger.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(240.0, mugger.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(3.0, mugger.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(30.0, mugger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(120.0, mugger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(30.0, mugger.Corpse.LootedCleanupSeconds);
         }
 
         [TestMethod]
@@ -1253,11 +1439,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 spawns.All(
                     value => value.RespawnPolicy.Mode
-                             == WorldRespawnPolicyAssignmentMode.Explicit
-                             && value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds == 240.0));
-            Assert.AreEqual(3.0, profile.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(240.0, profile.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(3.0, profile.Corpse.LootedCleanupSeconds);
+                             == WorldRespawnPolicyAssignmentMode.Inherit
+                             && value.RespawnDelaySeconds == 240.0));
+            Assert.AreEqual(30.0, profile.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(120.0, profile.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(30.0, profile.Corpse.LootedCleanupSeconds);
 
             CollectionAssert.AreEqual(
                 new[]
@@ -1810,18 +1996,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 StringComparison.Ordinal);
             Assert.IsTrue(reportStart >= 0 && reportEnd > reportStart);
             string report = generatedCombatReportText.Substring(reportStart, reportEnd - reportStart);
-            Assert.IsTrue(report.Contains("\"missedAttackInfoRows\": 2"));
+            Assert.IsTrue(report.Contains("\"normalAttackInfoRows\": 10"));
+            Assert.IsTrue(report.Contains("\"normalMinDamage\": 7"));
+            Assert.IsTrue(report.Contains("\"normalMaxDamage\": 15"));
+            Assert.IsTrue(report.Contains("\"missedAttackInfoRows\": 7"));
             Assert.IsTrue(report.Contains("\"missedAttackShapes\": ["));
             Assert.IsTrue(report.Contains("\"ammoCount\": -1"));
             Assert.IsTrue(report.Contains("\"weaponSlot\": 6"));
             Assert.IsTrue(report.Contains("\"unknown\": 0"));
-            Assert.IsTrue(report.Contains("\"rows\": 2"));
+            Assert.IsTrue(report.Contains("\"rows\": 7"));
+            Assert.IsTrue(report.Contains("\"specialAttackWeaponRows\": 1"));
+            Assert.IsTrue(report.Contains("\"unknown1\": 56"));
+            Assert.IsTrue(report.Contains("\"unknown2\": 45"));
+            Assert.IsTrue(report.Contains("\"unknown3\": 45"));
+            Assert.IsTrue(report.Contains("\"unknown4\": 45"));
+            Assert.IsTrue(report.Contains("\"unknown5\": 0"));
             Assert.IsTrue(report.Contains("\"equippedWeaponShapes\": ["));
             Assert.IsTrue(report.Contains("\"lowId\": 125454"));
             Assert.IsTrue(report.Contains("\"highId\": 125455"));
             Assert.IsTrue(report.Contains("\"quality\": 8"));
             Assert.IsTrue(report.Contains("20260710-202132"));
             Assert.IsTrue(report.Contains("(SimpleChar:79574527)"));
+            Assert.IsTrue(report.Contains("20260720-031025"));
+            Assert.IsTrue(report.Contains("(SimpleChar:79803651)"));
 
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
@@ -1869,8 +2066,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
             Assert.IsFalse(contract.HasCapturedAttackStartContext);
             Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+            Assert.IsTrue(contract.Evidence.Contains("20260720-031025"));
+            Assert.IsTrue(contract.Evidence.Contains("ten normal local-player hits span 7..15"));
             Assert.IsTrue(contract.Evidence.Contains("critical is report-only"));
-            Assert.IsTrue(contract.Evidence.Contains("one captured miss"));
+            Assert.IsTrue(contract.Evidence.Contains("six captured misses"));
+            Assert.IsTrue(contract.Evidence.Contains("empty SpecialAttackWeapon 56/45/45/45/0"));
+            Assert.IsTrue(contract.Evidence.Contains("attack-start, StopFight, and death context"));
+            Assert.IsTrue(contract.Evidence.Contains("runtime behavior is unchanged"));
             Assert.IsTrue(contract.Evidence.Contains("item owns runtime damage, damage bonus, and recharge"));
 
             CapturedEnemyCombatContract unknown = shopper.Combat.ResolveContract(
@@ -1896,23 +2098,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, shopper.Loot.PoolMode);
             Assert.IsFalse(shopper.Loot.ItemPoolComplete);
-            Assert.AreEqual(2, shopper.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(3, shopper.Loot.ObservedCompleteInventories);
             Assert.AreEqual(0, shopper.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
-                new[] { "123019:123020:6:1:2", "124465:124466:10:1:2" },
+                new[]
+                    {
+                        "123019:123020:6:1:3", "124465:124466:10:1:3",
+                        "234876:234876:1:1:3"
+                    },
                 shopper.Loot.Entries
                     .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "8:47:47:1", "9:53:53:1" },
+                new[] { "8:47:47:2", "9:53:53:1" },
                 shopper.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(5927, shopper.Corpse.CapturedCatMesh);
-            Assert.AreEqual(3.0, shopper.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(240.0, shopper.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(3.0, shopper.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(30.0, shopper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(120.0, shopper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(30.0, shopper.Corpse.LootedCleanupSeconds);
         }
 
         [TestMethod]
@@ -2129,7 +2335,43 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildLooterArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("looter_test", "looter", "Looter", 203745, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 40695, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 11, 11, 5.282358, 6, 0, 0, 15), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-212115" }, sourceWeaponEvidence); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildIncompleteRebuildArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence, int maximumDamage = 35) { return new CapturedSubwayOrdinaryArchetypeDefinition("incomplete_rebuild_test", "incomplete_rebuild", "Incomplete Rebuild", 203728, 148, 0, 268964353, 0, 0, 31, 0, 1643u, 29694, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 17, maximumDamage, 0.0, 6, 0, 0, 2), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-222339", "20260709-225408", "20260710-211430" }, sourceWeaponEvidence); }
         private static CapturedSubwayOrdinaryArchetypeDefinition BuildRedundantScanArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("redundant_scan_test", "redundant_scan", "Redundant Scan", 204178, 148, 0, 268964353, 0, 0, 31, 0, 1899u, 40660, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 19, 19, 0.0, 6, 0, 0, 1), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260709-222339", "20260709-225408" }, sourceWeaponEvidence); }
-        private static CapturedSubwayOrdinaryArchetypeDefinition BuildDerangedShopperArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("deranged_shopper_test", "deranged_shopper", "Deranged Shopper", 203736, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 5927, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 9, 15, 5.161083, 6, 0, 0, 8), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260710-202132" }, sourceWeaponEvidence); }
+        private static CapturedSubwayOrdinaryArchetypeDefinition BuildDerangedShopperArchetype(CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence) { return new CapturedSubwayOrdinaryArchetypeDefinition("deranged_shopper_test", "deranged_shopper", "Deranged Shopper", 203736, 138, 0, 268964353, 0, 0, 31, 1, 1579u, 5927, new CapturedSubwayTextureDefinition[0], new CapturedSubwayMeshDefinition[0], new CapturedSubwayCombatEvidenceDefinition(true, 7, 15, 5.161083, 6, 0, 0, 10), new CapturedSubwayLootEvidenceDefinition[0], new CapturedSubwayLootOutcomeEvidenceDefinition[0], new CapturedSubwayCorpseEvidenceDefinition[0], new[] { "20260710-202132", "20260720-031025" }, sourceWeaponEvidence); }
+
+        private static void AssertExactPatrol(
+            OrdinaryEnemySpawnDefinition spawn,
+            params float[][] expected)
+        {
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, spawn.MovementMode);
+            Assert.AreEqual(
+                OrdinaryEnemyMovementMode.Patrol,
+                spawn.MovementMode,
+                string.Format("source=0x{0:X8} patrol mode", spawn.SourceIdentity));
+            Assert.AreEqual(
+                expected.Length,
+                spawn.Waypoints.Length,
+                string.Format("source=0x{0:X8} waypoint count", spawn.SourceIdentity));
+            for (int index = 0; index < expected.Length; index++)
+            {
+                AssertWaypoint(
+                    spawn,
+                    index,
+                    expected[index][0],
+                    expected[index][1],
+                    expected[index][2]);
+            }
+        }
+
+        private static void AssertWaypoint(
+            OrdinaryEnemySpawnDefinition spawn,
+            int index,
+            float x,
+            float y,
+            float z)
+        {
+            Assert.AreEqual(x, spawn.Waypoints[index].X);
+            Assert.AreEqual(y, spawn.Waypoints[index].Y);
+            Assert.AreEqual(z, spawn.Waypoints[index].Z);
+        }
         private static void AssertThrows(Action action) { try { action(); Assert.Fail("Expected InvalidOperationException."); } catch (InvalidOperationException) { } }
         private static void AssertThrowsArgument(Action action) { try { action(); Assert.Fail("Expected ArgumentException."); } catch (ArgumentException) { } }
         private static string Read(string root, string file) { return System.IO.File.ReadAllText(System.IO.Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields", file)); }

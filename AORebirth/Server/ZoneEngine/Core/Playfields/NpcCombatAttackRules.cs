@@ -265,7 +265,7 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayAbmouthMonsterData = 155962;
 
-        public const int CapturedSubwayAbmouthXopzMinimumDamage = 74;
+        public const int CapturedSubwayAbmouthXopzMinimumDamage = 73;
 
         public const int CapturedSubwayAbmouthXopzMaximumDamage = 96;
 

@@ -1,6 +1,6 @@
 # Generic Ordinary-Enemy Runtime
 
-Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 321 rows, all 321 active, and zero quarantined.
+Population ownership: profile-backed Subway rows are activated and respawned by `WorldPopulationController`. `OrdinaryEnemyRuntimeService` materializes requested rows only and does not enumerate population or own respawn timers. The catalog remains the capture-backed adapter with 322 rows, all 322 active, and zero quarantined.
 
 ## Decision
 
@@ -129,7 +129,7 @@ services remain their established owners.
 ## Subway migration
 
 The catalog normalizes all existing supported-family and generated ordinary
-Subway evidence into 26 reusable type profiles and 321 exact spawn rows:
+Subway evidence into 26 reusable type profiles and 322 exact spawn rows:
 
 - supported profiles: Filth Flea, Discarded Pet, Disobedient Bot, Mugger, Thief,
   and Violent Vagabond;
@@ -139,9 +139,10 @@ Subway evidence into 26 reusable type profiles and 321 exact spawn rows:
   Rebuild, Fragmented Soul, Redundant Scan, Uncontrollable Anger, Infected
   Attendant, Lost Thought, Empty Shell, and Premature Pattern.
 
-The configured activation boundary is 321 active rows. The 16 accepted-profile
-rows activated in this slice require bounded private-client validation before
-this can be called the safe runtime boundary. All 22 Violent Vagabond rows are
+The configured activation boundary is 322 active rows across 26 accepted
+profiles. The newly promoted Infected Attendant, Lost Thought, Empty Shell,
+Premature Pattern, and Violent Vagabond rows require bounded private-client
+validation before this can be called the safe runtime boundary. All 22 Violent Vagabond rows are
 active under the explicit same-level Subway damage policy because the official
 family repeatedly missed the test character and cannot supply a landed roll.
 Exact landed-damage parity and reset boundaries remain unresolved; profile or
@@ -157,9 +158,9 @@ health 146 with captured current health 115, scale 93, run speed 20, exact
 position, captured appearance/SCFU bytes, retaliate aggression, captured patrol
 replay, QL1 Solar-Powered Pistol `121567` in the right hand, weapon-derived
 damage, captured attack timing/context, captured corpse packet/CATMesh,
-guaranteed QL1 Stolen Handbag `297055`, three-second fully-looted cleanup,
-four-minute unlooted lifetime across close/reopen, and 60-second post-despawn
-respawn.
+guaranteed QL1 Stolen Handbag `297055`, 30-second fully-looted cleanup,
+two-minute unlooted lifetime across close/reopen, and the shared 240-second
+post-despawn respawn.
 
 Finalized capture `20260717-012651` proves the 146 maximum independently: the
 Thief recovered from 115 to 146 at one health per second, then a 96-point hit
@@ -187,9 +188,11 @@ definition. Catalog data configures `L15..L25`, rerolled once per new population
 generation through the same selector used by every ordinary row. Captured
 `L24/691 HP/run 83` and `L25/724 HP/run 86` anchor the existing private derived
 progression. The level 15-23 values remain documented policy, not capture claims.
-All other 320 rows remain explicit fixed-level definitions until evidence or an
-approved design decision establishes a range; the shared mechanism does not
-guess one.
+The remaining 274 rows use explicit capture-fixed levels. Workman's 22 sources,
+Incomplete Rebuild's ten, Redundant Scan's four, Fragmented Soul's ten, and
+Premature Pattern source `79545356` use explicit captured variant pools; the
+single Bloodcreeper source uses the approved inclusive range. The shared
+mechanism does not guess another range.
 
 ## Ordinary loot evidence boundary
 
@@ -219,8 +222,8 @@ the incomplete item-pool boundary.
 
 The restored deep-population slice uses strict initial corpse snapshots, including
 empty snapshots, when calculating observed item frequencies. It does not infer
-guaranteed loot from a successful roll. The catalog now contains 321 represented
-rows, all 321 active rows, and zero quarantined rows.
+guaranteed loot from a successful roll. The catalog now contains 322 represented
+rows, all 322 active rows, and zero quarantined rows.
 
 Slum Runner now has 21 identity-linked corpse generations: seven focused
 records from `20260716-034656` and `20260716-215947`, plus fourteen recovered
@@ -228,9 +231,10 @@ deep-corpus records. They use CATMesh `31774`; exact credit rules cover observed
 levels 11, 12, 15, 16, 17, 18, 20, 21, 22, and 23. Every active Slum Runner
 level now has an exact rule, while other levels remain unresolved.
 Its 24 exact spawns, captured `5..11` normal damage and `4.210098`-second
-cadence, shared chase, strict loot sample, ordinary corpse lifetimes, and
-`59.433`-second observed death-to-respawn interval now pass the whole-enemy
-acceptance gate. Loot replay remains `ObservedSamples`; no official item
+cadence, shared chase, strict loot sample, and ordinary corpse lifetimes now
+pass the whole-enemy acceptance gate. The `59.433`-second observed interval is
+retained as capture evidence but does not override the shared 240-second PF127
+regular-mob policy. Loot replay remains `ObservedSamples`; no official item
 probability distribution is claimed.
 
 Molested Molecules is the fourth accepted ordinary profile. Its nine exact
@@ -238,9 +242,9 @@ spawns cover captured levels 17 through 24. Twenty normal local-player hits
 prove `16..42` damage with slot `6` and `4.749995`-second cadence. Three strict
 complete inventories prove four observed `1/3` item memberships and one empty
 outcome; seven positive-credit corpses preserve CATMesh `5921` and exact
-captured level-credit rules. Shared chase and ordinary three-second empty/four-
-minute loot-bearing corpse behavior apply. Its four-minute respawn remains the
-centralized private PF127 ordinary policy, not an official-live timing claim.
+captured level-credit rules. Shared chase and ordinary 30-second empty/two-
+minute loot-bearing corpse behavior apply. Its four-minute respawn comes from
+the authoritative shared PF127 regular-mob policy.
 
 Disobedient Bot is the fifth accepted ordinary profile. Its 12 exact spawn rows
 use captured NPC family `138`. Fifteen normal SIW1 hits against local players
@@ -259,32 +263,31 @@ hits at `8` and `19`.
 Thirteen valid identity-linked corpse rows preserve CATMesh `15215` and exact
 level-credit rules. The unlinked `20260713-013906` item outcome remains excluded.
 Seven strict inventories retain the provisional weighted-one `1 + 1 + 5 empty`
-policy for the two proven memberships. All Bot rows use an observed
-`450`-second post-NPC-despawn delay; capture `20260708-143600` records
-`459.913` seconds death-to-replacement at a `0.190`-unit position delta. Shared
-chase and ordinary three-second empty/four-minute loot-bearing corpse behavior
-apply. Both previously quarantined Bot rows are active for bounded private
+policy for the two proven memberships. Capture `20260708-143600` retains the
+observed `459.913`-second death-to-replacement and `0.190`-unit position delta
+as evidence, but all Bot rows use the shared `240`-second PF127 regular-mob
+policy. Shared chase and ordinary 30-second empty/two-minute loot-bearing
+corpse behavior apply. Both previously quarantined Bot rows are active for bounded private
 validation. Proactive aggro radius and leash/reset distance remain unresolved.
 
 Workman Striker is the tenth accepted ordinary profile. Declared overlap rules
 reduce simultaneous capture
-projections to 47 distinct normal local-player hits at `14..23`, six criticals
-at `36..42`, and a `5.092328`-second median attack interval; two Killer-pet hits
-stay in a separate target-role bucket. Twenty-one active exact spawns cover
-levels 13, 14, 15, 16, 17, and 25, and every one has an owner-linked captured
-weapon tuple. Ten complete first corpse opens prove eight positive and two empty
-loot outcomes; ten unopened corpse generations do not enter the denominator.
-The ten item/QL entries replay only their observed `1/10` or `2/10` frequencies,
-with wider pool completeness unresolved. Every active source now resolves its
-exact owner-linked captured low/high/QL weapon tuple; unknown, missing,
-conflicting, or aggregate resolution fails closed. Those equipped items own
-normal damage and recharge without a fixed-damage or captured-AttackInfo
-override. The six observed critical outcomes remain report-only, matching the
-explicit critical-parity gap already allowed for other accepted ordinary
-profiles; no shared weapon-critical formula is invented. Whole-enemy coverage
-now guards all 21 exact source weapons and spawns, fail-closed aggregate/unknown
-selection, shared chase, strict incomplete-pool loot, CATMesh/credits, private
-four-minute respawn, and ordinary corpse lifetimes together.
+projections to 56 distinct normal local-player hits at `9..23`, six criticals
+at `36..42`, and a `5.139163`-second median attack interval; two Killer-pet hits
+stay in a separate target-role bucket. Twenty-two active exact sources cover
+levels 13, 14, 15, 16, 17, and 25 and select from 31 source-local atomic
+level/stat/weapon generations. Thirteen complete first corpse opens prove 11
+positive and two empty loot outcomes; unopened corpse generations do not enter
+the denominator. Fifteen item/QL entries replay only their observed frequencies,
+with wider pool completeness unresolved. Unknown, missing, conflicting,
+aggregate, or partial generation selection fails closed. Equipped items own
+normal damage and recharge while captured AttackInfo retains ammo `-1`, slot
+`6`, unknown `0`, and instance `0`. Four misses, three SpecialAttackWeapon rows
+across two shapes, and six critical outcomes remain report-only. Sources `0x7953A84F`,
+`0x7953AA0D`, and `0x79545224` use their exact captured patrols. Whole-enemy
+coverage guards all sources/variants, shared chase, strict incomplete-pool loot,
+CATMesh/credits, shared four-minute respawn, and ordinary corpse lifetimes
+together.
 
 Melded Patterns no longer uses a fixed post-mitigation attack range as its
 runtime damage source. Focused capture `20260716-034559` proves the QL20
@@ -294,28 +297,31 @@ gate fails closed if the focused capture or seven normal `21..34` hit boundary
 drifts. No special-attack context or critical behavior is inferred, and the
 profile is accepted by the whole-enemy gate with those exclusions preserved.
 
-Reviewed first-open evidence now supplies strict item denominators for 18
+Reviewed first-open evidence now supplies strict item denominators for 20
 ordinary profiles through one reusable raw-generation validator. In addition
 to Shadow, ordinary Infector, Architect Striker, and Melded Patterns, the
 recovered set is Mugger `18/3 empty`, Discarded Pet `16/3`, Stim Fiend `13/0`,
 Looter `11/5`, Violent Vagabond `14/1`, Bloodcreeper `4/3`, Infected Attendant
-`4/1`, Fragmented Soul `4/0`, Deranged Shopper `2/0`, Incomplete Rebuild `2/0`,
-Redundant Scan `2/1`, Uncontrollable Anger `2/0`, Lost Thought `1/0`, and Neural
-Burnout `4/2`. Each reviewed source is capture-allowlisted and its complete set
+`6/1`, Fragmented Soul `4/0`, Deranged Shopper `3/0`, Incomplete Rebuild `2/0`,
+Redundant Scan `2/1`, Uncontrollable Anger `4/0`, Lost Thought `5/2`, Neural
+Burnout `6/2`, Empty Shell `5/1`, and Premature Pattern `5/1`. Each reviewed source is capture-allowlisted and its complete set
 of exact corpse/dead-NPC/first-raw-inventory generations is fingerprinted;
 capture allocations and declared overlap projections also fail closed. Unopened
 and snapshot-only corpses remain excluded, as does the known false Stim Fiend
 attribution. Runtime consumes generated strict-loot summary metadata, uses
 `IndependentEntries`, preserves observed empty counts, and keeps
-`ItemPoolComplete=false`; Empty Shell and Premature Pattern receive no table.
+`ItemPoolComplete=false`.
 
 Shadow, ordinary Infector, Architect Striker, and Melded Patterns are the sixth
 through ninth accepted ordinary profiles. Their gate coverage binds exact
 spawns, appearance, captured normal combat, shared chase, strict incomplete-pool
-loot, corpse visuals/credits, the private 240-second post-despawn ordinary
-respawn policy, and shared three-second empty/four-minute loot-bearing corpse
+loot, corpse visuals/credits, the shared 240-second post-despawn ordinary
+respawn policy, and shared 30-second empty/two-minute loot-bearing corpse
 lifetimes. Shadow's two, Infector's three, and Architect Striker's one observed
-critical outcomes remain report-only. Ordinary Infector's generated `16..36`
+critical outcomes remain report-only. Architect now retains 18 normal
+local-player outcomes at `10..17`, its `38` critical, one miss, and two
+`87/87/87/87/0` SpecialAttackWeapon rows; the latter three evidence shapes stay
+report-only. Ordinary Infector's generated `16..36`
 fixed contract stays isolated from the Abmouth-owned specialized Infector path.
 Architect Striker retains its captured fixed contract without an invented
 weapon. Melded Patterns retains its exact QL20 `121817/121818` weapon-owned
@@ -325,9 +331,12 @@ The gate also includes Looter, Bloodcreeper, Stim Fiend, and Neural
 Burnout. Looter resolves all eight exact owner-linked `123038/123039` tuples by
 source identity and QL; its visible equipped item owns normal damage and
 recharge, while aggregate, missing, conflicting, or unknown source selection
-fails closed. The other three retain their specialized or fixed capture-backed
+fails closed. Capture `20260720-031025` adds repeated exact-source patrols for
+`0x79545029` (10 segments) and `0x7954503C` (12 segments); five other observed
+sources remain stationary, and suspected duplicate `0x7957E5CD` remains
+unresolved and unchanged. The other three retain their specialized or fixed capture-backed
 combat, strict incomplete loot samples, exact observed credit rows, shared chase,
-ordinary corpse lifetimes, and private respawn policy. The ordinary generator and
+ordinary corpse lifetimes, and shared respawn policy. The ordinary generator and
 Debug build pass, as do the expanded fourteen-profile gate, WorldPopulation,
 and Subway loot suites.
 
@@ -343,6 +352,19 @@ shared chase, ordinary respawn, and corpse lifetimes.
 Deranged Shopper is the sixteenth accepted profile, Incomplete Rebuild the
 seventeenth, Redundant Scan the eighteenth, Fragmented Soul the nineteenth,
 Discarded Pet the twentieth, and Uncontrollable Anger the twenty-first.
+Finalized capture `20260720-031025` maps Deranged Shopper live alias `79803651`
+to canonical source `0x79574527` through the sole matching profile and patrol
+anchors. Its idle route uses 83 non-combat flag-24
+NpcPath rows; ten later flag-25 NpcPath rows and one additional non-NpcPath
+flag-25 movement row are excluded. The same capture adds two
+normal `7` hits, bringing the source contract to ten normal `7..15` hits, and
+adds five misses, bringing the source-associated total to six while the generated
+aggregate retains seven. Empty SIW `56/45/45/45/0` and the observed
+attack-start, StopFight, and death context remain evidence-only. The strict loot
+denominator is now `3/0 empty`, with a third positive first-open item `234876`
+QL1 on an L8 CATMesh `5927` corpse carrying `47` credits. No respawn or
+corpse-lifetime result was captured, so the established private lifecycle policy
+is unchanged.
 Discarded Pet activates all 29 exact L5..L10
 rows and keeps 37 normal local-player SIW1 outcomes at `9..18` separate from
 four report-only `30..33` criticals. Its fixed capture contract retains ammo
@@ -353,40 +375,50 @@ boundaries. Strict `16/3 empty` loot, CATMesh `15929`, standard corpse
 lifetimes, and 25 exact credit corpses pass the same whole-enemy gate. The
 Uncontrollable Anger slice keeps six exact active rows at captured levels
 `13,13,19,20,23,23`, two patrols and four static anchors, retaliatory shared
-chase, local-player SIW1 damage `11..18`, strict `2/0 empty` loot, CATMesh
-`96177`, inherited private respawn, and `3/240/3` corpse rules. Four Killer-pet
-hits at `25..42` and one other-player hit at `19` remain separate. Its complete
+chase, four local-player SIW1 normal outcomes at `9..18`, three misses, strict
+`3/0 empty` loot, CATMesh `96177`, inherited shared respawn, and `30/120/30`
+corpse rules. Four Killer-pet hits at `25..42`, one other-player hit at `19`,
+and the local `19` critical remain separate. Its complete
 reviewed Killer cadence window is `5.1165513`, `5.1671525`, `10.1003489`
 seconds; runtime uses the six-decimal median `5.167153` without dropping or
-dividing the doubled interval. Exact positive-credit evidence covers
+dividing the doubled interval. Seven exact positive-credit corpses cover
 L11/L12/L13/L20/L21, while active L19 and L23 remain unresolved. The
-twenty-one-profile gate, WorldPopulation `36/36`, and Subway loot `22/22` pass.
+twenty-one-profile gate, WorldPopulation `39/39`, and Subway loot `22/22` pass.
 ZoneEngine compiles. Private activation validation remains pending for the 16
 rows activated in this slice; the prior Discarded Pet validation boundary is
 tracked separately.
 
+Infected Attendant source `0x795451F8` now follows the complete idle route from
+capture `20260720-033749`. That capture proves retaliation and one
+`65/65/65/65/0` SpecialAttackWeapon row but no additional landed local hit, so
+the profile remains outside the whole-enemy gate. Strict loot is now `5/1`
+empty, including QL13 `290619/202727`; no respawn, leash/reset, or exact aggro
+threshold is inferred.
+
+Strike Foreman remains outside this ordinary catalog as a named encounter.
+Captures `20260720-032106` and `20260720-033513` add six local normal `13` hits,
+two misses, two `154/154/154/117/0` SpecialAttackWeapon rows, and two positive
+atomic loot outcomes on exact L19/CATMesh `17870`/`176`-credit corpses. QL17
+versus QL19 weapon selection, respawn, leash/reset, exact aggro threshold, and
+loot-bearing lifetime remain unresolved, so the runtime stays dormant.
+
 ## Ordinary respawn policy
 
-PF127 eligible ordinary enemies inherit a 240-second post-NPC-despawn default.
-This is a private-project regular-enemy policy, not proof that every official AO
-Subway enemy uses one exact timer.
+Every PF127 regular mob inherits the authoritative 240-second
+post-NPC-despawn policy. There are no per-archetype regular-mob exceptions.
 
 Resolution precedence is:
 
-1. explicit per-spawn or per-archetype policy;
-2. explicit group/encounter policy where a group supplies one;
-3. the shared 240-second ordinary default for `OrdinaryEnemy` classifications;
-4. explicit no-respawn or unresolved/fail-closed behavior.
+1. the shared 240-second policy for `OrdinaryEnemy` classifications;
+2. explicit boss or scripted-encounter ownership outside the ordinary catalog;
+3. explicit no-respawn or unresolved/fail-closed behavior for non-ordinary entities.
 
-Current explicit exceptions are Thief at 60 seconds, Filth Flea at 240 seconds,
-all 12 Disobedient Bot rows at 450 seconds, Bloodcreeper at 240 seconds, and all
-24 Slum Runner rows at 60 seconds. The catalog contains 89 explicit spawn rows;
-the other 232 represented ordinary
-rows inherit the default without changing whether they are active or
-quarantined. Named enemies, bosses, scripted
-encounters, summons, pets, temporary encounter adds, vendors, static objects,
-containers, and quest-owned entities cannot inherit the ordinary default.
-Their existing owners and encounter-specific policies remain separate.
+All 322 represented ordinary rows inherit the same policy without changing
+whether they are active or quarantined. Bosses, scripted encounters, pets,
+vendors, static objects, containers, and quest-owned entities cannot inherit
+the ordinary default. Their existing owners and encounter-specific policies
+remain separate. Subway bosses use a 10-minute death-based respawn and a
+30-minute corpse lifetime.
 
 Group policy references resolve through the same controller registration path;
 optional group overrides are injected before ordinary definitions resolve, and
@@ -490,8 +522,11 @@ established by evidence or decision, and random roam behavior not proven by
 movement evidence. No Violent Vagabond row remains quarantined. Exact patrols
 do not resolve the missing landed-damage evidence, so the `9..12` runtime range
 remains explicitly policy-backed rather than capture-proven.
-The whole-enemy gate still accepts 21 of 26 profiles. Infected Attendant, Lost
-Thought, Empty Shell, Premature Pattern, and Violent Vagabond account for 43
-active rows and require the next
-corpus-backed completion pass; active disposition is not a claim that those
-five profiles are complete.
+The whole-enemy gate now lists all 26 profiles. Capture `20260720-051714`
+promotes additional local-player damage rolls and strict first-open loot for
+Infected Attendant, Lost Thought, Empty Shell, and Premature Pattern. Lost
+Thought uses its observed `5.428348`-second cadence; the other three use an
+explicit shared five-second private-server cadence because the corpus has no
+trustworthy same-source landed-hit interval. Violent Vagabond retains its
+documented same-level Mugger damage policy and captured miss cadence. These are
+playability policies, not claims of exact official-server parity.

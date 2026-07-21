@@ -193,7 +193,7 @@ namespace AORebirth.Core.Playfields
                 ResetMovementState = true,
                 ResetAggressionState = true,
                 DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
-                Evidence = "PF127 ordinary-enemy project policy; not universal official AO timing",
+                Evidence = "PF127 Subway regular-mob lifecycle policy",
                 Confidence = "POLICY",
                 Enabled = true
             };

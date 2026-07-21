@@ -47,6 +47,9 @@ namespace AORebirth.Core.Playfields
             "00000000000000008000000003010001000100010001000000020000";
         private const double FirstInfectorDelaySeconds = 1.212281;
         private const double SecondInfectorDelaySeconds = 2.326367;
+        private const int AbmouthWarpNanoId = 286237;
+        private const int AbmouthWarpDurationMilliseconds = 500;
+        private const double AbmouthWarpDelaySeconds = 21.8;
         private const int VergilDirectHealNanoId = 43827;
         private const int VergilDirectHealAmount = 187;
         private const double VergilDirectHealCastSeconds = 1.480007;
@@ -100,6 +103,7 @@ namespace AORebirth.Core.Playfields
         private bool combatActive;
         private bool abmouthDead;
         private DateTime? abmouthRespawnDueAtUtc;
+        private DateTime? abmouthWarpDueAtUtc;
         private bool vergilCombatActive;
         private bool vergilDead;
         private DateTime? vergilRespawnDueAtUtc;
@@ -168,6 +172,7 @@ namespace AORebirth.Core.Playfields
             this.combatActive = false;
             this.abmouthDead = false;
             this.abmouthRespawnDueAtUtc = null;
+            this.abmouthWarpDueAtUtc = null;
             this.ClearVergilCombatState();
             this.vergilRespawnDueAtUtc = null;
             this.eumenidesRespawnDueAtUtc = null;
@@ -263,6 +268,7 @@ namespace AORebirth.Core.Playfields
             this.abmouthDead = false;
             this.infectorSlots[0].SpawnDueAtUtc = utcNow.AddSeconds(FirstInfectorDelaySeconds);
             this.infectorSlots[1].SpawnDueAtUtc = utcNow.AddSeconds(SecondInfectorDelaySeconds);
+            this.abmouthWarpDueAtUtc = utcNow.AddSeconds(AbmouthWarpDelaySeconds);
         }
 
         internal ICharacter[] NotifyCombatReset(ICharacter npc)
@@ -293,6 +299,7 @@ namespace AORebirth.Core.Playfields
 
             this.combatActive = false;
             this.abmouthDead = false;
+            this.abmouthWarpDueAtUtc = null;
             this.refillDelayIndex = 0;
             var activeSummons = new List<ICharacter>();
             foreach (InfectorSlotState slot in this.infectorSlots)
@@ -335,6 +342,13 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (this.abmouthWarpDueAtUtc.HasValue
+                && this.abmouthWarpDueAtUtc.Value <= utcNow)
+            {
+                this.ApplyAbmouthWarp(boss, this.FindAbmouthWarpTarget(boss, target));
+                this.abmouthWarpDueAtUtc = null;
+            }
+
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
                 if (slot.ActiveIdentity.Instance != 0
@@ -352,6 +366,76 @@ namespace AORebirth.Core.Playfields
                     slot.Generation++;
                     acquireAggro(target, infector);
                 }
+            }
+        }
+
+        private ICharacter FindAbmouthWarpTarget(ICharacter boss, ICharacter combatTarget)
+        {
+            ICharacter player = this.dynelRegistry
+                .Characters()
+                .Where(
+                    candidate => candidate != null
+                                 && candidate.Controller is PlayerController
+                                 && candidate.Stats[StatIds.health].Value > 0)
+                .OrderBy(candidate => candidate.Coordinates().coordinate.Distance2D(boss.Coordinates().coordinate))
+                .ThenBy(candidate => candidate.Identity.Instance)
+                .FirstOrDefault();
+            return player ?? combatTarget;
+        }
+
+        private void ApplyAbmouthWarp(ICharacter boss, ICharacter player)
+        {
+            if (boss == null || player == null || player.Stats[StatIds.health].Value <= 0)
+            {
+                return;
+            }
+
+            AORebirth.Core.Vector.Vector3 destination = boss.RawCoordinates;
+            SmokeLounge.AOtomation.Messaging.GameData.Vector3 teleportDestination =
+                new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                {
+                    X = destination.xf,
+                    Y = destination.yf,
+                    Z = destination.zf
+                };
+            CastNanoSpellMessageHandler.Default.SendCapturedNpcCast(
+                boss,
+                AbmouthWarpNanoId,
+                player.Identity);
+            CharacterActionMessageHandler.Default.NotifyActiveNanoDuration(
+                boss,
+                player.Identity,
+                AbmouthWarpNanoId,
+                AbmouthWarpDurationMilliseconds);
+            TeleportMessageHandler.Default.SendLocal(player, teleportDestination, player.RawHeading);
+            player.RawCoordinates = destination;
+            player.Coordinates(
+                new Coordinate
+                {
+                    x = destination.xf,
+                    y = destination.yf,
+                    z = destination.zf
+                });
+
+            foreach (ICharacter pet in this.dynelRegistry.Characters().Where(
+                candidate => candidate != null
+                             && candidate.Stats[StatIds.petmaster].Value == player.Identity.Instance
+                             && candidate.Stats[StatIds.health].Value > 0))
+            {
+                pet.Coordinates(
+                    new Coordinate
+                    {
+                        x = destination.xf,
+                        y = destination.yf,
+                        z = destination.zf
+                    });
+                this.playfield.Announce(
+                    new SetPosMessage
+                    {
+                        Identity = pet.Identity,
+                        Coordinates = teleportDestination,
+                        Unknown1 = 1
+                    });
             }
         }
 
@@ -427,6 +511,7 @@ namespace AORebirth.Core.Playfields
                     this.abmouthIdentity = boss.Identity;
                     this.abmouthDead = false;
                     this.combatActive = false;
+                    this.abmouthWarpDueAtUtc = null;
                     this.refillDelayIndex = 0;
                     foreach (InfectorSlotState slot in this.infectorSlots)
                     {
@@ -492,6 +577,7 @@ namespace AORebirth.Core.Playfields
             {
                 this.abmouthIdentity = Identity.None;
                 this.combatActive = false;
+                this.abmouthWarpDueAtUtc = null;
                 return;
             }
 
@@ -926,9 +1012,11 @@ namespace AORebirth.Core.Playfields
                 0,
                 155548,
                 1800.0,
-                3.0,
+                1800.0,
                 "20260712-224840 SCFU #1808; 20260712-232137 fight/corpse/loot; "
-                + "20260716-220400 spawn/fight/death/corpse");
+                + "20260716-220400 spawn/fight/death/corpse; "
+                + "20260720-053802 captured nano 286237 warp at approximately 21.8 seconds, "
+                + "with player and owned pets repositioned to Abmouth");
         }
 
         private CapturedEncounterRuntimeDefinition CreateVergilAeneidDefinition()
@@ -970,11 +1058,12 @@ namespace AORebirth.Core.Playfields
                 0,
                 5921,
                 1800.0,
-                3.0,
+                1800.0,
                 variant.Evidence
                 + "; exact spawn/appearance 20260709-222339 SCFU #5445; "
                 + "Mike 20260716 30-minute loot corpse and 10-minute respawn; "
-                + "20260716-222007 two approximately 40-unit leash resets",
+                + "20260716-222007 two approximately 40-unit leash resets; "
+                + "20260720-053542 follow-up normal/critical weapon evidence",
                 npcFamily: 138,
                 npcLosHeight: 0,
                 fatness: 1,
@@ -1033,12 +1122,12 @@ namespace AORebirth.Core.Playfields
                 0,
                 17905,
                 1800.0,
-                3.0,
+                1800.0,
                 "20260716-034559 atomic SCFU; 20260709-222339 plus 20260717-214612/214751/215250 weapon/combat/chase; "
                 + "20260716-222007 exact 416-byte corpse CATMesh 17905/MonsterData 203726/scale 130; "
                 + "20260717-214751/215250 two exact 186-credit item-plus-credit corpse snapshots; "
                 + "20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse; "
-                + "confirmed 3-second empty cleanup and shared 100-unit leash; active nano refresh unresolved and omitted",
+                + "confirmed 30-minute boss corpse and shared 100-unit leash; active nano refresh unresolved and omitted",
                 npcFamily: 148,
                 npcLosHeight: 0,
                 fatness: 1,
@@ -1129,8 +1218,8 @@ namespace AORebirth.Core.Playfields
                 HexToBytes(capturedScfuUnknown1),
                 0,
                 31868,
-                300.0,
-                3.0,
+                120.0,
+                30.0,
                 "20260712-224840 SCFU #1835/#1870; 20260712-232137 two-slot refill");
         }
 
