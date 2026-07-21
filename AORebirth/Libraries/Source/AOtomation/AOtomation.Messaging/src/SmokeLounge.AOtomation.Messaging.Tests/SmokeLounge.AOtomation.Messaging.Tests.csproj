@@ -162,6 +162,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs">
       <Link>CapturedTempleOfThreeWindsContentProvider.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs">
+      <Link>CapturedTempleOfThreeWindsCombatCatalog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
+      <Link>CapturedTempleOfThreeWindsLootDefinitions.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs">
       <Link>OrdinaryEnemyCatalog.cs</Link>
     </Compile>

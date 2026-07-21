@@ -2,19 +2,22 @@
 
 ## Current Focus
 
-Construct the Temple of Three Winds as its own PF647 content module from the
-finalized `20260721-030515`, `20260721-031913`, `20260721-032247`,
-`20260721-032547`, and `20260721-033006` captures. The first bounded slice covers
-only regular Cultists from the entrance through the hallways and first boss
-room: seven exact visual profiles, `122` deduplicated spawn anchors, `16`
-captured patrols, observed `15..32` normal damage, capture-backed chase/return,
-strict profile-scoped loot, exact level credits, and the captured approximately
-`310`-second death-to-respawn lifecycle. Bosses and named NPCs remain excluded.
+Construct the Temple of Three Winds as its own PF647 content module. The
+entrance-to-first-boss-room slice retains seven exact regular-Cultist profiles,
+`122` deduplicated spawn anchors, `16` captured patrols, observed `15..32`
+normal damage, capture-backed chase/return, strict profile-scoped loot, exact
+level credits, and the captured approximately `310`-second death-to-respawn
+lifecycle. Finalized captures `20260721-035526`, `20260721-040249`, and
+`20260721-040324` now add Defender of the Three as the first dedicated named
+Temple encounter: exact L42/7091-health spawn data, captured `43` weapon damage,
+nanos `205389` and `205561`, two atomic loot snapshots with `1450` credits,
+two-minute unlooted corpse lifetime, and ten-minute post-despawn replacement.
 
 Temple data is owned by `CapturedTempleOfThreeWindsContentProvider` and uses
 only `totw.*` keys on playfield `647`. Subway remains independently owned by its
 PF127 providers; only generic ordinary-enemy runtime infrastructure is shared.
-See `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md`.
+See `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md`
+and `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`.
 
 ## Subway enemy captures (2026-07-20)
 

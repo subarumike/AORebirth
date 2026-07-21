@@ -1484,7 +1484,17 @@ namespace AORebirth.Core.Playfields
 
             lock (Sync)
             {
-                Definitions.Clear();
+                int[] subwayRuntimeInstances = Definitions
+                    .Where(
+                        value => value.Value.ProfileKey.StartsWith(
+                            "subway.",
+                            StringComparison.Ordinal))
+                    .Select(value => value.Key)
+                    .ToArray();
+                foreach (int runtimeInstance in subwayRuntimeInstances)
+                {
+                    Definitions.Remove(runtimeInstance);
+                }
             }
         }
     }

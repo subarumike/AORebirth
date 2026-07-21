@@ -55,6 +55,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedSubwayEncounterRuntimeService capturedSubwayEncounters;
 
+        private readonly CapturedTempleOfThreeWindsEncounterRuntimeService capturedTempleEncounters;
+
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
         private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();
@@ -102,6 +104,10 @@ namespace AORebirth.Core.Playfields
                     this.playfield,
                     this.dynelRegistry,
                     this.ActivateNpc);
+            this.capturedTempleEncounters =
+                new CapturedTempleOfThreeWindsEncounterRuntimeService(
+                    this.playfield,
+                    this.ActivateNpc);
         }
 
         internal void ActivateNpc(ICharacter character)
@@ -125,6 +131,7 @@ namespace AORebirth.Core.Playfields
             this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
             this.chaseNavigation.ClearAll(NpcChaseInvalidationReason.EncounterReset);
             this.capturedSubwayEncounters.ClearRuntimeState();
+            this.capturedTempleEncounters.ClearRuntimeState();
             this.npcHomeStates.Clear();
             this.corpseDespawnTicks.Clear();
         }
@@ -181,6 +188,7 @@ namespace AORebirth.Core.Playfields
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
             this.worldPopulation.ActivatePlayfield(playfieldIdentity);
             this.capturedSubwayEncounters.ActivatePlayfield(playfieldIdentity);
+            this.capturedTempleEncounters.ActivatePlayfield(playfieldIdentity);
         }
 
         internal bool HasPendingDeadNpcDespawn(Identity identity)
@@ -209,6 +217,7 @@ namespace AORebirth.Core.Playfields
             this.ordinaryEnemies.ProcessExpiredSupportNanoEffects(utcNow);
             this.worldPopulation.ProcessDue(utcNow);
             this.capturedSubwayEncounters.ProcessDue(utcNow, this.AcquireAggro);
+            this.capturedTempleEncounters.ProcessDue(utcNow);
         }
 
         internal void ClearNpcCorpseDespawn(int corpseInstance)
@@ -252,6 +261,7 @@ namespace AORebirth.Core.Playfields
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }
+            this.capturedTempleEncounters.NotifyDeath(target);
 
             this.ScheduleDeadNpcDespawn(target);
 
@@ -290,6 +300,7 @@ namespace AORebirth.Core.Playfields
             DateTime utcNow = DateTime.UtcNow;
             this.worldPopulation.NotifyNpcDespawn(target, utcNow);
             this.capturedSubwayEncounters.NotifyNpcDespawn(target, utcNow);
+            this.capturedTempleEncounters.NotifyNpcDespawn(target, utcNow);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             OrdinaryEnemyRuntimeRegistry.Remove(target.Identity.Instance);
@@ -315,7 +326,8 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker))
+            if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker)
+                || this.capturedTempleEncounters.IsCapturedNanoCastInProgress(attacker))
             {
                 return;
             }
@@ -554,6 +566,7 @@ namespace AORebirth.Core.Playfields
             }
 
             this.capturedSubwayEncounters.NotifyCombatStarted(target, attacker, DateTime.UtcNow);
+            this.capturedTempleEncounters.NotifyCombatStarted(target, attacker, DateTime.UtcNow);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -628,6 +641,7 @@ namespace AORebirth.Core.Playfields
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }
+            this.capturedTempleEncounters.NotifyCombatReset(npc);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,

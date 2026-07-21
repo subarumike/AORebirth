@@ -4,6 +4,18 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Defender of the Three is the first dedicated named PF647 Temple encounter.
+  Finalized captures `20260721-035526`, `20260721-040249`, and
+  `20260721-040324` provide the exact L42/7091-health spawn, two landed `43`
+  weapon hits, special-weapon context, nanos `205389` and `205561`, a
+  ten-minute post-NPC-despawn replacement, a two-minute unlooted corpse, and
+  two exact atomic loot snapshots with `1450` credits. Temple encounter,
+  combat, and loot definitions are isolated from Subway definitions; shared
+  runtime registries stay profile-key scoped. Nano effects, repeat attack
+  cadence, auto/social aggro, reset/return, PF647 geometry, and wider loot
+  probabilities remain unresolved. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`.
+
 - Temple of Three Winds construction has begun as a dedicated PF647 module,
   separate from Subway PF127 content. Five finalized entrance-to-first-boss-room
   captures contribute seven exact regular-Cultist profiles and `122` spawn

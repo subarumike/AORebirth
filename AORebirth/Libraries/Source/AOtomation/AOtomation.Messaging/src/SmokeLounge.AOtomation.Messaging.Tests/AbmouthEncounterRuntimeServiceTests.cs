@@ -829,7 +829,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("CharacterActionMessageHandler.Default.FinishNanoCasting(")
                 && encounter.Contains("pending.DurationMilliseconds")
                 && encounter.Contains("Unknown2 = appliedHeal")
-                && npcRuntime.Contains("if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker))\n            {\n                return;\n            }")
+                && npcRuntime.Contains("if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker)\n                || this.capturedTempleEncounters.IsCapturedNanoCastInProgress(attacker))\n            {\n                return;\n            }")
                 && npcRuntime.Contains("this.combatTick.ProcessCombatTick(attacker);"),
                 "Vergil weapon ticks must pause during captured nano casting and resume through the normal combat coordinator afterward.");
         }
