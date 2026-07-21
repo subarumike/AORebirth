@@ -3603,8 +3603,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(3, CountOccurrences(ordinaryProviderText, "\"bloodcreeper\""));
             Assert.AreEqual(1, bloodcreeperSpawns.Length);
             Assert.AreEqual(1, bloodcreeperSpawns.Count(value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active));
-            Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Explicit, bloodcreeperSpawns[0].RespawnPolicy.Mode);
-            Assert.AreEqual(240.0, bloodcreeperSpawns[0].RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value);
+            Assert.AreEqual(WorldRespawnPolicyAssignmentMode.Inherit, bloodcreeperSpawns[0].RespawnPolicy.Mode);
             Assert.AreEqual(OrdinaryEnemySpawnLevelMode.InclusiveRange, bloodcreeperSpawns[0].LevelDefinition.Mode);
             Assert.AreEqual(15, bloodcreeperSpawns[0].LevelDefinition.MinimumLevel);
             Assert.AreEqual(25, bloodcreeperSpawns[0].LevelDefinition.MaximumLevel);
@@ -3639,12 +3638,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && combatContractText.Contains("CapturedSubwayBloodcreeperBiteInitialSeconds")
                 && combatContractText.Contains("CapturedSubwayBloodcreeperBiteRechargeSeconds")
                 && combatContractText.Contains("CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue")
-                && catalogText.Contains("\"ordinary.bloodcreeper.240\"")
+                && catalogText.Contains("SubwayOrdinaryRespawnPolicy()")
+                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
-                "Accepted Subway Bloodcreeper must keep its one exact active spawn, L15..25 generation policy, auto aggro and chase, dual captured natural attacks, strict incomplete-pool loot, L24 exact/private-band credit policy, CATMesh, explicit four-minute respawn, and ordinary corpse lifetimes together.");
+                "Accepted Subway Bloodcreeper must keep its one exact active spawn, L15..25 generation policy, auto aggro and chase, dual captured natural attacks, strict incomplete-pool loot, L24 exact/private-band credit policy, CATMesh, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile stimFiend = ordinaryProfiles.Single(value => value.DisplayName == "Stim Fiend");
             OrdinaryEnemySpawnDefinition[] stimFiendSpawns = ordinarySpawns
@@ -3722,20 +3722,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(OrdinaryEnemyDamageSource.CapturedFixed, neuralBurnout.Combat.DamageSource);
             Assert.IsFalse(neuralBurnout.Combat.VisibleWeapon);
             Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, neuralBurnout.Combat.Contract.AttackModel);
-            Assert.AreEqual(16, neuralBurnout.Combat.Contract.MinDamage);
+            Assert.AreEqual(15, neuralBurnout.Combat.Contract.MinDamage);
             Assert.AreEqual(22, neuralBurnout.Combat.Contract.MaxDamage);
             Assert.AreEqual(9.929338, neuralBurnout.Combat.Contract.RechargeSeconds);
             Assert.AreEqual(OrdinaryEnemyLootPoolMode.IndependentEntries, neuralBurnout.Loot.PoolMode);
             Assert.IsFalse(neuralBurnout.Loot.ItemPoolComplete);
-            Assert.AreEqual(4, neuralBurnout.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(6, neuralBurnout.Loot.ObservedCompleteInventories);
             Assert.AreEqual(2, neuralBurnout.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
-                new[] { "26471:26471:14:1:4", "123021:123021:21:1:4", "124560:124561:16:1:4" },
+                new[]
+                {
+                    "26471:26471:14:1:6",
+                    "122142:122142:21:1:6",
+                    "123021:123021:21:1:6",
+                    "124409:124410:18:1:6",
+                    "124560:124561:16:1:6"
+                },
                 neuralBurnout.Loot.Entries
                     .Select(value => string.Format("{0}:{1}:{2}:{3}:{4}", value.LowId, value.HighId, value.QualityLevel, value.ObservedCount, value.ObservedCorpses))
                     .ToArray());
             CollectionAssert.AreEqual(
-                new[] { "16:98:98:1", "17:105:105:1", "18:111:111:2", "23:144:144:1", "25:156:156:2" },
+                new[] { "16:98:98:1", "17:105:105:2", "18:111:111:3", "23:144:144:1", "25:156:156:2" },
                 neuralBurnout.Loot.LevelCreditRules
                     .OrderBy(value => value.EnemyLevel)
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
@@ -3746,10 +3753,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(120.0, neuralBurnout.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(30.0, neuralBurnout.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 203730, 5941,") == 7
+                CountOccurrences(ordinaryProviderText, ", 203730, 5941,") == 9
                 && generatedCombatReportText.Contains("\"Neural Burnout\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 5")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 16")
+                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 7")
+                && generatedCombatReportText.Contains("\"normalMinDamage\": 15")
                 && generatedCombatReportText.Contains("\"normalMaxDamage\": 22")
                 && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 1")
                 && generatedCombatReportText.Contains("\"criticalMinDamage\": 51")
@@ -3820,15 +3827,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 OrdinaryEnemyLootPoolMode.IndependentEntries,
                 uncontrollableAnger.Loot.PoolMode);
             Assert.IsFalse(uncontrollableAnger.Loot.ItemPoolComplete);
-            Assert.AreEqual(3, uncontrollableAnger.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(4, uncontrollableAnger.Loot.ObservedCompleteInventories);
             Assert.AreEqual(0, uncontrollableAnger.Loot.ObservedEmptyInventories);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
-                    "101809:101810:24:1:3",
-                    "109366:109367:9:1:3",
-                    "112863:112864:13:1:3",
-                    "290619:202727:19:1:3"
+                    "101809:101810:24:1:4",
+                    "109366:109367:9:1:4",
+                    "112863:112864:13:1:4",
+                    "234877:234877:1:1:4",
+                    "290619:202727:19:1:4"
                 },
                 uncontrollableAnger.Loot.Entries
                     .Select(value => string.Format(
@@ -3845,6 +3853,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "11:14:14:1",
                     "12:15:15:2",
                     "13:16:16:2",
+                    "19:24:24:1",
                     "20:25:25:1",
                     "21:26:26:1"
                 },
@@ -3859,21 +3868,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .ToArray());
             Assert.IsFalse(
                 uncontrollableAnger.Loot.LevelCreditRules.Any(
-                    value => value.EnemyLevel == 19 || value.EnemyLevel == 23));
+                    value => value.EnemyLevel == 23));
             Assert.AreEqual(96177, uncontrollableAnger.Corpse.CapturedCatMesh);
             Assert.AreEqual(30.0, uncontrollableAnger.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(120.0, uncontrollableAnger.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(30.0, uncontrollableAnger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 96195, 96177,") == 7
-                && uncontrollableAngerCombatReport.Contains("\"retaliationRows\": 11")
-                && uncontrollableAngerCombatReport.Contains("\"normalAttackInfoRows\": 4")
+                CountOccurrences(ordinaryProviderText, ", 96195, 96177,") == 8
+                && uncontrollableAngerCombatReport.Contains("\"retaliationRows\": 12")
+                && uncontrollableAngerCombatReport.Contains("\"normalAttackInfoRows\": 7")
                 && uncontrollableAngerCombatReport.Contains("\"normalMinDamage\": 9")
                 && uncontrollableAngerCombatReport.Contains("\"normalMaxDamage\": 18")
                 && uncontrollableAngerCombatReport.Contains("\"criticalAttackInfoRows\": 1")
                 && uncontrollableAngerCombatReport.Contains("\"criticalMinDamage\": 19")
                 && uncontrollableAngerCombatReport.Contains("\"criticalMaxDamage\": 19")
-                && uncontrollableAngerCombatReport.Contains("\"missedAttackInfoRows\": 3")
+                && uncontrollableAngerCombatReport.Contains("\"missedAttackInfoRows\": 9")
                 && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 4")
                 && uncontrollableAngerCombatReport.Contains("\"minDamage\": 25")
                 && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 42")
@@ -3912,8 +3921,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn => spawn.LevelDefinition.Mode
                              == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants
                              && spawn.RespawnPolicy.Mode
-                                == WorldRespawnPolicyAssignmentMode.Explicit
-                             && spawn.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds == 240.0
+                                == WorldRespawnPolicyAssignmentMode.Inherit
                              && spawn.LevelDefinition.GetExplicitVariants().All(
                                  variant => incompleteRebuild.Combat.ResolveContract(
                                                 spawn.SourceIdentity,

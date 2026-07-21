@@ -586,7 +586,7 @@ namespace AORebirth.Core.Playfields
             bool hasExactCombatEvidence = combat != null
                                           && combat.Observed
                                           && combat.RuntimeReady
-                                          && combat.ObservedRows == 56
+                                          && combat.ObservedRows == 59
                                           && combat.MinDamage == 9
                                           && combat.MaxDamage == 23
                                           && combat.WeaponSlot == 6
@@ -615,7 +615,7 @@ namespace AORebirth.Core.Playfields
                 IsCombatReady = true,
                 Evidence = weapon.Evidence
                            + ": Workman Striker selected one captured atomic level/stat/weapon generation; "
-                           + "56 normal local-player hits span 9..23; item owns runtime damage and recharge; "
+                           + "59 normal local-player hits span 9..23; item owns runtime damage and recharge; "
                            + "captured AttackInfo ammo -1, slot 6, unknown 0, and weapon instance 0.",
                 WeaponLowId = weapon.LowId,
                 WeaponHighId = weapon.HighId,

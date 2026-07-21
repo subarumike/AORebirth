@@ -82,8 +82,8 @@ named encounter runtime. See
   lifetime remain unresolved and are not guessed.
 - Ordinary generation/check, combat-report generation, Subway loot `22/22`,
   the focused promoted-profile test, and the Debug build pass. WorldPopulation
-  is `38/39`; its only failure is the pre-existing Workman source
-  `0x7953A84F` atomic weapon-resolution guard. Chat, Login, and Zone were
+  is `39/39` after aligning the Workman test stub with the captured `59` normal
+  hits used by the generated runtime profile. Chat, Login, and Zone were
   restarted on ports `6996`, `7012`, `7500`, and `7501`; no AO client was
   launched.
 
@@ -604,15 +604,14 @@ named encounter runtime. See
   ordinary profiles after existing-corpus combat and strict-loot promotion.
   Ordinary generation check, expanded
   gate-focused profile checks and Subway loot `22/22` pass. WorldPopulation is
-  `38/39` because of the existing Workman `0x7953A84F` atomic-generation
-  resolution failure.
+  `39/39`; the stale Workman test-stub expectation was updated from `56` to
+  the captured/generated `59` normal hits.
 - Playfield lifecycle class: `56/63`; every Subway and ordinary-enemy test
   passes. The seven remaining failures are the existing session lifecycle,
   teleport sequencing, and visibility ownership guardrails outside this slice.
 - Official entry/main-exit zoning guardrails: PASS.
 - Capture inventory classifier and reviewed-corpus drift check: PASS.
-- World population foundation: `38/39`; only the existing Workman source
-  `0x7953A84F` atomic weapon-resolution guard fails.
+- World population foundation: `39/39` PASS.
 - Subway merchant/Tailor content: `6/6` PASS; dialogue bootstrap: `5/5` PASS.
 - Visibility interest/catalog: `12/12` PASS.
 - Quarantine/spatial-selection guardrail: PASS.
