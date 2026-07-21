@@ -3,7 +3,6 @@ namespace ZoneEngine.Core.Arete.Quests
     #region Usings ...
 
     using System;
-    using System.Globalization;
 
     using AORebirth.Core.Entities;
     using AORebirth.Enums;
@@ -91,7 +90,7 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             int characterId = source.Identity.Instance;
-            ZoneEngine.Core.Missions.MissionStateRecord mission = MissionRuntime.Service.GetMission(characterId, MissionId);
+            ZoneEngine.Core.Missions.MissionStateRecord mission = EnsureB18EReadyForReturn(characterId);
             if (mission == null
                 || (mission.State != MissionLifecycleState.Active
                     && mission.State != MissionLifecycleState.Completed))
@@ -134,8 +133,13 @@ namespace ZoneEngine.Core.Arete.Quests
             MissionRewardExecutionResult rewardResult = ApplyPersistentRewards(source);
             if (!rewardResult.Succeeded)
             {
-                return RexB18ECompletionResult.Failed(
-                    "B18E durable reward failed: " + rewardResult.Message);
+                // Still project Delete+B18F — reward ledger AlreadyApplied / partial failures
+                // previously aborted the handoff and left Return to Rex stuck beside Marcus.
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "ARETE_REX_B18E_COMPLETION reward status=\""
+                    + rewardResult.Message
+                    + "\" — continuing B18F client handoff");
             }
 
             MissionOperationResult b18fTransition = MissionRuntime.Service.CompleteAndActivateNextMission(
@@ -144,14 +148,17 @@ namespace ZoneEngine.Core.Arete.Quests
                 MissionRuntime.RexB18FQuestId);
             if (IsPersistenceFailure(b18fTransition))
             {
-                return RexB18ECompletionResult.Failed(
-                    "B18F handoff persistence failed: " + b18fTransition.Message);
+                MissionRuntime.Service.OfferMission(characterId, MissionRuntime.RexB18FQuestId);
+                MissionRuntime.Service.AcceptMission(characterId, MissionRuntime.RexB18FQuestId);
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "ARETE_REX_B18E_COMPLETION B18F handoff status="
+                    + (b18fTransition == null ? "null" : b18fTransition.Status.ToString())
+                    + " message=\""
+                    + (b18fTransition == null ? "" : b18fTransition.Message)
+                    + "\" — forced offer/accept + client projection");
             }
 
-            bool deleteProjected = EnsureQuestProjection(
-                source,
-                "b18e-delete-projected",
-                () => SafeQuestFullUpdateSender.TrySendB18EQuestDelete(source));
             RewardFeedbackResult feedback = null;
             if (MissionRuntime.Service.GetFlag(characterId, MissionId, "reward-feedback-projected") == null)
             {
@@ -166,11 +173,16 @@ namespace ZoneEngine.Core.Arete.Quests
                 }
             }
 
-            bool b18fProjected = EnsureQuestProjection(
-                source,
-                "b18f-preview-projected",
-                () => SafeQuestFullUpdateSender.TrySendB18FPreview(source));
-            if (!deleteProjected || !b18fProjected)
+            // Always re-project Delete+B18F. Flag-gated sends left Return to Rex stuck next to Marcus.
+            RexQuestPreviewEmissionResult handoff = SafeQuestFullUpdateSender.TrySendB18EToB18FHandoff(source);
+            bool projected = handoff != null && handoff.Emitted;
+            if (!projected)
+            {
+                SafeQuestFullUpdateSender.TrySendB18EQuestDelete(source);
+                projected = SafeQuestFullUpdateSender.TrySendB18FPreview(source).Emitted;
+            }
+
+            if (!projected)
             {
                 return RexB18ECompletionResult.Failed(
                     "B18E state and rewards are durable, but a client quest projection remains retryable.");
@@ -183,9 +195,38 @@ namespace ZoneEngine.Core.Arete.Quests
                 + " creditDelta=" + CreditReward
                 + " displayXp=" + RewardMessageDisplayXp
                 + " b18fMission=" + MissionRuntime.RexB18FQuestId
-                + " deleteProjected=" + deleteProjected
-                + " rewardFeedback=" + (feedback == null ? "already-projected" : feedback.Message)
-                + " b18fProjected=" + b18fProjected);
+                + " handoffProjected=true"
+                + " rewardFeedback=" + (feedback == null ? "already-projected" : feedback.Message));
+        }
+
+        private static ZoneEngine.Core.Missions.MissionStateRecord EnsureB18EReadyForReturn(int characterId)
+        {
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(characterId, MissionId);
+            if (mission != null && mission.State == MissionLifecycleState.Offered)
+            {
+                MissionRuntime.Service.AcceptMission(characterId, MissionId);
+                mission = MissionRuntime.Service.GetMission(characterId, MissionId);
+            }
+
+            if (mission != null
+                && (mission.State == MissionLifecycleState.Active
+                    || mission.State == MissionLifecycleState.Completed))
+            {
+                return mission;
+            }
+
+            // Cargo handoff can leave B18D Completed while B18E was only client-previewed.
+            ZoneEngine.Core.Missions.MissionStateRecord b18d =
+                MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB18DQuestId);
+            if (b18d == null || b18d.State != MissionLifecycleState.Completed)
+            {
+                return mission;
+            }
+
+            MissionRuntime.Service.OfferMission(characterId, MissionId);
+            MissionRuntime.Service.AcceptMission(characterId, MissionId);
+            return MissionRuntime.Service.GetMission(characterId, MissionId);
         }
 
         private static MissionRewardExecutionResult ApplyPersistentRewards(ICharacter source)
@@ -254,32 +295,6 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             return result;
-        }
-
-        private static bool EnsureQuestProjection(
-            ICharacter source,
-            string flagKey,
-            Func<RexQuestPreviewEmissionResult> sender)
-        {
-            int characterId = source.Identity.Instance;
-            if (MissionRuntime.Service.GetFlag(characterId, MissionId, flagKey) != null)
-            {
-                return true;
-            }
-
-            RexQuestPreviewEmissionResult result = sender();
-            if (result == null || !result.Emitted)
-            {
-                return false;
-            }
-
-            MissionOperationResult flag = MissionRuntime.Service.SetFlag(
-                characterId,
-                MissionId,
-                flagKey,
-                "true");
-            return flag.Status == MissionOperationStatus.Applied
-                   || flag.Status == MissionOperationStatus.AlreadyApplied;
         }
 
         private static bool IsPersistenceFailure(MissionOperationResult result)

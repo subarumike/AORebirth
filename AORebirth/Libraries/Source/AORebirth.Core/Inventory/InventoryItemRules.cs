@@ -57,6 +57,12 @@ namespace AORebirth.Core.Inventory
             return IsUniqueFlags(item.GetAttribute(0));
         }
 
+        /// <summary>
+        /// True only for real bags (legacy backpack template / Book of Knowledge / Backpack identity).
+        /// Do NOT treat bare <see cref="IdentityType.Container"/> as a bag — armor and jewelry often
+        /// carry that identity and would wrongly be blocked from going into backpacks (same trap as
+        /// mail/GMI; see <see cref="IsMailForbiddenContainerItem"/>).
+        /// </summary>
         public static bool IsBackpackContainerItem(IItem item)
         {
             if (item == null)
@@ -64,7 +70,7 @@ namespace AORebirth.Core.Inventory
                 return false;
             }
 
-            if ((item.Identity != null) && (item.Identity.Type == IdentityType.Container))
+            if (item.Identity != null && item.Identity.Type == IdentityType.Backpack)
             {
                 return true;
             }
@@ -73,8 +79,12 @@ namespace AORebirth.Core.Inventory
         }
 
         /// <summary>
-        /// Items live mail Feedback_MailNoChests should block (Item field + send).
-        /// Broader than <see cref="IsBackpackContainerItem"/>: ItemClass 2 bags and Backpack identities.
+        /// Items live mail Feedback_MailNoChests should block (Item field + send): real backpacks/bags
+        /// ONLY — Backpack identity, legacy backpack template, or Book of Knowledge. Same conservative
+        /// set as <see cref="IsGmiForbiddenContainerItem"/>.
+        /// Do NOT use bare <see cref="IdentityType.Container"/> or bare ItemClass==2: many yes-drop
+        /// items (armor especially) carry a Container identity and ItemClass 2, so either check would
+        /// wrongly flag armor parts as containers and block them from mail.
         /// </summary>
         public static bool IsMailForbiddenContainerItem(IItem item)
         {
@@ -83,9 +93,24 @@ namespace AORebirth.Core.Inventory
                 return false;
             }
 
-            if (IsBackpackContainerItem(item))
+            if (item.Identity != null && item.Identity.Type == IdentityType.Backpack)
             {
                 return true;
+            }
+
+            return IsBackpackContainerTemplate(item);
+        }
+
+        /// <summary>
+        /// GMI deposit: block real backpacks/bags only (legacy backpack template / backpack identity / Book of Knowledge).
+        /// Do not treat bare IdentityType.Container as forbidden — many yes-drop items carry that identity wrongly / broadly.
+        /// Do not use bare ItemClass==2 — that is also Armor in AO data.
+        /// </summary>
+        public static bool IsGmiForbiddenContainerItem(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
             }
 
             if (item.Identity != null && item.Identity.Type == IdentityType.Backpack)
@@ -93,33 +118,7 @@ namespace AORebirth.Core.Inventory
                 return true;
             }
 
-            if (item.GetAttribute((int)StatIds.itemclass) == 2)
-            {
-                return true;
-            }
-
-            // Template ItemClass when instance attributes are missing/default.
-            ItemTemplate template;
-            if (ItemLoader.ItemList.TryGetValue(item.LowID, out template)
-                && template != null
-                && template.Stats != null
-                && template.Stats.ContainsKey((int)StatIds.itemclass)
-                && template.Stats[(int)StatIds.itemclass] == 2)
-            {
-                return true;
-            }
-
-            if (item.HighID != item.LowID
-                && ItemLoader.ItemList.TryGetValue(item.HighID, out template)
-                && template != null
-                && template.Stats != null
-                && template.Stats.ContainsKey((int)StatIds.itemclass)
-                && template.Stats[(int)StatIds.itemclass] == 2)
-            {
-                return true;
-            }
-
-            return false;
+            return IsBackpackContainerTemplate(item);
         }
 
         public static bool HasSameUniqueItem(IItem candidate, IEnumerable<IItem> existingItems)

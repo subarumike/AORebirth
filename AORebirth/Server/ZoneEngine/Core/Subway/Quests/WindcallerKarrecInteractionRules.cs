@@ -29,8 +29,22 @@ namespace ZoneEngine.Core.Subway.Quests
 
         internal static bool IsKarrec(Identity identity)
         {
-            return identity.Type == IdentityType.CanbeAffected
-                   && identity.Instance == KarrecInstance;
+            if (identity.Type != IdentityType.CanbeAffected)
+            {
+                return false;
+            }
+
+            if (identity.Instance == KarrecInstance)
+            {
+                return true;
+            }
+
+            // Spawned Karrec uses a free pool instance; capture source id alone is not enough.
+            WindcallerKarrecNpcRuntimeDefinition runtime;
+            return WindcallerKarrecNpcRuntimeRegistry.TryGet(identity.Instance, out runtime)
+                   && runtime != null
+                   && runtime.Content != null
+                   && runtime.Content.SourceNpcInstance == KarrecInstance;
         }
 
         internal static bool IsGateway(Identity identity)

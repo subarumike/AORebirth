@@ -187,7 +187,7 @@ namespace ZoneEngine.Core.Packets
             int slot)
         {
             IItem item = page[slot];
-            if (item == null || !IsWeaponItem(page, item))
+            if (item == null || !IsCombatWeaponItem(page, item, slot))
             {
                 return null;
             }
@@ -277,11 +277,22 @@ namespace ZoneEngine.Core.Packets
             };
         }
 
+        private static bool IsCombatWeaponItem(IInventoryPage page, IItem item, int slot)
+        {
+            // Only left/right hand are combat weapons. HUD/Util/NCU/Belt items on WeaponPage
+            // must NOT get WeaponItemFullUpdate — client then treats them as guns ("Wrong ammotype").
+            if (page is WeaponInventoryPage)
+            {
+                return slot == (int)WeaponSlots.Righthand || slot == (int)WeaponSlots.LeftHand;
+            }
+
+            return item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
+                   || HasWeaponStats(item);
+        }
+
         private static bool IsWeaponItem(IInventoryPage page, IItem item)
         {
-            return page is WeaponInventoryPage
-                   || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
-                   || HasWeaponStats(item);
+            return IsCombatWeaponItem(page, item, (int)WeaponSlots.Righthand);
         }
 
         private static bool HasWeaponStats(IItem item)

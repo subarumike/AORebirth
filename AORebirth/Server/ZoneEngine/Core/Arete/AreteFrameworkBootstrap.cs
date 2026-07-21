@@ -47,8 +47,11 @@ namespace ZoneEngine.Core.Arete
         {
             Path.Combine("Content", "Arete", "rex-larsson", "manifest.json"),
             Path.Combine("Content", "Arete", "marcus-stone", "manifest.json"),
+            Path.Combine("Content", "Arete", "flint-novak", "manifest.json"),
             Path.Combine("Content", "Subway", "windcaller-karrec", "manifest.json"),
-            Path.Combine("Content", "Subway", "tailor", "manifest.json")
+            Path.Combine("Content", "Subway", "tailor", "manifest.json"),
+            Path.Combine("Content", "Thrak", "garden-key", "manifest.json"),
+            Path.Combine("Content", "Thrak", "garden-vendors", "manifest.json")
         };
 
         private static AreteFrameworkRegistries current;

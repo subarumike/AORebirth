@@ -1,0 +1,300 @@
+{
+  "Identity": {
+    "Id": "arete-stan-goodman-dialogue-20260720-goldman",
+    "Version": "captured-stan-deliver-factory-20260721-afgter-dog-lockpick-goodman",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-goldman; 20260721-afgter dog lockpick goodman/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260720-goldman",
+    "20260721-afgter dog lockpick goodman"
+  ],
+  "Npcs": [
+    {
+      "Id": "stan-goodman",
+      "NpcIdentity": "SimpleChar:78E0FC65",
+      "Name": "Stan Goodman",
+      "RootNodeId": "stan_goldman_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC65)"
+      ],
+      "Nodes": [
+        {
+          "Id": "stan_goldman_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only",
+          "Options": [
+            {
+              "Id": "stan_goldman_001_option_0",
+              "Index": 0,
+              "Text": "I heard you could help me out... So, do you have any work for me?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:03.0743051Z",
+              "NextNodeId": "stan_goldman_002",
+              "Actions": []
+            },
+            {
+              "Id": "stan_goldman_001_option_1",
+              "Index": 1,
+              "Text": "I have some questions.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:03.0743051Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_goldman_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close until question tree captured"
+                }
+              ]
+            },
+            {
+              "Id": "stan_goldman_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:03.0743051Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_goldman_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_goldman_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only",
+          "Options": [
+            {
+              "Id": "stan_goldman_002_option_0",
+              "Index": 0,
+              "Text": "I arrived here without an ID and Alex said you could help me...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:05.7405949Z",
+              "NextNodeId": "stan_goldman_003",
+              "Actions": []
+            },
+            {
+              "Id": "stan_goldman_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:05.7405949Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_goldman_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_goldman_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only",
+          "Options": [
+            {
+              "Id": "stan_goldman_003_option_0",
+              "Index": 0,
+              "Text": "I suppose I don't have much choice...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:07.6374251Z; Answer=0 → Action59+Delete TalkStan + QFU Buy a Lockpick",
+              "NextNodeId": "stan_goldman_004",
+              "Actions": []
+            },
+            {
+              "Id": "stan_goldman_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:07.6374251Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_goldman_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_goldman_004",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only after tip handoff",
+          "Options": [
+            {
+              "Id": "stan_goldman_004_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:09.7131448Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_goldman_004_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_deliver_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only 20260721-afgter dog lockpick goodman",
+          "Options": [
+            {
+              "Id": "stan_deliver_001_option_0",
+              "Index": 0,
+              "Text": "I think I have what you were looking for.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:04:53.9991386Z; Answer=0 → StartTrade 4 slots",
+              "NextNodeId": "stan_deliver_trade",
+              "Actions": []
+            },
+            {
+              "Id": "stan_deliver_001_option_1",
+              "Index": 1,
+              "Text": "I have some questions.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:04:53.9991386Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_deliver_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close until question tree captured"
+                }
+              ]
+            },
+            {
+              "Id": "stan_deliver_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:04:53.9991386Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_deliver_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_deliver_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "Options": [
+            {
+              "Id": "stan_deliver_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → AnswerList Thanks/can't believe/Goodbye",
+              "NextNodeId": "stan_deliver_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_deliver_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after factory turn-in",
+          "Options": [
+            {
+              "Id": "stan_deliver_002_option_0",
+              "Index": 0,
+              "Text": "Thanks, it was fun.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:09.4201077Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_deliver_002_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            },
+            {
+              "Id": "stan_deliver_002_option_1",
+              "Index": 1,
+              "Text": "I can't believe I just did that.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:09.4201077Z; Answer=1 → Goodbye-only node",
+              "NextNodeId": "stan_deliver_003",
+              "Actions": []
+            },
+            {
+              "Id": "stan_deliver_002_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:09.4201077Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_deliver_002_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_deliver_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "stan_deliver_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:15.6582749Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "stan_deliver_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "terminal",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "stan_goldman_close",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

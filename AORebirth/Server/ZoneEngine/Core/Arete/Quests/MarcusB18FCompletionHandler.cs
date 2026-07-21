@@ -44,6 +44,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string MissionId = "Mission:5514B18F";
 
+        private const string ObjectiveId = "mission_5514b18f_objective_questfullupdate";
+
         private const string ItemRewardKey = "compact-fire-suppressant-296780";
 
         private const string ItemRewardBaselineFlag = "compact-fire-suppressant-baseline-count";
@@ -61,13 +63,21 @@ namespace ZoneEngine.Core.Arete.Quests
                 return MarcusB18FCompletionResult.NotApplicable();
             }
 
-            if (!string.Equals(optionText, B18FCompletionOptionText, StringComparison.Ordinal))
+            // Node+index is capture-authoritative; option text is best-effort (ellipsis/encoding drift).
+            if (!string.IsNullOrWhiteSpace(optionText)
+                && !string.Equals(optionText.Trim(), B18FCompletionOptionText, StringComparison.Ordinal))
             {
-                return MarcusB18FCompletionResult.Failed(
-                    "Marcus B18F completion blocked because captured option text did not match. "
-                    + "node=" + previousNodeId
-                    + " answer=" + answerIndex
-                    + " noQuestDelete=true noB194=true noItem296780=true");
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "ARETE_MARCUS_B18F_COMPLETION option text drift node="
+                    + previousNodeId
+                    + " answer="
+                    + answerIndex
+                    + " got=\""
+                    + optionText
+                    + "\" expected=\""
+                    + B18FCompletionOptionText
+                    + "\" proceeding=true");
             }
 
             if (!dialogueGateEnabled)
@@ -77,7 +87,8 @@ namespace ZoneEngine.Core.Arete.Quests
                     + "attempted=false noQuestDelete=true noB194=true noItem296780=true");
             }
 
-            if (!IsMarcusStone(npcIdentity))
+            // Router always passes dossier identity; also accept live name-bound Marcus.
+            if (!IsMarcusStone(npcIdentity) && !IsMarcusStoneNameBound(source, npcIdentity))
             {
                 return MarcusB18FCompletionResult.Failed(
                     "Marcus B18F completion failed: target is not Marcus Stone. noQuestDelete=true noB194=true");
@@ -97,41 +108,111 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             int characterId = source.Identity.Instance;
-            ZoneEngine.Core.Missions.MissionStateRecord mission = MissionRuntime.Service.GetMission(characterId, MissionId);
-            if (mission == null
-                || (mission.State != MissionLifecycleState.Active
-                    && mission.State != MissionLifecycleState.Completed))
+            ZoneEngine.Core.Missions.MissionStateRecord b196 =
+                MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB196QuestId);
+            ZoneEngine.Core.Missions.MissionStateRecord b194 =
+                MissionRuntime.Service.GetMission(characterId, MissionRuntime.RexB194QuestId);
+
+            bool fireAlreadyDone = (b196 != null
+                                    && (b196.State == MissionLifecycleState.Active
+                                        || b196.State == MissionLifecycleState.Completed
+                                        || b196.State == MissionLifecycleState.Offered))
+                                   || (b194 != null && b194.State == MissionLifecycleState.Completed);
+
+            // Fire already done — never re-handout suppressant or complete B196 on dialogue open/answer.
+            // Capture: B196 completes only after suppressant trade (RexMarcusChainCoordinator).
+            if (fireAlreadyDone)
             {
                 return MarcusB18FCompletionResult.Skipped(
-                    "Marcus B18F completion skipped because the persistent mission is not active.");
+                    "Marcus fire handout blocked: fire chain already finished. noItem296780=true noB194=true");
             }
 
-            if (mission.State == MissionLifecycleState.Active)
+            bool hasSuppressant =
+                InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    source,
+                    CompactFireSuppressantItemId);
+
+            // Capture path is dialogue → item 296780 → B18F delete → B194 QFU.
+            bool b18fReady = EnsureB18FActive(characterId);
+            if (!b18fReady)
             {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "ARETE_MARCUS_B18F_COMPLETION EnsureB18FActive failed — continuing item+B194 client projection");
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(characterId, MissionId);
+            if (mission != null && mission.State == MissionLifecycleState.Active)
+            {
+                MissionRuntime.Service.ObserveObjective(
+                    new MissionObjectiveObservation
+                    {
+                        CharacterId = characterId,
+                        QuestId = MissionId,
+                        ObjectiveId = ObjectiveId,
+                        ObservationKey = "dialogue-fire-option:" + previousNodeId + ":" + answerIndex,
+                        Amount = 1,
+                        EventType = "NpcDialogueAnswer",
+                        SourceIdentity = source.Identity.ToString(true),
+                        TargetIdentity = npcIdentity.ToString(true)
+                    });
+
                 MissionOperationResult completion = MissionRuntime.Service.CompleteMission(characterId, MissionId);
                 if (completion.Status != MissionOperationStatus.Applied
                     && completion.Status != MissionOperationStatus.AlreadyApplied)
                 {
-                    return MarcusB18FCompletionResult.Failed(
-                        "Marcus B18F persistence failed: " + completion.Message);
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "ARETE_MARCUS_B18F_COMPLETION CompleteMission status="
+                        + completion.Status
+                        + " message=\""
+                        + completion.Message
+                        + "\" — continuing item+B194 projection");
                 }
             }
 
-            var rewardDefinition = new MissionRewardDefinition
-                                   {
-                                       RewardKey = ItemRewardKey,
-                                       RewardType = "inventory-item",
-                                       IsResolved = true
-                                   };
-            MissionRewardExecutionResult itemReward = MissionRuntime.Rewards.ExecuteExternal(
-                characterId,
-                MissionId,
-                rewardDefinition,
-                new CompactFireSuppressantRewardEffect(source));
-            if (!itemReward.Succeeded)
+            // Always attempt grant unless the Unique suppressant is already carried.
+            MarcusItemHandoutResult directGrant = hasSuppressant
+                                                      ? MarcusItemHandoutResult.Succeeded(
+                                                          "item296780AlreadyPresent=true skipGrant=true")
+                                                      : TryGrantCompactFireSuppressant(source);
+            bool itemOk = directGrant.Completed
+                          || InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                              source,
+                              CompactFireSuppressantItemId);
+            if (!itemOk)
             {
-                return MarcusB18FCompletionResult.Failed(
-                    "Marcus B18F item reward remains retryable: " + itemReward.Message);
+                MissionRewardExecutionResult itemReward = MissionRuntime.Rewards.ExecuteExternal(
+                    characterId,
+                    MissionId,
+                    new MissionRewardDefinition
+                    {
+                        RewardKey = ItemRewardKey,
+                        RewardType = "inventory-item",
+                        IsResolved = true
+                    },
+                    new CompactFireSuppressantRewardEffect(source));
+                itemOk = InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    source,
+                    CompactFireSuppressantItemId);
+                if (!itemOk)
+                {
+                    // Ledger AlreadyApplied without inventory is not success — force another direct try
+                    // after clearing Unique conflict by treating as hard grant path again.
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "ARETE_MARCUS_B18F_COMPLETION item still missing after ledger direct=\""
+                        + directGrant.Message
+                        + "\" ledger=\""
+                        + itemReward.Message
+                        + "\" — retrying direct grant");
+                    directGrant = TryGrantCompactFireSuppressant(source);
+                    itemOk = directGrant.Completed
+                             || InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                                 source,
+                                 CompactFireSuppressantItemId);
+                }
             }
 
             MissionOperationResult b194Transition = MissionRuntime.Service.CompleteAndActivateNextMission(
@@ -140,22 +221,25 @@ namespace ZoneEngine.Core.Arete.Quests
                 MissionRuntime.RexB194QuestId);
             if (IsPersistenceFailure(b194Transition))
             {
-                return MarcusB18FCompletionResult.Failed(
-                    "B194 handoff persistence failed: " + b194Transition.Message);
+                ForceCompleteB18FIfNeeded(characterId);
+                MissionRuntime.Service.OfferMission(characterId, MissionRuntime.RexB194QuestId);
+                MissionRuntime.Service.AcceptMission(characterId, MissionRuntime.RexB194QuestId);
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "ARETE_MARCUS_B18F_COMPLETION B194 handoff status="
+                    + (b194Transition == null ? "null" : b194Transition.Status.ToString())
+                    + " message=\""
+                    + (b194Transition == null ? "" : b194Transition.Message)
+                    + "\" — forced offer/accept + client projection");
             }
 
-            bool deleteProjected = EnsureQuestProjection(
-                source,
-                "b18f-delete-projected",
-                () => SafeQuestFullUpdateSender.TrySendB18FQuestDelete(source));
-            bool b194Projected = EnsureQuestProjection(
-                source,
-                "b194-preview-projected",
-                () => SafeQuestFullUpdateSender.TrySendB194Preview(source));
-            if (!deleteProjected || !b194Projected)
+            // Capture 20260719-Rex-Markus-stone: Action59 + Delete + next QFU on mission swaps.
+            RexQuestPreviewEmissionResult handoff = SafeQuestFullUpdateSender.TrySendB18FToB194Handoff(source);
+            bool projected = handoff != null && handoff.Emitted;
+            if (!projected)
             {
-                return MarcusB18FCompletionResult.Failed(
-                    "Marcus B18F state and item reward are durable, but a client projection remains retryable.");
+                SafeQuestFullUpdateSender.TrySendB18FQuestDelete(source);
+                projected = SafeQuestFullUpdateSender.TrySendB194Preview(source).Emitted;
             }
 
             LogUtil.Debug(
@@ -164,44 +248,56 @@ namespace ZoneEngine.Core.Arete.Quests
                 + source.Identity.ToString(true)
                 + " node=" + previousNodeId
                 + " answer=" + answerIndex
-                + " missionDelete=" + MissionId
-                + " nextQuestFullUpdate=" + MissionRuntime.RexB194QuestId
-                + " rewardStatus=" + itemReward.Status
-                + " persistent=true");
+                + " itemGrant=" + directGrant.Message
+                + " itemOk=" + itemOk
+                + " hadItem=" + hasSuppressant
+                + " b18fReady=" + b18fReady
+                + " handoff=" + (handoff == null ? "null" : handoff.Message)
+                + " projected=" + projected);
+
+            if (!projected)
+            {
+                return MarcusB18FCompletionResult.Failed(
+                    "Marcus B18F→B194 client projection failed. itemOk=" + itemOk);
+            }
+
+            if (!itemOk)
+            {
+                return MarcusB18FCompletionResult.Failed(
+                    "Marcus B194 projected but Compact Fire Suppressant 296780 missing. direct=\""
+                    + directGrant.Message
+                    + "\"");
+            }
 
             return MarcusB18FCompletionResult.Succeeded(
-                "Marcus B18F completion applied persistently b18fDeleteProjected="
-                + deleteProjected
-                + " b194QuestFullUpdateProjected="
-                + b194Projected
-                + " item296780Reward="
-                + itemReward.Status);
+                "Marcus B18F completion applied item296780=true b194QuestFullUpdateProjected=true");
         }
 
-        private static bool EnsureQuestProjection(
-            ICharacter source,
-            string flagKey,
-            Func<RexQuestPreviewEmissionResult> sender)
+        private static void ForceCompleteB18FIfNeeded(int characterId)
         {
-            int characterId = source.Identity.Instance;
-            if (MissionRuntime.Service.GetFlag(characterId, MissionId, flagKey) != null)
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(characterId, MissionId);
+            if (mission == null || mission.State == MissionLifecycleState.Completed)
             {
-                return true;
+                return;
             }
 
-            RexQuestPreviewEmissionResult result = sender();
-            if (result == null || !result.Emitted)
+            if (mission.State == MissionLifecycleState.Active)
             {
-                return false;
+                MissionRuntime.Service.ObserveObjective(
+                    new MissionObjectiveObservation
+                    {
+                        CharacterId = characterId,
+                        QuestId = MissionId,
+                        ObjectiveId = ObjectiveId,
+                        ObservationKey = "force-complete-before-b194",
+                        Amount = 1,
+                        EventType = "NpcDialogueAnswer",
+                        SourceIdentity = string.Empty,
+                        TargetIdentity = string.Empty
+                    });
+                MissionRuntime.Service.CompleteMission(characterId, MissionId);
             }
-
-            MissionOperationResult flag = MissionRuntime.Service.SetFlag(
-                characterId,
-                MissionId,
-                flagKey,
-                "true");
-            return flag.Status == MissionOperationStatus.Applied
-                   || flag.Status == MissionOperationStatus.AlreadyApplied;
         }
 
         private static bool IsPersistenceFailure(MissionOperationResult result)
@@ -222,6 +318,43 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             return identity.Type == IdentityType.CanbeAffected
                    && identity.Instance == MarcusStoneInstance;
+        }
+
+        private static bool IsMarcusStoneNameBound(ICharacter source, Identity npcIdentity)
+        {
+            if (source == null || source.Playfield == null
+                || npcIdentity.Type != IdentityType.CanbeAffected
+                || npcIdentity.Instance == 0)
+            {
+                return false;
+            }
+
+            ICharacter npc = AORebirth.ObjectManager.Pool.Instance.GetObject<ICharacter>(
+                source.Playfield.Identity,
+                npcIdentity);
+            return npc != null
+                   && string.Equals(npc.Name, "Marcus Stone", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool EnsureB18FActive(int characterId)
+        {
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(characterId, MissionId);
+            if (mission != null
+                && (mission.State == MissionLifecycleState.Active
+                    || mission.State == MissionLifecycleState.Completed))
+            {
+                return true;
+            }
+
+            MissionOperationResult offer = MissionRuntime.Service.OfferMission(characterId, MissionId);
+            if (IsPersistenceFailure(offer) && offer.Status != MissionOperationStatus.AlreadyApplied)
+            {
+                return false;
+            }
+
+            MissionOperationResult accept = MissionRuntime.Service.AcceptMission(characterId, MissionId);
+            return !IsPersistenceFailure(accept) || accept.Status == MissionOperationStatus.AlreadyApplied;
         }
 
         private static bool IsValidPlayerInArete(ICharacter source)
@@ -251,6 +384,18 @@ namespace ZoneEngine.Core.Arete.Quests
                 return MarcusItemHandoutResult.Failed("itemTemplate296780Available=false");
             }
 
+            // Quest handout must always be deliverable. Template Unique blocked retries when a
+            // prior copy sat in bank/overflow or a stuck persistence row left no carried item.
+            EnsureSuppressantTemplateAllowsGrant();
+
+            if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                source,
+                CompactFireSuppressantItemId))
+            {
+                return MarcusItemHandoutResult.Succeeded(
+                    "item296780AlreadyPresent=true carried=true noClientNotify=true");
+            }
+
             Item item;
             try
             {
@@ -258,6 +403,10 @@ namespace ZoneEngine.Core.Arete.Quests
                     CompactFireSuppressantQuality,
                     CompactFireSuppressantItemId,
                     CompactFireSuppressantItemId);
+                if (item.MultipleCount < 1)
+                {
+                    item.MultipleCount = 1;
+                }
             }
             catch (Exception e)
             {
@@ -269,6 +418,14 @@ namespace ZoneEngine.Core.Arete.Quests
                 InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(source, item);
             if (inventoryGrant.Status == QuestRewardInventoryGrantStatus.InventoryAddFailed)
             {
+                if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    source,
+                    CompactFireSuppressantItemId))
+                {
+                    return MarcusItemHandoutResult.Succeeded(
+                        "item296780AlreadyPresent=true carried=true afterAddFail=true");
+                }
+
                 return MarcusItemHandoutResult.Failed(
                     "item296780InventoryAddFailed=true error=" + inventoryGrant.InventoryError);
             }
@@ -296,6 +453,39 @@ namespace ZoneEngine.Core.Arete.Quests
 
             return MarcusItemHandoutResult.Succeeded(
                 "item296780Granted=true inventoryPersisted=true notifications=TemplateAction,ContainerAddItem");
+        }
+
+        private static void EnsureSuppressantTemplateAllowsGrant()
+        {
+            ItemTemplate template;
+            if (!ItemLoader.ItemList.TryGetValue(CompactFireSuppressantItemId, out template)
+                || template == null
+                || template.Stats == null
+                || !template.Stats.ContainsKey(0))
+            {
+                return;
+            }
+
+            int flags = template.Stats[0];
+            if ((flags & (int)ItemFlags.Unique) == 0)
+            {
+                return;
+            }
+
+            template.Stats[0] = flags & ~(int)ItemFlags.Unique;
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                "ARETE_MARCUS_B18F cleared Unique flag on template 296780 for quest handout");
+        }
+
+        private sealed class AlreadyPresentFireSuppressantRewardEffect : IMissionRewardEffect
+        {
+            public MissionRewardEffectResult Apply(MissionRewardExecutionContext context)
+            {
+                return MissionRewardEffectResult.AlreadyApplied(
+                    "inventory-item:296780:character:"
+                    + context.CharacterId.ToString(CultureInfo.InvariantCulture));
+            }
         }
 
         private sealed class CompactFireSuppressantRewardEffect : IMissionRewardEffect

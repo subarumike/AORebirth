@@ -7,6 +7,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Arete.Quests;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -21,12 +23,35 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public bool TryHandle(IZoneClient client, GenericCmdMessage message)
         {
-            if (NascenceStatueTeleportInteractionHandler.Default.TryHandleUseItemOnItem(client, message))
+            if (MissionRepairService.TryHandleUseItemOnItem(client, message))
             {
                 return true;
             }
 
-            return InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message);
+            if (MarcusB194GasFireProgressTracker.TryHandleUseItemOnItem(client, message))
+            {
+                return true;
+            }
+
+            // Capture 20260720-105157: Use RC-P Audio Recording Device on Prized Houseplant → Plant a Bug.
+            if (SurveillanceUplinkQuestRuntime.TryHandleUseItemOnItem(client, message))
+            {
+                return true;
+            }
+
+            // Capture 20260721-afgter dog lockpick goodman: Lock Pick on Merchant's Strongbox.
+            if (StanGoodmanQuestRuntime.TryHandleUseItemOnItem(client, message))
+            {
+                return true;
+            }
+
+            // CellAO GenericCmd UseItemOnItem: stamp insignia + Pool StaticDynel OnUseItemOn first.
+            if (InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message))
+            {
+                return true;
+            }
+
+            return NascenceStatueTeleportInteractionHandler.Default.TryHandleUseItemOnItem(client, message);
         }
     }
 }

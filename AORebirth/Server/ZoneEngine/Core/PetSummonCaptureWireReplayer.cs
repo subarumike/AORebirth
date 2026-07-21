@@ -261,11 +261,41 @@ namespace ZoneEngine.Core
 
             EnqueueScfuForRebirth(
                 ownerClient,
+                owner,
                 ownerInstance,
                 petInstance,
                 playfieldId,
                 petCoord,
-                petHash);
+                petHash,
+                null);
+        }
+
+        public static void SendHealingPetScfuToOwner(
+            ZoneClient ownerClient,
+            ICharacter owner,
+            Character petCharacter,
+            string spawnPetHash,
+            string scfuTemplateHash)
+        {
+            if (ownerClient == null || owner == null || petCharacter == null)
+            {
+                return;
+            }
+
+            int ownerInstance = owner.Identity.Instance;
+            int petInstance = petCharacter.Identity.Instance;
+            int playfieldId = owner.Playfield.Identity.Instance;
+            Coordinate petCoord = petCharacter.Coordinates();
+
+            EnqueueScfuForRebirth(
+                ownerClient,
+                owner,
+                ownerInstance,
+                petInstance,
+                playfieldId,
+                petCoord,
+                spawnPetHash,
+                scfuTemplateHash);
         }
 
         public static void ReplayBelamorteSummonPostScfu(
@@ -421,19 +451,33 @@ namespace ZoneEngine.Core
 
         private static void EnqueueScfuForRebirth(
             ZoneClient ownerClient,
+            ICharacter owner,
             int ownerInstance,
             int petInstance,
             int playfieldId,
             Coordinate petCoord,
-            string petHash)
+            string spawnPetHash,
+            string scfuTemplateHash)
         {
+            // SCFU name/body templates are MT01-MT04/BSLX; Soothing Spirits hashes (LYNX..RHEF)
+            // only change metapet_healing texture id.
+            string templateHash = scfuTemplateHash;
+            if (string.IsNullOrWhiteSpace(templateHash))
+            {
+                templateHash = SoothingSpiritsHealPetLadder.IsSoothingSpiritsUpgradeHash(spawnPetHash)
+                    ? "MT02"
+                    : spawnPetHash;
+            }
+
             byte[] template;
-            if (!PetHealingPetScfuCatalog.TryGetScfuWire(petHash, out template))
+            if (!PetHealingPetScfuCatalog.TryGetScfuWire(templateHash, out template))
             {
                 template = (byte[])ScfuBelamorte.Clone();
             }
 
             byte[] packet = (byte[])template.Clone();
+            int textureId = SoothingSpiritsHealPetLadder.ResolveTextureIdFromSpawnHash(spawnPetHash, owner);
+            SoothingSpiritsHealPetLadder.TryPatchMetapetHealingTexture(packet, textureId);
             PatchHeader(packet, ownerInstance);
             WriteInt32BigEndian(packet, N3IdentityInstanceOffset, petInstance);
             WriteInt32BigEndian(packet, ScfuPlayfieldOffset, playfieldId);

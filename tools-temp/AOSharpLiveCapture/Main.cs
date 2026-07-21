@@ -102,6 +102,7 @@ namespace AOSharpLiveCapture
             "QuestFullUpdate",
             "QuestAlternative",
             "CreateQuest",
+            "N3Teleport",
             "NewLevel",
             "KnubotNPCDescription",
             "KnubotOpenChatWindow",
@@ -219,6 +220,7 @@ namespace AOSharpLiveCapture
         private string externalControlRequestPath;
         private string externalControlProcessingPath;
         private CombatLootSmoke combatLootSmoke;
+        private MissionFlowCapture missionFlowCapture;
         private Pf127GeometryCapture pf127GeometryCapture;
         private int pf127CaptureRuntimeReady;
         private int callbackDispatchEnabled;
@@ -289,6 +291,8 @@ namespace AOSharpLiveCapture
             }
 
             this.combatLootSmoke = new CombatLootSmoke(pluginDir, this.LogSmokeEvent);
+            this.missionFlowCapture = new MissionFlowCapture(this.LogEvent);
+            this.missionFlowCapture.BindSession(this.sessionDirectory);
 
             Network.N3MessageReceived += this.OnN3MessageReceivedBoundary;
             Network.N3MessageSent += this.OnN3MessageSentBoundary;
@@ -304,6 +308,7 @@ namespace AOSharpLiveCapture
             this.LogEvent("PLUGIN", "Commands: /aocap start | stop | mark <text> | status | flush | snapshot | dynels [force] | fight start|stop|auto on|auto off|status");
             this.LogEvent("PLUGIN", "Smoke commands: /aosmoke start [mobAlias] | stop | status | log");
             this.LogEvent("PLUGIN", "External control fallback: " + this.externalControlRequestPath);
+            this.LogEvent("PLUGIN", "Mission flow log: " + Path.Combine(this.sessionDirectory, "mission-flow.log"));
             this.LogEvent("PLUGIN", "ShopUpdate CSV: " + Path.Combine(this.sessionDirectory, "shop-updates.csv"));
             this.LogEvent("PLUGIN", "VendingMachineFullUpdate CSV: " + Path.Combine(this.sessionDirectory, "vendor-full-updates.csv"));
             this.LogEvent("PLUGIN", "System messages log: " + Path.Combine(this.sessionDirectory, "system-messages.log"));
@@ -379,6 +384,9 @@ namespace AOSharpLiveCapture
             this.callbackBoundary.Dispatch(
                 "Teardown.CombatLootSmoke",
                 () => this.combatLootSmoke?.Teardown());
+            this.callbackBoundary.Dispatch(
+                "Teardown.MissionFlowCapture",
+                () => this.missionFlowCapture?.Teardown());
             this.callbackBoundary.Dispatch(
                 "Teardown.FinalizeCapture",
                 () =>
@@ -465,6 +473,9 @@ namespace AOSharpLiveCapture
             this.callbackBoundary.Dispatch(
                 "Run.InitializationFailure.CombatLootSmoke",
                 () => this.combatLootSmoke?.Teardown());
+            this.callbackBoundary.Dispatch(
+                "Run.InitializationFailure.MissionFlowCapture",
+                () => this.missionFlowCapture?.Teardown());
             this.callbackBoundary.Dispatch(
                 "Run.InitializationFailure.FinalizeCapture",
                 () =>
@@ -1316,6 +1327,12 @@ namespace AOSharpLiveCapture
                     "IN-N3",
                     sequence,
                     message,
+                    "mission-flow",
+                    () => this.missionFlowCapture?.OnN3MessageReceived(message));
+                this.RunN3CaptureStage(
+                    "IN-N3",
+                    sequence,
+                    message,
                     "decoded-message-pipeline",
                     () => this.LogN3Message("IN-N3", sequence, message));
             }
@@ -1339,6 +1356,12 @@ namespace AOSharpLiveCapture
                     message,
                     "combat-loot-smoke",
                     () => this.combatLootSmoke?.OnN3MessageSent(message));
+                this.RunN3CaptureStage(
+                    "OUT-N3",
+                    sequence,
+                    message,
+                    "mission-flow",
+                    () => this.missionFlowCapture?.OnN3MessageSent(message));
                 this.RunN3CaptureStage(
                     "OUT-N3",
                     sequence,
@@ -1398,6 +1421,7 @@ namespace AOSharpLiveCapture
             Interlocked.Exchange(ref this.pf127CollectionArmed, 0);
             this.pf127GeometryCapture?.NotifyPlayfieldChanged(false);
             this.LogEvent("PLAYFIELD-INIT", this.lastPlayfieldId);
+            this.missionFlowCapture?.OnPlayfieldInit(playfieldId);
             this.knownCharacters.Clear();
             this.knownCorpses.Clear();
         }
@@ -1417,6 +1441,7 @@ namespace AOSharpLiveCapture
             Interlocked.Exchange(ref this.pf127CollectionArmed, 0);
             this.pf127GeometryCapture?.NotifyPlayfieldChanged(false);
             this.LogEvent("TELEPORT", "started");
+            this.missionFlowCapture?.OnTeleportStarted();
         }
 
         private void OnTeleportEnded(object sender, EventArgs e)
@@ -1433,6 +1458,7 @@ namespace AOSharpLiveCapture
             Interlocked.Exchange(ref this.teleportInProgress, 0);
             Interlocked.Exchange(ref this.pf127CollectionArmed, isPf127 ? 1 : 0);
             this.LogEvent("TELEPORT", "ended");
+            this.missionFlowCapture?.OnTeleportEnded();
             this.pf127GeometryCapture?.NotifyPlayfieldChanged(isPf127);
             this.pf127GeometryCapture?.RequestImmediateUpdate();
             this.LogSnapshot("teleport-ended");
@@ -7515,6 +7541,7 @@ namespace AOSharpLiveCapture
             // gameplay evidence and cannot safely run in a comprehensive packet
             // capture callback inside the live client.
             this.pf127GeometryCapture = null;
+            this.missionFlowCapture?.BindSession(this.sessionDirectory);
             this.WriteEnemyStateJson();
             this.WriteEnemyDossierJson();
             this.WriteMovementSummaryJson();

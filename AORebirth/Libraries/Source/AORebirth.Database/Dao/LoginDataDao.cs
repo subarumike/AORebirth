@@ -61,7 +61,13 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public DBLoginData GetByCharacterId(int charId)
         {
-            return this.GetAll(new { CharacterDao.Instance.Get(charId).Username }).FirstOrDefault();
+            var character = CharacterDao.Instance.Get(charId);
+            if (character == null || string.IsNullOrEmpty(character.Username))
+            {
+                return null;
+            }
+
+            return this.GetAll(new { character.Username }).FirstOrDefault();
         }
 
         /// <summary>

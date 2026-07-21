@@ -26,6 +26,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         /// <summary>Client → server: take all attachments (N3Msg_MailTakeAll).</summary>
         TakeAll = 3,
 
+        /// <summary>
+        /// Server → client: update cached mail flags (capture 20260715-Recive-mail-datetime-stamp).
+        /// Wire: mailId (int64) + FlagsField (int32). Live: open→0x7D (read), TakeAll empty→0x7F.
+        /// </summary>
+        UpdateMailFlags = 4,
+
         /// <summary>Client → server: delete mail (N3Msg_DeleteMail).</summary>
         Delete = 5,
 

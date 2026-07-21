@@ -49,6 +49,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core;
     using ZoneEngine.Core.Mail;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Perks;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -141,8 +142,14 @@ namespace ZoneEngine.Core.MessageHandlers
                 WeatherControlMessageHandler.Default.Send(client.Controller.Character, w);
             }
 
-            IEnumerable<StaticDynel> list =
-                Pool.Instance.GetAll<StaticDynel>(client.Controller.Character.Playfield.Identity);
+            List<StaticDynel> list =
+                new List<StaticDynel>(
+                    Pool.Instance.GetAll<StaticDynel>(client.Controller.Character.Playfield.Identity));
+            client.Server.Info(
+                client,
+                "StaticDynelSnapshot pf={0} count={1}",
+                client.Controller.Character.Playfield.Identity.Instance,
+                list.Count);
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowSamePlayfieldVisibility,
                 PlayfieldLifecycleTrace.StageStaticDynelSnapshot,
@@ -166,6 +173,54 @@ namespace ZoneEngine.Core.MessageHandlers
 
             // In-memory mail pending while offline → show envelope on enter world.
             MailRuntimeService.SyncUnreadMailEnvelope(client.Controller.Character);
+            // GMI web withdraw requests (capture 20260715-143838) → Omni-Trade mail.
+            ZoneEngine.Core.GMI.GmiRuntimeService.ProcessPendingWithdrawals(client.Controller.Character);
+
+            // Re-sync trained perks + Perk Actions after relog (also done after FullCharacter).
+            var inPlayCharacter = client.Controller.Character as Character;
+            if (inPlayCharacter != null)
+            {
+                inPlayCharacter.ReloadTrainedPerksFromDatabase();
+                PerkRuntimeService.Default.ResendPerkActions(inPlayCharacter);
+            }
+
+            // Backup path — primary resync is ClientConnected after FullCharacter (CharInPlay often missing).
+            bool missionWindowResent =
+                ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
+
+            bool thrakMissionResent =
+                ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryResendActiveMissionsForLogin(
+                    client.Controller.Character);
+
+            bool areteTipResent =
+                ZoneEngine.Core.Arete.Quests.RexMarcusChainCoordinator.TryResendActiveTipsForLogin(
+                    client.Controller.Character);
+
+            // Sacred Thrak garden key is permanent; restore if quest/account already earned it.
+            ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryRestoreGardenKeyIfMissing(
+                client.Controller.Character);
+
+            int pfInstance = client.Controller.Character.Playfield != null
+                                 ? client.Controller.Character.Playfield.Identity.Instance
+                                 : 0;
+            client.Server.Info(
+                client,
+                "CharInPlay mission-window resync resent={0} thrak={1} areteTips={2}",
+                missionWindowResent,
+                thrakMissionResent,
+                areteTipResent);
+
+            ZoneEngine.Core.Missions.MissionDiagnostics.Log(
+                "CHARINPLAY char={0} pf={1} windowResent={2} thrakResent={3}",
+                client.Controller.Character.Identity.Instance,
+                pfInstance,
+                missionWindowResent,
+                thrakMissionResent);
+
+            // Mission interiors: re-send Door/Chest FullUpdates (texture/mesh) after CharInPlay.
+            ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
+                client,
+                client.Controller.Character);
 
             client.Controller.Character.DoNotDoTimers = false;
             PlayfieldLifecycleTrace.Record(

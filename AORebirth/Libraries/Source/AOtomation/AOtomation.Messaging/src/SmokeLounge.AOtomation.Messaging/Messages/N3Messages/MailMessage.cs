@@ -56,6 +56,11 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         /// <summary>OpenOrRequest: uint64 mail id (0 = open list, else request detail).</summary>
         public ulong RequestedMailId { get; set; }
 
+        /// <summary>
+        /// UpdateMailFlags (action 4): FlagsField payload (capture: 0x7D after open, 0x7F after Take All).
+        /// </summary>
+        public int MailFlagsUpdate { get; set; }
+
         public int Unknown1 { get; set; }
 
         public int Unknown2 { get; set; }

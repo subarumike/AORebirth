@@ -140,6 +140,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Controller.Move(moveType, coordinates, heading);
 
+            // Garden save: only when standing on the save pad (once per visit).
+            ZoneEngine.Core.ShadowlandsGardenSaveRuntimeService.TryApplyWhenOnSavePad(
+                client.Controller.Character,
+                "CharDCMove");
+
             /* Start NV Heading Testing Code
              * Yaw: 0 to 360 Degrees (North turning clockwise to a complete revolution)
              * Roll: Not sure, but is always 0 cause we can't roll in AO

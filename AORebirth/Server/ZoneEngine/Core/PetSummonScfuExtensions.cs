@@ -10,6 +10,8 @@ namespace ZoneEngine.Core
 {
     #region Usings ...
 
+    using AORebirth.Core.Entities;
+
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     #endregion
@@ -51,7 +53,11 @@ namespace ZoneEngine.Core
             0x00, 0x00, 0x00, 0x00
         };
 
-        public static void ApplyCapturedMpPetMetadata(SimpleCharFullUpdateMessage message, int petSlotStrain)
+        public static void ApplyCapturedMpPetMetadata(
+            SimpleCharFullUpdateMessage message,
+            int petSlotStrain,
+            ICharacter owner = null,
+            string spawnPetHash = null)
         {
             if (message == null || petSlotStrain != PetSlotClassifier.HealingPetStrain)
             {
@@ -59,7 +65,10 @@ namespace ZoneEngine.Core
             }
 
             message.Unknown1 = (byte[])CapturedHealingPetUnknown1.Clone();
-            message.ExtendedTextureOverrideData = (byte[])CapturedHealingPetExtendedTextureOverrideData.Clone();
+            byte[] textureOverride = (byte[])CapturedHealingPetExtendedTextureOverrideData.Clone();
+            int textureId = SoothingSpiritsHealPetLadder.ResolveTextureIdFromSpawnHash(spawnPetHash, owner);
+            SoothingSpiritsHealPetLadder.TryPatchMetapetHealingTexture(textureOverride, textureId);
+            message.ExtendedTextureOverrideData = textureOverride;
             message.VisualFlags = 31;
             message.Expansions = 1;
         }

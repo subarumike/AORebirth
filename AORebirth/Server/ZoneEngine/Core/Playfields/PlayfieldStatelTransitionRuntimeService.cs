@@ -14,6 +14,8 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core.Missions;
+
     using Coordinate = AORebirth.Core.Vector.Coordinate;
     using Identity = SmokeLounge.AOtomation.Messaging.GameData.Identity;
     using RuntimeQuaternion = AORebirth.Core.Vector.Quaternion;
@@ -104,6 +106,60 @@ namespace AORebirth.Core.Playfields
 
         private const float CapturedSubwayEntranceHeadingW = 0.7071012f;
 
+        // Capture 20260719-155043: Andromeda ICC HQ (655) ↔ Holodeck Freelancers Inc. (7001).
+        // No door/statel identity in capture — coordinate-radius zones (Subway proxy pattern).
+        private const int CapturedHoloDeckPlayfieldId = 7001;
+
+        private const int CapturedHoloDeckEntrySourcePlayfieldId = 655;
+
+        private const float CapturedHoloDeckEntrySourceX = 3245.94f;
+
+        private const float CapturedHoloDeckEntrySourceY = 36.085f;
+
+        private const float CapturedHoloDeckEntrySourceZ = 943.3943f;
+
+        private const float CapturedHoloDeckEntryRadius = 2.5f;
+
+        private const float CapturedHoloDeckEntryVerticalTolerance = 4.0f;
+
+        private const float CapturedHoloDeckEntryLandingX = 183.01f;
+
+        private const float CapturedHoloDeckEntryLandingY = 1.02f;
+
+        private const float CapturedHoloDeckEntryLandingZ = 197.01f;
+
+        private const float CapturedHoloDeckEntryLandingHeadingX = 0.0f;
+
+        private const float CapturedHoloDeckEntryLandingHeadingY = 0.182956f;
+
+        private const float CapturedHoloDeckEntryLandingHeadingZ = 0.0f;
+
+        private const float CapturedHoloDeckEntryLandingHeadingW = 0.9831211f;
+
+        private const float CapturedHoloDeckExitSourceX = 178.5387f;
+
+        private const float CapturedHoloDeckExitSourceY = 1.02f;
+
+        private const float CapturedHoloDeckExitSourceZ = 197.1772f;
+
+        private const float CapturedHoloDeckExitRadius = 2.5f;
+
+        private const float CapturedHoloDeckExitVerticalTolerance = 4.0f;
+
+        private const float CapturedHoloDeckExitLandingX = 3245.0f;
+
+        private const float CapturedHoloDeckExitLandingY = 35.715f;
+
+        private const float CapturedHoloDeckExitLandingZ = 939.0f;
+
+        private const float CapturedHoloDeckExitLandingHeadingX = 0.0f;
+
+        private const float CapturedHoloDeckExitLandingHeadingY = -0.8022833f;
+
+        private const float CapturedHoloDeckExitLandingHeadingZ = 0.0f;
+
+        private const float CapturedHoloDeckExitLandingHeadingW = 0.5969435f;
+
         private static readonly Dictionary<int, DateTime> PostZoneCollisionGraceUntil =
             new Dictionary<int, DateTime>();
 
@@ -117,6 +173,16 @@ namespace AORebirth.Core.Playfields
         private readonly HashSet<int> statelCollisionInitializedCharacters = new HashSet<int>();
 
         private readonly HashSet<int> capturedSubwayEntryContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedHoloDeckEntryContacts = new HashSet<int>();
+
+        private readonly HashSet<int> capturedHoloDeckExitContacts = new HashSet<int>();
+
+        // After mission enter, player must walk away from the exit door before walk-on exit arms.
+        private readonly HashSet<int> missionExitDoorArmedCharacters = new HashSet<int>();
+
+        // Throttle for the mission-instance entry position diagnostic (see TryHandleMissionInstanceEntry).
+        private DateTime lastMissionEntryDiagUtc = DateTime.MinValue;
 
         internal static void ArmPostZoneCollisionGrace(ICharacter character)
         {
@@ -204,7 +270,43 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (this.TryHandleMissionInstanceEntry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleMissionInstanceExit(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
             if (this.TryHandleCapturedSubwayProxyEntry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedHoloDeckEntry(
+                dynel,
+                playfieldIdentity,
+                stopMovement,
+                teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (this.TryHandleCapturedHoloDeckExit(
                 dynel,
                 playfieldIdentity,
                 stopMovement,
@@ -280,8 +382,17 @@ namespace AORebirth.Core.Playfields
 
                         activeEnterContacts.Add(statelKey);
                     }
-                    else if (!wasInRange)
+                    else
                     {
+                        // OnCollide / OnTargetInVicinity are edge-triggered: fire once per vicinity
+                        // entry, NOT every movement tick. Without this, a rune statel (e.g. the
+                        // Shadowlands garden save rune) re-cast its nano ~8x/second while the player
+                        // stood on it, flooding chat and restarting the save animation endlessly.
+                        if (wasInRange)
+                        {
+                            continue;
+                        }
+
                         activeEnterContacts.Add(statelKey);
                     }
 
@@ -369,6 +480,223 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        private bool TryHandleMissionInstanceEntry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (!MissionInstanceService.EntryEnabled
+                || character == null
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            if (!MissionKeyGrantService.HasMissionKey(character))
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            int currentPf = playfieldIdentity.Instance;
+
+            bool near = false;
+            string nearReason = null;
+            double nearestDistanceSquared = double.MaxValue;
+
+            // Outdoor rolled marker (capture 20260718-062936: walk to map mark on dest PF → enter).
+            List<MissionAcceptedStore.AcceptedMission> missions =
+                MissionAcceptedStore.GetAll(character.Identity.Instance);
+            for (int i = 0; i < missions.Count; i++)
+            {
+                MissionAcceptedStore.AcceptedMission entry = missions[i];
+                if (entry == null || entry.MarkerPlayfield == 0 || entry.MarkerPlayfield != currentPf)
+                {
+                    continue;
+                }
+
+                double deltaX = sourceX - entry.MarkerX;
+                double deltaZ = sourceZ - entry.MarkerZ;
+                double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+                if (horizontalDistanceSquared < nearestDistanceSquared)
+                {
+                    nearestDistanceSquared = horizontalDistanceSquared;
+                }
+
+                double verticalDistance = Math.Abs(sourceY - entry.MarkerY);
+                // Slightly larger than Rome door radius — outdoor marks have no physical door mesh yet.
+                if (horizontalDistanceSquared <= 8.0 * 8.0 && verticalDistance <= 12.0)
+                {
+                    near = true;
+                    nearReason = "marker";
+                    break;
+                }
+            }
+
+            // Convenience: Rome Blue house doors (pf 735) still work with a key.
+            if (!near && currentPf == MissionInstanceService.RomeBluePlayfieldInstance)
+            {
+                foreach (float[] spot in MissionInstanceService.RomeEntranceSpots)
+                {
+                    double deltaX = sourceX - spot[0];
+                    double deltaZ = sourceZ - spot[2];
+                    double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+                    if (horizontalDistanceSquared < nearestDistanceSquared)
+                    {
+                        nearestDistanceSquared = horizontalDistanceSquared;
+                    }
+
+                    double verticalDistance = Math.Abs(sourceY - spot[1]);
+                    if (horizontalDistanceSquared <= 4.0 * 4.0 && verticalDistance <= 8.0)
+                    {
+                        near = true;
+                        nearReason = "rome";
+                        break;
+                    }
+                }
+            }
+
+            DateTime now = DateTime.UtcNow;
+            if (!near && (now - this.lastMissionEntryDiagUtc).TotalMilliseconds >= 1500)
+            {
+                this.lastMissionEntryDiagUtc = now;
+                MissionDiagnostics.Log(
+                    "ENTRY-CHECK char={0} pf={1} hasKey=true pos=({2:F2},{3:F2},{4:F2}) nearestDist={5:F2} near=false missions={6}",
+                    character.Identity.Instance,
+                    currentPf,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    nearestDistanceSquared == double.MaxValue ? -1.0 : Math.Sqrt(nearestDistanceSquared),
+                    missions.Count);
+            }
+
+            if (!near)
+            {
+                return false;
+            }
+
+            MissionDiagnostics.Log(
+                "ENTRY-TELEPORT char={0} reason={1} pf={2} pos=({3:F2},{4:F2},{5:F2})",
+                character.Identity.Instance,
+                nearReason,
+                currentPf,
+                sourceX,
+                sourceY,
+                sourceZ);
+
+            // Same path as door-use enter (shape spawn + door clearance). Do not use the
+            // legacy hardcoded SpawnX/Y/Z — that lands on the exit door and loops.
+            stopMovement(character);
+            if (!MissionInstanceService.TryEnterMissionInstance(character.Controller.Client))
+            {
+                return false;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Mission instance entry teleport character={0} reason={1} sourcePf={2} source=({3:F3},{4:F3},{5:F3})",
+                    character.Identity.ToString(true),
+                    nearReason,
+                    currentPf,
+                    sourceX,
+                    sourceY,
+                    sourceZ));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Walk onto the interior exit door after leaving spawn clearance — click-use also exits.
+        /// Armed only after the player walks away from the door once (prevents enter/exit loop).
+        /// </summary>
+        private bool TryHandleMissionInstanceExit(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (!MissionInstanceService.EntryEnabled
+                || character == null
+                || !MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance)
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float doorX;
+            float doorY;
+            float doorZ;
+            MissionInstanceService.ResolveInteriorExitDoor(
+                playfieldIdentity.Instance,
+                out doorX,
+                out doorY,
+                out doorZ);
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double dx = sourceX - doorX;
+            double dz = sourceZ - doorZ;
+            double horizontalSq = (dx * dx) + (dz * dz);
+            double vertical = Math.Abs(sourceY - doorY);
+            const double armRadius = 10.0;
+            const double exitRadius = 3.5;
+
+            int charId = character.Identity.Instance;
+            if (horizontalSq > (armRadius * armRadius) || vertical > 12.0)
+            {
+                this.missionExitDoorArmedCharacters.Add(charId);
+                return false;
+            }
+
+            if (!this.missionExitDoorArmedCharacters.Contains(charId))
+            {
+                return false;
+            }
+
+            if (horizontalSq > (exitRadius * exitRadius) || vertical > 8.0)
+            {
+                return false;
+            }
+
+            this.missionExitDoorArmedCharacters.Remove(charId);
+            if (!MissionInstanceService.TryExitMissionInstance(character.Controller.Client))
+            {
+                return false;
+            }
+
+            stopMovement(character);
+            MissionDiagnostics.Log(
+                "EXIT-PROXIMITY char={0} door=({1:F1},{2:F1},{3:F1})",
+                charId,
+                doorX,
+                doorY,
+                doorZ);
+            return true;
+        }
+
         private bool TryHandleCapturedSubwayProxyEntry(
             ICharacter character,
             Identity playfieldIdentity,
@@ -447,6 +775,169 @@ namespace AORebirth.Core.Playfields
                     sourceZ,
                     CapturedSubwayEntrySourceDoorInstance,
                     CapturedSubwayPlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedHoloDeckEntry(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || playfieldIdentity.Instance != CapturedHoloDeckEntrySourcePlayfieldId
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - CapturedHoloDeckEntrySourceX;
+            double deltaZ = sourceZ - CapturedHoloDeckEntrySourceZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - CapturedHoloDeckEntrySourceY);
+            bool inEntryTrigger =
+                horizontalDistanceSquared <= CapturedHoloDeckEntryRadius * CapturedHoloDeckEntryRadius
+                && verticalDistance <= CapturedHoloDeckEntryVerticalTolerance;
+            int dynelId = character.Identity.Instance;
+            if (!inEntryTrigger)
+            {
+                this.capturedHoloDeckEntryContacts.Remove(dynelId);
+                return false;
+            }
+
+            // Exit landing on PF 655 is near this trigger; treat arrival as existing contact.
+            if (this.capturedHoloDeckEntryContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedHoloDeckEntryContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedHoloDeckEntryContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                CapturedHoloDeckEntryLandingX,
+                CapturedHoloDeckEntryLandingY,
+                CapturedHoloDeckEntryLandingZ);
+            var heading = new RuntimeQuaternion(
+                CapturedHoloDeckEntryLandingHeadingX,
+                CapturedHoloDeckEntryLandingHeadingY,
+                CapturedHoloDeckEntryLandingHeadingZ,
+                CapturedHoloDeckEntryLandingHeadingW);
+
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue =
+                CapturedHoloDeckEntrySourcePlayfieldId;
+
+            stopMovement(character);
+            teleportToPlayfield(dynel, destination, heading, CapturedHoloDeckPlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "HoloDeck entry teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260719-155043",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    CapturedHoloDeckPlayfieldId,
+                    destination.x,
+                    destination.y,
+                    destination.z));
+
+            return true;
+        }
+
+        private bool TryHandleCapturedHoloDeckExit(
+            ICharacter character,
+            Identity playfieldIdentity,
+            Action<ICharacter> stopMovement,
+            Action<Dynel, Coordinate, RuntimeQuaternion, int> teleportToPlayfield)
+        {
+            if (character == null
+                || playfieldIdentity.Instance != CapturedHoloDeckPlayfieldId
+                || character.Controller == null
+                || character.Controller.Client == null
+                || character.DoNotDoTimers)
+            {
+                return false;
+            }
+
+            var dynel = character as Dynel;
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            float sourceX = character.RawCoordinates.X;
+            float sourceY = character.RawCoordinates.Y;
+            float sourceZ = character.RawCoordinates.Z;
+            double deltaX = sourceX - CapturedHoloDeckExitSourceX;
+            double deltaZ = sourceZ - CapturedHoloDeckExitSourceZ;
+            double horizontalDistanceSquared = (deltaX * deltaX) + (deltaZ * deltaZ);
+            double verticalDistance = Math.Abs(sourceY - CapturedHoloDeckExitSourceY);
+            bool inExitTrigger =
+                horizontalDistanceSquared <= CapturedHoloDeckExitRadius * CapturedHoloDeckExitRadius
+                && verticalDistance <= CapturedHoloDeckExitVerticalTolerance;
+            int dynelId = character.Identity.Instance;
+            if (!inExitTrigger)
+            {
+                this.capturedHoloDeckExitContacts.Remove(dynelId);
+                return false;
+            }
+
+            // Entry landing is near the exit pad; treat arrival as existing contact.
+            if (this.capturedHoloDeckExitContacts.Contains(dynelId)
+                || !this.statelCollisionInitializedCharacters.Contains(dynelId))
+            {
+                this.capturedHoloDeckExitContacts.Add(dynelId);
+                return false;
+            }
+
+            this.capturedHoloDeckExitContacts.Add(dynelId);
+
+            var destination = new Coordinate(
+                CapturedHoloDeckExitLandingX,
+                CapturedHoloDeckExitLandingY,
+                CapturedHoloDeckExitLandingZ);
+            var heading = new RuntimeQuaternion(
+                CapturedHoloDeckExitLandingHeadingX,
+                CapturedHoloDeckExitLandingHeadingY,
+                CapturedHoloDeckExitLandingHeadingZ,
+                CapturedHoloDeckExitLandingHeadingW);
+
+            character.Stats[StatIds.externalplayfieldinstance].BaseValue = CapturedHoloDeckPlayfieldId;
+
+            stopMovement(character);
+            teleportToPlayfield(dynel, destination, heading, CapturedHoloDeckEntrySourcePlayfieldId);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Zoning,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "HoloDeck exit teleport character={0} sourcePf={1} source=({2:F3},{3:F3},{4:F3}) destPf={5} dest=({6:F3},{7:F3},{8:F3}) evidence=20260719-155043",
+                    character.Identity.ToString(true),
+                    playfieldIdentity.Instance,
+                    sourceX,
+                    sourceY,
+                    sourceZ,
+                    CapturedHoloDeckEntrySourcePlayfieldId,
                     destination.x,
                     destination.y,
                     destination.z));

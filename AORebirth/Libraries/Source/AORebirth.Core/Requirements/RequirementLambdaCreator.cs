@@ -102,6 +102,10 @@ namespace AORebirth.Core.Requirements
                 case Operator.HasNotFormula:
 
                     return k => ((Character)GetTarget(t).Compile().Invoke(k)).HasNano(statValue);
+                case Operator.HasPerk:
+                    return k => ((Character)GetTarget(t).Compile().Invoke(k)).HasPerk(statValue);
+                case Operator.HasNotPerk:
+                    return k => !((Character)GetTarget(t).Compile().Invoke(k)).HasPerk(statValue);
                 case Operator.FlyingAllowed:
                     return k => true;
                 default:

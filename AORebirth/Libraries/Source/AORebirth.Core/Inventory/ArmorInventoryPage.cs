@@ -96,6 +96,7 @@ namespace AORebirth.Core.Inventory
                             if (result)
                             {
                                 Function copy = functions.Copy();
+                                AwakenedBurdenOfCompetenceAppearance.TryInjectBackMeshOverride(copy, item);
                                 MessagePackObject mpo = new MessagePackObject();
                                 mpo = itemSlot;
                                 copy.Arguments.Values.Add(mpo);

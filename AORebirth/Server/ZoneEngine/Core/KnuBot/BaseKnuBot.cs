@@ -297,6 +297,20 @@ namespace ZoneEngine.Core.KnuBot
         }
 
         /// <summary>
+        /// Client finished/declined a KnuBot cash/item trade. Capture 20260716-Reset-perks.
+        /// </summary>
+        /// <param name="amount">
+        /// Credits offered (FinishTrade.Amount).
+        /// </param>
+        /// <param name="decline">
+        /// True when client declined.
+        /// </param>
+        public virtual void FinishTrade(int amount, bool decline)
+        {
+            this.Answer(KnuBotOptionId.FinishTrade);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="item">
         /// </param>

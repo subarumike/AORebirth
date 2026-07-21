@@ -6,6 +6,7 @@ namespace ZoneEngine.Core.Subway.Quests
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Threading;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Inventory;
@@ -59,6 +60,14 @@ namespace ZoneEngine.Core.Subway.Quests
                 return false;
             }
 
+            // Trade can arrive before the return-offer answer creates a session; bind now so
+            // FinishTrade and staging share the runtime Karrec identity.
+            if (session == null && WindcallerKarrecInteractionRules.IsKarrec(message.Target))
+            {
+                BeginTrade(source, message.Target);
+                session = GetSession(source);
+            }
+
             if (!WindcallerKarrecQuestRuntime.IsActive(source))
             {
                 return true;
@@ -106,70 +115,220 @@ namespace ZoneEngine.Core.Subway.Quests
 
         internal static bool TryFinishTrade(ICharacter source, KnuBotFinishTradeMessage message)
         {
-            if (message == null)
+            if (message == null || source == null)
             {
                 return false;
             }
 
+            bool isKarrecTarget = WindcallerKarrecInteractionRules.IsKarrec(message.Target);
             KarrecTradeSession session = GetSession(source);
-            if (!IsHandledKarrecTarget(session, message.Target))
+            if (!isKarrecTarget && !IsHandledKarrecTarget(session, message.Target))
             {
                 return false;
             }
 
-            if (message.Decline != 0 || !WindcallerKarrecQuestRuntime.IsActive(source))
+            // Always claim Karrec FinishTrade so the generic knubot path cannot no-op
+            // (spawned Karrec has no BaseKnuBot).
+            if (message.Decline != 0)
             {
                 ForgetSession(source);
+                MissionDiagnostics.Log("karrec-trade decline character={0}", source.Identity.Instance);
+                return true;
+            }
+
+            if (session == null)
+            {
+                BeginTrade(source, message.Target);
+                session = GetSession(source);
+            }
+
+            // Server already finished earlier but client trade UI never closed — replay projection.
+            // Still consume burger/card if they remain in inventory from a prior incomplete turn-in.
+            if (WindcallerKarrecQuestRuntime.IsCompleted(source)
+                && WindcallerKarrecQuestRuntime.HasAccountAccess(source))
+            {
+                IList<StagedOffering> leftoverOfferings = null;
+                if (TryResolveOfferings(source, session, out leftoverOfferings)
+                    || TryFindOfferingsInInventory(source, out leftoverOfferings))
+                {
+                    TryConsumeAndNotifyOfferings(source, leftoverOfferings);
+                }
+
+                SendImmediateTradeAcceptanceUi(source, message.Target);
+                EnsureProjection(
+                    source,
+                    "completion-delete-projected",
+                    () => WindcallerKarrecPacketSender.TrySendCompletionAndDelete(source));
+                ForgetSession(source);
+                MissionDiagnostics.Log(
+                    "karrec-trade replay-ui character={0} (already completed, leftovers-consumed={1})",
+                    source.Identity.Instance,
+                    leftoverOfferings == null ? 0 : leftoverOfferings.Count);
                 return true;
             }
 
             IList<StagedOffering> offerings;
-            if (session == null || !TryResolveOfferings(source, session, out offerings))
+            if (!TryResolveOfferings(source, session, out offerings)
+                && !TryFindOfferingsInInventory(source, out offerings))
             {
+                MissionDiagnostics.Log(
+                    "karrec-trade finish rejected character={0} reason=missing-offerings active={1} staged={2}",
+                    source.Identity.Instance,
+                    WindcallerKarrecQuestRuntime.IsActive(source),
+                    session == null ? 0 : session.StagedLocations.Count);
                 ForgetSession(source);
                 return true;
             }
 
-            int characterId = source.Identity.Instance;
-            MissionOperationResult pending = MissionRuntime.Service.SetFlag(
-                characterId,
-                WindcallerKarrecQuestRuntime.QuestId,
-                TradePendingFlag,
-                SerializePendingOfferings(offerings));
-            if (IsPersistenceFailure(pending))
+            if (!WindcallerKarrecQuestRuntime.IsActive(source)
+                && !WindcallerKarrecQuestRuntime.IsCompleted(source))
             {
-                ForgetSession(source);
-                return true;
-            }
-
-            if (!TryConsumeOfferings(source, offerings))
-            {
-                ForgetSession(source);
-                return true;
-            }
-
-            MissionOperationResult consumed = MissionRuntime.Service.SetFlag(
-                characterId,
-                WindcallerKarrecQuestRuntime.QuestId,
-                TradeConsumedFlag,
-                "297042,297043");
-            if (IsPersistenceFailure(consumed))
-            {
-                ForgetSession(source);
-                return true;
+                MissionOperationResult acceptance = WindcallerKarrecQuestRuntime.Accept(source);
+                MissionDiagnostics.Log(
+                    "karrec-trade re-accept character={0} status={1} message={2}",
+                    source.Identity.Instance,
+                    acceptance == null ? "null" : acceptance.Status.ToString(),
+                    acceptance == null ? string.Empty : acceptance.Message);
             }
 
             KarrecCompletionResult completion =
                 WindcallerKarrecQuestRuntime.CompleteAfterOfferingsConsumed(source);
             if (!completion.Completed)
             {
+                MissionDiagnostics.Log(
+                    "karrec-trade completion-failed character={0} error={1}",
+                    source.Identity.Instance,
+                    completion.Error);
                 ForgetSession(source);
                 return true;
             }
 
+            if (!TryConsumeAndNotifyOfferings(source, offerings))
+            {
+                MissionDiagnostics.Log(
+                    "karrec-trade consume-failed character={0} (passage already granted)",
+                    source.Identity.Instance);
+            }
+
             SendCompletionProjection(source, message.Target, completion);
             ForgetSession(source);
+            MissionDiagnostics.Log(
+                "karrec-trade completed character={0} totw-access=granted",
+                source.Identity.Instance);
             return true;
+        }
+
+        private static bool TryConsumeAndNotifyOfferings(ICharacter source, IList<StagedOffering> offerings)
+        {
+            if (!TryConsumeOfferings(source, offerings))
+            {
+                return false;
+            }
+
+            MissionRuntime.Service.SetFlag(
+                source.Identity.Instance,
+                WindcallerKarrecQuestRuntime.QuestId,
+                TradeConsumedFlag,
+                "297042,297043");
+            NotifyOfferingsRemoved(source, offerings);
+            return true;
+        }
+
+        private static void NotifyOfferingsRemoved(ICharacter source, IList<StagedOffering> offerings)
+        {
+            if (source == null || offerings == null)
+            {
+                return;
+            }
+
+            foreach (StagedOffering offering in offerings)
+            {
+                try
+                {
+                    CharacterActionMessageHandler.Default.SendDeleteItem(
+                        source,
+                        (int)offering.Location.Type,
+                        offering.Slot);
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        private static bool TryFindOfferingsInInventory(
+            ICharacter source,
+            out IList<StagedOffering> offerings)
+        {
+            offerings = new List<StagedOffering>();
+            if (source == null || source.BaseInventory == null)
+            {
+                return false;
+            }
+
+            StagedOffering burger;
+            StagedOffering card;
+            if (!TryFindSingleOfferingInCarriedInventory(
+                    source,
+                    WindcallerKarrecQuestRuntime.BrontoBurgerItemId,
+                    out burger)
+                || !TryFindSingleOfferingInCarriedInventory(
+                    source,
+                    WindcallerKarrecQuestRuntime.MaddyCreditCardItemId,
+                    out card))
+            {
+                return false;
+            }
+
+            offerings.Add(burger);
+            offerings.Add(card);
+            return true;
+        }
+
+        private static bool TryFindSingleOfferingInCarriedInventory(
+            ICharacter source,
+            int itemId,
+            out StagedOffering offering)
+        {
+            offering = null;
+            foreach (int pageType in new[]
+                                        {
+                                            (int)IdentityType.Inventory,
+                                            (int)IdentityType.OverflowWindow
+                                        })
+            {
+                IInventoryPage page;
+                if (!source.BaseInventory.Pages.TryGetValue(pageType, out page) || page == null)
+                {
+                    continue;
+                }
+
+                foreach (KeyValuePair<int, IItem> entry in page.List())
+                {
+                    Item item = entry.Value as Item;
+                    if (ResolveOfferingItemId(item) != itemId)
+                    {
+                        continue;
+                    }
+
+                    offering = new StagedOffering
+                               {
+                                   ItemId = itemId,
+                                   Page = page,
+                                   Location =
+                                       new Identity
+                                       {
+                                           Type = (IdentityType)pageType,
+                                           Instance = entry.Key
+                                       },
+                                   Slot = entry.Key,
+                                   Item = item
+                               };
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static bool TryResumeDurableCompletion(ICharacter source, Identity karrecIdentity)
@@ -241,38 +400,9 @@ namespace ZoneEngine.Core.Subway.Quests
             Identity karrecIdentity,
             KarrecCompletionResult completion)
         {
-            EnsureProjection(
-                source,
-                "trade-acceptance-projected",
-                () =>
-                {
-                    KnuBotRejectedItemsMessageHandler.Default.Send(source, karrecIdentity, new Item[0]);
-                    return true;
-                });
-
-            EnsureProjection(
-                source,
-                "post-trade-dialogue-projected",
-                () =>
-                {
-                    KnuBotAppendTextMessageHandler.Default.Send(
-                        source,
-                        karrecIdentity,
-                        "Karrec hands you a note covered with strange words and symbols, none of which make any sense to you. You upload the information to your ncu and throw the paper away.",
-                        1);
-                    KnuBotAppendTextMessageHandler.Default.Send(
-                        source,
-                        karrecIdentity,
-                        "Your devotion to the Cult of Three Winds gains you passage to the sacred Temple "
-                        + (string.IsNullOrWhiteSpace(source.Name) ? string.Empty : source.Name)
-                        + ". You may now use the gateway.",
-                        0);
-                    KnuBotAnswerListMessageHandler.Default.Send(
-                        source,
-                        karrecIdentity,
-                        new[] { "Thank you, Karrec.", "Goodbye" });
-                    return true;
-                });
+            // Always push trade-close + dialogue on this Accept. Durable flags previously skipped
+            // the UI after a server-side success, so the give-items window looked stuck until zone.
+            SendImmediateTradeAcceptanceUi(source, karrecIdentity);
 
             EnsureProjection(
                 source,
@@ -288,6 +418,40 @@ namespace ZoneEngine.Core.Subway.Quests
                 source,
                 "completion-delete-projected",
                 () => WindcallerKarrecPacketSender.TrySendCompletionAndDelete(source));
+        }
+
+        private static void SendImmediateTradeAcceptanceUi(ICharacter source, Identity karrecIdentity)
+        {
+            try
+            {
+                KnuBotRejectedItemsMessageHandler.Default.Send(source, karrecIdentity, new Item[0]);
+                Thread.Sleep(25);
+                KnuBotAppendTextMessageHandler.Default.Send(
+                    source,
+                    karrecIdentity,
+                    "Karrec hands you a note covered with strange words and symbols, none of which make any sense to you. You upload the information to your ncu and throw the paper away.",
+                    1);
+                Thread.Sleep(25);
+                KnuBotAppendTextMessageHandler.Default.Send(
+                    source,
+                    karrecIdentity,
+                    "Your devotion to the Cult of Three Winds gains you passage to the sacred Temple "
+                    + (string.IsNullOrWhiteSpace(source.Name) ? string.Empty : source.Name)
+                    + ". You may now use the gateway.",
+                    0);
+                Thread.Sleep(25);
+                KnuBotAnswerListMessageHandler.Default.Send(
+                    source,
+                    karrecIdentity,
+                    new[] { "Thank you, Karrec.", "Goodbye" });
+            }
+            catch (Exception exception)
+            {
+                MissionDiagnostics.Log(
+                    "karrec-trade ui-send-failed character={0} error={1}",
+                    source == null ? 0 : source.Identity.Instance,
+                    exception.Message);
+            }
         }
 
         private static bool EnsureProjection(ICharacter source, string flagKey, Func<bool> sender)
@@ -483,10 +647,14 @@ namespace ZoneEngine.Core.Subway.Quests
 
         private static bool IsHandledKarrecTarget(KarrecTradeSession session, Identity identity)
         {
-            return WindcallerKarrecInteractionRules.IsKarrec(identity)
-                   || (session != null
-                       && session.KarrecIdentity.Type == identity.Type
-                       && session.KarrecIdentity.Instance == identity.Instance);
+            if (WindcallerKarrecInteractionRules.IsKarrec(identity))
+            {
+                return true;
+            }
+
+            return session != null
+                   && session.KarrecIdentity.Type == identity.Type
+                   && session.KarrecIdentity.Instance == identity.Instance;
         }
 
         private static void MarkUnrecognizedOffering(KarrecTradeSession session, Identity location)

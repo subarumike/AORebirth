@@ -1,0 +1,99 @@
+{
+  "identity": "(VendingMachine:12E559EA)",
+  "playfieldId": 7001,
+  "position": [
+    186.9554,
+    1.209999,
+    201.3939
+  ],
+  "rotation": [
+    0,
+    0.9999946,
+    0,
+    0.003283689
+  ],
+  "templateId": 303217,
+  "staticInstance": 303217,
+  "flags": -2147339773,
+  "interaction": "GenericCmd Action=Use Target=(VendingMachine:12E559EA)",
+  "shopItems": [
+    {
+      "slot": 0,
+      "lowId": 303231,
+      "highId": 303231,
+      "quality": 198
+    },
+    {
+      "slot": 1,
+      "lowId": 303236,
+      "highId": 303236,
+      "quality": 1
+    },
+    {
+      "slot": 2,
+      "lowId": 303225,
+      "highId": 303225,
+      "quality": 1
+    },
+    {
+      "slot": 3,
+      "lowId": 303227,
+      "highId": 303227,
+      "quality": 1
+    },
+    {
+      "slot": 4,
+      "lowId": 303233,
+      "highId": 303233,
+      "quality": 1
+    },
+    {
+      "slot": 5,
+      "lowId": 303219,
+      "highId": 303219,
+      "quality": 1
+    },
+    {
+      "slot": 6,
+      "lowId": 303220,
+      "highId": 303220,
+      "quality": 1
+    },
+    {
+      "slot": 7,
+      "lowId": 303222,
+      "highId": 303222,
+      "quality": 1
+    },
+    {
+      "slot": 8,
+      "lowId": 303221,
+      "highId": 303221,
+      "quality": 1
+    },
+    {
+      "slot": 9,
+      "lowId": 303234,
+      "highId": 303234,
+      "quality": 1
+    },
+    {
+      "slot": 10,
+      "lowId": 303232,
+      "highId": 303232,
+      "quality": 1
+    },
+    {
+      "slot": 11,
+      "lowId": 303228,
+      "highId": 303228,
+      "quality": 1
+    },
+    {
+      "slot": 12,
+      "lowId": 303223,
+      "highId": 303223,
+      "quality": 1
+    }
+  ]
+}

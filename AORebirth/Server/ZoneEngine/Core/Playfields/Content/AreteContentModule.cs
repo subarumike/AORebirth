@@ -4,8 +4,6 @@ namespace ZoneEngine.Core.Playfields.Content
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
-    using ZoneEngine.Core.Subway.Quests;
-
     #endregion
 
     public sealed class AreteContentModule : IPlayfieldContentModule
@@ -14,8 +12,9 @@ namespace ZoneEngine.Core.Playfields.Content
 
         public bool Supports(Identity playfieldIdentity)
         {
-            return playfieldIdentity.Instance == PrivateAretePlayfieldInstance
-                   || playfieldIdentity.Instance == WindcallerKarrecNpcContent.PlayfieldId;
+            // PF 655 (Andromeda / ICC HQ) is owned by AndromedaIccHqContentModule.
+            // Do not also Support 655 here — dual RegisterCapturedNpcSpawns doubles city NPCs.
+            return playfieldIdentity.Instance == PrivateAretePlayfieldInstance;
         }
 
         public void Register(PlayfieldContentRegistration registration)

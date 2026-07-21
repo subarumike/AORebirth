@@ -67,6 +67,14 @@ namespace ZoneEngine.Core.Arete.Quests
             RexMissionChainState chainState = RexMissionChainStateStore.GetState(source);
             if (chainState != RexMissionChainState.NoRexMission)
             {
+                // Re-project the active mission window after relog / re-talk when persistence
+                // already advanced past NoRexMission (common empty-window failure).
+                RexQuestPreviewEmissionResult resend = TryResendActiveMissionWindow(source, chainState);
+                if (resend.Emitted)
+                {
+                    return resend;
+                }
+
                 return RexQuestPreviewEmissionResult.Skipped(
                     "B18C quest preview skipped because Rex chain state is "
                     + chainState
@@ -118,6 +126,29 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             return string.Equals(previousNodeId, B18CPreviewSourceNodeId, StringComparison.OrdinalIgnoreCase)
                    && answerIndex == B18CPreviewAnswerIndex;
+        }
+
+        private static RexQuestPreviewEmissionResult TryResendActiveMissionWindow(
+            ICharacter source,
+            RexMissionChainState chainState)
+        {
+            switch (chainState)
+            {
+                case RexMissionChainState.B18CPreviewed:
+                    return SafeQuestFullUpdateSender.TrySendB18CPreview(source);
+                case RexMissionChainState.B18CObjectiveComplete:
+                case RexMissionChainState.B18DPreviewed:
+                    return SafeQuestFullUpdateSender.TrySendB18DPreview(source);
+                case RexMissionChainState.B18DObjectiveComplete:
+                case RexMissionChainState.B18EPreviewed:
+                    return SafeQuestFullUpdateSender.TrySendB18EPreview(source);
+                case RexMissionChainState.B18ECompleted:
+                case RexMissionChainState.B18FPreviewed:
+                    // Always delete B18E with B18F so Return to Rex cannot stick beside Marcus.
+                    return SafeQuestFullUpdateSender.TrySendB18EToB18FHandoff(source);
+                default:
+                    return RexQuestPreviewEmissionResult.NotApplicable();
+            }
         }
 
         private static bool IsPersistenceFailure(MissionOperationResult result)

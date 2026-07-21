@@ -20,6 +20,7 @@ namespace AORebirth.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -974,7 +975,30 @@ namespace AORebirth.Core.Playfields
                         damage));
             }
 
+            this.SendIncomingHitChatIfPlayer(attacker, target, damage);
             this.AnnounceHealthDamageIfNeeded(attacker, target, damage, source);
+        }
+
+        private void SendIncomingHitChatIfPlayer(ICharacter attacker, ICharacter target, int damage)
+        {
+            if (damage <= 0 || attacker == null || target == null)
+            {
+                return;
+            }
+
+            if (!(target.Controller is PlayerController) || target.Controller.Client == null)
+            {
+                return;
+            }
+
+            string mobName = string.IsNullOrWhiteSpace(attacker.Name) ? "Something" : attacker.Name;
+            ChatTextMessageHandler.Default.Send(
+                target,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "<font color=#FF0000>{0} hit you for {1} points of damage.</font>",
+                    mobName,
+                    damage));
         }
 
         private void AnnounceHealthDamageIfNeeded(
@@ -1130,6 +1154,14 @@ namespace AORebirth.Core.Playfields
             if (hasCapturedContract
                 && capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
             {
+                int weaponSlot = capturedContract.AttackInfoWeaponSlot;
+                int weaponInstance = capturedContract.AttackInfoWeaponInstance;
+                if (weaponInstance == 0)
+                {
+                    weaponSlot = this.GetUnarmedAttackInfoWeaponSlot(attacker);
+                    weaponInstance = this.GetUnarmedAttackInfoWeaponInstance(attacker);
+                }
+
                 return new CombatAttackSource
                        {
                            MinDamage = capturedContract.MinDamage,
@@ -1141,10 +1173,10 @@ namespace AORebirth.Core.Playfields
                                                  : NpcCombatAttackRules.DefaultCombatTickSeconds,
                            UsesEquippedWeapon = false,
                            AttackInfoAmmoCount = NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
-                           AttackInfoWeaponSlot = capturedContract.AttackInfoWeaponSlot,
+                           AttackInfoWeaponSlot = weaponSlot,
                            AttackInfoUnk1 = capturedContract.AttackInfoUnknown,
                            AttackInfoHitType = NpcCombatAttackRules.NormalAttackInfoHitType,
-                           AttackInfoWeaponInstance = capturedContract.AttackInfoWeaponInstance,
+                           AttackInfoWeaponInstance = weaponInstance,
                            SendAttackInfo = true
                        };
             }

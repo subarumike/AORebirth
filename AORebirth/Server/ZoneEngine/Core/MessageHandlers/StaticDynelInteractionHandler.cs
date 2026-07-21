@@ -95,44 +95,57 @@ namespace ZoneEngine.Core.MessageHandlers
                     Event ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnUse);
                     if (ev != null)
                     {
-                        ev.Perform(client.Controller.Character, entity);
-                        GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
-                    }
-                    else
-                    {
-                        ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnTrade);
-                        if (ev != null)
+                        // CellAO GenericCmd Use → OnUse.Perform. Ensure transfer can run:
+                        // expansion BitAnd 2 (SL) and DoNotDoTimers clear (Playfield.Teleport gate).
+                        ICharacter character = client.Controller.Character;
+                        character.DoNotDoTimers = false;
+                        try
                         {
-                            var vendor = entity as Vendor;
-                            if (vendor != null
-                                && this.TryDenyOfabProfessionVendor(client, message, vendor))
-                            {
-                                return true;
-                            }
-
-                            ev.Perform(client.Controller.Character, entity);
-
-                            TemporaryBag tempBag = new TemporaryBag(
-                                client.Controller.Character.Identity,
-                                new Identity()
-                                {
-                                    Type = IdentityType.TempBag,
-                                    Instance =
-                                        Pool.Instance.GetFreeInstance<TemporaryBag>(
-                                            0,
-                                            IdentityType.TempBag)
-                                },
-                                client.Controller.Character.Identity,
-                                target);
-                            client.Controller.Character.ShoppingBag = tempBag;
-                            TradeMessageHandler.Default.Send(client.Controller.Character, tempBag);
-                            GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
+                            character.Stats[StatIds.expansion].Value =
+                                character.Stats[StatIds.expansion].Value | 2;
                         }
+                        catch
+                        {
+                        }
+
+                        ev.Perform(character, entity);
+                        GenericCmdMessageHandler.Default.Acknowledge(character, message);
+                        return true;
+                    }
+
+                    ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnTrade);
+                    if (ev != null)
+                    {
+                        var vendor = entity as Vendor;
+                        if (vendor != null
+                            && this.TryDenyOfabProfessionVendor(client, message, vendor))
+                        {
+                            return true;
+                        }
+
+                        ev.Perform(client.Controller.Character, entity);
+
+                        TemporaryBag tempBag = new TemporaryBag(
+                            client.Controller.Character.Identity,
+                            new Identity()
+                            {
+                                Type = IdentityType.TempBag,
+                                Instance =
+                                    Pool.Instance.GetFreeInstance<TemporaryBag>(
+                                        0,
+                                        IdentityType.TempBag)
+                            },
+                            client.Controller.Character.Identity,
+                            target);
+                        client.Controller.Character.ShoppingBag = tempBag;
+                        TradeMessageHandler.Default.Send(client.Controller.Character, tempBag);
+                        GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
+                        return true;
                     }
                 }
             }
 
-            return true;
+            return false;
         }
 
         private bool TryDenyOfabProfessionVendor(IZoneClient client, GenericCmdMessage message, Vendor vendor)

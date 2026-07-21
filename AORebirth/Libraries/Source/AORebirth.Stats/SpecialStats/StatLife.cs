@@ -80,10 +80,19 @@ namespace AORebirth.Stats.SpecialStats
         {
             get
             {
+                // NPCs/mobs use stored life only. Do not read gmlevel.Value here —
+                // StatGmLevel hits LoginDataDao and NREs for non-player dynels
+                // (Subway/ordinary-enemy spawn on playfield materialize).
                 if (this.Stats[StatIds.npcfamily].BaseValue != 0
                     || this.Stats[StatIds.monsterdata].BaseValue != 0)
                 {
                     return base.GetBaseValue;
+                }
+
+                // GM max HP override (players only; session via login GM flag).
+                if (this.Stats[StatIds.gmlevel].Value > 0)
+                {
+                    return 2000000000u;
                 }
 
                 // Hitpoints by Profession and TitleLevel

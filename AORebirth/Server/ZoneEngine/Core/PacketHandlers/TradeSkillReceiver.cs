@@ -96,14 +96,47 @@ namespace ZoneEngine.Core.PacketHandlers
             Item targetItem =
                 InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, target);
 
+            if (sourceItem == null || targetItem == null)
+            {
+                ChatTextMessageHandler.Default.Send(
+                    client.Controller.Character,
+                    "It is not possible to assemble those two items. Maybe the order was wrong?");
+                return;
+            }
+
             TradeSkillEntry ts = TradeSkill.Instance.GetTradeSkillEntry(sourceItem.HighID, targetItem.HighID);
 
             if (ts != null)
             {
-                quality = Math.Min(quality, ItemLoader.ItemList[ts.ResultHighId].Quality);
+                int resultMaxQl = 1;
+                int resultHighForQl = ts.ResultHighId;
+                if (!ItemLoader.ItemList.ContainsKey(resultHighForQl)
+                    && ItemLoader.ItemList.ContainsKey(ts.ResultLowId))
+                {
+                    resultHighForQl = ts.ResultLowId;
+                    ts.ResultHighId = ts.ResultLowId;
+                }
+
+                if (ItemLoader.ItemList.ContainsKey(resultHighForQl))
+                {
+                    resultMaxQl = ItemLoader.ItemList[resultHighForQl].Quality;
+                }
+
+                quality = Math.Min(quality, resultMaxQl);
                 if (WindowBuild(client, quality, ts, sourceItem, targetItem))
                 {
-                    Item newItem = new Item(quality, ts.ResultLowId, ts.ResultHighId);
+                    Item newItem;
+                    try
+                    {
+                        newItem = new Item(quality, ts.ResultLowId, ts.ResultHighId);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        // Capture 20260721-001538 QL1 grants use low==high (156026/156026).
+                        newItem = new Item(quality, ts.ResultLowId, ts.ResultLowId);
+                        ts.ResultHighId = ts.ResultLowId;
+                    }
+
                     InventoryError inventoryError =
                         InventoryContainerRuntimeService.Default.AddTradeSkillResultItem(
                             client.Controller.Character,
@@ -138,9 +171,13 @@ namespace ZoneEngine.Core.PacketHandlers
 
                         ChatTextMessageHandler.Default.Send(
                             client.Controller.Character,
-                            SuccessMessage(sourceItem, targetItem, new Item(quality, ts.ResultLowId, ts.ResultHighId)));
+                            SuccessMessage(sourceItem, targetItem, newItem));
 
                         client.Controller.Character.Stats[StatIds.xp].Value += CalculateXP(quality, ts);
+                        ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainQuestRuntime.OnCombineSucceeded(
+                            client.Controller.Character,
+                            newItem.LowID,
+                            newItem.HighID);
                     }
                 }
             }
@@ -305,12 +342,23 @@ namespace ZoneEngine.Core.PacketHandlers
                             }
                         }
 
+                        int resultHighId = ts.ResultHighId;
+                        int resultLowId = ts.ResultLowId;
+                        if (!ItemLoader.ItemList.ContainsKey(resultHighId)
+                            && ItemLoader.ItemList.ContainsKey(resultLowId))
+                        {
+                            resultHighId = resultLowId;
+                        }
+
+                        int resultMaxQl = ItemLoader.ItemList.ContainsKey(resultHighId)
+                                              ? ItemLoader.ItemList[resultHighId].Quality
+                                              : targetItem.Quality;
                         TradeSkillPacket.SendResult(
                             client.Controller.Character,
                             targetItem.Quality,
-                            Math.Min(targetItem.Quality + leastbump, ItemLoader.ItemList[ts.ResultHighId].Quality),
-                            ts.ResultLowId,
-                            ts.ResultHighId);
+                            Math.Min(targetItem.Quality + leastbump, resultMaxQl),
+                            resultLowId,
+                            resultHighId);
                     }
                     else
                     {

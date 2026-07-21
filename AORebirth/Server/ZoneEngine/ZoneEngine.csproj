@@ -143,12 +143,22 @@
     <Compile Include="Core\Arete\Quests\MissionStateService.cs" />
     <Compile Include="Core\Arete\Quests\MissionStateStore.cs" />
     <Compile Include="Core\Arete\Quests\MarcusB18FCompletionHandler.cs" />
+    <Compile Include="Core\Arete\Quests\MarcusB194GasFireProgressTracker.cs" />
+    <Compile Include="Core\Arete\Quests\MarcusB196CompletionHandler.cs" />
+    <Compile Include="Core\Arete\Quests\MarcusWoundedWorkersQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\FlintBioComQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\SurveillanceUplinkQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\KneecappingQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\StanGoodmanQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\PersonalizedRobotBrainCombineRules.cs" />
+    <Compile Include="Core\Arete\Quests\PersonalizedRobotBrainQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackModels.cs" />
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackService.cs" />
     <Compile Include="Core\Arete\Quests\RexB18CObjectiveProgressTracker.cs" />
     <Compile Include="Core\Arete\Quests\RexB18CFeedbackPolicy.cs" />
     <Compile Include="Core\Arete\Quests\RexB18DBoxProgressTracker.cs" />
     <Compile Include="Core\Arete\Quests\RexB18ECompletionHandler.cs" />
+    <Compile Include="Core\Arete\Quests\RexMarcusChainCoordinator.cs" />
     <Compile Include="Core\Arete\Quests\RexQuestPreviewEmitter.cs" />
     <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.cs" />
     <Compile Include="Core\Missions\IMissionRepository.cs" />
@@ -167,10 +177,19 @@
     <Compile Include="Core\Subway\Quests\WindcallerKarrecPacketSender.cs" />
     <Compile Include="Core\Subway\Quests\WindcallerKarrecQuestRuntime.cs" />
     <Compile Include="Core\Subway\Quests\WindcallerKarrecTradeAdapter.cs" />
+    <Compile Include="Core\Thrak\Quests\ThrakGardenKeyCombineRules.cs" />
+    <Compile Include="Core\Thrak\Quests\ThrakGardenKeyInteractionRules.cs" />
+    <Compile Include="Core\Thrak\Quests\ThrakGardenKeyPacketSender.cs" />
+    <Compile Include="Core\Thrak\Quests\ThrakGardenKeyQuestRuntime.cs" />
+    <Compile Include="Core\Thrak\Quests\ThrakGardenKeySilvertailTransform.cs" />
+    <Compile Include="Core\Thrak\Quests\ThrakGardenKeyTradeAdapter.cs" />
+    <Compile Include="Core\Thrak\Vendors\ThrakGardenVendorInteractionRules.cs" />
     <Compile Include="Core\CombatCorpseRules.cs" />
     <Compile Include="Core\CombatDamageRules.cs" />
+    <Compile Include="Core\PlayerSpecialAttackRules.cs" />
     <Compile Include="Core\DamageCalculation.cs" />
     <Compile Include="Core\CombatXpRuntimeService.cs" />
+    <Compile Include="Core\ShadowlandsGardenSaveRuntimeService.cs" />
     <Compile Include="Core\AlienXpRuntimeService.cs" />
     <Compile Include="Core\SocialActionRuntimeService.cs" />
     <Compile Include="Core\CombatTestMobArchetype.cs" />
@@ -190,6 +209,7 @@
     <Compile Include="Core\Functions\GameFunctions\castnano.cs" />
     <Compile Include="Core\Functions\GameFunctions\teamcastnano.cs" />
     <Compile Include="Core\Functions\GameFunctions\areacastnano.cs" />
+    <Compile Include="Core\Functions\GameFunctions\tauntnpc.cs" />
     <Compile Include="Core\Functions\GameFunctions\undefined.cs" />
     <Compile Include="Core\Functions\GameFunctions\specialhit.cs" />
     <Compile Include="Core\Functions\GameFunctions\drainhit.cs" />
@@ -203,6 +223,7 @@
     <Compile Include="Core\Functions\GameFunctions\modify.cs" />
     <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
     <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
+    <Compile Include="Core\Functions\GameFunctions\opensystemdialog.cs" />
     <Compile Include="Core\Functions\GameFunctions\savechar.cs" />
     <Compile Include="Core\Functions\GameFunctions\shouldermesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs" />
@@ -231,6 +252,7 @@
     <Compile Include="Core\CombatStartPacketDiagnostics.cs" />
     <Compile Include="Core\ActiveNanoRuntimeService.cs" />
     <Compile Include="Core\NanoEventRuntimeService.cs" />
+    <Compile Include="Core\MongoSlamRuntimeService.cs" />
     <Compile Include="Core\PetRuntimeService.cs" />
     <Compile Include="Core\PetCommandService.cs" />
     <Compile Include="Core\PetHealNanoCatalog.cs" />
@@ -246,6 +268,8 @@
     <Compile Include="Core\PetSummonScfuExtensions.cs" />
     <Compile Include="Core\PetSummonCaptureWireReplayer.cs" />
     <Compile Include="Core\PetBureaucratGuardianScfuWire.cs" />
+    <Compile Include="Core\SurveillanceDroidScfuWire.cs" />
+    <Compile Include="Core\FlintKneecappingTipWire.cs" />
     <Compile Include="Core\PetSummonSpellListBuilder.cs" />
     <Compile Include="Core\PetSummonSpellListService.cs" />
     <Compile Include="Core\PetShellItemService.cs" />
@@ -253,14 +277,46 @@
     <Compile Include="Core\MessageHandlers\AddTemplateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AppearanceUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AttackMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CharSecSpecAttackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\BankMessageHandler.cs" />
     <Compile Include="Core\Mail\MailMessageHandler.cs" />
     <Compile Include="Core\Mail\MailRuntimeService.cs" />
     <Compile Include="Core\GMI\GmiRuntimeService.cs" />
+    <Compile Include="Core\GMI\GmiMarketTerminalInteractionHandler.cs" />
     <Compile Include="Core\GMI\MarketSendMessageHandler.cs" />
     <Compile Include="Core\Perks\PerkDefinition.cs" />
     <Compile Include="Core\Perks\PerkCatalog.cs" />
     <Compile Include="Core\Perks\PerkRuntimeService.cs" />
+    <Compile Include="Core\Perks\PerkResetMissionSender.cs" />
+    <Compile Include="Core\Missions\MissionRollCaptureTemplate.cs" />
+    <Compile Include="Core\Missions\MissionRollCaptureLibrary.cs" />
+    <Compile Include="Core\Missions\MissionRollService.cs" />
+    <Compile Include="Core\Missions\MissionOfferStore.cs" />
+    <Compile Include="Core\Missions\MissionLevelTable.cs" />
+    <Compile Include="Core\Missions\MissionKeyStore.cs" />
+    <Compile Include="Core\Missions\MissionDiagnostics.cs" />
+    <Compile Include="Core\Missions\MissionTypeCatalog.cs" />
+    <Compile Include="Core\Missions\MissionLocationPool.cs" />
+    <Compile Include="Core\Missions\MissionRewardCatalog.cs" />
+    <Compile Include="Core\Missions\MissionAcceptedStore.cs" />
+    <Compile Include="Core\Missions\MissionKeyGrantService.cs" />
+    <Compile Include="Core\Missions\MissionInstanceService.cs" />
+    <Compile Include="Core\Missions\MissionCompleteService.cs" />
+    <Compile Include="Core\Missions\MissionTargetTracker.cs" />
+    <Compile Include="Core\Missions\MissionMachineTracker.cs" />
+    <Compile Include="Core\Missions\MissionRepairService.cs" />
+    <Compile Include="Core\Missions\MissionInstanceDoorCapture.cs" />
+    <Compile Include="Core\Missions\MissionInstanceDynelCapture.cs" />
+    <Compile Include="Core\Missions\MissionInstanceDoorReplay.cs" />
+    <Compile Include="Core\Missions\MissionInstanceMobCombat.cs" />
+    <Compile Include="Core\Playfields\MissionInstanceShapeCatalog.cs" />
+    <Compile Include="Core\Playfields\MissionInstanceSpawn.cs" />
+    <Compile Include="Core\Missions\MissionAcceptService.cs" />
+    <Compile Include="Core\Missions\MissionAcceptCaptureTemplate.cs" />
+    <Compile Include="Core\MessageHandlers\QuestAlternativeMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CreateQuestMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\QuestMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\MissionEntranceInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\BuffMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\AddPetMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\RemovePetMessageHandler.cs" />
@@ -312,6 +368,7 @@
     <Compile Include="Core\MessageHandlers\KnuBotStartTradeMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\KnuBotTradeMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\LookAtMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\InspectMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\OrgClientMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\PlayfieldAnarchyFMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\ResearchRequestMessageHandler.cs" />
@@ -319,10 +376,13 @@
     <Compile Include="Core\MessageHandlers\RexB18DInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\RexB18DInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\CapturedSubwayVendorInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedThrakGardenVendorInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedHoloDeckVendorInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\ShopUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SimpleItemFullUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SkillMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\SocialActionCmdMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\InsuranceTerminalInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\SurgeryClinicInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\SurgeryClinicInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\StaticDynelInteractionHandler.cs" />
@@ -360,6 +420,13 @@
     <Compile Include="Core\Packets\WeaponItemFullUpdate.cs" />
     <Compile Include="Core\Playfields\Content\AreteContentModule.cs" />
     <Compile Include="Core\Playfields\Content\JobePlatformContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\NascenceCoreContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\NascenceLifeContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\ThrakOmniGardenContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\RomeBlueCityContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\AndromedaIccHqContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\HoloDeckContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\MissionInstanceContentModule.cs" />
     <Compile Include="Core\Playfields\Content\IPlayfieldContentModule.cs" />
     <Compile Include="Core\Playfields\Content\MontroyalContentModule.cs" />
     <Compile Include="Core\Playfields\Content\PlayfieldContentCoordinator.cs" />
@@ -368,7 +435,22 @@
     <Compile Include="Core\Playfields\Content\SubwayContentModule.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
+    <Compile Include="Core\Playfields\NascenceCoreHecklerContentProvider.cs" />
+    <Compile Include="Core\Playfields\NascenceCoreHecklerSpawnOrchestrator.cs" />
+    <Compile Include="Core\Playfields\NascenceLifeSpawn.cs" />
+    <Compile Include="Core\Playfields\ThrakOmniGardenSpawn.cs" />
     <Compile Include="Core\Playfields\PerkResetServiceProviderSpawn.cs" />
+    <Compile Include="Core\Playfields\RomeBlueCitySpawn.cs" />
+    <Compile Include="Core\Playfields\AndromedaIccHqSpawn.cs" />
+    <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />
+    <Compile Include="Core\Playfields\AreteLandingPopulationEnsure.cs" />
+    <Compile Include="Core\Playfields\MarcusPadAmbientCombat.cs" />
+    <Compile Include="Core\Playfields\JunkyardCleaningRobotRuntime.cs" />
+    <Compile Include="Core\Playfields\AlexAreaMobRuntime.cs" />
+    <Compile Include="Core\Playfields\SurveillanceDroidRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteLandingQuestPropDefinitions.cs" />
+    <Compile Include="Core\Playfields\HoloDeckSpawn.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
@@ -427,6 +509,16 @@
     <Compile Include="Core\Playfields\CapturedSubwayTailorDialogueRuntime.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayVendorRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedThrakGardenVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedThrakGardenVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedThrakGardenVendorRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedHoloDeckVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedHoloDeckVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedHoloDeckVendorRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorDefinition.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorStockDefinition.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />
@@ -553,6 +645,24 @@
     <Content Include="Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Arete\flint-novak\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\flint-novak.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\alex-gibbs.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\stan-goodman.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\icc-immigration-officer-bill.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\quests\flint-novak.quests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Subway\windcaller-karrec\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -566,6 +676,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Subway\tailor\dialogue\tailor.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Thrak\garden-key\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Thrak\garden-vendors\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Thrak\garden-vendors\dialogue\thrak-garden-vendors.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Thrak\garden-key\dialogue\thrak-garden-key.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Thrak\garden-key\quests\thrak-garden-key.quests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\dummy.txt">
@@ -635,6 +760,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\PerkActions.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionLevels.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionRewards\ItemDb_Clusters.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionRewards\ItemDB_Implants.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionRewards\ItemDb_Nanos.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionRewards\ItemDb_Refined.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionRewards\ItemDb_Rest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\Playfields.xml">

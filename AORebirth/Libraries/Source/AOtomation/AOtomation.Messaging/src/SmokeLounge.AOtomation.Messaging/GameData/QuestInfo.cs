@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,7 +27,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         [AoMember(4)]
         public int Unknown4 { get; set; }
 
-        [AoMember(5, SerializeSize = ArraySizeType.NoSerialization, FixedSizeLength = 32)]
+        [AoMember(5, SerializeSize = ArraySizeType.NoSerialization, FixedSizeLength = 32, IsFixedSize = true)]
         public string ShortInfo { get; set; }
 
         [AoMember(6, SerializeSize = ArraySizeType.Int32)]

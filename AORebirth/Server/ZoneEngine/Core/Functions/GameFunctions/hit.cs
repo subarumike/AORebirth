@@ -203,6 +203,18 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                         actualDamage));
             }
 
+            if (affected.Controller != null
+                && affected.Controller.Client != null
+                && source.Identity != affected.Identity)
+            {
+                ChatTextMessageHandler.Default.Send(
+                    affected,
+                    string.Format(
+                        "<font color=#FF0000>{0} hit you for {1} points of damage.</font>",
+                        string.IsNullOrWhiteSpace(source.Name) ? "Something" : source.Name,
+                        actualDamage));
+            }
+
             if (source.Identity != affected.Identity)
             {
                 playfield.AcquireNpcAggro(source, affected);

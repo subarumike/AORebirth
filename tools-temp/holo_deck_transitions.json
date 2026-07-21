@@ -1,0 +1,66 @@
+{
+  "capture": "20260719-155043",
+  "entry": {
+    "sourcePlayfieldId": 655,
+    "sourcePlayfieldHex": "0x28F",
+    "sourceName": "Andromeda ICC HQ",
+    "triggerPacket": "CharacterActionMessage Action=137 (0x89, undocumented; likely door/use acknowledgment)",
+    "triggerPosition": [
+      3245.94,
+      36.085,
+      943.3943
+    ],
+    "triggerHeading": [
+      0,
+      0.182956,
+      0,
+      0.9831211
+    ],
+    "teleportPacket": "N3TeleportMessage",
+    "teleportSequenceIn": 129,
+    "destinationPlayfieldId": 7001,
+    "destinationPlayfieldHex": "0x1B59",
+    "landingPosition": [
+      183.01,
+      1.02,
+      197.01
+    ],
+    "landingHeading": [
+      0,
+      0.182956,
+      0,
+      0.9831211
+    ]
+  },
+  "exit": {
+    "sourcePlayfieldId": 7001,
+    "triggerType": "walk-on / statel vicinity (ForwardStop at exit threshold; no Action=137)",
+    "triggerPosition": [
+      178.5387,
+      1.02,
+      197.1772
+    ],
+    "triggerHeading": [
+      0,
+      -0.8022833,
+      0,
+      0.5969435
+    ],
+    "teleportPacket": "N3TeleportMessage",
+    "teleportSequenceIn": 340,
+    "destinationPlayfieldId": 655,
+    "destinationPlayfieldHex": "0x28F",
+    "landingPosition": [
+      3245,
+      35.715,
+      939
+    ],
+    "landingHeading": [
+      0,
+      -0.8022833,
+      0,
+      0.5969435
+    ]
+  },
+  "statelIdentityNote": "No StatelFullUpdate or statel instance in capture. Use coordinate-radius zones in PlayfieldStatelTransitionRuntimeService (Montroyal/Subway pattern). DB teleports.sql has no 655<->7001 row."
+}

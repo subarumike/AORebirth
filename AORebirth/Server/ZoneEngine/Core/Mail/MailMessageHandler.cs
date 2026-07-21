@@ -37,6 +37,15 @@ namespace ZoneEngine.Core.Mail
         protected override void Read(MailMessage message, IZoneClient client)
         {
             ICharacter character = client.Controller.Character;
+            try
+            {
+                ZoneEngine.Core.GMI.GmiRuntimeService.ProcessPendingWithdrawals(character);
+            }
+            catch (Exception ex)
+            {
+                client.Server.Info(client, "GMI ProcessPendingWithdrawals during Mail failed: {0}", ex.Message);
+            }
+
             client.Server.Info(
                 client,
                 "Mail action={0}({1}) requestId={2} recipient={3} subject={4} credits={5} express={6}",
@@ -167,6 +176,10 @@ namespace ZoneEngine.Core.Mail
                     x.Detail = updated;
                 });
 
+            // Capture 20260715-Recive-mail: after Take All, live sends action 4 with 0x7F so the
+            // client clears its attachment lock (Delete is blocked until this).
+            this.SendMailFlagsUpdate(character, mailId);
+
             // Refresh inbox so read icon / attachment state update on list rows.
             this.SendMailboxList(character);
 
@@ -192,12 +205,37 @@ namespace ZoneEngine.Core.Mail
             string failure;
             if (!MailRuntimeService.TryReturnToSender(character, mailId, out failure))
             {
-                ChatTextMessageHandler.Default.Send(character, failure ?? "Return to sender failed.");
+                string text = failure ?? "Return to sender failed.";
+                if (character.Controller != null && character.Controller.Client != null)
+                {
+                    character.Controller.Client.Server.Info(
+                        character.Controller.Client,
+                        "Mail ReturnToSender FAILED id={0}: {1}",
+                        mailId,
+                        text);
+                }
+
+                this.SendFormatFeedbackDialog(character, text);
+                ChatTextMessageHandler.Default.Send(character, text);
+                this.SendMailboxList(character);
                 return;
             }
 
             this.SendMailboxList(character);
-            ChatTextMessageHandler.Default.Send(character, "Mail returned to sender.");
+
+            // System-mail discard path sets failureReason with an explanation but still succeeds.
+            string okText = !string.IsNullOrEmpty(failure) ? failure : "Mail returned to sender.";
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.Server.Info(
+                    character.Controller.Client,
+                    "Mail ReturnToSender OK id={0}: {1}",
+                    mailId,
+                    okText);
+            }
+
+            this.SendFormatFeedbackDialog(character, okText);
+            ChatTextMessageHandler.Default.Send(character, okText);
         }
 
         /// <summary>
@@ -273,8 +311,32 @@ namespace ZoneEngine.Core.Mail
                     x.Detail = detail;
                 });
 
+            // Capture: open detail then action 4 flags=0x7D (read). Client uses this for attachment
+            // / read state on the open message window.
+            this.SendMailFlagsUpdate(character, mailId);
+
             // Open marks read; push list so inbox envelope icon can flip.
             this.SendMailboxList(character);
+        }
+
+        private void SendMailFlagsUpdate(ICharacter character, ulong mailId)
+        {
+            int flags;
+            if (!MailRuntimeService.TryGetMailFlagsUpdate(character.Name, mailId, out flags))
+            {
+                return;
+            }
+
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Action = MailAction.UpdateMailFlags;
+                    x.RequestedMailId = mailId;
+                    x.MailFlagsUpdate = flags;
+                });
         }
     }
 }

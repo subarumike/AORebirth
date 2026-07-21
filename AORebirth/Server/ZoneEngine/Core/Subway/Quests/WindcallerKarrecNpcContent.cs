@@ -20,10 +20,14 @@ namespace ZoneEngine.Core.Subway.Quests
 
         internal const int AnnoyingDudeSourceInstance = 0x796360BD;
 
-        internal const string GateEnvironmentVariableName =
-            "AO_REBIRTH_ENABLE_SUBWAY_KARREC_QUEST";
-
         internal const string Evidence = "AOSharpLiveCapture/20260717-223626";
+
+        /// <summary>
+        /// Karrec sit + full mesh/texture: dynel focus capture 20260719-174340 (no SCFU;
+        /// already spawned) plus same-day SCFU wire from 20260719-ICC-Capture.
+        /// </summary>
+        internal const string KarrecAppearanceEvidence =
+            "AOSharpLiveCapture/20260719-174340+20260719-ICC-Capture";
 
         private static readonly WindcallerKarrecNpcDefinition KarrecDefinition = CreateKarrec();
 
@@ -82,13 +86,13 @@ namespace ZoneEngine.Core.Subway.Quests
             return new WindcallerKarrecNpcDefinition(
                 KarrecSourceInstance,
                 "Windcaller Karrec",
-                3212.37549f,
+                3212.36963f,
                 35.975f,
-                788.760132f,
+                788.7493f,
                 0.0f,
                 0.0f,
                 0.0f,
-                0.99999994f,
+                1.0f,
                 1576,
                 (int)Side.Neutral,
                 (int)Fatness.Normal,
@@ -107,6 +111,7 @@ namespace ZoneEngine.Core.Subway.Quests
                 31,
                 1,
                 170552011u,
+                // Unknown1 move-mode byte 0x08 = Sit (MoveModes.Sit).
                 HexToBytes("00000000000000000000000008010001000100010001000000020000"),
                 new[]
                 {
@@ -125,9 +130,9 @@ namespace ZoneEngine.Core.Subway.Quests
                 new WindcallerKarrecNpcPatrolSegment[0],
                 new[]
                 {
-                    new WindcallerKarrecNpcActiveNanoDefinition(53019, 0x3233F, 0, 29050327, 29050327)
+                    new WindcallerKarrecNpcActiveNanoDefinition(53019, 0x3233F, 0, 29050327, 20192939)
                 },
-                Evidence);
+                KarrecAppearanceEvidence);
         }
 
         private static WindcallerKarrecNpcDefinition CreateAnnoyingDude()
@@ -213,7 +218,9 @@ namespace ZoneEngine.Core.Subway.Quests
                 31,
                 0,
                 168520395u,
-                HexToBytes("BFB2416532D4C72A3F0EA85402020101000100010001000000020000"),
+                // Capture decode for Maddy Unknown1 was corrupt (float garbage in the first
+                // 12 bytes). Use the same NPC Unknown1 shape as Dude/Karrec.
+                HexToBytes("00000000000000000000000002010001000100010001000000020000"),
                 new[]
                 {
                     new WindcallerKarrecNpcTextureDefinition(0, 0, 0),
@@ -224,13 +231,13 @@ namespace ZoneEngine.Core.Subway.Quests
                 },
                 new[]
                 {
-                    new WindcallerKarrecNpcMeshDefinition(0, 40647, 0, 4),
-                    new WindcallerKarrecNpcMeshDefinition(1, 290019, 0, 2)
+                    // Head mesh only. Capture also listed mesh 290019; keep that out until
+                    // SCFU is stable — secondary mesh was a crash suspect with forced flags.
+                    new WindcallerKarrecNpcMeshDefinition(0, 40647, 0, 4)
                 },
                 new[]
                 {
-                    new WindcallerKarrecNpcWaypointDefinition(3332.37524f, 35.1100006f, 931.1814f),
-                    new WindcallerKarrecNpcWaypointDefinition(3329.789f, 35.1100006f, 932.215942f)
+                    new WindcallerKarrecNpcWaypointDefinition(3332.37524f, 35.1100006f, 931.1814f)
                 },
                 MaddyCardilePatrol(),
                 new WindcallerKarrecNpcActiveNanoDefinition[0],

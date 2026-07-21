@@ -4354,6 +4354,8 @@ namespace AORebirth.Stats
             this.objectType.DoNotDontWriteToSql = true;
             this.instance.DoNotDontWriteToSql = true;
             this.gmLevel.DoNotDontWriteToSql = true;
+            // Mail is in-memory only; persisting UnreadMailCount poisons the envelope HUD after restart.
+            this.unreadMailCount.DoNotDontWriteToSql = true;
         }
 
         #endregion

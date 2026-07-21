@@ -119,6 +119,7 @@
     <Compile Include="Dao\InstancedItemDao.cs" />
     <Compile Include="Dao\ItemDao.cs" />
     <Compile Include="Dao\ItemNamesDao.cs" />
+    <Compile Include="Dao\GmiVaultDao.cs" />
     <Compile Include="Dao\LoginDataDao.cs" />
     <Compile Include="Dao\OrganizationDao.cs" />
     <Compile Include="Dao\ReceivedMessagesDao.cs" />
@@ -129,7 +130,9 @@
     <Compile Include="Dao\TeleportDao.cs" />
     <Compile Include="Dao\TradeSkillDao.cs" />
     <Compile Include="Dao\UploadedNanosDao.cs" />
+    <Compile Include="Dao\CharacterPerksDao.cs" />
     <Compile Include="Dao\CharacterActiveNanosDao.cs" />
+
     <Compile Include="Dao\VendorDao.cs" />
     <Compile Include="Dao\VendorTemplateDao.cs" />
     <Compile Include="Entities\DBMobDroptable.cs" />
@@ -150,7 +153,9 @@
     <Compile Include="Entities\DBStats.cs" />
     <Compile Include="Entities\DBTradeSkill.cs" />
     <Compile Include="Entities\DBUploadedNano.cs" />
+    <Compile Include="Entities\DBCharacterPerk.cs" />
     <Compile Include="Entities\DBCharacterActiveNano.cs" />
+
     <Compile Include="Entities\DBVendor.cs" />
     <Compile Include="Entities\DBVendorTemplate.cs" />
     <Compile Include="Entities\ForeignKeyAttribute.cs" />
@@ -195,6 +200,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlTables\charactersuploadednanos.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlTables\charactersperks.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlTables\instanceditems.sql">

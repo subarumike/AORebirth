@@ -25,6 +25,22 @@ namespace ZoneEngine.Core.Missions
         public const string RexB18EQuestId = MissionDefinitionCatalog.RexB18EQuestId;
         public const string RexB18FQuestId = MissionDefinitionCatalog.RexB18FQuestId;
         public const string RexB194QuestId = MissionDefinitionCatalog.RexB194QuestId;
+        public const string RexB196QuestId = MissionDefinitionCatalog.RexB196QuestId;
+        public const string RexFlintQuestId = MissionDefinitionCatalog.RexFlintQuestId;
+        public const string RexB199QuestId = MissionDefinitionCatalog.RexB199QuestId;
+        public const string RexB19AQuestId = MissionDefinitionCatalog.RexB19AQuestId;
+        public const string RexFlintFindBioQuestId = MissionDefinitionCatalog.RexFlintFindBioQuestId;
+        public const string RexFlintDeliverBioQuestId = MissionDefinitionCatalog.RexFlintDeliverBioQuestId;
+        public const string RexFlintSurveillanceUplinkQuestId =
+            MissionDefinitionCatalog.RexFlintSurveillanceUplinkQuestId;
+        public const string RexFlintPlantBugQuestId = MissionDefinitionCatalog.RexFlintPlantBugQuestId;
+        public const string RexFlintDeliverHc12BillQuestId =
+            MissionDefinitionCatalog.RexFlintDeliverHc12BillQuestId;
+        public const string RexFlintKneecappingQuestId = MissionDefinitionCatalog.RexFlintKneecappingQuestId;
+        public const string RexFlintReportToAlexQuestId = MissionDefinitionCatalog.RexFlintReportToAlexQuestId;
+        public const string RexFlintTalkToStanQuestId = MissionDefinitionCatalog.RexFlintTalkToStanQuestId;
+        public const string RexFlintTradeskillNanoSensorQuestId =
+            MissionDefinitionCatalog.RexFlintTradeskillNanoSensorQuestId;
         public const string WindcallerKarrecQuestId = MissionDefinitionCatalog.WindcallerKarrecQuestId;
 
         private static readonly object SyncRoot = new object();

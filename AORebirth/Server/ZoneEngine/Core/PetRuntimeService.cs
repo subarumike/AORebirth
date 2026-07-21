@@ -100,7 +100,10 @@ namespace ZoneEngine.Core
                 petSlotStrain,
                 true);
 
-            string mobHash = PetMobTemplateResolver.Resolve(petHash);
+            string preferredBaseHash = summonNanoId > 0
+                ? PetSummonNanoCatalog.GetPreferredPetHash(summonNanoId)
+                : null;
+            string mobHash = PetMobTemplateResolver.Resolve(petHash, preferredBaseHash);
             if (string.IsNullOrWhiteSpace(mobHash))
             {
                 LogUtil.Debug(DebugInfoDetail.GameFunctions, "SummonPet unknown pet hash " + petHash);
@@ -205,7 +208,10 @@ namespace ZoneEngine.Core
             {
                 PetBureaucratGuardianAppearance.Apply(petCharacter, summonNanoId);
             }
-            this.ApplyHealingPetNanoPool(petCharacter, petSlotStrain, petHash);
+            this.ApplyHealingPetNanoPool(
+                petCharacter,
+                petSlotStrain,
+                preferredBaseHash ?? petHash);
             this.ApplyRestoredPetCombatStats(owner, petCharacter, petSlotStrain);
             petCharacter.Stats[StatIds.petmaster].Value = owner.Identity.Instance;
             petCharacter.Stats[StatIds.pettype].Value = resolvedPetTypeId;
@@ -224,7 +230,7 @@ namespace ZoneEngine.Core
             }
 
             SimpleCharFullUpdateMessage petSpawnUpdate =
-                this.ConstructPetSpawnFullUpdate(petCharacter, petSlotStrain, summonNanoId);
+                this.ConstructPetSpawnFullUpdate(petCharacter, petSlotStrain, summonNanoId, owner, petHash);
 
             ownerClient.Server.Info(
                 ownerClient,
@@ -241,7 +247,8 @@ namespace ZoneEngine.Core
                     ownerClient,
                     owner,
                     petCharacter,
-                    petHash);
+                    petHash,
+                    preferredBaseHash ?? petHash);
                 this.SendPetStatToOwner(
                     ownerClient,
                     petCharacter.Identity,
@@ -896,12 +903,18 @@ namespace ZoneEngine.Core
         private SimpleCharFullUpdateMessage ConstructPetSpawnFullUpdate(
             Character petCharacter,
             int petSlotStrain,
-            int summonNanoId)
+            int summonNanoId,
+            ICharacter owner = null,
+            string spawnPetHash = null)
         {
             SimpleCharFullUpdateMessage message = SimpleCharFullUpdate.ConstructMessage(petCharacter);
             if (petSlotStrain == PetSlotClassifier.HealingPetStrain)
             {
-                PetSummonScfuExtensions.ApplyCapturedMpPetMetadata(message, petSlotStrain);
+                PetSummonScfuExtensions.ApplyCapturedMpPetMetadata(
+                    message,
+                    petSlotStrain,
+                    owner,
+                    spawnPetHash);
             }
 
             return message;

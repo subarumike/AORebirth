@@ -1,0 +1,11 @@
+{
+  "DialoguePacks": [
+    "dialogue/flint-novak.dialogue.json",
+    "dialogue/alex-gibbs.dialogue.json",
+    "dialogue/icc-immigration-officer-bill.dialogue.json",
+    "dialogue/stan-goodman.dialogue.json"
+  ],
+  "QuestPacks": [
+    "quests/flint-novak.quests.json"
+  ]
+}

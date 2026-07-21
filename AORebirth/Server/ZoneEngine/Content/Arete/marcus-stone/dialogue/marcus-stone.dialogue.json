@@ -1,14 +1,17 @@
 {
   "Identity": {
     "Id": "arete-marcus-stone-dialogue-20260614-195107",
-    "Version": "captured-static-b18f-20260619",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log + packets.hex.log"
+    "Version": "captured-marcus-wounded-20260719-224226",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107 + 20260719-Rex-Markus-stone/chat-dialogue.log"
   },
   "SourceCaptures": [
     "20260614-195107",
+    "20260719-Rex-Markus-stone",
     "tools-temp/arete-analysis/dialogue_trees.json",
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log",
-    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log"
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log",
+    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-Rex-Markus-stone/chat-dialogue.log",
+    "20260719-224226"
   ],
   "Npcs": [
     {
@@ -120,6 +123,260 @@
             }
           ],
           "EnterActions": []
+        },
+        {
+          "Id": "marcus_return_001",
+          "PromptText": "You did a pretty good job there!",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1298",
+          "Options": [
+            {
+              "Id": "marcus_return_001_option_0",
+              "Index": 0,
+              "Text": "Thanks.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T16:55:48.1838967Z, 20260719-Rex-Markus-stone/chat-dialogue.log",
+              "NextNodeId": "marcus_return_trade",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_return_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T16:55:48.1838967Z, 20260719-Rex-Markus-stone/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_return_trade",
+          "PromptText": "Hand me the Compact Fire Suppressant Container, please.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1370",
+          "Options": [
+            {
+              "Id": "marcus_return_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic continue option; post-trade resumes to Thanks again per capture RejectedItems → AnswerList.",
+              "NextNodeId": "marcus_return_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_return_002",
+          "PromptText": "And, good to my word.... \\n\\nReaching into a small pouch by his side he produces a thin, flat, metallic disc, barely larger than a fingernail.\\n\\nThere. That's a generic nano transmitter, pretty standard equipment for... well, most everything. Same gizmo that lets you see things like data and information via your NCU's heads-up-display. Most of 'em are already programmed with something or another - Manufacturer's information, warning notes, care & use & feeding or whatever of whatever it is you're looking at. Typically blank ones aren't issued to the public - Supposed to make 'em hard to fake... Now, you go talk to Flint Novak. He runs the junkyard. Just head on down for the bottom of the ramp and look for a little shack. Can't miss it.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1507-1509 exact",
+          "Options": [
+            {
+              "Id": "marcus_return_002_option_0",
+              "Index": 0,
+              "Text": "Thanks again.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T16:55:55.9174015Z, 20260719-Rex-Markus-stone/chat-dialogue.log",
+              "NextNodeId": "marcus_return_003",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_return_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T16:55:55.9174015Z, 20260719-Rex-Markus-stone/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_return_003",
+          "PromptText": "Was there anything else?",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1600",
+          "Options": [
+            {
+              "Id": "marcus_return_003_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T16:55:58.9404835Z, 20260719-Rex-Markus-stone/chat-dialogue.log",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_return_003_option_1",
+              "Index": 1,
+              "Text": "Where am I?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T16:55:58.9404835Z, 20260719-Rex-Markus-stone/chat-dialogue.log",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_return_003_option_2",
+              "Index": 2,
+              "Text": "Are those wounded workers your guys?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:16.0746449Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_wounded_001",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_return_003_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:16.0746449Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_wounded_001",
+          "PromptText": "They are.. Say, if you are not in a hurry would you mind saving at least one of them? I'll reward you with some equipment to patch yourself up when you get hurt.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1741",
+          "Options": [
+            {
+              "Id": "marcus_wounded_001_option_0",
+              "Index": 0,
+              "Text": "I'll do it, just tell me how.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:20.5953771Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_wounded_002",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_wounded_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:20.5953771Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_wounded_002",
+          "PromptText": "Take this Health Regeneration Stim and use it on one of my wounded workers.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1835",
+          "Options": [
+            {
+              "Id": "marcus_wounded_002_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:23.6365003Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_heal_001",
+          "PromptText": "What?",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #2574",
+          "Options": [
+            {
+              "Id": "marcus_heal_001_option_0",
+              "Index": 0,
+              "Text": "I healed one of your workers with the Health Regeneration Stim.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:45.8980708Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_heal_trade",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_heal_001_option_1",
+              "Index": 1,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:45.8980708Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_heal_001_option_2",
+              "Index": 2,
+              "Text": "Where am I?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:45.8980708Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_heal_001_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:45.8980708Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_heal_trade",
+          "PromptText": "Great, hand me the stim.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #2721",
+          "Options": [
+            {
+              "Id": "marcus_heal_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic continue option; post-trade resumes to You are welcome per capture RejectedItems → AnswerList.",
+              "NextNodeId": "marcus_heal_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_heal_002",
+          "PromptText": "Thank you for saving one of my workers. Here, take this first aid equipment to heal yourself when you need it.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #2881",
+          "Options": [
+            {
+              "Id": "marcus_heal_002_option_0",
+              "Index": 0,
+              "Text": "You are welcome.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:53.9074824Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_heal_003",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_heal_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:53.9074824Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_heal_003",
+          "PromptText": "Good luck out there, kid.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 #3001",
+          "Options": [
+            {
+              "Id": "marcus_heal_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:57.6760468Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_goodbye",
+          "PromptText": "Yep, off you go.",
+          "PromptTextConfidence": "KnubotAppendText 20260719-224226 goodbye then CloseChatWindow",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "marcus_goodbye_end_dialogue",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after captured Yep, off you go."
+            }
+          ]
         }
       ],
       "Conditions": [],

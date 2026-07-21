@@ -1052,7 +1052,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadRepositoryFile(
                     @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs");
 
-            AssertContains(service, "public void DeleteInventoryItemAction");
+            AssertContains(service, "public bool DeleteInventoryItemAction");
             AssertContains(service, "ItemDao.Instance.Delete(");
             AssertContains(service, "character.BaseInventory.RemoveItem(");
             AssertContains(service, "public void SplitInventoryItemStackAction");
@@ -1062,7 +1062,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             AssertContains(
                 characterActionHandler,
-                "InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(client.Controller.Character, message);");
+                "InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(");
+            AssertContains(
+                characterActionHandler,
+                "ThrakGardenKeyQuestRuntime.TryForceReturnGardenKey");
             AssertContains(
                 characterActionHandler,
                 "InventoryContainerRuntimeService.Default.SplitInventoryItemStackAction(client.Controller.Character, message);");

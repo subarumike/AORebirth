@@ -81,7 +81,28 @@ namespace ZoneEngine.Core
 
         public void EnterZoningForPlayfieldTransfer()
         {
-            this.TransitionTo(ZoneClientSessionPhase.Zoning);
+            // CellAO Playfield.Teleport has no session-phase gate. AORebirth visibility
+            // can leave the client in CharInPlay (CharInPlay packet often never arrives),
+            // and Zoning was only legal from InPlay — statue Teleport then threw and aborted.
+            if (this.Phase == ZoneClientSessionPhase.Zoning)
+            {
+                return;
+            }
+
+            if (this.Phase == ZoneClientSessionPhase.CharInPlay)
+            {
+                this.Phase = ZoneClientSessionPhase.InPlay;
+                this.phaseHistory.Add(ZoneClientSessionPhase.InPlay);
+            }
+
+            if (this.CanTransitionTo(ZoneClientSessionPhase.Zoning))
+            {
+                this.TransitionTo(ZoneClientSessionPhase.Zoning);
+                return;
+            }
+
+            this.Phase = ZoneClientSessionPhase.Zoning;
+            this.phaseHistory.Add(ZoneClientSessionPhase.Zoning);
         }
 
         public void EnterDisconnectingForSessionDispose()
@@ -150,7 +171,8 @@ namespace ZoneEngine.Core
                 case ZoneClientSessionPhase.FullCharacterBoundary:
                     return to == ZoneClientSessionPhase.CharInPlay;
                 case ZoneClientSessionPhase.CharInPlay:
-                    return to == ZoneClientSessionPhase.InPlay;
+                    return to == ZoneClientSessionPhase.InPlay
+                           || to == ZoneClientSessionPhase.Zoning;
                 case ZoneClientSessionPhase.InPlay:
                     return to == ZoneClientSessionPhase.Zoning;
                 case ZoneClientSessionPhase.Zoning:

@@ -42,6 +42,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
@@ -55,6 +56,16 @@ namespace ZoneEngine.Core.MessageHandlers
     public class TeleportMessageHandler : BaseMessageHandler<N3TeleportMessage, TeleportMessageHandler>
     {
         private const IdentityType LivePlayfieldProxyType = (IdentityType)0x0000C79E;
+
+        /// <summary>Capture 20260718-062936 mission-enter N3Teleport Playfield identity type (ACGBuildingGeneratorData).</summary>
+        private const IdentityType LiveMissionBuildingType = (IdentityType)0x0000C79F;
+
+        /// <summary>Capture 20260718-062936 mission-enter building instance on the wire.</summary>
+        private const int CapturedMissionBuildingInstance = unchecked((int)0x00D6D5C0);
+
+        private const int CapturedMissionTeleportPlayfield2Type = 0x000186A2;
+
+        private const int CapturedMissionTeleportPlayfield2Instance = 1;
 
         private const int CapturedPrivateCityBuildingInstance = 0x0000177A;
 
@@ -240,6 +251,28 @@ namespace ZoneEngine.Core.MessageHandlers
                                 W = (float)heading.w
                             };
                 x.Unknown1 = 0x61;
+                if (IsMissionInstanceDestination(playfield))
+                {
+                    // Capture 20260718-062936: ACGBuildingGeneratorData + GameServerId=0 + Playfield2(100002:1) + empty payload.
+                    x.Playfield = new Identity
+                                  {
+                                      Type = LiveMissionBuildingType,
+                                      Instance = CapturedMissionBuildingInstance
+                                  };
+                    x.GameServerId = 0;
+                    x.SgId = 0;
+                    x.ChangePlayfield = new Identity { Type = IdentityType.Playfield2, Instance = playfield.Instance };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = new Identity
+                                   {
+                                       Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
+                                       Instance = CapturedMissionTeleportPlayfield2Instance
+                                   };
+                    x.Payload = new byte[0];
+                    return;
+                }
+
                 x.Playfield = IsPrivateCityDestination(playfield)
                                   ? new Identity { Type = LivePlayfieldProxyType, Instance = CapturedPrivateCityBuildingInstance }
                                   : new Identity() { Type = LivePlayfieldProxyType, Instance = playfield.Instance };
@@ -355,6 +388,16 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             return AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(
                 new Identity { Type = IdentityType.Playfield2, Instance = playfield.Instance });
+        }
+
+        private static bool IsMissionInstanceDestination(Identity playfield)
+        {
+            if (playfield.Type != IdentityType.Playfield && playfield.Type != IdentityType.Playfield2)
+            {
+                return false;
+            }
+
+            return MissionInstanceService.IsMissionInstancePlayfield(playfield.Instance);
         }
 
         private static int ResolvePrivateCityOrganizationInstance(ICharacter character)

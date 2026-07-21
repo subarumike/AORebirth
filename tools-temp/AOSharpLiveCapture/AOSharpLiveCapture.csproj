@@ -47,10 +47,11 @@
     <Compile Include="CaptureRuntimeSafety.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MinimalPf127Capture.cs" />
+    <Compile Include="MissionFlowCapture.cs" />
     <Compile Include="Pf127GeometryCapture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="Exists('..\external\aosharp-github\AOSharp.Core\AOSharp.Core.csproj')">
     <ProjectReference Include="..\external\aosharp-github\AOSharp.Common\AOSharp.Common.csproj">
       <Project>{2f48116b-5d7e-449c-a05a-7d82ea7169a3}</Project>
       <Name>AOSharp.Common</Name>
@@ -59,6 +60,17 @@
       <Project>{77516561-fa9c-47cd-8c2d-fc8a8b67876b}</Project>
       <Name>AOSharp.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <!-- Fallback when the vendored AOSharp tree is not present: reuse last-built plugin dependency DLLs. -->
+  <ItemGroup Condition="!Exists('..\external\aosharp-github\AOSharp.Core\AOSharp.Core.csproj')">
+    <Reference Include="AOSharp.Common">
+      <HintPath>bin\Debug\AOSharp.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AOSharp.Core">
+      <HintPath>bin\Debug\AOSharp.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

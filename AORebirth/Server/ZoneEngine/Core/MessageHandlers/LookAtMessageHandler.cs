@@ -75,6 +75,9 @@ namespace ZoneEngine.Core.MessageHandlers
 
             PetCommandService.OnOwnerLookAtTarget(client.Controller.Character, message.Target);
 
+            // Do NOT complete missions on LookAt — targeting a mob for combat was wiping the journal.
+            // Finish is Kill-target death (and later FindItem / Repair once those objectives exist).
+
             if (client.Controller.LookAt(message.Target))
             {
                 PetCommandService.ResolveFriendlyHealTargetForSelection(

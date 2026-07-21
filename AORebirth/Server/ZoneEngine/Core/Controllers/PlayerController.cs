@@ -106,6 +106,13 @@ namespace ZoneEngine.Core.Controllers
         {
             get
             {
+                // Disconnect/dispose can run before Character was bound (or after the weak
+                // ref was never set). Callers already null-check; do not throw NRE here.
+                if (this.character == null)
+                {
+                    return null;
+                }
+
                 return this.character.Target;
             }
 
@@ -130,6 +137,22 @@ namespace ZoneEngine.Core.Controllers
 
         public void CallFunction(Function function, IEntity caller)
         {
+            // CellAO always applies CallFunction on Character (no target resolve).
+            // Teleport(53016) must stay on the caster — target resolve broke SL statues.
+            // SaveChar(53032) Insurance Terminal must also stay on the caster.
+            if (function != null
+                && (function.FunctionType == (int)FunctionType.Teleport
+                    || function.FunctionType == (int)FunctionType.SaveChar))
+            {
+                FunctionCollection.Instance.CallFunction(
+                    function.FunctionType,
+                    this.Character,
+                    caller,
+                    this.Character,
+                    function.Arguments.Values.ToArray());
+                return;
+            }
+
             IInstancedEntity functionTarget;
             if (!this.TryResolveFunctionTarget(function, out functionTarget))
             {
@@ -157,16 +180,24 @@ namespace ZoneEngine.Core.Controllers
                 case ItemTarget.Target:
                 case ItemTarget.Selectedtarget:
                 {
-                    if (this.Character.SelectedTarget.Instance == 0
-                        || this.Character.SelectedTarget.Instance == this.Character.Identity.Instance)
+                    Identity preferred = this.Character.SelectedTarget;
+                    if (preferred.Instance == 0
+                        || preferred.Instance == this.Character.Identity.Instance)
+                    {
+                        // Attack perk actions (Quick Bash etc.) often need fighting target when
+                        // UsePerk wire Target is the caster (capture 20260715-194155).
+                        preferred = this.Character.FightingTarget;
+                    }
+
+                    if (preferred.Instance == 0
+                        || preferred.Instance == this.Character.Identity.Instance)
                     {
                         // Inventory treatment (rechargers/stims): no other target → self.
                         functionTarget = this.Character;
                         return true;
                     }
 
-                    functionTarget =
-                        this.Character.Playfield.FindByIdentity(this.Character.SelectedTarget);
+                    functionTarget = this.Character.Playfield.FindByIdentity(preferred);
                     if (functionTarget == null)
                     {
                         functionTarget = this.Character;
@@ -456,6 +487,11 @@ namespace ZoneEngine.Core.Controllers
                 }
 
                 NanoEventRuntimeService.Default.ExecuteOnUseEvents(this.Character, nano);
+                Character slamCaster = this.Character as Character;
+                if (slamCaster != null)
+                {
+                    MongoSlamRuntimeService.ApplyCaptureBackedSlamEffects(slamCaster, nanoId);
+                }
 
                 // Instant Hit drain nanos must not be treated as NCU buffs on the caster.
                 if (duration > 0 && !NanoEventRuntimeService.Default.HasOffensiveHitOnUse(nano))
@@ -465,6 +501,12 @@ namespace ZoneEngine.Core.Controllers
                         target,
                         nanoId,
                         duration);
+                    if (slamCaster != null
+                        && nanoId == MongoSlamRuntimeService.UploadedMongoSlamNanoId)
+                    {
+                        // Duration is applied after OnUse; arm HoT now that the program is active.
+                        MongoSlamRuntimeService.BeginHotWhileProgramActive(slamCaster);
+                    }
                 }
             }
 

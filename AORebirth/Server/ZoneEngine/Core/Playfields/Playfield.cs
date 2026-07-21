@@ -74,6 +74,7 @@ namespace AORebirth.Core.Playfields
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Arete.Quests;
@@ -522,6 +523,14 @@ namespace AORebirth.Core.Playfields
         public void AcquireNpcAggro(ICharacter attacker, ICharacter target)
         {
             this.runtimeSystems.AcquireNpcAggro(attacker, target);
+        }
+
+        /// <summary>
+        /// Mongo Slam / TauntNpc: force NPC to retarget the caster even if already fighting.
+        /// </summary>
+        public void ForceNpcTauntAggro(ICharacter taunter, ICharacter npc)
+        {
+            this.runtimeSystems.ForceNpcTauntAggro(taunter, npc);
         }
 
         internal IEnumerable<ICharacter> EnumerateActiveCharacters()
@@ -1019,6 +1028,28 @@ namespace AORebirth.Core.Playfields
             this.SendExistingCorpseVisibilityToClient(sendSCFUs.toClient.Controller.Character);
         }
 
+        /// <summary>
+        /// Send garden/zone staticdynel statues (CellAO CharInPlay SIFU path).
+        /// Must also run on ClientConnected — client often never sends CharInPlay on this fork.
+        /// </summary>
+        public void SendStaticDynelsToClient(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            List<StaticDynel> list =
+                new List<StaticDynel>(Pool.Instance.GetAll<StaticDynel>(this.Identity));
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                "SendStaticDynelsToClient pf=" + this.Identity.Instance + " count=" + list.Count);
+            foreach (StaticDynel staticDynel in list)
+            {
+                SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
+            }
+        }
+
         public void AnnouncePlayerVisibility(ICharacter character)
         {
             this.runtimeSystems.AnnounceJoiningCharacterVisibility(
@@ -1068,11 +1099,36 @@ namespace AORebirth.Core.Playfields
             AORebirth.Core.Vector.Quaternion heading,
             int playfieldInstance)
         {
-            this.Teleport(
-                dynel,
-                destination,
-                heading,
-                new Identity { Type = IdentityType.Playfield, Instance = playfieldInstance });
+            var playfieldIdentity = new Identity { Type = IdentityType.Playfield, Instance = playfieldInstance };
+
+            // Capture 20260719-155043: ICC Holodeck (7001) entry/exit use gateway-style N3Teleport
+            // (Playfield1 + GameServerId=0 + envelope Destination + 12-byte landing payload).
+            // NormalTeleport (C79E + GameServerId=1) freezes/crashes the client on this route.
+            if (playfieldInstance == 7001 || this.Identity.Instance == 7001)
+            {
+                var envelope = new AORebirth.Core.Vector.Vector3(
+                    dynel.RawCoordinates.X,
+                    dynel.RawCoordinates.Y,
+                    dynel.RawCoordinates.Z);
+                var landing = new AORebirth.Core.Vector.Vector3(
+                    (float)destination.x,
+                    (float)destination.y,
+                    (float)destination.z);
+                this.Teleport(
+                    dynel,
+                    destination,
+                    heading,
+                    playfieldIdentity,
+                    character => TeleportMessageHandler.Default.SendCapturedGatewayTransfer(
+                        character,
+                        envelope,
+                        landing,
+                        heading,
+                        playfieldInstance));
+                return;
+            }
+
+            this.Teleport(dynel, destination, heading, playfieldIdentity);
         }
 
         private static int ResolveOrganizationCityId(int organizationInstance)
@@ -1214,6 +1270,73 @@ namespace AORebirth.Core.Playfields
         public void CancelPlayerAttack(ICharacter character)
         {
             this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);
+        }
+
+        /// <summary>
+        /// Applies a capture-backed secondary special (FlingShot / Burst): rolls weapon damage,
+        /// subtracts HP, handles kill. Caller sends SpecialAttackInfo / SpecialUsed packets.
+        /// </summary>
+        public bool TryApplyPlayerSpecialAttack(
+            ICharacter attacker,
+            ICharacter target,
+            int specialStatId,
+            out int damage,
+            out int ammoCount,
+            out int equipSlot)
+        {
+            damage = 0;
+            ammoCount = 0;
+            equipSlot = (int)WeaponSlots.Righthand;
+
+            if (attacker == null || target == null || !PlayerSpecialAttackRules.IsSupportedSpecial(specialStatId))
+            {
+                return false;
+            }
+
+            CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
+            if (attackSource == null)
+            {
+                return false;
+            }
+
+            equipSlot = attackSource.AttackInfoWeaponSlot > 0
+                            ? attackSource.AttackInfoWeaponSlot
+                            : (int)WeaponSlots.Righthand;
+            ammoCount = Math.Max(0, attackSource.AttackInfoAmmoCount);
+
+            int hitCount = PlayerSpecialAttackRules.ResolveHitCount(specialStatId);
+            int totalDamage = 0;
+            for (int i = 0; i < hitCount; i++)
+            {
+                totalDamage += this.CalculateCombatDamage(attacker, attackSource);
+            }
+
+            damage = Math.Max(1, totalDamage);
+            int currentHealth = target.Stats[StatIds.health].Value;
+            int newHealth = Math.Max(0, currentHealth - damage);
+            bool killingHit = newHealth == 0;
+
+            target.Stats[StatIds.health].Value = newHealth;
+            this.runtimeSystems.SendChangedStats(target, SendChangedStats);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    "SpecialAttack hit attacker={0} target={1} special={2} damage={3} health={4}/{5} hits={6}",
+                    attacker.Identity,
+                    target.Identity,
+                    specialStatId,
+                    damage,
+                    newHealth,
+                    target.Stats[StatIds.life].Value,
+                    hitCount));
+
+            if (killingHit)
+            {
+                this.HandleCombatKillingHit(attacker, target);
+            }
+
+            return true;
         }
 
         private void ResetPlayerCombatTick(Identity attacker)
@@ -1414,6 +1537,14 @@ namespace AORebirth.Core.Playfields
                     Unknown4 = 80183.3125f
                 },
                 false);
+
+            // Re-anchor the mission-clock sync point: death respawn re-sends GameTimeMessage, which resets
+            // the client's countdown clock to the fixed server epoch (see PerkResetMissionSender).
+            var zoneClient = character.Controller != null ? character.Controller.Client as ZoneClient : null;
+            if (zoneClient != null)
+            {
+                zoneClient.LastGameTimeSyncUtc = DateTime.UtcNow;
+            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -2195,6 +2326,7 @@ namespace AORebirth.Core.Playfields
                 attacker,
                 target,
                 (character, text) => this.SendRewardFeedback(character, text));
+            MissionCompleteService.TryCompleteIfMissionTargetKilled(attacker, target, "KillTarget");
         }
 
         private void KillPlayerTarget(ICharacter target)
@@ -2536,6 +2668,17 @@ namespace AORebirth.Core.Playfields
                                        Type = IdentityType.Playfield,
                                        Instance = savedPlayfield
                                    };
+
+            // Garden tempsave stores pad X/Z only; death used current Y and clipped into portal texture.
+            // Always respawn on the known garden return pad when bound to a garden PF.
+            if (ShadowlandsGardenSaveRuntimeService.IsGardenPlayfield(savedPlayfield))
+            {
+                float padX;
+                float padY;
+                float padZ;
+                ShadowlandsGardenSaveRuntimeService.GetGardenSaveSpot(out padX, out padY, out padZ);
+                destination = new Coordinate(padX, padY, padZ);
+            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -3054,6 +3197,47 @@ namespace AORebirth.Core.Playfields
                     LootIdentity = this.AllocateCorpseLootItemIdentity()
                 })
                 .ToList();
+
+            // Capture-backed mission interior drops (20260719-5-different-shape-fo-mish).
+            if (ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(this.Identity.Instance)
+                && target != null)
+            {
+                if (ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsFindItemHost(target.Identity))
+                {
+                    MissionInstanceLootCatalog.LootDrop findDrop =
+                        MissionInstanceLootCatalog.ResolveFindItemDrop(target.Identity.Instance);
+                    lootItems.Insert(
+                        0,
+                        new CorpseLootItem
+                        {
+                            Slot = 0,
+                            Item = new Item(findDrop.Quality, findDrop.LowId, findDrop.HighId)
+                                   {
+                                       MultipleCount = 1
+                                   },
+                            LootIdentity = this.AllocateCorpseLootItemIdentity()
+                        });
+                    for (int i = 1; i < lootItems.Count; i++)
+                    {
+                        lootItems[i].Slot = i;
+                    }
+                }
+                else if (lootItems.Count == 0)
+                {
+                    MissionInstanceLootCatalog.LootDrop drop;
+                    int monsterData = target.Stats[StatIds.monsterdata].Value;
+                    if (MissionInstanceLootCatalog.TryGetDrop(monsterData, out drop) && drop != null)
+                    {
+                        lootItems.Add(
+                            new CorpseLootItem
+                            {
+                                Slot = 0,
+                                Item = new Item(drop.Quality, drop.LowId, drop.HighId) { MultipleCount = 1 },
+                                LootIdentity = this.AllocateCorpseLootItemIdentity()
+                            });
+                    }
+                }
+            }
             int credits = generatedLoot.Credits;
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);
             TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);

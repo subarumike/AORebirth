@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TypeSerializer.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -141,9 +141,15 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers
             Expression valueExpression,
             PropertyMetaData propertyMetaData)
         {
+            // The compiled serializer delegate takes an object value parameter, so value-type inputs
+            // (e.g. an Identity element from an Identity[]) must be boxed first. The scalar property path
+            // boxes structs before this call; array elements arrive unboxed, so handle both here.
+            var valueArg = valueExpression.Type.IsValueType
+                               ? (Expression)Expression.Convert(valueExpression, typeof(object))
+                               : valueExpression;
             var invokeExp = Expression.Invoke(
                 this.serializerExpression.Value,
-                new[] { streamWriterExpression, serializationContextExpression, valueExpression });
+                new[] { streamWriterExpression, serializationContextExpression, valueArg });
             return invokeExp;
         }
 

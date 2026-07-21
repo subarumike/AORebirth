@@ -20,6 +20,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                                   };
 
         [TestMethod]
+        public void IsKarrecRecognizesCapturedSourceInstance()
+        {
+            Assert.IsTrue(
+                WindcallerKarrecInteractionRules.IsKarrec(
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = WindcallerKarrecInteractionRules.KarrecInstance
+                    }));
+            Assert.IsFalse(
+                WindcallerKarrecInteractionRules.IsKarrec(
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = WindcallerKarrecInteractionRules.KarrecInstance + 1
+                    }));
+        }
+
+        [TestMethod]
         public void ExactPlayerPlayfieldNpcStateAndTwoOfferingsAreRequired()
         {
             Assert.AreEqual(

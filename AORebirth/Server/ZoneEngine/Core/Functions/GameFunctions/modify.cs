@@ -118,7 +118,19 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 return true;
             }
 
-            ((Character)Self).Stats[statId].Modifier += Arguments[1].AsInt32();
+            // ItemTarget.Target (e.g. Channel Rage pet mods) must affect Target, not Self.
+            Character affected = Target as Character;
+            if (affected == null)
+            {
+                affected = Self as Character;
+            }
+
+            if (affected == null)
+            {
+                return false;
+            }
+
+            affected.Stats[statId].Modifier += Arguments[1].AsInt32();
             return true;
         }
 

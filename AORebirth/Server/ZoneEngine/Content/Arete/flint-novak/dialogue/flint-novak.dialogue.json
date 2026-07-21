@@ -1,0 +1,179 @@
+{
+  "Identity": {
+    "Id": "arete-flint-novak-dialogue-20260720-072904",
+    "Version": "captured-flint-bio-com-20260720-072904",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-072904/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260720-072904",
+    "20260719-do-flint-bio-com"
+  ],
+  "Npcs": [
+    {
+      "Id": "flint-novak",
+      "NpcIdentity": "SimpleChar:78E0FC64",
+      "Name": "Flint Novak",
+      "RootNodeId": "flint_072904_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC64)"
+      ],
+      "Nodes": [
+        {
+          "Id": "flint_072904_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-072904; options-only AnswerList captured",
+          "Options": [
+            {
+              "Id": "flint_072904_001_option_0",
+              "Index": 0,
+              "Text": "Hi Flint, I'm {player}. I was told you had work for me.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:08.5881003Z chat-dialogue.log:3",
+              "NextNodeId": "flint_072904_002",
+              "Actions": []
+            },
+            {
+              "Id": "flint_072904_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:08.5881003Z chat-dialogue.log:3",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "flint_072904_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "flint_072904_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "flint_072904_002_option_0",
+              "Index": 0,
+              "Text": "What hardware does she need and where could I find it?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:10.4349603Z; accept Find quest on Answer=0 at 05:29:12.897",
+              "NextNodeId": "flint_072904_003",
+              "Actions": []
+            },
+            {
+              "Id": "flint_072904_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:10.4349603Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "flint_072904_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "flint_072904_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "flint_072904_003_option_0",
+              "Index": 0,
+              "Text": "What is a \"Bio Analyzing Computer?\"",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:12.4697055Z",
+              "NextNodeId": "flint_072904_004",
+              "Actions": []
+            },
+            {
+              "Id": "flint_072904_003_option_1",
+              "Index": 1,
+              "Text": "What does this Alex person want with a piece of robot scrap?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:12.4697055Z",
+              "NextNodeId": "flint_072904_005",
+              "Actions": []
+            },
+            {
+              "Id": "flint_072904_003_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:12.4697055Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "flint_072904_003_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "flint_072904_004",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "flint_072904_004_option_0",
+              "Index": 0,
+              "Text": "What does this Alex person want with a piece of robot scrap?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:15.8388697Z",
+              "NextNodeId": "flint_072904_005",
+              "Actions": []
+            },
+            {
+              "Id": "flint_072904_004_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:15.8388697Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "flint_072904_004_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "flint_072904_005",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "flint_072904_005_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:29:17.6297664Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "flint_072904_005_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

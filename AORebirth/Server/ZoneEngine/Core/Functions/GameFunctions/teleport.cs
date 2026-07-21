@@ -116,10 +116,13 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity Target,
             MessagePackObject[] Arguments)
         {
-            // TODO: Use the arguments!!!!!
-            
             Coordinate destination = new Coordinate(Arguments[0].AsInt32(), Arguments[1].AsInt32(), Arguments[2].AsInt32());
-            IQuaternion heading = new Quaternion(0.0, 0.0, 0.0, 0.0);
+            IQuaternion heading = ((Character)Self).Heading;
+            if (heading == null)
+            {
+                heading = new Quaternion(0.0, 0.0, 0.0, 1.0);
+            }
+
             Identity playfield = new Identity() { Type = IdentityType.Playfield, Instance = Arguments[3].AsInt32() };
             if (playfield.Instance==0)
             {

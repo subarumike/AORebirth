@@ -42,6 +42,9 @@
   <Playfield id="127" expansion="0" disabled="false" x="100000" xscale="1.00000" z="100000" zscale="1.00000">
     <Name>Condemned Subway (dng)</Name>
   </Playfield>
+  <Playfield id="7001" expansion="0" disabled="false" x="100000" xscale="1.00000" z="100000" zscale="1.00000">
+    <Name>ICC Holodeck Freelancers Inc.</Name>
+  </Playfield>
   <Playfield id="128" expansion="0" disabled="false" x="100000" xscale="1.00000" z="100000" zscale="1.00000">
     <Name>Subway Junction (dng)</Name>
   </Playfield>

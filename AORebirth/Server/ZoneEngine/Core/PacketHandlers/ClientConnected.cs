@@ -51,7 +51,9 @@ namespace ZoneEngine.Core.PacketHandlers
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Perks;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Script;
 
@@ -121,6 +123,7 @@ namespace ZoneEngine.Core.PacketHandlers
 
             /* send playfield info to client */
             PlayfieldAnarchyFMessageHandler.Default.Send(client.Controller.Character);
+            MissionInstanceDoorReplay.SendForCharacter(client, client.Controller.Character);
 
 
             foreach (
@@ -150,6 +153,7 @@ client.Controller.Character.Playfield.Identity,
                                       Unknown4 = 80183.3125f
                                   };
             client.SendCompressed(gameTimeMessage);
+            client.LastGameTimeSyncUtc = DateTime.UtcNow;
 
             InitializeActionableState(client);
             SendActionableState(client);
@@ -236,6 +240,30 @@ client.Controller.Character.Playfield.Identity,
                         client.Controller.Character,
                         "ClientConnected",
                         "zone-login-after-fullchar");
+
+                    // FullCharacter has no perk list yet — re-teach trained perks immediately
+                    // (do not wait for CharInPlay; reconnect UI clears on FullCharacter).
+                    var loginCharacter = client.Controller.Character as Character;
+                    if (loginCharacter != null)
+                    {
+                        PerkRuntimeService.Default.ResendPerkActions(loginCharacter);
+                    }
+
+                    // Same reason as perks: this client often never sends CharInPlay after zone/relog,
+                    // so the mission journal must be restored here or it stays empty.
+                    ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
+
+                    // Thrak garden-key journal entries are capture QFUs — re-emit Active missions after zone/relog.
+                    ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryResendActiveMissionsForLogin(
+                        client.Controller.Character);
+
+                    // Arete Rex→Marcus→Flint tip journal (Talk to Flint Novak) — same relog wipe as Thrak.
+                    ZoneEngine.Core.Arete.Quests.RexMarcusChainCoordinator.TryResendActiveTipsForLogin(
+                        client.Controller.Character);
+
+                    // Sacred Thrak garden key is permanent; restore if already earned and missing.
+                    ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryRestoreGardenKeyIfMissing(
+                        client.Controller.Character);
                 },
                 () =>
                 {
@@ -313,7 +341,12 @@ client.Controller.Character.Playfield.Identity,
                         client.Controller.Character.Identity),
                     client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,
                     () => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character),
-                    () => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client }));
+                    () =>
+                    {
+                        currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
+                        // CellAO sends statues on CharInPlay; this client often never sends CharInPlay.
+                        currentPlayfield.SendStaticDynelsToClient(client.Controller.Character);
+                    });
             }
 
             AppearanceUpdateMessageHandler.Default.Send(client.Controller.Character);
@@ -415,10 +448,10 @@ client.Controller.Character.Playfield.Identity,
 
             // 3. REGISTRATION IN STATS (CORRECT FOR IStatList - NO Add/Contains)
             SetStat(client, StatIds.gmlevel, login.GM);
-            SetStat(client, StatIds.expansion, login.Expansions);
+            SetStat(client, StatIds.expansion, login.Expansions | 2); // Shadowlands bit — CellAO statue OnUse requires it
 
             UpsertCharacterStat(character.Identity.Instance, StatIds.gmlevel, login.GM);
-            UpsertCharacterStat(character.Identity.Instance, StatIds.expansion, login.Expansions);
+            UpsertCharacterStat(character.Identity.Instance, StatIds.expansion, login.Expansions | 2);
 
             // optional safety reset (if engine ask refresh)
             client.Controller.SendChangedStats();

@@ -35,6 +35,8 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Inventory;
+    using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
     using AORebirth.Enums;
@@ -58,6 +60,14 @@ namespace ZoneEngine.Core.MessageHandlers
     public class AttackMessageHandler : BaseMessageHandler<AttackMessage, AttackMessageHandler>
     {
         private const int SimpleCharFullUpdateIsImmuneFlag = 0x00800000;
+
+        // Capture 20260719-fling-burst (ranged Fling/Burst combat start trailer).
+        private const int RangedCombatStartSpecialAttackUnknown1 = -53;
+        private const int RangedCombatStartSpecialAttackUnknown2 = 1306;
+        private const int RangedCombatStartSpecialAttackUnknown3 = -53;
+        private const int RangedCombatStartSpecialAttackUnknown4 = 2439;
+        private const int RangedCombatStartSpecialAttackUnknown5 = -100;
+
         private const int CombatStartSpecialAttackUnknown1 = 13;
         private const int CombatStartSpecialAttackUnknown2 = 25;
         private const int CombatStartSpecialAttackUnknown3 = 13;
@@ -185,15 +195,26 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private void SendCombatStartSpecialAttackWeapon(ICharacter character)
         {
+            bool rangedSpecials = WeaponSupportsRangedSpecials(character);
             var message = new SpecialAttackWeaponMessage
                           {
                               Identity = character.Identity,
                               Specials = CreateDefaultPlayerSpecialAttacks(),
-                              Unknown1 = CombatStartSpecialAttackUnknown1,
-                              Unknown2 = CombatStartSpecialAttackUnknown2,
-                              Unknown3 = CombatStartSpecialAttackUnknown3,
-                              Unknown4 = CombatStartSpecialAttackUnknown4,
-                              Unknown5 = CombatStartSpecialAttackUnknown5
+                              Unknown1 = rangedSpecials
+                                             ? RangedCombatStartSpecialAttackUnknown1
+                                             : CombatStartSpecialAttackUnknown1,
+                              Unknown2 = rangedSpecials
+                                             ? RangedCombatStartSpecialAttackUnknown2
+                                             : CombatStartSpecialAttackUnknown2,
+                              Unknown3 = rangedSpecials
+                                             ? RangedCombatStartSpecialAttackUnknown3
+                                             : CombatStartSpecialAttackUnknown3,
+                              Unknown4 = rangedSpecials
+                                             ? RangedCombatStartSpecialAttackUnknown4
+                                             : CombatStartSpecialAttackUnknown4,
+                              Unknown5 = rangedSpecials
+                                             ? RangedCombatStartSpecialAttackUnknown5
+                                             : CombatStartSpecialAttackUnknown5
                           };
 
             CombatStartPacketDiagnostics.LogOutbound(
@@ -201,6 +222,35 @@ namespace ZoneEngine.Core.MessageHandlers
                 message,
                 Identity.None);
             character.Playfield.Announce(message);
+        }
+
+        private static bool WeaponSupportsRangedSpecials(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            IInventoryPage weaponPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
+            {
+                return false;
+            }
+
+            IItem right = weaponPage[(int)WeaponSlots.Righthand];
+            IItem left = weaponPage[(int)WeaponSlots.LeftHand];
+            return ItemSupportsRangedSpecial(right) || ItemSupportsRangedSpecial(left);
+        }
+
+        private static bool ItemSupportsRangedSpecial(IItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            int can = item.GetAttribute((int)StatIds.can);
+            return ((can & (int)CanFlags.FlingShot) != 0) || ((can & (int)CanFlags.Burst) != 0);
         }
 
         private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()

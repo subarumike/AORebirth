@@ -36,9 +36,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { "Windcaller Karrec", "Annoying Dude", "Maddy Cardile" },
                 definitions.Select(definition => definition.DisplayName).ToArray());
             Assert.IsTrue(definitions.All(definition => definition.PlayfieldId == 655));
+            Assert.AreEqual(
+                WindcallerKarrecNpcContent.KarrecAppearanceEvidence,
+                WindcallerKarrecNpcContent.Karrec.Evidence);
             Assert.IsTrue(
-                definitions.All(
-                    definition => definition.Evidence == "AOSharpLiveCapture/20260717-223626"));
+                definitions.Where(definition => definition != WindcallerKarrecNpcContent.Karrec)
+                    .All(definition => definition.Evidence == "AOSharpLiveCapture/20260717-223626"));
             WindcallerKarrecNpcDefinition missing;
             Assert.IsFalse(WindcallerKarrecNpcContent.TryGetBySourceInstance(12345, out missing));
         }
@@ -75,31 +78,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { 1, 0, 0 },
                 new[] { karrec.VisibleTitle, annoying.VisibleTitle, maddy.VisibleTitle });
             Assert.AreEqual(28, karrec.CapturedScfuUnknown1.Count);
+            Assert.AreEqual(0x08, karrec.CapturedScfuUnknown1[12]);
             Assert.AreEqual(28, annoying.CapturedScfuUnknown1.Count);
             Assert.AreEqual(28, maddy.CapturedScfuUnknown1.Count);
             Assert.AreEqual(5, karrec.Textures.Count);
             Assert.AreEqual(5, annoying.Textures.Count);
             Assert.AreEqual(5, maddy.Textures.Count);
             Assert.AreEqual(2, karrec.Meshes.Count);
+            Assert.AreEqual(20108u, karrec.Meshes[0].Id);
+            Assert.AreEqual(161720, karrec.Meshes[0].OverrideTextureId);
+            Assert.AreEqual(2, karrec.Meshes[0].Layer);
+            Assert.AreEqual(40696u, karrec.Meshes[1].Id);
             Assert.AreEqual(2, annoying.Meshes.Count);
-            Assert.AreEqual(2, maddy.Meshes.Count);
+            Assert.AreEqual(1, maddy.Meshes.Count);
 
             Assert.AreEqual(0, karrec.ScfuWaypoints.Count);
             Assert.AreEqual(1, annoying.ScfuWaypoints.Count);
             Assert.AreEqual(3185.87134f, annoying.ScfuWaypoints[0].X);
             Assert.AreEqual(963.378967f, annoying.ScfuWaypoints[0].Z);
-            Assert.AreEqual(2, maddy.ScfuWaypoints.Count);
+            Assert.AreEqual(1, maddy.ScfuWaypoints.Count);
             Assert.AreEqual(3332.37524f, maddy.ScfuWaypoints[0].X);
             Assert.AreEqual(931.1814f, maddy.ScfuWaypoints[0].Z);
-            Assert.AreEqual(3329.789f, maddy.ScfuWaypoints[1].X);
-            Assert.AreEqual(932.215942f, maddy.ScfuWaypoints[1].Z);
 
             Assert.AreEqual(1, karrec.ActiveNanos.Count);
             Assert.AreEqual(53019, karrec.ActiveNanos[0].NanoIdentityType);
             Assert.AreEqual(0x3233F, karrec.ActiveNanos[0].NanoIdentityInstance);
             Assert.AreEqual(0, karrec.ActiveNanos[0].NanoInstance);
             Assert.AreEqual(29050327, karrec.ActiveNanos[0].Time1);
-            Assert.AreEqual(29050327, karrec.ActiveNanos[0].Time2);
+            Assert.AreEqual(20192939, karrec.ActiveNanos[0].Time2);
         }
 
         [TestMethod]
@@ -133,11 +139,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     activeSegment.EndX,
                     activeSegment.EndY,
                     activeSegment.EndZ);
-            Assert.AreEqual(2, beforeMovement.Length);
+            Assert.AreEqual(1, beforeMovement.Length);
             Assert.AreEqual(3332.37524f, beforeMovement[0].X);
             Assert.AreEqual(931.1814f, beforeMovement[0].Z);
-            Assert.AreEqual(3329.789f, beforeMovement[1].X);
-            Assert.AreEqual(932.215942f, beforeMovement[1].Z);
 
             WindcallerKarrecNpcWaypointDefinition whileMovingCoordinates =
                 maddy.ResolveScfuCoordinates(

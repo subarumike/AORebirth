@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IdentityType.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -77,6 +77,9 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         SpecialAction = 0x0000DEB0,
 
         MissionEntrance = 0x0000DAC6,
+
+        /// <summary>Mission journal identity (QuestFullUpdate / Quest Delete). Capture 0xDAC3.</summary>
+        Mission = 0x0000DAC3,
 
         MissionTerminal = 0x0000DCA1,
 

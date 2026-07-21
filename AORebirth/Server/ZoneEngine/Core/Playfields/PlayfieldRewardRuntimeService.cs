@@ -7,6 +7,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Core.Entities;
 
     using ZoneEngine.Core.Arete.Quests;
+    using ZoneEngine.Core.Thrak.Quests;
 
     #endregion
 
@@ -28,6 +29,9 @@ namespace AORebirth.Core.Playfields
             }
 
             RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);
+            FlintBioComQuestRuntime.TryObserveNpcDeath(attacker, target);
+            KneecappingQuestRuntime.TryObserveNpcDeath(attacker, target);
+            ThrakGardenKeySilvertailTransform.TryObserveCursedDeath(attacker, target);
         }
     }
 }

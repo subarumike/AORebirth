@@ -1,0 +1,550 @@
+namespace ZoneEngine.Core.Missions
+{
+    #region Usings ...
+
+    using System;
+    using System.IO;
+    using System.Threading;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using SmokeLounge.AOtomation.Messaging.Serialization;
+
+    using StreamReader = SmokeLounge.AOtomation.Messaging.Serialization.StreamReader;
+    using StreamWriter = SmokeLounge.AOtomation.Messaging.Serialization.StreamWriter;
+
+    #endregion
+
+    /// <summary>
+    /// Produces the QuestAlternative "roll" response a mission terminal sends back to the client.
+    /// Starts from a whole captured 5-offer roll (library: capture 20260719-Rolling different mishes,
+    /// fallback: 20260717-Mission terminal2) so icons stay paired with ShortInfo/Info. Variety across
+    /// pulls comes from selecting different captured rolls. Safe fixed-size fields (QL, quest id, cash/XP,
+    /// item reward ids, XYZ, terminal retarget) are mutated — never variable-length strings.
+    /// </summary>
+    internal static class MissionRollService
+    {
+        // Mission-terminal identity type as observed on the wire. The repo enum value
+        // (IdentityType.MissionTerminal = 0x0000DCA1) does not match live captures, so compare raw.
+        private const int MissionTerminalIdentityTypeRaw = 0x0000DAC1;
+
+        private const int MissionIdentityTypeRaw = 0x0000DAC3;
+
+        private static readonly object InitLock = new object();
+
+        private static SerializerResolver serializerResolver;
+
+        private static ISerializer questAlternativeSerializer;
+
+        private static byte[] templateBody;
+
+        private static byte[][] libraryBodies;
+
+        private static int questInstanceSeed =
+            Math.Max(0x55569000, unchecked((int)(DateTime.UtcNow.Ticks & 0x3fffffff)));
+
+        /// <summary>
+        /// Builds a fresh 5-offer roll for the requesting player/terminal.
+        /// </summary>
+        /// <param name="terminalPlayfieldId">
+        /// Playfield of the rolling character (Omni Trade / Rome / Tir / Athens…). Used to keep
+        /// Omni city rolls off Clan markers and Clan city rolls off Omni markers.
+        /// </param>
+        public static QuestAlternativeMessage BuildRollResponse(
+            QuestAlternativeMessage request,
+            Identity character,
+            int characterLevel,
+            int terminalPlayfieldId = 0)
+        {
+            EnsureInitialized();
+
+            int missionQuality = MissionLevelTable.GetMissionQuality(characterLevel, request.LevelSlider);
+            var rng = new Random(unchecked(Environment.TickCount * 397) ^ character.Instance ^ missionQuality);
+            MissionLocationSide terminalSide = MissionLocationPool.ResolveTerminalSide(terminalPlayfieldId);
+
+            // Whole captured roll — keeps Kill / Find / Repair / Broken-Machine texts matched to icons.
+            QuestAlternativeMessage response = DecodeRollBody(PickLibraryBody(rng));
+            Identity templateTerminal = response.MissionTerminalIdentity;
+            Identity terminal = request.MissionTerminalIdentity;
+
+            response.Identity = character;
+            response.MissionTerminalIdentity = terminal;
+            response.VersionId = request.VersionId;
+            response.Unknown5 = request.Unknown5;
+            response.LevelSlider = request.LevelSlider;
+            response.GoodBadSlider = request.GoodBadSlider;
+            response.OrderChaosSlider = request.OrderChaosSlider;
+            response.OpenHiddenSlider = request.OpenHiddenSlider;
+            response.PhysicalMysticalSlider = request.PhysicalMysticalSlider;
+            response.HeadOnStealthSlider = request.HeadOnStealthSlider;
+            response.MoneyExperienceSlider = request.MoneyExperienceSlider;
+            response.Unknown4 = unchecked((int)(uint)Environment.TickCount);
+
+            QuestInfo[] offers = response.QuestInfos;
+            if (offers == null || offers.Length == 0)
+            {
+                MissionDiagnostics.Log("ROLL-EMPTY-LIBRARY fallback to single template");
+                response = DecodeTemplate();
+                offers = response.QuestInfos;
+                templateTerminal = response.MissionTerminalIdentity;
+                response.Identity = character;
+                response.MissionTerminalIdentity = terminal;
+            }
+
+            var usedSpotIndexes = new int[offers.Length];
+            for (int i = 0; i < usedSpotIndexes.Length; i++)
+            {
+                usedSpotIndexes[i] = -1;
+            }
+
+            MissionDiagnostics.Log(
+                "ROLL-SIDE terminalPf={0} side={1}",
+                terminalPlayfieldId,
+                terminalSide);
+
+            int[] allowedSpotIndexes = BuildAllowedSpotIndexes(terminalSide);
+
+            for (int i = 0; i < offers.Length; i++)
+            {
+                QuestInfo offer = offers[i];
+                if (offer == null)
+                {
+                    continue;
+                }
+
+                MissionRollType type = MissionTypeCatalog.TypeFromIcon(offer.MissionIconId);
+
+                // Assign a distinct Rubi-Ka marker from the live roll capture pool (different playfields).
+                ApplyPoolLocation(offer, rng, usedSpotIndexes, i, allowedSpotIndexes);
+
+                offer.QuestIdentity = new Identity
+                                      {
+                                          Type = (IdentityType)MissionIdentityTypeRaw,
+                                          Instance = NextQuestInstance()
+                                      };
+                offer.Unknown5 = RetargetTerminal(offer.Unknown5, templateTerminal, terminal);
+                offer.Unknown14 = RetargetTerminal(offer.Unknown14, templateTerminal, terminal);
+                offer.Unknown23 = RetargetTerminal(offer.Unknown23, templateTerminal, terminal);
+                offer.Quality = missionQuality;
+
+                // Keep captured MissionIconId — do NOT rewrite ShortInfo/Info or swap icons onto wrong shells.
+                ApplyMoneyExperienceSlider(offer, request.MoneyExperienceSlider, missionQuality);
+                ApplyMaliReward(offer, missionQuality, rng, type);
+
+                int markerPf = 0;
+                float markerX = 0;
+                float markerZ = 0;
+                if (offer.QuestActions != null && offer.QuestActions.Length > 0 && offer.QuestActions[0] != null)
+                {
+                    markerPf = offer.QuestActions[0].Playfield.Instance;
+                    markerX = offer.QuestActions[0].X;
+                    markerZ = offer.QuestActions[0].Z;
+                }
+
+                MissionDiagnostics.Log(
+                    "ROLL-OFFER slot={0} type={1} icon={2} ql={3} quest={4:X8} pf={5} xz=({6:F0},{7:F0}) rewardLow={8} rewardQl={9}",
+                    i,
+                    MissionTypeCatalog.TypeName(type),
+                    offer.MissionIconId,
+                    offer.Quality,
+                    offer.QuestIdentity.Instance,
+                    markerPf,
+                    markerX,
+                    markerZ,
+                    offer.ItemRewards != null && offer.ItemRewards.Length > 0 ? offer.ItemRewards[0].LowId : 0,
+                    offer.ItemRewards != null && offer.ItemRewards.Length > 0 ? offer.ItemRewards[0].Quality : 0);
+            }
+
+            response.QuestInfos = offers;
+            RestoreStringTerminators(response);
+            return response;
+        }
+
+        /// <summary>
+        /// Decodes the captured template into a live message and restores the string terminators that the
+        /// stream reader trims on read, so that re-serialization reproduces the captured bytes exactly.
+        /// </summary>
+        internal static QuestAlternativeMessage DecodeTemplate()
+        {
+            EnsureInitialized();
+
+            var message = (QuestAlternativeMessage)Deserialize(templateBody);
+            RestoreStringTerminators(message);
+            return message;
+        }
+
+        /// <summary>
+        /// Serializes a QuestAlternative message to its N3 body bytes using the shared resolver.
+        /// </summary>
+        internal static byte[] SerializeBody(QuestAlternativeMessage message)
+        {
+            EnsureInitialized();
+
+            using (var memoryStream = new MemoryStream())
+            using (var writer = new StreamWriter(memoryStream))
+            {
+                questAlternativeSerializer.Serialize(
+                    writer,
+                    new SerializationContext(serializerResolver),
+                    message);
+                return memoryStream.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// The captured template N3 body (without the transport header).
+        /// </summary>
+        internal static byte[] TemplateBody
+        {
+            get
+            {
+                EnsureInitialized();
+                return templateBody;
+            }
+        }
+
+        private static QuestInfo CloneArchetype(QuestInfo[] archetypes, int index)
+        {
+            // DecodeTemplate gives a deep copy of all five; pick by index from a fresh decode so each offer
+            // is an independent object graph (no shared QuestActions arrays across slots).
+            QuestInfo[] fresh = DecodeTemplate().QuestInfos;
+            int safe = index;
+            if (fresh == null || fresh.Length == 0)
+            {
+                return archetypes != null && archetypes.Length > 0 ? archetypes[0] : null;
+            }
+
+            if (safe < 0)
+            {
+                safe = 0;
+            }
+
+            if (safe >= fresh.Length)
+            {
+                safe = fresh.Length - 1;
+            }
+
+            return fresh[safe];
+        }
+
+        private static byte[] PickLibraryBody(Random rng)
+        {
+            if (libraryBodies == null || libraryBodies.Length == 0)
+            {
+                return templateBody;
+            }
+
+            return libraryBodies[rng.Next(libraryBodies.Length)];
+        }
+
+        private static QuestAlternativeMessage DecodeRollBody(byte[] body)
+        {
+            EnsureInitialized();
+            var message = (QuestAlternativeMessage)Deserialize(body);
+            RestoreStringTerminators(message);
+            return message;
+        }
+
+        private static void ApplyPoolLocation(
+            QuestInfo offer,
+            Random rng,
+            int[] usedSpotIndexes,
+            int slot,
+            int[] allowedSpotIndexes)
+        {
+            if (offer == null || offer.QuestActions == null || offer.QuestActions.Length == 0
+                || MissionLocationPool.Spots == null || MissionLocationPool.Spots.Length == 0)
+            {
+                return;
+            }
+
+            QuestActionList dst = offer.QuestActions[0];
+            if (dst == null)
+            {
+                return;
+            }
+
+            int spotIndex = PickDistinctSpotIndex(rng, usedSpotIndexes, slot, allowedSpotIndexes);
+            usedSpotIndexes[slot] = spotIndex;
+            MissionLocationPool.Spot spot = MissionLocationPool.Spots[spotIndex];
+
+            dst.Playfield = new Identity { Type = IdentityType.Playfield2, Instance = spot.Playfield };
+            dst.Unknown18 = spot.EntranceLow;
+            dst.Unknown19 = spot.EntranceHigh;
+            dst.X = spot.X;
+            dst.Y = spot.Y;
+            dst.Z = spot.Z;
+        }
+
+        private static int PickDistinctSpotIndex(
+            Random rng,
+            int[] usedSpotIndexes,
+            int slot,
+            int[] allowedSpotIndexes)
+        {
+            int count = MissionLocationPool.Spots.Length;
+            int[] allowed = allowedSpotIndexes;
+            if (allowed == null || allowed.Length == 0)
+            {
+                allowed = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    allowed[i] = i;
+                }
+            }
+
+            for (int attempt = 0; attempt < 32; attempt++)
+            {
+                int candidate = allowed[rng.Next(allowed.Length)];
+                bool taken = false;
+                int candidatePf = MissionLocationPool.Spots[candidate].Playfield;
+                for (int i = 0; i < slot; i++)
+                {
+                    if (usedSpotIndexes[i] < 0)
+                    {
+                        continue;
+                    }
+
+                    // Prefer different playfields across the five offers in one roll.
+                    if (usedSpotIndexes[i] == candidate
+                        || MissionLocationPool.Spots[usedSpotIndexes[i]].Playfield == candidatePf)
+                    {
+                        taken = true;
+                        break;
+                    }
+                }
+
+                if (!taken)
+                {
+                    return candidate;
+                }
+            }
+
+            return allowed[rng.Next(allowed.Length)];
+        }
+
+        private static int[] BuildAllowedSpotIndexes(MissionLocationSide terminalSide)
+        {
+            int count = MissionLocationPool.Spots.Length;
+            if (terminalSide == MissionLocationSide.Neutral)
+            {
+                var all = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    all[i] = i;
+                }
+
+                return all;
+            }
+
+            int matched = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (MissionLocationPool.IsSpotAllowedForTerminal(
+                    MissionLocationPool.Spots[i].Playfield,
+                    terminalSide))
+                {
+                    matched++;
+                }
+            }
+
+            if (matched == 0)
+            {
+                // Fail open to full pool rather than empty offers.
+                var all = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    all[i] = i;
+                }
+
+                return all;
+            }
+
+            var allowed = new int[matched];
+            int write = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (MissionLocationPool.IsSpotAllowedForTerminal(
+                    MissionLocationPool.Spots[i].Playfield,
+                    terminalSide))
+                {
+                    allowed[write++] = i;
+                }
+            }
+
+            return allowed;
+        }
+
+        private static void ApplyMaliReward(QuestInfo offer, int missionQuality, Random rng, MissionRollType type)
+        {
+            QuestItemShort reward;
+            string itemName;
+            bool isNano;
+            if (!MissionRewardCatalog.TryPickReward(missionQuality, rng, out reward, out itemName, out isNano))
+            {
+                MissionDiagnostics.Log(
+                    "ROLL-REWARD-MISS ql={0} type={1} catalogItems={2} err={3}",
+                    missionQuality,
+                    MissionTypeCatalog.TypeName(type),
+                    MissionRewardCatalog.ItemCount,
+                    MissionRewardCatalog.LastLoadError ?? string.Empty);
+                return;
+            }
+
+            // Keep the captured ItemRewards array length when possible — only overwrite the first slot's
+            // ids/QL so the X3F1 count stays identical to the template for that archetype.
+            if (offer.ItemRewards != null && offer.ItemRewards.Length > 0)
+            {
+                offer.ItemRewards[0].LowId = reward.LowId;
+                offer.ItemRewards[0].HighId = reward.HighId;
+                offer.ItemRewards[0].Quality = reward.Quality;
+            }
+            else
+            {
+                offer.ItemRewards = new[] { reward };
+            }
+
+            MissionDiagnostics.Log(
+                "ROLL-REWARD ql={0} type={1} nano={2} low={3} high={4} rewardQl={5} name={6}",
+                missionQuality,
+                MissionTypeCatalog.TypeName(type),
+                isNano,
+                reward.LowId,
+                reward.HighId,
+                reward.Quality,
+                itemName ?? string.Empty);
+        }
+
+        private static void ApplyMoneyExperienceSlider(QuestInfo offer, byte moneyExperienceSlider, int missionQuality)
+        {
+            int slider;
+            if (moneyExperienceSlider <= 100)
+            {
+                slider = moneyExperienceSlider;
+            }
+            else
+            {
+                slider = 50 + (unchecked((sbyte)moneyExperienceSlider) / 2);
+                if (slider < 0)
+                {
+                    slider = 0;
+                }
+
+                if (slider > 100)
+                {
+                    slider = 100;
+                }
+            }
+
+            int baseCash = offer.CashReward > 0 ? offer.CashReward : Math.Max(100, missionQuality * 50);
+            int baseXp = offer.ExperienceReward > 0 ? offer.ExperienceReward : Math.Max(100, missionQuality * 200);
+
+            offer.CashReward = Math.Max(1, baseCash * (150 - slider) / 100);
+            offer.ExperienceReward = Math.Max(1, baseXp * (50 + slider) / 100);
+        }
+
+        private static int NextQuestInstance()
+        {
+            int instance = Interlocked.Increment(ref questInstanceSeed) & 0x7fffffff;
+            return instance == 0 ? NextQuestInstance() : instance;
+        }
+
+        private static void RestoreStringTerminators(QuestAlternativeMessage message)
+        {
+            if (message.QuestInfos == null)
+            {
+                return;
+            }
+
+            foreach (QuestInfo info in message.QuestInfos)
+            {
+                if (info == null)
+                {
+                    continue;
+                }
+
+                if (info.Info != null && !info.Info.EndsWith("\0", StringComparison.Ordinal))
+                {
+                    info.Info += '\0';
+                }
+            }
+        }
+
+        private static Identity RetargetTerminal(Identity value, Identity from, Identity to)
+        {
+            if ((int)value.Type == MissionTerminalIdentityTypeRaw && value.Instance == from.Instance)
+            {
+                value.Type = to.Type;
+                value.Instance = to.Instance;
+            }
+
+            return value;
+        }
+
+        private static void EnsureInitialized()
+        {
+            if (questAlternativeSerializer != null)
+            {
+                return;
+            }
+
+            lock (InitLock)
+            {
+                if (questAlternativeSerializer != null)
+                {
+                    return;
+                }
+
+                var builder = new SerializerResolverBuilder<MessageBody>();
+                SerializerResolver resolver = builder.Build();
+                ISerializer serializer = resolver.GetSerializer(typeof(QuestAlternativeMessage));
+
+                byte[] full = HexToBytes(MissionRollCaptureTemplate.CapturedPacketHex);
+                var body = new byte[full.Length - MissionRollCaptureTemplate.TransportHeaderLength];
+                Array.Copy(full, MissionRollCaptureTemplate.TransportHeaderLength, body, 0, body.Length);
+
+                serializerResolver = resolver;
+                questAlternativeSerializer = serializer;
+                templateBody = body;
+
+                string[] hexRolls = MissionRollCaptureLibrary.CapturedRollBodiesHex;
+                var loaded = new byte[hexRolls.Length][];
+                for (int i = 0; i < hexRolls.Length; i++)
+                {
+                    loaded[i] = HexToBytes(hexRolls[i]);
+                }
+
+                libraryBodies = loaded;
+                MissionDiagnostics.Log(
+                    "ROLL-LIBRARY loaded={0} fallbackTemplateBytes={1}",
+                    libraryBodies.Length,
+                    templateBody.Length);
+            }
+        }
+
+        private static QuestAlternativeMessage Deserialize(byte[] body)
+        {
+            using (var memoryStream = new MemoryStream(body))
+            using (var reader = new StreamReader(memoryStream))
+            {
+                return (QuestAlternativeMessage)questAlternativeSerializer.Deserialize(
+                    reader,
+                    new SerializationContext(serializerResolver));
+            }
+        }
+
+        private static byte[] HexToBytes(string hex)
+        {
+            var bytes = new byte[hex.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = byte.Parse(
+                    hex.Substring(i * 2, 2),
+                    System.Globalization.NumberStyles.HexNumber);
+            }
+
+            return bytes;
+        }
+    }
+}

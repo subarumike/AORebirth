@@ -44,6 +44,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
@@ -58,7 +59,13 @@ namespace ZoneEngine.Core.MessageHandlers
     {
         private const IdentityType CapturedPrivateCityPlayfieldProxyType = (IdentityType)0x0000C79E;
 
+        /// <summary>Capture 20260718-062936 mission-enter PlayfieldAnarchyF PlayfieldId1 type.</summary>
+        private const IdentityType CapturedMissionBuildingType = (IdentityType)0x0000C79F;
+
         private const int CapturedPrivateCityBuildingInstance = 0x0000177A;
+
+        /// <summary>Capture 20260718-062936 mission-enter ACGBuildingGeneratorData instance.</summary>
+        private const int CapturedMissionBuildingInstance = unchecked((int)0x00D6D5C0);
 
         private const int CapturedPrivateCityOrganizationInstance = 1370122;
 
@@ -109,7 +116,31 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.PlayfieldX = Playfields.GetPlayfieldX(character.Playfield.Identity.Instance);
                 x.PlayfieldZ = Playfields.GetPlayfieldZ(character.Playfield.Identity.Instance);
 
-                if (AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
+                if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
+                {
+                    // Live zone-in: PlayfieldId1 = ACGBuildingGeneratorData + generator layout payload.
+                    // Capture 20260719-5-different-shape-fo-mish supplies per-shape payloads.
+                    int pf = character.Playfield.Identity.Instance;
+                    byte[] payload =
+                        AORebirth.Core.Playfields.MissionInstanceShapeCatalog.GetGeneratorPayload(pf);
+                    int buildingInstance =
+                        AORebirth.Core.Playfields.MissionInstanceShapeCatalog.GetBuildingInstance(payload);
+                    if (payload == null || payload.Length == 0)
+                    {
+                        payload = CreateCapturedMissionGeneratorPayload();
+                        buildingInstance = CapturedMissionBuildingInstance;
+                    }
+
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = CapturedMissionBuildingType,
+                                         Instance = buildingInstance
+                                     };
+                    x.Unknown3 = 0;
+                    x.Unknown4 = 0;
+                    x.GeneratorPayload = payload;
+                }
+                else if (AORebirth.Core.Playfields.Playfield.IsPrivateCityPlayfieldCandidate(character.Playfield.Identity))
                 {
                     x.PlayfieldId1 = new Identity
                                      {
@@ -194,6 +225,34 @@ namespace ZoneEngine.Core.MessageHandlers
         {
             return playfieldInstance == CapturedMontroyalPrivateCityInstance
                    || playfieldInstance == CapturedOwnedMontroyalPrivateCityInstance;
+        }
+
+        private static byte[] CreateCapturedMissionGeneratorPayload()
+        {
+            // Capture 20260718-062936 PlayfieldAnarchyF for pf 1413198 — opaque layout after PlayfieldId2.
+            return new byte[]
+                   {
+                       0x00, 0x00, 0xC7, 0x9F, 0x00, 0xD6, 0xD5, 0xC0,
+                       0x00, 0x00, 0x00, 0x02, 0x00, 0x03, 0x00, 0x1E,
+                       0x00, 0x1E, 0x00, 0x40, 0x00, 0x00, 0x01, 0x44,
+                       0x64, 0x64, 0x64, 0x00, 0x00, 0x00, 0x13, 0x00,
+                       0x2B, 0x00, 0x00, 0x15, 0x00, 0x00, 0x2F, 0x00,
+                       0x01, 0x14, 0x01, 0x00, 0x00, 0x00, 0x06, 0x12,
+                       0x01, 0x00, 0x1E, 0x00, 0x06, 0x16, 0x03, 0x00,
+                       0x12, 0x00, 0x03, 0x12, 0x03, 0x00, 0x14, 0x00,
+                       0x04, 0x16, 0x02, 0x00, 0x05, 0x00, 0x02, 0x16,
+                       0x02, 0x00, 0x15, 0x00, 0x06, 0x17, 0x03, 0x00,
+                       0x05, 0x00, 0x03, 0x17, 0x03, 0x00, 0x05, 0x00,
+                       0x08, 0x11, 0x00, 0x00, 0x17, 0x00, 0x08, 0x15,
+                       0x02, 0x00, 0x06, 0x00, 0x07, 0x11, 0x00, 0x00,
+                       0x29, 0x00, 0x07, 0x15, 0x00, 0x00, 0x0D, 0x00,
+                       0x06, 0x11, 0x00, 0x00, 0x0A, 0x00, 0x09, 0x12,
+                       0x01, 0x00, 0x2A, 0x00, 0x05, 0x12, 0x01, 0x00,
+                       0x17, 0x00, 0x05, 0x13, 0x03, 0x00, 0x2A, 0x00,
+                       0x05, 0x14, 0x01, 0x00, 0x2A, 0x00, 0x03, 0x11,
+                       0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                       0xFF
+                   };
         }
 
         private static byte[] CreateCapturedPrivateCityGeneratorPayload()

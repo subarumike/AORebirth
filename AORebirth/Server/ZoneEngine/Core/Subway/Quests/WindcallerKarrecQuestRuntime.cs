@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.Subway.Quests
     #region Usings ...
 
     using System;
+    using System.Globalization;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Items;
@@ -34,6 +35,7 @@ namespace ZoneEngine.Core.Subway.Quests
         private const string BurgerGrantFlag = "bronto-burger-granted";
         private const string CardGrantFlag = "maddy-credit-card-granted";
         private const string ResearchAllocationFlag = "personal-research-xp-allocation";
+        private const string LevelXpRewardFlag = "one-level-xp-reward";
 
         internal static bool IsActive(ICharacter source)
         {
@@ -118,7 +120,8 @@ namespace ZoneEngine.Core.Subway.Quests
             string accountKey = MissionRuntime.ResolveAccountKey(characterId);
             if (string.IsNullOrWhiteSpace(accountKey))
             {
-                return KarrecCompletionResult.Failed("account-key-unresolved");
+                // Prefer username, but never block TOTW passage if the character row is incomplete.
+                accountKey = "character:" + characterId.ToString(CultureInfo.InvariantCulture);
             }
 
             if (mission.State == MissionLifecycleState.Active)
@@ -146,28 +149,8 @@ namespace ZoneEngine.Core.Subway.Quests
                 }
             }
 
-            MissionRewardExecutionResult sideTokens = ApplySideTokenReward(source);
-            if (!sideTokens.Succeeded)
-            {
-                return KarrecCompletionResult.Failed("side-token-reward-failed:" + sideTokens.Message);
-            }
-
-            var researchDefinition = new MissionRewardDefinition
-                                     {
-                                         RewardKey = "personal-research-xp-5000",
-                                         RewardType = "personal-research-allocation",
-                                         IsResolved = true
-                                     };
-            MissionRewardExecutionResult research = MissionRuntime.Rewards.ExecuteExternal(
-                characterId,
-                QuestId,
-                researchDefinition,
-                new PersonalResearchAllocationEffect(characterId));
-            if (!research.Succeeded)
-            {
-                return KarrecCompletionResult.Failed("research-allocation-record-failed:" + research.Message);
-            }
-
+            // TOTW gateway access is the turn-in contract. Side token / research feedback are
+            // best-effort so a reward-writer failure cannot strand the player without passage.
             if (MissionRuntime.Service.GetAccountFlag(accountKey, AccountAccessFlagKey) == null)
             {
                 MissionOperationResult accessFlag = MissionRuntime.Service.SetAccountFlag(
@@ -183,8 +166,28 @@ namespace ZoneEngine.Core.Subway.Quests
                 }
             }
 
+            TryAwardOneLevelXpReward(source, characterId);
+
+            MissionRewardExecutionResult sideTokens = ApplySideTokenReward(source);
+            MissionRewardExecutionStatus researchStatus = MissionRewardExecutionStatus.Unresolved;
+            var researchDefinition = new MissionRewardDefinition
+                                     {
+                                         RewardKey = "personal-research-xp-5000",
+                                         RewardType = "personal-research-allocation",
+                                         IsResolved = true
+                                     };
+            MissionRewardExecutionResult research = MissionRuntime.Rewards.ExecuteExternal(
+                characterId,
+                QuestId,
+                researchDefinition,
+                new PersonalResearchAllocationEffect(characterId));
+            if (research != null && research.Succeeded)
+            {
+                researchStatus = research.Status;
+            }
+
             long sideTokenValue = source.Stats[(StatIds)SideTokenStatId].BaseValue;
-            if (sideTokens.StatValues != null)
+            if (sideTokens != null && sideTokens.Succeeded && sideTokens.StatValues != null)
             {
                 foreach (MissionCharacterStatValue statValue in sideTokens.StatValues)
                 {
@@ -205,8 +208,10 @@ namespace ZoneEngine.Core.Subway.Quests
 
             return KarrecCompletionResult.Succeeded(
                 sideTokenValue,
-                sideTokens.Status,
-                research.Status);
+                sideTokens != null && sideTokens.Succeeded
+                    ? sideTokens.Status
+                    : MissionRewardExecutionStatus.Unresolved,
+                researchStatus);
         }
 
         internal static bool HasAccountAccess(ICharacter source)
@@ -216,9 +221,52 @@ namespace ZoneEngine.Core.Subway.Quests
                 return false;
             }
 
-            string accountKey = MissionRuntime.ResolveAccountKey(source.Identity.Instance);
-            return !string.IsNullOrWhiteSpace(accountKey)
-                   && MissionRuntime.Service.GetAccountFlag(accountKey, AccountAccessFlagKey) != null;
+            int characterId = source.Identity.Instance;
+            string accountKey = MissionRuntime.ResolveAccountKey(characterId);
+            if (!string.IsNullOrWhiteSpace(accountKey)
+                && MissionRuntime.Service.GetAccountFlag(accountKey, AccountAccessFlagKey) != null)
+            {
+                return true;
+            }
+
+            string fallbackKey = "character:" + characterId.ToString(CultureInfo.InvariantCulture);
+            return MissionRuntime.Service.GetAccountFlag(fallbackKey, AccountAccessFlagKey) != null;
+        }
+
+        private static void TryAwardOneLevelXpReward(ICharacter source, int characterId)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return;
+            }
+
+            if (MissionRuntime.Service.GetFlag(characterId, QuestId, LevelXpRewardFlag) != null)
+            {
+                return;
+            }
+
+            int xpNeeded = CombatXpRuntimeService.GetXpNeededForNextLevel(source);
+            if (xpNeeded <= 0)
+            {
+                MissionRuntime.Service.SetFlag(
+                    characterId,
+                    QuestId,
+                    LevelXpRewardFlag,
+                    "skipped-max-level");
+                return;
+            }
+
+            bool awarded = CombatXpRuntimeService.AwardDirectXp(
+                source,
+                xpNeeded,
+                "karrec-quest");
+            MissionRuntime.Service.SetFlag(
+                characterId,
+                QuestId,
+                LevelXpRewardFlag,
+                awarded
+                    ? "awarded:" + xpNeeded.ToString(CultureInfo.InvariantCulture)
+                    : "failed:" + xpNeeded.ToString(CultureInfo.InvariantCulture));
         }
 
         private static MissionOperationResult ObserveOffering(

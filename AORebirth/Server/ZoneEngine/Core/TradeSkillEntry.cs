@@ -130,6 +130,12 @@ namespace ZoneEngine.Core
                 tss.StatId = int.Parse(skillStrings[i].Trim());
                 tss.SkillPerBump = int.Parse(skillPerBumps[i].Trim());
                 tss.Percent = int.Parse(skillPercents[i].Trim());
+                // Skill='0' placeholder rows are not real requirements; Stats[0] breaks WindowBuild.
+                if (tss.StatId == 0)
+                {
+                    continue;
+                }
+
                 tse.Skills.Add(tss);
             }
 

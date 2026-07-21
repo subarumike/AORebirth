@@ -1,0 +1,278 @@
+{
+  "capture": "20260719-155043",
+  "playfieldId": 7001,
+  "playfieldHex": "0x1B59",
+  "npcCount": 10,
+  "npcs": [
+    {
+      "identity": "(SimpleChar:78D08F3C)",
+      "name": "Adeline Guerra [Freelancers Inc.]",
+      "level": 210,
+      "health": 31900,
+      "monsterData": 26155,
+      "monsterScale": 130,
+      "visualFlags": 31,
+      "headMesh": 40138,
+      "runSpeed": 632,
+      "npcFamily": 1020,
+      "characterFlags": 277615105,
+      "position": [
+        213.4695,
+        1.02,
+        207.9243
+      ],
+      "heading": [
+        0.0,
+        0.000318,
+        0.0,
+        1.0
+      ],
+      "textures": "0:0:0|1:247933:0|2:247977:0|3:247887:0|4:248016:0",
+      "meshes": "0:204941:0:0|0:40138:0:4|1:29084:0:2",
+      "scfuUnknown1Hex": "00000000000000000000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:795B64ED)",
+      "name": "Arbiter Vincenzo Palmiero",
+      "level": 220,
+      "health": 203721,
+      "monsterData": 26092,
+      "monsterScale": 100,
+      "visualFlags": 31,
+      "headMesh": 40694,
+      "runSpeed": 749,
+      "npcFamily": 3,
+      "characterFlags": 277615105,
+      "position": [
+        229.31,
+        1.02,
+        198.0397
+      ],
+      "heading": [
+        0.0,
+        0.002199,
+        0.0,
+        0.999998
+      ],
+      "textures": "0:286229:0|1:286227:0|2:286228:0|3:286226:0|4:286225:0",
+      "meshes": "0:40694:0:4|1:258459:0:2|3:286446:0:0",
+      "scfuUnknown1Hex": "00000000000000000000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:78D08F3D)",
+      "name": "Arbiter's Guardian",
+      "level": 220,
+      "health": 101861,
+      "monsterData": 165196,
+      "monsterScale": 125,
+      "visualFlags": 31,
+      "headMesh": 40117,
+      "runSpeed": 749,
+      "npcFamily": 137,
+      "characterFlags": 269226497,
+      "position": [
+        221.8891,
+        1.02,
+        205.7225
+      ],
+      "heading": [
+        0.0,
+        -0.926655,
+        0.0,
+        0.375912
+      ],
+      "textures": "0:286229:0|1:286227:0|2:286228:0|3:286226:0|4:286225:0",
+      "meshes": "0:40117:0:4|1:99154:0:2|3:286466:0:0",
+      "scfuUnknown1Hex": "80000000000000008000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:78D08F3E)",
+      "name": "Arbiter's Guardian",
+      "level": 220,
+      "health": 101861,
+      "monsterData": 165196,
+      "monsterScale": 125,
+      "visualFlags": 31,
+      "headMesh": 40117,
+      "runSpeed": 749,
+      "npcFamily": 137,
+      "characterFlags": 269226497,
+      "position": [
+        221.9611,
+        1.02,
+        188.022
+      ],
+      "heading": [
+        0.0,
+        -0.393288,
+        0.0,
+        0.919415
+      ],
+      "textures": "0:286229:0|1:286227:0|2:286228:0|3:286226:0|4:286225:0",
+      "meshes": "0:40117:0:4|1:99154:0:2|3:286466:0:0",
+      "scfuUnknown1Hex": "80000000000000000000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:78D08F3F)",
+      "name": "Arbiter's Guardian",
+      "level": 220,
+      "health": 101861,
+      "monsterData": 165196,
+      "monsterScale": 125,
+      "visualFlags": 31,
+      "headMesh": 40117,
+      "runSpeed": 749,
+      "npcFamily": 137,
+      "characterFlags": 269226497,
+      "position": [
+        181.0215,
+        1.02,
+        193.9571
+      ],
+      "heading": [
+        0.0,
+        0.701076,
+        0.0,
+        0.713087
+      ],
+      "textures": "0:286229:0|1:286227:0|2:286228:0|3:286226:0|4:286225:0",
+      "meshes": "0:40117:0:4|1:99154:0:2|3:286466:0:0",
+      "scfuUnknown1Hex": "00000000000000000000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:78D08F40)",
+      "name": "Arbiter's Guardian",
+      "level": 220,
+      "health": 101861,
+      "monsterData": 165196,
+      "monsterScale": 125,
+      "visualFlags": 31,
+      "headMesh": 40117,
+      "runSpeed": 749,
+      "npcFamily": 137,
+      "characterFlags": 269226497,
+      "position": [
+        181.0337,
+        1.02,
+        199.8694
+      ],
+      "heading": [
+        0.0,
+        0.708745,
+        0.0,
+        0.705465
+      ],
+      "textures": "0:286229:0|1:286227:0|2:286228:0|3:286226:0|4:286225:0",
+      "meshes": "0:40117:0:4|1:99154:0:2|3:286466:0:0",
+      "scfuUnknown1Hex": "00000000000000008000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:795B64EE)",
+      "name": "Arbitration Drone",
+      "level": 100,
+      "health": 13658,
+      "monsterData": 260229,
+      "monsterScale": 100,
+      "visualFlags": 31,
+      "headMesh": null,
+      "runSpeed": 346,
+      "npcFamily": 3,
+      "characterFlags": 277369345,
+      "position": [
+        227.2182,
+        1.02,
+        193.0427
+      ],
+      "heading": [
+        0.0,
+        -0.682641,
+        0.0,
+        0.730759
+      ],
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "meshes": "",
+      "scfuUnknown1Hex": "80000000000000000000000001010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:797AC338)",
+      "name": "CEO Guardian",
+      "level": 215,
+      "health": 34513,
+      "monsterData": 227701,
+      "monsterScale": 125,
+      "visualFlags": 31,
+      "headMesh": null,
+      "runSpeed": 2701,
+      "npcFamily": 95,
+      "characterFlags": 403182081,
+      "position": [
+        180.577,
+        1.02,
+        197.9095
+      ],
+      "heading": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "meshes": "1:273304:0:2",
+      "scfuUnknown1Hex": "00000000000000000000000003010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:797AC337)",
+      "name": "Carlo Pinnetti",
+      "level": 220,
+      "health": 55687,
+      "monsterData": 258209,
+      "monsterScale": 130,
+      "visualFlags": 31,
+      "headMesh": 40121,
+      "runSpeed": 2706,
+      "npcFamily": 97,
+      "characterFlags": 403182081,
+      "position": [
+        181.3702,
+        1.02,
+        195.2665
+      ],
+      "heading": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "textures": "0:0:0|1:284557:0|2:247977:0|3:247887:0|4:248016:0",
+      "meshes": "0:204896:0:0|0:40121:0:4|1:29084:0:2",
+      "scfuUnknown1Hex": "00000000000000000000000003010001000100010001000000020000"
+    },
+    {
+      "identity": "(SimpleChar:78D08F3B)",
+      "name": "RALPH",
+      "level": 200,
+      "health": 36434,
+      "monsterData": 96056,
+      "monsterScale": 110,
+      "visualFlags": 31,
+      "headMesh": null,
+      "runSpeed": 515,
+      "npcFamily": 103,
+      "characterFlags": 277615105,
+      "position": [
+        191.6574,
+        1.02,
+        197.0204
+      ],
+      "heading": [
+        0.0,
+        -0.709236,
+        0.0,
+        0.704971
+      ],
+      "textures": "0:0:0|1:0:0|2:0:0|3:0:0|4:0:0",
+      "meshes": "",
+      "scfuUnknown1Hex": "80000000000000008000000003010001000100010001000000020000"
+    }
+  ]
+}

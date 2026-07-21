@@ -1,0 +1,365 @@
+[
+  {
+    "inst": "79732DA2",
+    "name": "Guide",
+    "level": 200,
+    "monsterData": 26076,
+    "pos": [
+      113.744,
+      115.01,
+      150.229
+    ],
+    "playfield": 3046,
+    "health": 36434,
+    "scale": 121,
+    "headMesh": 40635,
+    "run": 515
+  },
+  {
+    "inst": "797055A0",
+    "name": "Male Captain",
+    "level": 165,
+    "monsterData": 26151,
+    "pos": [
+      727.388,
+      21.415,
+      311.262
+    ],
+    "playfield": 735,
+    "health": 15605,
+    "scale": 118,
+    "headMesh": 40171,
+    "run": 440
+  },
+  {
+    "inst": "797055AA",
+    "name": "Male Lieutenant",
+    "level": 150,
+    "monsterData": 26088,
+    "pos": [
+      639.612,
+      17.41,
+      397.184
+    ],
+    "playfield": 735,
+    "health": 13369,
+    "scale": 117,
+    "headMesh": 40687,
+    "run": 432
+  },
+  {
+    "inst": "797055A3",
+    "name": "Male Lieutenant",
+    "level": 150,
+    "monsterData": 26088,
+    "pos": [
+      551.759,
+      17.41,
+      313.59
+    ],
+    "playfield": 735,
+    "health": 13369,
+    "scale": 117,
+    "headMesh": 40687,
+    "run": 432
+  },
+  {
+    "inst": "797055A2",
+    "name": "Male Lieutenant",
+    "level": 151,
+    "monsterData": 26088,
+    "pos": [
+      615.867,
+      17.41,
+      280.823
+    ],
+    "playfield": 735,
+    "health": 13518,
+    "scale": 117,
+    "headMesh": 40687,
+    "run": 433
+  },
+  {
+    "inst": "797055AC",
+    "name": "Male Lieutenant",
+    "level": 154,
+    "monsterData": 26088,
+    "pos": [
+      635.229,
+      17.41,
+      230.103
+    ],
+    "playfield": 735,
+    "health": 13965,
+    "scale": 117,
+    "headMesh": 40687,
+    "run": 434
+  },
+  {
+    "inst": "797055A7",
+    "name": "Male Lieutenant",
+    "level": 156,
+    "monsterData": 26088,
+    "pos": [
+      536.459,
+      17.41,
+      446.56
+    ],
+    "playfield": 735,
+    "health": 14263,
+    "scale": 117,
+    "headMesh": 40687,
+    "run": 435
+  },
+  {
+    "inst": "797055A9",
+    "name": "Male Lieutenant",
+    "level": 156,
+    "monsterData": 26088,
+    "pos": [
+      713.304,
+      17.41,
+      246.429
+    ],
+    "playfield": 735,
+    "health": 14263,
+    "scale": 117,
+    "headMesh": 40687,
+    "run": 435
+  },
+  {
+    "inst": "797055A8",
+    "name": "Male Lieutenant",
+    "level": 157,
+    "monsterData": 26088,
+    "pos": [
+      709.505,
+      17.41,
+      384.986
+    ],
+    "playfield": 735,
+    "health": 14413,
+    "scale": 118,
+    "headMesh": 40687,
+    "run": 436
+  },
+  {
+    "inst": "797055A6",
+    "name": "Male Lieutenant",
+    "level": 161,
+    "monsterData": 26088,
+    "pos": [
+      536.373,
+      17.41,
+      438.665
+    ],
+    "playfield": 735,
+    "health": 15009,
+    "scale": 118,
+    "headMesh": 40687,
+    "run": 438
+  },
+  {
+    "inst": "797055AB",
+    "name": "Male Lieutenant",
+    "level": 162,
+    "monsterData": 26088,
+    "pos": [
+      661.56,
+      17.41,
+      346.511
+    ],
+    "playfield": 735,
+    "health": 15158,
+    "scale": 118,
+    "headMesh": 40687,
+    "run": 439
+  },
+  {
+    "inst": "797055BA",
+    "name": "Master OT Robotbuilder",
+    "level": 196,
+    "monsterData": 26092,
+    "pos": [
+      559.616,
+      17.41,
+      380.508
+    ],
+    "playfield": 735,
+    "health": 23349,
+    "scale": 121,
+    "headMesh": 40694,
+    "run": 468
+  },
+  {
+    "inst": "797055B5",
+    "name": "Mr. Blake",
+    "level": 200,
+    "monsterData": 245897,
+    "pos": [
+      646.0,
+      21.415,
+      426.0
+    ],
+    "playfield": 735,
+    "health": 36434,
+    "scale": 121,
+    "headMesh": 40694,
+    "run": 515
+  },
+  {
+    "inst": "797055AF",
+    "name": "Omni-AF Urban Trooper",
+    "level": 250,
+    "monsterData": 26151,
+    "pos": [
+      600.0,
+      17.41,
+      389.68
+    ],
+    "playfield": 735,
+    "health": 200000,
+    "scale": 130,
+    "headMesh": 40171,
+    "run": 1185
+  },
+  {
+    "inst": "797055B0",
+    "name": "Omni-AF Urban Trooper",
+    "level": 250,
+    "monsterData": 26151,
+    "pos": [
+      727.775,
+      21.415,
+      317.172
+    ],
+    "playfield": 735,
+    "health": 200000,
+    "scale": 130,
+    "headMesh": 40171,
+    "run": 1185
+  },
+  {
+    "inst": "797055B3",
+    "name": "Omni-AF Urban Trooper",
+    "level": 250,
+    "monsterData": 26151,
+    "pos": [
+      742.509,
+      17.41,
+      358.158
+    ],
+    "playfield": 735,
+    "health": 200000,
+    "scale": 130,
+    "headMesh": 40171,
+    "run": 1185
+  },
+  {
+    "inst": "797055B1",
+    "name": "Omni-AF Urban Trooper",
+    "level": 250,
+    "monsterData": 26151,
+    "pos": [
+      742.288,
+      17.41,
+      260.851
+    ],
+    "playfield": 735,
+    "health": 200000,
+    "scale": 130,
+    "headMesh": 40171,
+    "run": 1185
+  },
+  {
+    "inst": "797055B2",
+    "name": "Omni-AF Urban Trooper",
+    "level": 250,
+    "monsterData": 26151,
+    "pos": [
+      742.403,
+      17.41,
+      269.562
+    ],
+    "playfield": 735,
+    "health": 200000,
+    "scale": 130,
+    "headMesh": 40171,
+    "run": 1185
+  },
+  {
+    "inst": "797055AD",
+    "name": "Omni-AF Urban Trooper",
+    "level": 250,
+    "monsterData": 26137,
+    "pos": [
+      642.602,
+      17.41,
+      314.654
+    ],
+    "playfield": 735,
+    "health": 200000,
+    "scale": 130,
+    "headMesh": 40209,
+    "run": 1185
+  },
+  {
+    "inst": "797055B8",
+    "name": "Rookie OT Mercenary",
+    "level": 47,
+    "monsterData": 26097,
+    "pos": [
+      659.056,
+      17.41,
+      242.46
+    ]
+  },
+  {
+    "inst": "797055BC",
+    "name": "Seasoned OT Mercenary",
+    "level": 135,
+    "monsterData": 26103,
+    "pos": [
+      706.783,
+      17.41,
+      382.475
+    ],
+    "playfield": 735,
+    "health": 11133,
+    "scale": 116,
+    "headMesh": 40103,
+    "run": 551
+  },
+  {
+    "inst": "797055B6",
+    "name": "Seasoned OT Techhunter",
+    "level": 112,
+    "monsterData": 26147,
+    "pos": [
+      726.606,
+      17.41,
+      360.567
+    ],
+    "playfield": 735,
+    "health": 8253,
+    "scale": 113,
+    "headMesh": 40172,
+    "run": 376
+  },
+  {
+    "inst": "797055BB",
+    "name": "Veteran OT Marksman",
+    "level": 179,
+    "monsterData": 26147,
+    "pos": [
+      583.152,
+      17.41,
+      337.496
+    ],
+    "playfield": 735,
+    "health": 17692,
+    "scale": 119,
+    "headMesh": 40172,
+    "run": 448
+  }
+]
