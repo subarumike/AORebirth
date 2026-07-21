@@ -2,45 +2,19 @@
 
 ## Current Focus
 
-Complete the Subway dungeon from the existing capture corpus before requesting
-more gameplay evidence. The full location inventory and raw lifecycle recovery
-are complete. All `74` Subway-bearing sessions with raw packet rows now
-reprocess successfully, so incomplete legacy
-projections no longer require repeat gameplay captures. The active work is to
-promote recovered exact evidence and validate the `322` active PF127 population
-in bounded runtime batches; no population rows remain quarantined. The full
-private-server walkthrough passed, except that Muggers were found to require
-proactive social aggression. Muggers now acquire players automatically within
-the shared seven-meter Subway policy radius only with clear PF127 geometry LOS,
-pull nearby same-profile Muggers with their own clear LOS, and retain LOS-gated
-ranged damage after combat begins. Focused private validation of that final
-Mugger adjustment remains.
+Construct the Temple of Three Winds as its own PF647 content module from the
+finalized `20260721-030515`, `20260721-031913`, `20260721-032247`,
+`20260721-032547`, and `20260721-033006` captures. The first bounded slice covers
+only regular Cultists from the entrance through the hallways and first boss
+room: seven exact visual profiles, `122` deduplicated spawn anchors, `16`
+captured patrols, observed `15..32` normal damage, capture-backed chase/return,
+strict profile-scoped loot, exact level credits, and the captured approximately
+`310`-second death-to-respawn lifecycle. Bosses and named NPCs remain excluded.
 
-Authoritative PF127 lifecycle policy: every regular Subway mob uses the shared
-`240`-second post-NPC-despawn respawn schedule. Regular corpses remain for
-`120` seconds while loot or credits remain and `30` seconds when born empty or
-after becoming empty. Subway boss corpses remain for `30` minutes and Subway
-bosses respawn `10` minutes after death. There are no per-archetype regular-mob
-respawn exceptions. This shared policy satisfies the lifecycle portion of all
-26 ordinary profiles; profile-specific capture gaps must now be limited to
-combat, movement/aggro/leash, loot membership, or appearance evidence.
-
-The finalized `20260720-051714` whole-subway survey adds no new ordinary
-hostile archetype; its Bureaucrat Worker and Wrath Incarnation rows are
-player-owned pets. Its exact identity-linked evidence is now promoted for the
-four remaining ordinary profiles: Infected Attendant adds a second local hit
-and a sixth strict first-open sample; Lost Thought adds seven local hits and two
-empty first opens; Empty Shell adds three normal hits, one critical, five
-strict first opens, and six credit corpses; Premature Pattern adds a third
-normal hit, five strict first opens, and six credit corpses. All 26 ordinary
-profiles now have runtime combat and loot tables. Lost Thought uses its observed
-`5.428348`-second cadence; Infected Attendant, Empty Shell, and Premature Pattern
-use an explicit five-second private-server cadence pending bounded playability
-validation. Vergil follow-up `20260720-053542` records a normal `22..25`
-weapon roll and one `54` critical. Abmouth follow-up `20260720-053802` proves
-the one-per-fight nano `286237` player/pet warp and is now implemented in the
-named encounter runtime. See
-`docs/evidence/SUBWAY_20260720_REST_MISSING_ENEMIES_AND_BOSS_FOLLOWUPS.md`.
+Temple data is owned by `CapturedTempleOfThreeWindsContentProvider` and uses
+only `totw.*` keys on playfield `647`. Subway remains independently owned by its
+PF127 providers; only generic ordinary-enemy runtime infrastructure is shared.
+See `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md`.
 
 ## Subway enemy captures (2026-07-20)
 

@@ -78,7 +78,8 @@ namespace AORebirth.Core.Playfields
             this.ordinaryEnemyCatalog =
                 new OrdinaryEnemyCatalog(
                     this.capturedSubwayContent,
-                    this.capturedSubwayOrdinaryContent);
+                    this.capturedSubwayOrdinaryContent,
+                    new CapturedTempleOfThreeWindsContentProvider());
             this.patrolReplay =
                 new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
             this.capturedAreteRobotSpawns =
