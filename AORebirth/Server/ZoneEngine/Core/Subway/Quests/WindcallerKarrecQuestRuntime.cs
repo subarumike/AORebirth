@@ -4,6 +4,7 @@ namespace ZoneEngine.Core.Subway.Quests
 
     using System;
     using System.Globalization;
+    using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Items;
@@ -12,7 +13,6 @@ namespace ZoneEngine.Core.Subway.Quests
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
 
     #endregion
@@ -25,17 +25,14 @@ namespace ZoneEngine.Core.Subway.Quests
         internal const int MaddyCardileInstance = unchecked((int)0x796360BC);
         internal const int BrontoBurgerItemId = WindcallerKarrecInteractionRules.BurgerItemId;
         internal const int MaddyCreditCardItemId = WindcallerKarrecInteractionRules.CreditCardItemId;
-        internal const int SideTokenStatId = 75;
-        internal const int SideTokenReward = 2;
-        internal const int PersonalResearchXpAllocation = 5000;
+        internal const int DailyMissionXpRewardItemId = 285612;
         internal const string AccountAccessFlagKey = "totw-wall-access";
 
         internal const string QuestId = "Mission:55579381";
         private const string ObjectiveId = "mission_55579381_deliver_offerings";
         private const string BurgerGrantFlag = "bronto-burger-granted";
         private const string CardGrantFlag = "maddy-credit-card-granted";
-        private const string ResearchAllocationFlag = "personal-research-xp-allocation";
-        private const string LevelXpRewardFlag = "one-level-xp-reward";
+        private const string CompletionRewardSnapshotFlag = "completion-reward-snapshot-v1";
 
         internal static bool IsActive(ICharacter source)
         {
@@ -101,6 +98,53 @@ namespace ZoneEngine.Core.Subway.Quests
                        MaddyCreditCardItemId);
         }
 
+        internal static bool TryPrepareCompletionRewardSnapshot(ICharacter source)
+        {
+            if (!IsActive(source))
+            {
+                return false;
+            }
+
+            int characterId = source.Identity.Instance;
+            MissionFlagRecord existing = MissionRuntime.Service.GetFlag(
+                characterId,
+                QuestId,
+                CompletionRewardSnapshotFlag);
+            DailyMissionRewardSnapshot snapshot;
+            if (existing != null)
+            {
+                return DailyMissionRewardRules.TryParseCompletionSnapshot(existing.Value, out snapshot);
+            }
+
+            if (!DailyMissionRewardRules.TryCreateCompletionSnapshot(
+                source.Stats[StatIds.level].Value,
+                source.Stats[StatIds.side].Value,
+                out snapshot))
+            {
+                return false;
+            }
+
+            string serialized = DailyMissionRewardRules.SerializeCompletionSnapshot(snapshot);
+            MissionOperationResult persisted = MissionRuntime.Service.SetFlag(
+                characterId,
+                QuestId,
+                CompletionRewardSnapshotFlag,
+                serialized);
+            if (persisted.Status != MissionOperationStatus.Applied
+                && persisted.Status != MissionOperationStatus.AlreadyApplied)
+            {
+                return false;
+            }
+
+            MissionFlagRecord readBack = MissionRuntime.Service.GetFlag(
+                characterId,
+                QuestId,
+                CompletionRewardSnapshotFlag);
+            return readBack != null
+                   && string.Equals(readBack.Value, serialized, StringComparison.Ordinal)
+                   && DailyMissionRewardRules.TryParseCompletionSnapshot(readBack.Value, out snapshot);
+        }
+
         internal static KarrecCompletionResult CompleteAfterOfferingsConsumed(ICharacter source)
         {
             if (!IsPlayerInSubway(source) || !MissionRuntime.IsInitialized)
@@ -115,6 +159,12 @@ namespace ZoneEngine.Core.Subway.Quests
                     && mission.State != MissionLifecycleState.Completed))
             {
                 return KarrecCompletionResult.Failed("karrec-mission-not-active");
+            }
+
+            DailyMissionRewardSnapshot rewardSnapshot;
+            if (!TryReadCompletionRewardSnapshot(characterId, out rewardSnapshot))
+            {
+                return KarrecCompletionResult.Failed("completion-reward-snapshot-missing-or-invalid");
             }
 
             string accountKey = MissionRuntime.ResolveAccountKey(characterId);
@@ -149,8 +199,75 @@ namespace ZoneEngine.Core.Subway.Quests
                 }
             }
 
-            // TOTW gateway access is the turn-in contract. Side token / research feedback are
-            // best-effort so a reward-writer failure cannot strand the player without passage.
+            MissionRewardExecutionResult sideTokens = ApplySideTokenReward(source, rewardSnapshot);
+            if (!sideTokens.Succeeded)
+            {
+                return KarrecCompletionResult.Failed("side-token-reward-failed:" + sideTokens.Message);
+            }
+
+            int appliedSideTokenStatId;
+            int appliedSideTokenReward;
+            if (sideTokens.Stage == null
+                || !DailyMissionRewardRules.TryResolveAppliedSideTokenForSnapshot(
+                    rewardSnapshot,
+                    sideTokens.Stage.EffectReference,
+                    out appliedSideTokenStatId,
+                    out appliedSideTokenReward))
+            {
+                return KarrecCompletionResult.Failed("side-token-reward-provenance-unresolved");
+            }
+
+            long sideTokenValue = 0;
+            if (appliedSideTokenStatId != DailyMissionRewardRules.NoSideTokenStatId)
+            {
+                if (!TryGetPersistedStatValue(
+                    sideTokens.StatValues,
+                    appliedSideTokenStatId,
+                    out sideTokenValue))
+                {
+                    sideTokenValue = source.Stats[(StatIds)appliedSideTokenStatId].BaseValue;
+                }
+
+                source.Stats[(StatIds)appliedSideTokenStatId].Set(
+                    sideTokenValue <= 0
+                        ? 0
+                        : (uint)Math.Min(sideTokenValue, uint.MaxValue));
+                source.Stats[(StatIds)appliedSideTokenStatId].Changed = false;
+            }
+
+            MissionRewardExecutionResult xpReward = ApplyFullLevelXpReward(source, rewardSnapshot);
+            if (!xpReward.Succeeded)
+            {
+                return KarrecCompletionResult.Failed("full-level-xp-reward-failed:" + xpReward.Message);
+            }
+
+            int appliedXpLevel;
+            int appliedXpReward;
+            if (xpReward.Stage == null
+                || !DailyMissionRewardRules.TryParseFullLevelXpEffectReference(
+                    xpReward.Stage.EffectReference,
+                    out appliedXpLevel,
+                    out appliedXpReward)
+                || appliedXpLevel != rewardSnapshot.LevelBefore
+                || appliedXpReward != rewardSnapshot.XpReward)
+            {
+                return KarrecCompletionResult.Failed("full-level-xp-reward-provenance-unresolved");
+            }
+
+            if (!ContainsPersistedStatValue(xpReward.StatValues, (int)StatIds.xp)
+                || !ContainsPersistedStatValue(xpReward.StatValues, (int)StatIds.lastxp))
+            {
+                return KarrecCompletionResult.Failed("full-level-xp-reward-values-unresolved");
+            }
+
+            ApplyPersistedStatValues(source, xpReward.StatValues);
+            if (!CombatXpRuntimeService.ReconcilePersistedMissionXpRewardState(
+                source,
+                rewardSnapshot.LevelBefore))
+            {
+                return KarrecCompletionResult.Failed("full-level-xp-state-reconciliation-failed");
+            }
+
             if (MissionRuntime.Service.GetAccountFlag(accountKey, AccountAccessFlagKey) == null)
             {
                 MissionOperationResult accessFlag = MissionRuntime.Service.SetAccountFlag(
@@ -166,52 +283,31 @@ namespace ZoneEngine.Core.Subway.Quests
                 }
             }
 
-            TryAwardOneLevelXpReward(source, characterId);
-
-            MissionRewardExecutionResult sideTokens = ApplySideTokenReward(source);
-            MissionRewardExecutionStatus researchStatus = MissionRewardExecutionStatus.Unresolved;
-            var researchDefinition = new MissionRewardDefinition
-                                     {
-                                         RewardKey = "personal-research-xp-5000",
-                                         RewardType = "personal-research-allocation",
-                                         IsResolved = true
-                                     };
-            MissionRewardExecutionResult research = MissionRuntime.Rewards.ExecuteExternal(
-                characterId,
-                QuestId,
-                researchDefinition,
-                new PersonalResearchAllocationEffect(characterId));
-            if (research != null && research.Succeeded)
-            {
-                researchStatus = research.Status;
-            }
-
-            long sideTokenValue = source.Stats[(StatIds)SideTokenStatId].BaseValue;
-            if (sideTokens != null && sideTokens.Succeeded && sideTokens.StatValues != null)
-            {
-                foreach (MissionCharacterStatValue statValue in sideTokens.StatValues)
-                {
-                    if (statValue.StatId != SideTokenStatId)
-                    {
-                        continue;
-                    }
-
-                    sideTokenValue = statValue.Value;
-                    source.Stats[(StatIds)SideTokenStatId].Set(
-                        statValue.Value <= 0
-                            ? 0
-                            : (uint)Math.Min(statValue.Value, uint.MaxValue));
-                }
-
-                StatMessageHandler.Default.SendChanged(source);
-            }
-
             return KarrecCompletionResult.Succeeded(
                 sideTokenValue,
-                sideTokens != null && sideTokens.Succeeded
-                    ? sideTokens.Status
-                    : MissionRewardExecutionStatus.Unresolved,
-                researchStatus);
+                appliedSideTokenStatId,
+                appliedSideTokenReward,
+                rewardSnapshot.LevelBefore,
+                rewardSnapshot.XpReward,
+                sideTokens.Status,
+                xpReward.Status,
+                CloneStatValues(xpReward.StatValues));
+        }
+
+        internal static bool TryProjectXpReward(ICharacter source, KarrecCompletionResult completion)
+        {
+            if (source == null
+                || completion == null
+                || !completion.Completed
+                || !ContainsPersistedStatValue(completion.XpStatValues, (int)StatIds.xp)
+                || !ContainsPersistedStatValue(completion.XpStatValues, (int)StatIds.lastxp))
+            {
+                return false;
+            }
+
+            return CombatXpRuntimeService.TryProjectPersistedMissionXpReward(
+                source,
+                completion.LevelBefore);
         }
 
         internal static bool HasAccountAccess(ICharacter source)
@@ -233,42 +329,6 @@ namespace ZoneEngine.Core.Subway.Quests
             return MissionRuntime.Service.GetAccountFlag(fallbackKey, AccountAccessFlagKey) != null;
         }
 
-        private static void TryAwardOneLevelXpReward(ICharacter source, int characterId)
-        {
-            if (source == null || !MissionRuntime.IsInitialized)
-            {
-                return;
-            }
-
-            if (MissionRuntime.Service.GetFlag(characterId, QuestId, LevelXpRewardFlag) != null)
-            {
-                return;
-            }
-
-            int xpNeeded = CombatXpRuntimeService.GetXpNeededForNextLevel(source);
-            if (xpNeeded <= 0)
-            {
-                MissionRuntime.Service.SetFlag(
-                    characterId,
-                    QuestId,
-                    LevelXpRewardFlag,
-                    "skipped-max-level");
-                return;
-            }
-
-            bool awarded = CombatXpRuntimeService.AwardDirectXp(
-                source,
-                xpNeeded,
-                "karrec-quest");
-            MissionRuntime.Service.SetFlag(
-                characterId,
-                QuestId,
-                LevelXpRewardFlag,
-                awarded
-                    ? "awarded:" + xpNeeded.ToString(CultureInfo.InvariantCulture)
-                    : "failed:" + xpNeeded.ToString(CultureInfo.InvariantCulture));
-        }
-
         private static MissionOperationResult ObserveOffering(
             ICharacter source,
             int itemId,
@@ -288,10 +348,16 @@ namespace ZoneEngine.Core.Subway.Quests
                 });
         }
 
-        private static MissionRewardExecutionResult ApplySideTokenReward(ICharacter source)
+        private static MissionRewardExecutionResult ApplySideTokenReward(
+            ICharacter source,
+            DailyMissionRewardSnapshot snapshot)
         {
+            int mutationStatId = snapshot.SideTokenStatId == DailyMissionRewardRules.NoSideTokenStatId
+                                     ? DailyMissionRewardRules.OmniSideTokenStatId
+                                     : snapshot.SideTokenStatId;
             var definition = new MissionRewardDefinition
                              {
+                                 // Retain this legacy key so already-applied completions cannot double-grant.
                                  RewardKey = "side-tokens-2",
                                  RewardType = "character-stats",
                                  IsResolved = true,
@@ -300,11 +366,11 @@ namespace ZoneEngine.Core.Subway.Quests
                                                      new MissionCharacterStatMutation
                                                      {
                                                          StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                         StatId = SideTokenStatId,
+                                                         StatId = mutationStatId,
                                                          Kind = MissionStatMutationKind.AddClamped,
-                                                         Value = SideTokenReward,
+                                                         Value = snapshot.SideTokenReward,
                                                          MinimumValue = 0,
-                                                         MaximumValue = uint.MaxValue
+                                                         MaximumValue = int.MaxValue
                                                      }
                                                  }
                              };
@@ -312,7 +378,151 @@ namespace ZoneEngine.Core.Subway.Quests
                 source.Identity.Instance,
                 QuestId,
                 definition,
-                "capture:20260717-223626:stat-75-plus-2");
+                DailyMissionRewardRules.CreateSideTokenEffectReference(
+                    snapshot.SideTokenStatId,
+                    snapshot.SideTokenReward));
+        }
+
+        private static MissionRewardExecutionResult ApplyFullLevelXpReward(
+            ICharacter source,
+            DailyMissionRewardSnapshot snapshot)
+        {
+            var definition = new MissionRewardDefinition
+                             {
+                                 RewardKey = "daily-mission-full-level-xp-v1",
+                                 RewardType = "character-stats",
+                                 IsResolved = true,
+                                 StatMutations = new[]
+                                                 {
+                                                     new MissionCharacterStatMutation
+                                                     {
+                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                         StatId = (int)StatIds.xp,
+                                                         Kind = MissionStatMutationKind.AddClamped,
+                                                         Value = snapshot.XpReward,
+                                                         MinimumValue = 0,
+                                                         MaximumValue = int.MaxValue
+                                                     },
+                                                     new MissionCharacterStatMutation
+                                                     {
+                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                         StatId = (int)StatIds.lastxp,
+                                                         Kind = MissionStatMutationKind.Set,
+                                                         Value = snapshot.XpReward,
+                                                         MinimumValue = 0,
+                                                         MaximumValue = int.MaxValue
+                                                     }
+                                                 }
+                             };
+            return MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
+                QuestId,
+                definition,
+                DailyMissionRewardRules.CreateFullLevelXpEffectReference(
+                    snapshot.LevelBefore,
+                    snapshot.XpReward));
+        }
+
+        private static bool TryReadCompletionRewardSnapshot(
+            int characterId,
+            out DailyMissionRewardSnapshot snapshot)
+        {
+            snapshot = null;
+            MissionFlagRecord flag = MissionRuntime.Service.GetFlag(
+                characterId,
+                QuestId,
+                CompletionRewardSnapshotFlag);
+            return flag != null
+                   && DailyMissionRewardRules.TryParseCompletionSnapshot(flag.Value, out snapshot);
+        }
+
+        private static void ApplyPersistedStatValues(
+            ICharacter source,
+            IList<MissionCharacterStatValue> statValues)
+        {
+            if (source == null || statValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in statValues)
+            {
+                if (statValue == null
+                    || statValue.StatIdentityType != (int)IdentityType.CanbeAffected
+                    || statValue.StatId < 0)
+                {
+                    continue;
+                }
+
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                if (source.Stats[(StatIds)statValue.StatId].BaseValue != value)
+                {
+                    source.Stats[(StatIds)statValue.StatId].Set(value);
+                }
+            }
+        }
+
+        private static IList<MissionCharacterStatValue> CloneStatValues(
+            IList<MissionCharacterStatValue> statValues)
+        {
+            var clones = new List<MissionCharacterStatValue>();
+            if (statValues == null)
+            {
+                return clones;
+            }
+
+            foreach (MissionCharacterStatValue statValue in statValues)
+            {
+                if (statValue == null)
+                {
+                    continue;
+                }
+
+                clones.Add(
+                    new MissionCharacterStatValue
+                    {
+                        StatIdentityType = statValue.StatIdentityType,
+                        StatId = statValue.StatId,
+                        Value = statValue.Value
+                    });
+            }
+
+            return clones;
+        }
+
+        private static bool ContainsPersistedStatValue(
+            IList<MissionCharacterStatValue> statValues,
+            int statId)
+        {
+            long ignored;
+            return TryGetPersistedStatValue(statValues, statId, out ignored);
+        }
+
+        private static bool TryGetPersistedStatValue(
+            IList<MissionCharacterStatValue> statValues,
+            int statId,
+            out long value)
+        {
+            value = 0;
+            if (statValues == null)
+            {
+                return false;
+            }
+
+            foreach (MissionCharacterStatValue statValue in statValues)
+            {
+                if (statValue != null
+                    && statValue.StatIdentityType == (int)IdentityType.CanbeAffected
+                    && statValue.StatId == statId)
+                {
+                    value = statValue.Value;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool TryGrantObjectiveItem(ICharacter source, int itemId, string flagKey)
@@ -411,68 +621,56 @@ namespace ZoneEngine.Core.Subway.Quests
                    || result.Status == MissionOperationStatus.Unresolved;
         }
 
-        private sealed class PersonalResearchAllocationEffect : IMissionRewardEffect
-        {
-            private readonly int characterId;
-
-            public PersonalResearchAllocationEffect(int characterId)
-            {
-                this.characterId = characterId;
-            }
-
-            public MissionRewardEffectResult Apply(MissionRewardExecutionContext context)
-            {
-                MissionFlagRecord existing = MissionRuntime.Service.GetFlag(
-                    this.characterId,
-                    QuestId,
-                    ResearchAllocationFlag);
-                if (existing != null)
-                {
-                    return MissionRewardEffectResult.AlreadyApplied(
-                        "mission-flag:" + ResearchAllocationFlag + ":5000");
-                }
-
-                MissionOperationResult flag = MissionRuntime.Service.SetFlag(
-                    this.characterId,
-                    QuestId,
-                    ResearchAllocationFlag,
-                    PersonalResearchXpAllocation.ToString());
-                return flag.Status == MissionOperationStatus.Applied
-                           || flag.Status == MissionOperationStatus.AlreadyApplied
-                           ? MissionRewardEffectResult.Applied(
-                               "mission-flag:" + ResearchAllocationFlag + ":5000")
-                           : MissionRewardEffectResult.RetryableFailure(flag.Message);
-            }
-        }
     }
 
     internal sealed class KarrecCompletionResult
     {
         private KarrecCompletionResult()
         {
+            this.XpStatValues = new MissionCharacterStatValue[0];
         }
 
         internal bool Completed { get; private set; }
 
         internal long SideTokenValue { get; private set; }
 
+        internal int SideTokenStatId { get; private set; }
+
+        internal int SideTokenReward { get; private set; }
+
+        internal int XpReward { get; private set; }
+
+        internal int LevelBefore { get; private set; }
+
+        internal IList<MissionCharacterStatValue> XpStatValues { get; private set; }
+
         internal MissionRewardExecutionStatus SideTokenStatus { get; private set; }
 
-        internal MissionRewardExecutionStatus ResearchStatus { get; private set; }
+        internal MissionRewardExecutionStatus XpStatus { get; private set; }
 
         internal string Error { get; private set; }
 
         internal static KarrecCompletionResult Succeeded(
             long sideTokenValue,
+            int sideTokenStatId,
+            int sideTokenReward,
+            int levelBefore,
+            int xpReward,
             MissionRewardExecutionStatus sideTokenStatus,
-            MissionRewardExecutionStatus researchStatus)
+            MissionRewardExecutionStatus xpStatus,
+            IList<MissionCharacterStatValue> xpStatValues)
         {
             return new KarrecCompletionResult
                    {
                        Completed = true,
                        SideTokenValue = sideTokenValue,
+                       SideTokenStatId = sideTokenStatId,
+                       SideTokenReward = sideTokenReward,
+                       LevelBefore = levelBefore,
+                       XpReward = xpReward,
                        SideTokenStatus = sideTokenStatus,
-                       ResearchStatus = researchStatus
+                       XpStatus = xpStatus,
+                       XpStatValues = xpStatValues ?? new MissionCharacterStatValue[0]
                    };
         }
 

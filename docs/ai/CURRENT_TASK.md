@@ -145,9 +145,11 @@ and `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`.
   idempotent reward stages. Rex B18C through the B18F/B194 handoff now use this
   runtime instead of process-local authoritative state.
 - Windcaller Karrec's capture-backed PF655 flow now covers dialogue acceptance,
-  burger/card handout, an exact two-item trade, `+2` stat-75 side tokens, a
-  durable `5000` personal-research allocation record, mission cleanup, and
-  account flag `totw-wall-access`. The known wall `Terminal:C004028F` transfers
+  burger/card handout, an exact two-item trade, a durable direct full-level XP
+  reward, and item-`285612` token scaling (`+4` at level 25, `+6` at level 60;
+  Clan stat `62`, Omni stat `75`, Neutral none), followed by mission cleanup and
+  account flag `totw-wall-access`. Research diversion is excluded because that
+  expansion system is not implemented. The known wall `Terminal:C004028F` transfers
   eligible accounts to PF647 at payload landing `(1814, 29, 2699)`. PF655 now
   also materializes Karrec, Annoying Dude, and Maddy Cardile from their exact
   captured appearance contract; Annoying Dude and Maddy replay their complete
@@ -163,8 +165,8 @@ and `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`.
 - Remaining validation is live database/schema startup and private-client smoke
   for restart persistence, duplicate prevention, dialogue/trade/rewards, and
   denied/eligible wall use. The capture does not prove the official account-flag
-  identity, denial packet, NPC spawn template, total ordinary XP, or research
-  progression semantics; unresolved `PerkUpdate` fields are not replayed.
+  identity, denial packet, or NPC spawn template. Research diversion and
+  unresolved `PerkUpdate` fields are excluded with the unimplemented expansion.
 - Detailed status: `docs/project/QUEST_SYSTEM_AUDIT_20260717.md`.
 
 ## Corpus Inventory

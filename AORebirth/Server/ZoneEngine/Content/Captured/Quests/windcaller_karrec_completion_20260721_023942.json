@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "windcaller-karrec-completion-20260721-023942",
+  "evidenceClass": "capture-observation",
+  "runtimeSpecification": false,
+  "sourceCapture": {
+    "captureId": "20260721-023942",
+    "utcStart": "2026-07-21T07:39:42.8211115Z",
+    "utcEnd": "2026-07-21T07:42:34.1271190Z",
+    "validation": {
+      "rawInbound": 3205,
+      "rawOutbound": 190,
+      "rawTotal": 3395,
+      "rawWriteErrors": 0,
+      "projectionErrors": 0,
+      "callbackErrors": 0,
+      "processingAllowed": true,
+      "recaptureRequired": false,
+      "scfuDecoded": 366,
+      "scfuFailures": 0,
+      "scfuIncomplete": 0
+    },
+    "provenance": {
+      "rawPacketsCsvSha256": "D4FF98AF8A6D1822D432208489E8E1AEA6E09B62B29E8B6FB041A7EC33212FC6",
+      "packetHexLogSha256": "E16B3B400A05CE3370F0FD0CF86940F2F146971F1082AA9E2762E85B5B446656"
+    }
+  },
+  "completionObservations": {
+    "userConfirmedCharacterLevel": 60,
+    "userObservedUi": {
+      "text": "45000 of your XP were allocated to your personal research.",
+      "isPacketPlaintext": false,
+      "runtimeUse": "excluded-unimplemented-expansion-system"
+    },
+    "perkUpdate": {
+      "rawPacketRow": 3054,
+      "sequence": 2871,
+      "semantics": "unresolved-player-specific-expansion-state",
+      "runtimeUse": "excluded"
+    },
+    "statProjections": [
+      {
+        "sequence": 2830,
+        "statId": 592,
+        "capturedLabel": "UnsavedXP",
+        "value": 170716,
+        "source": "enemy-stat-updates.csv:1496",
+        "interpretation": "absolute-value-not-reward-delta"
+      },
+      {
+        "sequence": 2832,
+        "statId": 75,
+        "value": 4005,
+        "source": "enemy-stat-updates.csv:1497"
+      },
+      {
+        "sequence": 2833,
+        "statId": 75,
+        "value": 4007,
+        "source": "enemy-stat-updates.csv:1498"
+      },
+      {
+        "sequence": 2834,
+        "statId": 75,
+        "value": 4009,
+        "source": "enemy-stat-updates.csv:1499"
+      },
+      {
+        "sequence": 2839,
+        "statId": 521,
+        "capturedLabel": "SocialStatus",
+        "value": 0,
+        "unknown": 1,
+        "source": "enemy-stat-updates.csv:1500"
+      }
+    ],
+    "sideTokenInterpretation": {
+      "statId": 75,
+      "pulseValues": [4005, 4007, 4009],
+      "pulseDelta": 2,
+      "pulseCount": 3,
+      "totalDelta": 6,
+      "inferredPriorValue": 4003
+    },
+    "ordinaryXp": {
+      "userConfirmedBehavior": "one-complete-level",
+      "captureProvidesDirectRewardDelta": false,
+      "runtimeResolution": "XPTable.TableRKXP[level - 1, 2]",
+      "level60Reward": 203500
+    }
+  },
+  "unresolvedExclusions": [
+    "The capture metadata does not record character level 60; that level is user-confirmed.",
+    "UnsavedXP 170716 is an absolute projection and is not treated as the mission reward amount.",
+    "Personal-research UI text and PerkUpdate fields are expansion-system provenance only.",
+    "The direct ordinary-XP wire sequence is not capture-proven because official live diverted it into research."
+  ]
+}

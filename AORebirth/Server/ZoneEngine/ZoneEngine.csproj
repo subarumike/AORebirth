@@ -165,6 +165,7 @@
     <Compile Include="Core\Missions\InMemoryMissionRepository.cs" />
     <Compile Include="Core\Missions\MissionModels.cs" />
     <Compile Include="Core\Missions\MissionDefinitionCatalog.cs" />
+    <Compile Include="Core\Missions\DailyMissionRewardRules.cs" />
     <Compile Include="Core\Missions\MissionRewardCoordinator.cs" />
     <Compile Include="Core\Missions\MySqlMissionRepository.cs" />
     <Compile Include="Core\Missions\PersistentMissionService.cs" />
