@@ -80,6 +80,7 @@
     <Compile Include="AbmouthEncounterRuntimeServiceTests.cs" />
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
+    <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
@@ -157,6 +158,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs">
       <Link>CapturedSubwayOrdinaryContentProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs">
+      <Link>CapturedTempleOfThreeWindsContentProvider.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs">
       <Link>OrdinaryEnemyCatalog.cs</Link>

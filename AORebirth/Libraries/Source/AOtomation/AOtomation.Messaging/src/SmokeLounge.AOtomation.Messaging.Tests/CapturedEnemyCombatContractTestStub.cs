@@ -55,6 +55,31 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedEnemyCombatContract
     {
+        internal static CapturedEnemyCombatContract FixedAttack(
+            string evidence,
+            int minDamage,
+            int maxDamage,
+            double rechargeSeconds,
+            int weaponSlot,
+            int attackInfoUnknown,
+            int weaponInstance,
+            int attackInfoAmmoCount = 0)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
+                IsCombatReady = true,
+                Evidence = evidence,
+                MinDamage = minDamage,
+                MaxDamage = maxDamage,
+                RechargeSeconds = rechargeSeconds,
+                AttackInfoWeaponSlot = weaponSlot,
+                AttackInfoUnknown = attackInfoUnknown,
+                AttackInfoWeaponInstance = weaponInstance,
+                AttackInfoAmmoCount = attackInfoAmmoCount
+            };
+        }
+
         internal CapturedEnemyAttackModel AttackModel { get; set; }
 
         internal bool IsCombatReady { get; set; }

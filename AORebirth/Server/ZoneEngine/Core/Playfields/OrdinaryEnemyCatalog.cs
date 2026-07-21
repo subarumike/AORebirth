@@ -125,6 +125,14 @@ namespace AORebirth.Core.Playfields
         internal OrdinaryEnemyCatalog(
             CapturedSubwayContentProvider supportedContent,
             CapturedSubwayOrdinaryContentProvider ordinaryContent)
+            : this(supportedContent, ordinaryContent, null)
+        {
+        }
+
+        internal OrdinaryEnemyCatalog(
+            CapturedSubwayContentProvider supportedContent,
+            CapturedSubwayOrdinaryContentProvider ordinaryContent,
+            CapturedTempleOfThreeWindsContentProvider templeContent)
         {
             if (supportedContent == null)
             {
@@ -140,6 +148,11 @@ namespace AORebirth.Core.Playfields
             var spawnRows = new List<OrdinaryEnemySpawnDefinition>();
             BuildSupportedRows(supportedContent, ordinaryContent, profileRows, spawnRows);
             BuildCapturedOrdinaryRows(ordinaryContent, profileRows, spawnRows);
+            if (templeContent != null)
+            {
+                profileRows.AddRange(templeContent.GetProfiles());
+                spawnRows.AddRange(templeContent.GetSpawns());
+            }
 
             this.profiles = profileRows
                 .OrderBy(value => value.ProfileKey, StringComparer.Ordinal)

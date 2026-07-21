@@ -4,6 +4,19 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Temple of Three Winds construction has begun as a dedicated PF647 module,
+  separate from Subway PF127 content. Five finalized entrance-to-first-boss-room
+  captures contribute seven exact regular-Cultist profiles and `122` spawn
+  anchors, including `16` two-point patrols. Combat uses the observed `15..32`
+  normal envelope and `4.635295`-second median; automatic aggression uses an
+  explicit conservative seven-meter policy while chase/return is capture-backed.
+  Strict loot covers `74` first opens (`17` positive, `57` empty), exact credits
+  cover levels `20..35`, and the observed approximately `310`-second
+  death-to-replacement lifecycle is normalized to `300` seconds after the
+  engine's ten-second NPC-despawn boundary. Named NPCs and bosses remain outside
+  the ordinary provider. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md`.
+
 - Existing-corpus promotion from finalized capture `20260720-051714` completes
   runtime combat/loot coverage for the last five ordinary Subway profiles.
   Infected Attendant now uses captured local damage `11..15` and strict loot
