@@ -3,7 +3,15 @@
     "dialogue/flint-novak.dialogue.json",
     "dialogue/alex-gibbs.dialogue.json",
     "dialogue/icc-immigration-officer-bill.dialogue.json",
-    "dialogue/stan-goodman.dialogue.json"
+    "dialogue/stan-goodman.dialogue.json",
+    "dialogue/sarah-greene.dialogue.json",
+    "dialogue/vernon-godfray.dialogue.json",
+    "dialogue/doctor-mason.dialogue.json",
+    "dialogue/lorelei-bartender.dialogue.json",
+    "dialogue/lolly-the-reet.dialogue.json",
+    "dialogue/shipping-manifest-terminal.dialogue.json",
+    "dialogue/marco-spida.dialogue.json",
+    "dialogue/vaughn-hammond.dialogue.json"
   ],
   "QuestPacks": [
     "quests/flint-novak.quests.json"

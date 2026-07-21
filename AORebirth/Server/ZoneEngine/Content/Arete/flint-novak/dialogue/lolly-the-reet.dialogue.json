@@ -1,0 +1,124 @@
+{
+  "Identity": {
+    "Id": "arete-lolly-the-reet-dialogue-20260721-loralei",
+    "Version": "captured-lolly-lost-pet-20260721-loralei",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-loralei/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260721-loralei"
+  ],
+  "Npcs": [
+    {
+      "Id": "lolly-the-reet",
+      "NpcIdentity": "SimpleChar:7985CAEC",
+      "Name": "Lolly the Reet",
+      "RootNodeId": "lolly_greet",
+      "Aliases": [
+        "(SimpleChar:7985CAEC)"
+      ],
+      "Nodes": [
+        {
+          "Id": "lolly_greet",
+          "PromptText": "Lolly wants a cracker!",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lolly_greet_option_0",
+              "Index": 0,
+              "Text": "Please get in to the cage...",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei; Answer=0 → StartTrade 1 slot",
+              "NextNodeId": "lolly_trade",
+              "Actions": []
+            },
+            {
+              "Id": "lolly_greet_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lolly_greet_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lolly_trade",
+          "PromptText": "U giev cracker! Nao!",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lolly_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → lolly_pickup",
+              "NextNodeId": "lolly_pickup",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lolly_pickup",
+          "PromptText": "The bird starts eating the tasty cookie. It is distracted, now is the time to catch it!",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lolly_pickup_option_0",
+              "Index": 0,
+              "Text": "(Quietly pick up the bird)",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei; runtime grants reet on answer 0",
+              "NextNodeId": "lolly_caught",
+              "Actions": []
+            },
+            {
+              "Id": "lolly_pickup_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lolly_pickup_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lolly_caught",
+          "PromptText": "Lolly doesn't notice that you get closer and by the time he does, he is already in your hands!",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lolly_caught_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lolly_caught_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

@@ -12,6 +12,9 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public const int CapturedAlternateSurgeryClinicTerminalInstance = unchecked((int)0xC00004A2);
 
+        // Capture 20260721-Mason Arete Landing hospital: GenericCmd Use → implant swap window.
+        public const int CapturedAreteLandingSurgeryClinicTerminalInstance = unchecked((int)0x574187D1);
+
         public const int CapturedSurgeryClinicTemplateId = 43553;
 
         public const int CapturedImprovedSurgeryClinicTemplateId = 295742;
@@ -38,7 +41,8 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (target.Instance == CapturedSurgeryClinicTerminalInstance
-                || target.Instance == CapturedAlternateSurgeryClinicTerminalInstance)
+                || target.Instance == CapturedAlternateSurgeryClinicTerminalInstance
+                || target.Instance == CapturedAreteLandingSurgeryClinicTerminalInstance)
             {
                 return true;
             }

@@ -150,6 +150,17 @@
     <Compile Include="Core\Arete\Quests\SurveillanceUplinkQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\KneecappingQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\StanGoodmanQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\SarahGreeneQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\VernonGodfrayQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\DoctorMasonQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\DoctorMasonTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\DoctorMasonCombineRules.cs" />
+    <Compile Include="Core\Arete\Quests\LoreleiQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\LoreleiTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\LoreleiCombineRules.cs" />
+    <Compile Include="Core\Arete\Quests\VaughnHammondQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\ShippingManifestTerminalQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\VernonGodfrayCombineRules.cs" />
     <Compile Include="Core\Arete\Quests\PersonalizedRobotBrainCombineRules.cs" />
     <Compile Include="Core\Arete\Quests\PersonalizedRobotBrainQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\ObjectivePlaybackModels.cs" />
@@ -447,7 +458,10 @@
     <Compile Include="Core\Playfields\AreteLandingPopulationEnsure.cs" />
     <Compile Include="Core\Playfields\MarcusPadAmbientCombat.cs" />
     <Compile Include="Core\Playfields\JunkyardCleaningRobotRuntime.cs" />
+    <Compile Include="Core\AndromedaIccHqArrivalSaveRuntime.cs" />
     <Compile Include="Core\Playfields\AlexAreaMobRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteFinishCaptureMobRuntime.cs" />
+    <Compile Include="Core\Playfields\LoreleiOasisMobRuntime.cs" />
     <Compile Include="Core\Playfields\SurveillanceDroidRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingQuestPropDefinitions.cs" />
     <Compile Include="Core\Playfields\HoloDeckSpawn.cs" />
@@ -522,6 +536,15 @@
     <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorStockDefinition.cs" />
     <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteAlexAreaVendorRuntimeService.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaNanoPackageRuntime.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMarcoSpidaVendorRuntimeService.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteMarcoSpidaVendorInteractionHandler.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteLoreleiVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteLoreleiVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteLoreleiVendorRuntimeService.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteLoreleiVendorInteractionHandler.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />
@@ -540,6 +563,7 @@
     <Compile Include="Core\Playfields\WallCollision.cs" />
     <Compile Include="Core\Playfields\WallCollisionResult.cs" />
     <Compile Include="Core\TradeSkill.cs" />
+    <Compile Include="Core\TradeSkillMatch.cs" />
     <Compile Include="Core\TradeSkillEntry.cs" />
     <Compile Include="Core\TradeSkillSkill.cs" />
     <Compile Include="Core\ZoneClient.cs" />
@@ -660,7 +684,31 @@
     <Content Include="Content\Arete\flint-novak\dialogue\stan-goodman.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\marco-spida.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\sarah-greene.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\vernon-godfray.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\doctor-mason.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\lorelei-bartender.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\lolly-the-reet.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\shipping-manifest-terminal.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Arete\flint-novak\dialogue\icc-immigration-officer-bill.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\vaughn-hammond.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Arete\flint-novak\quests\flint-novak.quests.json">

@@ -24,6 +24,12 @@ namespace ZoneEngine.Core.Playfields
         private readonly CapturedAreteAlexAreaVendorRuntimeService capturedAreteAlexArea =
             new CapturedAreteAlexAreaVendorRuntimeService();
 
+        private readonly CapturedAreteMarcoSpidaVendorRuntimeService capturedAreteMarcoSpida =
+            new CapturedAreteMarcoSpidaVendorRuntimeService();
+
+        private readonly CapturedAreteLoreleiVendorRuntimeService capturedAreteLorelei =
+            new CapturedAreteLoreleiVendorRuntimeService();
+
         internal void SpawnVendors(Playfield playfield, StatelData[] vendorStatels)
         {
             VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);
@@ -81,12 +87,32 @@ namespace ZoneEngine.Core.Playfields
             PlayfieldDynelRegistry dynelRegistry)
         {
             this.capturedAreteAlexArea.Spawn(playfield, playfieldIdentity, dynelRegistry);
+            this.AttachCapturedAreteMarcoSpidaVendor(playfield, playfieldIdentity, dynelRegistry);
+            this.AttachCapturedAreteLoreleiVendor(playfield, playfieldIdentity, dynelRegistry);
+        }
+
+        internal void AttachCapturedAreteMarcoSpidaVendor(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry)
+        {
+            this.capturedAreteMarcoSpida.Attach(playfield, playfieldIdentity, dynelRegistry);
+        }
+
+        internal void AttachCapturedAreteLoreleiVendor(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry)
+        {
+            this.capturedAreteLorelei.Attach(playfield, playfieldIdentity, dynelRegistry);
         }
 
         internal void ClearCapturedAreteAlexAreaVendors(
             Identity playfieldIdentity,
             PlayfieldDynelRegistry dynelRegistry)
         {
+            this.capturedAreteLorelei.Clear(playfieldIdentity, dynelRegistry);
+            this.capturedAreteMarcoSpida.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteAlexArea.Clear(playfieldIdentity, dynelRegistry);
         }
     }

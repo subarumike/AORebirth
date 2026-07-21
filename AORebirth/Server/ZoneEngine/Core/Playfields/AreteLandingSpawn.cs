@@ -404,6 +404,71 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                // Capture 20260721-loralei 78E0FC6B (dossier + SCFU CharacterFlags=279450113)
+                CaptureInstance = unchecked((int)0x78E0FC6B),
+                Name = "Lorelei the Bartender",
+                Level = 10, Health = 227, MonsterData = 26137, Scale = 100, VisualFlags = 31, HeadMesh = 40209, RunSpeed = 35,
+                NpcFamily = 0, LosHeight = 0, CharacterFlags = 279450113, AppearanceValue = 1864,
+                Side = 0, Breed = 2, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3369.1416f, Y = 17.315f, Z = 794.4232f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 30862 }, new[] { 2, 40903 }, new[] { 3, 30839 }, new[] { 4, 30886 } },
+                Meshes = new[] { new[] { 0, 40209, 0, 4 }, new[] { 1, 7777, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish Omni-AF pad 7982B839
+                CaptureInstance = unchecked((int)0x7982B839),
+                Name = "Omni-AF Private",
+                Level = 10, Health = 227, MonsterData = 26151, Scale = 110, VisualFlags = 31, HeadMesh = 40171, RunSpeed = 119,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1642,
+                Side = 1, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3393.15747f, Y = 18.545f, Z = 854.9975f,
+                Hx = 0.0f, Hy = -0.709484041f, Hz = 0.0f, Hw = 0.7047215f,
+                Textures = new[] { new[] { 0, 15806 }, new[] { 1, 204160 }, new[] { 2, 15807 }, new[] { 3, 15808 }, new[] { 4, 15805 } },
+                Meshes = new[] { new[] { 0, 20038, 0, 2 }, new[] { 0, 40171, 0, 4 }, new[] { 1, 209529, 0, 2 }, new[] { 3, 11535, 206969, 0 }, new[] { 4, 11535, 206969, 0 }, new[] { 5, 11543, 206969, 0 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish Omni-AF pad 7982BA04
+                CaptureInstance = unchecked((int)0x7982BA04),
+                Name = "Omni-AF Private",
+                Level = 10, Health = 227, MonsterData = 26151, Scale = 110, VisualFlags = 31, HeadMesh = 40171, RunSpeed = 119,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1642,
+                Side = 1, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3393.19434f, Y = 18.545f, Z = 858.1331f,
+                Hx = 0.0f, Hy = -0.737966955f, Hz = 0.0f, Hw = 0.6748368f,
+                Textures = new[] { new[] { 0, 15806 }, new[] { 1, 204160 }, new[] { 2, 15807 }, new[] { 3, 15808 }, new[] { 4, 15805 } },
+                Meshes = new[] { new[] { 0, 20038, 0, 2 }, new[] { 0, 40171, 0, 4 }, new[] { 1, 209529, 0, 2 }, new[] { 3, 11535, 206969, 0 }, new[] { 4, 11535, 206969, 0 }, new[] { 5, 11543, 206969, 0 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish Omni-AF pad 798467B8
+                CaptureInstance = unchecked((int)0x798467B8),
+                Name = "Omni-AF Private",
+                Level = 10, Health = 227, MonsterData = 26151, Scale = 110, VisualFlags = 31, HeadMesh = 40171, RunSpeed = 119,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1642,
+                Side = 1, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3387.38f, Y = 18.545f, Z = 854.7541f,
+                Hx = 0.0f, Hy = -0.739335656f, Hz = 0.0f, Hw = 0.673337042f,
+                Textures = new[] { new[] { 0, 15806 }, new[] { 1, 204160 }, new[] { 2, 15807 }, new[] { 3, 15808 }, new[] { 4, 15805 } },
+                Meshes = new[] { new[] { 0, 20038, 0, 2 }, new[] { 0, 40171, 0, 4 }, new[] { 1, 209529, 0, 2 }, new[] { 3, 11535, 206969, 0 }, new[] { 4, 11535, 206969, 0 }, new[] { 5, 11543, 206969, 0 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish Omni-AF pad 7985C927
+                CaptureInstance = unchecked((int)0x7985C927),
+                Name = "Omni-AF Private",
+                Level = 10, Health = 227, MonsterData = 26151, Scale = 110, VisualFlags = 31, HeadMesh = 40171, RunSpeed = 119,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1642,
+                Side = 1, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3387.17114f, Y = 18.545f, Z = 858.179443f,
+                Hx = 0.0f, Hy = -0.7357304f, Hz = 0.0f, Hw = 0.6772745f,
+                Textures = new[] { new[] { 0, 15806 }, new[] { 1, 204160 }, new[] { 2, 15807 }, new[] { 3, 15808 }, new[] { 4, 15805 } },
+                Meshes = new[] { new[] { 0, 20038, 0, 2 }, new[] { 0, 40171, 0, 4 }, new[] { 1, 209529, 0, 2 }, new[] { 3, 11535, 206969, 0 }, new[] { 4, 11535, 206969, 0 }, new[] { 5, 11543, 206969, 0 } },
+            },
+            new AreteNpc
+            {
                 // Capture 20260720-goldman 78E0FC6C (scfu)
                 CaptureInstance = unchecked((int)0x78E0FC6C),
                 Name = "Dr. Mason",
@@ -714,32 +779,7 @@ namespace AORebirth.Core.Playfields
                 Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
                 Meshes = null,
             },
-            new AreteNpc
-            {
-                // Capture 20260720-goldman 7982BA16 (scfu)
-                CaptureInstance = unchecked((int)0x7982BA16),
-                Name = "Rollerrat",
-                Level = 5, Health = 58, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
-                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 46539,
-                Side = 3, Breed = 6, Gender = 1, Race = 45, Fatness = 1, MovementMode = 3,
-                X = 3430.96021f, Y = 3.01f, Z = 724.9166f,
-                Hx = 0.0f, Hy = 0.5361505f, Hz = 0.0f, Hw = 0.8441224f,
-                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
-                Meshes = null,
-            },
-            new AreteNpc
-            {
-                // Capture 20260720-goldman 7982BA7B (scfu)
-                CaptureInstance = unchecked((int)0x7982BA7B),
-                Name = "Rollerrat",
-                Level = 5, Health = 58, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
-                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1483,
-                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
-                X = 3454.85132f, Y = 4.12108f, Z = 746.9683f,
-                Hx = -0.0230448339f, Hy = 0.6756808f, Hz = 0.07972066f, Hw = 0.732508659f,
-                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
-                Meshes = null,
-            },
+            // Rollerrats near oasis: LoreleiOasisMobRuntime (A004 + ExtTex), not BART.
             new AreteNpc
             {
                 // Capture 20260720-goldman 78E0FD0E (scfu)
@@ -895,6 +935,201 @@ namespace AORebirth.Core.Playfields
                 Hx = 0.0f, Hy = 0.92450124f, Hz = 0.0f, Hw = 0.381179065f,
                 Textures = new[] { new[] { 0, 0 }, new[] { 1, 164803 }, new[] { 2, 164804 }, new[] { 3, 164802 }, new[] { 4, 164806 } },
                 Meshes = new[] { new[] { 0, 40271, 0, 4 }, new[] { 1, 35542, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei Vaughn Hammond 78E0FC73 (finish dossier + loralei SCFU)
+                CaptureInstance = unchecked((int)0x78E0FC73),
+                Name = "Vaughn Hammond",
+                Level = 25, Health = 724, MonsterData = 281855, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 86,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
+                Side = 0, Breed = 1, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3369.26465f, Y = 18.1111526f, Z = 828.5384f,
+                Hx = 0.0f, Hy = 0.7086759f, Hz = 0.0f, Hw = 0.70553416f,
+                Textures = new[] { new[] { 0, 286229 }, new[] { 1, 286227 }, new[] { 2, 286228 }, new[] { 3, 286226 }, new[] { 4, 286225 } },
+                Meshes = new[] { new[] { 0, 265793, 286562, 2 }, new[] { 1, 264698, 0, 2 }, new[] { 3, 286446, 0, 0 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FC7F
+                CaptureInstance = unchecked((int)0x78E0FC7F),
+                Name = "Omni-Trans Equipment Vendor",
+                Level = 40, Health = 1650, MonsterData = 250380, Scale = 103, VisualFlags = 31, HeadMesh = 40173, RunSpeed = 137,
+                NpcFamily = 88, LosHeight = 0, CharacterFlags = 271061505, AppearanceValue = 1642,
+                Side = 1, Breed = 1, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3392.456f, Y = 18.545f, Z = 876.7765f,
+                Hx = 0.0f, Hy = -0.979695261f, Hz = 0.0f, Hw = 0.200497165f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 22579 }, new[] { 2, 9619 }, new[] { 3, 22550 }, new[] { 4, 22638 } },
+                Meshes = new[] { new[] { 0, 40173, 0, 4 }, new[] { 1, 7777, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCF6
+                CaptureInstance = unchecked((int)0x78E0FCF6),
+                Name = "Omni-AF Officer Milne",
+                Level = 35, Health = 1341, MonsterData = 165186, Scale = 110, VisualFlags = 31, HeadMesh = 40681, RunSpeed = 120,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1578,
+                Side = 1, Breed = 1, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3390.00366f, Y = 18.545f, Z = 856.0561f,
+                Hx = 0.0f, Hy = -0.7103106f, Hz = 0.0f, Hw = 0.7038884f,
+                Textures = new[] { new[] { 0, 15806 }, new[] { 1, 204160 }, new[] { 2, 15807 }, new[] { 3, 15808 }, new[] { 4, 15805 } },
+                Meshes = new[] { new[] { 0, 40681, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCFA
+                CaptureInstance = unchecked((int)0x78E0FCFA),
+                Name = "Omni-Pol Guard",
+                Level = 20, Health = 447, MonsterData = 26097, Scale = 99, VisualFlags = 31, HeadMesh = 40111, RunSpeed = 62,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1418,
+                Side = 1, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3381.43726f, Y = 17.11f, Z = 850.484131f,
+                Hx = 0.0f, Hy = 0.999769f, Hz = 0.0f, Hw = 0.02149579f,
+                Textures = new[] { new[] { 0, 8744 }, new[] { 1, 8738 }, new[] { 2, 8742 }, new[] { 3, 8735 }, new[] { 4, 8746 } },
+                Meshes = new[] { new[] { 0, 20003, 0, 2 }, new[] { 0, 40111, 0, 4 }, new[] { 1, 7783, 0, 2 }, new[] { 2, 155083, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCFB
+                CaptureInstance = unchecked((int)0x78E0FCFB),
+                Name = "Omni-Pol Guard",
+                Level = 20, Health = 447, MonsterData = 26097, Scale = 99, VisualFlags = 31, HeadMesh = 40111, RunSpeed = 62,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1418,
+                Side = 1, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3383.63623f, Y = 17.11f, Z = 850.8805f,
+                Hx = 0.0f, Hy = 0.9997583f, Hz = 0.0f, Hw = -0.0219841618f,
+                Textures = new[] { new[] { 0, 8744 }, new[] { 1, 8738 }, new[] { 2, 8742 }, new[] { 3, 8735 }, new[] { 4, 8746 } },
+                Meshes = new[] { new[] { 0, 20003, 0, 2 }, new[] { 0, 40111, 0, 4 }, new[] { 1, 7783, 0, 2 }, new[] { 2, 155083, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCFC
+                CaptureInstance = unchecked((int)0x78E0FCFC),
+                Name = "Omni-Pol Guard",
+                Level = 25, Health = 724, MonsterData = 26090, Scale = 100, VisualFlags = 31, HeadMesh = 40629, RunSpeed = 86,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1834,
+                Side = 1, Breed = 1, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3371.524f, Y = 18.525f, Z = 877.873657f,
+                Hx = 0.0f, Hy = 0.7098279f, Hz = 0.0f, Hw = 0.704375148f,
+                Textures = new[] { new[] { 0, 8744 }, new[] { 1, 8738 }, new[] { 2, 8742 }, new[] { 3, 8735 }, new[] { 4, 8746 } },
+                Meshes = new[] { new[] { 0, 20087, 0, 2 }, new[] { 0, 40629, 0, 4 }, new[] { 1, 7783, 0, 2 }, new[] { 2, 155083, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCFD
+                CaptureInstance = unchecked((int)0x78E0FCFD),
+                Name = "Omni-Pol Guard",
+                Level = 25, Health = 724, MonsterData = 26090, Scale = 100, VisualFlags = 31, HeadMesh = 40629, RunSpeed = 86,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1834,
+                Side = 1, Breed = 1, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3371.587f, Y = 18.525f, Z = 875.7479f,
+                Hx = 0.0f, Hy = 0.7055516f, Hz = 0.0f, Hw = 0.7086585f,
+                Textures = new[] { new[] { 0, 8744 }, new[] { 1, 8738 }, new[] { 2, 8742 }, new[] { 3, 8735 }, new[] { 4, 8746 } },
+                Meshes = new[] { new[] { 0, 20087, 0, 2 }, new[] { 0, 40629, 0, 4 }, new[] { 1, 7783, 0, 2 }, new[] { 2, 155083, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCFE
+                CaptureInstance = unchecked((int)0x78E0FCFE),
+                Name = "Omni-Pol Guard",
+                Level = 25, Health = 724, MonsterData = 26090, Scale = 100, VisualFlags = 31, HeadMesh = 40629, RunSpeed = 86,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1834,
+                Side = 1, Breed = 1, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3376.234f, Y = 18.525f, Z = 875.3516f,
+                Hx = 0.0f, Hy = 0.7064728f, Hz = 0.0f, Hw = 0.7077402f,
+                Textures = new[] { new[] { 0, 8744 }, new[] { 1, 8738 }, new[] { 2, 8742 }, new[] { 3, 8735 }, new[] { 4, 8746 } },
+                Meshes = new[] { new[] { 0, 20087, 0, 2 }, new[] { 0, 40629, 0, 4 }, new[] { 1, 7783, 0, 2 }, new[] { 2, 155083, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FCFF
+                CaptureInstance = unchecked((int)0x78E0FCFF),
+                Name = "Omni-Pol Guard",
+                Level = 25, Health = 724, MonsterData = 26090, Scale = 100, VisualFlags = 31, HeadMesh = 40629, RunSpeed = 86,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1834,
+                Side = 1, Breed = 1, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3376.49438f, Y = 18.525f, Z = 878.162f,
+                Hx = 0.0f, Hy = 0.707606f, Hz = 0.0f, Hw = 0.7066072f,
+                Textures = new[] { new[] { 0, 8744 }, new[] { 1, 8738 }, new[] { 2, 8742 }, new[] { 3, 8735 }, new[] { 4, 8746 } },
+                Meshes = new[] { new[] { 0, 20087, 0, 2 }, new[] { 0, 40629, 0, 4 }, new[] { 1, 7783, 0, 2 }, new[] { 2, 155083, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FD00
+                CaptureInstance = unchecked((int)0x78E0FD00),
+                Name = "Omni-Med Surgeon",
+                Level = 20, Health = 559, MonsterData = 26092, Scale = 99, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 69,
+                NpcFamily = 105, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1578,
+                Side = 1, Breed = 1, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3372.307f, Y = 18.525f, Z = 855.9362f,
+                Hx = 0.0f, Hy = 0.7095248f, Hz = 0.0f, Hw = 0.704680443f,
+                Textures = new[] { new[] { 0, 14048 }, new[] { 1, 120608 }, new[] { 2, 284442 }, new[] { 3, 120607 }, new[] { 4, 120606 } },
+                Meshes = new[] { new[] { 0, 40694, 0, 4 }, new[] { 1, 81804, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FD01
+                CaptureInstance = unchecked((int)0x78E0FD01),
+                Name = "Omni-Med Guard",
+                Level = 20, Health = 559, MonsterData = 26139, Scale = 99, VisualFlags = 31, HeadMesh = 40249, RunSpeed = 69,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1610,
+                Side = 1, Breed = 2, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3375.78125f, Y = 18.525f, Z = 854.6186f,
+                Hx = 0.0f, Hy = 0.709713757f, Hz = 0.0f, Hw = 0.7044901f,
+                Textures = new[] { new[] { 0, 206966 }, new[] { 1, 206963 }, new[] { 2, 206965 }, new[] { 3, 206964 }, new[] { 4, 206968 } },
+                Meshes = new[] { new[] { 0, 20064, 206967, 2 }, new[] { 0, 40249, 0, 4 }, new[] { 1, 284456, 0, 2 }, new[] { 2, 284456, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FD02
+                CaptureInstance = unchecked((int)0x78E0FD02),
+                Name = "Omni-Med Guard",
+                Level = 20, Health = 559, MonsterData = 26139, Scale = 99, VisualFlags = 31, HeadMesh = 40249, RunSpeed = 69,
+                NpcFamily = 2, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1610,
+                Side = 1, Breed = 2, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3375.82227f, Y = 18.525f, Z = 857.3344f,
+                Hx = 0.0f, Hy = 0.708575845f, Hz = 0.0f, Hw = 0.705634654f,
+                Textures = new[] { new[] { 0, 206966 }, new[] { 1, 206963 }, new[] { 2, 206965 }, new[] { 3, 206964 }, new[] { 4, 206968 } },
+                Meshes = new[] { new[] { 0, 20064, 206967, 2 }, new[] { 0, 40249, 0, 4 }, new[] { 1, 284456, 0, 2 }, new[] { 2, 284456, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FD1C
+                CaptureInstance = unchecked((int)0x78E0FD1C),
+                Name = "Clan Protester",
+                Level = 20, Health = 447, MonsterData = 26139, Scale = 99, VisualFlags = 31, HeadMesh = 40249, RunSpeed = 62,
+                NpcFamily = 104, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1609,
+                Side = 1, Breed = 2, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3381.953f, Y = 17.11f, Z = 842.000061f,
+                Hx = 0.0f, Hy = 0.00200117147f, Hz = 0.0f, Hw = 0.999998f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 37030 }, new[] { 2, 248873 }, new[] { 3, 37031 }, new[] { 4, 30883 } },
+                Meshes = new[] { new[] { 0, 204921, 0, 0 }, new[] { 0, 40249, 0, 4 }, new[] { 1, 262812, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FD1E
+                CaptureInstance = unchecked((int)0x78E0FD1E),
+                Name = "Clan Protester",
+                Level = 20, Health = 447, MonsterData = 26090, Scale = 99, VisualFlags = 31, HeadMesh = 40629, RunSpeed = 62,
+                NpcFamily = 104, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1833,
+                Side = 1, Breed = 1, Gender = 3, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3385.4978f, Y = 17.11f, Z = 842.0052f,
+                Hx = 0.0f, Hy = -0.199943557f, Hz = 0.0f, Hw = 0.979807436f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 37030 }, new[] { 2, 248873 }, new[] { 3, 37031 }, new[] { 4, 30883 } },
+                Meshes = new[] { new[] { 0, 204935, 0, 0 }, new[] { 0, 40629, 0, 4 }, new[] { 1, 262812, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-finish 78E0FD1F
+                CaptureInstance = unchecked((int)0x78E0FD1F),
+                Name = "Clan Protester",
+                Level = 20, Health = 447, MonsterData = 26103, Scale = 99, VisualFlags = 31, HeadMesh = 40103, RunSpeed = 62,
+                NpcFamily = 104, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1673,
+                Side = 1, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3377.99951f, Y = 17.11f, Z = 842.001f,
+                Hx = 0.0f, Hy = 0.212661952f, Hz = 0.0f, Hw = 0.9771258f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 37030 }, new[] { 2, 248873 }, new[] { 3, 37031 }, new[] { 4, 30883 } },
+                Meshes = new[] { new[] { 0, 40103, 0, 4 }, new[] { 1, 262812, 0, 2 } },
             },
         };
 

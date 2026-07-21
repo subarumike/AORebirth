@@ -19,6 +19,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Playfields;
+    using ZoneEngine.Core.Arete.Quests;
 
     #endregion
 
@@ -100,6 +101,19 @@ namespace ZoneEngine.Core.MessageHandlers
             if (target.Instance == OmniTradeInsuranceTerminalInstance)
             {
                 return true;
+            }
+
+            // Never steal Stationary Automated Surgery Clinic Uses (Arete + private).
+            if (SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(target, templateId))
+            {
+                return false;
+            }
+
+            // Capture 20260721-finish: Exit Arete Landing → ICC HQ (not Insurance SaveChar).
+            if (target.Instance == VaughnHammondQuestRuntime.ExitAreteLandingTerminalInstance
+                || templateId == 297303)
+            {
+                return false;
             }
 
             if (templateId != 0)

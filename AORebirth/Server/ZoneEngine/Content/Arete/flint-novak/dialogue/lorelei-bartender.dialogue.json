@@ -1,0 +1,309 @@
+{
+  "Identity": {
+    "Id": "arete-lorelei-bartender-dialogue-20260721-loralei",
+    "Version": "captured-lorelei-lost-pet-20260721-loralei",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-loralei/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260721-loralei"
+  ],
+  "Npcs": [
+    {
+      "Id": "lorelei-bartender",
+      "NpcIdentity": "SimpleChar:78E0FC6B",
+      "Name": "Lorelei the Bartender",
+      "RootNodeId": "lorelei_greet",
+      "Aliases": [
+        "(SimpleChar:78E0FC6B)"
+      ],
+      "Nodes": [
+        {
+          "Id": "lorelei_greet",
+          "PromptText": "The young woman before you smiles brightly as you approach, her hands busy polishing a tumbler with a rather less-than-sanitary looking rag.\nHey there, cutie. What can I get ya?",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_greet_option_0",
+              "Index": 0,
+              "Text": "I was told you might be able to give me a hand...",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "lorelei_accept",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_greet_option_1",
+              "Index": 1,
+              "Text": "What do you have?",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei; opens shop via side effect",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_greet_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close after shop open"
+                }
+              ]
+            },
+            {
+              "Id": "lorelei_greet_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_greet_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_accept",
+          "PromptText": "You yet again start the process of explaining your situation when, barely five words in, Lorelei raises her hand to stop you with a soft, friendly chuckle.\nNo, no, it's ok I can help you! You don't have to go through the whole story. Probably better I <i>don't</i> know. However, I will need you to do me a favor before I help you out.",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_accept_option_0",
+              "Index": 0,
+              "Text": "I will help you, what do you need?",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei; Accept quest runtime on answer 0",
+              "NextNodeId": "lorelei_lost_pet",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_accept_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_accept_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_lost_pet",
+          "PromptText": "You need to find my stupid Reet, Lolly. He escaped again... I believe he might have found a girlfriend or something... Try looking for him near the other Reets in the desert oasis.",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_lost_pet_option_0",
+              "Index": 0,
+              "Text": "What is a Reet?",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "lorelei_reet_faq",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_lost_pet_option_1",
+              "Index": 1,
+              "Text": "Is there anything in particular I should know about Lolly?",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "lorelei_lolly_faq",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_lost_pet_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_lost_pet_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_reet_faq",
+          "PromptText": "Raising an eyebrow she looks slightly confused for a moment.\nIts a bird! Have you been living under a rock?",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_reet_faq_option_0",
+              "Index": 0,
+              "Text": "Is there anything in particular I should know about Lolly?",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "lorelei_lolly_faq",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_reet_faq_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_reet_faq_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_lolly_faq",
+          "PromptText": "He is blue and talks a lot... \nAnd he really loves peanut butter cookies. If you plan to lure him in to the cage, it would probably be a good idea to buy a cookie before you leave.",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_lolly_faq_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_lolly_faq_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_deliver",
+          "PromptText": "The young woman before you smiles brightly as you approach, her hands busy polishing a tumbler with a rather less-than-sanitary looking rag.\nHey there, cutie. What can I get ya?",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_deliver_option_0",
+              "Index": 0,
+              "Text": "I have the bird...",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei; Answer=0 → StartTrade 2 slots",
+              "NextNodeId": "lorelei_deliver_trade",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_deliver_option_1",
+              "Index": 1,
+              "Text": "What do you have?",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei; opens shop via side effect",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_deliver_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close after shop open"
+                }
+              ]
+            },
+            {
+              "Id": "lorelei_deliver_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_deliver_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_deliver_trade",
+          "PromptText": "With a sharp smile and nod the bartender extends her hand.\nAlright then, sounds like we're ready to do this. I'll need the ID chip too.",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_deliver_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → lorelei_thanks",
+              "NextNodeId": "lorelei_thanks",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_thanks",
+          "PromptText": "She places the bird cage on the ground and you can see Lolly breaking out of his cage as she crouches down behind the counter.\nThis'll take just a sec.\nYou hear a few miscellaneous beeps and dings from... something... underneath the bar top.\n And here you go. Congratulations, you are now a fully-fledged colonist of Rubi-Ka!\nYou should talk to Vaughn Hammond about entering ICC HQ.",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_thanks_option_0",
+              "Index": 0,
+              "Text": "Thank you.",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "lorelei_feathers",
+              "Actions": []
+            },
+            {
+              "Id": "lorelei_thanks_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_thanks_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "lorelei_feathers",
+          "PromptText": "No, thank you. I'm glad to have Lolly back!\nShe looks down at the cage...\nExcuse me... I have some feathers to pick with my little friend...",
+          "PromptTextConfidence": "knubot-append-text-20260721-loralei",
+          "Options": [
+            {
+              "Id": "lorelei_feathers_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 20260721-loralei",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "lorelei_feathers_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

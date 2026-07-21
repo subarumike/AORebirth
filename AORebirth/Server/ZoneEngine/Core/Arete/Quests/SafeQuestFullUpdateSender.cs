@@ -65,6 +65,22 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int BuyNanoProgramsInstance = unchecked((int)0x555BE9F4);
 
+        private const int FindTheThiefInstance = unchecked((int)0x555BE9F5);
+
+        private const int DeliverDnaLockedArmorInstance = unchecked((int)0x555BE9F6);
+
+        private const int SpeakToVernonGodfrayInstance = unchecked((int)0x555BE9F7);
+
+        private const int HackingSkillsInstance = unchecked((int)0x555BE9F8);
+
+        private const int GiveHackedTechnicalLibraryInstance = unchecked((int)0x555BE9F9);
+
+        private const int CargoLiftingInstance = unchecked((int)0x555BE9FA);
+
+        private const int ReturnToVernonGodfrayInstance = unchecked((int)0x555BE9FB);
+
+        private const int TalkToDoctorMasonInstance = unchecked((int)0x555BE9FC);
+
         private const int TradeskillNanoSensorInstance = unchecked((int)0x555B4367);
 
         private const int TradeskillBasicBrainInstance = unchecked((int)0x555B4368);
@@ -326,6 +342,59 @@ namespace ZoneEngine.Core.Arete.Quests
             + "Stanley Goodman told you to go talk to Marco Spida to buy a Nanoprogram Container.<BR><BR>"
             + "<font color=\"#FF0000\">Mission Objective: Talk to Marco Spida and buy a Nanoprogram Container "
             + "for your profession. Open the Container to complete your mission.</font>";
+
+        // Capture 20260721-sara QuestFullUpdate short/long after Talk to Sarah accept.
+        private const string FindTheThiefShortInfo = "Find the thief";
+
+        private const string FindTheThiefLongInfo =
+            "Find the thief<BR><BR>"
+            + "Sarah recently had one of her custom-built suits of armor stolen from her. The thief was last seen "
+            + "in the underground.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Locate the thief and recover the DNA-Locked Armor.</font>";
+
+        private const string DeliverDnaLockedArmorShortInfo = "Deliver DNA-Locked Armor to ...";
+
+        private const string DeliverDnaLockedArmorLongInfo =
+            "Deliver DNA-Locked Armor to Sarah Greene<BR><BR>"
+            + "You have found the stolen suit of armor. <BR><BR>"
+            + "<a href='itemref://295618/295618/1'><img src=\"rdb://88053\"></a><BR>"
+            + "<font color=\"#FFFFFF\">Return the DNA-Locked Armor to Sarah Greene.</font>";
+
+        private const string SpeakToVernonGodfrayShortInfo = "Speak to Vernon Godfray";
+
+        private const string SpeakToVernonGodfrayLongInfo =
+            "Speak to Vernon Godfray<BR><BR>"
+            + "<font color=\"#63ad63\">Identity Crisis:</font><BR>"
+            + "In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. "
+            + "Your mission is to create a fake ID Card to you can leave this place..<BR><BR>"
+            + "Sarah told you to speak to Vernon Godfray, a local hacker, who should be able to help with aquiring "
+            + "more parts needed for your ID card.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Vernon Godfray.</font>";
+
+        private const string GiveHackedTechnicalLibraryShortInfo = "Give the Hacked Technical Li...";
+
+        private const string GiveHackedTechnicalLibraryLongInfo =
+            "Give the Hacked Technical Library to Vernon Godfray<BR><BR>"
+            + "You successfully hacked the OT Technical Library. You should return it to Vernon Godfray.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Give the <a href='itemref://295756/295756/1'>Hacked Technical Library</a> to Vernon Godfray.</font>";
+
+        private const string HackingSkillsShortInfo = "Hacking Skills";
+
+        private const string HackingSkillsLongInfo =
+            "Hacking Skills<BR><BR>"
+            + "Vernon Godfray told you to hack the OT Technical Library to allow it to be worn by anyone.<BR><BR>"
+            + "Use the <a href='itemref://87810/87810/1'>Hacker Tool</a> to hack the "
+            + "<a href='itemref://248377/248377/1'> Omni-Tek Technical Library</a> to create the "
+            + "<a href='itemref://295756/295756/1'>Hacked Technical Library</a>.<BR>"
+            + "<a href='itemref://87810/87810/1'><img src=\"rdb://99282\"></a> + "
+            + "<a href='itemref://248377/248377/1'><img src=\"rdb://130564\"></a> = "
+            + "<a href='itemref://295756/295756/1'><img src=\"rdb://130561\"></a><BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective: Open the Tradeskill Kit %{KEY:WINDOW_TS}%, place the "
+            + "<a href='itemref://87810/87810/1'>Hacker Tool</a> as the Source and the "
+            + "<a href='itemref://248377/248377/1'> Omni-Tek Technical Library</a> as the Target, then press Build.</font>";
 
         private const string TradeskillNanoSensorShortInfo = "Tradeskilling (1/4): Assembl...";
 
@@ -1922,6 +1991,517 @@ namespace ZoneEngine.Core.Arete.Quests
             source.Controller.Client.SendCompressed(message);
         }
 
+        /// <summary>
+        /// Capture 20260721-sara: Talk Sarah accept → Action59+Delete TalkSarah + QFU Find the thief.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTalkSarahToFindThiefHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "TalkSarah→FindThief handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, TalkToSarahGreeneInstance);
+                SendFindTheThiefTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "TalkSarah→FindThief tip. mission=Mission:555BE9F5 source=20260721-sara");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "TalkSarah→FindThief handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-sara: Use Remains of Shop Thief → Action59+Delete FindThief + QFU Deliver.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendFindThiefToDeliverArmorHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "FindThief→DeliverArmor handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, FindTheThiefInstance);
+                SendDeliverDnaLockedArmorTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "FindThief→DeliverArmor tip. mission=Mission:555BE9F6 source=20260721-sara");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "FindThief→DeliverArmor handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-sara: Sarah Accept → Action59+Delete Deliver + QFU Speak to Vernon.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendDeliverArmorToVernonHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "DeliverArmor→Vernon handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, DeliverDnaLockedArmorInstance);
+                SendSpeakToVernonGodfrayTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "DeliverArmor→Vernon tip. mission=Mission:555BE9F7 source=20260721-sara");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "DeliverArmor→Vernon handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray: "... well what?" → Action59+Delete SpeakVernon + QFU Hacking Skills.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendSpeakVernonToHackingSkillsHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "SpeakVernon→HackingSkills handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, SpeakToVernonGodfrayInstance);
+                SendHackingSkillsTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "SpeakVernon→HackingSkills tip. mission=Mission:555BE9F8 source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "SpeakVernon→HackingSkills handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray: combine → Action59+Delete Hacking Skills + QFU Give Hacked Library.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendHackingSkillsToGiveLibraryHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "HackingSkills→GiveLibrary handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, HackingSkillsInstance);
+                SendGiveHackedTechnicalLibraryTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "HackingSkills→GiveLibrary tip. mission=Mission:555BE9F9 source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "HackingSkills→GiveLibrary handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Login/zone resync: emit Give Hacked Library tip without deleting prior tips.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendGiveHackedTechnicalLibraryTipOnly(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "GiveLibrary tip skipped: client missing.");
+            }
+
+            try
+            {
+                SendGiveHackedTechnicalLibraryTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "GiveLibrary tip-only. mission=Mission:555BE9F9 source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "GiveLibrary tip-only failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray: Hacked Library Accept → Delete Give tip + QFU Cargo Lifting.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendGiveLibraryToCargoLiftingHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "GiveLibrary→CargoLifting handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, GiveHackedTechnicalLibraryInstance);
+                SendCargoLiftingTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "GiveLibrary→CargoLifting tip. mission=Mission:555BE9FA source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "GiveLibrary→CargoLifting handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Login/zone resync: Cargo Lifting tip without Action59 delete.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendCargoLiftingTipOnly(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "CargoLifting tip skipped: client missing.");
+            }
+
+            try
+            {
+                SendCargoLiftingTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "CargoLifting tip-only. mission=Mission:555BE9FA source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "CargoLifting tip-only failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray: Re-route → Delete Cargo Lifting + QFU Return to Vernon.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendCargoLiftingToReturnVernonHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "CargoLifting→ReturnVernon handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, CargoLiftingInstance);
+                SendReturnToVernonGodfrayTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "CargoLifting→ReturnVernon tip. mission=Mission:555BE9FB source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "CargoLifting→ReturnVernon handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Login/zone resync: Return to Vernon tip without Action59 delete.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendReturnToVernonGodfrayTipOnly(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "ReturnVernon tip skipped: client missing.");
+            }
+
+            try
+            {
+                SendReturnToVernonGodfrayTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "ReturnVernon tip-only. mission=Mission:555BE9FB source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "ReturnVernon tip-only failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray: return chip Accept → Delete Return tip + QFU Talk to Doctor Mason.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendReturnVernonToDoctorMasonHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "ReturnVernon→DoctorMason handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, ReturnToVernonGodfrayInstance);
+                SendTalkToDoctorMasonTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "ReturnVernon→DoctorMason tip. mission=Mission:555BE9FC source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "ReturnVernon→DoctorMason handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Login/zone resync: Talk to Doctor Mason tip without Action59 delete.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTalkToDoctorMasonTipOnly(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "TalkDoctorMason tip skipped: client missing.");
+            }
+
+            try
+            {
+                SendTalkToDoctorMasonTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "TalkDoctorMason tip-only. mission=Mission:555BE9FC source=20260721-Vernon-Godfray");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "TalkDoctorMason tip-only failed: " + e.Message);
+            }
+        }
+
+        private static void SendHackingSkillsTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateHackingSkillsPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        private static void SendGiveHackedTechnicalLibraryTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            // Capture 20260721-Vernon-Godfray #304: replay wire QFU (DTO rebuild crashed client on login).
+            if (TrySendGiveHackedTechnicalLibraryTipWire(source))
+            {
+                return;
+            }
+
+            QuestFullUpdateMessage message = CreateGiveHackedTechnicalLibraryPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray IN #304 QuestFullUpdate (live Mission:555CF576).
+        /// Patches player instance + fixed mission id Mission:555BE9F9.
+        /// </summary>
+        private static bool TrySendGiveHackedTechnicalLibraryTipWire(ICharacter source)
+        {
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client == null || source.Identity.Instance == 0)
+            {
+                return false;
+            }
+
+            const string giveLibraryQfuHex =
+                "4625000A000102C200000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF5760000000F0000000000000000000000024769766520746865204861636B656420546563686E6963616C204C692E2E2E000000012C4769766520746865204861636B656420546563686E6963616C204C69627261727920746F205665726E6F6E20476F64667261793C42523E3C42523E596F75207375636365737366756C6C79206861636B656420746865204F5420546563686E6963616C204C6962726172792E20596F752073686F756C642072657475726E20697420746F205665726E6F6E20476F64667261792E3C42523E3C42523E3C666F6E7420636F6C6F723D2223464630303030223E4D697373696F6E204F626A6563746976653A3C42523E4769766520746865203C6120687265663D276974656D7265663A2F2F3239353735362F3239353735362F31273E4861636B656420546563686E6963616C204C6962726172793C2F613E20746F205665726E6F6E20476F64667261792E3C2F666F6E743E000000C35078E0FC63000000060000052800000000000008B5000003F1000003F1000003F14F47493800000000000000000000000000000000000000000000000000000000000000000000C350797E306A00026ADD0000000000000000000007E200000006000111D3484154430000000000000000000111D3565254520000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D578B3000009C5000001999000186A0000186A04556A00000000000444E4000000007E20000C350797E306A0000000105578B30000000000000000000000006000007E20000C350797E306A0000000000019A8B000000000000000000000000000000000000000000000007000003F101";
+
+            const int capturedPlayerInstance = unchecked((int)0x797E306A);
+            const int capturedMissionInstance = unchecked((int)0x555CF576);
+
+            byte[] packet = HexToBytes(giveLibraryQfuHex);
+            ReplaceInt32Be(packet, capturedPlayerInstance, source.Identity.Instance);
+            ReplaceInt32Be(packet, capturedMissionInstance, GiveHackedTechnicalLibraryInstance);
+            client.EnqueueOutboundCompressedBuffer(packet);
+            return true;
+        }
+
+        private static void SendCargoLiftingTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            if (TrySendCargoLiftingTipWire(source))
+            {
+                return;
+            }
+
+            QuestFullUpdateMessage message = CreateCargoLiftingPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray IN #429 QuestFullUpdate (live Mission:555CF577).
+        /// Patches player instance + fixed mission id Mission:555BE9FA.
+        /// </summary>
+        private static bool TrySendCargoLiftingTipWire(ICharacter source)
+        {
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client == null || source.Identity.Instance == 0)
+            {
+                return false;
+            }
+
+            const string cargoLiftingQfuHex =
+                "46A2000A000102FE00000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF5770000000F000000000000000000000002436172676F204C696674696E67000000017A436172676F204C696674696E673C42523E3C42523E5665726E6F6E206D656E74696F6E6564207468617420686520776F756C64206C696B6520746F20676574206869732068616E6473206F6E2074686520646174612066726F6D206F6E65206F6620746865205368697070696E67204D616E6966657374205465726D696E616C73206C6F636174656420696E2074686520696E647573747269616C206469737472696374206F66207468652073687574746C65706F72742E3C42523E3C42523E3C666F6E7420636F6C6F723D2223464630303030223E4D697373696F6E204F626A6563746976653A3C42523E4F70656E2061206469616C6F67207769746820746865205368697070696E67204D616E6966657374205465726D696E616C20616E64206170706C7920746865203C6120687265663D276974656D7265663A2F2F38373831302F38373831302F31273E4861636B657220546F6F6C3C2F613E206966206163636573732069732064656E6965642E3C2F666F6E743E000000C35078E0FC6300000006000000000000000000000000000003F1000003F1000003F14850554E00000000000000000000000000000000000000000000000000000000000000000000C350797E306A0003BC520000000000000000000007E20000001800000000000000000000000000000000000111D3000199D60000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D578B3100009C5000001999000186A0000186A0455DE0000000000044504000000007E20000C350797E306A0000000105578B31000000000000000000000006000007E20000C350797E306A00000000000199D6000000000000000000000000000000000000000000000007000003F101";
+
+            const int capturedPlayerInstance = unchecked((int)0x797E306A);
+            const int capturedMissionInstance = unchecked((int)0x555CF577);
+
+            byte[] packet = HexToBytes(cargoLiftingQfuHex);
+            ReplaceInt32Be(packet, capturedPlayerInstance, source.Identity.Instance);
+            ReplaceInt32Be(packet, capturedMissionInstance, CargoLiftingInstance);
+            client.EnqueueOutboundCompressedBuffer(packet);
+            return true;
+        }
+
+        private static void SendReturnToVernonGodfrayTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            if (TrySendReturnToVernonGodfrayTipWire(source))
+            {
+                return;
+            }
+
+            QuestFullUpdateMessage message = CreateReturnToVernonGodfrayPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray IN #1494 QuestFullUpdate (live Mission:555CF578).
+        /// Patches player instance + fixed mission id Mission:555BE9FB.
+        /// </summary>
+        private static bool TrySendReturnToVernonGodfrayTipWire(ICharacter source)
+        {
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client == null || source.Identity.Instance == 0)
+            {
+                return false;
+            }
+
+            const string returnVernonQfuHex =
+                "4ACB000A000102C600000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF5780000000F00000000000000000000000252657475726E20746F205665726E6F6E20476F6466726179000000012752657475726E20746F205665726E6F6E20476F64667261793C42523E3C42523E41667465722066696E697368696E6720746865206861636B206A6F622C2072657475726E20746F205665726E6F6E20616E64206865206D696768742068656C7020796F75207769746820796F75722049442070726F626C656D2E3C42523E3C42523E3C666F6E7420636F6C6F723D2223464630303030223E4D697373696F6E204F626A6563746976653A3C42523E54616C6B20746F205665726E6F6E20476F646672617920616E6420676976652068696D20746865203C6120687265663D276974656D7265663A2F2F3239363537322F3239363537322F31273E556E70726F6772616D6D6564204964656E74696669636174696F6E20436869703C2F613E2E3C2F666F6E743E000000C35078E0FC63000000060000055000000000000008B5000003F1000003F1000007E20004867F0004867F0000000100000000595A464900000000000000003132593800000009000000000000000000000000000000000000C350797E306A00026ADD0000000000000000000007E200000006000111D3554E49440000000000000000000111D3565254520000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D578B3600009C5000001999000186A0000186A04556A00000000000444E4000000007E20000C350797E306A0000000105578B36000000000000000000000006000007E20000C350797E306A00000000000199F3000000000000000000000000000000000000000000000007000003F101";
+
+            const int capturedPlayerInstance = unchecked((int)0x797E306A);
+            const int capturedMissionInstance = unchecked((int)0x555CF578);
+
+            byte[] packet = HexToBytes(returnVernonQfuHex);
+            ReplaceInt32Be(packet, capturedPlayerInstance, source.Identity.Instance);
+            ReplaceInt32Be(packet, capturedMissionInstance, ReturnToVernonGodfrayInstance);
+            client.EnqueueOutboundCompressedBuffer(packet);
+            return true;
+        }
+
+        private static void SendTalkToDoctorMasonTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            if (TrySendTalkToDoctorMasonTipWire(source))
+            {
+                return;
+            }
+
+            QuestFullUpdateMessage message = CreateTalkToDoctorMasonPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-Vernon-Godfray QuestFullUpdate (live Mission:555CF579).
+        /// Patches player instance + fixed mission id Mission:555BE9FC.
+        /// </summary>
+        private static bool TrySendTalkToDoctorMasonTipWire(ICharacter source)
+        {
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client == null || source.Identity.Instance == 0)
+            {
+                return false;
+            }
+
+            const string doctorMasonQfuHex =
+                "4EAA000A0001036400000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF5790000000F00000000000000000000000254616C6B20746F20446F63746F72204D61736F6E00000001D954616C6B20746F20446F63746F72204D61736F6E3C42523E3C42523E3C666F6E7420636F6C6F723D2223363361643633223E4964656E74697479204372697369733A3C2F666F6E743E3C42523E496E206F7264657220746F206C65617665204172657465204C616E64696E6720616E64206265636F6D65206120636974697A656E206F6620527562692D4B612C20796F75206E65656420616E206964656E746974792E20596F7572206D697373696F6E20697320746F2063726561746520612066616B65204944204361726420746F20796F752063616E206C65617665207468697320706C6163652E2E3C42523E3C42523E41667465722068656C70696E67205665726E6F6E2C206865206761766520796F75206120426C616E6B2049434320494420436869702E20486520736169642074686174204472204D61736F6E20776F756C642062652061626C6520746F2068656C7020796F75206F7574206675727468657220746F20696D7072696E7420796F757220444E4120696E20746F2074686520636869702E3C42523E3C42523E3C666F6E7420636F6C6F723D2223464630303030223E4D697373696F6E204F626A6563746976653A3C42523E54616C6B20746F20446F63746F72204D61736F6E2E3C2F666F6E743E000000C35078E0FC6800000006000000000000000000000000000003F1000003F1000003F15352374200000000000000000000000000000000000000000000000000000000000000000000C350797E306A0003BC520000000000000000000007E20000001800000000000000000000000000000000000111D300019A5A0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D578B3700009C5000001999000186A0000186A0455670000000000044474000000007E20000C350797E306A0000000105578B37000000000000000000000006000007E20000C350797E306A0000000000019A5A000000000000000000000000000000000000000000000007000003F101";
+
+            const int capturedPlayerInstance = unchecked((int)0x797E306A);
+            const int capturedMissionInstance = unchecked((int)0x555CF579);
+
+            byte[] packet = HexToBytes(doctorMasonQfuHex);
+            ReplaceInt32Be(packet, capturedPlayerInstance, source.Identity.Instance);
+            ReplaceInt32Be(packet, capturedMissionInstance, TalkToDoctorMasonInstance);
+            client.EnqueueOutboundCompressedBuffer(packet);
+            return true;
+        }
+
+        private static byte[] HexToBytes(string hex)
+        {
+            byte[] bytes = new byte[hex.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+            }
+
+            return bytes;
+        }
+
+        private static void ReplaceInt32Be(byte[] packet, int from, int to)
+        {
+            byte b0 = (byte)(from >> 24);
+            byte b1 = (byte)(from >> 16);
+            byte b2 = (byte)(from >> 8);
+            byte b3 = (byte)from;
+            for (int i = 0; i + 4 <= packet.Length; i++)
+            {
+                if (packet[i] == b0 && packet[i + 1] == b1 && packet[i + 2] == b2 && packet[i + 3] == b3)
+                {
+                    packet[i] = (byte)(to >> 24);
+                    packet[i + 1] = (byte)(to >> 16);
+                    packet[i + 2] = (byte)(to >> 8);
+                    packet[i + 3] = (byte)to;
+                    i += 3;
+                }
+            }
+        }
+
+        private static void SendFindTheThiefTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateFindTheThiefPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        private static void SendDeliverDnaLockedArmorTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateDeliverDnaLockedArmorPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        private static void SendSpeakToVernonGodfrayTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateSpeakToVernonGodfrayPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
         private static void SendTalkToStanTip(ICharacter source)
         {
             ReanchorGameTimeForTipJournal(source);
@@ -2056,7 +2636,7 @@ namespace ZoneEngine.Core.Arete.Quests
                        || mission.State == ZoneEngine.Core.Missions.MissionLifecycleState.Offered);
         }
 
-        private static void SendTipAction59AndDelete(ICharacter source, int missionInstance)
+        internal static void SendTipAction59AndDelete(ICharacter source, int missionInstance)
         {
             if (source?.Controller?.Client == null || missionInstance == 0)
             {
@@ -3756,6 +4336,115 @@ namespace ZoneEngine.Core.Arete.Quests
                 TalkToSarahGreeneLongInfo);
         }
 
+        internal static QuestFullUpdateMessage CreateFindTheThiefPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                FindTheThiefInstance,
+                FindTheThiefShortInfo,
+                FindTheThiefLongInfo,
+                244818,
+                unchecked((int)0x78E0FC69));
+        }
+
+        internal static QuestFullUpdateMessage CreateDeliverDnaLockedArmorPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                DeliverDnaLockedArmorInstance,
+                DeliverDnaLockedArmorShortInfo,
+                DeliverDnaLockedArmorLongInfo,
+                158429,
+                unchecked((int)0x78E0FC69));
+        }
+
+        internal static QuestFullUpdateMessage CreateSpeakToVernonGodfrayPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                SpeakToVernonGodfrayInstance,
+                SpeakToVernonGodfrayShortInfo,
+                SpeakToVernonGodfrayLongInfo,
+                244818,
+                unchecked((int)0x78E0FC68));
+        }
+
+        internal static QuestFullUpdateMessage CreateHackingSkillsPreviewMessage(Identity characterIdentity)
+        {
+            // Capture 20260721-Vernon-Godfray #261: tip NPC CanbeAffected:78E0FC63 (not Vernon).
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                HackingSkillsInstance,
+                HackingSkillsShortInfo,
+                HackingSkillsLongInfo,
+                11340,
+                unchecked((int)0x78E0FC63));
+        }
+
+        internal static QuestFullUpdateMessage CreateGiveHackedTechnicalLibraryPreviewMessage(
+            Identity characterIdentity)
+        {
+            // Capture 20260721-Vernon-Godfray #304: icon=158429, tip NPC 78E0FC63,
+            // Unknown6=1320 credits, Unknown8=2229 XP.
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                GiveHackedTechnicalLibraryInstance,
+                GiveHackedTechnicalLibraryShortInfo,
+                GiveHackedTechnicalLibraryLongInfo,
+                158429,
+                unchecked((int)0x78E0FC63),
+                unknown6: 1320,
+                unknown8: 2229);
+        }
+
+        internal static QuestFullUpdateMessage CreateCargoLiftingPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                CargoLiftingInstance,
+                "Cargo Lifting",
+                "Cargo Lifting<BR><BR>Vernon mentioned that he would like to get his hands on the data from one of the "
+                + "Shipping Manifest Terminals located in the industrial district of the shuttleport.<BR><BR>"
+                + "<font color=\"#FF0000\">Mission Objective:<BR>"
+                + "Open a dialog with the Shipping Manifest Terminal and apply the "
+                + "<a href='itemref://87810/87810/1'>Hacker Tool</a> if access is denied.</font>",
+                244818,
+                unchecked((int)0x78E0FC63));
+        }
+
+        internal static QuestFullUpdateMessage CreateReturnToVernonGodfrayPreviewMessage(
+            Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                ReturnToVernonGodfrayInstance,
+                "Return to Vernon Godfray",
+                "Return to Vernon Godfray<BR><BR>After finishing the hack job, return to Vernon and he might help you "
+                + "with your ID problem.<BR><BR>"
+                + "<font color=\"#FF0000\">Mission Objective:<BR>"
+                + "Talk to Vernon Godfray and give him the "
+                + "<a href='itemref://296572/296572/1'>Unprogrammed Identification Chip</a>.</font>",
+                158429,
+                unchecked((int)0x78E0FC63));
+        }
+
+        internal static QuestFullUpdateMessage CreateTalkToDoctorMasonPreviewMessage(
+            Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                TalkToDoctorMasonInstance,
+                "Talk to Doctor Mason",
+                "Talk to Doctor Mason<BR><BR><font color=\"#63ad63\">Identity Crisis:</font><BR>"
+                + "In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. "
+                + "Your mission is to create a fake ID Card to you can leave this place..<BR><BR>"
+                + "After helping Vernon, he gave you a Blank ICC ID Chip. He said that Dr Mason would be able "
+                + "to help you out further to imprint your DNA in to the chip.<BR><BR>"
+                + "<font color=\"#FF0000\">Mission Objective:<BR>Talk to Doctor Mason.</font>",
+                244818,
+                unchecked((int)0x78E0FC68));
+        }
+
         internal static QuestFullUpdateMessage CreateBuyNanoProgramsPreviewMessage(Identity characterIdentity)
         {
             // Capture 20260721-afgter dog lockpick goodman: UnknownId1 = CanbeAffected:78E0FC65 (Stan).
@@ -3831,12 +4520,49 @@ namespace ZoneEngine.Core.Arete.Quests
             string shortInfo,
             string longInfo)
         {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                missionInstance,
+                shortInfo,
+                longInfo,
+                244818,
+                unchecked((int)0x78E0FC63));
+        }
+
+        private static QuestFullUpdateMessage CreateSarahChainTipPreviewMessage(
+            Identity characterIdentity,
+            int missionInstance,
+            string shortInfo,
+            string longInfo,
+            int missionIconId,
+            int tipNpcInstance)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                missionInstance,
+                shortInfo,
+                longInfo,
+                missionIconId,
+                tipNpcInstance,
+                unknown6: 0,
+                unknown8: 0);
+        }
+
+        private static QuestFullUpdateMessage CreateSarahChainTipPreviewMessage(
+            Identity characterIdentity,
+            int missionInstance,
+            string shortInfo,
+            string longInfo,
+            int missionIconId,
+            int tipNpcInstance,
+            int unknown6,
+            int unknown8)
+        {
             Identity missionIdentity = IdentityFromRaw(MissionIdentityType, missionInstance);
-            // Capture 20260720-goldman / 20260721-lockpick: UnknownId1 = CanbeAffected:78E0FC63.
             Identity tipNpcIdentity = new Identity
                                        {
                                            Type = IdentityType.CanbeAffected,
-                                           Instance = unchecked((int)0x78E0FC63)
+                                           Instance = tipNpcInstance
                                        };
             int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
 
@@ -3858,9 +4584,9 @@ namespace ZoneEngine.Core.Arete.Quests
                                    LongInfo = longInfo,
                                    UnknownId1 = tipNpcIdentity,
                                    Unknown5 = 6,
-                                   Unknown6 = 0,
+                                   Unknown6 = unknown6,
                                    Unknown7 = 0,
-                                   Unknown8 = 0,
+                                   Unknown8 = unknown8,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData = new MissionItemReward[0],
@@ -3874,7 +4600,7 @@ namespace ZoneEngine.Core.Arete.Quests
                                    Unknown17 = 0,
                                    Unknown18 = 0,
                                    UnknownId2 = characterIdentity,
-                                   MissionIconId = 244818,
+                                   MissionIconId = missionIconId,
                                    Unknown20 = TipMissionDurationSeconds,
                                    Unknown21 = TipMissionDurationSeconds,
                                    QuestActions = new QuestActionInfo[0],

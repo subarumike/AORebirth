@@ -32,6 +32,7 @@ namespace ZoneEngine.Core
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Functions.GameFunctions;
+    using ZoneEngine.Core.Playfields;
     using ZoneEngine.Core.Thrak.Quests;
 
     using MsgPack;
@@ -703,7 +704,20 @@ namespace ZoneEngine.Core
 
         public Item GetTradeSkillItem(ICharacter character, TradeSkillInfo info)
         {
-            return character.BaseInventory.GetItemInContainer(info.Container, info.Placement);
+            if (character == null || info == null || character.BaseInventory == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return character.BaseInventory.GetItemInContainer(info.Container, info.Placement);
+            }
+            catch (Exception)
+            {
+                // GetItemInContainer throws on empty/wrong slot; UseItemOnItem must not crash.
+                return null;
+            }
         }
 
         public InventoryError AddTradeSkillResultItem(ICharacter character, Item item)
@@ -719,13 +733,13 @@ namespace ZoneEngine.Core
         public Item SetTradeSkillSource(ICharacter character, int container, int placement)
         {
             character.TradeSkillSource = new TradeSkillInfo(0, container, placement);
-            return character.BaseInventory.GetItemInContainer(container, placement);
+            return this.GetTradeSkillItem(character, character.TradeSkillSource);
         }
 
         public Item SetTradeSkillTarget(ICharacter character, int container, int placement)
         {
-            character.TradeSkillTarget = new TradeSkillInfo(0, container, placement);
-            return character.BaseInventory.GetItemInContainer(container, placement);
+            character.TradeSkillTarget = new TradeSkillInfo(1, container, placement);
+            return this.GetTradeSkillItem(character, character.TradeSkillTarget);
         }
 
         public void ClearTradeSkillSource(ICharacter character)
@@ -950,6 +964,15 @@ namespace ZoneEngine.Core
             {
                 return true;
             }
+
+            // Capture 20260721-nano-enforcer-arete: Use Marco Enforcer crystal → Overflow nanos + tip.
+            if (CapturedAreteMarcoSpidaNanoPackageRuntime.TryHandleCrystalUse(character, itemPosition, item))
+            {
+                return true;
+            }
+
+            // Capture 20260721-nanoprogramsvendor: Use Marco nano crystal → complete tip 555BE9F4.
+            StanGoodmanQuestRuntime.TryCompleteBuyNanoTipOnCrystalUse(character, item);
 
             TemplateActionMessageHandler.Default.Send(
                 character,
@@ -1706,7 +1729,32 @@ namespace ZoneEngine.Core
             }
 
             int fromPlacement = message.SourceContainer.Instance;
+            Identity ackSourceContainer = message.SourceContainer;
             IItem itemFrom = sendingPage[fromPlacement];
+            if (itemFrom == null
+                && this.TryResolveCarriedItemForImplantEquip(
+                    character,
+                    message.TargetPlacement,
+                    ref sendingPage,
+                    ref fromPlacement,
+                    out itemFrom))
+            {
+                ackSourceContainer = new Identity
+                {
+                    Type = (IdentityType)sendingPage.Identity.Type,
+                    Instance = fromPlacement
+                };
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "ClientMoveItemToInventory remapped empty source to carried item={0}/{1} page={2} slot={3} character={4}",
+                        itemFrom.LowID,
+                        itemFrom.HighID,
+                        sendingPage.GetType().Name,
+                        fromPlacement,
+                        character.Identity));
+            }
+
             if (itemFrom == null)
             {
                 // Client phantom HUD/equipment: slot looks filled client-side but server page is empty.
@@ -1749,6 +1797,9 @@ namespace ZoneEngine.Core
                         message.SourceContainer,
                         message.TargetPlacement,
                         character.Identity));
+                ChatTextMessageHandler.Default.Send(
+                    character,
+                    "That item is not in the expected inventory slot. Move it into your inventory and try again.");
                 return true;
             }
 
@@ -1830,6 +1881,9 @@ namespace ZoneEngine.Core
                             message.SourceContainer,
                             toPlacement,
                             character.Identity));
+                    ChatTextMessageHandler.Default.Send(
+                        character,
+                        "You do not meet the requirements to equip that item.");
                     return true;
                 }
 
@@ -1862,12 +1916,20 @@ namespace ZoneEngine.Core
 
                 this.SendMoveItemToInventoryAck(
                     character,
-                    message.SourceContainer,
+                    ackSourceContainer,
                     ackTargetPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
                 character.CalculateSkills();
                 this.EnsureWeaponVisualMeshes(character, true);
                 this.PersistClientMoveItemToInventory(character, "equip");
+                if (receivingPage is ImplantInventoryPage)
+                {
+                    DoctorMasonQuestRuntime.OnGiftImplantEquipped(
+                        character,
+                        itemFrom.LowID,
+                        itemFrom.HighID);
+                }
+
                 return true;
             }
 
@@ -2029,6 +2091,84 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        private bool TryResolveCarriedItemForImplantEquip(
+            ICharacter character,
+            int targetPlacement,
+            ref IInventoryPage sendingPage,
+            ref int fromPlacement,
+            out IItem itemFrom)
+        {
+            itemFrom = null;
+            if (character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            IInventoryPage targetPage = this.ResolveMoveTargetPage(character, targetPlacement);
+            if (!(targetPage is ImplantInventoryPage))
+            {
+                return false;
+            }
+
+            // Capture 20260721-184426: ClientMoveItemToInventory Inventory:slot → ImplantPage:0x2B.
+            // Quest gift packets advertise Overflow while TryAdd lands on Inventory — client/server
+            // slot can diverge. Recover Mason gift 295706 from carried pages.
+            IInventoryPage inventory;
+            IInventoryPage overflow;
+            character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventory);
+            character.BaseInventory.Pages.TryGetValue((int)IdentityType.OverflowWindow, out overflow);
+
+            int foundSlot;
+            IItem foundItem;
+            if (this.TryFindGiftImplantOnPage(inventory, out foundSlot, out foundItem))
+            {
+                sendingPage = inventory;
+                fromPlacement = foundSlot;
+                itemFrom = foundItem;
+                return true;
+            }
+
+            if (this.TryFindGiftImplantOnPage(overflow, out foundSlot, out foundItem))
+            {
+                sendingPage = overflow;
+                fromPlacement = foundSlot;
+                itemFrom = foundItem;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryFindGiftImplantOnPage(
+            IInventoryPage page,
+            out int slot,
+            out IItem item)
+        {
+            slot = -1;
+            item = null;
+            if (page == null)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IItem> entry in page.List())
+            {
+                if (entry.Value == null)
+                {
+                    continue;
+                }
+
+                if (entry.Value.LowID == 295706 || entry.Value.HighID == 295706)
+                {
+                    slot = entry.Key;
+                    item = entry.Value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool TryResolveMoveSourcePage(
             ICharacter character,
             Identity sourceContainer,
@@ -2121,6 +2261,15 @@ namespace ZoneEngine.Core
 
         private bool CanEquipToPage(ICharacter character, IInventoryPage page, IItem item)
         {
+            // Capture 20260721-Mason: after surgery clinic, gift leg 295706 equips to ImplantPage:002B.
+            // Clinic nano Treatment can still be short if OnUse missed; allow the quest gift while
+            // implant access is active so Install tip can complete.
+            if (page is ImplantInventoryPage
+                && DoctorMasonQuestRuntime.ShouldAllowGiftImplantEquip(character, item))
+            {
+                return true;
+            }
+
             AOAction action = null;
             if ((page is ArmorInventoryPage) || (page is ImplantInventoryPage))
             {

@@ -390,7 +390,8 @@ namespace ZoneEngine.Core.MessageHandlers
                         1,
                         (int)item2.Type,
                         item2.Instance);
-                    TradeSkillReceiver.TradeSkillBuildPressed(client, 300);
+                    // quality < 0 → derive from implant QL (+ bump), not hardcode 300.
+                    TradeSkillReceiver.TradeSkillBuildPressed(client, -1);
 
                     break;
                 }

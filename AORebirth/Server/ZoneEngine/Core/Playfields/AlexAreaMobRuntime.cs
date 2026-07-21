@@ -120,6 +120,16 @@ namespace ZoneEngine.Core.Playfields
                 0, 0, 0, 0, 0, 0, 0, 1
             };
 
+        // Capture 20260721-finish Mutated Garbage Flea Material #9 / 275711 (0x0434BF).
+        private static readonly byte[] MutatedGarbageFleaExtendedTextureOverrideData =
+            {
+                0, 0, 7, 226, 77, 97, 116, 101, 114, 105,
+                97, 108, 32, 35, 57, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 4, 52, 191,
+                0, 0, 0, 0, 0, 0, 0, 1
+            };
+
         private static readonly byte[] WasteCollectorExtendedTextureOverrideData =
             {
                 0, 0, 7, 226, 77, 97, 116, 101, 114, 105,
@@ -205,7 +215,7 @@ namespace ZoneEngine.Core.Playfields
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3422.32f, 0.01f, 866.07f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3425.29f, 0.01f, 818.4f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3437.13f, 0.01f, 803.59f),
-                new MobSlot("Mutated Garbage Flea", MobKind.GarbageFlea, 17657, 7, 69, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3424.34f, 0.01f, 888.16f),
+                new MobSlot("Mutated Garbage Flea", MobKind.GarbageFlea, 17657, 7, 559, 25, 200, 23, NpcAiProfile.Aggressive, 1.0f, 3422.907f, 0.01f, 878.7842f),
                 new MobSlot("Supreme Collector of Waste", MobKind.WasteCollector, 17714, 4, 60, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3505.91f, 11.02f, 943.13f),
                 new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3548.63f, 6.93f, 906.13f),
                 new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3567.44f, 8.14f, 919.03f),
@@ -219,6 +229,12 @@ namespace ZoneEngine.Core.Playfields
 
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
         {
+            if (string.Equals(name, "Mutated Garbage Flea", StringComparison.Ordinal))
+            {
+                data = (byte[])MutatedGarbageFleaExtendedTextureOverrideData.Clone();
+                return true;
+            }
+
             if (string.Equals(name, "Garbage Flea", StringComparison.Ordinal))
             {
                 data = (byte[])GarbageFleaExtendedTextureOverrideData.Clone();

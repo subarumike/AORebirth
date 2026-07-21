@@ -145,6 +145,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 client.Controller.Character,
                 "CharDCMove");
 
+            // Capture 20260721-finish: first move after Arete→ICC HQ arrival registers bind point.
+            ZoneEngine.Core.AndromedaIccHqArrivalSaveRuntime.TryApplyOnArrival(
+                client.Controller.Character,
+                "CharDCMove");
+
             /* Start NV Heading Testing Code
              * Yaw: 0 to 360 Degrees (North turning clockwise to a complete revolution)
              * Roll: Not sure, but is always 0 cause we can't roll in AO

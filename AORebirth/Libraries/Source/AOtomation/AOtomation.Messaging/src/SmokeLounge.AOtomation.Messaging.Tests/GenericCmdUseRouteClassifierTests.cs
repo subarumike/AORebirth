@@ -63,6 +63,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(interactionService, "internal bool TryHandleGenericCmdUse(");
             AssertTextBefore(
                 interactionService,
+                "InsuranceTerminalInteractionHandler.Default.TryHandleUse",
+                "SurgeryClinicInteractionHandler.Default.TryHandleUse");
+            AssertTextBefore(
+                interactionService,
                 "RexB18DInteractionHandler.Default.TryHandleUse",
                 "InventoryContainerInteractionHandler.Default.TryHandleUse");
             AssertTextBefore(
@@ -85,10 +89,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 interactionService,
                 "GridTerminalInteractionHandler.Default.TryHandleCapturedUse",
                 "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse");
-            AssertTextBefore(
-                interactionService,
-                "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse",
-                "SurgeryClinicInteractionHandler.Default.TryHandleUse");
             AssertTextBefore(
                 interactionService,
                 "SurgeryClinicInteractionHandler.Default.TryHandleUse",
@@ -384,6 +384,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
                     Terminal(SurgeryClinicInteractionRules.CapturedAlternateSurgeryClinicTerminalInstance),
+                    0));
+            Assert.IsTrue(
+                SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(
+                    Terminal(SurgeryClinicInteractionRules.CapturedAreteLandingSurgeryClinicTerminalInstance),
                     0));
             Assert.IsTrue(
                 SurgeryClinicInteractionRules.IsCapturedSurgeryClinicTerminal(

@@ -573,6 +573,20 @@ namespace ZoneEngine.Core.Packets
                         scfu.Unknown1 = alexUnknown1;
                     }
                 }
+                else if (LoreleiOasisMobRuntime.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
+                    // Capture 20260721-loralei SCFU flags include UnknownFlag6|IsPet|UnknownFlag7 + ExtTex.
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                    scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                        | SimpleCharFullUpdateFlags.IsPet
+                        | SimpleCharFullUpdateFlags.UnknownFlag7;
+                    scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+                    byte[] oasisUnknown1;
+                    if (LoreleiOasisMobRuntime.TryGetCapturedScfuUnknown1(charName, out oasisUnknown1))
+                    {
+                        scfu.Unknown1 = oasisUnknown1;
+                    }
+                }
                 else if (petMasterInstance != 0
                     && ZoneEngine.Core.PetBureaucratGuardianAppearance.IsGuardianPet(character))
                 {

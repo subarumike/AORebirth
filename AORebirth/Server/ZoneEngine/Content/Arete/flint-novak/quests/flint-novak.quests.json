@@ -290,7 +290,7 @@
       "QuestId": "Mission:555BE9F3",
       "Title": "Talk to Sarah Greene",
       "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-afgter dog lockpick goodman raw-packets.csv #923",
-      "SourceNpcIdentity": "SimpleChar:78E0FC63",
+      "SourceNpcIdentity": "SimpleChar:78E0FC69",
       "InitialStepId": "talk_to_sarah_greene",
       "Steps": [
         {
@@ -301,7 +301,382 @@
               "ObjectiveId": "mission_555BE9F3_talk_sarah",
               "Type": "CapturedPreviewObjective",
               "Description": "Talk to Sarah Greene.",
-              "TargetIdentity": "SimpleChar:78E0FC63",
+              "TargetIdentity": "SimpleChar:78E0FC69",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F5",
+      "Title": "Find the thief",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-sara mission-flow / packets.hex",
+      "SourceNpcIdentity": "SimpleChar:78E0FC69",
+      "InitialStepId": "find_the_thief",
+      "Steps": [
+        {
+          "StepId": "find_the_thief",
+          "Name": "Find the thief",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F5_find_thief",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Locate the thief and recover the DNA-Locked Armor.",
+              "TargetIdentity": "Terminal:574187CF",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F6",
+      "Title": "Deliver DNA-Locked Armor to Sarah Greene",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-sara mission-flow / packets.hex",
+      "SourceNpcIdentity": "SimpleChar:78E0FC69",
+      "InitialStepId": "deliver_dna_locked_armor",
+      "Steps": [
+        {
+          "StepId": "deliver_dna_locked_armor",
+          "Name": "Deliver DNA-Locked Armor",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F6_deliver_armor",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Return the DNA-Locked Armor to Sarah Greene.",
+              "TargetIdentity": "SimpleChar:78E0FC69",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F7",
+      "Title": "Speak to Vernon Godfray",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-sara mission-flow / packets.hex",
+      "SourceNpcIdentity": "SimpleChar:78E0FC68",
+      "InitialStepId": "speak_to_vernon_godfray",
+      "Steps": [
+        {
+          "StepId": "speak_to_vernon_godfray",
+          "Name": "Speak to Vernon Godfray",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F7_speak_vernon",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Vernon Godfray.",
+              "TargetIdentity": "SimpleChar:78E0FC68",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F8",
+      "Title": "Hacking Skills",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Vernon-Godfray mission-flow",
+      "SourceNpcIdentity": "SimpleChar:78E0FC68",
+      "InitialStepId": "hacking_skills",
+      "Steps": [
+        {
+          "StepId": "hacking_skills",
+          "Name": "Hacking Skills",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F8_hacking_skills",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Combine the Hacker Tool with the Omni-Tek Technical Library.",
+              "TargetIdentity": "SimpleChar:78E0FC68",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F9",
+      "Title": "Give the Hacked Technical Library",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Vernon-Godfray mission-flow",
+      "SourceNpcIdentity": "SimpleChar:78E0FC68",
+      "InitialStepId": "give_hacked_technical_library",
+      "Steps": [
+        {
+          "StepId": "give_hacked_technical_library",
+          "Name": "Give the Hacked Technical Library",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F9_give_hacked_library",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Give the Hacked Technical Library to Vernon Godfray.",
+              "TargetIdentity": "SimpleChar:78E0FC68",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FA",
+      "Title": "Cargo Lifting",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Vernon-Godfray mission-flow",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6A",
+      "InitialStepId": "cargo_lifting",
+      "Steps": [
+        {
+          "StepId": "cargo_lifting",
+          "Name": "Cargo Lifting",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9FA_cargo_lifting",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Open a dialog with the Shipping Manifest Terminal and apply the Hacker Tool if access is denied.",
+              "TargetIdentity": "SimpleChar:78E0FC6A",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FB",
+      "Title": "Return to Vernon Godfray",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Vernon-Godfray mission-flow",
+      "SourceNpcIdentity": "SimpleChar:78E0FC68",
+      "InitialStepId": "return_to_vernon_godfray",
+      "Steps": [
+        {
+          "StepId": "return_to_vernon_godfray",
+          "Name": "Return to Vernon Godfray",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9FB_return_vernon",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Vernon Godfray and give him the Unprogrammed Identification Chip.",
+              "TargetIdentity": "SimpleChar:78E0FC68",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FC",
+      "Title": "Talk to Doctor Mason",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Vernon-Godfray / 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "talk_to_doctor_mason",
+      "Steps": [
+        {
+          "StepId": "talk_to_doctor_mason",
+          "Name": "Talk to Doctor Mason",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9FC_talk_doctor_mason",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Doctor Mason.",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FD",
+      "Title": "Assemble an Implant (1/3)",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "assemble_implant_1",
+      "Steps": [
+        {
+          "StepId": "assemble_implant_1",
+          "Name": "Assemble an Implant (1/3)",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9FD_assemble_1",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Assemble Leg Implant: Agility, Shiny (113127).",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FE",
+      "Title": "Assemble an Implant (2/3)",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "assemble_implant_2",
+      "Steps": [
+        {
+          "StepId": "assemble_implant_2",
+          "Name": "Assemble an Implant (2/3)",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9FE_assemble_2",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Assemble next implant stage (113186).",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FF",
+      "Title": "Assemble an Implant (3/3)",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "assemble_implant_3",
+      "Steps": [
+        {
+          "StepId": "assemble_implant_3",
+          "Name": "Assemble an Implant (3/3)",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9FF_assemble_3",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Finish implant assembly (113440).",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA00",
+      "Title": "Show Dr. Mason your brand new Implant",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "show_dr_mason_implant",
+      "Steps": [
+        {
+          "StepId": "show_dr_mason_implant",
+          "Name": "Show Dr. Mason your brand new Implant",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA00_show_implant",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Return the finished implant to Dr. Mason for inspection.",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA01",
+      "Title": "Install the implant",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "install_the_implant",
+      "Steps": [
+        {
+          "StepId": "install_the_implant",
+          "Name": "Install the implant",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA01_install_implant",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Equip gift leg implant 295706 after activating Surgery Clinic.",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA02",
+      "Title": "Talk to Doctor Mason",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason chip turn-in",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "talk_to_doctor_mason_after_install",
+      "Steps": [
+        {
+          "StepId": "talk_to_doctor_mason_after_install",
+          "Name": "Talk to Doctor Mason",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA02_talk_mason_chip",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Give Blank ICC ID Chip and Biological Survey Nanobots to Dr. Mason.",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA03",
+      "Title": "Talk to Lorelei",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-Mason",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6C",
+      "InitialStepId": "talk_to_lorelei",
+      "Steps": [
+        {
+          "StepId": "talk_to_lorelei",
+          "Name": "Talk to Lorelei",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA03_talk_lorelei",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Lorelei the Bartender.",
+              "TargetIdentity": "SimpleChar:78E0FC6C",
               "RequiredCount": 1,
               "Conditions": []
             }
@@ -427,6 +802,81 @@
               "Type": "CapturedPreviewObjective",
               "Description": "Give the Personalized Basic Robot Brain to Alex Gibbs.",
               "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA04",
+      "Title": "Lorelei's Lost Pet",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-loralei packet #541",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6B",
+      "InitialStepId": "capture_lolly",
+      "Steps": [
+        {
+          "StepId": "capture_lolly",
+          "Name": "Capture Lorelei's Reet Pet",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA04_lost_pet",
+              "Type": "CapturedTurnInObjective",
+              "Description": "Capture Lorelei's Reet Pet.",
+              "TargetIdentity": "SimpleChar:7985CAEC",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA05",
+      "Title": "Deliver the Reet to Lorelei",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-loralei packet #1278",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6B",
+      "InitialStepId": "deliver_reet",
+      "Steps": [
+        {
+          "StepId": "deliver_reet",
+          "Name": "Give Lorelei Pet Cage With a Reet",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA05_deliver_reet",
+              "Type": "CapturedTurnInObjective",
+              "Description": "Give Lorelei the Pet Cage With a Reet and programmed ID chip.",
+              "TargetIdentity": "SimpleChar:78E0FC6B",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA06",
+      "Title": "Talk to Vaughn Hammond",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-loralei packet #1902",
+      "SourceNpcIdentity": "SimpleChar:78E0FC6B",
+      "InitialStepId": "talk_vaughn",
+      "Steps": [
+        {
+          "StepId": "talk_vaughn",
+          "Name": "Talk to Vaughn Hammond",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BEA06_talk_vaughn",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Vaughn Hammond about leaving Arete Landing.",
+              "TargetIdentity": null,
               "RequiredCount": 1,
               "Conditions": []
             }

@@ -1,0 +1,339 @@
+{
+  "Identity": {
+    "Id": "arete-doctor-mason-dialogue-20260721-Mason",
+    "Version": "captured-mason-implant-20260721-Mason",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-Mason/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260721-Mason"
+  ],
+  "Npcs": [
+    {
+      "Id": "doctor-mason",
+      "NpcIdentity": "SimpleChar:78E0FC6C",
+      "Name": "Dr. Mason",
+      "RootNodeId": "mason_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC6C)"
+      ],
+      "Nodes": [
+        {
+          "Id": "mason_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "mason_001_option_0",
+              "Index": 0,
+              "Text": "I heard you might be able to help me...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:01; Answer=0 → Assemble Implant (1/3)",
+              "NextNodeId": "mason_002",
+              "Actions": []
+            },
+            {
+              "Id": "mason_001_option_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:01",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close until questions captured"
+                }
+              ]
+            },
+            {
+              "Id": "mason_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:01",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after accept",
+          "Options": [
+            {
+              "Id": "mason_002_option_0",
+              "Index": 0,
+              "Text": "I'll come back when I'm done.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:05",
+              "NextNodeId": "mason_003",
+              "Actions": []
+            },
+            {
+              "Id": "mason_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:05",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "mason_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:07",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_show_001",
+          "PromptText": "",
+          "PromptTextConfidence": "show implant visit",
+          "Options": [
+            {
+              "Id": "mason_show_001_option_0",
+              "Index": 0,
+              "Text": "I finished that implant.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:38; Answer=0 → StartTrade 1 slot",
+              "NextNodeId": "mason_show_trade",
+              "Actions": []
+            },
+            {
+              "Id": "mason_show_001_option_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:38",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_show_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            },
+            {
+              "Id": "mason_show_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:38",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_show_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_show_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade 1 slot",
+          "Options": [
+            {
+              "Id": "mason_show_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → How do I install?",
+              "NextNodeId": "mason_show_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_show_002",
+          "PromptText": "",
+          "PromptTextConfidence": "after show implant",
+          "Options": [
+            {
+              "Id": "mason_show_002_option_0",
+              "Index": 0,
+              "Text": "How do I install an Implant?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:46",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_show_002_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close after install question"
+                }
+              ]
+            },
+            {
+              "Id": "mason_show_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:46",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_show_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_chip_001",
+          "PromptText": "",
+          "PromptTextConfidence": "after install tip complete",
+          "Options": [
+            {
+              "Id": "mason_chip_001_option_0",
+              "Index": 0,
+              "Text": "I have installed the implant and I have all the items we need for the chip.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:04; Answer=0 → StartTrade 2 slots",
+              "NextNodeId": "mason_chip_trade",
+              "Actions": []
+            },
+            {
+              "Id": "mason_chip_001_option_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:04",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_chip_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            },
+            {
+              "Id": "mason_chip_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:04",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_chip_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_chip_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade 2 slots",
+          "Options": [
+            {
+              "Id": "mason_chip_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → Thank you",
+              "NextNodeId": "mason_chip_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_chip_002",
+          "PromptText": "",
+          "PromptTextConfidence": "after chip turn-in",
+          "Options": [
+            {
+              "Id": "mason_chip_002_option_0",
+              "Index": 0,
+              "Text": "Thank you for all the help.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:15",
+              "NextNodeId": "mason_chip_003",
+              "Actions": []
+            },
+            {
+              "Id": "mason_chip_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:15",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_chip_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_chip_003",
+          "PromptText": "",
+          "PromptTextConfidence": "final goodbye",
+          "Options": [
+            {
+              "Id": "mason_chip_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:19",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_chip_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

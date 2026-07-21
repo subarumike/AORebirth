@@ -1,0 +1,155 @@
+{
+  "Identity": {
+    "Id": "arete-shipping-manifest-terminal-dialogue-20260721-Vernon-Godfray",
+    "Version": "captured-shipping-manifest-20260721-Vernon-Godfray",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-Vernon-Godfray/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260721-Vernon-Godfray"
+  ],
+  "Npcs": [
+    {
+      "Id": "shipping-manifest-terminal",
+      "NpcIdentity": "SimpleChar:78E0FC6A",
+      "Name": "Shipping Manifest Terminal",
+      "RootNodeId": "smt_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC6A)"
+      ],
+      "Nodes": [
+        {
+          "Id": "smt_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260721-Vernon-Godfray; options-only",
+          "Options": [
+            {
+              "Id": "smt_001_option_0",
+              "Index": 0,
+              "Text": "(Access Shipping Manifest Logging)",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:30.8401532Z",
+              "NextNodeId": "smt_002",
+              "Actions": []
+            },
+            {
+              "Id": "smt_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:30.8401532Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "smt_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "smt_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "smt_002_option_0",
+              "Index": 0,
+              "Text": "(Apply Hacker Tool)",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:31.7465940Z; Answer=0 → StartTrade",
+              "NextNodeId": "smt_trade",
+              "Actions": []
+            },
+            {
+              "Id": "smt_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:31.7465940Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "smt_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "smt_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "Options": [
+            {
+              "Id": "smt_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → AnswerList Re-route",
+              "NextNodeId": "smt_003",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "smt_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after Hacker Tool inspect",
+          "Options": [
+            {
+              "Id": "smt_003_option_0",
+              "Index": 0,
+              "Text": "(Re-route shipping report data.)",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:38.3205408Z; Answer=0 → Delete Cargo Lifting + QFU Return to Vernon",
+              "NextNodeId": "smt_004",
+              "Actions": []
+            },
+            {
+              "Id": "smt_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:38.3205408Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "smt_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "smt_004",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after tip handoff",
+          "Options": [
+            {
+              "Id": "smt_004_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:34:45.2962378Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "smt_004_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

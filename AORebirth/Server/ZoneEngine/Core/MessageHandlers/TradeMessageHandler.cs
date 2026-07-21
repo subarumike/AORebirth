@@ -51,6 +51,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using Utility;
 
     using ZoneEngine.Core.Arete.Dialogue;
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Controllers;
 
     #endregion
@@ -407,6 +408,12 @@ namespace ZoneEngine.Core.MessageHandlers
                                 shoppingBag.Vendor,
                                 shoppingBag.Vendor);
                             client.Controller.SendChangedStats();
+
+                            // Capture 20260721-nanoprogramsvendor: buy Marco nano package clears tip 555BE9F4.
+                            StanGoodmanQuestRuntime.TryCompleteBuyNanoTipOnVendorPurchase(
+                                client.Controller.Character,
+                                boughtItems);
+
                             shoppingBag.Dispose();
                         }
                     }

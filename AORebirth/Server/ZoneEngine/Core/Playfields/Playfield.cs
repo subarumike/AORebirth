@@ -189,15 +189,15 @@ namespace AORebirth.Core.Playfields
 
         private const double OutOfRangeRetrySeconds = NpcCombatAttackRules.OutOfRangeRetrySeconds;
 
-        private const int RubiKaStartPlayfield = 4582;
+        private const int RubiKaStartPlayfield = 6553;
 
         private const int GridPlayfield = 152;
 
-        private const int RubiKaStartX = 939;
+        private const int RubiKaStartX = 3607;
 
-        private const int RubiKaStartY = 20;
+        private const int RubiKaStartY = 52;
 
-        private const int RubiKaStartZ = 732;
+        private const int RubiKaStartZ = 786;
 
         private const int ShadowlandsStartPlayfield = 4001;
 
@@ -2678,6 +2678,14 @@ namespace AORebirth.Core.Playfields
                 float padZ;
                 ShadowlandsGardenSaveRuntimeService.GetGardenSaveSpot(out padX, out padY, out padZ);
                 destination = new Coordinate(padX, padY, padZ);
+            }
+            else if (AndromedaIccHqArrivalSaveRuntime.IsAndromedaPlayfield(savedPlayfield))
+            {
+                float bindX;
+                float bindY;
+                float bindZ;
+                AndromedaIccHqArrivalSaveRuntime.GetBindSpot(out bindX, out bindY, out bindZ);
+                destination = new Coordinate(bindX, bindY, bindZ);
             }
 
             LogUtil.Debug(
