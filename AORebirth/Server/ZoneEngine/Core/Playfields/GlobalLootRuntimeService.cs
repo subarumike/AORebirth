@@ -245,6 +245,14 @@ namespace AORebirth.Core.Playfields
 
         private void EnsureCapturedEncounter(CapturedEncounterRuntimeDefinition encounter)
         {
+            if (CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                    this.registry,
+                    encounter.ProfileKey,
+                    encounter.EncounterKey))
+            {
+                return;
+            }
+
             string tableKey = "captured." + encounter.ProfileKey;
             if (this.registry.ContainsTable(tableKey)) return;
 

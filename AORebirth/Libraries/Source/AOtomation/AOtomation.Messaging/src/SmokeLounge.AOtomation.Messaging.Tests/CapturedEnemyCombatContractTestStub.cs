@@ -15,11 +15,49 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedEnemyCombatAttackDefinition
     {
+        internal CapturedEnemyCombatAttackDefinition()
+        {
+        }
+
+        internal CapturedEnemyCombatAttackDefinition(
+            int minDamage,
+            int maxDamage,
+            int damageBonus,
+            double range,
+            double rechargeSeconds,
+            bool usesEquippedWeapon,
+            int attackInfoAmmoCount,
+            int attackInfoWeaponSlot,
+            int attackInfoUnknown,
+            int attackInfoHitType,
+            int attackInfoWeaponInstance,
+            bool sendAttackInfo)
+        {
+            this.MinDamage = minDamage;
+            this.MaxDamage = maxDamage;
+            this.DamageBonus = damageBonus;
+            this.Range = range;
+            this.RechargeSeconds = rechargeSeconds;
+            this.UsesEquippedWeapon = usesEquippedWeapon;
+            this.AttackInfoAmmoCount = attackInfoAmmoCount;
+            this.AttackInfoWeaponSlot = attackInfoWeaponSlot;
+            this.AttackInfoUnknown = attackInfoUnknown;
+            this.AttackInfoHitType = attackInfoHitType;
+            this.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            this.SendAttackInfo = sendAttackInfo;
+        }
+
         internal int MinDamage { get; set; }
 
         internal int MaxDamage { get; set; }
 
+        internal int DamageBonus { get; set; }
+
+        internal double Range { get; set; }
+
         internal double RechargeSeconds { get; set; }
+
+        internal bool UsesEquippedWeapon { get; set; }
 
         internal int AttackInfoAmmoCount { get; set; }
 
@@ -28,14 +66,65 @@ namespace AORebirth.Core.Playfields
         internal int AttackInfoUnknown { get; set; }
 
         internal int AttackInfoWeaponInstance { get; set; }
+
+        internal int AttackInfoHitType { get; set; }
+
+        internal bool SendAttackInfo { get; set; }
     }
 
     internal sealed class CapturedEnemySpecialAttackDefinition
     {
+        internal CapturedEnemySpecialAttackDefinition(
+            int lowTemplate,
+            int highTemplate,
+            int tag,
+            string name)
+        {
+            this.LowTemplate = lowTemplate;
+            this.HighTemplate = highTemplate;
+            this.Tag = tag;
+            this.Name = name;
+        }
+
+        internal int LowTemplate { get; private set; }
+
+        internal int HighTemplate { get; private set; }
+
+        internal int Tag { get; private set; }
+
+        internal string Name { get; private set; }
     }
 
     internal sealed class CapturedEnemySpecialAttackSequenceDefinition
     {
+        internal CapturedEnemySpecialAttackSequenceDefinition()
+        {
+        }
+
+        internal CapturedEnemySpecialAttackSequenceDefinition(
+            double initialAttackDelaySeconds,
+            CapturedEnemyCombatAttackDefinition openingAttack,
+            CapturedEnemyCombatAttackDefinition repeatingAttack,
+            CapturedEnemySpecialAttackDefinition[] specialAttacks,
+            int specialAttackWeaponUnknown1,
+            int specialAttackWeaponUnknown2,
+            int specialAttackWeaponUnknown3,
+            int specialAttackWeaponUnknown4,
+            int specialAttackWeaponUnknown5)
+        {
+            this.InitialAttackDelaySeconds = initialAttackDelaySeconds;
+            this.OpeningAttack = openingAttack;
+            this.RepeatingAttack = repeatingAttack;
+            this.SpecialAttacks = specialAttacks;
+            this.SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1;
+            this.SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2;
+            this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
+            this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
+            this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+        }
+
+        internal double InitialAttackDelaySeconds { get; set; }
+
         internal CapturedEnemyCombatAttackDefinition OpeningAttack { get; set; }
 
         internal CapturedEnemyCombatAttackDefinition RepeatingAttack { get; set; }
@@ -55,6 +144,19 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedEnemyCombatContract
     {
+        internal static CapturedEnemyCombatContract CapturedSpecialSequence(
+            string evidence,
+            CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.Specialized,
+                IsCombatReady = true,
+                Evidence = evidence,
+                SpecialAttackSequence = specialAttackSequence
+            };
+        }
+
         internal static CapturedEnemyCombatContract FixedAttack(
             string evidence,
             int minDamage,

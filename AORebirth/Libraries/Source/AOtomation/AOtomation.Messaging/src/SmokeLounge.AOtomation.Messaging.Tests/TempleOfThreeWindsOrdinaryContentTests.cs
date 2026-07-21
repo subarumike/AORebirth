@@ -88,5 +88,54 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(profiles.All(value => value.Loot.LevelCreditRules.Single(rule => rule.EnemyLevel == 20).MinimumCredits == 371));
             Assert.IsTrue(profiles.All(value => value.Loot.LevelCreditRules.Single(rule => rule.EnemyLevel == 35).MaximumCredits == 705));
         }
+
+        [TestMethod]
+        public void DefenderCombatAndLootRemainDedicatedToTheTempleEncounter()
+        {
+            CapturedEnemyCombatContract combat =
+                CapturedTempleOfThreeWindsCombatCatalog.DefenderOfTheThree();
+            Assert.AreEqual(CapturedEnemyAttackModel.Specialized, combat.AttackModel);
+            Assert.IsTrue(combat.IsCombatReady);
+            Assert.AreEqual(10.915985, combat.SpecialAttackSequence.InitialAttackDelaySeconds);
+            Assert.AreEqual(43, combat.SpecialAttackSequence.RepeatingAttack.MinDamage);
+            Assert.AreEqual(43, combat.SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(-1, combat.SpecialAttackSequence.RepeatingAttack.AttackInfoAmmoCount);
+            Assert.AreEqual(0, combat.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1465538645, combat.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance);
+            Assert.AreEqual(1, combat.SpecialAttackSequence.SpecialAttacks.Length);
+            Assert.AreEqual(205877, combat.SpecialAttackSequence.SpecialAttacks[0].LowTemplate);
+            Assert.AreEqual(205878, combat.SpecialAttackSequence.SpecialAttacks[0].HighTemplate);
+            Assert.AreEqual("WZXU", combat.SpecialAttackSequence.SpecialAttacks[0].Name);
+            Assert.AreEqual(239, combat.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(25, combat.SpecialAttackSequence.SpecialAttackWeaponUnknown4);
+
+            LootTableDefinition table =
+                CapturedTempleOfThreeWindsLootDefinitions.BuildDefenderLootTable();
+            Assert.AreEqual(2, table.ObservedCorpseSnapshots.Length);
+            Assert.IsTrue(table.ObservedCorpseSnapshots.All(value => value.Credits == 1450));
+            Assert.AreEqual(
+                1,
+                table.ObservedCorpseSnapshots[0].Entries.Single(value => value.ItemTemplateId == 204750).MinimumQuantity);
+            Assert.AreEqual(
+                2,
+                table.ObservedCorpseSnapshots[1].Entries.Single(value => value.ItemTemplateId == 204750).MinimumQuantity);
+            Assert.IsTrue(
+                table.ObservedCorpseSnapshots.All(
+                    value => value.Entries.Single(entry => entry.ItemTemplateId == 204649).MinimumQuantity == 1));
+
+            var registry = new LootTableRegistry(value => true);
+            Assert.IsTrue(
+                CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                    registry,
+                    CapturedTempleOfThreeWindsLootDefinitions.DefenderProfileKey,
+                    CapturedTempleOfThreeWindsLootDefinitions.DefenderEncounterKey));
+            Assert.IsFalse(
+                CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                    registry,
+                    "subway.127.boss.abmouth-supremus",
+                    "subway.127.encounter.abmouth"));
+            Assert.AreEqual(1, registry.Assignments().Length);
+            Assert.AreEqual(647, registry.Assignments()[0].PlayfieldId.Value);
+        }
     }
 }
