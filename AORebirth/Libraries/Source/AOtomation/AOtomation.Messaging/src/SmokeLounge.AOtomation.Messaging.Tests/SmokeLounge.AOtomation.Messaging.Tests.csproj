@@ -112,6 +112,7 @@
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
     <Compile Include="WindcallerKarrecNpcContentTests.cs" />
     <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
+    <Compile Include="DailyMissionRewardRulesTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
     <Compile Include="SubwayVendorContentTests.cs" />
@@ -217,6 +218,8 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs"><Link>WindcallerKarrecNpcRuntimeRegistry.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecInteractionRules.cs"><Link>WindcallerKarrecInteractionRules.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\DailyMissionRewardRules.cs"><Link>DailyMissionRewardRules.cs</Link></Compile>
+    <Compile Include="..\..\..\..\AORebirth.Stats\SpecialStats\XPTable.cs"><Link>XPTable.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteConditionReferenceValidator.cs"><Link>AreteConditionReferenceValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentLoadResult.cs"><Link>AreteContentLoadResult.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentManifest.cs"><Link>AreteContentManifest.cs</Link></Compile>
@@ -300,6 +303,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json">
+      <Link>Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
       <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

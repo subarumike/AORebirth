@@ -124,6 +124,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, b18e.Objectives.Single().RequiredCount);
             Assert.AreEqual(MissionDefinitionCatalog.RexB18DQuestId, b18e.PrerequisiteQuestIds.Single());
             Assert.AreEqual(2, karrec.Objectives.Single().RequiredCount);
+
+            QuestDefinition karrecContent;
+            Assert.IsTrue(
+                registries.QuestRegistry.TryGetQuest(
+                    MissionDefinitionCatalog.WindcallerKarrecQuestId,
+                    out karrecContent));
+            QuestAction lifecycleEvidence = karrecContent.Steps
+                .Single(step => step.StepId == "deliver_offerings")
+                .Actions.Single(action => action.Type == "CapturedLifecycleEvidence");
+            Assert.AreEqual("285612", lifecycleEvidence.Parameters["dailyRewardItemId"]);
+            Assert.AreEqual(
+                "two-tokens-per-mission-token-level-tier-clan-stat-62-omni-stat-75-neutral-zero",
+                lifecycleEvidence.Parameters["sideTokenModel"]);
+            Assert.AreEqual(
+                "one-full-Rubika-level-direct-XP-from-XPTable-no-research-diversion",
+                lifecycleEvidence.Parameters["xpRewardModel"]);
+            Assert.AreEqual(
+                "excluded-expansion-system-not-implemented",
+                lifecycleEvidence.Parameters["researchRuntime"]);
+            Assert.IsFalse(lifecycleEvidence.Parameters.ContainsKey("sideTokenDelta"));
+            Assert.IsFalse(lifecycleEvidence.Parameters.ContainsKey("rewardXpEvidence"));
+            Assert.IsFalse(karrecContent.UnresolvedFields.Contains("exactTotalXpAndResearchPersistenceSemantics"));
+            Assert.IsTrue(karrecContent.UnresolvedFields.Contains("officialDirectXpPacketSequence"));
             Assert.AreEqual(0, b18f.Objectives.Count);
             Assert.AreEqual(MissionDefinitionCatalog.RexB18EQuestId, b18f.PrerequisiteQuestIds.Single());
             Assert.AreEqual(0, b194.Objectives.Count);

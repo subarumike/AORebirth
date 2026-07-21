@@ -167,10 +167,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void KarrecProgressRewardsAndAccountAccessAreScopedAndRetrySafe()
         {
-            var repository = new InMemoryMissionRepository();
+            var state = new InMemoryMissionRepositoryState();
+            var repository = new InMemoryMissionRepository(state);
             PersistentMissionService service = Service(repository);
             Activate(service, 1501, Karrec);
             Activate(service, 1502, Karrec);
+            repository.SeedCharacterStat(1501, 50000, 52, 1000);
+            repository.SeedCharacterStat(1501, 50000, 57, 0);
+            repository.SeedCharacterStat(1501, 50000, 75, 4024);
 
             Assert.AreEqual(
                 MissionOperationStatus.Applied,
@@ -182,45 +186,157 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 MissionOperationStatus.Applied,
                 Observe(service, 1501, Karrec, KarrecObjective, "trade-offering:297043").Status);
             Assert.AreEqual(0, service.GetObjective(1502, Karrec, KarrecObjective).Progress);
-            Assert.AreEqual(MissionOperationStatus.Applied, service.CompleteMission(1501, Karrec).Status);
 
             var coordinator = new MissionRewardCoordinator(repository);
-            MissionRewardExecutionResult sideTokens = coordinator.ExecuteAtomicCharacterStats(
-                1501,
-                Karrec,
-                SideTokenReward(),
-                "capture:karrec-side-token-plus-two");
-            var researchEffect = new SequencedEffect(
-                MissionRewardEffectResult.RetryableFailure("research persistence unavailable"),
-                MissionRewardEffectResult.Applied("personal-research-allocation:5000"));
-            MissionRewardDefinition researchReward = ResearchReward();
+            MissionRewardDefinition xpReward = FullLevelXpReward(21500);
             Assert.AreEqual(
-                MissionRewardExecutionStatus.RetryableFailure,
-                coordinator.ExecuteExternal(1501, Karrec, researchReward, researchEffect).Status);
-            Assert.IsNull(service.GetAccountFlag("account-1501", "totw-wall-access"));
-
-            Assert.AreEqual(
-                MissionRewardExecutionStatus.AlreadyApplied,
+                MissionRewardExecutionStatus.Rejected,
                 coordinator.ExecuteAtomicCharacterStats(
                     1501,
                     Karrec,
-                    SideTokenReward(),
-                    "capture:karrec-side-token-plus-two").Status);
-            Assert.AreEqual(
-                MissionRewardExecutionStatus.Applied,
-                coordinator.ExecuteExternal(1501, Karrec, researchReward, researchEffect).Status);
+                    xpReward,
+                    DailyMissionRewardRules.CreateFullLevelXpEffectReference(25, 21500)).Status);
+            Assert.IsNull(service.GetAccountFlag("account-1501", "totw-wall-access"));
+
+            Assert.AreEqual(MissionOperationStatus.Applied, service.CompleteMission(1501, Karrec).Status);
+            MissionRewardExecutionResult sideTokens = coordinator.ExecuteAtomicCharacterStats(
+                1501,
+                Karrec,
+                SideTokenReward(75, 4),
+                DailyMissionRewardRules.CreateSideTokenEffectReference(75, 4));
+
+            Assert.AreEqual(MissionRewardExecutionStatus.Applied, sideTokens.Status);
+            Assert.AreEqual(4028, sideTokens.StatValues.Single(value => value.StatId == 75).Value);
+            Assert.IsNull(service.GetAccountFlag("account-1501", "totw-wall-access"));
+
+            var reconstructedRepository = new InMemoryMissionRepository(state);
+            PersistentMissionService reconstructedService = Service(reconstructedRepository);
+            var reconstructedCoordinator = new MissionRewardCoordinator(reconstructedRepository);
+            MissionRewardExecutionResult sideTokenRetry = reconstructedCoordinator.ExecuteAtomicCharacterStats(
+                1501,
+                Karrec,
+                SideTokenReward(75, 4),
+                DailyMissionRewardRules.CreateSideTokenEffectReference(75, 4));
+            Assert.AreEqual(MissionRewardExecutionStatus.AlreadyApplied, sideTokenRetry.Status);
+            Assert.AreEqual(4028, sideTokenRetry.StatValues.Single(value => value.StatId == 75).Value);
+            MissionRewardExecutionResult xp = reconstructedCoordinator.ExecuteAtomicCharacterStats(
+                1501,
+                Karrec,
+                xpReward,
+                DailyMissionRewardRules.CreateFullLevelXpEffectReference(25, 21500));
+            Assert.AreEqual(MissionRewardExecutionStatus.Applied, xp.Status);
+            Assert.AreEqual(22500, xp.StatValues.Single(value => value.StatId == 52).Value);
+            Assert.AreEqual(21500, xp.StatValues.Single(value => value.StatId == 57).Value);
+            MissionRewardExecutionResult xpRetry = reconstructedCoordinator.ExecuteAtomicCharacterStats(
+                1501,
+                Karrec,
+                xpReward,
+                DailyMissionRewardRules.CreateFullLevelXpEffectReference(25, 21500));
+            Assert.AreEqual(MissionRewardExecutionStatus.AlreadyApplied, xpRetry.Status);
+            Assert.AreEqual(22500, xpRetry.StatValues.Single(value => value.StatId == 52).Value);
+            Assert.AreEqual(21500, xpRetry.StatValues.Single(value => value.StatId == 57).Value);
             Assert.AreEqual(
                 MissionOperationStatus.Applied,
-                service.SetAccountFlag(1501, "account-1501", Karrec, "totw-wall-access", "completed:" + Karrec).Status);
-            Assert.AreEqual(
-                MissionRewardExecutionStatus.AlreadyApplied,
-                coordinator.ExecuteExternal(1501, Karrec, researchReward, researchEffect).Status);
+                reconstructedService.SetAccountFlag(
+                    1501,
+                    "account-1501",
+                    Karrec,
+                    "totw-wall-access",
+                    "completed:" + Karrec).Status);
 
-            Assert.AreEqual(2, sideTokens.StatValues.Single(value => value.StatId == 75).Value);
-            Assert.AreEqual(2, researchEffect.CallCount);
-            Assert.IsNotNull(service.GetAccountFlag("account-1501", "totw-wall-access"));
-            Assert.AreEqual(MissionLifecycleState.Active, service.GetMission(1502, Karrec).State);
-            Assert.AreEqual(2, repository.ReadCharacter(1501).Rewards.Count);
+            Assert.AreEqual(4028, reconstructedRepository.GetCharacterStat(1501, 50000, 75));
+            Assert.AreEqual(22500, reconstructedRepository.GetCharacterStat(1501, 50000, 52));
+            Assert.AreEqual(21500, reconstructedRepository.GetCharacterStat(1501, 50000, 57));
+            Assert.IsNotNull(reconstructedService.GetAccountFlag("account-1501", "totw-wall-access"));
+            Assert.IsNull(reconstructedService.GetFlag(1501, Karrec, "personal-research-xp-allocation"));
+            Assert.AreEqual(MissionLifecycleState.Active, reconstructedService.GetMission(1502, Karrec).State);
+            Assert.AreEqual(2, reconstructedRepository.ReadCharacter(1501).Rewards.Count);
+        }
+
+        [TestMethod]
+        public void KarrecTokenRetryUsesTheAppliedTierInsteadOfTheNewLiveTier()
+        {
+            var state = new InMemoryMissionRepositoryState();
+            var repository = new InMemoryMissionRepository(state);
+            PersistentMissionService service = Service(repository);
+            Activate(service, 1503, Karrec);
+            Observe(service, 1503, Karrec, KarrecObjective, "trade-offering:297042");
+            Observe(service, 1503, Karrec, KarrecObjective, "trade-offering:297043");
+            Assert.AreEqual(MissionOperationStatus.Applied, service.CompleteMission(1503, Karrec).Status);
+            repository.SeedCharacterStat(1503, 50000, 75, 20);
+
+            var coordinator = new MissionRewardCoordinator(repository);
+            Assert.AreEqual(
+                MissionRewardExecutionStatus.Applied,
+                coordinator.ExecuteAtomicCharacterStats(
+                    1503,
+                    Karrec,
+                    SideTokenReward(75, 2),
+                    DailyMissionRewardRules.CreateSideTokenEffectReference(75, 2)).Status);
+
+            var reconstructed = new InMemoryMissionRepository(state);
+            MissionRewardExecutionResult retry = new MissionRewardCoordinator(reconstructed)
+                .ExecuteAtomicCharacterStats(
+                    1503,
+                    Karrec,
+                    SideTokenReward(75, 4),
+                    DailyMissionRewardRules.CreateSideTokenEffectReference(75, 4));
+            int statId;
+            int reward;
+            Assert.AreEqual(MissionRewardExecutionStatus.AlreadyApplied, retry.Status);
+            Assert.IsTrue(
+                DailyMissionRewardRules.TryResolveAppliedSideTokenEffectReference(
+                    retry.Stage.EffectReference,
+                    out statId,
+                    out reward));
+            Assert.AreEqual(75, statId);
+            Assert.AreEqual(2, reward);
+            Assert.AreEqual(22, retry.StatValues.Single(value => value.StatId == 75).Value);
+            Assert.AreEqual(22, reconstructed.GetCharacterStat(1503, 50000, 75));
+        }
+
+        [TestMethod]
+        public void NeutralKarrecTokenDecisionRemainsZeroAfterSidedRetry()
+        {
+            var state = new InMemoryMissionRepositoryState();
+            var repository = new InMemoryMissionRepository(state);
+            PersistentMissionService service = Service(repository);
+            Activate(service, 1504, Karrec);
+            Observe(service, 1504, Karrec, KarrecObjective, "trade-offering:297042");
+            Observe(service, 1504, Karrec, KarrecObjective, "trade-offering:297043");
+            Assert.AreEqual(MissionOperationStatus.Applied, service.CompleteMission(1504, Karrec).Status);
+            repository.SeedCharacterStat(1504, 50000, 75, 20);
+
+            var coordinator = new MissionRewardCoordinator(repository);
+            Assert.AreEqual(
+                MissionRewardExecutionStatus.Applied,
+                coordinator.ExecuteAtomicCharacterStats(
+                    1504,
+                    Karrec,
+                    SideTokenReward(75, 0),
+                    DailyMissionRewardRules.CreateSideTokenEffectReference(
+                        DailyMissionRewardRules.NoSideTokenStatId,
+                        0)).Status);
+
+            var reconstructed = new InMemoryMissionRepository(state);
+            MissionRewardExecutionResult retry = new MissionRewardCoordinator(reconstructed)
+                .ExecuteAtomicCharacterStats(
+                    1504,
+                    Karrec,
+                    SideTokenReward(75, 6),
+                    DailyMissionRewardRules.CreateSideTokenEffectReference(75, 6));
+            int statId;
+            int reward;
+            Assert.AreEqual(MissionRewardExecutionStatus.AlreadyApplied, retry.Status);
+            Assert.IsTrue(
+                DailyMissionRewardRules.TryResolveAppliedSideTokenEffectReference(
+                    retry.Stage.EffectReference,
+                    out statId,
+                    out reward));
+            Assert.AreEqual(DailyMissionRewardRules.NoSideTokenStatId, statId);
+            Assert.AreEqual(0, reward);
+            Assert.AreEqual(20, retry.StatValues.Single(value => value.StatId == 75).Value);
+            Assert.AreEqual(20, reconstructed.GetCharacterStat(1504, 50000, 75));
         }
 
         [TestMethod]
@@ -375,24 +491,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                    };
         }
 
-        private static MissionRewardDefinition SideTokenReward()
+        private static MissionRewardDefinition SideTokenReward(int statId, long value)
         {
             return new MissionRewardDefinition
                    {
                        RewardKey = "side-tokens-2",
                        RewardType = "character-stats",
                        IsResolved = true,
-                       StatMutations = new[] { AddStat(75, 2) }
+                       StatMutations = new[] { AddStat(statId, value) }
                    };
         }
 
-        private static MissionRewardDefinition ResearchReward()
+        private static MissionRewardDefinition FullLevelXpReward(long value)
         {
             return new MissionRewardDefinition
                    {
-                       RewardKey = "personal-research-xp-5000",
-                       RewardType = "personal-research-allocation",
-                       IsResolved = true
+                       RewardKey = "daily-mission-full-level-xp-v1",
+                       RewardType = "character-stats",
+                       IsResolved = true,
+                       StatMutations = new[] { AddStat(52, value), SetStat(57, value) }
                    };
         }
 

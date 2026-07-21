@@ -191,6 +191,43 @@ namespace ZoneEngine.Core.Subway.Quests
                     acceptance == null ? string.Empty : acceptance.Message);
             }
 
+            if (!WindcallerKarrecQuestRuntime.TryPrepareCompletionRewardSnapshot(source))
+            {
+                ForgetSession(source);
+                return true;
+            }
+
+            int characterId = source.Identity.Instance;
+            MissionOperationResult pending = MissionRuntime.Service.SetFlag(
+                characterId,
+                WindcallerKarrecQuestRuntime.QuestId,
+                TradePendingFlag,
+                SerializePendingOfferings(offerings));
+            if (IsPersistenceFailure(pending))
+            {
+                ForgetSession(source);
+                return true;
+            }
+
+            if (!TryConsumeOfferings(source, offerings))
+            {
+                ForgetSession(source);
+                return true;
+            }
+
+            MissionOperationResult consumed = MissionRuntime.Service.SetFlag(
+                characterId,
+                WindcallerKarrecQuestRuntime.QuestId,
+                TradeConsumedFlag,
+                "297042,297043");
+            if (IsPersistenceFailure(consumed))
+            {
+                ForgetSession(source);
+                return true;
+            }
+
+            NotifyOfferingsRemoved(source, offerings);
+
             KarrecCompletionResult completion =
                 WindcallerKarrecQuestRuntime.CompleteAfterOfferingsConsumed(source);
             if (!completion.Completed)
@@ -201,13 +238,6 @@ namespace ZoneEngine.Core.Subway.Quests
                     completion.Error);
                 ForgetSession(source);
                 return true;
-            }
-
-            if (!TryConsumeAndNotifyOfferings(source, offerings))
-            {
-                MissionDiagnostics.Log(
-                    "karrec-trade consume-failed character={0} (passage already granted)",
-                    source.Identity.Instance);
             }
 
             SendCompletionProjection(source, message.Target, completion);
@@ -342,8 +372,7 @@ namespace ZoneEngine.Core.Subway.Quests
                     return false;
                 }
 
-                SendCompletionProjection(source, karrecIdentity, completed);
-                return true;
+                return SendCompletionProjection(source, karrecIdentity, completed);
             }
 
             if (!WindcallerKarrecQuestRuntime.IsActive(source))
@@ -390,37 +419,50 @@ namespace ZoneEngine.Core.Subway.Quests
                 return false;
             }
 
-            SendCompletionProjection(source, karrecIdentity, completion);
+            bool projected = SendCompletionProjection(source, karrecIdentity, completion);
             ForgetSession(source);
-            return true;
+            return projected;
         }
 
-        private static void SendCompletionProjection(
+        private static bool SendCompletionProjection(
             ICharacter source,
             Identity karrecIdentity,
             KarrecCompletionResult completion)
         {
             // Always push trade-close + dialogue on this Accept. Durable flags previously skipped
             // the UI after a server-side success, so the give-items window looked stuck until zone.
-            SendImmediateTradeAcceptanceUi(source, karrecIdentity);
+            if (!SendImmediateTradeAcceptanceUi(source, karrecIdentity))
+            {
+                return false;
+            }
 
-            EnsureProjection(
+            if (!EnsureProjection(
                 source,
-                "personal-research-feedback-projected",
-                () => WindcallerKarrecPacketSender.TrySendPersonalResearchFeedback(source));
-            EnsureProjection(
+                "full-level-xp-projected",
+                () => WindcallerKarrecQuestRuntime.TryProjectXpReward(source, completion)))
+            {
+                return false;
+            }
+
+            if (!EnsureProjection(
                 source,
                 "side-token-projected",
                 () => WindcallerKarrecPacketSender.TrySendSideTokenProjection(
                     source,
-                    completion.SideTokenValue));
-            EnsureProjection(
+                    completion.SideTokenStatId,
+                    completion.SideTokenReward,
+                    completion.SideTokenValue)))
+            {
+                return false;
+            }
+
+            return EnsureProjection(
                 source,
                 "completion-delete-projected",
                 () => WindcallerKarrecPacketSender.TrySendCompletionAndDelete(source));
         }
 
-        private static void SendImmediateTradeAcceptanceUi(ICharacter source, Identity karrecIdentity)
+        private static bool SendImmediateTradeAcceptanceUi(ICharacter source, Identity karrecIdentity)
         {
             try
             {
@@ -444,6 +486,7 @@ namespace ZoneEngine.Core.Subway.Quests
                     source,
                     karrecIdentity,
                     new[] { "Thank you, Karrec.", "Goodbye" });
+                return true;
             }
             catch (Exception exception)
             {
@@ -451,6 +494,7 @@ namespace ZoneEngine.Core.Subway.Quests
                     "karrec-trade ui-send-failed character={0} error={1}",
                     source == null ? 0 : source.Identity.Instance,
                     exception.Message);
+                return false;
             }
         }
 

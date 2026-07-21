@@ -5,6 +5,7 @@ namespace ZoneEngine.Core.Subway.Quests
     using System;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -64,6 +65,20 @@ namespace ZoneEngine.Core.Subway.Quests
             {
                 character.Controller.Client.SendCompressed(CreateAction59(character.Identity));
                 character.Controller.Client.SendCompressed(CreateQuestDelete(character.Identity));
+                character.Controller.Client.SendCompressed(
+                    new StatMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 1,
+                        Stats = new[]
+                                {
+                                    new GameTuple<CharacterStat, uint>
+                                    {
+                                        Value1 = CharacterStat.SocialStatus,
+                                        Value2 = 0
+                                    }
+                                }
+                    });
                 return true;
             }
             catch (Exception exception)
@@ -75,44 +90,43 @@ namespace ZoneEngine.Core.Subway.Quests
             }
         }
 
-        internal static bool TrySendPersonalResearchFeedback(ICharacter character)
+        internal static bool TrySendSideTokenProjection(
+            ICharacter character,
+            int sideTokenStatId,
+            int sideTokenReward,
+            long sideTokenValue)
         {
-            if (!CanSend(character))
+            if (sideTokenReward <= 0)
             {
-                return false;
-            }
-
-            try
-            {
-                character.Controller.Client.SendCompressed(
-                    new FormatFeedbackMessage
-                    {
-                        Identity = character.Identity,
-                        Unknown = 1,
-                        Unknown1 = 1107296284,
-                        FormattedMessage = "~&!!!\":!)90Fi!!![g~",
-                        Unknown2 = 0
-                    });
                 return true;
             }
-            catch (Exception exception)
+
+            if (!CanSend(character))
             {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "SUBWAY_KARREC_QUEST personal research feedback failed: " + exception.Message);
                 return false;
             }
-        }
 
-        internal static bool TrySendSideTokenProjection(ICharacter character, long sideTokenValue)
-        {
-            if (!CanSend(character))
+            if ((sideTokenStatId != 62 && sideTokenStatId != 75)
+                || sideTokenReward % 2 != 0
+                || sideTokenValue < sideTokenReward
+                || sideTokenValue > uint.MaxValue)
             {
                 return false;
             }
 
             try
             {
+                character.Stats[(StatIds)sideTokenStatId].Set((uint)sideTokenValue);
+                long priorValue = sideTokenValue - sideTokenReward;
+                int pulseCount = sideTokenReward / 2;
+                for (int pulse = 1; pulse <= pulseCount; pulse++)
+                {
+                    StatMessageHandler.Default.SendSingle(
+                        character,
+                        sideTokenStatId,
+                        (uint)(priorValue + (pulse * 2)));
+                }
+
                 character.Controller.Client.SendCompressed(
                     new FormatFeedbackMessage
                     {
@@ -123,10 +137,12 @@ namespace ZoneEngine.Core.Subway.Quests
                         Unknown2 = 0
                     });
                 FeedbackMessageHandler.Default.Send(character, 110, 108871108);
+                character.Stats[(StatIds)sideTokenStatId].Changed = false;
                 return true;
             }
             catch (Exception exception)
             {
+                character.Stats[(StatIds)sideTokenStatId].Changed = false;
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "SUBWAY_KARREC_QUEST side token projection failed: " + exception.Message);
@@ -166,8 +182,8 @@ namespace ZoneEngine.Core.Subway.Quests
                         {
                             new MissionItemReward
                             {
-                                LowId = 285612,
-                                HighId = 285612,
+                                LowId = WindcallerKarrecQuestRuntime.DailyMissionXpRewardItemId,
+                                HighId = WindcallerKarrecQuestRuntime.DailyMissionXpRewardItemId,
                                 Ql = 1,
                                 Unknown = 0
                             }

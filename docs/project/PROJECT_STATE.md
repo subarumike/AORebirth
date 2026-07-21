@@ -93,15 +93,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   snapshots are retained as named, report-only evidence; unresolved weapon
   selection, respawn, leash/reset, aggro threshold, and corpse lifetime keep
   that encounter dormant.
-- Quest-system status as of `2026-07-17` supersedes the older process-local Rex
+- Quest-system status as of `2026-07-21` supersedes the older process-local Rex
   and generic-scaffolding notes retained below for history. ZoneEngine now has a
   MySQL-backed character-scoped mission lifecycle, deduplicated objective
   observations, persistent character/account flags, atomic current-to-next
   handoffs, and an idempotent reward ledger. Rex B18C/B18D/B18E/B18F/B194 use
   this runtime. Windcaller Karrec's bounded PF655 flow includes burger/card
-  handout and exact trade, `+2` stat-75 side tokens, a durable `5000`
-  personal-research allocation record, account flag `totw-wall-access`, mission
-  cleanup, and the captured wall transfer to PF647. PF655 now also materializes
+  handout and exact trade, direct XP equal to one full Rubi-Ka level, the
+  item-`285612` two-token-per-level-tier reward (Clan stat `62`, Omni stat `75`,
+  Neutral none), account flag `totw-wall-access`, mission cleanup, and the
+  captured wall transfer to PF647. Personal research is excluded as an
+  unimplemented expansion system. PF655 now also materializes
   Karrec, Annoying Dude, and Maddy Cardile from capture-exact appearances; the
   latter two replay their complete `16`- and `19`-segment walking cycles as
   passive social NPCs. See
@@ -114,11 +116,10 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   diagnostic is bounded to PF655 test client `CanbeAffected:22` and the three
   quest-NPC runtime identities.
 - Quest limitations remain explicit: live mission-table creation/startup and
-  private-client restart/duplicate/reward/gateway smoke are pending; no general
-  research-progression subsystem applies the recorded allocation; total ordinary
-  XP, the official account-flag identity, denial packet, NPC spawn template, and
-  interaction-distance boundary are uncaptured. Unresolved fixed `PerkUpdate`
-  values are not emitted.
+  private-client restart/duplicate/reward/gateway smoke are pending. Research
+  diversion and PerkUpdate projection are excluded with the unimplemented
+  expansion system. The official account-flag identity, denial packet, NPC spawn
+  template, and interaction-distance boundary remain uncaptured.
 - The completed 313-folder location inventory identifies 44 Subway-only
   captures, 34 mixed Subway/outside captures, 231 elsewhere captures, and four
   unresolved startup/crash remnants. Of the 78 Subway-bearing sessions, 74

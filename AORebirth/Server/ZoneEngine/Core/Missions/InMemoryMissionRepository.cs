@@ -584,7 +584,11 @@ namespace ZoneEngine.Core.Missions
 
                     if (existing.Status == MissionRewardStatus.Applied)
                     {
-                        return AtomicResult(MissionAtomicRewardStatus.AlreadyApplied, existing, null, "Reward was already applied.");
+                        return AtomicResult(
+                            MissionAtomicRewardStatus.AlreadyApplied,
+                            existing,
+                            this.ReadStatValues(mutations),
+                            "Reward was already applied.");
                     }
                 }
 
@@ -688,6 +692,33 @@ namespace ZoneEngine.Core.Missions
                            StatValues = (statValues ?? Enumerable.Empty<MissionCharacterStatValue>()).ToList(),
                            Message = message
                        };
+            }
+
+            private IList<MissionCharacterStatValue> ReadStatValues(
+                IEnumerable<MissionCharacterStatMutation> mutations)
+            {
+                var values = new List<MissionCharacterStatValue>();
+                foreach (MissionCharacterStatMutation mutation in mutations)
+                {
+                    if (mutation == null || mutation.StatIdentityType <= 0 || mutation.StatId < 0)
+                    {
+                        throw new InvalidOperationException("Atomic stat mutation is unresolved or invalid.");
+                    }
+
+                    long value;
+                    this.characterStats.TryGetValue(
+                        MakeStatKey(this.CharacterId, mutation.StatIdentityType, mutation.StatId),
+                        out value);
+                    values.Add(
+                        new MissionCharacterStatValue
+                        {
+                            StatIdentityType = mutation.StatIdentityType,
+                            StatId = mutation.StatId,
+                            Value = value
+                        });
+                }
+
+                return values;
             }
 
             private static void EnsureVersion(long stored, long supplied, string entity)
