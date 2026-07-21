@@ -2,16 +2,25 @@
 
 ## Active
 
-### Local (Any-QL implant tradeskill) — RETEST after “wrong item” fix
+### Local — Arete main quest + implant crafting (pushed)
 
-#### Root causes addressed
-1. **Dapper column map** — `DBTradeSkill` properties now match MySQL (`Id1`/`Id2`/`ResultIds`/`QlRangePercent`) so recipes actually load
-2. **Tradeskill window slot 0** — Source/Target Changed used `placement != 0`, which cleared items in inventory slot 0 (valid slot)
-3. **UseItemOnItem QL** — was hardcoded 300; now `quality < 0` → implant QL + NanoProg bump
-4. **Resolve** — reverse drag + Low/High/relation ID expand; clearer fail chat (recipe vs skill vs cluster QL%)
+#### Arete main quest
+- Mason / Vernon / Lorelei / Vaughn / Sarah / Stan / Shipping Manifest / ICC exit path
+- Deliver tip → Stan trade factory → reward + Sarah / Buy Nano tips
+- Bill FinishTrade no longer steals Stan Accept
+
+#### Implant crafting
+- Any-QL `IsImplant` recipes via robust resolve (reverse drag + Low/High/relations)
+- Dapper `DBTradeSkill` column map (`Id1`/`Id2`/`ResultIds`/`QlRangePercent`)
+- Tradeskill window accepts inventory slot 0
+- UseItemOnItem derives result QL from implant (+ NanoProg bump)
+- Mason Arete tip still QL1 Overflow
 
 #### Retest (restart engines)
-1. Watch Zone console: `Cached N trade skill entries` with N ≈ 100k (not 0 / not all skipped)
-2. Cluster + Basic Implant QL 1/50/100, both drag orders
-3. Mason Arete tip still QL1 Overflow
-4. If fail: chat now prints tried Low/High IDs — paste that
+1. Zone console: large `Cached N trade skill entries` (~100k)
+2. Cluster + Basic Implant both drag orders
+3. Mason tip QL1 Overflow
+4. Stan factory deliver with active tip
+
+### Upstream (merged from origin)
+Subway PF127 + Temple of Three Winds PF647 continue on master (TOTW Defender / Yatila–Betany slice). See `docs/project/PROJECT_STATE.md` and TOTW evidence docs for that track.

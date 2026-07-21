@@ -142,6 +142,56 @@ namespace AORebirth.Core.Playfields
         internal int SpecialAttackWeaponUnknown5 { get; set; }
     }
 
+    internal sealed class CapturedEnemyParallelAttackStreamDefinition
+    {
+        internal CapturedEnemyParallelAttackStreamDefinition(
+            double initialDelaySeconds,
+            CapturedEnemyCombatAttackDefinition attack)
+        {
+            this.InitialDelaySeconds = initialDelaySeconds;
+            this.Attack = attack;
+        }
+
+        internal double InitialDelaySeconds { get; private set; }
+
+        internal CapturedEnemyCombatAttackDefinition Attack { get; private set; }
+    }
+
+    internal sealed class CapturedEnemyParallelAttackSequenceDefinition
+    {
+        internal CapturedEnemyParallelAttackSequenceDefinition(
+            CapturedEnemyParallelAttackStreamDefinition[] streams,
+            CapturedEnemySpecialAttackDefinition[] specialAttacks,
+            int specialAttackWeaponUnknown1,
+            int specialAttackWeaponUnknown2,
+            int specialAttackWeaponUnknown3,
+            int specialAttackWeaponUnknown4,
+            int specialAttackWeaponUnknown5)
+        {
+            this.Streams = streams;
+            this.SpecialAttacks = specialAttacks;
+            this.SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1;
+            this.SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2;
+            this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
+            this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
+            this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+        }
+
+        internal CapturedEnemyParallelAttackStreamDefinition[] Streams { get; private set; }
+
+        internal CapturedEnemySpecialAttackDefinition[] SpecialAttacks { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown1 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown2 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown3 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown4 { get; private set; }
+
+        internal int SpecialAttackWeaponUnknown5 { get; private set; }
+    }
+
     internal sealed class CapturedEnemyCombatContract
     {
         internal static CapturedEnemyCombatContract CapturedSpecialSequence(
@@ -154,6 +204,33 @@ namespace AORebirth.Core.Playfields
                 IsCombatReady = true,
                 Evidence = evidence,
                 SpecialAttackSequence = specialAttackSequence
+            };
+        }
+
+        internal static CapturedEnemyCombatContract CapturedParallelAttackSequence(
+            string evidence,
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence,
+            bool requiresDamageLineOfSight = false)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.Specialized,
+                IsCombatReady = true,
+                Evidence = evidence,
+                ParallelAttackSequence = parallelAttackSequence,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
+            };
+        }
+
+        internal static CapturedEnemyCombatContract Unresolved(
+            string evidence,
+            bool retaliationObserved)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.Unresolved,
+                IsCombatReady = false,
+                Evidence = evidence
             };
         }
 
@@ -219,6 +296,8 @@ namespace AORebirth.Core.Playfields
         internal int AttackInfoAmmoCount { get; set; }
 
         internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; set; }
+
+        internal CapturedEnemyParallelAttackSequenceDefinition ParallelAttackSequence { get; set; }
 
         internal bool RequiresDamageLineOfSight { get; set; }
     }

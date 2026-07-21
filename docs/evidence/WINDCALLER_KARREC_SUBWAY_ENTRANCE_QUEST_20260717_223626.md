@@ -190,8 +190,8 @@ The player selects index `0` for `I have the bronto burger and a donation to you
 9. Options: `Thank you, Karrec.` / `Goodbye`.
 10. FormatFeedback: `Unknown=1`, `Unknown1=1107296284`, encoded message `~&!!!":!)90Fi!!![g~`, `Unknown2=0` (`raw-packets.csv:3908`, sequence `3654`). The capture contains no plaintext decoding of this value. The contemporaneous client UI displayed `5000 of your XP were allocated to your personal research.`; that sentence is user-observed UI evidence, not packet plaintext.
 11. PerkUpdate: `Unknown=1`, `Unknown1=2680`, `Unknown2=2680`, `Unknown3=45000` (`raw-packets.csv:3909`, sequence `3655`). These fields remain semantically unresolved; `45000` is not labeled total/base XP here.
-12. Stat numeric ID `75` changes `4026 -> 4028` (`raw-packets.csv:3910-3911`).
-13. FormatFeedback literal: `Side tokens collected: 4028.` (`raw-packets.csv:3912`). This proves an observed side-token delta of `+2`; it does not resolve every use of numeric stat ID `75`.
+12. Stat numeric ID `75` is projected twice, first as `4026` and then as `4028` (`raw-packets.csv:3910-3911`). The capture does not contain the pre-reward baseline or character level; the user confirmed level 25. Item `285612`, the second capture, and the documented mission-token ratio resolve these as two `+2` reward pulses: level 25 receives `+4`, with an inferred pre-reward value of `4024`.
+13. FormatFeedback literal: `Side tokens collected: 4028.` (`raw-packets.csv:3912`). Repository full-character handling identifies stat `75` as the Omni token counter; Clan uses stat `62`.
 14. Feedback: category `110`, message ID `108871108` (`raw-packets.csv:3913`).
 15. CharacterAction: action `59`, target `(Mission:55579381)`, parameter 1 `56003`, parameter 2 `1431802753` (`raw-packets.csv:3914`).
 16. Quest action `Delete`, mission `(Mission:55579381)`, remaining fields zero (`raw-packets.csv:3915`).
@@ -231,13 +231,26 @@ PayloadBEFloats = (1814.0,29.0,2699.0)
 
 Playfield initialization then reports `647`, and the local player appears at `(1814,28.81,2699)`. This is behavioral corroboration that this completed character can use the gateway; it does not expose the persistent eligibility flag or storage location.
 
+## Second completion capture `20260721-023942`
+
+The second completed Karrec run is available at `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-023942`; its bounded checked-in companion is `AORebirth/Server/ZoneEngine/Content/Captured/Quests/windcaller_karrec_completion_20260721_023942.json`. It provides the level-dependent comparison that the first capture lacked:
+
+- The user confirmed that the character was level 60; the capture metadata itself does not record that level. The client displayed `45000 of your XP were allocated to your personal research.` This is a capture-local expansion-system diversion, not the quest's total XP and not an AORebirth reward constant.
+- `enemy-stat-updates.csv:1496` projects absolute `UnsavedXP=170716`; it is not a reward delta.
+- `enemy-stat-updates.csv:1497-1499` projects Omni token stat `75` as `4005`, `4007`, then `4009`. Item `285612` applies a `+2` token action once per reached mission-token tier, so level 60 receives three pulses for `+6`, with an inferred pre-reward value of `4003`.
+- The PerkUpdate values differ from the first capture and remain player-specific expansion state. They are neither fixed reward values nor inputs to the AORebirth Karrec implementation.
+- The user confirmed that the quest's ordinary-XP component is one complete level. AORebirth therefore resolves the direct award from `XPTable.TableRKXP[level - 1, 2]`: `21500` at level 25 and `203500` at level 60, preserving any existing bar progress across the one-level gain. Direct-XP projection in the official research-feedback slot is an AORebirth implementation decision; official live diverted that component into research, so a direct-XP packet sequence is not capture-proven.
+
+The token model is also documented by [AO-Universe's mission-token ratio](https://www.ao-universe.com/guides/classic-ao/gameplay-guides-6/mission-token---title-ratio) and the linked [Daily Mission XP Reward item 285612](https://www.aogalaxy.com/_items/item.php?aoid=285612), whose on-use actions add two Clan or Omni tokens at the base tier and again at levels `15`, `50`, `75`, `100`, `125`, `150`, `175`, and `190`.
+
 ## Explicit unresolved and excluded claims
 
 - No packet identifies an account, character, or mission flag that stores permanent gateway eligibility. The post-zone player SCFU still reports `AccountFlags=0`.
 - No access-denial capture for exact identity `(Terminal:C004028F)` was found in the searched capture corpus.
 - No exact Terminal full update or template ID was found. Vending-machine identity `(VendingMachine:C004028F)` is a different identity type at a different position and is excluded despite its matching instance suffix.
-- The exact reward XP total/base amount is unresolved. Only the user-observed `5000` personal-research allocation and the unknown numeric PerkUpdate fields are recorded.
-- Numeric stat ID `75` is authoritative; a derived enum label is not treated as proof because the adjacent literal packet says `Side tokens collected: 4028.`
+- Personal research belongs to an expansion system AORebirth has not implemented. The capture-local `5000`/`45000` diversions and PerkUpdate state remain provenance only and are intentionally excluded from the active runtime and client projection.
+- The ordinary-XP award is one full Rubi-Ka level and is resolved from the repository XP table. `UnsavedXP=170716` is an absolute stat projection, not the reward amount.
+- Token stat `62` is the Clan counter and stat `75` is the Omni counter in the repository's full-character contract. Neutral characters receive no mission tokens or token feedback.
 - The capture proves successful two-slot trade completion and no rejected items, but it does not label which inventory container is the burger versus the credit card.
 - It does not prove failure branches, alternate dialogue choices, repeated-objective behavior, already-completed dialogue, delete/abandon recovery, reconnect persistence, or team sharing.
 - It does not prove a next quest or any mission-state transition beyond server full update at acceptance and server delete at completion.

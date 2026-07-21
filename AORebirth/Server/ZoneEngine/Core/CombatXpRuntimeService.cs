@@ -486,6 +486,78 @@ namespace ZoneEngine.Core
             LogXpWireSnapshot(character, "CombatXpRuntimeService", "login-prepare-after");
         }
 
+        internal static bool ReconcilePersistedMissionXpRewardState(ICharacter character, int levelBefore)
+        {
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return false;
+            }
+
+            LogXpWireSnapshot(character, "CombatXpRuntimeService", "mission-reward-before");
+            NormalizeXpStatsFromPersistedLevel(character);
+
+            int levelAfter = GetCurrentLevel(character);
+            bool leveledUp = levelAfter > levelBefore;
+            if (leveledUp)
+            {
+                PersistLevelStat(character);
+            }
+
+            ClearManualXpWireStatChangedFlags(character, leveledUp);
+            WriteXpStatsToDb(character, leveledUp ? "mission-reward-levelup" : "mission-reward-reconcile");
+
+            LogXpWireSnapshot(
+                character,
+                "CombatXpRuntimeService",
+                "mission-reward-state-after",
+                "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + levelAfter.ToString(CultureInfo.InvariantCulture));
+            return leveledUp;
+        }
+
+        internal static bool TryProjectPersistedMissionXpReward(ICharacter character, int levelBefore)
+        {
+            if (character == null
+                || !(character.Controller is Controllers.PlayerController)
+                || character.Controller.Client == null)
+            {
+                return false;
+            }
+
+            int levelAfter = GetCurrentLevel(character);
+            int expectedLevelAfter = Math.Min(MaxRubikaLevel, levelBefore + 1);
+            if (levelAfter < expectedLevelAfter)
+            {
+                return false;
+            }
+
+            if (levelAfter > expectedLevelAfter)
+            {
+                LogXpWireSnapshot(
+                    character,
+                    "CombatXpRuntimeService",
+                    "mission-reward-projection-skipped-stale",
+                    "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                    + " expectedLevelAfter=" + expectedLevelAfter.ToString(CultureInfo.InvariantCulture)
+                    + " currentLevel=" + levelAfter.ToString(CultureInfo.InvariantCulture));
+                return true;
+            }
+
+            SendLevelUpPreFeedbackPackets(
+                character.Controller.Client,
+                character,
+                levelBefore,
+                expectedLevelAfter);
+            AlienXpRuntimeService.TryApplyBankedAlienLevelUps(character);
+            LogXpWireSnapshot(
+                character,
+                "CombatXpRuntimeService",
+                "mission-reward-projected",
+                "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + levelAfter.ToString(CultureInfo.InvariantCulture));
+            return true;
+        }
+
         internal static void SendLoginXpBarSync(ICharacter character)
         {
             if (character == null || character.Controller?.Client == null)
@@ -937,6 +1009,15 @@ namespace ZoneEngine.Core
             ICharacter character,
             int levelBefore)
         {
+            SendLevelUpPreFeedbackPackets(client, character, levelBefore, GetCurrentLevel(character));
+        }
+
+        private static void SendLevelUpPreFeedbackPackets(
+            IZoneClient client,
+            ICharacter character,
+            int levelBefore,
+            int levelAfter)
+        {
             int maxLife = Math.Max(1, character.Stats[StatIds.life].Value);
             int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
 
@@ -944,7 +1025,6 @@ namespace ZoneEngine.Core
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.maxnanoenergy, (uint)maxNano);
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.currentnano, (uint)maxNano);
 
-            int levelAfter = GetCurrentLevel(character);
             for (int level = levelBefore + 1; level <= levelAfter; level++)
             {
                 uint cumulativeXp = character.Stats[StatIds.xp].BaseValue;

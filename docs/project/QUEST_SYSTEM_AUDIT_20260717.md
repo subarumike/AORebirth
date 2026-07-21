@@ -46,9 +46,11 @@ This is not a general production-ready AO mission system. The implemented scope 
 - Mission `Mission:55579381` is accepted through the captured Karrec dialogue path. No speculative mission-window accept/decline/abandon handler was added.
 - Annoying Dude grants Bronto Burger `297042`; Maddy grants Maddy's Credit Card `297043` through persisted inventory writes.
 - Completion requires exactly two distinct offered slots containing one burger and one card. Unknown or extra offerings fail closed. The selected slots and durable trade-pending state are used for crash recovery, so unrelated duplicate copies elsewhere in inventory do not decide whether the offered copies were consumed.
-- Completion records both delivery observations, completes the mission, applies `+2` to numeric stat `75` once, records the proven `5000` personal-research XP allocation once, and only then writes account flag `totw-wall-access`.
-- The exact captured research feedback is projected. Fixed `PerkUpdate` values `2680/2680/45000` are not replayed because their meaning is unresolved and they cannot safely be treated as player-independent state.
-- Completion sends the captured post-trade dialogue, side-token feedback, action `59`, and mission deletion in durable retryable projection stages. No follow-on mission is invented.
+- Completion records both delivery observations, completes the mission, awards one full Rubi-Ka level of direct XP through the shared XP/level-up path, applies the two-token Daily Mission XP Reward once per reached mission-token level tier, and only then writes account flag `totw-wall-access`. Level 25 receives `21500` XP and `+4` tokens; level 60 receives `203500` XP and `+6` tokens while retaining prior XP-bar progress.
+- Clan tokens use stat `62`, Omni tokens use stat `75`, and Neutral characters receive neither tokens nor token feedback. Capture-local personal-research feedback and PerkUpdate values are not replayed because research belongs to an expansion system outside AORebirth's implemented scope.
+- The level/XP/token decision is durably snapshotted before either offering is consumed. Retry therefore cannot recalculate a higher token tier after the XP level-up, switch token counters after a faction change, or turn a Neutral completion into a later sided reward. Unsupported XP levels fail before inventory mutation.
+- Completion sends the captured post-trade dialogue, direct-XP projection in the excluded research slot, side-token pulses/feedback, action `59`, mission deletion, and SocialStatus reset in ordered durable retryable projection stages. No follow-on mission is invented. The direct-XP placement is an implementation decision because official live diverted the XP component into research.
+- The pre-consumption snapshot, live-stat hydration, state/wire split, and fail-stopping order are implementation- and Debug-build-validated; a private-client completion/reconnect smoke remains required before calling those paths live-proven.
 - Gateway `Terminal:C004028F` is accepted only in playfield `655`, only when that terminal exists in the loaded playfield data, and only for an account with `totw-wall-access`. Eligible use sends the captured acknowledgement and PF `647` transfer with payload landing `(1814, 29, 2699)` and captured heading/envelope fields.
 - Because the denial packet was not captured, denial uses the existing generic denied acknowledgement and does not invent retail-specific feedback.
 
@@ -60,7 +62,9 @@ This is not a general production-ready AO mission system. The implemented scope 
 - Prevented extra Karrec trade items and stale trade-session selections from satisfying the quest.
 - Bound trade completion to the Karrec identity that actually opened the trade, while retaining the exact captured identity contract.
 - Replaced global item-presence recovery with exact persisted offered-slot recovery.
-- Delayed the account gateway flag until both captured reward stages are durable.
+- Delayed the account gateway flag until both the scaled token reward and direct full-level XP reward are durable.
+- Added a pre-consumption reward snapshot plus amount-bearing reward provenance, preventing retry-time level/side drift and preserving a durable zero-token Neutral decision.
+- Made completion projection sequential and fail-stopping so a failed earlier wire stage cannot be skipped while later stages are marked complete.
 - Removed unsafe fixed `PerkUpdate` replay.
 - Added server-side verification that the requested TOTW terminal exists in the current playfield data.
 - Strengthened Marcus item idempotency so a pre-existing `296780` does not suppress the captured reward.
@@ -68,7 +72,10 @@ This is not a general production-ready AO mission system. The implemented scope 
 
 ## Not implemented or still unresolved
 
-- AORebirth has no general personal-research progression subsystem. The exact `5000` allocation is durable in the mission reward ledger/flag and the captured feedback is sent, but no proven research-line progress model exists to apply it to research levels. The total/base ordinary XP reward is unresolved; `45000` and a derived `50000` are not asserted or granted.
+- Personal research is an unimplemented expansion system and is explicitly outside this quest runtime. Capture-local `5000`/`45000` diversion messages, absolute `UnsavedXP=170716`, and player-specific PerkUpdate values remain evidence only; they are not persisted as Karrec rewards or projected to the client.
+- Pre-correction `side-tokens-2` ledger rows prove only that the old fixed `+2` was applied; they do not retain completion level, side, or the missing tier delta. They are not automatically backfilled from mutable current character state. Any such legacy under-reward or interrupted completion needs targeted repair backed by completion-time evidence.
+- Durable XP and tokens are exactly-once, but completion packets are intentionally at-least-once because projection flags are written after a successful send. A process failure in the send/flag gap, or login normalization after the XP commit but before mission reconciliation, can replay the final unacknowledged level-up projection without duplicating the persisted reward.
+- Banked alien-level follow-up remains coupled to successful XP projection, matching the existing ordinary level-up order. If an earlier completion dialogue/network stage fails, that follow-up is delayed until completion projection retries or login reconciliation runs.
 - No general mission-journal reconstruction occurs on login/reconnect/zoning. Durable state reloads, while captured quest packets are emitted only by their proven dialogue, objective, and completion triggers.
 - No team missions, shared kill credit, random missions, repeatable missions, timed missions, escort missions, branching quests, or broad mission-window client actions were added.
 - The capture does not prove abandon, failure, repeat acceptance, alternate completion, or team-sharing behavior for Karrec, so those routes remain unavailable.
@@ -81,11 +88,14 @@ This is not a general production-ready AO mission system. The implemented scope 
 
 - `20260717-223626`: `3940/3940` raw records, zero raw write/projection/callback errors; bounded fixture and evidence report checked in. Temporary-copy validation decoded `288/288` SCFU rows with zero failures or incomplete rows.
 - `20260717-232249`: `220/220` raw records, zero errors; exact gateway Use, acknowledgement, N3Teleport envelope, PF647 payload, and post-init landing recovered.
+- `20260721-023942`: second Karrec completion, with level 60 confirmed by the user, captures three sequential stat-`75` projections (`4005/4007/4009`) and absolute `UnsavedXP=170716`. Item `285612`, the repository stat contract, and the mission-token ratio resolve the projections as three `+2` Omni-token pulses; research/PerkUpdate values remain player-specific and must not be hardcoded. A bounded fixture is checked in at `AORebirth/Server/ZoneEngine/Content/Captured/Quests/windcaller_karrec_completion_20260721_023942.json`.
 - Persistent mission foundation tests: `12/12` PASS.
-- Quest runtime persistence and duplicate-reward tests: `7/7` PASS.
-- Checked-in bootstrap/runtime-definition tests: `4/4` PASS.
+- Quest runtime persistence and duplicate-reward tests: `9/9` PASS.
+- Daily Mission XP Reward scaling/source/provenance tests: `9/9` PASS.
+- Checked-in bootstrap/runtime-definition tests: `5/5` PASS.
 - Karrec eligibility and gateway identity rules: `3/3` PASS.
-- Capture-backed Karrec NPC population/appearance/patrol/dialogue-link/lifecycle tests: `7/7` PASS; complete Windcaller-focused suite: `10/10` PASS.
+- Capture-backed Karrec NPC population/appearance/patrol/dialogue-link/lifecycle tests: `7/7` PASS; complete Windcaller-focused suite: `11/11` PASS.
+- Full approved legacy wrapper: `428/452` PASS with the same `24` known unrelated/harness failures; every affected Karrec/reward suite passes when run through its focused approved filter.
 - AORebirth Debug build, including ZoneEngine: PASS.
 
 The capture evidence remains bounded in `Content/Captured/Quests`; the original raw captures were not modified or copied into source control.
