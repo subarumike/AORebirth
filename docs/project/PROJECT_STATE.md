@@ -4,6 +4,22 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- The next PF647 Temple slice is active from Windcaller Yatila through Acolyte
+  Betany. Captures `20260721-041439`, `20260721-042139`, `20260721-042705`,
+  `20260721-043204`, and `20260721-044256` provide exact named SCFU generations,
+  combat streams, nano timing, leash/reset evidence, corpses, credits, and
+  atomic loot snapshots. The Re-Animator uses its exact level-60 generation;
+  nano `205604` refills one of two captured Reanimated Corpse slots and living
+  encounter adds are cleaned up with the boss. Three exact Eternal Sentinel
+  room spawns bring PF647 ordinary content to eight profiles / `125` anchors.
+  The reported 23-point poison row and Gulard health changes remain effect-
+  unresolved because packet ownership is not safe. The broader
+  `20260721-052115` survey is evidence-only and does not activate deeper bosses.
+  Focused Temple tests and the full Debug build pass. Runtime restart is blocked
+  before port `7501` by the existing interactive SQL-table creation prompt;
+  no schema creation was authorized. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_YATILA_TO_BETANY.md`.
+
 - Defender of the Three is the first dedicated named PF647 Temple encounter.
   Finalized captures `20260721-035526`, `20260721-040249`, and
   `20260721-040324` provide the exact L42/7091-health spawn, two landed `43`
