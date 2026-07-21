@@ -25,8 +25,29 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            // Capture 20260721-finish: Use Exit Arete Landing Terminal:574187C3 → ICC HQ PF 655.
+            // Must run before Insurance — template 297303 must not be stolen as SaveChar.
+            if (VaughnHammondQuestRuntime.TryHandleExitAreteLandingUse(client, message, target))
+            {
+                return true;
+            }
+
             // Insurance Terminal → SaveChar (must run; playfields.dat has no SaveChar OnUse).
+            // Surgery clinic Uses are excluded inside InsuranceTerminalInteractionHandler so they
+            // fall through to SurgeryClinicInteractionHandler (Arete Terminal:574187D1).
             if (InsuranceTerminalInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            // Capture 20260721-Mason / 20260721-182543: Arete surgery clinic before other quest Uses.
+            if (SurgeryClinicInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            // Capture 20260721-sara: Use Remains of Shop Thief → DNA-Locked Armor.
+            if (SarahGreeneQuestRuntime.TryHandleShopThiefUse(client, message, target))
             {
                 return true;
             }
@@ -69,6 +90,32 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            // NPC-owned capture shops before corpse routing (living Marco is CanbeAffected).
+            if (CapturedSubwayVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedThrakGardenVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedHoloDeckVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteMarcoSpidaVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteLoreleiVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             if (CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
@@ -98,26 +145,6 @@ namespace ZoneEngine.Core.Playfields
 
             // Fallback when Pool miss: items.dat Teleport / catalog (CellAO still needs Pool).
             if (NascenceStatueTeleportInteractionHandler.Default.TryHandleUse(client, message, target))
-            {
-                return true;
-            }
-
-            if (SurgeryClinicInteractionHandler.Default.TryHandleUse(client, message, target))
-            {
-                return true;
-            }
-
-            if (CapturedSubwayVendorInteractionHandler.Default.TryHandleUse(client, message, target))
-            {
-                return true;
-            }
-
-            if (CapturedThrakGardenVendorInteractionHandler.Default.TryHandleUse(client, message, target))
-            {
-                return true;
-            }
-
-            if (CapturedHoloDeckVendorInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

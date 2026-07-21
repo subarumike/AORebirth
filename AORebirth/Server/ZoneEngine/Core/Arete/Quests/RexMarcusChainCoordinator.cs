@@ -867,33 +867,19 @@ namespace ZoneEngine.Core.Arete.Quests
 
             bool isMarcus = IsMarcusStoneNpc(source, message.Target);
             MarcusTradeSession session = GetTradeSession(source);
+            // Only claim Marcus Stone trades. B196 returnTip / suppressant inventory must not steal
+            // Alex BioCom Accept (ZoneEngineLog 2026-07-21 13:02:42 marcus-trade on Alex target).
+            if (!isMarcus && session == null)
+            {
+                return false;
+            }
+
             bool returnTip = IsMarcusReturnTip(source);
             bool stimReturnTip = MarcusWoundedWorkersQuestRuntime.IsStimReturnTip(source);
             bool stolenRepair = ShouldRepairStolenSuppressantTurnIn(source);
             IItem item = TryGetTradeContainerItem(source, message.Container);
             bool isSuppressant = IsSuppressantItem(item);
             bool isStim = MarcusWoundedWorkersQuestRuntime.IsHealthRegenStim(item);
-
-            // Fail-closed: any Marcus Stone trade must be claimed so HandleKnuBotTradeItemRemove
-            // cannot delete the turn-in item and leave the tip stuck.
-            if (!isMarcus
-                && session == null
-                && !returnTip
-                && !stimReturnTip
-                && !stolenRepair
-                && !isSuppressant
-                && !isStim)
-            {
-                return false;
-            }
-
-            if (!isMarcus && session == null && !returnTip && !stimReturnTip && !stolenRepair)
-            {
-                if (!isSuppressant && !isStim)
-                {
-                    return false;
-                }
-            }
 
             MarcusTradeKind kind = stimReturnTip || isStim
                                        ? MarcusTradeKind.Stim
@@ -923,7 +909,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 {
                     session.StagedContainer = message.Container;
                     session.NpcIdentity = message.Target;
-                    if (isSuppressant || item != null || returnTip || stolenRepair)
+                    if (isSuppressant || stolenRepair)
                     {
                         session.HasSuppressant = true;
                     }
@@ -965,8 +951,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 return true;
             }
 
-            // Suppressant path: private client often never Accepts — complete on drag.
-            if (isMarcus || session != null || returnTip || stolenRepair || isSuppressant)
+            // Suppressant path: private client often never Accepts — complete on drag to Marcus only.
+            if (isMarcus && (isSuppressant || stolenRepair || returnTip || (session != null && session.HasSuppressant)))
             {
                 ApplyMarcusTradeTurnIn(
                     source,
@@ -987,13 +973,15 @@ namespace ZoneEngine.Core.Arete.Quests
 
             bool isMarcus = IsMarcusStoneNpc(source, message.Target);
             MarcusTradeSession session = GetTradeSession(source);
-            bool returnTip = IsMarcusReturnTip(source);
-            bool stimReturnTip = MarcusWoundedWorkersQuestRuntime.IsStimReturnTip(source);
-            bool stolenRepair = ShouldRepairStolenSuppressantTurnIn(source);
-            if (!isMarcus && session == null && !returnTip && !stimReturnTip && !stolenRepair)
+            // Only claim Marcus Stone FinishTrade — never steal Alex/Bill/Stan Accept.
+            if (!isMarcus && session == null)
             {
                 return false;
             }
+
+            bool returnTip = IsMarcusReturnTip(source);
+            bool stimReturnTip = MarcusWoundedWorkersQuestRuntime.IsStimReturnTip(source);
+            bool stolenRepair = ShouldRepairStolenSuppressantTurnIn(source);
 
             if (message.Decline != 0)
             {

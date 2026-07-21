@@ -106,30 +106,46 @@ namespace ZoneEngine.Core
         public static TradeSkillEntry ConvertFromDB(DBTradeSkill ts)
         {
             TradeSkillEntry tse = new TradeSkillEntry();
-            tse.ID1 = ts.ID1;
-            tse.ID2 = ts.ID2;
+            tse.ID1 = ts.Id1;
+            tse.ID2 = ts.Id2;
             tse.IsImplant = ts.IsImplant > 0;
             tse.MaxBump = ts.MaxBump;
             tse.MaxXP = ts.MaxXP;
             tse.MinTargetQL = ts.MinTarget;
             tse.MinXP = ts.MinXP;
-            tse.ResultLowId = int.Parse(ts.ResultIDS.Split(',')[0].Trim());
-            tse.ResultHighId = int.Parse(ts.ResultIDS.Split(',')[1].Trim());
-            tse.QLRangePercent = ts.QLRangePercent;
+            string resultIds = ts.ResultIds ?? string.Empty;
+            string[] resultParts = resultIds.Split(',');
+            tse.ResultLowId = int.Parse(resultParts[0].Trim());
+            tse.ResultHighId = resultParts.Length > 1
+                                   ? int.Parse(resultParts[1].Trim())
+                                   : tse.ResultLowId;
+            tse.QLRangePercent = ts.QlRangePercent;
             tse.DeleteFlag = ts.DeleteFlag;
 
-            string[] skillStrings = ts.Skill.Split(',');
-            string[] skillPercents = ts.SkillPercent.Split(',');
-            string[] skillPerBumps = ts.SkillPerBump.Split(',');
+            string skill = ts.Skill ?? string.Empty;
+            string skillPercent = ts.SkillPercent ?? string.Empty;
+            string skillPerBump = ts.SkillPerBump ?? string.Empty;
+            string[] skillStrings = skill.Split(',');
+            string[] skillPercents = skillPercent.Split(',');
+            string[] skillPerBumps = skillPerBump.Split(',');
 
             int skillcount = skillStrings.Length;
 
             for (int i = 0; i < skillcount; i++)
             {
+                if (string.IsNullOrWhiteSpace(skillStrings[i]))
+                {
+                    continue;
+                }
+
                 TradeSkillSkill tss = new TradeSkillSkill();
                 tss.StatId = int.Parse(skillStrings[i].Trim());
-                tss.SkillPerBump = int.Parse(skillPerBumps[i].Trim());
-                tss.Percent = int.Parse(skillPercents[i].Trim());
+                tss.SkillPerBump = i < skillPerBumps.Length && !string.IsNullOrWhiteSpace(skillPerBumps[i])
+                                       ? int.Parse(skillPerBumps[i].Trim())
+                                       : 0;
+                tss.Percent = i < skillPercents.Length && !string.IsNullOrWhiteSpace(skillPercents[i])
+                                  ? int.Parse(skillPercents[i].Trim())
+                                  : 0;
                 // Skill='0' placeholder rows are not real requirements; Stats[0] breaks WindowBuild.
                 if (tss.StatId == 0)
                 {

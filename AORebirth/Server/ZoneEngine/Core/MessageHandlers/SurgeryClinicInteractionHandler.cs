@@ -8,6 +8,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Nanos;
     using AORebirth.Core.Network;
     using AORebirth.Core.Statels;
     using AORebirth.Database.Dao;
@@ -49,26 +50,41 @@ namespace ZoneEngine.Core.MessageHandlers
             {
                 client.Server.Info(
                     client,
-                    "Surgery clinic terminal use blocked by insufficient captured-state support char={0} target={1} cash={2} cost={3}",
+                    "Surgery clinic terminal use blocked by insufficient credits char={0} target={1} cash={2} cost={3}",
                     character.Identity,
                     target,
                     cashBefore,
                     SurgeryClinicInteractionRules.SurgeryClinicCreditCost);
-                return false;
+                ChatTextMessageHandler.Default.Send(
+                    character,
+                    "You need 300 credits to use the Stationary Automated Surgery Clinic.");
+                GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                return true;
             }
 
             int cashAfter = CashStatRules.Clamp(
                 (long)cashBefore - SurgeryClinicInteractionRules.SurgeryClinicCreditCost);
             character.Stats[StatIds.cash].Set((uint)cashAfter);
+            // Capture 20260721-184426: HealthDamage(0) → Stat(cash) → FormatFeedback → CastNano
+            // → Buff → SetNanoDuration → SpecialUsed → GenericCmd ACK.
+            SendSurgeryClinicHealthDamage(character);
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.cash, (uint)cashAfter);
             SendSurgeryClinicFeedback(character);
             SendSurgeryClinicCastNano(character);
+            BuffMessageHandler.Default.SendAddNanoBuff(
+                character,
+                SurgeryClinicInteractionRules.SurgeryClinicNanoId,
+                false);
+            // Nano OnUse applies temporary Treatment (Modify) + ChangeActionRestriction implant access.
+            // Without ExecuteOnUseEvents, client shows the buff icon but ToWear Treatment checks fail
+            // and Mason gift leg 295706 cannot install.
+            ApplySurgeryClinicNanoEffects(character);
+            GrantSurgeryClinicImplantAccess(character);
             CharacterActionMessageHandler.Default.SetNanoDuration(
                 character,
                 character.Identity,
                 SurgeryClinicInteractionRules.SurgeryClinicNanoId,
                 SurgeryClinicInteractionRules.SurgeryClinicNanoDuration);
-            GrantSurgeryClinicImplantAccess(character);
             SendSurgeryClinicSpecialUsed(character);
             GenericCmdMessageHandler.Default.Acknowledge(character, message);
             SendSurgeryClinicSpecialAvailableDelayed(character);
@@ -84,7 +100,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 SurgeryClinicInteractionRules.SurgeryClinicNanoId.ToString("X", CultureInfo.InvariantCulture),
                 SurgeryClinicInteractionRules.SurgeryClinicNanoDuration,
                 SurgeryClinicInteractionRules.SurgeryClinicImplantAccessSeconds,
-                "captures/20260620-213807/events.log:51-52;captures/20260621-062224/events.log:52-71");
+                "captures/20260721-184426 Terminal:574187D1");
 
             return true;
         }
@@ -106,6 +122,26 @@ namespace ZoneEngine.Core.MessageHandlers
                 x => x.Identity.Type == target.Type && x.Identity.Instance == target.Instance);
         }
 
+        private static void ApplySurgeryClinicNanoEffects(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            NanoFormula nano;
+            if (!NanoLoader.NanoList.TryGetValue(
+                    SurgeryClinicInteractionRules.SurgeryClinicNanoId,
+                    out nano))
+            {
+                return;
+            }
+
+            NanoEventRuntimeService.Default.ExecuteOnUseEvents(character, nano);
+            character.CalculateSkills();
+            StatMessageHandler.Default.SendChanged(character);
+        }
+
         private static void GrantSurgeryClinicImplantAccess(ICharacter character)
         {
             Character concreteCharacter = character as Character;
@@ -115,6 +151,32 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             concreteCharacter.GrantImplantAccess(SurgeryClinicInteractionRules.SurgeryClinicImplantAccessSeconds);
+        }
+
+        private static void SendSurgeryClinicHealthDamage(ICharacter character)
+        {
+            // Capture 20260721-184426 #10 hex:
+            // HealthDamage TargetHp=<current> Amount=0 Stat=Flags Unk1=0 Target=self Unk2=0
+            // Wire: Unknown1=TargetHp, Unknown2=Amount. Swapping them made Amount=full HP
+            // and the client drained life then aborted the socket.
+            int targetHp = character.Stats[StatIds.health].Value;
+            if (targetHp < 1)
+            {
+                targetHp = 1;
+            }
+
+            character.Controller.Client.SendCompressed(
+                new HealthDamageMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    Unknown1 = targetHp,
+                    Unknown2 = 0,
+                    Unknown3 = 0,
+                    Unknown4 = 0,
+                    Target = character.Identity,
+                    Unknown5 = 0
+                });
         }
 
         private static void SendSurgeryClinicFeedback(ICharacter character)

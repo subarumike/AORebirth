@@ -48,6 +48,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const int BillInstance = unchecked((int)0x78E0FC66);
 
         private const int StanGoodmanInstance = unchecked((int)0x78E0FC65);
+        private const int SarahGreeneInstance = unchecked((int)0x78E0FC69);
+        private const int VernonGodfrayInstance = unchecked((int)0x78E0FC68);
+        private const int DoctorMasonInstance = unchecked((int)0x78E0FC6C);
+        private const int LoreleiBartenderInstance = unchecked((int)0x78E0FC6B);
+        private const int LollyTheReetInstance = unchecked((int)0x7985CAEC);
+        private const int ShippingManifestTerminalInstance = unchecked((int)0x78E0FC6A);
+        private const int MarcoSpidaInstance = unchecked((int)0x78E0FC81);
+        private const int VaughnHammondInstance = unchecked((int)0x78E0FC73);
 
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
 
@@ -58,6 +66,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const string AlexGibbsNpcIdentity = "SimpleChar:78E0FC61";
 
         private const string StanGoodmanNpcIdentity = "SimpleChar:78E0FC65";
+        private const string SarahGreeneNpcIdentity = "SimpleChar:78E0FC69";
+        private const string VernonGodfrayNpcIdentity = "SimpleChar:78E0FC68";
+        private const string DoctorMasonNpcIdentity = "SimpleChar:78E0FC6C";
+        private const string LoreleiBartenderNpcIdentity = "SimpleChar:78E0FC6B";
+        private const string LollyTheReetNpcIdentity = "SimpleChar:7985CAEC";
+        private const string ShippingManifestTerminalNpcIdentity = "SimpleChar:78E0FC6A";
+        private const string MarcoSpidaNpcIdentity = "SimpleChar:78E0FC81";
+        private const string VaughnHammondNpcIdentity = "SimpleChar:78E0FC73";
 
         private const string RexB18EReturnNodeId = "rex_194454_006";
 
@@ -163,6 +179,142 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 PlayfieldId = AreteLandingPlayfieldId,
                 GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
                 LogPrefix = "ARETE_STAN_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration SarahGreeneRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Sarah Greene",
+                ExpectedNpcName = "Sarah Greene",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = SarahGreeneInstance
+                    },
+                NpcIdentityText = SarahGreeneNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_SARAH_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration VernonGodfrayRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Vernon Godfray",
+                ExpectedNpcName = "Vernon Godfray",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = VernonGodfrayInstance
+                    },
+                NpcIdentityText = VernonGodfrayNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_VERNON_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration DoctorMasonRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Dr. Mason",
+                ExpectedNpcName = "Dr. Mason",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = DoctorMasonInstance
+                    },
+                NpcIdentityText = DoctorMasonNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_MASON_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration LoreleiBartenderRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Lorelei the Bartender",
+                ExpectedNpcName = "Lorelei the Bartender",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = LoreleiBartenderInstance
+                    },
+                NpcIdentityText = LoreleiBartenderNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_LORELEI_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration LollyTheReetRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Lolly the Reet",
+                ExpectedNpcName = "Lolly the Reet",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = LollyTheReetInstance
+                    },
+                NpcIdentityText = LollyTheReetNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_LOLLY_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration ShippingManifestTerminalRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Shipping Manifest Terminal",
+                ExpectedNpcName = "Shipping Manifest Terminal",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = ShippingManifestTerminalInstance
+                    },
+                NpcIdentityText = ShippingManifestTerminalNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_SMT_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration MarcoSpidaRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Marco Spida",
+                ExpectedNpcName = "Marco Spida",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = MarcoSpidaInstance
+                    },
+                NpcIdentityText = MarcoSpidaNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_MARCO_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration VaughnHammondRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Vaughn Hammond",
+                ExpectedNpcName = "Vaughn Hammond",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = VaughnHammondInstance
+                    },
+                NpcIdentityText = VaughnHammondNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_VAUGHN_DIALOGUE"
             };
 
         private static readonly ContentDrivenNpcDialogueRegistration WindcallerKarrecRegistration =
@@ -303,6 +455,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
             AlexGibbsRegistration,
             BillRegistration,
             StanGoodmanRegistration,
+            SarahGreeneRegistration,
+            VernonGodfrayRegistration,
+            DoctorMasonRegistration,
+            LoreleiBartenderRegistration,
+            LollyTheReetRegistration,
+            ShippingManifestTerminalRegistration,
+            MarcoSpidaRegistration,
+            VaughnHammondRegistration,
             WindcallerKarrecRegistration,
             AnnoyingDudeRegistration,
             MaddyCardileRegistration,
@@ -535,6 +695,11 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 SafeQuestFullUpdateSender.TrySendDeliverFactoryToSarahAndNanoTipsHandoff(source);
             }
 
+            if (IsRegistration(registration, SarahGreeneRegistration))
+            {
+                SafeQuestFullUpdateSender.TrySendDeliverArmorToVernonHandoff(source);
+            }
+
             SendDialogueNode(source, result, registration, null);
             return true;
         }
@@ -672,6 +837,47 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            registration,
                            previousNodeId,
                            answerIndex,
+                           targetIdentity)
+                       || TryHandleSarahTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
+                       || TryHandleVernonTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
+                       || TryHandleDoctorMasonTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
+                       || TryHandleLoreleiTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
+                       || TryHandleLoreleiVendorSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex)
+                       || TryHandleVaughnTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
+                       || TryHandleShippingManifestTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
                            targetIdentity);
             };
 
@@ -742,6 +948,47 @@ namespace ZoneEngine.Core.Arete.Dialogue
                     answerIndex);
             }
 
+            if (IsRegistration(registration, SarahGreeneRegistration))
+            {
+                SarahGreeneQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
+            if (IsRegistration(registration, VernonGodfrayRegistration))
+            {
+                VernonGodfrayQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
+            if (IsRegistration(registration, DoctorMasonRegistration))
+            {
+                DoctorMasonQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
+            if (IsRegistration(registration, LoreleiBartenderRegistration)
+                || IsRegistration(registration, LollyTheReetRegistration))
+            {
+                LoreleiQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
+            if (IsRegistration(registration, ShippingManifestTerminalRegistration))
+            {
+                ShippingManifestTerminalQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
             PaceKnuBotPackets();
 
             // Capture 20260720-190432 / 074847: Answer → StartTrade only.
@@ -758,6 +1005,75 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             if (TryHandleStanTradeHoldSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity))
+            {
+                return true;
+            }
+
+            if (TryHandleSarahTradeHoldSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity))
+            {
+                return true;
+            }
+
+            if (TryHandleVernonTradeHoldSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity))
+            {
+                return true;
+            }
+
+            if (TryHandleDoctorMasonTradeHoldSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity))
+            {
+                return true;
+            }
+
+            if (TryHandleLoreleiTradeHoldSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity))
+            {
+                return true;
+            }
+
+            if (TryHandleLoreleiVendorSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex))
+            {
+                return true;
+            }
+
+            if (TryHandleVaughnTradeHoldSideEffect(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity))
+            {
+                return true;
+            }
+
+            if (TryHandleShippingManifestTradeHoldSideEffect(
                     source,
                     registration,
                     previousNodeId,
@@ -1114,6 +1430,242 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return StanGoodmanQuestRuntime.TryBeginStanTrade(source, tradeTarget);
         }
 
+        private static bool TryHandleSarahTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveSarahIdentity)
+        {
+            if (!IsRegistration(registration, SarahGreeneRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!string.Equals(
+                    previousNodeId,
+                    SarahGreeneQuestRuntime.DeliverOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveSarahIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            return SarahGreeneQuestRuntime.TryBeginSarahTrade(source, tradeTarget);
+        }
+
+        private static bool TryHandleVernonTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveVernonIdentity)
+        {
+            if (!IsRegistration(registration, VernonGodfrayRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!string.Equals(
+                    previousNodeId,
+                    VernonGodfrayQuestRuntime.HackOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(
+                    previousNodeId,
+                    VernonGodfrayQuestRuntime.ReturnOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveVernonIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    VernonGodfrayQuestRuntime.ReturnOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return VernonGodfrayQuestRuntime.TryBeginVernonReturnTrade(source, tradeTarget);
+            }
+
+            return VernonGodfrayQuestRuntime.TryBeginVernonHackTrade(source, tradeTarget);
+        }
+
+        private static bool TryHandleDoctorMasonTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveMasonIdentity)
+        {
+            if (!IsRegistration(registration, DoctorMasonRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!string.Equals(
+                    previousNodeId,
+                    DoctorMasonQuestRuntime.ShowOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(
+                    previousNodeId,
+                    DoctorMasonQuestRuntime.ChipOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveMasonIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            if (string.Equals(
+                    previousNodeId,
+                    DoctorMasonQuestRuntime.ChipOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return DoctorMasonQuestRuntime.TryBeginChipTrade(source, tradeTarget);
+            }
+
+            return DoctorMasonQuestRuntime.TryBeginShowTrade(source, tradeTarget);
+        }
+
+        private static bool TryHandleLoreleiTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveNpcIdentity)
+        {
+            if (answerIndex != 0)
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveNpcIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            if (IsRegistration(registration, LollyTheReetRegistration)
+                && string.Equals(
+                    previousNodeId,
+                    LoreleiQuestRuntime.LollyCookieTradeNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return LoreleiQuestRuntime.TryBeginLollyCookieTrade(source, tradeTarget);
+            }
+
+            if (IsRegistration(registration, LoreleiBartenderRegistration)
+                && string.Equals(
+                    previousNodeId,
+                    LoreleiQuestRuntime.DeliverOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return LoreleiQuestRuntime.TryBeginDeliverTrade(source, tradeTarget);
+            }
+
+            return false;
+        }
+
+        private static bool TryHandleVaughnTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveVaughnIdentity)
+        {
+            if (!IsRegistration(registration, VaughnHammondRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!string.Equals(
+                    previousNodeId,
+                    VaughnHammondQuestRuntime.IdOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveVaughnIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            return VaughnHammondQuestRuntime.TryBeginVaughnTrade(source, tradeTarget);
+        }
+
+        private static bool TryHandleLoreleiVendorSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            // Capture 20260721-loralei: greet/deliver option "What do you have?" (index 1).
+            // Knubot Shop cart also sends GenericCmd Use (handled separately).
+            if (!IsRegistration(registration, LoreleiBartenderRegistration) || answerIndex != 1)
+            {
+                return false;
+            }
+
+            if (!string.Equals(previousNodeId, "lorelei_greet", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(
+                    previousNodeId,
+                    LoreleiQuestRuntime.DeliverOfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            CapturedAreteLoreleiVendorInteractionHandler.Default.TryOpenShop(
+                source,
+                registration.NpcIdentity);
+            return false;
+        }
+
+        private static bool TryHandleShippingManifestTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveTerminalIdentity)
+        {
+            if (!IsRegistration(registration, ShippingManifestTerminalRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!string.Equals(
+                    previousNodeId,
+                    ShippingManifestTerminalQuestRuntime.ApplyHackerToolNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            Identity tradeTarget = liveTerminalIdentity;
+            if (tradeTarget.Type != IdentityType.CanbeAffected || tradeTarget.Instance == 0)
+            {
+                tradeTarget = registration.NpcIdentity;
+            }
+
+            return ShippingManifestTerminalQuestRuntime.TryBeginTerminalTrade(source, tradeTarget);
+        }
+
         private static RexQuestPreviewEmissionResult TryHandleDialogueSideEffect(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
@@ -1367,6 +1919,31 @@ namespace ZoneEngine.Core.Arete.Dialogue
             if (IsRegistration(registration, StanGoodmanRegistration))
             {
                 return StanGoodmanQuestRuntime.ResolveStanStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, SarahGreeneRegistration))
+            {
+                return SarahGreeneQuestRuntime.ResolveSarahStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, VernonGodfrayRegistration))
+            {
+                return VernonGodfrayQuestRuntime.ResolveVernonStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, DoctorMasonRegistration))
+            {
+                return DoctorMasonQuestRuntime.ResolveMasonStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, LoreleiBartenderRegistration))
+            {
+                return LoreleiQuestRuntime.ResolveLoreleiStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, LollyTheReetRegistration))
+            {
+                return LoreleiQuestRuntime.ResolveLollyStartNodeId(source);
             }
 
             if (IsRegistration(registration, ProphetYuttRegistration))

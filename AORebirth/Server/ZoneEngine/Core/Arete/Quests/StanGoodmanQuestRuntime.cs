@@ -22,6 +22,7 @@ namespace ZoneEngine.Core.Arete.Quests
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -75,6 +76,11 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int StanTurnInCreditReward = 1240;
 
+        // Capture 20260721-nanoprogramsvendor: Use Doctor crystal → "Received reward: 2569 XP, 1240 credits."
+        private const int BuyNanoTipXpReward = 2569;
+
+        private const int BuyNanoTipCreditReward = 1240;
+
         private const int CapturedTemplateActionUnknown1 = 1;
 
         private const int CapturedTemplateActionUnknown2 = 87;
@@ -89,6 +95,9 @@ namespace ZoneEngine.Core.Arete.Quests
 
         // Capture wire FormattedMessage for XP/credits after factory turn-in.
         private const string StanTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!?Oi!!!/S~";
+
+        // Capture 20260721-nanoprogramsvendor FormatFeedback after Doctor pack open.
+        private const string BuyNanoTipRewardFeedback = "~&!!!\":$'O\"ui!!!?4i!!!/S~";
 
         private const string StanTradePrompt =
             "Drag and drop the item(s) you want to give to Stanley Goodman into one of the slots available and press \"accept\"";
@@ -236,10 +245,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            bool isStan = IsStanNpc(source, message.Target);
-            StanTradeSession session = GetTradeSession(source);
-            // Only claim Stan's own FinishTrade — never steal Accept from Bill/Alex/etc.
-            if (!isStan && session == null)
+            // Only claim Stan's own FinishTrade — never steal Accept from Sarah/Bill/Alex/etc.
+            if (!IsStanNpc(source, message.Target))
             {
                 return false;
             }
@@ -250,6 +257,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return true;
             }
 
+            StanTradeSession session = GetTradeSession(source);
             if (session == null)
             {
                 EnsureStanTradeSession(source, message.Target);
@@ -259,6 +267,165 @@ namespace ZoneEngine.Core.Arete.Quests
             Identity stagedContainer = session != null ? session.StagedContainer : Identity.None;
             ApplyStanTradeTurnIn(source, message.Target, stagedContainer);
             return true;
+        }
+
+        /// <summary>
+        /// Capture 20260721-nanoprogramsvendor: buy any Marco nano package →
+        /// Overflow reward 223373 + Action59/Delete Mission:555BE9F4.
+        /// </summary>
+        public static bool TryCompleteBuyNanoTipOnVendorPurchase(ICharacter character, IItem[] boughtItems)
+        {
+            if (character == null || boughtItems == null || boughtItems.Length == 0)
+            {
+                return false;
+            }
+
+            bool boughtNanoPackage = false;
+            for (int i = 0; i < boughtItems.Length; i++)
+            {
+                IItem item = boughtItems[i];
+                if (item == null)
+                {
+                    continue;
+                }
+
+                if (CapturedAreteMarcoSpidaVendorContentProvider.IsCapturedNanoCrystalItemId(item.LowID)
+                    || CapturedAreteMarcoSpidaVendorContentProvider.IsCapturedNanoCrystalItemId(item.HighID))
+                {
+                    boughtNanoPackage = true;
+                    break;
+                }
+            }
+
+            if (!boughtNanoPackage)
+            {
+                return false;
+            }
+
+            return TryCompleteBuyNanoTip(character, "vendor-purchase");
+        }
+
+        /// <summary>
+        /// Fallback: Use purchased Marco nano crystal completes tip if buy path missed it.
+        /// Side-effect only; returns false so normal crystal Use continues.
+        /// </summary>
+        public static bool TryCompleteBuyNanoTipOnCrystalUse(ICharacter character, Item item)
+        {
+            if (character == null || item == null)
+            {
+                return false;
+            }
+
+            if (!CapturedAreteMarcoSpidaVendorContentProvider.IsCapturedNanoCrystalItemId(item.LowID)
+                && !CapturedAreteMarcoSpidaVendorContentProvider.IsCapturedNanoCrystalItemId(item.HighID))
+            {
+                return false;
+            }
+
+            TryCompleteBuyNanoTip(character, "crystal-use item=" + item.LowID + "/" + item.HighID);
+            return false;
+        }
+
+        private static bool TryCompleteBuyNanoTip(ICharacter character, string reason)
+        {
+            if (character == null
+                || !MissionRuntime.IsInitialized
+                || !IsMissionLifecycle(character, BuyNanoProgramsQuestId, true, false))
+            {
+                return false;
+            }
+
+            int characterId = character.Identity.Instance;
+            ForceCompleteHandoffTip(
+                characterId,
+                BuyNanoProgramsQuestId,
+                "mission_555BE9F4_buy_nano");
+            ApplyBuyNanoTipXpCredits(character);
+            TrySendBuyNanoTipRewardFeedback(character);
+            TryGrantBuyNanoTipReward(character);
+            try
+            {
+                FeedbackMessageHandler.Default.Send(character, 110, 108871108);
+            }
+            catch (Exception ex)
+            {
+                Log("buy-nano tip item-feedback failed: " + ex.Message);
+            }
+
+            FlintKneecappingTipWire.TryDeleteTip(character, unchecked((int)0x555BE9F4));
+            Log(
+                "buy-nano tip complete ("
+                + reason
+                + ") character="
+                + character.Identity.ToString(true));
+            return true;
+        }
+
+        /// <summary>
+        /// Login heal: Talk to Stan stayed Active because completes skipped ObserveObjective.
+        /// Prefer later Stan-chain tips; clear Talk to Stan ghost when past it.
+        /// </summary>
+        public static bool TrySyncTipsForLogin(ICharacter source)
+        {
+            if (source == null
+                || source.Controller == null
+                || source.Controller.Client == null
+                || !MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            int characterId = source.Identity.Instance;
+            bool pastTalkStan =
+                IsMissionLifecycle(source, BuyLockpickQuestId, true, true)
+                || IsMissionLifecycle(source, StrongboxQuestId, true, true)
+                || IsMissionLifecycle(source, DeliverAntonioFactoryQuestId, true, true)
+                || IsMissionLifecycle(source, TalkToSarahGreeneQuestId, true, true)
+                || IsMissionLifecycle(source, BuyNanoProgramsQuestId, true, true);
+
+            if (pastTalkStan || IsMissionLifecycle(source, TalkToStanQuestId, true, true))
+            {
+                if (pastTalkStan)
+                {
+                    ForceCompleteHandoffTip(
+                        characterId,
+                        TalkToStanQuestId,
+                        "mission_555B4366_talk_to_stan");
+                    FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x555B4366));
+                }
+            }
+
+            if (IsMissionLifecycle(source, BuyNanoProgramsQuestId, true, false))
+            {
+                SafeQuestFullUpdateSender.TrySendDeliverFactoryToSarahAndNanoTipsHandoff(source);
+                return true;
+            }
+
+            if (IsMissionLifecycle(source, DeliverAntonioFactoryQuestId, true, false))
+            {
+                SafeQuestFullUpdateSender.TrySendStrongboxToDeliverFactoryHandoff(source);
+                return true;
+            }
+
+            if (IsMissionLifecycle(source, StrongboxQuestId, true, false))
+            {
+                SafeQuestFullUpdateSender.TrySendBuyLockpickToStrongboxHandoff(source);
+                return true;
+            }
+
+            if (IsMissionLifecycle(source, BuyLockpickQuestId, true, false))
+            {
+                SafeQuestFullUpdateSender.TrySendTalkStanToBuyLockpickHandoff(source);
+                return true;
+            }
+
+            if (IsMissionLifecycle(source, TalkToStanQuestId, true, false))
+            {
+                SafeQuestFullUpdateSender.TrySendReportAlexToTalkStanHandoff(source);
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -503,6 +670,10 @@ namespace ZoneEngine.Core.Arete.Quests
             int instance = source.Identity.Instance;
             if (MissionRuntime.IsInitialized)
             {
+                ForceCompleteHandoffTip(
+                    instance,
+                    TalkToStanQuestId,
+                    "mission_555B4366_talk_to_stan");
                 MissionOperationResult result = MissionRuntime.Service.CompleteAndActivateNextMission(
                     instance,
                     TalkToStanQuestId,
@@ -510,7 +681,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 if (result.Status != MissionOperationStatus.Applied
                     && result.Status != MissionOperationStatus.AlreadyApplied)
                 {
-                    MissionRuntime.Service.CompleteMission(instance, TalkToStanQuestId);
                     MissionRuntime.Service.OfferMission(instance, BuyLockpickQuestId);
                     MissionRuntime.Service.AcceptMission(instance, BuyLockpickQuestId);
                 }
@@ -525,6 +695,10 @@ namespace ZoneEngine.Core.Arete.Quests
             int instance = source.Identity.Instance;
             if (MissionRuntime.IsInitialized)
             {
+                ForceCompleteHandoffTip(
+                    instance,
+                    BuyLockpickQuestId,
+                    "mission_555BD124_buy_lockpick");
                 MissionOperationResult result = MissionRuntime.Service.CompleteAndActivateNextMission(
                     instance,
                     BuyLockpickQuestId,
@@ -532,7 +706,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 if (result.Status != MissionOperationStatus.Applied
                     && result.Status != MissionOperationStatus.AlreadyApplied)
                 {
-                    MissionRuntime.Service.CompleteMission(instance, BuyLockpickQuestId);
                     MissionRuntime.Service.OfferMission(instance, StrongboxQuestId);
                     MissionRuntime.Service.AcceptMission(instance, StrongboxQuestId);
                 }
@@ -546,6 +719,10 @@ namespace ZoneEngine.Core.Arete.Quests
             int instance = source.Identity.Instance;
             if (MissionRuntime.IsInitialized)
             {
+                ForceCompleteHandoffTip(
+                    instance,
+                    StrongboxQuestId,
+                    "mission_555BE9C5_strongbox");
                 MissionOperationResult result = MissionRuntime.Service.CompleteAndActivateNextMission(
                     instance,
                     StrongboxQuestId,
@@ -553,7 +730,6 @@ namespace ZoneEngine.Core.Arete.Quests
                 if (result.Status != MissionOperationStatus.Applied
                     && result.Status != MissionOperationStatus.AlreadyApplied)
                 {
-                    MissionRuntime.Service.CompleteMission(instance, StrongboxQuestId);
                     MissionRuntime.Service.OfferMission(instance, DeliverAntonioFactoryQuestId);
                     MissionRuntime.Service.AcceptMission(instance, DeliverAntonioFactoryQuestId);
                 }
@@ -652,7 +828,10 @@ namespace ZoneEngine.Core.Arete.Quests
             int instance = source.Identity.Instance;
             if (MissionRuntime.IsInitialized)
             {
-                MissionRuntime.Service.CompleteMission(instance, DeliverAntonioFactoryQuestId);
+                ForceCompleteHandoffTip(
+                    instance,
+                    DeliverAntonioFactoryQuestId,
+                    "mission_555BE9F2_deliver_factory");
                 MissionRuntime.Service.OfferMission(instance, TalkToSarahGreeneQuestId);
                 MissionRuntime.Service.AcceptMission(instance, TalkToSarahGreeneQuestId);
                 MissionRuntime.Service.OfferMission(instance, BuyNanoProgramsQuestId);
@@ -660,6 +839,185 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             SafeQuestFullUpdateSender.TrySendDeliverFactoryToSarahAndNanoTipsHandoff(source);
+        }
+
+        private static void ForceCompleteHandoffTip(int characterId, string questId, string objectiveId)
+        {
+            if (!MissionRuntime.IsInitialized || string.IsNullOrEmpty(questId))
+            {
+                return;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(characterId, questId);
+            if (mission == null || mission.State == MissionLifecycleState.Completed)
+            {
+                return;
+            }
+
+            if (mission.State == MissionLifecycleState.Offered)
+            {
+                MissionRuntime.Service.AcceptMission(characterId, questId);
+                mission = MissionRuntime.Service.GetMission(characterId, questId);
+            }
+
+            if (mission == null || mission.State != MissionLifecycleState.Active)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(objectiveId))
+            {
+                MissionRuntime.Service.ObserveObjective(
+                    new MissionObjectiveObservation
+                    {
+                        CharacterId = characterId,
+                        QuestId = questId,
+                        ObjectiveId = objectiveId,
+                        ObservationKey = "stan-goodman-force-complete",
+                        Amount = 1,
+                        EventType = "StanGoodmanQuestRuntime",
+                        SourceIdentity = string.Empty,
+                        TargetIdentity = string.Empty
+                    });
+            }
+
+            MissionRuntime.Service.CompleteMission(characterId, questId);
+        }
+
+        private static void TryGrantBuyNanoTipReward(ICharacter character)
+        {
+            if (character == null
+                || !ItemLoader.ItemList.ContainsKey(
+                        CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId))
+            {
+                return;
+            }
+
+            if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    character,
+                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId))
+            {
+                SendOverflowGrantPackets(
+                    character,
+                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
+                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality);
+                return;
+            }
+
+            Item reward;
+            try
+            {
+                reward = new Item(
+                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality,
+                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
+                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId);
+            }
+            catch (Exception ex)
+            {
+                Log("buy-nano tip reward create failed: " + ex.Message);
+                return;
+            }
+
+            QuestRewardInventoryGrantResult grant =
+                InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(character, reward);
+            if (grant.Status != QuestRewardInventoryGrantStatus.Success)
+            {
+                Log("buy-nano tip reward grant failed status=" + grant.Status);
+                return;
+            }
+
+            SendOverflowGrantPackets(
+                character,
+                CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
+                CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality);
+        }
+
+        private static void ApplyBuyNanoTipXpCredits(ICharacter source)
+        {
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-buy-nano-tip-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = BuyNanoTipCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = BuyNanoTipXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = BuyNanoTipXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.lastxp,
+                                                                Kind = MissionStatMutationKind.Set,
+                                                                Value = BuyNanoTipXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
+                BuyNanoProgramsQuestId,
+                definition,
+                "capture:20260721-nanoprogramsvendor:buy-nano-tip-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
+        }
+
+        private static void TrySendBuyNanoTipRewardFeedback(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return;
+            }
+
+            source.Controller.Client.SendCompressed(
+                new FormatFeedbackMessage
+                {
+                    Identity = source.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = BuyNanoTipRewardFeedback,
+                    Unknown2 = 0
+                });
         }
 
         private static void ApplyStanTurnInXpCredits(ICharacter source)

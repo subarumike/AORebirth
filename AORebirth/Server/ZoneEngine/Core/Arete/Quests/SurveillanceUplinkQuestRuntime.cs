@@ -829,6 +829,31 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             // Current tip only (highest progress first).
+            if (VernonGodfrayQuestRuntime.TrySyncTipsForLogin(source))
+            {
+                return true;
+            }
+
+            if (DoctorMasonQuestRuntime.TrySyncTipsForLogin(source))
+            {
+                return true;
+            }
+
+            if (LoreleiQuestRuntime.TrySyncTipsForLogin(source))
+            {
+                return true;
+            }
+
+            if (SarahGreeneQuestRuntime.TrySyncTipsForLogin(source))
+            {
+                return true;
+            }
+
+            if (StanGoodmanQuestRuntime.TrySyncTipsForLogin(source))
+            {
+                return true;
+            }
+
             if (IsMissionActiveOrOffered(characterId, "Mission:555B4367"))
             {
                 RexQuestPreviewEmissionResult tradeskill =

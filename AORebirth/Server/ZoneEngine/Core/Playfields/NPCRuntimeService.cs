@@ -152,6 +152,8 @@ namespace AORebirth.Core.Playfields
             MarcusPadAmbientCombat.ClearPlayfield(this.playfield.Identity.Instance);
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            LoreleiOasisMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteFinishCaptureMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             SurveillanceDroidRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AreteLandingPopulationEnsure.ClearPlayfield(this.playfield.Identity.Instance);
             HoloDeckSpawn.ClearPlayfield(this.playfield.Identity.Instance);
@@ -263,6 +265,33 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "AlexAreaMobRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                // Capture 20260721-loralei: Desert Reets + Lolly at oasis cage.
+                LoreleiOasisMobRuntime.StartForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "LoreleiOasisMobRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                // Capture 20260721-finish: Engineer Automaton I near Vernon (A004 monster body).
+                AreteFinishCaptureMobRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteFinishCaptureMobRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
             }
 
             try
@@ -560,6 +589,13 @@ namespace AORebirth.Core.Playfields
             {
                 this.AcquireAggro(attacker, ally, false);
             }
+
+            foreach (ICharacter ally in LoreleiOasisMobRuntime.FindSocialAggroAllies(
+                target,
+                attacker))
+            {
+                this.AcquireAggro(attacker, ally, false);
+            }
         }
 
         /// <summary>
@@ -624,6 +660,10 @@ namespace AORebirth.Core.Playfields
                     this.playfield,
                     this.playfield.Identity,
                     this.ActivateNpc);
+                LoreleiOasisMobRuntime.TickRespawn(
+                    this.playfield,
+                    this.playfield.Identity,
+                    this.ActivateNpc);
             }
 
             PetCommandService.ProcessPetHealTick(character);
@@ -648,6 +688,7 @@ namespace AORebirth.Core.Playfields
             ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
+                                         ?? LoreleiOasisMobRuntime.FindAutomaticAggroTarget(character)
                                          ?? ZoneEngine.Core.Missions.MissionInstanceMobCombat.FindAutomaticAggroTarget(
                                              character);
             if (automaticTarget != null)

@@ -52,7 +52,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (RexMarcusChainCoordinator.TryFinishMarcusTrade(
+            // Alex BioCom before Marcus: B196 returnTip must not steal Alex Accept.
+            if (FlintBioComQuestRuntime.TryFinishAlexTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
             {
@@ -66,7 +67,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            if (FlintBioComQuestRuntime.TryFinishAlexTrade(
+            if (RexMarcusChainCoordinator.TryFinishMarcusTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
             {
@@ -76,6 +77,48 @@ namespace ZoneEngine.Core.MessageHandlers
             // Stan before Bill: prior Bill tip/HC-12 greed stole Stan Accept
             // (ZoneEngineLog 2026-07-21 01:33:42 bill-turnin ABORTED during Stan deliver).
             if (StanGoodmanQuestRuntime.TryFinishStanTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (SarahGreeneQuestRuntime.TryFinishSarahTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (VernonGodfrayQuestRuntime.TryFinishVernonTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (DoctorMasonQuestRuntime.TryFinishMasonTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (LoreleiQuestRuntime.TryFinishLoreleiTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (VaughnHammondQuestRuntime.TryFinishVaughnTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (ShippingManifestTerminalQuestRuntime.TryFinishTerminalTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
             {

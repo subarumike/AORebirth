@@ -1,0 +1,51 @@
+{
+  "Identity": {
+    "Id": "marco-spida-dialogue-20260721-nanoprogramsvendor",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260721-nanoprogramsvendor"
+  },
+  "SourceCaptures": [
+    "20260721-nanoprogramsvendor"
+  ],
+  "Npcs": [
+    {
+      "Id": "marco_spida_78E0FC81",
+      "NpcIdentity": "SimpleChar:78E0FC81",
+      "Name": "Marco Spida",
+      "RootNodeId": "marco_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "marco_001",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured",
+          "Options": [
+            {
+              "Id": "marco001_0",
+              "Index": 0,
+              "Text": "What can you tell me about Nano Programs?",
+              "TextEvidence": "20260721-nanoprogramsvendor",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "marco001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260721-nanoprogramsvendor",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

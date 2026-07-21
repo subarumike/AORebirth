@@ -634,6 +634,19 @@ namespace AORebirth.Core.Playfields
             },
             new CityNpc
             {
+                // Capture 20260721-finish Engineer Warbot 7984BF25 near ICC HQ arrival plaza.
+                Name = "Engineer Warbot",
+                Level = 121, Health = 11184, MonsterData = 17697, Scale = 114, VisualFlags = 31, HeadMesh = 0, RunSpeed = 132,
+                NpcFamily = 95, LosHeight = 0, CharacterFlags = 403182081, AppearanceValue = 1513,
+                Side = 1, Breed = 7, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3338.26416f, Y = 36.4849968f, Z = 862.944153f,
+                Hx = 0.0f, Hy = -0.194869325f, Hz = 0.0f, Hw = 0.980829239f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+                Waypoints = null,
+            },
+            new CityNpc
+            {
                 Name = "Dockworker",
                 Level = 5, Health = 115, MonsterData = 26074, Scale = 93, VisualFlags = 31, HeadMesh = 40691, RunSpeed = 19,
                 NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,

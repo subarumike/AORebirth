@@ -34,6 +34,24 @@ namespace ZoneEngine.Core.Missions
         internal const string RexFlintDeliverAntonioFactoryQuestId = "Mission:555BE9F2";
         internal const string RexFlintTalkToSarahGreeneQuestId = "Mission:555BE9F3";
         internal const string RexFlintBuyNanoProgramsQuestId = "Mission:555BE9F4";
+        internal const string RexFlintFindTheThiefQuestId = "Mission:555BE9F5";
+        internal const string RexFlintDeliverDnaLockedArmorQuestId = "Mission:555BE9F6";
+        internal const string RexFlintSpeakToVernonGodfrayQuestId = "Mission:555BE9F7";
+        internal const string RexFlintHackingSkillsQuestId = "Mission:555BE9F8";
+        internal const string RexFlintGiveHackedTechnicalLibraryQuestId = "Mission:555BE9F9";
+        internal const string RexFlintCargoLiftingQuestId = "Mission:555BE9FA";
+        internal const string RexFlintReturnToVernonGodfrayQuestId = "Mission:555BE9FB";
+        internal const string RexFlintTalkToDoctorMasonQuestId = "Mission:555BE9FC";
+        internal const string RexFlintAssembleImplant1QuestId = "Mission:555BE9FD";
+        internal const string RexFlintAssembleImplant2QuestId = "Mission:555BE9FE";
+        internal const string RexFlintAssembleImplant3QuestId = "Mission:555BE9FF";
+        internal const string RexFlintShowDrMasonImplantQuestId = "Mission:555BEA00";
+        internal const string RexFlintInstallTheImplantQuestId = "Mission:555BEA01";
+        internal const string RexFlintTalkToDoctorMasonAfterInstallQuestId = "Mission:555BEA02";
+        internal const string RexFlintTalkToLoreleiQuestId = "Mission:555BEA03";
+        internal const string RexFlintLoreleiLostPetQuestId = "Mission:555BEA04";
+        internal const string RexFlintDeliverReetToLoreleiQuestId = "Mission:555BEA05";
+        internal const string RexFlintTalkToVaughnHammondQuestId = "Mission:555BEA06";
         internal const string RexFlintTradeskillNanoSensorQuestId = "Mission:555B4367";
         internal const string RexFlintTradeskillBasicBrainQuestId = "Mission:555B4368";
         internal const string RexFlintTradeskillPersonalizedBrainQuestId = "Mission:555B4369";
@@ -185,6 +203,96 @@ namespace ZoneEngine.Core.Missions
                 new string[0]);
             AddHandoffDefinitionIfMissing(
                 definitions,
+                RexFlintFindTheThiefQuestId,
+                "find_the_thief",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintDeliverDnaLockedArmorQuestId,
+                "deliver_dna_locked_armor",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintSpeakToVernonGodfrayQuestId,
+                "speak_to_vernon_godfray",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintHackingSkillsQuestId,
+                "hacking_skills",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintGiveHackedTechnicalLibraryQuestId,
+                "give_hacked_technical_library",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintCargoLiftingQuestId,
+                "cargo_lifting",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintReturnToVernonGodfrayQuestId,
+                "return_to_vernon_godfray",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintTalkToDoctorMasonQuestId,
+                "talk_to_doctor_mason",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintAssembleImplant1QuestId,
+                "assemble_implant_1",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintAssembleImplant2QuestId,
+                "assemble_implant_2",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintAssembleImplant3QuestId,
+                "assemble_implant_3",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintShowDrMasonImplantQuestId,
+                "show_dr_mason_implant",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintInstallTheImplantQuestId,
+                "install_the_implant",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintTalkToDoctorMasonAfterInstallQuestId,
+                "talk_to_doctor_mason_after_install",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintTalkToLoreleiQuestId,
+                "talk_to_lorelei",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintLoreleiLostPetQuestId,
+                "lorelei_lost_pet",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintDeliverReetToLoreleiQuestId,
+                "deliver_reet_to_lorelei",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
+                RexFlintTalkToVaughnHammondQuestId,
+                "talk_to_vaughn_hammond",
+                new string[0]);
+            AddHandoffDefinitionIfMissing(
+                definitions,
                 RexFlintTradeskillNanoSensorQuestId,
                 "tradeskill_assemble_nano_sensor",
                 new string[0]);
@@ -233,6 +341,24 @@ namespace ZoneEngine.Core.Missions
                 || string.Equals(questId, RexFlintDeliverAntonioFactoryQuestId, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(questId, RexFlintTalkToSarahGreeneQuestId, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(questId, RexFlintBuyNanoProgramsQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintFindTheThiefQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintDeliverDnaLockedArmorQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintSpeakToVernonGodfrayQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintHackingSkillsQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintGiveHackedTechnicalLibraryQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintCargoLiftingQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintReturnToVernonGodfrayQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintTalkToDoctorMasonQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintAssembleImplant1QuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintAssembleImplant2QuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintAssembleImplant3QuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintShowDrMasonImplantQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintInstallTheImplantQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintTalkToDoctorMasonAfterInstallQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintTalkToLoreleiQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintLoreleiLostPetQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintDeliverReetToLoreleiQuestId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(questId, RexFlintTalkToVaughnHammondQuestId, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(questId, RexFlintTradeskillNanoSensorQuestId, StringComparison.OrdinalIgnoreCase))
             {
                 return 1;

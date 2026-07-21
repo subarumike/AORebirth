@@ -104,10 +104,17 @@ namespace ZoneEngine.Core.PacketHandlers
                 return;
             }
 
-            TradeSkillEntry ts = TradeSkill.Instance.GetTradeSkillEntry(sourceItem.HighID, targetItem.HighID);
+            TradeSkillMatch match = TradeSkill.Instance.ResolveTradeSkill(
+                sourceItem.LowID,
+                sourceItem.HighID,
+                targetItem.LowID,
+                targetItem.HighID);
+            TradeSkillEntry ts = match != null ? match.Entry : null;
 
             if (ts != null)
             {
+                Item implantItem = match.ImplantOrTargetItem(sourceItem, targetItem);
+
                 int resultMaxQl = 1;
                 int resultHighForQl = ts.ResultHighId;
                 if (!ItemLoader.ItemList.ContainsKey(resultHighForQl)
@@ -122,71 +129,159 @@ namespace ZoneEngine.Core.PacketHandlers
                     resultMaxQl = ItemLoader.ItemList[resultHighForQl].Quality;
                 }
 
-                quality = Math.Min(quality, resultMaxQl);
-                if (WindowBuild(client, quality, ts, sourceItem, targetItem))
+                // UseItemOnItem passes quality < 0 → build at implant QL (+ NanoProg bump).
+                if (quality < 0)
                 {
-                    Item newItem;
+                    quality = DeriveResultQuality(client, match, implantItem, resultMaxQl);
+                }
+                else
+                {
+                    quality = Math.Min(quality, resultMaxQl);
+                }
+
+                string failReason;
+                if (!WindowBuild(client, quality, match, sourceItem, targetItem, out failReason))
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        string.IsNullOrEmpty(failReason)
+                            ? "It is not possible to assemble those two items. Maybe the order was wrong?"
+                            : failReason);
+                    return;
+                }
+
+                Item newItem;
+                try
+                {
+                    newItem = new Item(quality, ts.ResultLowId, ts.ResultHighId);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
                     try
-                    {
-                        newItem = new Item(quality, ts.ResultLowId, ts.ResultHighId);
-                    }
-                    catch (ArgumentOutOfRangeException)
                     {
                         // Capture 20260721-001538 QL1 grants use low==high (156026/156026).
                         newItem = new Item(quality, ts.ResultLowId, ts.ResultLowId);
                         ts.ResultHighId = ts.ResultLowId;
                     }
-
-                    InventoryError inventoryError =
-                        InventoryContainerRuntimeService.Default.AddTradeSkillResultItem(
-                            client.Controller.Character,
-                            newItem);
-                    if (inventoryError == InventoryError.OK)
+                    catch (ArgumentOutOfRangeException)
                     {
-                        AddTemplateMessageHandler.Default.Send(client.Controller.Character, newItem);
-
-                        // Delete source?
-                        if ((ts.DeleteFlag & 1) == 1)
-                        {
-                            InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(
-                                client.Controller.Character,
-                                source);
-                            CharacterActionMessageHandler.Default.SendDeleteItem(
-                                client.Controller.Character,
-                                source.Container,
-                                source.Placement);
-                        }
-
-                        // Delete target?
-                        if ((ts.DeleteFlag & 2) == 2)
-                        {
-                            InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(
-                                client.Controller.Character,
-                                target);
-                            CharacterActionMessageHandler.Default.SendDeleteItem(
-                                client.Controller.Character,
-                                target.Container,
-                                target.Placement);
-                        }
-
                         ChatTextMessageHandler.Default.Send(
                             client.Controller.Character,
-                            SuccessMessage(sourceItem, targetItem, newItem));
-
-                        client.Controller.Character.Stats[StatIds.xp].Value += CalculateXP(quality, ts);
-                        ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainQuestRuntime.OnCombineSucceeded(
-                            client.Controller.Character,
-                            newItem.LowID,
-                            newItem.HighID);
+                            "Combine failed: result item template is missing on the server.");
+                        return;
                     }
                 }
+
+                bool vernonLibraryHack =
+                    ZoneEngine.Core.Arete.Quests.VernonGodfrayCombineRules
+                        .IsHackedTechnicalLibrary(newItem.LowID, newItem.HighID);
+                bool masonAssemble =
+                    ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules
+                        .IsAssembleResult(newItem.LowID, newItem.HighID);
+
+                // Capture: Overflow grants do not need a free inventory slot first, but our
+                // server TryAdd does. Consume inputs before add when both are deleted (Mason)
+                // or when Vernon consumes the library.
+                if (vernonLibraryHack || masonAssemble)
+                {
+                    // Capture Mason results are always QL1 Overflow (even with QL5 clusters).
+                    if (masonAssemble && newItem.Quality != 1)
+                    {
+                        try
+                        {
+                            newItem = new Item(1, newItem.LowID, newItem.HighID);
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            // Keep prior quality if template clamp rejects QL1.
+                        }
+                    }
+
+                    ConsumeInputsByDeleteFlag(client, match, source, target);
+                }
+
+                InventoryError inventoryError =
+                    InventoryContainerRuntimeService.Default.AddTradeSkillResultItem(
+                        client.Controller.Character,
+                        newItem);
+                if (inventoryError != InventoryError.OK)
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        "Your inventory is full. Free a slot and try the combine again.");
+                    return;
+                }
+
+                if (vernonLibraryHack)
+                {
+                    // Capture 20260721-Vernon-Godfray: FormatFeedback + TemplateAction
+                    // Overflow + ContainerAddItem — never AddTemplate (client crash).
+                    ZoneEngine.Core.Arete.Quests.VernonGodfrayQuestRuntime
+                        .SendCombineResultClientPackets(
+                            client.Controller.Character,
+                            sourceItem,
+                            targetItem,
+                            newItem);
+                }
+                else if (masonAssemble)
+                {
+                    // Capture 20260721-Mason: FormatFeedback + Overflow TemplateAction.
+                    ZoneEngine.Core.Arete.Quests.DoctorMasonQuestRuntime
+                        .SendCombineResultClientPackets(
+                            client.Controller.Character,
+                            sourceItem,
+                            targetItem,
+                            newItem);
+                }
+                else
+                {
+                    AddTemplateMessageHandler.Default.Send(client.Controller.Character, newItem);
+
+                    ConsumeInputsByDeleteFlag(client, match, source, target);
+
+                    ChatTextMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        SuccessMessage(sourceItem, targetItem, newItem));
+
+                    client.Controller.Character.Stats[StatIds.xp].Value += CalculateXP(quality, ts);
+                }
+
+                ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainQuestRuntime.OnCombineSucceeded(
+                    client.Controller.Character,
+                    newItem.LowID,
+                    newItem.HighID);
+                ZoneEngine.Core.Arete.Quests.VernonGodfrayQuestRuntime.OnCombineSucceeded(
+                    client.Controller.Character,
+                    newItem.LowID,
+                    newItem.HighID);
+                ZoneEngine.Core.Arete.Quests.DoctorMasonQuestRuntime.OnCombineSucceeded(
+                    client.Controller.Character,
+                    newItem.LowID,
+                    newItem.HighID);
+                ZoneEngine.Core.Arete.Quests.LoreleiQuestRuntime.OnCombineSucceeded(
+                    client.Controller.Character,
+                    newItem.LowID,
+                    newItem.HighID);
             }
             else
             {
                 ChatTextMessageHandler.Default.Send(
                     client.Controller.Character,
-                    "It is not possible to assemble those two items. Maybe the order was wrong?");
-                ChatTextMessageHandler.Default.Send(client.Controller.Character, "No combination found!");
+                    "No tradeskill recipe for those two items (check cluster slot matches the implant).");
+                ChatTextMessageHandler.Default.Send(
+                    client.Controller.Character,
+                    "Tried "
+                    + sourceItem.LowID
+                    + "/"
+                    + sourceItem.HighID
+                    + " QL"
+                    + sourceItem.Quality
+                    + " + "
+                    + targetItem.LowID
+                    + "/"
+                    + targetItem.HighID
+                    + " QL"
+                    + targetItem.Quality);
             }
         }
 
@@ -200,15 +295,22 @@ namespace ZoneEngine.Core.PacketHandlers
         /// </param>
         public static void TradeSkillSourceChanged(IZoneClient client, int container, int placement)
         {
-            if ((container != 0) && (placement != 0))
+            // Clear signal is container=0 (placement may also be 0). Placement 0 is a valid inventory slot.
+            if (container != 0)
             {
                 Item item = InventoryContainerRuntimeService.Default.SetTradeSkillSource(
                     client.Controller.Character,
                     container,
                     placement);
+                if (item == null)
+                {
+                    InventoryContainerRuntimeService.Default.ClearTradeSkillSource(client.Controller.Character);
+                    return;
+                }
+
                 TradeSkillPacket.SendSource(
                     client.Controller.Character,
-                    TradeSkill.Instance.SourceProcessesCount(item.HighID));
+                    TradeSkill.Instance.SourceProcessesCount(item.LowID, item.HighID));
 
                 TradeSkillChanged(client);
             }
@@ -228,15 +330,21 @@ namespace ZoneEngine.Core.PacketHandlers
         /// </param>
         public static void TradeSkillTargetChanged(IZoneClient client, int container, int placement)
         {
-            if ((container != 0) && (placement != 0))
+            if (container != 0)
             {
                 Item item = InventoryContainerRuntimeService.Default.SetTradeSkillTarget(
                     client.Controller.Character,
                     container,
                     placement);
+                if (item == null)
+                {
+                    InventoryContainerRuntimeService.Default.ClearTradeSkillTarget(client.Controller.Character);
+                    return;
+                }
+
                 TradeSkillPacket.SendTarget(
                     client.Controller.Character,
-                    TradeSkill.Instance.TargetProcessesCount(item.HighID));
+                    TradeSkill.Instance.TargetProcessesCount(item.LowID, item.HighID));
 
                 TradeSkillChanged(client);
             }
@@ -288,15 +396,28 @@ namespace ZoneEngine.Core.PacketHandlers
                     InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, source);
                 Item targetItem =
                     InventoryContainerRuntimeService.Default.GetTradeSkillItem(client.Controller.Character, target);
-
-                TradeSkillEntry ts = TradeSkill.Instance.GetTradeSkillEntry(sourceItem.HighID, targetItem.HighID);
-                if (ts != null)
+                if (sourceItem == null || targetItem == null)
                 {
-                    if (ts.ValidateRange(sourceItem.Quality, targetItem.Quality))
+                    TradeSkillPacket.SendNotTradeskill(client.Controller.Character);
+                    return;
+                }
+
+                TradeSkillMatch match = TradeSkill.Instance.ResolveTradeSkill(
+                    sourceItem.LowID,
+                    sourceItem.HighID,
+                    targetItem.LowID,
+                    targetItem.HighID);
+                if (match != null)
+                {
+                    TradeSkillEntry ts = match.Entry;
+                    Item clusterItem = match.ClusterItem(sourceItem, targetItem);
+                    Item implantItem = match.ImplantOrTargetItem(sourceItem, targetItem);
+
+                    if (ts.ValidateRange(clusterItem.Quality, implantItem.Quality))
                     {
                         foreach (TradeSkillSkill tsi in ts.Skills)
                         {
-                            int skillReq = (int)Math.Ceiling(tsi.Percent / 100M * targetItem.Quality);
+                            int skillReq = (int)Math.Ceiling(tsi.Percent / 100M * implantItem.Quality);
                             if (skillReq > client.Controller.Character.Stats[tsi.StatId].Value)
                             {
                                 TradeSkillPacket.SendRequirement(client.Controller.Character, tsi.StatId, skillReq);
@@ -304,30 +425,7 @@ namespace ZoneEngine.Core.PacketHandlers
                         }
 
                         int leastbump = 0;
-                        int maxbump = 0;
-                        if (ts.IsImplant)
-                        {
-                            if (targetItem.Quality >= 250)
-                            {
-                                maxbump = 5;
-                            }
-                            else if (targetItem.Quality >= 201)
-                            {
-                                maxbump = 4;
-                            }
-                            else if (targetItem.Quality >= 150)
-                            {
-                                maxbump = 3;
-                            }
-                            else if (targetItem.Quality >= 100)
-                            {
-                                maxbump = 2;
-                            }
-                            else if (targetItem.Quality >= 50)
-                            {
-                                maxbump = 1;
-                            }
-                        }
+                        int maxbump = GetImplantMaxBump(ts, implantItem.Quality);
 
                         foreach (TradeSkillSkill tsSkill in ts.Skills)
                         {
@@ -337,7 +435,7 @@ namespace ZoneEngine.Core.PacketHandlers
                                     Math.Min(
                                         Convert.ToInt32(
                                             (client.Controller.Character.Stats[tsSkill.StatId].Value
-                                             - (tsSkill.Percent / 100M * targetItem.Quality)) / tsSkill.SkillPerBump),
+                                             - (tsSkill.Percent / 100M * implantItem.Quality)) / tsSkill.SkillPerBump),
                                         maxbump);
                             }
                         }
@@ -352,11 +450,11 @@ namespace ZoneEngine.Core.PacketHandlers
 
                         int resultMaxQl = ItemLoader.ItemList.ContainsKey(resultHighId)
                                               ? ItemLoader.ItemList[resultHighId].Quality
-                                              : targetItem.Quality;
+                                              : implantItem.Quality;
                         TradeSkillPacket.SendResult(
                             client.Controller.Character,
-                            targetItem.Quality,
-                            Math.Min(targetItem.Quality + leastbump, resultMaxQl),
+                            implantItem.Quality,
+                            Math.Min(implantItem.Quality + leastbump, resultMaxQl),
                             resultLowId,
                             resultHighId);
                     }
@@ -365,7 +463,9 @@ namespace ZoneEngine.Core.PacketHandlers
                         TradeSkillPacket.SendOutOfRange(
                             client.Controller.Character,
                             Convert.ToInt32(
-                                Math.Round((double)targetItem.Quality - ts.QLRangePercent * targetItem.Quality / 100)));
+                                Math.Round(
+                                    (double)implantItem.Quality
+                                    - ts.QLRangePercent * implantItem.Quality / 100)));
                     }
                 }
                 else
@@ -376,41 +476,156 @@ namespace ZoneEngine.Core.PacketHandlers
         }
 
         /// <summary>
+        /// AO-Universe / UseItemOnItem: result QL = implant QL + excess NanoProg bumps.
         /// </summary>
-        /// <param name="client">
-        /// </param>
-        /// <param name="desiredQuality">
-        /// </param>
-        /// <param name="ts">
-        /// </param>
-        /// <param name="sourceItem">
-        /// </param>
-        /// <param name="targetItem">
-        /// </param>
-        /// <returns>
-        /// </returns>
+        private static int DeriveResultQuality(
+            IZoneClient client,
+            TradeSkillMatch match,
+            Item implantItem,
+            int resultMaxQl)
+        {
+            TradeSkillEntry ts = match.Entry;
+            int bump = 0;
+            int maxbump = GetImplantMaxBump(ts, implantItem.Quality);
+            foreach (TradeSkillSkill tsSkill in ts.Skills)
+            {
+                if (tsSkill.SkillPerBump == 0)
+                {
+                    continue;
+                }
+
+                int req = (int)Math.Ceiling(tsSkill.Percent / 100M * implantItem.Quality);
+                int have = client.Controller.Character.Stats[tsSkill.StatId].Value;
+                if (have > req)
+                {
+                    bump = Math.Min((have - req) / tsSkill.SkillPerBump, maxbump);
+                }
+            }
+
+            return Math.Min(implantItem.Quality + Math.Max(0, bump), resultMaxQl);
+        }
+
+        /// <summary>
+        /// AO-Universe implant QL bump caps; DB MaxBump used when lower and &gt; 0.
+        /// </summary>
+        private static int GetImplantMaxBump(TradeSkillEntry ts, int implantQuality)
+        {
+            if (ts == null || !ts.IsImplant)
+            {
+                return 0;
+            }
+
+            int tierCap = 0;
+            if (implantQuality >= 250)
+            {
+                tierCap = 5;
+            }
+            else if (implantQuality >= 201)
+            {
+                tierCap = 4;
+            }
+            else if (implantQuality >= 150)
+            {
+                tierCap = 3;
+            }
+            else if (implantQuality >= 100)
+            {
+                tierCap = 2;
+            }
+            else if (implantQuality >= 50)
+            {
+                tierCap = 1;
+            }
+
+            if (ts.MaxBump > 0 && ts.MaxBump < tierCap)
+            {
+                return ts.MaxBump;
+            }
+
+            return tierCap;
+        }
+
+        /// <summary>
+        /// DeleteFlag bit0 = DB Id1 (cluster), bit1 = DB Id2 (implant). Map to UI slots when swapped.
+        /// </summary>
+        private static void ConsumeInputsByDeleteFlag(
+            IZoneClient client,
+            TradeSkillMatch match,
+            TradeSkillInfo source,
+            TradeSkillInfo target)
+        {
+            TradeSkillEntry ts = match.Entry;
+            TradeSkillInfo id1Slot = match.Swapped ? target : source;
+            TradeSkillInfo id2Slot = match.Swapped ? source : target;
+
+            if ((ts.DeleteFlag & 1) == 1)
+            {
+                InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(client.Controller.Character, id1Slot);
+                CharacterActionMessageHandler.Default.SendDeleteItem(
+                    client.Controller.Character,
+                    id1Slot.Container,
+                    id1Slot.Placement);
+            }
+
+            if ((ts.DeleteFlag & 2) == 2)
+            {
+                InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(client.Controller.Character, id2Slot);
+                CharacterActionMessageHandler.Default.SendDeleteItem(
+                    client.Controller.Character,
+                    id2Slot.Container,
+                    id2Slot.Placement);
+            }
+        }
+
         private static bool WindowBuild(
             IZoneClient client,
             int desiredQuality,
-            TradeSkillEntry ts,
+            TradeSkillMatch match,
             Item sourceItem,
-            Item targetItem)
+            Item targetItem,
+            out string failReason)
         {
-            if (!((ts.MinTargetQL >= targetItem.Quality) || (ts.MinTargetQL == 0)))
+            failReason = null;
+            TradeSkillEntry ts = match.Entry;
+            Item clusterItem = match.ClusterItem(sourceItem, targetItem);
+            Item implantItem = match.ImplantOrTargetItem(sourceItem, targetItem);
+
+            if (!((ts.MinTargetQL >= implantItem.Quality) || (ts.MinTargetQL == 0)))
             {
+                failReason = "Target implant QL is too low for this recipe.";
                 return false;
             }
 
-            if (!ts.ValidateRange(sourceItem.Quality, targetItem.Quality))
+            if (!ts.ValidateRange(clusterItem.Quality, implantItem.Quality))
             {
+                int minClusterQl = Convert.ToInt32(
+                    Math.Round(
+                        (double)implantItem.Quality - ts.QLRangePercent * implantItem.Quality / 100));
+                failReason =
+                    "Cluster QL too low for that implant (need about QL "
+                    + Math.Max(1, minClusterQl)
+                    + "+ for implant QL "
+                    + implantItem.Quality
+                    + ").";
                 return false;
             }
 
             foreach (TradeSkillSkill tss in ts.Skills)
             {
-                if (client.Controller.Character.Stats[tss.StatId].Value
-                    < Convert.ToInt32(tss.Percent / 100M * targetItem.Quality))
+                int need = (int)Math.Ceiling(tss.Percent / 100M * implantItem.Quality);
+                int have = client.Controller.Character.Stats[tss.StatId].Value;
+                if (have < need)
                 {
+                    failReason =
+                        "Need "
+                        + need
+                        + " in skill "
+                        + tss.StatId
+                        + " (you have "
+                        + have
+                        + ") for implant QL "
+                        + implantItem.Quality
+                        + ".";
                     return false;
                 }
             }

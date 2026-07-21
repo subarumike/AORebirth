@@ -1,0 +1,348 @@
+{
+  "Identity": {
+    "Id": "arete-vernon-godfray-dialogue-20260721-Vernon-Godfray",
+    "Version": "captured-vernon-20260721-Vernon-Godfray",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-Vernon-Godfray/chat-dialogue.log"
+  },
+  "SourceCaptures": [
+    "20260721-Vernon-Godfray"
+  ],
+  "Npcs": [
+    {
+      "Id": "vernon-godfray",
+      "NpcIdentity": "SimpleChar:78E0FC68",
+      "Name": "Vernon Godfray",
+      "RootNodeId": "vernon_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC68)"
+      ],
+      "Nodes": [
+        {
+          "Id": "vernon_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260721-Vernon-Godfray; options-only",
+          "Options": [
+            {
+              "Id": "vernon_001_option_0",
+              "Index": 0,
+              "Text": "Fine, I will hold the items for you.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:21.7997114Z",
+              "NextNodeId": "vernon_002",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:21.7997114Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "vernon_002_option_0",
+              "Index": 0,
+              "Text": "... well what?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:24.1852408Z; Answer=0 → Overflow 248377+87810 + Delete SpeakVernon + QFU Hacking Skills",
+              "NextNodeId": "vernon_003",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:24.1852408Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "vernon_003_option_0",
+              "Index": 0,
+              "Text": "I'm done now.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:28.0348654Z; Answer=0 after combine → hack-offer list",
+              "NextNodeId": "vernon_hack_offer",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:28.0348654Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_hack_offer",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "vernon_hack_offer_option_0",
+              "Index": 0,
+              "Text": "I was able to hack the device.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:36.9503877Z; Answer=0 → StartTrade",
+              "NextNodeId": "vernon_hack_trade",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_hack_offer_option_1",
+              "Index": 1,
+              "Text": "On second thought, I need some more time.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:36.9503877Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_hack_offer_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close until more time path captured"
+                }
+              ]
+            },
+            {
+              "Id": "vernon_hack_offer_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:36.9503877Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_hack_offer_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_hack_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "Options": [
+            {
+              "Id": "vernon_hack_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → AnswerList Is this legal?",
+              "NextNodeId": "vernon_after_hack_turnin",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_after_hack_turnin",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after Hacked Library turn-in",
+          "Options": [
+            {
+              "Id": "vernon_after_hack_turnin_option_0",
+              "Index": 0,
+              "Text": "Is this... legal?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:46.3316032Z",
+              "NextNodeId": "vernon_after_hack_close",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_after_hack_turnin_option_1",
+              "Index": 1,
+              "Text": "Nope.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:46.3316032Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_after_hack_turnin_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            },
+            {
+              "Id": "vernon_after_hack_turnin_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:46.3316032Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_after_hack_turnin_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_after_hack_close",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "vernon_after_hack_close_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:33:49.4007112Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_after_hack_close_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_return_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only return visit",
+          "Options": [
+            {
+              "Id": "vernon_return_001_option_0",
+              "Index": 0,
+              "Text": "I've returned. The terminal was hacked.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:35:23.0679447Z; Answer=0 → StartTrade",
+              "NextNodeId": "vernon_return_trade",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_return_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:35:23.0679447Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_return_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_return_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade captured",
+          "Options": [
+            {
+              "Id": "vernon_return_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → Great! Anything else?",
+              "NextNodeId": "vernon_return_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_return_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after return turn-in",
+          "Options": [
+            {
+              "Id": "vernon_return_002_option_0",
+              "Index": 0,
+              "Text": "Great! Anything else?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:35:38.2835611Z",
+              "NextNodeId": "vernon_return_003",
+              "Actions": []
+            },
+            {
+              "Id": "vernon_return_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:35:38.2835611Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_return_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "vernon_return_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Options": [
+            {
+              "Id": "vernon_return_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-21T12:35:42.1501771Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vernon_return_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}
