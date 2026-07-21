@@ -16,8 +16,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   interval exists. Violent Vagabond retains the accepted same-level Mugger
   damage policy and captured miss cadence. All 26 profiles and 322 rows are
   active; bounded private-client validation remains pending. Ordinary content
-  generation and Subway loot `22/22` pass; WorldPopulation is `38/39` with only
-  the pre-existing Workman source `0x7953A84F` atomic weapon-resolution failure.
+  generation and Subway loot `22/22` pass; WorldPopulation is `39/39` after the
+  Workman test stub was aligned with the captured/generated `59` normal hits.
 
 - Authoritative PF127 lifecycle policy now applies uniformly: every regular
   Subway mob respawns `240` seconds after NPC despawn; regular corpses persist
