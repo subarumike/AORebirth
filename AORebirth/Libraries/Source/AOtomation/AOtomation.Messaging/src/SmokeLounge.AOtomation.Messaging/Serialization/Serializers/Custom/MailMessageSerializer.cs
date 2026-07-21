@@ -74,6 +74,14 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                     message.Detail = ReadMailListEntry(streamReader);
                     break;
 
+                case MailAction.UpdateMailFlags:
+                    if (streamReader.Position + 12 <= streamReader.Length)
+                    {
+                        message.RequestedMailId = unchecked((ulong)streamReader.ReadInt64());
+                        message.MailFlagsUpdate = streamReader.ReadInt32();
+                    }
+                    break;
+
                 case MailAction.SendMail:
                     message.Recipient = ReadLengthPrefixedString(streamReader);
                     message.Subject = ReadLengthPrefixedString(streamReader);
@@ -90,9 +98,14 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 case MailAction.TakeAll:
                 case MailAction.Delete:
                 case MailAction.ReturnToSender:
+                    // Live N3Msg_* uses uint64; tolerate truncated 32-bit ids from some clients.
                     if (streamReader.Position + 8 <= streamReader.Length)
                     {
                         message.RequestedMailId = unchecked((ulong)streamReader.ReadInt64());
+                    }
+                    else if (streamReader.Position + 4 <= streamReader.Length)
+                    {
+                        message.RequestedMailId = unchecked((ulong)(uint)streamReader.ReadInt32());
                     }
                     break;
 
@@ -160,6 +173,11 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                     WriteMailListEntry(streamWriter, message.Detail ?? new MailListEntry { IsSummary = false });
                     break;
 
+                case MailAction.UpdateMailFlags:
+                    streamWriter.WriteInt64(unchecked((long)message.RequestedMailId));
+                    streamWriter.WriteInt32(message.MailFlagsUpdate);
+                    break;
+
                 case MailAction.SendMail:
                     WriteLengthPrefixedString(streamWriter, message.Recipient ?? string.Empty);
                     WriteLengthPrefixedString(streamWriter, message.Subject ?? string.Empty);
@@ -175,6 +193,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                     streamWriter.WriteInt32(message.Unknown1);
                     streamWriter.WriteInt32(message.MailId);
                     streamWriter.WriteInt32(message.Unknown2);
+                    break;
+
+                case MailAction.TakeAll:
+                case MailAction.Delete:
+                case MailAction.ReturnToSender:
+                    // Same payload as deserialize (mail id uint64). from_dll left these empty.
+                    streamWriter.WriteInt64(unchecked((long)message.RequestedMailId));
                     break;
             }
         }

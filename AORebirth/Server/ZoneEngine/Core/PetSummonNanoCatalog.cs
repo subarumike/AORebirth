@@ -442,15 +442,22 @@ namespace ZoneEngine.Core
             string preferredHash;
             if (PreferredPetHashByNano.TryGetValue(nanoId, out preferredHash))
             {
-                List<PetSummonParams> candidates = CollectCandidates(nanoId, nano);
+                // Heal-pet nanos gate SpawnPet hashes with Soothing Spirits (MT02 → LYNX…RHEF).
+                // Prefer the qualified branch; do not force PreferredPetHash (that kept SS10 on MT02).
                 List<PetSummonParams> preferredQualified = CollectQualifiedCandidates(character, nanoId, nano);
-                List<PetSummonParams> preferredSelectionPool =
-                    preferredQualified.Count > 0 ? preferredQualified : candidates;
-                List<PetSummonParams> preferredPool = preferredSelectionPool
-                    .Where(x => string.Equals(x.PetHash, preferredHash, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                PetSummonParams preferred = SelectBestCandidate(
+                    character,
+                    preferredQualified,
+                    preferredHash);
+                if (preferred == null)
+                {
+                    List<PetSummonParams> candidates = CollectCandidates(nanoId, nano);
+                    List<PetSummonParams> preferredPool = candidates
+                        .Where(x => string.Equals(x.PetHash, preferredHash, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                    preferred = SelectBestCandidate(character, preferredPool, preferredHash);
+                }
 
-                PetSummonParams preferred = SelectBestCandidate(character, preferredPool);
                 if (preferred == null)
                 {
                     int ownerLevel = character.Stats[StatIds.level].Value;
@@ -477,7 +484,7 @@ namespace ZoneEngine.Core
 
             List<PetSummonParams> qualified = CollectQualifiedCandidates(character, nanoId, nano);
             List<PetSummonParams> selectionPool = qualified.Count > 0 ? qualified : catalogCandidates;
-            PetSummonParams bestMatch = SelectBestCandidate(character, selectionPool);
+            PetSummonParams bestMatch = SelectBestCandidate(character, selectionPool, null);
             if (bestMatch == null)
             {
                 return false;
@@ -574,7 +581,8 @@ namespace ZoneEngine.Core
 
         private static PetSummonParams SelectBestCandidate(
             ICharacter character,
-            List<PetSummonParams> candidates)
+            List<PetSummonParams> candidates,
+            string preferredBaseHash)
         {
             if (candidates == null || candidates.Count == 0)
             {
@@ -583,7 +591,9 @@ namespace ZoneEngine.Core
 
             int ownerLevel = character.Stats[StatIds.level].Value;
             List<PetSummonParams> resolvable = candidates
-                .Where(x => !string.IsNullOrWhiteSpace(PetMobTemplateResolver.Resolve(x.PetHash)))
+                .Where(
+                    x => !string.IsNullOrWhiteSpace(
+                        PetMobTemplateResolver.Resolve(x.PetHash, preferredBaseHash)))
                 .ToList();
 
             if (resolvable.Count == 0)
@@ -591,18 +601,82 @@ namespace ZoneEngine.Core
                 return null;
             }
 
-            List<PetSummonParams> pool = resolvable;
+            // Among Soothing Spirits gates, prefer the highest texture tier (RHEF > … > MT02).
+            List<PetSummonParams> soothingPool = resolvable
+                .Where(
+                    x => SoothingSpiritsHealPetLadder.IsSoothingSpiritsUpgradeHash(x.PetHash)
+                        || string.Equals(x.PetHash, preferredBaseHash, StringComparison.OrdinalIgnoreCase)
+                        || IsHealPetBaseHash(x.PetHash))
+                .ToList();
+            List<PetSummonParams> pool = soothingPool.Count > 0 ? soothingPool : resolvable;
+
             List<PetSummonParams> withinLevel = pool
                 .Where(x => x.PetTypeId <= ownerLevel)
                 .ToList();
 
             if (withinLevel.Count > 0)
             {
-                int bestType = withinLevel.Max(x => x.PetTypeId);
-                return withinLevel.Last(x => x.PetTypeId == bestType);
+                return PickHighestSoothingTier(withinLevel);
             }
 
-            return pool.OrderByDescending(x => x.PetTypeId).First();
+            return PickHighestSoothingTier(pool);
+        }
+
+        private static bool IsHealPetBaseHash(string petHash)
+        {
+            return string.Equals(petHash, "MT01", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "MT02", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "MT03", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "MT04", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(petHash, "BSLX", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static PetSummonParams PickHighestSoothingTier(List<PetSummonParams> pool)
+        {
+            if (pool == null || pool.Count == 0)
+            {
+                return null;
+            }
+
+            int bestScore = int.MinValue;
+            PetSummonParams best = null;
+            foreach (PetSummonParams candidate in pool)
+            {
+                int score = ScoreSoothingSpawnHash(candidate.PetHash) * 100000 + candidate.PetTypeId;
+                if (score >= bestScore)
+                {
+                    bestScore = score;
+                    best = candidate;
+                }
+            }
+
+            return best;
+        }
+
+        private static int ScoreSoothingSpawnHash(string petHash)
+        {
+            if (string.IsNullOrWhiteSpace(petHash))
+            {
+                return 0;
+            }
+
+            switch (petHash.ToUpperInvariant())
+            {
+                case "RHEF":
+                    return 6;
+                case "MNKW":
+                    return 5;
+                case "QRMT":
+                    return 4;
+                case "DKEL":
+                    return 3;
+                case "JBOB":
+                    return 2;
+                case "LYNX":
+                    return 1;
+                default:
+                    return 0;
+            }
         }
 
         private static bool IsSummonFunction(Function function)

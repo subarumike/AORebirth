@@ -78,7 +78,13 @@ namespace AORebirth.Stats.SpecialStats
         {
             get
             {
-                return LoginDataDao.Instance.GetByCharacterId(this.Stats.Owner.Instance).GM;
+                if (this.Stats?.Owner == null)
+                {
+                    return 0;
+                }
+
+                var login = LoginDataDao.Instance.GetByCharacterId(this.Stats.Owner.Instance);
+                return login != null ? login.GM : 0;
             }
         }
 

@@ -143,8 +143,8 @@ namespace ZoneEngine.Core.Subway.Quests
             SetStat(character, StatIds.monsterscale, definition.MonsterScale);
             SetStat(character, StatIds.headmesh, definition.HeadMesh);
             SetStat(character, StatIds.visualflags, definition.VisualFlags);
-            SetStat(character, StatIds.currentmovementmode, 3);
-            SetStat(character, StatIds.prevmovementmode, 3);
+            SetStat(character, StatIds.currentmovementmode, (int)MoveModes.Sit);
+            SetStat(character, StatIds.prevmovementmode, (int)MoveModes.Sit);
             SetStat(character, StatIds.runspeed, definition.RunSpeed);
             SetStat(character, StatIds.level, definition.Level);
             SetStat(character, StatIds.life, definition.Health);

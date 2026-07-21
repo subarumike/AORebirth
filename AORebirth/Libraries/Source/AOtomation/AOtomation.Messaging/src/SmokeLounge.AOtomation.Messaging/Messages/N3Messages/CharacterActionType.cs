@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CharacterActionType.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -32,6 +32,11 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         UseItemOnItem = 0x00000051,
 
+        /// <summary>
+        /// Server→client: perk action queued (capture 20260715-194155 UsePerk reply).
+        /// </summary>
+        QueuePerk = 0x00000050,
+
         StandUp = 0x00000057,
 
         Unknown3 = 0x00000061,
@@ -51,6 +56,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         UseActionFinished = 0x0000006E,
 
         DeleteItem = 0x00000070,
+
+        /// <summary>
+        /// Server→client: NPC social/idle gesture. Target.Instance = animation id.
+        /// Capture 20260719-Natalia-Akcoraanimation (Action=100 / 0x64).
+        /// </summary>
+        NpcSocialAnim = 0x00000064,
 
         Logout = 0x00000078,
 
@@ -80,9 +91,52 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         DeathRespawn = 0x000000AB,
 
+        /// <summary>
+        /// Client→server: use a trained perk action (Perk Actions menu). Capture 20260715-194155.
+        /// </summary>
+        UsePerk = 0x000000B3,
+
+        /// <summary>
+        /// Server→client: grant a Perk Actions button for a trained perk. Capture 20260715-194155.
+        /// Target.Instance = action template id; Parameter1 = 10000+PacketID; Parameter2 = 4-char action hash.
+        /// </summary>
+        AddPerkAction = 0x000000B4,
+
+        /// <summary>
+        /// Server→client: remove a Perk Actions button. Capture 20260716-Reset-perks (Action=182).
+        /// Same Parameter layout as AddPerkAction.
+        /// </summary>
+        RemovePerkAction = 0x000000B6,
+
+        /// <summary>
+        /// Client↔server: train a perk by PacketID (Parameter2). Capture 20260715-194155.
+        /// </summary>
+        TrainPerk = 0x000000BB,
+
+        /// <summary>
+        /// Server→client: all trained perks cleared (full reset). Capture 20260716-Reset-perks (Action=201).
+        /// </summary>
+        ClearAllPerks = 0x000000C9,
+
+        /// <summary>
+        /// Client→server: Character Info → Inspect Equipment.
+        /// Server replies with InspectMessage. Capture 20260719-182611 (Action=0x105).
+        /// </summary>
+        Inspect = 0x00000105,
+
         SitDown = 0x00000107,
 
         UploadNano = 0x000000CC,
+
+        /// <summary>
+        /// Server→client: perk action off cooldown. Parameter2 = PacketID. Capture 20260715-194155.
+        /// </summary>
+        PerkAvailable = 0x000000CE,
+
+        /// <summary>
+        /// Server→client: perk action on cooldown. Parameter1 = PacketID. Capture 20260715-194155.
+        /// </summary>
+        PerkUnavailable = 0x000000CF,
 
         TradeskillSourceChanged = 0x000000DC,
 

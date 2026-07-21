@@ -1,0 +1,1001 @@
+namespace ZoneEngine.Core.Arete.Quests
+{
+    #region Usings ...
+
+    using System;
+    using System.Collections.Generic;
+
+    using AORebirth.Core.Entities;
+    using AORebirth.Core.Inventory;
+    using AORebirth.Core.Items;
+    using AORebirth.Core.Network;
+    using AORebirth.Enums;
+    using AORebirth.ObjectManager;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using Utility;
+
+    using ZoneEngine.Core;
+    using ZoneEngine.Core.Arete.Dialogue;
+    using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Missions;
+
+    #endregion
+
+    /// <summary>
+    /// Capture 20260720-goldman: Stan Goodman dialogue → accept job →
+    /// Action59+Delete Talk to Stan (555B4366) + QFU Buy a Lockpick (555BD124).
+    /// Capture 20260721-lockpick: Use sealed 295999 → TemplateAction 95577 (Unknown2=87) +
+    /// consume sealed + Action59+Delete Buy Lockpick + QFU Strongbox (555BE9C5).
+    /// Capture 20260721-afgter dog lockpick goodman: UseItemOnItem Lock Pick on
+    /// Terminal:574187CE → grant 248306 + tip Deliver to Stan (555BE9F2);
+    /// Stan deliver dialogue → StartTrade → FinishTrade → Talk to Sarah + Buy Nano Programs.
+    /// </summary>
+    public static class StanGoodmanQuestRuntime
+    {
+        public const string AcceptJobNodeId = "stan_goldman_003";
+
+        public const string DeliverOfferNodeId = "stan_deliver_001";
+
+        public const string DeliverTradeHoldNodeId = "stan_deliver_trade";
+
+        public const string TalkToStanQuestId = "Mission:555B4366";
+
+        public const string BuyLockpickQuestId = "Mission:555BD124";
+
+        public const string StrongboxQuestId = "Mission:555BE9C5";
+
+        public const string DeliverAntonioFactoryQuestId = "Mission:555BE9F2";
+
+        public const string TalkToSarahGreeneQuestId = "Mission:555BE9F3";
+
+        public const string BuyNanoProgramsQuestId = "Mission:555BE9F4";
+
+        private const int AreteLandingPlayfieldId = 6553;
+
+        private const int StanGoodmanInstance = unchecked((int)0x78E0FC65);
+
+        private const int SealedLockpickItemId = 295999;
+
+        private const int LockPickItemId = 95577;
+
+        private const int MerchantsStrongboxTemplateId = 295604;
+
+        private const int MerchantsStrongboxInstance = unchecked((int)0x574187CE);
+
+        private const int AntoniosAdaptionFactoryItemId = 248306;
+
+        // Capture 20260721-afgter dog lockpick goodman TemplateAction after Stan Accept.
+        private const int StanTurnInRewardItemId = 296572;
+
+        private const int StanTurnInXpReward = 2596;
+
+        private const int StanTurnInCreditReward = 1240;
+
+        private const int CapturedTemplateActionUnknown1 = 1;
+
+        private const int CapturedTemplateActionUnknown2 = 87;
+
+        private const int CapturedOverflowNextFreeSlot = 0x6F;
+
+        private const int CapturedTradeSlotCount = 4;
+
+        // Capture 20260721-afgter dog lockpick goodman FormatFeedback (Adaption spelling on wire).
+        private const string LockpickSuccessFeedback =
+            "~&!!!\":!!!)<sOYou successfully picked this lock and obtained the Antonio's Adaption Factory.";
+
+        // Capture wire FormattedMessage for XP/credits after factory turn-in.
+        private const string StanTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!?Oi!!!/S~";
+
+        private const string StanTradePrompt =
+            "Drag and drop the item(s) you want to give to Stanley Goodman into one of the slots available and press \"accept\"";
+
+        private static readonly object TradeSyncRoot = new object();
+
+        private static readonly Dictionary<int, StanTradeSession> TradeSessionsByCharacter =
+            new Dictionary<int, StanTradeSession>();
+
+        private static readonly HashSet<int> TurnInInFlightByCharacter = new HashSet<int>();
+
+        private sealed class StanTradeSession
+        {
+            public Identity NpcIdentity;
+
+            public Identity StagedContainer;
+        }
+
+        public static string ResolveStanStartNodeId(ICharacter source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            if (IsDeliverTipActive(source) || HasAntonioFactory(source))
+            {
+                return DeliverOfferNodeId;
+            }
+
+            return null;
+        }
+
+        public static bool TryHandleDialogueAnswer(ICharacter source, string previousNodeId, int answerIndex)
+        {
+            if (source == null || answerIndex != 0)
+            {
+                return false;
+            }
+
+            if (!string.Equals(previousNodeId, AcceptJobNodeId, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // Never re-offer Buy Lockpick once deliver/factory chain is active.
+            if (IsDeliverTipActive(source)
+                || HasAntonioFactory(source)
+                || IsMissionActiveOrCompleted(source, TalkToSarahGreeneQuestId)
+                || IsMissionActiveOrCompleted(source, BuyNanoProgramsQuestId)
+                || IsMissionActiveOrCompleted(source, DeliverAntonioFactoryQuestId)
+                || IsMissionActiveOrCompleted(source, StrongboxQuestId)
+                || IsMissionActiveOrCompleted(source, BuyLockpickQuestId))
+            {
+                Log("accept-job ignored — lockpick chain already progressed");
+                return true;
+            }
+
+            CompleteTalkToStanAndOfferBuyLockpick(source);
+            return true;
+        }
+
+        public static bool TryBeginStanTrade(ICharacter source, Identity stanIdentity)
+        {
+            if (source == null)
+            {
+                return false;
+            }
+
+            if (!IsDeliverTipActive(source) && !HasAntonioFactory(source) && GetTradeSession(source) == null)
+            {
+                return false;
+            }
+
+            if (stanIdentity.Type != IdentityType.CanbeAffected || stanIdentity.Instance == 0)
+            {
+                stanIdentity = new Identity
+                               {
+                                   Type = IdentityType.CanbeAffected,
+                                   Instance = StanGoodmanInstance
+                               };
+            }
+
+            BeginStanTrade(source, stanIdentity);
+            KnuBotStartTradeMessageHandler.Default.Send(
+                source,
+                stanIdentity,
+                StanTradePrompt,
+                CapturedTradeSlotCount);
+            Log(
+                "stan-trade-opened character="
+                + source.Identity.ToString(true)
+                + " hasFactory="
+                + HasAntonioFactory(source));
+            return true;
+        }
+
+        public static bool TryStageStanTradeItem(ICharacter source, KnuBotTradeMessage message)
+        {
+            if (source == null || message == null || !IsStanNpc(source, message.Target))
+            {
+                return false;
+            }
+
+            if (!HasAntonioFactory(source) && !IsDeliverTipActive(source) && GetTradeSession(source) == null)
+            {
+                return false;
+            }
+
+            EnsureStanTradeSession(source, message.Target);
+            StanTradeSession session = GetTradeSession(source);
+            if (session == null)
+            {
+                return true;
+            }
+
+            session.NpcIdentity = message.Target;
+            if (message.Container.Type != IdentityType.None && message.Container.Instance > 0)
+            {
+                session.StagedContainer = message.Container;
+                Log(
+                    "stan-trade-staged character="
+                    + source.Identity.ToString(true)
+                    + " container="
+                    + message.Container.ToString(true));
+            }
+
+            return true;
+        }
+
+        public static bool ShouldSuppressGenericStanTradeRemove(ICharacter source, Identity target)
+        {
+            if (source == null || !IsStanNpc(source, target))
+            {
+                return false;
+            }
+
+            return HasAntonioFactory(source) || IsDeliverTipActive(source) || GetTradeSession(source) != null;
+        }
+
+        public static bool TryFinishStanTrade(ICharacter source, KnuBotFinishTradeMessage message)
+        {
+            if (source == null || message == null)
+            {
+                return false;
+            }
+
+            bool isStan = IsStanNpc(source, message.Target);
+            StanTradeSession session = GetTradeSession(source);
+            // Only claim Stan's own FinishTrade — never steal Accept from Bill/Alex/etc.
+            if (!isStan && session == null)
+            {
+                return false;
+            }
+
+            if (message.Decline != 0)
+            {
+                ForgetTradeSession(source);
+                return true;
+            }
+
+            if (session == null)
+            {
+                EnsureStanTradeSession(source, message.Target);
+                session = GetTradeSession(source);
+            }
+
+            Identity stagedContainer = session != null ? session.StagedContainer : Identity.None;
+            ApplyStanTradeTurnIn(source, message.Target, stagedContainer);
+            return true;
+        }
+
+        /// <summary>
+        /// Capture 20260721-lockpick @22:45:47: Use Inventory sealed package → Lock Pick + tip handoff.
+        /// </summary>
+        public static bool TryHandleSealedLockpickUse(
+            ICharacter character,
+            Identity itemPosition,
+            Item item)
+        {
+            if (character == null
+                || item == null
+                || (item.LowID != SealedLockpickItemId && item.HighID != SealedLockpickItemId))
+            {
+                return false;
+            }
+
+            if (!ItemLoader.ItemList.ContainsKey(LockPickItemId))
+            {
+                Log("sealed-use skipped: ItemLoader missing Lock Pick id=" + LockPickItemId);
+                return false;
+            }
+
+            if (!InventoryContainerRuntimeService.Default.HasCharacterInventory(character)
+                || character.Controller == null
+                || character.Controller.Client == null)
+            {
+                Log("sealed-use skipped: inventory/client missing");
+                return false;
+            }
+
+            if (!InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    character,
+                    LockPickItemId))
+            {
+                Item lockPick;
+                try
+                {
+                    lockPick = new Item(1, LockPickItemId, LockPickItemId);
+                }
+                catch (Exception ex)
+                {
+                    Log("Lock Pick create failed: " + ex.Message);
+                    return false;
+                }
+
+                QuestRewardInventoryGrantResult grant =
+                    InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(character, lockPick);
+                if (grant.Status != QuestRewardInventoryGrantStatus.Success)
+                {
+                    Log(
+                        "Lock Pick grant failed status="
+                        + grant.Status
+                        + " invErr="
+                        + grant.InventoryError);
+                    return false;
+                }
+
+                SendOverflowGrantPackets(character, LockPickItemId, 1);
+            }
+
+            // Capture: TemplateAction sealed Unknown2=3 at placement, then DeleteItem.
+            TemplateActionMessageHandler.Default.Send(
+                character,
+                item,
+                (int)itemPosition.Type,
+                itemPosition.Instance);
+            character.BaseInventory.RemoveItem((int)itemPosition.Type, itemPosition.Instance);
+            CharacterActionMessageHandler.Default.SendDeleteItem(
+                character,
+                (int)itemPosition.Type,
+                itemPosition.Instance);
+
+            CompleteBuyLockpickAndOfferStrongbox(character);
+            Log(
+                "sealed-lockpick-opened→lockpick+strongbox character="
+                + character.Identity.ToString(true)
+                + " slot="
+                + itemPosition);
+            return true;
+        }
+
+        /// <summary>
+        /// Capture 20260721-afgter dog lockpick goodman @23:04:25:
+        /// UseItemOnItem Lock Pick (Inventory) on Merchant's Strongbox (Terminal:574187CE).
+        /// </summary>
+        public static bool TryHandleUseItemOnItem(IZoneClient client, GenericCmdMessage message)
+        {
+            if (client == null || message == null || message.Target == null || message.Target.Length < 2)
+            {
+                return false;
+            }
+
+            if (UseItemOnItemInteractionRules.ResolveRouteMode(message.Action)
+                != UseItemOnItemInteractionRouteMode.UseItemOnItem)
+            {
+                return false;
+            }
+
+            ICharacter character = client.Controller != null ? client.Controller.Character : null;
+            if (character == null
+                || character.Playfield == null
+                || character.Playfield.Identity.Instance != AreteLandingPlayfieldId
+                || !(character.Controller is PlayerController))
+            {
+                return false;
+            }
+
+            Identity itemIdentity = message.Target[0];
+            Identity strongboxIdentity = message.Target[1];
+            if (strongboxIdentity.Type != IdentityType.Terminal)
+            {
+                return false;
+            }
+
+            IItem lockPick = ResolveInventoryItem(character, itemIdentity);
+            if (lockPick == null
+                || (lockPick.LowID != LockPickItemId && lockPick.HighID != LockPickItemId))
+            {
+                return false;
+            }
+
+            if (!IsMerchantsStrongbox(character, strongboxIdentity))
+            {
+                return false;
+            }
+
+            if (!ItemLoader.ItemList.ContainsKey(AntoniosAdaptionFactoryItemId))
+            {
+                Log("strongbox-pick skipped: ItemLoader missing factory id=" + AntoniosAdaptionFactoryItemId);
+                return false;
+            }
+
+            GenericCmdMessageHandler.Default.Acknowledge(character, message);
+
+            if (!InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    character,
+                    AntoniosAdaptionFactoryItemId))
+            {
+                Item factory;
+                try
+                {
+                    factory = new Item(1, AntoniosAdaptionFactoryItemId, AntoniosAdaptionFactoryItemId);
+                }
+                catch (Exception ex)
+                {
+                    Log("factory create failed: " + ex.Message);
+                    return true;
+                }
+
+                QuestRewardInventoryGrantResult grant =
+                    InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(character, factory);
+                if (grant.Status != QuestRewardInventoryGrantStatus.Success)
+                {
+                    Log(
+                        "factory grant failed status="
+                        + grant.Status
+                        + " invErr="
+                        + grant.InventoryError);
+                }
+                else
+                {
+                    SendOverflowGrantPackets(character, AntoniosAdaptionFactoryItemId, 1);
+                }
+            }
+
+            try
+            {
+                character.Controller.Client.SendCompressed(
+                    new FormatFeedbackMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 1,
+                        Unknown1 = 0,
+                        FormattedMessage = LockpickSuccessFeedback,
+                        Unknown2 = 0
+                    });
+            }
+            catch (Exception ex)
+            {
+                Log("lockpick feedback failed: " + ex.Message);
+            }
+
+            CompleteStrongboxAndOfferDeliverFactory(character);
+            Log(
+                "strongbox-picked character="
+                + character.Identity.ToString(true)
+                + " target="
+                + strongboxIdentity.ToString(true));
+            return true;
+        }
+
+        private static bool IsMerchantsStrongbox(ICharacter character, Identity target)
+        {
+            if (target.Type != IdentityType.Terminal)
+            {
+                return false;
+            }
+
+            if (target.Instance == MerchantsStrongboxInstance)
+            {
+                return true;
+            }
+
+            StaticDynel dynel = Pool.Instance.GetObject<StaticDynel>(character.Playfield.Identity, target);
+            if (dynel == null)
+            {
+                return false;
+            }
+
+            if (dynel.Template != null && dynel.Template.ID == MerchantsStrongboxTemplateId)
+            {
+                return true;
+            }
+
+            int template;
+            if (dynel.Stats != null
+                && (dynel.Stats.TryGetValue((int)StatIds.acgitemtemplateid, out template)
+                    || dynel.Stats.TryGetValue((int)StatIds.staticinstance, out template)))
+            {
+                return template == MerchantsStrongboxTemplateId;
+            }
+
+            return false;
+        }
+
+        private static IItem ResolveInventoryItem(ICharacter character, Identity itemIdentity)
+        {
+            IInventoryPage sourcePage;
+            if (character.BaseInventory != null
+                && character.BaseInventory.Pages.TryGetValue((int)itemIdentity.Type, out sourcePage)
+                && sourcePage != null)
+            {
+                return sourcePage[itemIdentity.Instance];
+            }
+
+            return null;
+        }
+
+        private static void CompleteTalkToStanAndOfferBuyLockpick(ICharacter source)
+        {
+            int instance = source.Identity.Instance;
+            if (MissionRuntime.IsInitialized)
+            {
+                MissionOperationResult result = MissionRuntime.Service.CompleteAndActivateNextMission(
+                    instance,
+                    TalkToStanQuestId,
+                    BuyLockpickQuestId);
+                if (result.Status != MissionOperationStatus.Applied
+                    && result.Status != MissionOperationStatus.AlreadyApplied)
+                {
+                    MissionRuntime.Service.CompleteMission(instance, TalkToStanQuestId);
+                    MissionRuntime.Service.OfferMission(instance, BuyLockpickQuestId);
+                    MissionRuntime.Service.AcceptMission(instance, BuyLockpickQuestId);
+                }
+            }
+
+            SafeQuestFullUpdateSender.TrySendTalkStanToBuyLockpickHandoff(source);
+            Log("talk-stan-complete→buy-lockpick character=" + source.Identity.ToString(true));
+        }
+
+        private static void CompleteBuyLockpickAndOfferStrongbox(ICharacter source)
+        {
+            int instance = source.Identity.Instance;
+            if (MissionRuntime.IsInitialized)
+            {
+                MissionOperationResult result = MissionRuntime.Service.CompleteAndActivateNextMission(
+                    instance,
+                    BuyLockpickQuestId,
+                    StrongboxQuestId);
+                if (result.Status != MissionOperationStatus.Applied
+                    && result.Status != MissionOperationStatus.AlreadyApplied)
+                {
+                    MissionRuntime.Service.CompleteMission(instance, BuyLockpickQuestId);
+                    MissionRuntime.Service.OfferMission(instance, StrongboxQuestId);
+                    MissionRuntime.Service.AcceptMission(instance, StrongboxQuestId);
+                }
+            }
+
+            SafeQuestFullUpdateSender.TrySendBuyLockpickToStrongboxHandoff(source);
+        }
+
+        private static void CompleteStrongboxAndOfferDeliverFactory(ICharacter source)
+        {
+            int instance = source.Identity.Instance;
+            if (MissionRuntime.IsInitialized)
+            {
+                MissionOperationResult result = MissionRuntime.Service.CompleteAndActivateNextMission(
+                    instance,
+                    StrongboxQuestId,
+                    DeliverAntonioFactoryQuestId);
+                if (result.Status != MissionOperationStatus.Applied
+                    && result.Status != MissionOperationStatus.AlreadyApplied)
+                {
+                    MissionRuntime.Service.CompleteMission(instance, StrongboxQuestId);
+                    MissionRuntime.Service.OfferMission(instance, DeliverAntonioFactoryQuestId);
+                    MissionRuntime.Service.AcceptMission(instance, DeliverAntonioFactoryQuestId);
+                }
+            }
+
+            SafeQuestFullUpdateSender.TrySendStrongboxToDeliverFactoryHandoff(source);
+        }
+
+        private static void ApplyStanTradeTurnIn(ICharacter source, Identity stanTarget, Identity stagedContainer)
+        {
+            int instance = source.Identity.Instance;
+            lock (TradeSyncRoot)
+            {
+                if (!TurnInInFlightByCharacter.Add(instance))
+                {
+                    return;
+                }
+            }
+
+            try
+            {
+                if (!TryConsumeInventoryItem(source, stagedContainer, AntoniosAdaptionFactoryItemId))
+                {
+                    Log(
+                        "stan-turnin ABORTED — factory not consumed character="
+                        + source.Identity.ToString(true)
+                        + " staged="
+                        + stagedContainer.ToString(true)
+                        + " hasItem="
+                        + HasAntonioFactory(source));
+                    Identity reopenTarget = stanTarget;
+                    if (reopenTarget.Type != IdentityType.CanbeAffected || reopenTarget.Instance == 0)
+                    {
+                        reopenTarget = new Identity
+                                       {
+                                           Type = IdentityType.CanbeAffected,
+                                           Instance = StanGoodmanInstance
+                                       };
+                    }
+
+                    BeginStanTrade(source, reopenTarget);
+                    KnuBotStartTradeMessageHandler.Default.Send(
+                        source,
+                        reopenTarget,
+                        StanTradePrompt,
+                        CapturedTradeSlotCount);
+                }
+                else
+                {
+                    try
+                    {
+                        KnuBotRejectedItemsMessageHandler.Default.Send(source, stanTarget, new Item[0], 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("stan-rejecteditems failed: " + ex.Message);
+                    }
+
+                    ApplyStanTurnInXpCredits(source);
+                    TrySendStanTurnInRewardFeedback(source);
+                    TryGrantStanTurnInRewardItem(source);
+                    try
+                    {
+                        FeedbackMessageHandler.Default.Send(source, 110, 108871108);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("stan-item-feedback failed: " + ex.Message);
+                    }
+
+                    CompleteDeliverFactoryAndOfferNextTips(source);
+                    ForgetTradeSession(source);
+                    try
+                    {
+                        ContentDrivenNpcDialogueRouter.TryResumeAfterNpcTrade(source, stanTarget);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("stan-resume-dialogue failed: " + ex.Message);
+                    }
+
+                    Log("stan-turnin done character=" + source.Identity.ToString(true));
+                }
+            }
+            finally
+            {
+                lock (TradeSyncRoot)
+                {
+                    TurnInInFlightByCharacter.Remove(instance);
+                }
+            }
+        }
+
+        private static void CompleteDeliverFactoryAndOfferNextTips(ICharacter source)
+        {
+            int instance = source.Identity.Instance;
+            if (MissionRuntime.IsInitialized)
+            {
+                MissionRuntime.Service.CompleteMission(instance, DeliverAntonioFactoryQuestId);
+                MissionRuntime.Service.OfferMission(instance, TalkToSarahGreeneQuestId);
+                MissionRuntime.Service.AcceptMission(instance, TalkToSarahGreeneQuestId);
+                MissionRuntime.Service.OfferMission(instance, BuyNanoProgramsQuestId);
+                MissionRuntime.Service.AcceptMission(instance, BuyNanoProgramsQuestId);
+            }
+
+            SafeQuestFullUpdateSender.TrySendDeliverFactoryToSarahAndNanoTipsHandoff(source);
+        }
+
+        private static void ApplyStanTurnInXpCredits(ICharacter source)
+        {
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-stan-factory-turnin-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = StanTurnInCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = StanTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = StanTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.lastxp,
+                                                                Kind = MissionStatMutationKind.Set,
+                                                                Value = StanTurnInXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                source.Identity.Instance,
+                DeliverAntonioFactoryQuestId,
+                definition,
+                "capture:20260721-afgter-dog-lockpick-goodman:stan-turnin-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
+        }
+
+        private static void TrySendStanTurnInRewardFeedback(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return;
+            }
+
+            source.Controller.Client.SendCompressed(
+                new FormatFeedbackMessage
+                {
+                    Identity = source.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = StanTurnInRewardFeedback,
+                    Unknown2 = 0
+                });
+        }
+
+        private static void TryGrantStanTurnInRewardItem(ICharacter source)
+        {
+            if (source == null || !ItemLoader.ItemList.ContainsKey(StanTurnInRewardItemId))
+            {
+                Log("stan reward grant skipped: missing template " + StanTurnInRewardItemId);
+                return;
+            }
+
+            if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                    source,
+                    StanTurnInRewardItemId))
+            {
+                return;
+            }
+
+            Item reward;
+            try
+            {
+                reward = new Item(1, StanTurnInRewardItemId, StanTurnInRewardItemId);
+            }
+            catch (Exception ex)
+            {
+                Log("stan reward create failed: " + ex.Message);
+                return;
+            }
+
+            QuestRewardInventoryGrantResult grant =
+                InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(source, reward);
+            if (grant.Status != QuestRewardInventoryGrantStatus.Success)
+            {
+                Log("stan reward grant failed status=" + grant.Status);
+                return;
+            }
+
+            SendOverflowGrantPackets(source, StanTurnInRewardItemId, 1);
+        }
+
+        private static bool TryConsumeInventoryItem(ICharacter source, Identity stagedContainer, int itemId)
+        {
+            if (source == null || source.BaseInventory == null || itemId <= 0)
+            {
+                return false;
+            }
+
+            if (stagedContainer.Type != IdentityType.None && stagedContainer.Instance > 0)
+            {
+                IInventoryPage stagedPage;
+                if (source.BaseInventory.Pages.TryGetValue((int)stagedContainer.Type, out stagedPage)
+                    && stagedPage != null)
+                {
+                    IItem staged = stagedPage[stagedContainer.Instance];
+                    if (staged != null
+                        && (staged.LowID == itemId || staged.HighID == itemId))
+                    {
+                        source.BaseInventory.RemoveItem((int)stagedContainer.Type, stagedContainer.Instance);
+                        CharacterActionMessageHandler.Default.SendDeleteItem(
+                            source,
+                            (int)stagedContainer.Type,
+                            stagedContainer.Instance);
+                        return true;
+                    }
+                }
+            }
+
+            return TryRemoveFactoryAnywhere(source, itemId);
+        }
+
+        private static bool TryRemoveFactoryAnywhere(ICharacter source, int itemId)
+        {
+            if (source?.BaseInventory?.Pages == null)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in source.BaseInventory.Pages)
+            {
+                IInventoryPage page = pageEntry.Value;
+                if (page == null)
+                {
+                    continue;
+                }
+
+                foreach (KeyValuePair<int, IItem> slot in page.List())
+                {
+                    IItem item = slot.Value;
+                    if (item == null || (item.LowID != itemId && item.HighID != itemId))
+                    {
+                        continue;
+                    }
+
+                    source.BaseInventory.RemoveItem(pageEntry.Key, slot.Key);
+                    CharacterActionMessageHandler.Default.SendDeleteItem(source, pageEntry.Key, slot.Key);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool HasAntonioFactory(ICharacter source)
+        {
+            return source != null
+                   && InventoryContainerRuntimeService.Default.HasCharacterInventory(source)
+                   && InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
+                       source,
+                       AntoniosAdaptionFactoryItemId);
+        }
+
+        private static bool IsDeliverTipActive(ICharacter source)
+        {
+            return IsMissionLifecycle(source, DeliverAntonioFactoryQuestId, true, false);
+        }
+
+        private static bool IsMissionActiveOrCompleted(ICharacter source, string questId)
+        {
+            return IsMissionLifecycle(source, questId, true, true);
+        }
+
+        private static bool IsMissionLifecycle(
+            ICharacter source,
+            string questId,
+            bool includeActive,
+            bool includeCompleted)
+        {
+            if (source == null || !MissionRuntime.IsInitialized || string.IsNullOrEmpty(questId))
+            {
+                return false;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(source.Identity.Instance, questId);
+            if (mission == null)
+            {
+                return false;
+            }
+
+            if (includeActive
+                && (mission.State == MissionLifecycleState.Active
+                    || mission.State == MissionLifecycleState.Offered))
+            {
+                return true;
+            }
+
+            return includeCompleted && mission.State == MissionLifecycleState.Completed;
+        }
+
+        private static bool IsStanNpc(ICharacter source, Identity target)
+        {
+            if (target.Type == IdentityType.CanbeAffected && target.Instance == StanGoodmanInstance)
+            {
+                return true;
+            }
+
+            if (source?.Playfield == null || target.Type != IdentityType.CanbeAffected)
+            {
+                return false;
+            }
+
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, target);
+            return npc != null
+                   && !string.IsNullOrEmpty(npc.Name)
+                   && npc.Name.IndexOf("Goodman", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static StanTradeSession GetTradeSession(ICharacter source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            lock (TradeSyncRoot)
+            {
+                StanTradeSession session;
+                return TradeSessionsByCharacter.TryGetValue(source.Identity.Instance, out session)
+                           ? session
+                           : null;
+            }
+        }
+
+        private static void BeginStanTrade(ICharacter source, Identity stanIdentity)
+        {
+            lock (TradeSyncRoot)
+            {
+                TradeSessionsByCharacter[source.Identity.Instance] = new StanTradeSession
+                                                                    {
+                                                                        NpcIdentity = stanIdentity,
+                                                                        StagedContainer = Identity.None
+                                                                    };
+            }
+        }
+
+        private static void EnsureStanTradeSession(ICharacter source, Identity stanIdentity)
+        {
+            if (GetTradeSession(source) == null)
+            {
+                BeginStanTrade(source, stanIdentity);
+            }
+        }
+
+        private static void ForgetTradeSession(ICharacter source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            lock (TradeSyncRoot)
+            {
+                TradeSessionsByCharacter.Remove(source.Identity.Instance);
+            }
+        }
+
+        private static void SendOverflowGrantPackets(ICharacter source, int itemId, int quality)
+        {
+            source.Send(
+                new TemplateActionMessage
+                {
+                    Identity = source.Identity,
+                    Unknown = 0,
+                    ItemLowId = itemId,
+                    ItemHighId = itemId,
+                    Quality = quality,
+                    Unknown1 = CapturedTemplateActionUnknown1,
+                    Unknown2 = CapturedTemplateActionUnknown2,
+                    Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
+                    Unknown3 = 0,
+                    Unknown4 = 0
+                });
+            source.Send(
+                new ContainerAddItemMessage
+                {
+                    Identity = source.Identity,
+                    Unknown = 0,
+                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
+                    Target = new Identity
+                             {
+                                 Type = IdentityType.OverflowWindow,
+                                 Instance = source.Identity.Instance
+                             },
+                    TargetPlacement = CapturedOverflowNextFreeSlot
+                });
+        }
+
+        private static void Log(string message)
+        {
+            LogUtil.Debug(DebugInfoDetail.Engine, "StanGoodmanQuestRuntime " + message);
+        }
+    }
+}

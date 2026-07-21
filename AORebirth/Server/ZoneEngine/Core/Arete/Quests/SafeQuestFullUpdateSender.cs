@@ -5,11 +5,15 @@ namespace ZoneEngine.Core.Arete.Quests
     using System;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Network;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using Utility;
+
+    using ZoneEngine.Core;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -27,7 +31,60 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int B194Instance = unchecked((int)0x5514B194);
 
+        private const int B196Instance = unchecked((int)0x5514B196);
+
+        private const int FlintInstance = unchecked((int)0x5514B198);
+
+        private const int B199Instance = unchecked((int)0x5514B199);
+
+        private const int B19AInstance = unchecked((int)0x5514B19A);
+
+        private const int FindBioInstance = unchecked((int)0x5514B19B);
+
+        private const int DeliverBioInstance = unchecked((int)0x5514B19C);
+
+        // Capture 20260720-074847 / 105157 tip QuestId instances (client Mission window).
+        // Server MissionRuntime keys stay Mission:5514B19D..A0; tip wire must match live AO.
+        private const int SurveillanceUplinkInstance = unchecked((int)0x555A4A49);
+
+        private const int PlantBugInstance = unchecked((int)0x555A4E3B);
+
+        private const int DeliverHc12BillInstance = unchecked((int)0x555A4E3C);
+
+        private const int KneecappingInstance = unchecked((int)0x555A4E3D);
+        private const int ReportToAlexInstance = unchecked((int)0x555B4365);
+        private const int TalkToStanInstance = unchecked((int)0x555B4366);
+
+        private const int BuyLockpickInstance = unchecked((int)0x555BD124);
+
+        private const int StrongboxContentsInstance = unchecked((int)0x555BE9C5);
+
+        private const int DeliverAntonioFactoryInstance = unchecked((int)0x555BE9F2);
+
+        private const int TalkToSarahGreeneInstance = unchecked((int)0x555BE9F3);
+
+        private const int BuyNanoProgramsInstance = unchecked((int)0x555BE9F4);
+
+        private const int TradeskillNanoSensorInstance = unchecked((int)0x555B4367);
+
+        private const int TradeskillBasicBrainInstance = unchecked((int)0x555B4368);
+
+        private const int TradeskillPersonalizedBrainInstance = unchecked((int)0x555B4369);
+
+        private const int TradeskillShowBrainInstance = unchecked((int)0x555B436A);
+
+        // Prior private-server tip IDs (wrong); still Action59+Delete so stuck Remain 00:00 tips clear.
+        private const int LegacySurveillanceUplinkInstance = unchecked((int)0x5514B19D);
+
+        private const int LegacyPlantBugInstance = unchecked((int)0x5514B19E);
+
+        private const int LegacyDeliverHc12BillInstance = unchecked((int)0x5514B19F);
+
+        private const int LegacyKneecappingInstance = unchecked((int)0x5514B1A0);
+
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
+
+        private const int MarcusStoneInstance = unchecked((int)0x782DE567);
 
         private const int B18CUnknownActionIdType = 0x00001999;
 
@@ -124,6 +181,242 @@ namespace ZoneEngine.Core.Arete.Quests
             + "(Left Click) the <a href='itemref://296780/296780/1'>Compact Fire Suppressant Container</a> "
             + "in your inventory to lift it up, then Left Click the Gas Fire to apply the fire suppressant.</font>";
 
+        private const string B196ShortInfo = "Return to Marcus";
+
+        private const string B196LongInfo =
+            "Return to Marcus<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Marcus Stone and hand him the "
+            + "<a href='itemref://296780/296780/1'>Compact Fire Suppressant Container</a>.</font>";
+
+        private const string FlintShortInfo = "Talk to Flint Novak";
+
+        private const string FlintLongInfo =
+            "Talk to Flint Novak<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Flint Novak.</font>";
+
+        private const string FindBioShortInfo = "Find a Bio Analyzing Computer";
+
+        private const string FindBioLongInfo =
+            "Find a Bio Analyzing Computer<BR><BR>"
+            + "At the request of Flint Novak you must  find a Bio Analyzing Computer. "
+            + "You may find one of these computers by taking out the malfunctioning robots in the nearby junkyard."
+            + "<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Kill 7 Robots in the junkyard.</font>";
+
+        private const string DeliverBioShortInfo = "Deliver the Bio Analyzing Co...";
+
+        private const string DeliverBioLongInfo =
+            "Deliver the Bio Analyzing Computer to Alex Gibbs<BR><BR>"
+            + "After killing a few junk robots you finally found a Bio Analyzing Computer. "
+            + "Flint Novak told you to give this to Alex Gibbs, a local roboticist."
+            + "<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Give the <a href='itemref://156020/156021/1'>Bio Analyzing Computer</a> to Alex Gibbs.</font>";
+
+        private const string SurveillanceUplinkShortInfo = "Surveillance Uplink";
+
+        private const string SurveillanceUplinkLongInfo =
+            "Surveillance Uplink<BR><BR>"
+            + "Alex Gibbs has provided you with a contraption that will be able to hook into the video feed "
+            + "one of Desmond Calitri's Surveillance Droids.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Target the Surveillance Droid and use (Right Click) the "
+            + "<a href='itemref://295800/295800/1'>Rebuilt HC-12 SecTec Monitor in your inventory.</a></font>";
+
+        private const string PlantBugShortInfo = "Plant a Bug";
+
+        private const string PlantBugLongInfo =
+            "Plant a Bug<BR><BR>"
+            + "To further incriminate Desmond Calitri, a remote audio recording device is to be placed "
+            + "within his office.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Find a suitable location in Desmond Calitri's office to hide the bug. Pick up (Left Click) the "
+            + "<a href='itemref://295801/295801/1'>RC-P Audio Recording Device</a> in your inventory and drop "
+            + "it (Left Click) in a suitable location.</font>";
+
+        private const string DeliverHc12BillShortInfo = "Deliver the Rebuilt HC-12 Se...";
+
+        private const string DeliverHc12BillLongInfo =
+            "Deliver the Rebuilt HC-12 SecTec Monitor<BR><BR>"
+            + "With the Surveillance Droid feed uplink and a hidden audio recording device in Desmond Calitri's "
+            + "office, it is time to deliver this potential evidence to one of Alex's friend ICC Immigration "
+            + "Officer Bill.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Give the <a href='itemref://295800/295800/1'>Rebuilt HC-12 SecTec Monitor</a> to ICC Immigration "
+            + "Officer Bill.</font>";
+
+        private const string KneecappingShortInfo = "Kneecapping a Kneebreaker";
+
+        private const string KneecappingLongInfo =
+            "Kneecapping a Kneebreaker<BR><BR>"
+            + "While monitoring the audio and video feeds of Desmond Calitri, it became clear that he intends "
+            + "to send \"The Kneebreaker\", Alfonzo Rizzolo, to deal with an upstart Dockworker who is fighting "
+            + "for fair working conditions.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Kill \"The Kneebreaker\".</font>";
+
+        private const string ReportToAlexShortInfo = "Report to Alex";
+
+        private const string ReportToAlexLongInfo =
+            "Report to Alex<BR><BR>"
+            + "You have put a major dent in Demond Caltiri's plans. Since Bill doesn't want to talk to you about "
+            + "this matter, you decided to update Alex on your progress. She did promise you a reward for your "
+            + "efforts...<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Alex Gibbs.</font>";
+
+        private const string TalkToStanShortInfo = "Talk to Stan Goodman";
+
+        private const string TalkToStanLongInfo =
+            "Talk to Stan Goodman<BR><BR>"
+            + "<font color=\"#63ad63\">Identity Crisis:</font><BR>"
+            + "In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. Your mission "
+            + "is to create a fake ID Card to you can leave this place..<BR><BR>"
+            + "Alex told you to go talk to Stan Goodman, a local 'purveyer of recently used merchandise'. He should "
+            + "be able to help with aquiring more parts for your ID card.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Stan Goodman.</font>";
+
+        private const string BuyLockpickShortInfo = "Buy a Lockpick";
+
+        private const string BuyLockpickLongInfo =
+            "Buy a Lockpick<BR><BR>"
+            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetected, but in order "
+            + "to do so you need to buy a <a href='itemref://95577/95577/1'>Lock Pick</a>.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Find the <a href='itemref://297290/297290/3'>ICC Tech Supplies</a> vending machine and buy a "
+            + "<a href='itemref://95577/95577/1'>Lock Pick</a>.</font>";
+
+        private const string StrongboxContentsShortInfo = "Take the contents of the Str...";
+
+        private const string StrongboxContentsLongInfo =
+            "Take the contents of the Strongbox <BR><BR>"
+            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetetected. "
+            + "Now that you have bought a <a href='itemref://95577/95577/1'>Lock Pick</a>, this should be an easy task."
+            + "<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Pick up (Left Click) your <a href='itemref://95577/95577/1'>Lock Pick</a> from your inventory and "
+            + "drop it (Left Click) on the <a href='itemref://295604/295604/1'>Merchant's Strongbox</a>.</font>";
+
+        private const string DeliverAntonioFactoryShortInfo = "Deliver Antonio's Adaptatio...";
+
+        private const string DeliverAntonioFactoryLongInfo =
+            "Deliver Antonio's Adaptation Factory to Stan Goodman.<BR><BR>"
+            + "Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetetected. "
+            + "Now that you have found <a href='itemref://248306/248306/1'>Antonio's Adaptation Factory</a>, "
+            + "bring it back to Stan.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Bring <a href='itemref://248306/248306/1'>Antonio's Adaptation Factory</a> to Stan Goodman.</font>";
+
+        private const string TalkToSarahGreeneShortInfo = "Talk to Sarah Greene";
+
+        private const string TalkToSarahGreeneLongInfo =
+            "Talk to Sarah Greene<BR><BR>"
+            + "<font color=\"#63ad63\">Identity Crisis:</font><BR>"
+            + "In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. "
+            + "Your mission is to create a fake ID Card to you can leave this place..<BR><BR>"
+            + "Stab told you that Sarah Greene, a local armorsmith, should be able to help you with aquiring more "
+            + "parts needed for your ID card.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Sarah Greene.</font>";
+
+        private const string BuyNanoProgramsShortInfo = "Buy some Nano Programs";
+
+        private const string BuyNanoProgramsLongInfo =
+            "Buy some Nano Programs<BR><BR>"
+            + "Stanley Goodman told you to go talk to Marco Spida to buy a Nanoprogram Container.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective: Talk to Marco Spida and buy a Nanoprogram Container "
+            + "for your profession. Open the Container to complete your mission.</font>";
+
+        private const string TradeskillNanoSensorShortInfo = "Tradeskilling (1/4): Assembl...";
+
+        private const string TradeskillNanoSensorLongInfo =
+            "Tradeskilling (1/4): Assemble a Nano Sensor<BR><BR>"
+            + "<font color=\"#FF0000\">WARNING: If you are interested in learning tradeskilling, this mission will "
+            + "help you learn the basics. However, only Engineers and Traders are equipped with profession tools to "
+            + "help them master the art of tradeskilling.</font><BR><BR>"
+            + "Alex Gibbs has provided you with the recipe for creating a "
+            + "<a href='itemref:// 156026/156027/1'>Personalized Basic Robot Brain</a>. Once this mission has been "
+            + "completed, allow her to inspect it. <BR><BR>"
+            + "<font color=\"#FFFFFF\">1. Buy the following item from the "
+            + "<a href='itemref://297281/297281/1'>Junk Shop</a>:<BR>"
+            + "<a href='itemref://150922/150922/1'><img src=\"rdb://151011\"> Screwdriver</a><BR><BR>"
+            + "2. Find <a href='itemref://42620/42620/1'>Robot Junk</a>.<BR>"
+            + "Do so by killing and looting a robot.<BR><BR>"
+            + "3. Modify the <a href='itemref://42620/42620/1'>Robot Junk</a> with the "
+            + "<a href='itemref://150922/150922/1'>Screwdriver</a> to create a "
+            + "<a href='itemref://150923/150924/1'>Nano Sensor</a>.<BR>"
+            + "<a href='itemref://150922/150922/1'><img src=\"rdb://151011\"></a> + "
+            + "<a href='itemref://42620/42620/1'><img src=\"rdb://290417\"></a> = "
+            + "<a href='itemref://150923/150923/1'><img src=\"rdb://149940\"></a><BR></font><BR>"
+            + "<font color=\"#FF0000\">Mission Objective: Open the Tradeskill Kit %{KEY:WINDOW_TS}%, place the "
+            + "<a href='itemref://150922/150922/1'>Screwdriver</a> as the Source and the "
+            + "<a href='itemref://42620/42620/1'>Robot Junk</a> as the Target, then press Build.</font>";
+
+        private const string TradeskillBasicBrainShortInfo = "Tradeskilling (2/4): Assembl...";
+
+        private const string TradeskillBasicBrainLongInfo =
+            "Tradeskilling (2/4): Assemble a Basic Robot Brain<BR><BR>"
+            + "Alex Gibbs has provided you with the recipe for creating a "
+            + "<a href='itemref:// 156026/156027/1'>Personalized Basic Robot Brain</a>. Once it has been completed, "
+            + "allow her to inspect it. <BR><BR>"
+            + "<font color=\"#FFFFFF\">1. Buy the following item from the "
+            + "<a href='itemref://297281/297281/1'>Junk Shop</a>:<BR>"
+            + "<a href='itemref://156020/156021/5'><img src=\"rdb://156084\"> Bio Analyzing Computer</a><BR><BR>"
+            + "2. Apply the <a href='itemref://156020/156021/1'>Bio Analyzing Computer</a> onto the "
+            + "<a href='itemref:// 150923/150923/1'> Nano Sensor</a> to create a "
+            + "<a href='itemref://156022/156022/1'>Basic Robot Brain</a>.</font><BR>"
+            + "<a href='itemref://156020/156021/5'><img src=\"rdb://156084\"></a> + "
+            + "<a href='itemref://150923/150923/1'><img src=\"rdb://149940\"></a> = "
+            + "<a href='itemref://156022/156022/1'><img src=\"rdb://156085\"></a><BR><BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective: Open the Tradeskill Kit (SHIFT+T), place the "
+            + "<a href='itemref://156020/156021/5'>Bio Analyzing Computer</a> as the Source and the "
+            + "<a href='itemref:// 150923/150923/1'> Nano Sensor</a> as the Target, then press Build.</font>";
+
+        private const string TradeskillPersonalizedBrainShortInfo = "Tradeskilling (3/4): Assembl...";
+
+        private const string TradeskillPersonalizedBrainLongInfo =
+            "Tradeskilling (3/4): Assemble a Personalized Basic Robot Brain<BR><BR>"
+            + "Alex Gibbs has provided you with the recipe for creating a "
+            + "<a href='itemref:// 156026/156027/1'>Personalized Basic Robot Brain</a>. Once it has been completed, "
+            + "allow her to inspect it. <BR><BR>"
+            + "<font color=\"#FFFFFF\">1. Buy the following item from the Junk Shop:<BR>"
+            + "<a href='itemref://156024/ 156025/5'><img src=\"rdb://11618\"> MasterComm - Personalization Device</a>."
+            + "<BR><BR>"
+            + "2. Attach the <a href='itemref://156024/ 156025/5'>MasterComm - Personalization Device</a> to the "
+            + "<a href='itemref://156022/156022/1'>Basic Robot Brain</a> to create the "
+            + "<a href='itemref:// 156026/156027/1'>Personalized Basic Robot Brain</a>.<BR>"
+            + "<a href='itemref://156024/156024/1'><img src=\"rdb://11618\"></a> + "
+            + "<a href='itemref://156022/156022/1'><img src=\"rdb://156085\"></a> = "
+            + "<a href='itemref://156026/156026/1'><img src=\"rdb://156087\"></a><BR></font><BR> <BR>"
+            + "<font color=\"#FF0000\">Mission Objective: Open the Tradeskill Kit (SHIFT+T), place the "
+            + "<a href='itemref://156024/ 156025/5'>MasterComm - Personalization Device</a> as the Source and the "
+            + "<a href='itemref://156022/156022/1'>Basic Robot Brain</a> as the Target, then press Build.</font>";
+
+        private const string TradeskillShowBrainShortInfo = "Tradeskilling (4/4): Show th...";
+
+        private const string TradeskillShowBrainLongInfo =
+            "Tradeskilling (4/4): Show the Personalized Computer Brain to Alex<BR><BR>"
+            + "Allow Alex Gibbs to inspect the <a href='itemref://156026/156026/1'>Personalized Computer Brain</a> "
+            + "you assembled!<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Give the <a href='itemref://156026/156026/1'>Personalized Basic Robot Brain</a> to Alex Gibbs.</font>";
+
+        private const string B199ShortInfo = "Use the Stim on a Wounded Do...";
+
+        private const string B199LongInfo =
+            "Use the Stim on a Wounded Dockworker<BR><BR>"
+            + "Marcus Stone's workers got damaged by the fire, he asked you to help him save their lives.<BR><BR> "
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Target a Wounded Dockworker and use the <a href='itemref://297044/297044/1'>Health Regeneration Stim</a> (Right-Click).</font>";
+
+        private const string B19AShortInfo = "Return to Marcus Stone";
+
+        private const string B19ALongInfo =
+            "Return to Marcus Stone<BR><BR>"
+            + "Marcus Stone's workers got damaged by the fire, he asked you to help him save their lives.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Return to Marcus Stone and hand him the <a href='itemref://297044/297044/1'>Health Regeneration Stim</a>.</font>";
+
         public static RexQuestPreviewEmissionResult TrySendB18CPreview(ICharacter source)
         {
             if (source == null)
@@ -167,6 +460,38 @@ namespace ZoneEngine.Core.Arete.Quests
                     "Arete Rex B18C QuestFullUpdate DTO preview failed: " + e.Message);
                 return RexQuestPreviewEmissionResult.Failed(
                     "B18C QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB18DPreview(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18D QuestFullUpdate preview failed: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18D QuestFullUpdate preview failed: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18D QuestFullUpdate preview failed: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB18DPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B18D QuestFullUpdate preview resent. mission=Mission:5514B18D");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18D QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
             }
         }
 
@@ -359,6 +684,47 @@ namespace ZoneEngine.Core.Arete.Quests
             }
         }
 
+        /// <summary>
+        /// Capture 20260614-194454: Quest Delete B18E then QuestFullUpdate B18F (Talk to Marcus).
+        /// Always send both — flag-gated delete-only left Return to Rex stuck beside Marcus.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB18EToB18FHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18E→B18F handoff skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18E→B18F handoff skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18E→B18F handoff skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                // Capture packets #5495 then #5497 (and a live duplicate delete). No Action59 on this swap.
+                source.Controller.Client.SendCompressed(CreateB18EQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18EQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18FPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B18E→B18F handoff sent delete+delete+Talk to Marcus Stone. "
+                    + "source=20260614-194454/packets.hex.log:5947-5949");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Rex B18E→B18F handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18E→B18F handoff failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
         public static RexQuestPreviewEmissionResult TrySendB18FPreview(ICharacter source)
         {
             if (source == null)
@@ -405,6 +771,43 @@ namespace ZoneEngine.Core.Arete.Quests
                     "Arete Rex B18F QuestFullUpdate DTO handoff failed: " + e.Message);
                 return RexQuestPreviewEmissionResult.Failed(
                     "B18F QuestFullUpdate failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB18FToB194Handoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18F→B194 handoff skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18F→B194 handoff skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B18F→B194 handoff skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                // Same capture pattern as B18C→B18D and B194→B196: Action59 + Delete + next QFU.
+                source.Controller.Client.SendCompressed(CreateB18FAction59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18FQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB194PreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B18F→B194 handoff sent action59+delete+Extinguish the Gas Fire. "
+                    + "source=20260719-Rex-Markus-stone/mission-flow.log:8-10");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B18F→B194 handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B18F→B194 handoff failed during DTO serialization/send: " + e.Message);
             }
         }
 
@@ -499,6 +902,1199 @@ namespace ZoneEngine.Core.Arete.Quests
                 return RexQuestPreviewEmissionResult.Failed(
                     "B194 QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
             }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB194QuestDelete(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194 Quest Delete skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194 Quest Delete skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194 Quest Delete skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                // Capture 20260719-Rex-Markus-stone events.log:11002-11006:
+                // CharacterAction 59 targeting the B194 mission, then Quest Delete.
+                source.Controller.Client.SendCompressed(CreateB194Action59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB194QuestDeleteMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B194 Action59+Quest Delete sent. mission=Mission:5514B194 "
+                    + "source=20260719-Rex-Markus-stone/events.log:11002-11006");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B194 Quest Delete DTO cleanup failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B194 Quest Delete failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture-backed B194 → B196 handoff: remove Extinguish (+ leftover Talk to Marcus), then Return to Marcus.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB194ToB196Handoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194→B196 handoff skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194→B196 handoff skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B194→B196 handoff skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB194Action59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB194QuestDeleteMessage(source.Identity));
+                // Leftover Talk to Marcus (B18F) must not stay beside Return to Marcus.
+                source.Controller.Client.SendCompressed(CreateB18FQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18EQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB196PreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B194→B196 handoff sent action59+delete B194/B18F/B18E + Return to Marcus. "
+                    + "source=20260719-Rex-Markus-stone/events.log:11002-11008");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B194→B196 handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B194→B196 handoff failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB196Preview(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 QuestFullUpdate preview failed: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B196 QuestFullUpdate preview failed: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B196 QuestFullUpdate preview failed: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB196PreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B196 QuestFullUpdate preview sent using DTO serializer. mission=Mission:5514B196 "
+                    + "title=\"Return to Marcus\" source=20260614-195107/packets.hex.log:1773");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B196 QuestFullUpdate DTO preview failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B196 QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB196QuestDelete(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 Quest Delete skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 Quest Delete skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 Quest Delete skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                // Delete-only (no Action59) — Action59 mid-dialogue was aborting the client transport.
+                source.Controller.Client.SendCompressed(CreateB196QuestDeleteMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B196 Quest Delete sent. mission=Mission:5514B196");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B196 Quest Delete failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B196 Quest Delete failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Finish Return to Marcus: remove B196 and every leftover Marcus/Rex fire-chain mission from the client.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB196CompletionCleanup(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 cleanup skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 cleanup skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196 cleanup skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                // Delete-only — do not send Action59 here (client abort / ZoneClient IOException).
+                source.Controller.Client.SendCompressed(CreateB196QuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB194QuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18FQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18EQuestDeleteMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B196 completion cleanup deleted B196/B194/B18F/B18E from mission window.");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B196 completion cleanup failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B196 completion cleanup failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260719-185137 / Rex-Markus-stone events.log:12204-12210:
+        /// Action59 on Return to Marcus → Quest Delete → QuestFullUpdate Talk to Flint Novak.
+        /// Leftover mission deletes after the live tip so dirty clients cannot keep Extinguish/Talk Marcus.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB196ToFlintHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196→Flint handoff skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196→Flint handoff skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B196→Flint handoff skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB196Action59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB196QuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB194QuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18FQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB18EQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateFlintPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B196→Flint handoff Action59+Delete leftovers + Talk to Flint Novak. "
+                    + "mission=Mission:5514B198 source=20260719-185137/events.log:12204-12210");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B196→Flint handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B196→Flint handoff failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendFlintPreview(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint QuestFullUpdate preview failed: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Flint QuestFullUpdate preview failed: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Flint QuestFullUpdate preview failed: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateFlintPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Flint QuestFullUpdate preview sent. mission=Mission:5514B198 title=\"Talk to Flint Novak\"");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Flint QuestFullUpdate DTO preview failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Flint QuestFullUpdate preview failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Accept wounded-workers side quest: ADD Use Stim (B199) without removing Talk to Flint Novak.
+        /// Flint is the main tip; heal workers is optional and stacks beside it.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendFlintToB199Handoff(ICharacter source)
+        {
+            // Kept name for call-site compatibility; stacks B199 beside Flint (does not delete Flint).
+            return TrySendB199Preview(source);
+        }
+
+        /// <summary>
+        /// Capture 20260719-224226: stim use → Action59+Delete B199 + QFU Return to Marcus Stone (B19A).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB199ToB19AHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B199→B19A handoff skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B199→B19A handoff skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B199→B19A handoff skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB199Action59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB199QuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB19APreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B199→B19A handoff Action59+Delete + Return to Marcus Stone. mission=Mission:5514B19A "
+                    + "source=20260719-224226/events.log");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B199→B19A handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B199→B19A handoff failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Stim return finished: remove Return to Marcus Stone (B19A) from the mission window.
+        /// Delete-only mid-dialogue — Action59 can abort transport before Delete is applied.
+        /// Does not touch Talk to Flint Novak.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB19ACompletionCleanup(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A cleanup skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A cleanup skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A cleanup skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB19AQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateB19AQuestDeleteMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B19A completion cleanup Delete×2 (no Action59). mission=Mission:5514B19A "
+                    + "keepFlint=true");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B19A cleanup failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B19A cleanup failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Soft-remove Flint tip without Action59 (stacked-tip cleanup on Marcus reopen).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendFlintQuestDeleteOnly(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint delete skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint delete skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint delete skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateFlintQuestDeleteMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Flint Quest Delete only. mission=Mission:5514B198");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus Flint delete failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Flint delete failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB199Preview(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B199 preview failed: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B199 preview failed: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B199 preview failed: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB199PreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B199 QuestFullUpdate preview sent. mission=Mission:5514B199 "
+                    + "title=\"Use the Stim on a Wounded Dockworker\"");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B199 preview failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B199 preview failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendB19APreview(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A preview failed: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A preview failed: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A preview failed: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB19APreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B19A QuestFullUpdate preview sent. mission=Mission:5514B19A "
+                    + "title=\"Return to Marcus Stone\"");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B19A preview failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B19A preview failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Soft-remove Return to Marcus Stone tip without Action59 (stacked-tip cleanup while Use Stim is active).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendB19AQuestDeleteOnly(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A delete skipped: source character missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A delete skipped: source client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("B19A delete skipped: source identity is invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateB19AQuestDeleteMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "B19A Quest Delete only. mission=Mission:5514B19A");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Arete Marcus B19A delete failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed(
+                    "B19A delete failed during DTO serialization/send: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-072904: Action59+Delete Talk to Flint + QFU Find a Bio Analyzing Computer.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendFlintToFindBioHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint→FindBio handoff skipped: source missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint→FindBio handoff skipped: client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Flint→FindBio handoff skipped: identity invalid.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateFlintAction59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateFlintQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateFindBioPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Flint→FindBio Action59+Delete + Find a Bio Analyzing Computer. mission=Mission:5514B19B "
+                    + "source=20260720-072904/mission-flow.log:2-3");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "Arete Flint→FindBio handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed("Flint→FindBio handoff failed: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendFindBioPreview(ICharacter source)
+        {
+            if (source == null || source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("FindBio preview skipped: source/client missing.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateFindBioPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "FindBio QuestFullUpdate preview sent. mission=Mission:5514B19B");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("FindBio preview failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-072904: TemplateAction 156020 + Action59+Delete Find + QFU Deliver.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendFindBioToDeliverHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("FindBio→Deliver handoff skipped: source missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("FindBio→Deliver handoff skipped: client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("FindBio→Deliver handoff skipped: identity invalid.");
+            }
+
+            try
+            {
+                // Grant already sent TemplateAction 156020 — tip wire only.
+                // Also clear leftover Talk to Flint ghosts from earlier handoffs.
+                FlintKneecappingTipWire.TryDeleteTip(source, FlintInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, FindBioInstance);
+                source.Controller.Client.SendCompressed(CreateFindBioAction59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateFindBioQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateDeliverBioPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "FindBio→Deliver Action59+Delete + Deliver tip. mission=Mission:5514B19C "
+                    + "source=20260720-flint/mission-flow.log");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "Arete FindBio→Deliver handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed("FindBio→Deliver handoff failed: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendDeliverBioPreview(ICharacter source)
+        {
+            if (source == null || source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("DeliverBio preview skipped: source/client missing.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateDeliverBioPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "DeliverBio QuestFullUpdate preview sent. mission=Mission:5514B19C");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("DeliverBio preview failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-074847: Action59+Delete Deliver + QFU Surveillance Uplink.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendDeliverBioToSurveillanceUplinkHandoff(ICharacter source)
+        {
+            if (source == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Deliver→Uplink handoff skipped: source missing.");
+            }
+
+            if (source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Deliver→Uplink handoff skipped: client missing.");
+            }
+
+            if (source.Identity.Type != IdentityType.CanbeAffected || source.Identity.Instance == 0)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Deliver→Uplink handoff skipped: identity invalid.");
+            }
+
+            try
+            {
+                FlintKneecappingTipWire.TryDeleteTip(source, FlintInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, FindBioInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, DeliverBioInstance);
+                source.Controller.Client.SendCompressed(CreateDeliverBioAction59Message(source.Identity));
+                source.Controller.Client.SendCompressed(CreateDeliverBioQuestDeleteMessage(source.Identity));
+                source.Controller.Client.SendCompressed(CreateSurveillanceUplinkPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Deliver→SurveillanceUplink Action59+Delete + tip. mission=Mission:5514B19D "
+                    + "source=20260720-074847/mission-flow.log");
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(DebugInfoDetail.Error, "Arete Deliver→Uplink handoff failed: " + e.Message);
+                return RexQuestPreviewEmissionResult.Failed("Deliver→Uplink handoff failed: " + e.Message);
+            }
+        }
+
+        public static RexQuestPreviewEmissionResult TrySendSurveillanceUplinkPreview(ICharacter source)
+        {
+            if (source == null || source.Controller == null || source.Controller.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Uplink preview skipped: source/client missing.");
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(CreateSurveillanceUplinkPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "SurveillanceUplink QuestFullUpdate preview sent. mission=Mission:5514B19D");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Uplink preview failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-105157: Action59+Delete Surveillance Uplink (555A4A49) + QFU Plant a Bug (555A4E3B).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendUplinkToPlantBugHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Uplink→PlantBug handoff skipped: client missing.");
+            }
+
+            try
+            {
+                // Capture: Action59 (Int16) + Quest/Delete Uplink, then QFU Plant a Bug.
+                FlintKneecappingTipWire.TryDeleteTip(source, SurveillanceUplinkInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, LegacySurveillanceUplinkInstance);
+                source.Controller.Client.SendCompressed(CreatePlantBugPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Uplink→PlantBug Action59+Delete + tip. mission=Mission:555A4E3B "
+                    + "source=20260720-105157");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Uplink→PlantBug handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-105157: Action59+Delete Plant a Bug + QFU Deliver HC-12 to Bill.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendPlantBugToDeliverBillHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("PlantBug→DeliverBill handoff skipped: client missing.");
+            }
+
+            try
+            {
+                // Also wipe Uplink if a prior handoff left it stuck (Remain 00:00).
+                FlintKneecappingTipWire.TryDeleteTip(source, SurveillanceUplinkInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, LegacySurveillanceUplinkInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, PlantBugInstance);
+                FlintKneecappingTipWire.TryDeleteTip(source, LegacyPlantBugInstance);
+                source.Controller.Client.SendCompressed(CreateDeliverHc12BillPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "PlantBug→DeliverBill Action59+Delete + tip. mission=Mission:555A4E3C "
+                    + "source=20260720-105157");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("PlantBug→DeliverBill handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-105157: FinishTrade / "I will take care of it."
+        /// Action59+Delete prior tips, then Kneecapping QFU (serializer path).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendDeliverBillToKneecappingHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "DeliverBill→Kneecapping handoff skipped: client missing.");
+            }
+
+            try
+            {
+                int[] tipsToDelete =
+                    {
+                        SurveillanceUplinkInstance,
+                        LegacySurveillanceUplinkInstance,
+                        PlantBugInstance,
+                        LegacyPlantBugInstance,
+                        DeliverHc12BillInstance,
+                        LegacyDeliverHc12BillInstance,
+                        KneecappingInstance,
+                        LegacyKneecappingInstance
+                    };
+
+                for (int i = 0; i < tipsToDelete.Length; i++)
+                {
+                    FlintKneecappingTipWire.TryDeleteTip(source, tipsToDelete[i]);
+                }
+
+                source.Controller.Client.SendCompressed(CreateKneecappingPreviewMessage(source.Identity));
+                return RexQuestPreviewEmissionResult.Sent(
+                    "DeliverBill→Kneecapping Action59+Delete + tip. mission=Mission:555A4E3D "
+                    + "source=20260720-105157");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "DeliverBill→Kneecapping handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Legacy name — Bill turn-in clears Deliver and grants Kneecapping tip (capture).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendBillTurnInClearTips(ICharacter source)
+        {
+            return TrySendDeliverBillToKneecappingHandoff(source);
+        }
+
+        /// <summary>
+        /// Idempotent Kneecapping tip send (dialogue safety / re-send).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendKneecappingTip(ICharacter source)
+        {
+            return TrySendDeliverBillToKneecappingHandoff(source);
+        }
+
+        /// <summary>
+        /// Capture 20260720-171317: kill Kneebreaker → Delete Kneecapping + QFU Report to Alex.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendKneecappingToReportAlexHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Kneecapping→ReportAlex handoff skipped: client missing.");
+            }
+
+            try
+            {
+                ZoneClient client = source.Controller.Client as ZoneClient;
+                Character character = source as Character;
+                if (client != null && character != null)
+                {
+                    FlintKneecappingTipWire.ClearChainTips(client, character);
+                }
+                else
+                {
+                    SendTipAction59AndDelete(source, KneecappingInstance);
+                    SendTipAction59AndDelete(source, LegacyKneecappingInstance);
+                }
+
+                QuestFullUpdateMessage reportTip = CreateReportToAlexPreviewMessage(source.Identity);
+                ApplyLiveTipExpiry(reportTip, source);
+                source.Controller.Client.SendCompressed(reportTip);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Kneecapping→ReportAlex tip. mission=Mission:555B4365 source=20260720-171317");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Kneecapping→ReportAlex handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-171317: Alex Calitri report → Delete Report + QFU Talk to Stan.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendReportAlexToTalkStanHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "ReportAlex→TalkStan handoff skipped: client missing.");
+            }
+
+            try
+            {
+                ZoneClient client = source.Controller.Client as ZoneClient;
+                Character character = source as Character;
+                if (client != null && character != null)
+                {
+                    FlintKneecappingTipWire.ClearChainTips(client, character);
+                }
+                else
+                {
+                    SendTipAction59AndDelete(source, ReportToAlexInstance);
+                }
+
+                SendTalkToStanTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "ReportAlex→TalkStan tip. mission=Mission:555B4366 source=20260720-171317");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("ReportAlex→TalkStan handoff failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Soft re-emit Talk to Stan tip (no ClearChainTips). Keeps main quest beside Tip 4/4.
+        /// Capture 20260720-190432: Talk to Stan + Tradeskilling tips coexist.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TryRefreshTalkToStanTip(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Talk to Stan refresh skipped: client missing.");
+            }
+
+            try
+            {
+                SendTalkToStanTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Talk to Stan tip refreshed. mission=Mission:555B4366");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Talk to Stan refresh failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-goldman: accept Stan job → Action59+Delete TalkStan + QFU Buy a Lockpick.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTalkStanToBuyLockpickHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "TalkStan→BuyLockpick handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, TalkToStanInstance);
+                SendBuyLockpickTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "TalkStan→BuyLockpick tip. mission=Mission:555BD124 source=20260720-goldman");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("TalkStan→BuyLockpick handoff failed: " + e.Message);
+            }
+        }
+
+        private static void SendBuyLockpickTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateBuyLockpickPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-lockpick: open sealed Lock Pick → Action59+Delete BuyLockpick + QFU Strongbox.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendBuyLockpickToStrongboxHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "BuyLockpick→Strongbox handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, BuyLockpickInstance);
+                SendStrongboxContentsTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "BuyLockpick→Strongbox tip. mission=Mission:555BE9C5 source=20260721-lockpick");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("BuyLockpick→Strongbox handoff failed: " + e.Message);
+            }
+        }
+
+        private static void SendStrongboxContentsTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateStrongboxContentsPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-afgter dog lockpick goodman: strongbox pick → Action59+Delete Strongbox +
+        /// QFU Deliver Antonio's Adaptation Factory (555BE9F2).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendStrongboxToDeliverFactoryHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Strongbox→DeliverFactory handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, StrongboxContentsInstance);
+                SendDeliverAntonioFactoryTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Strongbox→DeliverFactory tip. mission=Mission:555BE9F2 source=20260721-afgter dog lockpick goodman");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Strongbox→DeliverFactory handoff failed: " + e.Message);
+            }
+        }
+
+        private static void SendDeliverAntonioFactoryTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateDeliverAntonioFactoryPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Capture 20260721-afgter dog lockpick goodman: Stan Accept → Action59+Delete Deliver +
+        /// QFU Talk to Sarah Greene (555BE9F3) + QFU Buy some Nano Programs (555BE9F4).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendDeliverFactoryToSarahAndNanoTipsHandoff(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "DeliverFactory→Sarah/Nano handoff skipped: client missing.");
+            }
+
+            try
+            {
+                SendTipAction59AndDelete(source, DeliverAntonioFactoryInstance);
+                SendTalkToSarahGreeneTip(source);
+                SendBuyNanoProgramsTip(source);
+                return RexQuestPreviewEmissionResult.Sent(
+                    "DeliverFactory→Sarah+Nano tips. missions=Mission:555BE9F3,Mission:555BE9F4 "
+                    + "source=20260721-afgter dog lockpick goodman");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "DeliverFactory→Sarah/Nano handoff failed: " + e.Message);
+            }
+        }
+
+        private static void SendTalkToSarahGreeneTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateTalkToSarahGreenePreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        private static void SendBuyNanoProgramsTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateBuyNanoProgramsPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        private static void SendTalkToStanTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+            QuestFullUpdateMessage message = CreateTalkToStanPreviewMessage(source.Identity);
+            ApplyLiveTipExpiry(message, source);
+            source.Controller.Client.SendCompressed(message);
+        }
+
+        private static void ReanchorGameTimeForTipJournal(ICharacter source)
+        {
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client == null)
+            {
+                return;
+            }
+
+            client.SendCompressed(
+                new GameTimeMessage
+                {
+                    Identity = source.Identity,
+                    Unknown1 = 30024.0f,
+                    Unknown3 = 185408,
+                    Unknown4 = 80183.3125f
+                });
+            client.LastGameTimeSyncUtc = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Capture 20260720-171317: Alex robot-brain option → Tradeskilling (1/4) tip.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTradeskillNanoSensorTip(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed(
+                    "Tradeskill tip skipped: client missing.");
+            }
+
+            try
+            {
+                QuestFullUpdateMessage message = CreateTradeskillNanoSensorPreviewMessage(source.Identity);
+                ApplyLiveTipExpiry(message, source);
+                source.Controller.Client.SendCompressed(message);
+                if (IsTalkToStanMissionOpen(source))
+                {
+                    TryRefreshTalkToStanTip(source);
+                }
+
+                return RexQuestPreviewEmissionResult.Sent(
+                    "Tradeskill Nano Sensor tip. mission=Mission:555B4367 source=20260720-171317");
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Tradeskill tip failed: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260720-190432: after Nano Sensor combine → Tradeskilling (2/4).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTradeskillBasicBrainTip(ICharacter source)
+        {
+            return TrySendTradeskillStepTip(
+                source,
+                CreateTradeskillBasicBrainPreviewMessage,
+                "Tradeskill Basic Robot Brain tip. mission=Mission:555B4368 source=20260720-190432");
+        }
+
+        /// <summary>
+        /// Capture 20260720-190432: after Basic Robot Brain combine → Tradeskilling (3/4).
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTradeskillPersonalizedBrainTip(ICharacter source)
+        {
+            return TrySendTradeskillStepTip(
+                source,
+                CreateTradeskillPersonalizedBrainPreviewMessage,
+                "Tradeskill Personalized Brain tip. mission=Mission:555B4369 source=20260720-190432");
+        }
+
+        /// <summary>
+        /// Capture 20260720-190432: after Personalized combine → Tradeskilling (4/4) show to Alex.
+        /// </summary>
+        public static RexQuestPreviewEmissionResult TrySendTradeskillShowBrainTip(ICharacter source)
+        {
+            return TrySendTradeskillStepTip(
+                source,
+                CreateTradeskillShowBrainPreviewMessage,
+                "Tradeskill Show Brain tip. mission=Mission:555B436A source=20260720-190432");
+        }
+
+        private static RexQuestPreviewEmissionResult TrySendTradeskillStepTip(
+            ICharacter source,
+            Func<Identity, QuestFullUpdateMessage> createMessage,
+            string successDetail)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Tradeskill tip skipped: client missing.");
+            }
+
+            try
+            {
+                QuestFullUpdateMessage message = createMessage(source.Identity);
+                ApplyLiveTipExpiry(message, source);
+                source.Controller.Client.SendCompressed(message);
+
+                // Capture 20260720-190432: Tip 4/4 stacks beside Talk to Stan — refresh main tip.
+                if (IsTalkToStanMissionOpen(source))
+                {
+                    TryRefreshTalkToStanTip(source);
+                }
+
+                return RexQuestPreviewEmissionResult.Sent(successDetail);
+            }
+            catch (Exception e)
+            {
+                return RexQuestPreviewEmissionResult.Failed("Tradeskill tip failed: " + e.Message);
+            }
+        }
+
+        private static bool IsTalkToStanMissionOpen(ICharacter source)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord mission =
+                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:555B4366");
+            return mission != null
+                   && (mission.State == ZoneEngine.Core.Missions.MissionLifecycleState.Active
+                       || mission.State == ZoneEngine.Core.Missions.MissionLifecycleState.Offered);
+        }
+
+        private static void SendTipAction59AndDelete(ICharacter source, int missionInstance)
+        {
+            if (source?.Controller?.Client == null || missionInstance == 0)
+            {
+                return;
+            }
+
+            // Typed CharacterAction Action=59 is Int32-shaped and leaves Remain 00:00 stuck tips.
+            // Capture wire: Int16 Action59 + Quest/Delete (same Thrak / Bill tip shells).
+            FlintKneecappingTipWire.TryDeleteTip(source, missionInstance);
+        }
+
+        private static CharacterActionMessage CreateTipAction59Message(Identity characterIdentity, int missionInstance)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, missionInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = missionInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        private static QuestMessage CreateTipQuestDeleteMessage(Identity characterIdentity, int missionInstance)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, missionInstance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
         }
 
         internal static QuestFullUpdateMessage CreateB18CPreviewMessage(Identity characterIdentity)
@@ -1001,6 +2597,21 @@ namespace ZoneEngine.Core.Arete.Quests
                    };
         }
 
+        internal static CharacterActionMessage CreateB18FAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B18FInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B18FInstance,
+                       Unknown2 = 0
+                   };
+        }
+
         internal static CharacterActionMessage CreateB18CAction59Message(Identity characterIdentity)
         {
             return new CharacterActionMessage
@@ -1069,6 +2680,1556 @@ namespace ZoneEngine.Core.Arete.Quests
                        Mission = IdentityFromRaw(MissionIdentityType, B18FInstance),
                        Unknown2 = 0,
                        Unknown3 = 0
+                   };
+        }
+
+        internal static CharacterActionMessage CreateB194Action59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B194Instance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B194Instance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB194QuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B194Instance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static CharacterActionMessage CreateB196Action59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B196Instance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B196Instance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB196QuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B196Instance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateB196PreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, B196Instance);
+            Identity marcusIdentity = new Identity
+                                      {
+                                          Type = IdentityType.CanbeAffected,
+                                          Instance = MarcusStoneInstance
+                                      };
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = B196ShortInfo,
+                                   LongInfo = B196LongInfo,
+                                   UnknownId1 = marcusIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = 1229076054,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 158429,
+                                   Unknown20 = 0,
+                                   Unknown21 = 0,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360448 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 104939,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        private const long TipClientClockBaseSeconds = 1_201_445_827L;
+
+        private const int TipMissionDurationSeconds = 48 * 60 * 60;
+
+        /// <summary>
+        /// Remain = expiry - clientClock. Client clock = GameTime anchor + seconds since sync
+        /// (same math as MissionAcceptService / PerkResetMissionSender).
+        /// </summary>
+        private static int ComputeLiveTipExpiry(ICharacter source)
+        {
+            double secondsSinceSync = 0;
+            ZoneClient client = source?.Controller?.Client as ZoneClient;
+            if (client != null)
+            {
+                secondsSinceSync = (DateTime.UtcNow - client.LastGameTimeSyncUtc).TotalSeconds;
+                if (secondsSinceSync < 0)
+                {
+                    secondsSinceSync = 0;
+                }
+            }
+
+            return unchecked(
+                (int)(TipClientClockBaseSeconds + (long)secondsSinceSync + TipMissionDurationSeconds));
+        }
+
+        private static void ApplyLiveTipExpiry(QuestFullUpdateMessage message, ICharacter source)
+        {
+            if (message?.Quests == null || message.Quests.Length == 0)
+            {
+                return;
+            }
+
+            message.Quests[0].Unknown11 = ComputeLiveTipExpiry(source);
+        }
+
+        internal static QuestFullUpdateMessage CreateFlintPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, FlintInstance);
+            Identity marcusIdentity = new Identity
+                                      {
+                                          Type = IdentityType.CanbeAffected,
+                                          Instance = MarcusStoneInstance
+                                      };
+
+            // AbsoluteTime expiry must be clientClockNow + duration or Remain can hide the tip.
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = FlintShortInfo,
+                                   LongInfo = FlintLongInfo,
+                                   UnknownId1 = marcusIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 24,
+                                               Action = Identity.None,
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = IdentityFromRaw(0x000111D3, 0x00019A52),
+                                               UnknownId3 = Identity.None,
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(0x0000D2F1, 0x4D167F3C),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3598, 0, 863)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateFindBioPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, FindBioInstance);
+            Identity flintIdentity = new Identity
+                                     {
+                                         Type = IdentityType.CanbeAffected,
+                                         Instance = unchecked((int)0x78E0FC64)
+                                     };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = FindBioShortInfo,
+                                   LongInfo = FindBioLongInfo,
+                                   UnknownId1 = flintIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 11330,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 20,
+                                               Action = Identity.None,
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = Identity.None,
+                                               UnknownId3 = IdentityFromRaw(0x00001999, 0x4D424957),
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(0x0000D2FC, unchecked((int)0x1C69BEF2)),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3598, 0, 863)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateDeliverBioPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, DeliverBioInstance);
+            Identity alexIdentity = new Identity
+                                    {
+                                        Type = IdentityType.CanbeAffected,
+                                        Instance = unchecked((int)0x78E0FC61)
+                                    };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = DeliverBioShortInfo,
+                                   LongInfo = DeliverBioLongInfo,
+                                   UnknownId1 = alexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 1120,
+                                   Unknown7 = 0,
+                                   Unknown8 = 2076,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 158429,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 6,
+                                               Action = IdentityFromRaw(0x000111D3, 0x4249414E),
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = IdentityFromRaw(0x000111D3, 0x414C4749),
+                                               UnknownId3 = Identity.None,
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(0x0000D2F1, unchecked((int)0x4D55E6F5)),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3521, 0, 857)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreateFindBioAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, FindBioInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = FindBioInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateFindBioQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Mission = IdentityFromRaw(MissionIdentityType, FindBioInstance)
+                   };
+        }
+
+        internal static CharacterActionMessage CreateDeliverBioAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, DeliverBioInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = DeliverBioInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateDeliverBioQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Mission = IdentityFromRaw(MissionIdentityType, DeliverBioInstance)
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateSurveillanceUplinkPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, SurveillanceUplinkInstance);
+            Identity alexIdentity = new Identity
+                                    {
+                                        Type = IdentityType.CanbeAffected,
+                                        Instance = unchecked((int)0x78E0FC61)
+                                    };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = SurveillanceUplinkShortInfo,
+                                   LongInfo = SurveillanceUplinkLongInfo,
+                                   UnknownId1 = alexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions =
+                                       new[]
+                                       {
+                                           new QuestActionInfo
+                                           {
+                                               Version = 24,
+                                               Action = Identity.None,
+                                               UnknownId1 = Identity.None,
+                                               UnknownId2 = IdentityFromRaw(0x000111D3, 0x000199D3),
+                                               UnknownId3 = Identity.None,
+                                               UnknownId4 = Identity.None,
+                                               Unknown1 = 0,
+                                               Unknown2 = 0,
+                                               Unknown3 = 0,
+                                               Unknown4 = 0,
+                                               UnknownId5 = Identity.None,
+                                               Unknown5 = 0,
+                                               Unknown6 = 0,
+                                               Unknown7 = 0,
+                                               Unknown8 = 0,
+                                               UnknownId6 = Identity.None,
+                                               UnknownHash1 = string.Empty,
+                                               Unknown9 = 0,
+                                               UnknownId7 = IdentityFromRaw(0x0000D2F1, unchecked((int)0x4D55E7EA)),
+                                               PlayfieldId = new Identity
+                                                             {
+                                                                 Type = IdentityType.Playfield2,
+                                                                 Instance = 6553
+                                                             },
+                                               Unknown10 = 100000,
+                                               Unknown11 = 100000,
+                                               Position = new Vector3(3521, 0, 857)
+                                           }
+                                       },
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreateSurveillanceUplinkAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, SurveillanceUplinkInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = SurveillanceUplinkInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateSurveillanceUplinkQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Mission = IdentityFromRaw(MissionIdentityType, SurveillanceUplinkInstance)
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreatePlantBugPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, PlantBugInstance);
+            Identity droidIdentity = new Identity
+                                     {
+                                         Type = IdentityType.CanbeAffected,
+                                         Instance = unchecked((int)0x78E0FC8A)
+                                     };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = PlantBugShortInfo,
+                                   LongInfo = PlantBugLongInfo,
+                                   UnknownId1 = droidIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 11342,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreatePlantBugAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, PlantBugInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = PlantBugInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreatePlantBugQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Mission = IdentityFromRaw(MissionIdentityType, PlantBugInstance)
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateDeliverHc12BillPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, DeliverHc12BillInstance);
+            Identity billIdentity = new Identity
+                                    {
+                                        Type = IdentityType.CanbeAffected,
+                                        Instance = unchecked((int)0x78E0FC66)
+                                    };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = DeliverHc12BillShortInfo,
+                                   LongInfo = DeliverHc12BillLongInfo,
+                                   UnknownId1 = billIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 158429,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreateDeliverHc12BillAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, DeliverHc12BillInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = DeliverHc12BillInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateDeliverHc12BillQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Mission = IdentityFromRaw(MissionIdentityType, DeliverHc12BillInstance)
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateKneecappingPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, KneecappingInstance);
+            Identity alfonzIdentity = new Identity
+                                      {
+                                          Type = IdentityType.CanbeAffected,
+                                          Instance = unchecked((int)0x78E0FC63)
+                                      };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = KneecappingShortInfo,
+                                   LongInfo = KneecappingLongInfo,
+                                   UnknownId1 = alfonzIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 11330,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateReportToAlexPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, ReportToAlexInstance);
+            Identity alexIdentity = new Identity
+                                    {
+                                        Type = IdentityType.CanbeAffected,
+                                        Instance = unchecked((int)0x78E0FC61)
+                                    };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = ReportToAlexShortInfo,
+                                   LongInfo = ReportToAlexLongInfo,
+                                   UnknownId1 = alexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateTalkToStanPreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, TalkToStanInstance);
+            // Capture 20260720-171317 Talk-to-Stan QFU UnknownId1 = SimpleChar:78E0FC63.
+            Identity stanIdentity = new Identity
+                                    {
+                                        Type = IdentityType.CanbeAffected,
+                                        Instance = unchecked((int)0x78E0FC63)
+                                    };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = TalkToStanShortInfo,
+                                   LongInfo = TalkToStanLongInfo,
+                                   UnknownId1 = stanIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateBuyLockpickPreviewMessage(Identity characterIdentity)
+        {
+            return CreateStanChainTipPreviewMessage(
+                characterIdentity,
+                BuyLockpickInstance,
+                BuyLockpickShortInfo,
+                BuyLockpickLongInfo);
+        }
+
+        internal static QuestFullUpdateMessage CreateStrongboxContentsPreviewMessage(Identity characterIdentity)
+        {
+            return CreateStanChainTipPreviewMessage(
+                characterIdentity,
+                StrongboxContentsInstance,
+                StrongboxContentsShortInfo,
+                StrongboxContentsLongInfo);
+        }
+
+        internal static QuestFullUpdateMessage CreateDeliverAntonioFactoryPreviewMessage(Identity characterIdentity)
+        {
+            return CreateStanChainTipPreviewMessage(
+                characterIdentity,
+                DeliverAntonioFactoryInstance,
+                DeliverAntonioFactoryShortInfo,
+                DeliverAntonioFactoryLongInfo);
+        }
+
+        internal static QuestFullUpdateMessage CreateTalkToSarahGreenePreviewMessage(Identity characterIdentity)
+        {
+            return CreateStanChainTipPreviewMessage(
+                characterIdentity,
+                TalkToSarahGreeneInstance,
+                TalkToSarahGreeneShortInfo,
+                TalkToSarahGreeneLongInfo);
+        }
+
+        internal static QuestFullUpdateMessage CreateBuyNanoProgramsPreviewMessage(Identity characterIdentity)
+        {
+            // Capture 20260721-afgter dog lockpick goodman: UnknownId1 = CanbeAffected:78E0FC65 (Stan).
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, BuyNanoProgramsInstance);
+            Identity tipNpcIdentity = new Identity
+                                       {
+                                           Type = IdentityType.CanbeAffected,
+                                           Instance = unchecked((int)0x78E0FC65)
+                                       };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = BuyNanoProgramsShortInfo,
+                                   LongInfo = BuyNanoProgramsLongInfo,
+                                   UnknownId1 = tipNpcIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        private static QuestFullUpdateMessage CreateStanChainTipPreviewMessage(
+            Identity characterIdentity,
+            int missionInstance,
+            string shortInfo,
+            string longInfo)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, missionInstance);
+            // Capture 20260720-goldman / 20260721-lockpick: UnknownId1 = CanbeAffected:78E0FC63.
+            Identity tipNpcIdentity = new Identity
+                                       {
+                                           Type = IdentityType.CanbeAffected,
+                                           Instance = unchecked((int)0x78E0FC63)
+                                       };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = shortInfo,
+                                   LongInfo = longInfo,
+                                   UnknownId1 = tipNpcIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateTradeskillNanoSensorPreviewMessage(Identity characterIdentity)
+        {
+            return CreateTradeskillTipPreviewMessage(
+                characterIdentity,
+                TradeskillNanoSensorInstance,
+                TradeskillNanoSensorShortInfo,
+                TradeskillNanoSensorLongInfo,
+                11340);
+        }
+
+        internal static QuestFullUpdateMessage CreateTradeskillBasicBrainPreviewMessage(Identity characterIdentity)
+        {
+            return CreateTradeskillTipPreviewMessage(
+                characterIdentity,
+                TradeskillBasicBrainInstance,
+                TradeskillBasicBrainShortInfo,
+                TradeskillBasicBrainLongInfo,
+                11340);
+        }
+
+        internal static QuestFullUpdateMessage CreateTradeskillPersonalizedBrainPreviewMessage(
+            Identity characterIdentity)
+        {
+            return CreateTradeskillTipPreviewMessage(
+                characterIdentity,
+                TradeskillPersonalizedBrainInstance,
+                TradeskillPersonalizedBrainShortInfo,
+                TradeskillPersonalizedBrainLongInfo,
+                11340);
+        }
+
+        internal static QuestFullUpdateMessage CreateTradeskillShowBrainPreviewMessage(Identity characterIdentity)
+        {
+            return CreateTradeskillTipPreviewMessage(
+                characterIdentity,
+                TradeskillShowBrainInstance,
+                TradeskillShowBrainShortInfo,
+                TradeskillShowBrainLongInfo,
+                158429);
+        }
+
+        private static QuestFullUpdateMessage CreateTradeskillTipPreviewMessage(
+            Identity characterIdentity,
+            int missionInstance,
+            string shortInfo,
+            string longInfo,
+            int missionIconId)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, missionInstance);
+            Identity alexIdentity = new Identity
+                                    {
+                                        Type = IdentityType.CanbeAffected,
+                                        Instance = unchecked((int)0x78E0FC61)
+                                    };
+            int expiry = (int)(TipClientClockBaseSeconds + TipMissionDurationSeconds);
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = shortInfo,
+                                   LongInfo = longInfo,
+                                   UnknownId1 = alexIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = expiry,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = missionIconId,
+                                   Unknown20 = TipMissionDurationSeconds,
+                                   Unknown21 = TipMissionDurationSeconds,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 105040,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 0,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreateFlintAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, FlintInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = FlintInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateFlintQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, FlintInstance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static CharacterActionMessage CreateB199Action59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B199Instance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B199Instance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB199QuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B199Instance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateB199PreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, B199Instance);
+            Identity marcusIdentity = new Identity
+                                      {
+                                          Type = IdentityType.CanbeAffected,
+                                          Instance = MarcusStoneInstance
+                                      };
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = B199ShortInfo,
+                                   LongInfo = B199LongInfo,
+                                   UnknownId1 = marcusIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = 1229076059,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 244818,
+                                   Unknown20 = 0,
+                                   Unknown21 = 0,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 104939,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
+                   };
+        }
+
+        internal static CharacterActionMessage CreateB19AAction59Message(Identity characterIdentity)
+        {
+            return new CharacterActionMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = (CharacterActionType)59,
+                       Unknown1 = 0,
+                       Target = IdentityFromRaw(MissionIdentityType, B19AInstance),
+                       Parameter1 = MissionIdentityType,
+                       Parameter2 = B19AInstance,
+                       Unknown2 = 0
+                   };
+        }
+
+        internal static QuestMessage CreateB19AQuestDeleteMessage(Identity characterIdentity)
+        {
+            return new QuestMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 0,
+                       Action = SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAction.Delete,
+                       Unknown1 = 0,
+                       Mission = IdentityFromRaw(MissionIdentityType, B19AInstance),
+                       Unknown2 = 0,
+                       Unknown3 = 0
+                   };
+        }
+
+        internal static QuestFullUpdateMessage CreateB19APreviewMessage(Identity characterIdentity)
+        {
+            Identity missionIdentity = IdentityFromRaw(MissionIdentityType, B19AInstance);
+            Identity marcusIdentity = new Identity
+                                      {
+                                          Type = IdentityType.CanbeAffected,
+                                          Instance = MarcusStoneInstance
+                                      };
+
+            return new QuestFullUpdateMessage
+                   {
+                       Identity = characterIdentity,
+                       Unknown = 1,
+                       Quests =
+                           new[]
+                           {
+                               new Quest
+                               {
+                                   QuestId = missionIdentity,
+                                   Unknown1 = 15,
+                                   Unknown2 = 0,
+                                   Unknown3 = 0,
+                                   Unknown4 = 2,
+                                   ShortInfo = B19AShortInfo,
+                                   LongInfo = B19ALongInfo,
+                                   UnknownId1 = marcusIdentity,
+                                   Unknown5 = 6,
+                                   Unknown6 = 0,
+                                   Unknown7 = 0,
+                                   Unknown8 = 0,
+                                   Unknown9 = 1009,
+                                   Unknown10 = 1009,
+                                   MissionItemData = new MissionItemReward[0],
+                                   Unknown11 = 1229076060,
+                                   Unknown12 = 0,
+                                   Unknown13 = 0,
+                                   UnknownHash1 = string.Empty,
+                                   Unknown14 = 0,
+                                   Unknown15 = 0,
+                                   Unknown16 = 0,
+                                   Unknown17 = 0,
+                                   Unknown18 = 0,
+                                   UnknownId2 = characterIdentity,
+                                   MissionIconId = 158429,
+                                   Unknown20 = 0,
+                                   Unknown21 = 0,
+                                   QuestActions = new QuestActionInfo[0],
+                                   PlayerIds = new[] { characterIdentity },
+                                   UnknownArray1 = new[] { 85360450 },
+                                   UnknownArray2 = new int[0],
+                                   CharacterInfos = new CharacterInfo[0],
+                                   Unknown22 = 6,
+                                   PlayerIds2 = new[] { characterIdentity },
+                                   Unknown23 = 0,
+                                   Unknown24 = 104939,
+                                   UnknownId3 = Identity.None,
+                                   Unknown25 = 0,
+                                   Unknown26 = 0,
+                                   QuestIdentities = new QuestIdentity[0],
+                                   Unknown27 = 7,
+                                   FactionInfos = new Identity[0],
+                                   Unknown28 = 1
+                               }
+                           }
                    };
         }
 

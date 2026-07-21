@@ -58,13 +58,18 @@ namespace ZoneEngine.Core.Playfields
 
                     PlayfieldData destinationPlayfieldData = PlayfieldLoader.PFData[destPlayfield];
                     byte destinationIndex = wcr.SecondWall.DestinationIndex;
-                    if (destinationIndex < 0 || destinationIndex >= destinationPlayfieldData.Destinations.Count)
+                    // Destinations is Dictionary<byte, PlayfieldDestination> keyed by destinationIndex
+                    // (sparse). Do NOT compare against .Count — that broke Jobe→Nascense (index 4,
+                    // count 3) after the June 7 bounds guard. Match lineteleport.cs: TryGetValue.
+                    PlayfieldDestination dest;
+                    if (!destinationPlayfieldData.Destinations.TryGetValue(destinationIndex, out dest)
+                        || dest == null)
                     {
                         LogUtil.Debug(
                             DebugInfoDetail.Engine,
                             string.Format(
                                 CultureInfo.InvariantCulture,
-                                "Wall collision ignored character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} invalidDestinationIndex={6} destinationCount={7}",
+                                "Wall collision ignored character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} missingDestinationIndex={6} destinationCount={7}",
                                 dynel.Identity.ToString(true),
                                 dynel.Playfield.Identity.Instance,
                                 dynel.RawCoordinates.X,
@@ -73,24 +78,6 @@ namespace ZoneEngine.Core.Playfields
                                 destPlayfield,
                                 destinationIndex,
                                 destinationPlayfieldData.Destinations.Count));
-                        return;
-                    }
-
-                    PlayfieldDestination dest = destinationPlayfieldData.Destinations[destinationIndex];
-                    if (dest == null)
-                    {
-                        LogUtil.Debug(
-                            DebugInfoDetail.Engine,
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "Wall collision ignored character={0} fromPlayfield={1} fromCoords={2:F1},{3:F1},{4:F1} toPlayfield={5} nullDestinationIndex={6}",
-                                dynel.Identity.ToString(true),
-                                dynel.Playfield.Identity.Instance,
-                                dynel.RawCoordinates.X,
-                                dynel.RawCoordinates.Y,
-                                dynel.RawCoordinates.Z,
-                                destPlayfield,
-                                destinationIndex));
                         return;
                     }
 

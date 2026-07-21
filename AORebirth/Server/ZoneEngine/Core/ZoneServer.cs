@@ -230,17 +230,18 @@ namespace ZoneEngine.Core
         /// </returns>
         public IPlayfield PlayfieldById(Identity id)
         {
-            // TODO: This needs to be changed to check for whole Identity
-            foreach (IPlayfield pf in this.playfields)
+            lock (this.playfields)
             {
-                if (pf.Identity == id)
+                foreach (IPlayfield pf in this.playfields)
                 {
-                    return pf;
+                    if (pf.Identity == id)
+                    {
+                        return pf;
+                    }
                 }
-            }
 
-            this.CreatePlayfield(id);
-            return this.PlayfieldById(id);
+                return this.CreatePlayfieldUnlocked(id);
+            }
         }
 
         #endregion
@@ -316,6 +317,22 @@ namespace ZoneEngine.Core
         /// <returns>
         /// </returns>
         protected IPlayfield CreatePlayfield(Identity playfieldIdentity)
+        {
+            lock (this.playfields)
+            {
+                foreach (IPlayfield pf in this.playfields)
+                {
+                    if (pf.Identity == playfieldIdentity)
+                    {
+                        return pf;
+                    }
+                }
+
+                return this.CreatePlayfieldUnlocked(playfieldIdentity);
+            }
+        }
+
+        private IPlayfield CreatePlayfieldUnlocked(Identity playfieldIdentity)
         {
             var temp = new Playfield(this, playfieldIdentity);
             this.playfields.Add(temp);
@@ -420,10 +437,14 @@ namespace ZoneEngine.Core
 
         public override void Stop()
         {
-            foreach (Playfield pf in this.playfields)
+            lock (this.playfields)
             {
-                pf.Dispose();
+                foreach (Playfield pf in this.playfields)
+                {
+                    pf.Dispose();
+                }
             }
+
             base.Stop();
         }
 

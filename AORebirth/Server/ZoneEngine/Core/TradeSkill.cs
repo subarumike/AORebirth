@@ -153,7 +153,23 @@ namespace ZoneEngine.Core
         /// </returns>
         public TradeSkillEntry GetTradeSkillEntry(int id1, int id2)
         {
-            return this.tradeSkillList.FirstOrDefault(x => (x.ID1 == id1) && (x.ID2 == id2));
+            // Capture-backed Arete Personalized Robot Brain chain first.
+            // DB rows exist but Skill='0' breaks WindowBuild / Stats[0] checks.
+            TradeSkillEntry entry =
+                ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainCombineRules.TryMatch(id1, id2);
+            if (entry != null)
+            {
+                return entry;
+            }
+
+            entry = this.tradeSkillList.FirstOrDefault(x => (x.ID1 == id1) && (x.ID2 == id2));
+            if (entry != null)
+            {
+                return entry;
+            }
+
+            // Capture-backed Thrak garden key combine (DB may not have the recipe).
+            return ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyCombineRules.TryMatch(id1, id2);
         }
 
         /// <summary>
@@ -164,7 +180,8 @@ namespace ZoneEngine.Core
         /// </returns>
         public int SourceProcessesCount(int id)
         {
-            return this.tradeSkillList.Count(x => x.ID1 == id);
+            return this.tradeSkillList.Count(x => x.ID1 == id)
+                   + ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainCombineRules.SourceProcessBonus(id);
         }
 
         /// <summary>
@@ -175,7 +192,8 @@ namespace ZoneEngine.Core
         /// </returns>
         public int TargetProcessesCount(int id)
         {
-            return this.tradeSkillList.Count(x => x.ID2 == id);
+            return this.tradeSkillList.Count(x => x.ID2 == id)
+                   + ZoneEngine.Core.Arete.Quests.PersonalizedRobotBrainCombineRules.TargetProcessBonus(id);
         }
 
         #endregion

@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.InternalMessages;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.PacketHandlers;
+    using ZoneEngine.Core.Perks;
 
     #endregion
 
@@ -189,6 +190,19 @@ namespace ZoneEngine.Core.MessageHandlers
 
                     break;
 
+                case CharacterActionType.Inspect:
+
+                    // Character Info → Inspect Equipment (capture 20260719-182611).
+                    IInstancedEntity inspectEntity =
+                        client.Controller.Character.Playfield.FindByIdentity(message.Target);
+                    var inspectTarget = inspectEntity as Character;
+                    if (inspectTarget != null)
+                    {
+                        InspectMessageHandler.Default.Send(client.Controller.Character, inspectTarget);
+                    }
+
+                    break;
+
                 case CharacterActionType.Logout:
 
                     // If action == Logout
@@ -321,7 +335,16 @@ namespace ZoneEngine.Core.MessageHandlers
                     break;
 
                 case CharacterActionType.DeleteItem: // Remove/Delete item
-                    InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(client.Controller.Character, message);
+                    if (!InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(
+                            client.Controller.Character,
+                            message))
+                    {
+                        // Sacred Thrak garden key refused — keep on server and re-sync client.
+                        ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryForceReturnGardenKey(
+                            client.Controller.Character);
+                        break;
+                    }
+
                     this.AcknowledgeDelete(client.Controller.Character, message);
                     break;
 
@@ -397,6 +420,14 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 case CharacterActionType.RemoveFriendlyNano:
                     ActiveNanoRuntimeService.Default.TryHandleRemoveFriendlyNano(client, message);
+                    break;
+
+                case CharacterActionType.TrainPerk:
+                    PerkRuntimeService.Default.TryHandleTrainPerk(client, message);
+                    break;
+
+                case CharacterActionType.UsePerk:
+                    PerkRuntimeService.Default.TryHandleUsePerk(client, message);
                     break;
 
                 default:
@@ -531,17 +562,33 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void SetNanoDuration(ICharacter character, Identity target, int unknown1, int duration = 0x249F0)
         {
-            int strain = ActiveNanoRuntimeService.Default.ResolveNanoStrain(character, unknown1);
-            if (duration > 0
-                && !ActiveNanoRuntimeService.Default.HasActiveNanoInStrain(character, unknown1, strain))
+            ICharacter recipient = character;
+            if (character != null
+                && character.Playfield != null
+                && target.Instance != 0
+                && target.Instance != character.Identity.Instance)
             {
+                ICharacter found = character.Playfield.FindByIdentity<ICharacter>(target);
+                if (found != null)
+                {
+                    recipient = found;
+                }
+            }
+
+            int strain = ActiveNanoRuntimeService.Default.ResolveNanoStrain(recipient, unknown1);
+            if (duration > 0
+                && !ActiveNanoRuntimeService.Default.HasActiveNanoInStrain(recipient, unknown1, strain))
+            {
+                // Perk pet buffs (Channel Rage) must land on the pet even if NCU gate is tight.
                 if (!ActiveNanoRuntimeService.Default.ApplyActiveNano(
-                    character,
+                    recipient,
                     unknown1,
                     duration,
                     target,
                     strain))
                 {
+                    // Still notify client so NCU icon/duration appear for perk buffs.
+                    this.Send(character, this.ConstructSetNanoDuration(character, target, unknown1, duration));
                     return;
                 }
 

@@ -165,14 +165,20 @@ namespace AORebirth.ObjectManager
                         var temp = new Dictionary<ulong, IEntity>();
                         parentList.Add((int)obj.Identity.Type, temp);
                     }
-                    // I dont check for duplicates here, thrown exceptions should be enough
-                    try
+                    // Avoid ArgumentException spam when two threads race to register the same
+                    // identity (e.g. concurrent Playfield create). Keep the first registration.
+                    Dictionary<ulong, IEntity> byInstance = parentList[(int)obj.Identity.Type];
+                    ulong objectKey = obj.Identity.Long();
+                    if (byInstance.ContainsKey(objectKey))
                     {
-                        parentList[(int)obj.Identity.Type].Add(obj.Identity.Long(), obj);
+                        LogUtil.Debug(
+                            DebugInfoDetail.Pool,
+                            "Pool.AddObject skipped duplicate " + obj.Identity.ToString(true)
+                            + " of " + parentId.ToString("X"));
                     }
-                    catch (Exception ef)
+                    else
                     {
-                        LogUtil.ErrorException(ef);
+                        byInstance.Add(objectKey, obj);
                     }
                     this.reservedIds.Remove(obj.Identity.Long());
                 }

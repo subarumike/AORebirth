@@ -22,17 +22,24 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public bool TryHandleUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
-            bool boxProgressObserved = RexB18DBoxProgressTracker.TryObserveBoxUse(
-                client.Controller.Character,
-                target);
-            if (RexB18DInteractionRules.ResolveRouteMode(boxProgressObserved)
-                != RexB18DInteractionRouteMode.RexB18DBoxProgress)
+            if (!RexMarcusChainCoordinator.IsCargoBoxTarget(target))
             {
                 return false;
             }
 
-            GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
-            return true;
+            if (RexMarcusChainCoordinator.OnCargoUse(client.Controller.Character, target))
+            {
+                GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
+                return true;
+            }
+
+            // Capture 20260719-203251: cargo without quest → Temp1=2 + FormatFeedback wire body.
+            if (RexMarcusChainCoordinator.TryRejectCargoWithoutQuest(client, message, target))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

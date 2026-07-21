@@ -1,6 +1,22 @@
 # Current Task
 
-## Current Focus
+## Active
+
+### Local (Arete — Stan Goodman deliver)
+
+Stan Goodman deliver-factory turn-in (`20260721-afgter dog lockpick goodman`).
+
+#### Done
+- Deliver tip active → Stan root: "I think I have what you were looking for."
+- Answer → StartTrade (4 slots) → Accept → consume factory, XP/credits, reward `296572`
+- Tips: Talk to Sarah Greene + Buy some Nano Programs
+- Bill finish handler no longer steals Stan Accept (FinishTrade ordering fix)
+
+#### Retest
+1. With Deliver tip + factory, talk Stan → deliver option (not buy lockpick)
+2. Trade factory → Accept → post-trade options + new tips
+
+### Upstream (Subway / TOTW)
 
 Construct the Temple of Three Winds as its own PF647 content module from the
 finalized `20260721-030515`, `20260721-031913`, `20260721-032247`,
@@ -66,8 +82,6 @@ See `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md`.
   hits used by the generated runtime profile. Chat, Login, and Zone were
   restarted on ports `6996`, `7012`, `7500`, and `7501`; no AO client was
   launched.
-
-## Subway Tailor and vendors (2026-07-19)
 
 - Finalized official-live capture `20260719-021611` now supplies the complete
   Tailor KnuBot dialogue, including exact ordered append segments, root/about/

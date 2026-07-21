@@ -301,6 +301,15 @@ namespace ZoneEngine.Core.Missions
                         return Result(MissionOperationStatus.Unresolved, mission, null, "Objective progress was not initialized.");
                     }
 
+                    // Handoff definitions may have shipped with RequiredCount=1; refresh from catalog.
+                    if (progress.RequiredCount != objectiveDefinition.RequiredCount
+                        && objectiveDefinition.RequiredCount > 0)
+                    {
+                        progress.RequiredCount = objectiveDefinition.RequiredCount;
+                        progress.UpdatedAtUtcTicks = now;
+                        transaction.SaveObjective(objectiveKey, progress);
+                    }
+
                     if (progress.Progress >= progress.RequiredCount)
                     {
                         return Result(MissionOperationStatus.AlreadyApplied, mission, progress, "Objective was already completed.");

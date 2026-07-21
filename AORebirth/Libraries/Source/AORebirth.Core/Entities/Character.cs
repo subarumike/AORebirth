@@ -121,6 +121,9 @@ namespace AORebirth.Core.Entities
 
             this.UploadedNanos = new List<IUploadedNanos>();
 
+            this.TrainedPerkPacketIds = new HashSet<int>();
+            this.LockedPerkPacketIdsUntilUtc = new Dictionary<int, DateTime>();
+
             this.BaseInventory = new PlayerInventory(this);
 
             this.SocialTab = new Dictionary<int, int>
@@ -204,6 +207,16 @@ namespace AORebirth.Core.Entities
         /// <summary>
         /// </summary>
         public List<IUploadedNanos> UploadedNanos { get; private set; }
+
+        /// <summary>
+        /// Trained perk PacketIDs (HasPerk / TrainPerk). Loaded/saved via charactersperks.
+        /// </summary>
+        public HashSet<int> TrainedPerkPacketIds { get; private set; }
+
+        /// <summary>
+        /// Server-side LockPerk cooldowns (PacketID → UTC unlock time).
+        /// </summary>
+        public Dictionary<int, DateTime> LockedPerkPacketIdsUntilUtc { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -472,6 +485,9 @@ namespace AORebirth.Core.Entities
                 this.UploadedNanos.Add(new UploadedNano() { NanoId = nano });
             }
 
+            this.EnsureTrainedPerks();
+            this.ReloadTrainedPerksFromDatabase();
+
             this.BaseInventory.Read();
             base.Read();
 
@@ -502,6 +518,9 @@ namespace AORebirth.Core.Entities
                 this.Playfield.Identity.Instance);
 
             UploadedNanosDao.Instance.WriteNanos(this.Identity.Instance, this.UploadedNanos);
+
+            this.EnsureTrainedPerks();
+            CharacterPerksDao.Instance.WritePerks(this.Identity.Instance, this.TrainedPerkPacketIds);
 
             return base.Write();
         }
@@ -650,6 +669,82 @@ namespace AORebirth.Core.Entities
         public bool HasNano(int nanoId)
         {
             return this.UploadedNanos.Any(x => x.NanoId == nanoId);
+        }
+
+        public bool HasPerk(int packetId)
+        {
+            this.EnsureTrainedPerks();
+            return this.TrainedPerkPacketIds.Contains(packetId);
+        }
+
+        public void EnsureTrainedPerks()
+        {
+            if (this.TrainedPerkPacketIds == null)
+            {
+                this.TrainedPerkPacketIds = new HashSet<int>();
+            }
+
+            if (this.LockedPerkPacketIdsUntilUtc == null)
+            {
+                this.LockedPerkPacketIdsUntilUtc = new Dictionary<int, DateTime>();
+            }
+        }
+
+        /// <summary>
+        /// Reload trained perk PacketIDs from charactersperks.
+        /// Required on reconnect (CreateCharacter skips Read) and safe after Read.
+        /// </summary>
+        public int ReloadTrainedPerksFromDatabase()
+        {
+            this.EnsureTrainedPerks();
+            this.TrainedPerkPacketIds.Clear();
+            try
+            {
+                List<int> loaded = CharacterPerksDao.Instance.ReadPacketIds(this.Identity.Instance).ToList();
+                foreach (int packetId in loaded)
+                {
+                    this.TrainedPerkPacketIds.Add(packetId);
+                }
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "PERK_PERSIST reload char=" + this.Identity.Instance + " count=" + loaded.Count);
+                return loaded.Count;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.ErrorException(ex);
+                return 0;
+            }
+        }
+
+        public bool IsPerkLocked(int packetId)
+        {
+            this.EnsureTrainedPerks();
+            DateTime untilUtc;
+            if (!this.LockedPerkPacketIdsUntilUtc.TryGetValue(packetId, out untilUtc))
+            {
+                return false;
+            }
+
+            if (untilUtc <= DateTime.UtcNow)
+            {
+                this.LockedPerkPacketIdsUntilUtc.Remove(packetId);
+                return false;
+            }
+
+            return true;
+        }
+
+        public void LockPerkPacket(int packetId, int durationSeconds)
+        {
+            if (packetId <= 0 || durationSeconds <= 0)
+            {
+                return;
+            }
+
+            this.EnsureTrainedPerks();
+            this.LockedPerkPacketIdsUntilUtc[packetId] = DateTime.UtcNow.AddSeconds(durationSeconds);
         }
 
         #endregion

@@ -5620,7 +5620,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && wallCollisionText.Contains("isPostZoneCollisionGraceActive(dynel)")
                 && wallCollisionText.Contains("WallCollision.CheckCollision(")
                 && wallCollisionText.Contains("PlayfieldLoader.PFData.ContainsKey(destPlayfield)")
-                && wallCollisionText.Contains("PlayfieldDestination dest = destinationPlayfieldData.Destinations[destinationIndex];")
+                && wallCollisionText.Contains("Destinations.TryGetValue(destinationIndex, out dest)")
                 && wallCollisionText.Contains("float dist = WallCollision.Distance(")
                 && wallCollisionText.Contains("teleportToPlayfield("),
                 "PlayfieldWallCollisionRuntimeService must own wall-collision routing and destination-coordinate orchestration.");

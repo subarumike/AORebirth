@@ -9,6 +9,8 @@ Do not grow new mail/pets/bank/quest logic inside `Playfields/Playfield.cs`.
 ZoneEngine/Core/
   Navigation/    - Global NPC chase planning/following and playfield providers
   Mail/          ← Mail Terminal ecosystem (active)
+  GMI/           ← Global Market vault (MarketSend deposit; web UI separate)
+  Perks/         ← TrainPerk / UsePerk / AddPerkAction (session-trained; capture-backed)
   Arete/         ← Arete dialogue/quests (existing pattern)
   Playfields/    ← World space / visibility / population only
   MessageHandlers/  ← Thin handlers OR move handler into the subsystem folder

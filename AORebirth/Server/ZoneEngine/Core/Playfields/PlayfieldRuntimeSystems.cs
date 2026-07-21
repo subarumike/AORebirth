@@ -15,6 +15,7 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
+    using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -123,6 +124,14 @@ namespace ZoneEngine.Core.Playfields
                 new AreteContentModule(),
                 new MontroyalContentModule(),
                 new SubwayContentModule(),
+                new JobePlatformContentModule(),
+                new NascenceCoreContentModule(),
+                new NascenceLifeContentModule(),
+                new ThrakOmniGardenContentModule(),
+                new RomeBlueCityContentModule(),
+                new AndromedaIccHqContentModule(),
+                new HoloDeckContentModule(),
+                new MissionInstanceContentModule(),
                 new PrivateCityContentModule());
             this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);
             this.corpseAccess = new PlayfieldCorpseAccessRuntimeService();
@@ -223,11 +232,26 @@ namespace ZoneEngine.Core.Playfields
                 playfieldIdentity,
                 this.dynelRegistry,
                 this.RegisterDynel);
+            this.vendors.AttachCapturedThrakGardenVendors(
+                this.playfield,
+                playfieldIdentity,
+                this.dynelRegistry);
+            this.vendors.SpawnCapturedHoloDeckVendors(
+                this.playfield,
+                playfieldIdentity,
+                this.dynelRegistry);
+            this.vendors.SpawnCapturedAreteAlexAreaVendors(
+                this.playfield,
+                playfieldIdentity,
+                this.dynelRegistry);
         }
 
         internal void ClearNpcRuntimeState()
         {
             this.windcallerKarrecNpcs.Clear(this.playfield.Identity, this.DeactivateNpc);
+            this.vendors.ClearCapturedThrakGardenVendors(this.playfield.Identity, this.dynelRegistry);
+            this.vendors.ClearCapturedHoloDeckVendors(this.playfield.Identity, this.dynelRegistry);
+            this.vendors.ClearCapturedAreteAlexAreaVendors(this.playfield.Identity, this.dynelRegistry);
             this.vendors.ClearCapturedSubwayVendors(this.playfield.Identity, this.dynelRegistry);
             this.npcRuntime.ClearRuntimeState();
             this.npcChaseNavigation.Dispose();
@@ -274,6 +298,8 @@ namespace ZoneEngine.Core.Playfields
 
         internal void RegisterDynel(IEntity entity)
         {
+            // StaticDynel already enters Pool via PooledObject ctor (CellAO LoadStaticDynels pattern).
+            // Do not AddObject again — that throws duplicate-key and floods the log.
             this.dynelRegistry.Register(entity);
             ICharacter character = entity as ICharacter;
             if (character != null)
@@ -763,6 +789,11 @@ namespace ZoneEngine.Core.Playfields
             Action<ICharacter> processFollow,
             Action<ICharacter> processPlayerCollision)
         {
+            if (playfieldIdentity.Instance == 6553)
+            {
+                this.npcRuntime.EnsureAreteCapturePopulation();
+            }
+
             this.timedLifecycle.ProcessHeartbeatLifecycle(
                 playfieldIdentity,
                 this.Characters,
@@ -1202,6 +1233,11 @@ namespace ZoneEngine.Core.Playfields
         internal void AcquireNpcAggro(ICharacter attacker, ICharacter target)
         {
             this.npcRuntime.AcquireAggro(attacker, target);
+        }
+
+        internal void ForceNpcTauntAggro(ICharacter taunter, ICharacter npc)
+        {
+            this.npcRuntime.ForceTauntAggro(taunter, npc);
         }
 
         internal void ProcessNpcPatrolTick(ICharacter character)

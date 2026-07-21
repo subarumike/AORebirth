@@ -36,6 +36,7 @@ namespace ZoneEngine.Core
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Net.Sockets;
     using System.Threading;
 
@@ -77,6 +78,15 @@ namespace ZoneEngine.Core
         public IPlayfield Playfield;
 
         public bool PreserveLogoutSitOnConnect { get; set; }
+
+        /// <summary>
+        /// Real (UTC) time we last sent this client a <c>GameTimeMessage</c>. The client anchors its
+        /// mission/quest countdown clock to that message (a fixed server epoch) and advances it in real
+        /// time from there, re-anchoring on every login and zone-in. Mission expiry timestamps must be
+        /// computed relative to this sync point, not wall-clock time, or the "Remain" value drifts every
+        /// restart and jumps on zone change. See <see cref="ZoneEngine.Core.Perks.PerkResetMissionSender"/>.
+        /// </summary>
+        public DateTime LastGameTimeSyncUtc { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// </summary>
@@ -328,6 +338,14 @@ namespace ZoneEngine.Core
                 this.Controller.Character = pooledCharacter;
                 this.Controller.Character.Reconnect(this);
                 LogUtil.Debug(DebugInfoDetail.Engine, "Reconnected to Character " + charId);
+            }
+
+            // Always refresh from DB — reconnect skips Character.Read(), and client UI
+            // resets on FullCharacter so server memory alone is not enough without a resync.
+            Character playerCharacter = this.Controller.Character as Character;
+            if (playerCharacter != null)
+            {
+                playerCharacter.ReloadTrainedPerksFromDatabase();
             }
 
             this.PreserveLogoutSitOnConnect =
@@ -680,10 +698,13 @@ namespace ZoneEngine.Core
                         this.questNpcTransportDiagnosticSessionId,
                         EmitQuestNpcOutboundTransportDiagnostic);
 
-                    // Remove reference of character
-                    if ((this.Controller != null) && (this.Controller.Character != null))
+                    // Remove reference of character. Character getter is null-safe when
+                    // the weak ref was never bound (early disconnect).
+                    IController disconnectController = this.Controller;
+                    ICharacter disconnectCharacter =
+                        disconnectController == null ? null : disconnectController.Character;
+                    if (disconnectCharacter != null)
                     {
-                        ICharacter disconnectCharacter = this.Controller.Character;
                         int characterId = disconnectCharacter.Identity.Instance;
                         Playfield disconnectPlayfield = disconnectCharacter.Playfield as Playfield;
                         if (disconnectPlayfield != null)
@@ -704,7 +725,7 @@ namespace ZoneEngine.Core
                             if (!isZoneTransfer)
                             {
                                 disconnectCharacter.EnterLogoutSitPosture();
-                                this.Controller.State = CharacterState.Idle;
+                                disconnectController.State = CharacterState.Idle;
                                 disconnectCharacter.StartLogoutTimer();
                             }
                         }
@@ -714,14 +735,9 @@ namespace ZoneEngine.Core
                         //this.character.Client = null;
                         // }
                     }
-                    if (this.zStream != null)
-                    {
-                        this.zStream.Close();
-                    }
-                    if (this.netStream != null)
-                    {
-                        this.netStream.Close();
-                    }
+                    // Client often aborts the TCP socket before we dispose. Closing ZlibStream
+                    // flushes to NetworkStream and throws IOException/SocketException — expected.
+                    this.CloseTransportStreamsQuietly();
                     this.controller = null;
                 }
             }
@@ -731,6 +747,51 @@ namespace ZoneEngine.Core
             // this.Controller.Character = null;
 
             base.Dispose(disposing);
+        }
+
+        private void CloseTransportStreamsQuietly()
+        {
+            try
+            {
+                if (this.zStream != null)
+                {
+                    this.zStream.Close();
+                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (SocketException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            finally
+            {
+                this.zStream = null;
+            }
+
+            try
+            {
+                if (this.netStream != null)
+                {
+                    this.netStream.Close();
+                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (SocketException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            finally
+            {
+                this.netStream = null;
+            }
         }
 
         /// <summary>

@@ -60,7 +60,19 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         public void Send(ICharacter character, Identity knubotTarget, IEnumerable<Item> items)
         {
-            this.Send(character, this.RejectedItems(character, knubotTarget, items), false);
+            // Default Unknown2=1: Prophet / most inspection closes (capture 20260718-185306).
+            this.Send(character, knubotTarget, items, 1);
+        }
+
+        /// <summary>
+        /// Capture 20260718-185306: Hypnagogic analyzer/return trades use Unknown2=0;
+        /// Prophet / Silvertail keep-item trades use Unknown2=1 and include the returned item
+        /// (hex shows Low/High/QL + Unknown=1234567890). Empty Items leaves the client trade UI
+        /// without restoring Ancient Device / Insignia.
+        /// </summary>
+        public void Send(ICharacter character, Identity knubotTarget, IEnumerable<Item> items, int unknown2)
+        {
+            this.Send(character, this.RejectedItems(character, knubotTarget, items, unknown2), false);
         }
 
         /// <summary>
@@ -71,9 +83,15 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         /// <param name="items">
         /// </param>
+        /// <param name="unknown2">
+        /// </param>
         /// <returns>
         /// </returns>
-        private MessageDataFiller RejectedItems(ICharacter character, Identity knubotTarget, IEnumerable<Item> items)
+        private MessageDataFiller RejectedItems(
+            ICharacter character,
+            Identity knubotTarget,
+            IEnumerable<Item> items,
+            int unknown2)
         {
             return x =>
             {
@@ -81,14 +99,29 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.Target = knubotTarget;
                 x.Identity = character.Identity;
                 List<KnuBotRejectedItem> temp = new List<KnuBotRejectedItem>();
-                foreach (Item item in items)
+                if (items != null)
                 {
-                    // TODO: Find out what the unknown in rejecteditem is
-                    temp.Add(
-                        new KnuBotRejectedItem() { HighId = item.HighID, LowId = item.LowID, Quality = item.Quality });
+                    foreach (Item item in items)
+                    {
+                        if (item == null)
+                        {
+                            continue;
+                        }
+
+                        // Capture Prophet RejectedItems Unknown field (0x499602D2 = 1234567890).
+                        temp.Add(
+                            new KnuBotRejectedItem
+                            {
+                                HighId = item.HighID,
+                                LowId = item.LowID,
+                                Quality = item.Quality > 0 ? item.Quality : 1,
+                                Unknown = 1234567890
+                            });
+                    }
                 }
 
                 x.Items = temp.ToArray();
+                x.Unknown2 = unknown2;
             };
         }
     }

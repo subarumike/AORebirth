@@ -371,6 +371,37 @@ namespace AORebirth.Core.Playfields
             };
         }
 
+        /// <summary>
+        /// Fixed damage + attack-on-sight (mission interiors).
+        /// Enables AttackMessage start context so the client plays a real melee swing,
+        /// and uses unarmed AttackInfo tags (not zeros) so hits are not "UNKNOWN damage".
+        /// </summary>
+        internal static CapturedEnemyCombatContract FixedAttackOnSight(
+            string evidence,
+            int minDamage,
+            int maxDamage,
+            double rechargeSeconds,
+            int weaponSlot,
+            int attackInfoUnknown,
+            int weaponInstance)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                Evidence = evidence,
+                Retaliates = true,
+                AiProfile = NpcAiProfile.Aggressive,
+                AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
+                MinDamage = minDamage,
+                MaxDamage = maxDamage,
+                RechargeSeconds = rechargeSeconds,
+                AttackInfoWeaponSlot = weaponSlot,
+                AttackInfoUnknown = attackInfoUnknown,
+                AttackInfoWeaponInstance = weaponInstance,
+                HasCapturedAttackStartContext = true,
+                HasEmptySpecialAttackWeaponContext = true
+            };
+        }
+
         internal static CapturedEnemyCombatContract EquippedWeapon(
             string evidence,
             int lowId,
@@ -573,6 +604,11 @@ namespace AORebirth.Core.Playfields
             {
                 SetMobStat(character, StatIds.mindamage, contract.MinDamage);
                 SetMobStat(character, StatIds.maxdamage, contract.MaxDamage);
+                // Client combat text uses damagetype (91 = Melee). Leave 0 → "UNKNOWN damage".
+                SetMobStat(character, StatIds.damagetype, (int)StatIds.meleeac);
+                SetMobStat(character, StatIds.damageoverridetype, (int)StatIds.meleeac);
+                SetMobStat(character, StatIds.defaultattacktype, 0);
+                SetMobStat(character, StatIds.weapontype, 0);
             }
             else if (contract.AttackModel == CapturedEnemyAttackModel.EquippedWeapon
                      && !TryEquipCapturedWeapon(character, contract, out failure))

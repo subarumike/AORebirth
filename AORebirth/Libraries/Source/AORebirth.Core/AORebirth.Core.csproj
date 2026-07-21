@@ -139,6 +139,7 @@
     <Compile Include="Items\IItem.cs" />
     <Compile Include="Items\IItemNanoActions.cs" />
     <Compile Include="Items\IItemNanoEvents.cs" />
+    <Compile Include="Items\AwakenedBurdenOfCompetenceAppearance.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\ItemLoader.cs" />
     <Compile Include="Items\ItemTemplate.cs" />

@@ -1,0 +1,849 @@
+{
+  "Identity": {
+    "Id": "thrak-garden-key-dialogue-20260718-185306",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260718-185306"
+  },
+  "SourceCaptures": [
+    "20260718-185306"
+  ],
+  "Npcs": [
+    {
+      "Id": "scientist_veronica_787B54B2",
+      "NpcIdentity": "SimpleChar:787B54B2",
+      "Name": "Scientist Veronica Escobar",
+      "RootNodeId": "veronica_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "veronica_001",
+          "PromptText": "The young woman wrinkles her forehead.\nThey can't be serious...\nYou take a quick look around. Yep, she's talking to you.\nI ask for an assistant... \nand they send me...\nVeronica looks at you with disbelief.\n...something looking like a science experiment sent here from Rubi-Ka!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "v001_0",
+              "Index": 0,
+              "Text": "I am one of those science experiments.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_002",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v001_1",
+              "Index": 1,
+              "Text": "I'm not anyone's assistant. Get lost.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v001_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_002",
+          "PromptText": "Ohh.\n\nDid I hurt your feelings, dear?\nYou can tell by the sound of her voice that she really doesn't care.\nI suspect you have the bracer Drake gave you? Let's have a look.\nVeronica seems to have conducted these readings for quite a while. As she quickly programs her wrist-attached DNA-Recompiler to receive the information from your bracer, you can't help wondering what they aim to accomplish with these experiments.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "v002_0",
+              "Index": 0,
+              "Text": "Here is the Bracer.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_bracer_stub",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v002_1",
+              "Index": 1,
+              "Text": "I don't have the Bracer.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_003",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v002_2",
+              "Index": 2,
+              "Text": "I am not interested.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v002_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_bracer_stub",
+          "PromptText": "Veronica studies the bracer briefly.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "vbs_0",
+              "Index": 0,
+              "Text": "Continue",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_003",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "vbs_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_003",
+          "PromptText": "Veronica taps her foot impatiently as she waits for the DNA-Recompiler to reset.\nI don't have time for this...\nI found a strange and ancient-looking object today.\n\nI am not sure what it might have been used for, nor am I particularly interested in finding out.\nShe proudly lifts her head up and pulls her shoulders back in a well rehearsed pose to look important.\nI'm much too valuable for the project to be jeopardized as a consequence of sheer immature curiosity.\n\nYou on the other hand... are expendable.\n\nAnd since it doesn't look like I'm getting a new assistant anytime soon, you will just have to do.\nWith that, she starts rummaging around her backpack and digs up a strange item. You wonder whether you should take the job?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "v003_0",
+              "Index": 0,
+              "Text": "What's the rush?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_004",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v003_1",
+              "Index": 1,
+              "Text": "I have all the time in the world.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v003_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_004",
+          "PromptText": "You do that, and make sure to keep any information you find to yourself.\n\nI would suggest you search West of here. I have heard rumors of a settlement there. Find out anyone there shows interest in this Ancient Device and give it to him for inspection.\n\nReturn to me if you find something important enough to occupy my precious time.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "v004_0",
+              "Index": 0,
+              "Text": "I'll see what I can do.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_005",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v004_1",
+              "Index": 1,
+              "Text": "I am not interested.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v004_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_005",
+          "PromptText": "You do that, and make sure to keep any information you find to yourself.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "v005_0",
+              "Index": 0,
+              "Text": "What kind of rumors have you heard?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_rumors",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v005_1",
+              "Index": 1,
+              "Text": "What can you tell me of the symbols you seem to be researching here?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_symbols",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v005_2",
+              "Index": 2,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_brink",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "v005_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_rumors",
+          "PromptText": "I have heard that a settlement has been found west of here.\n\nAnd that the settlement was supposed to be inhabited by powerful creatures, searching for a way to harvest the energies of nature.\n\nBut I haven't had time to explore that part of Nascence. I am sure you will.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "vr_0",
+              "Index": 0,
+              "Text": "What can you tell me of the symbols you seem to be researching here?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_symbols",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "vr_1",
+              "Index": 1,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_brink",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "vr_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_symbols",
+          "PromptText": "They refer to someone well versed in the past. His title would be, directly translated, Hypnagogic.\n\nThe one close in touch with the Divine entity is referred to as a Prophet.\n\nThese are all directly translated titles and my knowledge of the ancient alphabet is limited. Even though it is highly unlikely, keep in mind that there is a slight chance of error due to some phonetic variations that might have been lost in the translation.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "vs_0",
+              "Index": 0,
+              "Text": "What can you tell me about the Brink?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "veronica_brink",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "vs_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "veronica_brink",
+          "PromptText": "The Brink can be found North of here.\n\nBut since seismic readings from that area are not reliable, you would be wise to keep away.\n\nThe Brink is the very edge of these lands, but I have reached the conclusion that something is causing the edge to dissolve.\n\nI hope Drake can find a solution to this problem soon or we will be in serious danger out here.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "vb_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    },
+    {
+      "Id": "prophet_yutt_78D280F6",
+      "NpcIdentity": "SimpleChar:78D280F6",
+      "Name": "Prophet Yutt Thrak",
+      "RootNodeId": "prophet_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "prophet_001",
+          "PromptText": "Greetings, child of Thrak.\nYou see a gleam of interest in the Prophet's eyes as he notices the ancient device you are carrying.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "p001_0",
+              "Index": 0,
+              "Text": "I found this ancient device...",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_trade_device",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p001_1",
+              "Index": 1,
+              "Text": "I don't need any help from you.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p001_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_trade_device",
+          "PromptText": "Let me have a look.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "ptd_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_002",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_002",
+          "PromptText": "Yes. I have seen these before.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "p002_0",
+              "Index": 0,
+              "Text": "I need to know more about this ancient item. Can you help me?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_003",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p002_1",
+              "Index": 1,
+              "Text": "I don't need any help from you.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p002_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_003",
+          "PromptText": "We all have needs, Thenera.\n\nThe question is how much you are willing to sacrifice to have them satisfied.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "p003_0",
+              "Index": 0,
+              "Text": "I have nothing to lose, what do you require?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_004",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p003_1",
+              "Index": 1,
+              "Text": "I don't like the sound of this.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p003_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_004",
+          "PromptText": "Nothing to lose?\nYutt Thrak lowers his voice.\nWe will see about that.\n\nLook around you...\n\nWe were all chosen by the Sacred One. We now devote our lives to the cause and carry out His hallowed commands - whatever they may be.\n\n\nWe are the only ones who can show you the path to grandness. Those most dedicated of His followers may be granted entrance to His Garden and Sanctuary.\n\nOne may recieve incredible powers.\n\nOne may even evolve beyond human comprehension.\n\nBut one may also be destroyed in the blink of an eye, should the Divine decide you are not worthy.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "p004_0",
+              "Index": 0,
+              "Text": "I am prepared to follow every command and reap the benefits of my hard work.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_005",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p004_1",
+              "Index": 1,
+              "Text": "No, thanks. I think I should be leaving now.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p004_2",
+              "Index": 2,
+              "Text": "Tell me more about that Garden.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_garden_info",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p004_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_garden_info",
+          "PromptText": "Words, nothing but words.\n\nShow us proof of your devotion - commit yourself to the Sacred One!\n\nBring before me the mark revealing His existence here in Nascence.\n\nNow leave!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "pgi_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_005",
+          "PromptText": "Words, nothing but words.\n\nShow us proof of your devotion - commit yourself to the Sacred One!\n\nBring before me the mark revealing His existence here in Nascence.\n\nNow leave!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "p005_0",
+              "Index": 0,
+              "Text": "I have proof of Thraks Divine presence here in Nascence.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_trade_insignia",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "p005_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_trade_insignia",
+          "PromptText": "Really?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "pti_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_006",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_006",
+          "PromptText": "Well done, Thenera. But you have much to prove before Thrak turns his attention your way.\n\nTravel to the statue raised in His glory and place the Insignia by its feet.\n\nYou will be granted passage to His Garden.\n\nThis is where you must continue your journey.\n\nSomeone versed in what has once been, may be able to tell you more about the Ancient Device.\n\nNow leave.\nStay in the shadows, Thenera and may Thrak keep prying eyes away from your path to glory.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "p006_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "prophet_need_insignia",
+          "PromptText": "Bring before me the mark revealing His existence here in Nascence.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "pni_0",
+              "Index": 0,
+              "Text": "I have proof of Thraks Divine presence here in Nascence.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "prophet_trade_insignia",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "pni_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    },
+    {
+      "Id": "hypnagogic_urga_lum_79758F3A",
+      "NpcIdentity": "SimpleChar:79758F3A",
+      "Name": "Hypnagogic Urga-Lum Thrak",
+      "RootNodeId": "hyp_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "hyp_001",
+          "PromptText": "At first the Hypnagogic pretends not to see you, but then he notices the artifact.\nYou there!\nAs you approach him, he points at the ancient device.\nHow did you acquire that artifact?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "h001_0",
+              "Index": 0,
+              "Text": "That's really none of your business, but make it worth my while and I might tell you.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_002",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "h001_1",
+              "Index": 1,
+              "Text": "It was found by a scientist close to Jobe research area.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_trade_analyzer",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "h001_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_002",
+          "PromptText": "How dare you?!\n\nYou will tell me right now or I will have you regret ever talking to me!",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "h002_0",
+              "Index": 0,
+              "Text": "It was found by a scientist close to Jobe research area.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_trade_analyzer",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "h002_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_trade_analyzer",
+          "PromptText": "So it is true!\n\nAs it has been foretold, ancient Xan technology has been recovered and once again returned to the Devoted ones.\n\nGive me the artifact.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "hta_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_004",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_004",
+          "PromptText": "Yes, this is a powerful artifact indeed.\n\nIt claims the soul of feeble creatures, if one knows how to release its dormant powers.\n\nFind out how utilize this Ancient Artifact and claim three souls in the name of Thrak.\nThe Hypnagogic unconsciously waves you away, whispering to himself.\nI must hurry! All the signs are in place. It is time.\n\nTime for us to act! Yes, I must let them know now.\nHe suddenly notices you still standing here.\nWhat are you waiting for, chosen one? Leave at once!\n Take this insignia of Thrak, it will aid us in our journey to glory.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "h004_0",
+              "Index": 0,
+              "Text": "What signs are you talking about?",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_005",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "h004_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_005",
+          "PromptText": "The signs are all over.\n\nThey are showing us that the time has come. The time to set our grand plan in motion. Staged for centuries upon centuries.\n\nAnd there will be no mercy if we fail them. But the rewards when we succeed will be beyond comprehension!\nThe Hypnagogic turns around, busy preparing for the important events to follow.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "h005_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_return",
+          "PromptText": "At first the Hypnagogic pretends not to see you, but then he notices the artifact.\nYou there!\nAs you approach him, he points at the ancient device.\nHow did you acquire that artifact?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "hr_0",
+              "Index": 0,
+              "Text": "I claimed the three souls as you commanded.",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_return_trade",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "hr_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_return_trade",
+          "PromptText": "The Hypnagogic gives you a sharp look.\nIs that so?\n\nI did feel a massive surge of power, but I must inspect the Artifact before I can decide whether you deserve a reward.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "hrt_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "hyp_return_after",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "hyp_return_after",
+          "PromptText": "Very well, Thenera. The Artifact seems to be in perfect order.\n\nWe entrust you to keep it safe and out of reach from Aban, cursed be her name and her treacherous followers.\n\nYour reward, sanctified by Thrak, will be this sacred key. Use it to gain safe passage to this place, but use it with care.\n\nThrak will not look lightly upon misuse of such a powerful gift...\nThe Hypnagogic is muttering to himself, not paying you any attention.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "hra_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    },
+    {
+      "Id": "dreaming_silvertail",
+      "NpcIdentity": "SimpleChar:797652A0",
+      "Name": "Dreaming Silvertail",
+      "RootNodeId": "silver_001",
+      "Aliases": [
+        "SimpleChar:797652F5",
+        "SimpleChar:797652A7"
+      ],
+      "Nodes": [
+        {
+          "Id": "silver_001",
+          "PromptText": "The creature looks at you with wide eyes.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "s001_0",
+              "Index": 0,
+              "Text": "'Cover her eyes with the ancient device'",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "silver_trade",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "s001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "silver_trade",
+          "PromptText": "The creature stops and studies you for a couple of seconds as you look through your backpack. You reach out to cover her eyes with the ancient device.\nThe Silvertail starts to change shape as soon as you place the device close to her eyes.",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "st_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-185306",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": []
+    }
+  ]
+}

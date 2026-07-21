@@ -19,6 +19,21 @@ namespace AORebirth.Core.Playfields
         private const string CleaningRobotProfileKey = "captured.arete.cleaning-robot";
         private const int CleaningRobotMonsterData = 297023;
         private const int CleaningRobotCredits = 5;
+
+        // Capture 20260720-204431 / 20260720-212302 Alex-pad hostiles.
+        private const string AlexDockerProfileKey = "captured.arete.alex-32v-docker";
+        private const int AlexDockerMonsterData = 17649;
+        private const int AlexDockerCredits = 4;
+        private const string AlexWasteProfileKey = "captured.arete.alex-waste-collector";
+        private const int AlexWasteMonsterData = 17714;
+        private const int AlexWasteCredits = 11;
+        private const string AlexFleaProfileKey = "captured.arete.alex-garbage-flea";
+        private const int AlexFleaMonsterData = 17657;
+        private const int AlexFleaCredits = 11;
+        private const string AlexPadLootEvidence =
+            "AOSharpLiveCapture 20260720-204431/20260720-212302 corpse-loot-observations; Docker credits=4; Waste/Flea credits=11; Cleaning Robot credits=5 (empty or Robot Junk)";
+        private const string CleaningRobotLootEvidence =
+            "AOSharpLiveCapture 20260720-212302 corpse-loot-observations; Cleaning Robot credits=5; 2x Robot Junk 42620; 3x empty";
         private const int CapturedAbmouthCredits = 587;
         private const int CapturedInfectorCredits = 150;
         private const int CapturedEumenidesCredits = 186;
@@ -63,6 +78,7 @@ namespace AORebirth.Core.Playfields
             lock (this.productionRandomSync) seed = this.productionRandom.Next();
             context.Seed = seed;
             LootGenerationResult result = this.generator.Generate(context, new SeededLootRandomSource(seed));
+            this.EnsureAlexPadCreditsEvenWhenEmpty(context, result);
             if (DiagnosticsEnabled())
             {
                 LogUtil.Debug(DebugInfoDetail.Engine, string.Format(
@@ -73,6 +89,55 @@ namespace AORebirth.Core.Playfields
                     result.Items.Count, result.Credits, result.LootUnresolved, result.CreditsUnresolved));
             }
             return result;
+        }
+
+        private void EnsureAlexPadCreditsEvenWhenEmpty(LootGenerationContext context, LootGenerationResult result)
+        {
+            if (context == null || result == null || result.Credits > 0)
+            {
+                return;
+            }
+
+            int credits;
+            if (!TryGetAlexPadEmptyCredits(context.MonsterData, out credits))
+            {
+                return;
+            }
+
+            // Capture empty corpses still carried credits and stayed openable.
+            result.Credits = credits;
+            result.CreditsUnresolved = true;
+            result.LootUnresolved = true;
+        }
+
+        private static bool TryGetAlexPadEmptyCredits(int monsterData, out int credits)
+        {
+            if (monsterData == AlexDockerMonsterData)
+            {
+                credits = AlexDockerCredits;
+                return true;
+            }
+
+            if (monsterData == AlexWasteMonsterData)
+            {
+                credits = AlexWasteCredits;
+                return true;
+            }
+
+            if (monsterData == AlexFleaMonsterData)
+            {
+                credits = AlexFleaCredits;
+                return true;
+            }
+
+            if (monsterData == CleaningRobotMonsterData)
+            {
+                credits = CleaningRobotCredits;
+                return true;
+            }
+
+            credits = 0;
+            return false;
         }
 
         internal LootGenerationResult GenerateDeterministic(LootGenerationContext context, int seed)
@@ -135,6 +200,27 @@ namespace AORebirth.Core.Playfields
                     out encounter))
                 {
                     this.EnsureCapturedEncounter(encounter);
+                    return;
+                }
+
+                if (context.MonsterData == AlexDockerMonsterData)
+                {
+                    this.EnsureAlexDocker();
+                    context.EnemyProfileKey = AlexDockerProfileKey;
+                    return;
+                }
+
+                if (context.MonsterData == AlexWasteMonsterData)
+                {
+                    this.EnsureAlexWasteCollector();
+                    context.EnemyProfileKey = AlexWasteProfileKey;
+                    return;
+                }
+
+                if (context.MonsterData == AlexFleaMonsterData)
+                {
+                    this.EnsureAlexGarbageFlea();
+                    context.EnemyProfileKey = AlexFleaProfileKey;
                     return;
                 }
 
@@ -423,60 +509,247 @@ namespace AORebirth.Core.Playfields
             this.registry.RegisterTableAndAssignment(adapted.Table, adapted.Assignment);
         }
 
+        private void EnsureAlexDocker()
+        {
+            const string tableKey = "captured.arete.alex-32v-docker";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            // Capture 20260720-204431: 6 corpse opens — credits always 4; 2 empty; items include Robot Junk.
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260720-204431.docker.a",
+                        AlexDockerCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.a", 70560, 85688, 3, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260720-204431.docker.b",
+                        AlexDockerCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.b", 248307, 248307, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.b", 70564, 85515, 3, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260720-204431.docker.c",
+                        AlexDockerCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.c", 248318, 248318, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260720-204431.docker.d",
+                        AlexDockerCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.d", 42620, 42619, 3, 1)),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.docker.empty-a", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.docker.empty-b", AlexDockerCredits)
+                };
+
+            this.RegisterAlexPadTable(
+                tableKey,
+                "32-V Docker captured corpse",
+                AlexDockerProfileKey,
+                snapshots);
+        }
+
+        private void EnsureAlexWasteCollector()
+        {
+            const string tableKey = "captured.arete.alex-waste-collector";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            // Capture 20260720-224646: Waste credits=11 (monsterData 17714). Guarantee Robot Junk
+            // so corpses are never item-empty (Mike: "no loot" on Waste Collector).
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = "Waste Collector captured outcomes",
+                    TableType = LootTableType.EnemyType,
+                    RollGroups =
+                        new[]
+                        {
+                            new LootGroupDefinition
+                            {
+                                LootGroupKey = "captured-outcome",
+                                RollMode = LootRollMode.WeightedOne,
+                                RollCount = 1,
+                                EmptyWeight = 0,
+                                DropChanceBasisPoints = 10000,
+                                Entries =
+                                    new[]
+                                    {
+                                        FixedEntry(42620, 1, "waste.robot-junk", 4),
+                                        FixedEntry(70564, 1, "waste.armor-a", 1),
+                                        FixedEntry(155666, 1, "waste.misc-a", 1),
+                                        FixedEntry(70565, 1, "waste.armor-b", 1)
+                                    },
+                                Conditions = new string[0]
+                            }
+                        },
+                    CreditsPolicy = CreditsRange(
+                        AlexWasteCredits,
+                        AlexWasteCredits,
+                        LootEvidenceConfidence.ProvenCapture),
+                    QualityPolicy = "captured-fixed",
+                    Evidence = AlexPadLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = AlexWasteProfileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Evidence = AlexPadLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true,
+                    Conditions = new string[0]
+                });
+        }
+
+        private void EnsureAlexGarbageFlea()
+        {
+            const string tableKey = "captured.arete.alex-garbage-flea";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.flea.empty-a", AlexFleaCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.flea.empty-b", AlexFleaCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-212302.flea.empty", AlexFleaCredits)
+                };
+
+            this.RegisterAlexPadTable(
+                tableKey,
+                "Garbage Flea captured corpse",
+                AlexFleaProfileKey,
+                snapshots);
+        }
+
+        private void RegisterAlexPadTable(
+            string tableKey,
+            string displayName,
+            string profileKey,
+            ObservedCorpseSnapshotDefinition[] snapshots)
+        {
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = displayName,
+                    TableType = LootTableType.EnemyType,
+                    RollGroups = new LootGroupDefinition[0],
+                    ObservedCorpseSnapshots = snapshots,
+                    CreditsPolicy = new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.Unresolved
+                    },
+                    QualityPolicy = "captured-observed-corpse-snapshots",
+                    Evidence = AlexPadLootEvidence,
+                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                    ItemPoolUnresolved = true,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = profileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Conditions = new string[0],
+                    Evidence = AlexPadLootEvidence,
+                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                    Enabled = true
+                });
+        }
+
         private void EnsureCleaningRobot()
         {
             const string tableKey = "captured.arete.cleaning-robot";
-            if (this.registry.ContainsTable(tableKey)) return;
-            int[][] outcomes =
+            if (this.registry.ContainsTable(tableKey))
             {
-                new[] { 42620 }, new int[0], new[] { 36779, 84142 }, new int[0], new[] { 297289 },
-                new int[0], new int[0], new[] { 70558, 155685 }, new[] { 297289, 150306 },
-                new int[0], new[] { 155666 }, new int[0], new[] { 70564 }, new[] { 155666 },
-                new[] { 155687 }, new[] { 70565 }, new[] { 155684 }, new int[0]
-            };
+                return;
+            }
+
+            // Prior proven weighted outcomes + capture 20260720-212302 empty/junk weight.
+            int[][] outcomes =
+                {
+                    new[] { 42620 }, new int[0], new[] { 36779, 84142 }, new int[0], new[] { 297289 },
+                    new int[0], new int[0], new[] { 70558, 155685 }, new[] { 297289, 150306 },
+                    new int[0], new[] { 155666 }, new int[0], new[] { 70564 }, new[] { 155666 },
+                    new[] { 155687 }, new[] { 70565 }, new[] { 155684 }, new int[0],
+                    new[] { 42620 }, new int[0], new int[0], new int[0]
+                };
             var entries = new List<LootEntryDefinition>();
             int emptyWeight = 0;
             for (int index = 0; index < outcomes.Length; index++)
             {
-                if (outcomes[index].Length == 0) { emptyWeight++; continue; }
-                foreach (int itemId in outcomes[index]) entries.Add(FixedEntry(itemId, 1, "outcome." + index, 1));
-            }
-            this.registry.RegisterTable(new LootTableDefinition
-            {
-                LootTableKey = tableKey,
-                DisplayName = "Malfunctioning Cleaning Robot captured outcomes",
-                TableType = LootTableType.EnemyType,
-                RollGroups = new[]
+                if (outcomes[index].Length == 0)
                 {
-                    new LootGroupDefinition
-                    {
-                        LootGroupKey = "captured-outcome",
-                        RollMode = LootRollMode.WeightedOne,
-                        RollCount = 1,
-                        EmptyWeight = emptyWeight,
-                        DropChanceBasisPoints = 10000,
-                        Entries = entries.ToArray(),
-                        Conditions = new string[0]
-                    }
-                },
-                CreditsPolicy = CreditsRange(CleaningRobotCredits, CleaningRobotCredits, LootEvidenceConfidence.ProvenCapture),
-                QualityPolicy = "captured-fixed",
-                Evidence = "live-capture-20260629-142800",
-                Confidence = LootEvidenceConfidence.ProvenCapture,
-                Enabled = true
-            });
-            this.registry.RegisterAssignment(new LootAssignmentDefinition
-            {
-                AssignmentKey = tableKey,
-                TargetType = LootAssignmentTargetType.EnemyType,
-                TargetKey = CleaningRobotProfileKey,
-                LootTableKey = tableKey,
-                Priority = 0,
-                Evidence = "live-capture-20260629-142800",
-                Confidence = LootEvidenceConfidence.ProvenCapture,
-                Enabled = true,
-                Conditions = new string[0]
-            });
+                    emptyWeight++;
+                    continue;
+                }
+
+                foreach (int itemId in outcomes[index])
+                {
+                    entries.Add(FixedEntry(itemId, 1, "outcome." + index, 1));
+                }
+            }
+
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = "Cleaning Robot captured outcomes",
+                    TableType = LootTableType.EnemyType,
+                    RollGroups =
+                        new[]
+                        {
+                            new LootGroupDefinition
+                            {
+                                LootGroupKey = "captured-outcome",
+                                RollMode = LootRollMode.WeightedOne,
+                                RollCount = 1,
+                                EmptyWeight = emptyWeight,
+                                DropChanceBasisPoints = 10000,
+                                Entries = entries.ToArray(),
+                                Conditions = new string[0]
+                            }
+                        },
+                    CreditsPolicy = CreditsRange(
+                        CleaningRobotCredits,
+                        CleaningRobotCredits,
+                        LootEvidenceConfidence.ProvenCapture),
+                    QualityPolicy = "captured-fixed",
+                    Evidence = "live-capture-20260629-142800; 20260720-212302 empty/junk",
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = CleaningRobotProfileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Evidence = "live-capture-20260629-142800; 20260720-212302 empty/junk",
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true,
+                    Conditions = new string[0]
+                });
         }
 
         private void EnsureDatabaseLoaded()

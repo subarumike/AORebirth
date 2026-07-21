@@ -507,15 +507,16 @@ namespace AORebirth.Core.Inventory
         public void Equip(IInventoryPage sendingPage, int fromPlacement, int toPlacement)
         {
             IItem toEquip = sendingPage[fromPlacement];
-
-            // First: Check if the item can be worn
-            bool canBeWornCheck = (toEquip.GetAttribute(30) & (int)CanFlags.Wear) == (int)CanFlags.Wear;
-
-            if (canBeWornCheck)
+            if (toEquip == null)
             {
-                this.Add(toPlacement, toEquip);
-                sendingPage.Remove(fromPlacement);
+                return;
             }
+
+            // Always complete the server-side move. Callers already validated CanEquipToPage.
+            // Requiring Wear/Use flags left HUD utilities (garden keys) visually equipped on the
+            // client while missing on the server → cannot unequip / Wrong ammotype / cannot use.
+            this.Add(toPlacement, toEquip);
+            sendingPage.Remove(fromPlacement);
         }
 
         /// <summary>

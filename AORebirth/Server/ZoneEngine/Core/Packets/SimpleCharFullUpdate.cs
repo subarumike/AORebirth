@@ -177,6 +177,19 @@ namespace ZoneEngine.Core.Packets
 
                 charName = character.Name;
                 charFlagsValue = character.Stats[StatIds.flags].Value;
+                bool isGm = character.Stats[StatIds.gmlevel].Value > 0;
+                if (isGm)
+                {
+                    // Green unknown without capture. Use confirmed blue bit + "[GM]" suffix.
+                    charFlagsValue &= ~(int)CharacterFlags.NpcStyleFlag28;
+                    charFlagsValue |= (int)CharacterFlags.HasBlueName;
+                    if (charName != null
+                        && charName.IndexOf("[GM]", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        charName = charName + " [GM]";
+                    }
+                }
+
                 accFlagsValue = character.Stats[StatIds.accountflags].Value;
 
                 expansionValue = character.Stats[StatIds.expansion].Value;
@@ -371,8 +384,11 @@ namespace ZoneEngine.Core.Packets
             scfu.AccountFlags = (short)accFlagsValue;
             scfu.Expansions = (short)expansionValue;
 
+            // Capture-backed city NPCs (e.g. ICC Peacekeepers) can have NpcFamily=0 while still
+            // using SimpleNpcInfo. Prefer NPCController over the family!=0 heuristic.
             bool isNpc = hasWindcallerNpcRuntime
                          || hasCapturedVendorRuntime
+                         || character.Controller is NPCController
                          || ((NPCFamily != 1234567890) && (NPCFamily != 0));
 
             if (isNpc)
@@ -415,10 +431,33 @@ namespace ZoneEngine.Core.Packets
             // Level
             scfu.Level = (short)levelValue;
 
-            // Health
-            scfu.Health = healthValue;
+            // Health — values above ushort.MaxValue use int32 SCFU encoding and the client
+            // shows the large boss HP bar. Keep server combat HP; clamp presentation only.
+            int displayMaxHealth = healthValue;
+            int displayCurrentHealth = currentHealth;
+            if (healthValue > ushort.MaxValue)
+            {
+                displayMaxHealth = ushort.MaxValue;
+                if (healthValue > 0)
+                {
+                    displayCurrentHealth = (int)((long)currentHealth * ushort.MaxValue / healthValue);
+                    if (displayCurrentHealth < 0)
+                    {
+                        displayCurrentHealth = 0;
+                    }
+                    else if (displayCurrentHealth > displayMaxHealth)
+                    {
+                        displayCurrentHealth = displayMaxHealth;
+                    }
+                }
+                else
+                {
+                    displayCurrentHealth = 0;
+                }
+            }
 
-            scfu.HealthDamage = healthValue - currentHealth;
+            scfu.Health = displayMaxHealth;
+            scfu.HealthDamage = displayMaxHealth - displayCurrentHealth;
 
             // If player is in grid or fixer grid
             // make him/her/it a nice upside down pyramid
@@ -446,8 +485,8 @@ namespace ZoneEngine.Core.Packets
                                 0x00, 0x00, 0x00, 0x00
                             };
 
-            // NPC Unknown1
-            if ((NPCFamily != 0) && (NPCFamily != 1234567890))
+            // NPC Unknown1 (28-byte). Family=0 ICC NPCs still need this shape for idle anims.
+            if (isNpc)
             {
                 scfu.Unknown1 = new byte[]
                                 {
@@ -471,6 +510,27 @@ namespace ZoneEngine.Core.Packets
                 scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
                     | SimpleCharFullUpdateFlags.IsPet
                     | SimpleCharFullUpdateFlags.UnknownDataFlag;
+            }
+            else if (!hasWindcallerNpcRuntime
+                     && !hasCapturedVendorRuntime
+                     && !hasEncounterRuntime
+                     && character.Controller is NPCController
+                     && AndromedaIccHqSpawn.IsAndromedaCityNpcPlayfield(charPlayfield))
+            {
+                // Live ICC HQ SCFU: UnknownFlag6 + IsPet; serializer's UnknownFlag2 is not on capture.
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6
+                    | SimpleCharFullUpdateFlags.IsPet;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;
+                if (AndromedaIccHqSpawn.NeedsNataliaScfuFlag7(charName))
+                {
+                    scfu.AdditionalFlags |= SimpleCharFullUpdateFlags.UnknownFlag7;
+                }
+
+                byte[] extendedTextures;
+                if (AndromedaIccHqSpawn.TryGetExtendedTextureOverride(charName, out extendedTextures))
+                {
+                    scfu.ExtendedTextureOverrideData = extendedTextures;
+                }
             }
 
             int emittedHeadMesh = hasWindcallerNpcRuntime
@@ -500,14 +560,28 @@ namespace ZoneEngine.Core.Packets
             {
                 scfu.ExtendedTextureOverrideData = CapturedSubwayFilthFleaExtendedTextureOverrideData;
             }
-            else if (petMasterInstance != 0
-                && ZoneEngine.Core.PetBureaucratGuardianAppearance.IsGuardianPet(character))
+            else
             {
-                // Owner receives the capture-exact guardian wire; other players receive this
-                // serializer-built visibility SCFU. Attach the guardian body textures so both match.
-                scfu.ExtendedTextureOverrideData =
-                    ZoneEngine.Core.PetSummonScfuExtensions.CloneGuardianExtendedTextureOverrideData();
-                scfu.VisualFlags = 31;
+                byte[] alexExtendedTextures;
+                if (AlexAreaMobRuntime.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
+                    // Capture 20260720-204431: Docker / Waste Collector / Garbage Flea HasExtendedTextures.
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                    byte[] alexUnknown1;
+                    if (AlexAreaMobRuntime.TryGetCapturedScfuUnknown1(charName, out alexUnknown1))
+                    {
+                        scfu.Unknown1 = alexUnknown1;
+                    }
+                }
+                else if (petMasterInstance != 0
+                    && ZoneEngine.Core.PetBureaucratGuardianAppearance.IsGuardianPet(character))
+                {
+                    // Owner receives the capture-exact guardian wire; other players receive this
+                    // serializer-built visibility SCFU. Attach the guardian body textures so both match.
+                    scfu.ExtendedTextureOverrideData =
+                        ZoneEngine.Core.PetSummonScfuExtensions.CloneGuardianExtendedTextureOverrideData();
+                    scfu.VisualFlags = 31;
+                }
             }
 
             scfu.ActiveNanos = (from nano in nanos
@@ -642,7 +716,11 @@ namespace ZoneEngine.Core.Packets
             else if (hasWindcallerNpcRuntime)
             {
                 WindcallerKarrecNpcDefinition definition = windcallerNpcRuntime.Content;
-                var capturedFlags = (SimpleCharFullUpdateFlags)definition.CapturedScfuFlags;
+                // Do not force exact capture flags via SuppressedFlags=~flags.
+                // That clears serializer-owned size bits (e.g. HasExtendedLevel for L200)
+                // after Int16 level was already written, which desyncs/crashes the client.
+                // Mirror subway thief/vendor style: only OR cosmetic bits; let the serializer
+                // own health/level/runspeed/waypoint/npc-family sizing flags.
                 scfu.CharacterInfo =
                     new SimpleNpcInfo
                     {
@@ -652,8 +730,9 @@ namespace ZoneEngine.Core.Packets
                 scfu.CharacterFlags = (CharacterFlags)definition.CharacterFlags;
                 scfu.AccountFlags = 0;
                 scfu.Expansions = 0;
-                scfu.AdditionalFlags = capturedFlags;
-                scfu.SuppressedFlags = ~capturedFlags;
+                scfu.AdditionalFlags = SimpleCharFullUpdateFlags.UnknownFlag6;
+                scfu.SuppressedFlags = SimpleCharFullUpdateFlags.None;
+                scfu.VisualFlags = (short)definition.VisualFlags;
                 scfu.Flags2 = 0;
                 scfu.Unknown1 = definition.CapturedScfuUnknown1.ToArray();
                 scfu.Unknown2 = 0;

@@ -634,11 +634,18 @@ namespace ZoneEngine.Core.Controllers
                 return true;
             }
 
-            // Do we have a attached KnuBot?
-            if ((this.KnuBot != null) && (this.KnuBot.Character.Target == null))
+            // Do we have an attached KnuBot?
+            if (this.KnuBot != null)
             {
                 ICharacter source = Pool.Instance.GetObject<ICharacter>(this.Character.Playfield.Identity, target);
+                if (source == null)
+                {
+                    return false;
+                }
+
                 this.FaceDialoguePartner(source);
+                // Allow re-open after a stuck/previous conversation partner.
+                this.KnuBot.Character = new Utility.WeakReference<ICharacter>(null);
                 return this.KnuBot.StartDialog(source);
             }
             return false;

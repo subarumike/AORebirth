@@ -108,10 +108,16 @@ namespace ZoneEngine.Core.Playfields
             Func<PlayfieldStaticDynelDefinition, IEntity> instantiateStaticDynel,
             Action<IEntity> registerDynel)
         {
+            int loaded = 0;
             foreach (PlayfieldStaticDynelDefinition staticDynel in resolveStaticDynels(playfieldIdentity))
             {
                 registerDynel(instantiateStaticDynel(staticDynel));
+                loaded++;
             }
+
+            Utility.LogUtil.Debug(
+                Utility.DebugInfoDetail.Database,
+                "MaterializeStaticDynels pf=" + playfieldIdentity.Instance + " loaded=" + loaded);
         }
 
         private static void Require(Delegate callback, string name)

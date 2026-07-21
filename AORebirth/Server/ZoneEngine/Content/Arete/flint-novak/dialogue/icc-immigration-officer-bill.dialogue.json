@@ -1,0 +1,139 @@
+{
+  "Identity": {
+    "Id": "arete-icc-immigration-officer-bill-dialogue-20260720-105157",
+    "Version": "captured-bill-hc12-turnin-20260720-105157",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-105157/npc-interactions.log"
+  },
+  "SourceCaptures": [
+    "20260720-105157"
+  ],
+  "Npcs": [
+    {
+      "Id": "icc-immigration-officer-bill",
+      "NpcIdentity": "SimpleChar:78E0FC66",
+      "Name": "ICC Immigration Officer Bill",
+      "RootNodeId": "bill_105157_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC66)"
+      ],
+      "Nodes": [
+        {
+          "Id": "bill_105157_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-105157; options-only",
+          "Options": [
+            {
+              "Id": "bill_105157_001_option_0",
+              "Index": 0,
+              "Text": "Alex Gibbs thought you may be interested in seeing this?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:53:53.0992964Z; StartTrade follows Answer=0",
+              "NextNodeId": "bill_105157_trade",
+              "Actions": []
+            },
+            {
+              "Id": "bill_105157_001_option_1",
+              "Index": 1,
+              "Text": "My name is Mrhella. I am new to the planet.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:53:53.0992964Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "bill_105157_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            },
+            {
+              "Id": "bill_105157_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:53:53.0992964Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "bill_105157_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "bill_105157_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "Options": [
+            {
+              "Id": "bill_105157_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → AnswerList I will take care of it",
+              "NextNodeId": "bill_105157_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "bill_105157_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "bill_105157_002_option_0",
+              "Index": 0,
+              "Text": "I will take care of it.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:54:01.6570189Z",
+              "NextNodeId": "bill_105157_003",
+              "Actions": []
+            },
+            {
+              "Id": "bill_105157_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:54:01.6570189Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "bill_105157_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "bill_105157_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "bill_105157_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:54:05.9363794Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "bill_105157_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

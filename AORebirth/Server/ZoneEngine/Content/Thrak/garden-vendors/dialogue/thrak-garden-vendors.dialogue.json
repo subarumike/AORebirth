@@ -1,0 +1,263 @@
+{
+  "Identity": {
+    "Id": "thrak-garden-vendors-dialogue-20260718-210135",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260718-210135"
+  },
+  "SourceCaptures": [
+    "20260718-210135"
+  ],
+  "Npcs": [
+    {
+      "Id": "craig_or_furious_fists_79758F3F",
+      "NpcIdentity": "SimpleChar:79758F3F",
+      "Name": "Craig-Or of the Furious Fists",
+      "RootNodeId": "craig_or_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "craig_or_001",
+          "PromptText": "Hello.\nBusiness or pleasure?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "co001_0",
+              "Index": 0,
+              "Text": "Business. Let's see what you've got.",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "co001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "craig_or_preservation_79758F3E",
+      "NpcIdentity": "SimpleChar:79758F3E",
+      "Name": "Craig-Or of Preservation",
+      "RootNodeId": "craig_or_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "craig_or_001",
+          "PromptText": "Hello.\nBusiness or pleasure?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "co001_0",
+              "Index": 0,
+              "Text": "Business. Let's see what you've got.",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "co001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "craig_or_flaming_barrels_79758F3B",
+      "NpcIdentity": "SimpleChar:79758F3B",
+      "Name": "Craig-Or of Flaming Barrels",
+      "RootNodeId": "craig_or_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "craig_or_001",
+          "PromptText": "Hello.\nBusiness or pleasure?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "co001_0",
+              "Index": 0,
+              "Text": "Business. Let's see what you've got.",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "co001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "craig_or_gear_ammo_79758F3C",
+      "NpcIdentity": "SimpleChar:79758F3C",
+      "Name": "Craig-Or of Gear & Ammo",
+      "RootNodeId": "craig_or_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "craig_or_001",
+          "PromptText": "Hello.\nBusiness or pleasure?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "co001_0",
+              "Index": 0,
+              "Text": "Business. Let's see what you've got.",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "co001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "craig_or_protection_79758F3D",
+      "NpcIdentity": "SimpleChar:79758F3D",
+      "Name": "Craig-Or of Protection",
+      "RootNodeId": "craig_or_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "craig_or_001",
+          "PromptText": "Hello.\nBusiness or pleasure?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "co001_0",
+              "Index": 0,
+              "Text": "Business. Let's see what you've got.",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            },
+            {
+              "Id": "co001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "son_len_79758F40",
+      "NpcIdentity": "SimpleChar:79758F40",
+      "Name": "Son-Len, Official of Power",
+      "RootNodeId": "son_len_001",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "son_len_001",
+          "PromptText": "Greetings, friend.\nHow can I be of assistance?",
+          "PromptTextConfidence": "captured-exact",
+          "Options": [
+            {
+              "Id": "sl001_0",
+              "Index": 0,
+              "Text": "What are you doing here?",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "son_len_stub",
+              "Conditions": [],
+              "Actions": []
+            },
+            {
+              "Id": "sl001_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "son_len_stub",
+          "PromptText": "Son-Len regards you calmly.",
+          "PromptTextConfidence": "inferred-placeholder",
+          "Options": [
+            {
+              "Id": "slstub_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "20260718-210135",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [
+                { "Type": "EndDialogue" }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

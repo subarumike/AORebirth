@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SimpleCharFullUpdateFlags.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -75,6 +75,10 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         // 0000 0000 0010 0000 0000 0000 0000 0000
         UnknownFlag2 = 0x00200000,
+
+        // 0000 0000 0100 0000 0000 0000 0000 0000
+        // Present on Natalia Akcora SCFU (capture 20260719-ICC-Capture / Natalia animation).
+        UnknownFlag7 = 0x00400000,
 
         // 0000 0000 1000 0000 0000 0000 0000 0000
         // Blue name and not attackable

@@ -1,0 +1,153 @@
+{
+  "Identity": {
+    "Id": "thrak-garden-key-quests-20260718-185306",
+    "Version": "capture-backed-1",
+    "Source": "capture 20260718-185306"
+  },
+  "SourceCaptures": [
+    "20260718-185306"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:5556893A",
+      "Title": "Ancient Device Inspection",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:787B54B2",
+      "InitialStepId": "find_settlement",
+      "Steps": [
+        {
+          "StepId": "find_settlement",
+          "Name": "Find western settlement interested in the Ancient Device",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5556893A_find",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Search west of Veronica and show the Ancient Pattern Analyzer to interested parties.",
+              "TargetIdentity": "SimpleChar:78D280F6",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55563C16",
+      "Title": "Proof of Thrak",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:78D280F6",
+      "InitialStepId": "bring_insignia",
+      "Steps": [
+        {
+          "StepId": "bring_insignia",
+          "Name": "Bring Insignia of Thrak to Prophet Yutt Thrak",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55563C16_insignia",
+              "Type": "CapturedInventoryDeliveryObjective",
+              "Description": "Deliver Insignia of Thrak to Prophet Yutt Thrak.",
+              "TargetIdentity": "SimpleChar:78D280F6",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:55563C18",
+      "Title": "Thrak Garden Passage",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:78D280F6",
+      "InitialStepId": "enter_garden",
+      "Steps": [
+        {
+          "StepId": "enter_garden",
+          "Name": "Place Insignia at Thrak statue and enter His Garden",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_55563C18_garden",
+              "Type": "CapturedDialogueObjective",
+              "Description": "Use Insignia of Thrak on the Thrak statue, then speak with Hypnagogic Urga-Lum Thrak.",
+              "TargetIdentity": "SimpleChar:79758F3A",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:5556591A",
+      "Title": "Claim Three Souls",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:79758F3A",
+      "InitialStepId": "claim_souls",
+      "Steps": [
+        {
+          "StepId": "claim_souls",
+          "Name": "Release the power of the Ancient Artifact and claim three souls",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5556591A_souls",
+              "Type": "CapturedKillObjective",
+              "Description": "Cover Dreaming Silvertail eyes with the favored Ancient Pattern Analyzer and claim three cursed souls.",
+              "TargetIdentity": "Dreaming Silvertail",
+              "RequiredCount": 3,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    },
+    {
+      "QuestId": "Mission:5556893D",
+      "Title": "Return the Artifact",
+      "TitleConfidence": "decoded-from-QuestFullUpdate",
+      "SourceNpcIdentity": "SimpleChar:79758F3A",
+      "InitialStepId": "return_artifact",
+      "Steps": [
+        {
+          "StepId": "return_artifact",
+          "Name": "Return the charged artifact to Hypnagogic Urga-Lum Thrak",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5556893D_return",
+              "Type": "CapturedInventoryDeliveryObjective",
+              "Description": "Trade the favored Ancient Pattern Analyzer back to Hypnagogic Urga-Lum Thrak for the sacred garden key.",
+              "TargetIdentity": "SimpleChar:79758F3A",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ],
+      "Conditions": [],
+      "Actions": [],
+      "UnresolvedFields": []
+    }
+  ],
+  "Links": []
+}

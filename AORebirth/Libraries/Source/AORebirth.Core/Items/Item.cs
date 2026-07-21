@@ -228,6 +228,13 @@ namespace AORebirth.Core.Items
         /// </returns>
         public int GetAttribute(int attributeId)
         {
+            int awakenedIcon = 0;
+            if (attributeId == (int)StatIds.icon
+                && AwakenedBurdenOfCompetenceAppearance.TryResolveIcon(this, out awakenedIcon))
+            {
+                return awakenedIcon;
+            }
+
             if (this.Attributes.Keys.Contains(attributeId))
             {
                 return this.Attributes[attributeId];

@@ -18,7 +18,8 @@ namespace ZoneEngine.Core.MessageHandlers
     {
         public static InventoryContainerInteractionRouteMode ResolveRouteMode(Identity target)
         {
-            if (target.Type == IdentityType.Inventory)
+            if (target.Type == IdentityType.Inventory
+                || target.Type == IdentityType.WeaponPage)
             {
                 return InventoryContainerInteractionRouteMode.InventoryItem;
             }

@@ -281,9 +281,9 @@ namespace AORebirth.Core.Playfields
                     throw new LootDefinitionValidationException(
                         "Invalid or duplicate observed corpse snapshot in " + table.LootTableKey);
                 }
+                // Empty Entries are valid: capture often records credits-only / empty corpses.
                 if (snapshot.Credits < 0
                     || snapshot.Entries == null
-                    || snapshot.Entries.Length == 0
                     || snapshot.Evidence == LootEvidenceConfidence.Unresolved
                     || snapshot.SelectionProbabilityEvidence != LootEvidenceConfidence.Unresolved
                     || string.IsNullOrWhiteSpace(snapshot.EvidenceReference))

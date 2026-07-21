@@ -330,10 +330,20 @@ namespace ZoneEngine.Core.Mail
             Item claimItem = null;
             if (hasItem)
             {
+                int low = mail.AcgLow != 0 ? mail.AcgLow : mail.AcgHigh;
+                int high = mail.AcgHigh != 0 ? mail.AcgHigh : mail.AcgLow;
+                if (!ItemLoader.ItemList.ContainsKey(low) || !ItemLoader.ItemList.ContainsKey(high))
+                {
+                    failureReason = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Attached item template {0}/{1} is missing from item data.",
+                        low,
+                        high);
+                    return false;
+                }
+
                 try
                 {
-                    int low = mail.AcgLow != 0 ? mail.AcgLow : mail.AcgHigh;
-                    int high = mail.AcgHigh != 0 ? mail.AcgHigh : mail.AcgLow;
                     claimItem = new Item(Math.Max(1, mail.AcgLevel), low, high);
                     int stack = mail.AcgMultipleCount > 0 ? mail.AcgMultipleCount : 1;
                     if (stack > 10000)
@@ -390,6 +400,12 @@ namespace ZoneEngine.Core.Mail
                     }
 
                     failureReason = "Not enough inventory space for the attached item.";
+                    if (grant.Status == QuestRewardInventoryGrantStatus.PersistFailed
+                        || grant.Status == QuestRewardInventoryGrantStatus.PersistReturnedFalse)
+                    {
+                        failureReason = "Attached item could not be saved to inventory.";
+                    }
+
                     return false;
                 }
 
@@ -409,6 +425,22 @@ namespace ZoneEngine.Core.Mail
             }
 
             updatedDetail = ToListEntry(mail, summary: false);
+            return true;
+        }
+
+        /// <summary>
+        /// Capture action-4 payload for an existing mail (open → 0x7D, Take All empty → 0x7F).
+        /// </summary>
+        public static bool TryGetMailFlagsUpdate(string characterName, ulong mailId, out int flags)
+        {
+            flags = 0;
+            StoredMail mail = FindMail(characterName, mailId);
+            if (mail == null)
+            {
+                return false;
+            }
+
+            flags = ComputeMailFlags(mail);
             return true;
         }
 
@@ -448,6 +480,7 @@ namespace ZoneEngine.Core.Mail
         /// <summary>
         /// N3Msg_ReturnMail (action 7): move remaining contents back to the original sender.
         /// Returned letter arrives now; Expires = Sent + MailRetentionDays on the client.
+        /// System senders (Omni-Trade / Market / unknown NPC) cannot receive returns — mail is removed.
         /// </summary>
         public static bool TryReturnToSender(ICharacter character, ulong mailId, out string failureReason)
         {
@@ -455,6 +488,12 @@ namespace ZoneEngine.Core.Mail
             if (character == null || string.IsNullOrEmpty(character.Name))
             {
                 failureReason = "Return to sender failed.";
+                return false;
+            }
+
+            if (mailId == 0)
+            {
+                failureReason = "No mail selected.";
                 return false;
             }
 
@@ -468,8 +507,16 @@ namespace ZoneEngine.Core.Mail
             string originalSender = (mail.SenderName ?? string.Empty).Trim();
             if (originalSender.Length == 0)
             {
-                failureReason = "Original sender is unknown.";
-                return false;
+                // Still remove so the button does something.
+                if (!RemoveMail(character.Name, mailId))
+                {
+                    failureReason = "Mail not found.";
+                    return false;
+                }
+
+                SyncUnreadMailEnvelope(character);
+                failureReason = "Original sender is unknown; mail removed.";
+                return true;
             }
 
             if (string.Equals(originalSender, character.Name, StringComparison.OrdinalIgnoreCase))
@@ -478,14 +525,47 @@ namespace ZoneEngine.Core.Mail
                 return false;
             }
 
-            DBCharacter senderRow = CharacterDao.Instance.GetByCharName(originalSender);
-            if (senderRow == null)
+            // GMI / Market / NPC: no player mailbox to receive a return.
+            if (IsSystemMailSender(originalSender))
             {
+                if (!RemoveMail(character.Name, mailId))
+                {
+                    failureReason = "Mail not found.";
+                    return false;
+                }
+
+                SyncUnreadMailEnvelope(character);
                 failureReason = string.Format(
                     CultureInfo.InvariantCulture,
-                    "Original sender \"{0}\" is unknown.",
+                    "Mail from \"{0}\" cannot be returned; removed from your mailbox.",
                     originalSender);
-                return false;
+                return true;
+            }
+
+            string deliverToName = originalSender;
+            int deliverToId = mail.SenderId;
+            DBCharacter senderRow = CharacterDao.Instance.GetByCharName(originalSender);
+            if (senderRow == null && mail.SenderId != 0)
+            {
+                // Player mail stores Identity.Instance as SenderId.
+                senderRow = CharacterDao.Instance.Get(mail.SenderId);
+            }
+
+            if (senderRow != null)
+            {
+                deliverToName = senderRow.Name;
+                deliverToId = senderRow.Id;
+            }
+            else
+            {
+                // DB miss: still deliver into the in-memory queue keyed by From name
+                // (older path required a DB row and failed with no UI effect).
+                ICharacter onlineSender = FindOnlinePlayerByName(originalSender);
+                if (onlineSender != null)
+                {
+                    deliverToName = onlineSender.Name;
+                    deliverToId = onlineSender.Identity.Instance;
+                }
             }
 
             if (!RemoveMail(character.Name, mailId))
@@ -507,8 +587,8 @@ namespace ZoneEngine.Core.Mail
                 MailId = returnedId,
                 SenderName = character.Name ?? string.Empty,
                 SenderId = character.Identity.Instance,
-                RecipientName = senderRow.Name,
-                RecipientId = senderRow.Id,
+                RecipientName = deliverToName,
+                RecipientId = deliverToId,
                 Subject = subject,
                 Body = mail.Body ?? string.Empty,
                 ItemField1 = 0,
@@ -525,13 +605,26 @@ namespace ZoneEngine.Core.Mail
             };
 
             ConcurrentQueue<StoredMail> queue = ByRecipient.GetOrAdd(
-                senderRow.Name,
+                deliverToName,
                 _ => new ConcurrentQueue<StoredMail>());
             queue.Enqueue(returned);
 
-            NotifyRecipientEnvelope(senderRow.Name);
+            NotifyRecipientEnvelope(deliverToName);
             SyncUnreadMailEnvelope(character);
             return true;
+        }
+
+        private static bool IsSystemMailSender(string senderName)
+        {
+            if (string.IsNullOrEmpty(senderName))
+            {
+                return true;
+            }
+
+            return string.Equals(senderName, "Omni-Trade", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(senderName, "Market", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(senderName, "GMI", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(senderName, "System", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool RemoveMail(string characterName, ulong mailId)
@@ -548,7 +641,7 @@ namespace ZoneEngine.Core.Mail
             for (int i = 0; i < snapshot.Length; i++)
             {
                 StoredMail entry = snapshot[i];
-                if (!found && entry != null && (ulong)(uint)entry.MailId == mailId)
+                if (!found && entry != null && SameMailId(entry.MailId, mailId))
                 {
                     found = true;
                     continue;
@@ -626,8 +719,11 @@ namespace ZoneEngine.Core.Mail
 
             int unread = CountUnread(character.Name);
             uint value = (uint)Math.Max(0, unread);
-            character.Stats[StatIds.unreadmailcount].Set(value);
+            // Always apply (including 0) so a stale DB UnreadMailCount cannot keep the HUD envelope up.
+            character.Stats[StatIds.unreadmailcount].SetBaseValue(value);
+            character.Stats[StatIds.unreadmailcount].Changed = true;
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.unreadmailcount, value);
+            character.Stats[StatIds.unreadmailcount].Changed = false;
         }
 
         private static int CountUnread(string characterName)
@@ -640,13 +736,21 @@ namespace ZoneEngine.Core.Mail
             IList<StoredMail> pending = PeekMailbox(characterName);
             for (int i = 0; i < pending.Count; i++)
             {
-                if ((ulong)(uint)pending[i].MailId == mailId)
+                if (pending[i] != null && SameMailId(pending[i].MailId, mailId))
                 {
                     return pending[i];
                 }
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Client RequestedMailId is int64; we allocate 32-bit ids. Compare low 32 bits only.
+        /// </summary>
+        private static bool SameMailId(int storedMailId, ulong requestedMailId)
+        {
+            return unchecked((uint)storedMailId) == unchecked((uint)requestedMailId);
         }
 
         private static bool TryTakeAttachedItemFromSender(
@@ -890,11 +994,11 @@ namespace ZoneEngine.Core.Mail
             // Capture 20260715-Recive-mail-datetime-stamp (live Market mail):
             //   TimeField = 0
             //   wire after Subject: Sent unix (UTC) then Expire unix (Sent+2d for player/COD mail)
-            //   FlagsField = 0x7C base; bit0 marks read
+            //   FlagsField = 0x7C base; bit0 = read; bit1 = attachments cleared (post Take All → 0x7F)
             //   ExtendedField64 = signed money (+gift / -COD), not the Sent/Expire slots
             int sentUnix = ToMailUnixSeconds(mail.SentAt);
             int expireUnix = sentUnix + (MailRetentionDays * 86400);
-            int flags = 0x7C | (mail.IsRead ? 1 : 0);
+            int flags = ComputeMailFlags(mail);
 
             return new MailListEntry
             {
@@ -913,6 +1017,33 @@ namespace ZoneEngine.Core.Mail
                 ExtendedField74 = mail.AcgMultipleCount > 0 ? mail.AcgMultipleCount : 0,
                 Body = mail.Body ?? string.Empty
             };
+        }
+
+        /// <summary>
+        /// Live Market mail flags (capture open→0x7D, TakeAll empty→0x7F).
+        /// </summary>
+        private static int ComputeMailFlags(StoredMail mail)
+        {
+            if (mail == null)
+            {
+                return 0x7C;
+            }
+
+            int flags = 0x7C;
+            if (mail.IsRead)
+            {
+                flags |= 1;
+            }
+
+            bool hasItem = mail.AcgLow != 0 || mail.AcgHigh != 0;
+            bool hasCredits = mail.Credits != 0;
+            if (!hasItem && !hasCredits)
+            {
+                // bit1: attachments accepted/cleared (required for client Delete).
+                flags |= 2;
+            }
+
+            return flags;
         }
 
         /// <summary>
@@ -1002,6 +1133,102 @@ namespace ZoneEngine.Core.Mail
                         character,
                         (int)StatIds.computerliteracy);
                 });
+        }
+
+        /// <summary>
+        /// Capture 20260715-143838 + live GMI UI: withdrawals arrive as mail from Omni-Trade,
+        /// expire with MailRetentionDays (48h / 2 days on live delivery policy text).
+        /// </summary>
+        public static bool TryEnqueueGmiDelivery(
+            string recipientName,
+            int credits,
+            int acgLow,
+            int acgHigh,
+            int acgLevel,
+            int acgMultipleCount,
+            string subject,
+            string body,
+            out string failureReason)
+        {
+            return TryEnqueueGmiDelivery(
+                recipientName,
+                credits,
+                acgLow,
+                acgHigh,
+                acgLevel,
+                acgMultipleCount,
+                subject,
+                body,
+                "Omni-Trade",
+                out failureReason);
+        }
+
+        /// <summary>
+        /// Capture 20260715-143838 Omni-Trade withdraws; purchase mails use From=Market.
+        /// </summary>
+        public static bool TryEnqueueGmiDelivery(
+            string recipientName,
+            int credits,
+            int acgLow,
+            int acgHigh,
+            int acgLevel,
+            int acgMultipleCount,
+            string subject,
+            string body,
+            string senderName,
+            out string failureReason)
+        {
+            failureReason = null;
+            recipientName = (recipientName ?? string.Empty).Trim();
+            if (recipientName.Length == 0)
+            {
+                failureReason = "GMI mail needs a recipient.";
+                return false;
+            }
+
+            bool hasCredits = credits > 0;
+            bool hasItem = acgLow != 0 || acgHigh != 0;
+            if (!hasCredits && !hasItem)
+            {
+                failureReason = "GMI delivery is empty.";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(senderName))
+            {
+                senderName = "Omni-Trade";
+            }
+
+            DateTime now = DateTime.Now;
+            var stored = new StoredMail
+                {
+                    MailId = AllocateMailId(),
+                    SenderName = senderName,
+                    SenderId = 0,
+                    RecipientName = recipientName,
+                    RecipientId = 0,
+                    Subject = string.IsNullOrEmpty(subject) ? "GMI Delivery" : subject,
+                    Body =
+                        string.IsNullOrEmpty(body)
+                            ? "Delivery from the Omni-Trade Global Market Interface."
+                            : body,
+                    Credits = hasCredits ? credits : 0,
+                    AcgLow = hasItem ? (acgLow != 0 ? acgLow : acgHigh) : 0,
+                    AcgHigh = hasItem ? (acgHigh != 0 ? acgHigh : acgLow) : 0,
+                    AcgLevel = hasItem ? Math.Max(1, acgLevel) : 0,
+                    AcgMultipleCount = hasItem ? Math.Max(1, acgMultipleCount) : 0,
+                    ExpressFlag = 0,
+                    SentAt = now,
+                    SentDayNumber = ToMailTimeField(now),
+                    IsRead = false
+                };
+
+            ConcurrentQueue<StoredMail> queue = ByRecipient.GetOrAdd(
+                recipientName,
+                _ => new ConcurrentQueue<StoredMail>());
+            queue.Enqueue(stored);
+            NotifyRecipientEnvelope(recipientName);
+            return true;
         }
 
         private static void NotifyRecipientEnvelope(string recipientName)

@@ -21,6 +21,8 @@ namespace ZoneEngine.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core.Missions;
+
     using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
 
     #endregion
@@ -58,6 +60,28 @@ namespace ZoneEngine.Core.Playfields
                 return new List<StatelData>();
             }
 
+            // RK mission interiors (e.g. 1413198 / 0x15904E) are dynamic high-band ids with no PFData —
+            // same empty-statel pattern as private cities. Capture 20260718-062936.
+            if (MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Dynamic mission instance created without PFData statels instance={0} evidence=live_capture_20260718-062936",
+                        playfieldIdentity.Instance));
+                return new List<StatelData>();
+            }
+
+            // Capture-backed ICC Holodeck (7001) — may be absent from older playfields.dat builds.
+            if (playfieldIdentity.Instance == 7001)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Zoning,
+                    "HoloDeck PF 7001 created without PFData statels evidence=20260719-155043");
+                return new List<StatelData>();
+            }
+
             return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;
         }
 
@@ -88,23 +112,38 @@ namespace ZoneEngine.Core.Playfields
 
         internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)
         {
+            List<PlayfieldStaticDynelDefinition> fromDb = new List<PlayfieldStaticDynelDefinition>();
             IEnumerable<DBStaticDynel> dynels =
                 StaticDynelDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance });
+            int dbCount = 0;
+            int skippedNoTemplateStat = 0;
+            int skippedMissingItem = 0;
+            int yielded = 0;
             foreach (DBStaticDynel staticDynel in dynels)
             {
+                dbCount++;
                 List<GameTuple<CharacterStat, uint>> stats =
                     MessagePackZip.DeserializeData<GameTuple<CharacterStat, uint>>(staticDynel.stats.ToArray());
 
                 if (!stats.Any(x => x.Value1 == (CharacterStat)StatIds.acgitemtemplateid))
                 {
+                    skippedNoTemplateStat++;
                     continue;
                 }
 
                 int templateId =
                     (int)stats.First(x => x.Value1 == (CharacterStat)StatIds.acgitemtemplateid).Value2;
-                yield return new PlayfieldStaticDynelDefinition(
+                ItemTemplate template;
+                if (!ItemLoader.ItemList.TryGetValue(templateId, out template))
+                {
+                    skippedMissingItem++;
+                    continue;
+                }
+
+                yielded++;
+                PlayfieldStaticDynelDefinition definition = new PlayfieldStaticDynelDefinition(
                     new Identity { Type = (IdentityType)staticDynel.Type, Instance = staticDynel.Instance },
-                    ItemLoader.ItemList[templateId],
+                    template,
                     stats,
                     new Coordinate(staticDynel.X, staticDynel.Y, staticDynel.Z),
                     new Quaternion
@@ -114,7 +153,24 @@ namespace ZoneEngine.Core.Playfields
                         Z = staticDynel.HeadingZ,
                         W = staticDynel.HeadingW
                     });
+                fromDb.Add(definition);
+                yield return definition;
             }
+
+            foreach (PlayfieldStaticDynelDefinition captureProp in
+                AreteLandingQuestPropDefinitions.ResolveMissingProps(playfieldIdentity, fromDb))
+            {
+                yielded++;
+                yield return captureProp;
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Database,
+                "ResolveStaticDynels pf=" + playfieldIdentity.Instance
+                + " db=" + dbCount
+                + " yielded=" + yielded
+                + " skipNoTplStat=" + skippedNoTemplateStat
+                + " skipMissingItem=" + skippedMissingItem);
         }
 
         private StatelData[] ResolveVendorStatels(IEnumerable<StatelData> statels)

@@ -1,31 +1,8 @@
 #region License
 
 // Copyright (c) 2005-2014, CellAO Team
-// 
-// 
+//
 // All rights reserved.
-// 
-// 
-// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-// 
-// 
-//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-// 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
 
 #endregion
 
@@ -39,22 +16,28 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Controllers;
+    using ZoneEngine.Core.KnuBot;
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Subway.Quests;
+    using ZoneEngine.Core.Thrak.Quests;
 
     #endregion
 
     /// <summary>
+    /// Capture 20260716-Reset-perks: client FinishTrade with Amount (credits) for Perk-Reset Service Provider.
     /// </summary>
     [MessageHandler(MessageHandlerDirection.InboundOnly)]
     public class KnuBotFinishTradeMessageHandler :
         BaseMessageHandler<KnuBotFinishTradeMessage, KnuBotFinishTradeMessageHandler>
     {
-        /// <summary>
-        /// </summary>
-        /// <param name="messageWrapper">
-        /// </param>
         public override void Receive(MessageWrapper<KnuBotFinishTradeMessage> messageWrapper)
         {
+            if (messageWrapper == null || messageWrapper.MessageBody == null || messageWrapper.Client == null)
+            {
+                return;
+            }
+
             if (WindcallerKarrecTradeAdapter.TryFinishTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
@@ -62,13 +45,65 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            // TODO: Code it!
-            // As always, find KnuBot npc by its identity and call the appropriate method
-            ICharacter npc = Pool.Instance.GetObject<ICharacter>(messageWrapper.MessageBody.Target);
-            if (npc != null)
+            if (ThrakGardenKeyTradeAdapter.TryFinishTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
             {
-                // npc.KnuBotFinishTrade(messageWrapper.Client.Character.Identity);
+                return;
             }
+
+            if (RexMarcusChainCoordinator.TryFinishMarcusTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (PersonalizedRobotBrainQuestRuntime.TryFinishBrainTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (FlintBioComQuestRuntime.TryFinishAlexTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            // Stan before Bill: prior Bill tip/HC-12 greed stole Stan Accept
+            // (ZoneEngineLog 2026-07-21 01:33:42 bill-turnin ABORTED during Stan deliver).
+            if (StanGoodmanQuestRuntime.TryFinishStanTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            if (SurveillanceUplinkQuestRuntime.TryFinishBillTrade(
+                messageWrapper.Client.Controller.Character,
+                messageWrapper.MessageBody))
+            {
+                return;
+            }
+
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(messageWrapper.MessageBody.Target);
+            if (npc == null)
+            {
+                return;
+            }
+
+            NPCController controller = npc.Controller as NPCController;
+            if (controller == null || controller.KnuBot == null)
+            {
+                return;
+            }
+
+            BaseKnuBot knu = controller.KnuBot;
+            KnuBotFinishTradeMessage body = messageWrapper.MessageBody;
+            knu.FinishTrade(body.Amount, body.Decline != 0);
         }
     }
 }

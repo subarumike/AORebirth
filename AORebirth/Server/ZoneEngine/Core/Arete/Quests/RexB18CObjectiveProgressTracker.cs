@@ -423,19 +423,58 @@ namespace ZoneEngine.Core.Arete.Quests
 
             public static bool TrySend(ICharacter character, ObjectiveProgressRecord progress)
             {
-                if (!RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(
-                        ProgressCount(progress),
-                        progress == null ? 0 : progress.RequiredCount))
+                if (character == null || character.Controller == null || character.Controller.Client == null)
                 {
                     return false;
                 }
 
-                // B18C kill feedback disabled until mission work resumes.
-                return false;
+                if (progress == null
+                    || !RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(
+                        progress.CurrentCount,
+                        progress.RequiredCount))
+                {
+                    return false;
+                }
+
+                // Capture: remaining-count FormatFeedback for 1/5-4/5, then Feedback 110/249817907 for 1/5-5/5.
+                string formatFeedback = GetCapturedRemainingCountFeedback(progress.CurrentCount);
+                if (!string.IsNullOrEmpty(formatFeedback))
+                {
+                    character.Controller.Client.SendCompressed(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            FormattedMessage = formatFeedback,
+                            Unknown2 = 0
+                        });
+                }
+
+                character.Controller.Client.SendCompressed(
+                    new FeedbackMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 1,
+                        Unknown1 = 0,
+                        CategoryId = FeedbackCategoryId,
+                        MessageId = FeedbackMessageId
+                    });
+
+                Log(
+                    "feedback sent mission={0} character={1} progress={2}/{3} remainingFormat={4} sender=server",
+                    MissionId,
+                    IdentityText(character),
+                    progress.CurrentCount,
+                    progress.RequiredCount,
+                    !string.IsNullOrEmpty(formatFeedback));
+                return true;
             }
 
             private static string GetCapturedRemainingCountFeedback(int currentCount)
             {
+                // Encoded remaining counts from capture system-messages.log (client renders as
+                // "You need to kill N more Malfunctioning Cleaning Robot").
                 switch (currentCount)
                 {
                     case 1:
@@ -449,11 +488,6 @@ namespace ZoneEngine.Core.Arete.Quests
                     default:
                         return null;
                 }
-            }
-
-            private static int ProgressCount(ObjectiveProgressRecord progress)
-            {
-                return progress == null ? 0 : progress.CurrentCount;
             }
         }
     }

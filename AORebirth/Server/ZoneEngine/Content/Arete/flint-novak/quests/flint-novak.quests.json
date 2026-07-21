@@ -1,0 +1,440 @@
+{
+  "Identity": {
+    "Id": "arete-flint-novak-quests-20260720-072904",
+    "Version": "captured-find-deliver-uplink-20260720-105157",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-072904"
+  },
+  "SourceCaptures": [
+    "20260720-072904",
+    "20260719-do-flint-bio-com",
+    "20260720-074847",
+    "20260720-105157"
+  ],
+  "Quests": [
+    {
+      "QuestId": "Mission:5514B19B",
+      "Title": "Find a Bio Analyzing Computer",
+      "TitleConfidence": "decoded-from-QuestFullUpdate packet #139 shortinfo",
+      "SourceNpcIdentity": "SimpleChar:78E0FC64",
+      "InitialStepId": "kill_junkyard_robots",
+      "Steps": [
+        {
+          "StepId": "kill_junkyard_robots",
+          "Name": "Kill 7 Robots in the junkyard",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B19B_kill_junkyard_robots",
+              "Type": "CapturedKillCountObjective",
+              "Description": "Kill 7 Robots in the junkyard.",
+              "TargetIdentity": null,
+              "RequiredCount": 7,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19C",
+      "Title": "Deliver the Bio Analyzing Computer to Alex Gibbs",
+      "TitleConfidence": "decoded-from-QuestFullUpdate packet #2460",
+      "SourceNpcIdentity": "SimpleChar:78E0FC64",
+      "InitialStepId": "deliver_bio_com",
+      "Steps": [
+        {
+          "StepId": "deliver_bio_com",
+          "Name": "Give Bio Analyzing Computer to Alex Gibbs",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B19C_deliver_to_alex",
+              "Type": "CapturedTurnInObjective",
+              "Description": "Give the Bio Analyzing Computer to Alex Gibbs.",
+              "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19D",
+      "Title": "Surveillance Uplink",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-074847 packet #585",
+      "SourceNpcIdentity": "SimpleChar:78E0FC61",
+      "InitialStepId": "use_sectec_monitor",
+      "Steps": [
+        {
+          "StepId": "use_sectec_monitor",
+          "Name": "Use Rebuilt HC-12 SecTec Monitor on Surveillance Droid",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B19D_use_sectec_monitor",
+              "Type": "CapturedUseItemObjective",
+              "Description": "Target the Surveillance Droid and use the Rebuilt HC-12 SecTec Monitor.",
+              "TargetIdentity": "SimpleChar:78E0FC8A",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19E",
+      "Title": "Plant a Bug",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-105157 packet #1347",
+      "SourceNpcIdentity": "SimpleChar:78E0FC8A",
+      "InitialStepId": "plant_rc_p_device",
+      "Steps": [
+        {
+          "StepId": "plant_rc_p_device",
+          "Name": "Plant RC-P Audio Recording Device on Surveillance Droid",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B19E_plant_rc_p_device",
+              "Type": "CapturedUseItemObjective",
+              "Description": "Use the RC-P Audio Recording Device on the Surveillance Droid.",
+              "TargetIdentity": "SimpleChar:78E0FC8A",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19F",
+      "Title": "Deliver the Rebuilt HC-12 SecTec Monitor",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-105157 packet #1859",
+      "SourceNpcIdentity": "SimpleChar:78E0FC66",
+      "InitialStepId": "deliver_hc12_bill",
+      "Steps": [
+        {
+          "StepId": "deliver_hc12_bill",
+          "Name": "Give Rebuilt HC-12 SecTec Monitor to ICC Immigration Officer Bill",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B19F_deliver_hc12_bill",
+              "Type": "CapturedTurnInObjective",
+              "Description": "Give the Rebuilt HC-12 SecTec Monitor to ICC Immigration Officer Bill.",
+              "TargetIdentity": "SimpleChar:78E0FC66",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B1A0",
+      "Title": "Kneecapping a Kneebreaker",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-105157 packet #2688",
+      "SourceNpcIdentity": "SimpleChar:78E0FC63",
+      "InitialStepId": "kneecapping_tip",
+      "Steps": [
+        {
+          "StepId": "kneecapping_tip",
+          "Name": "Kill The Kneebreaker",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_5514B1A0_kneecapping_tip",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Kill The Kneebreaker.",
+              "TargetIdentity": "SimpleChar:78E0FC63",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4365",
+      "Title": "Report to Alex",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-171317 packet #762",
+      "SourceNpcIdentity": "SimpleChar:78E0FC61",
+      "InitialStepId": "report_to_alex",
+      "Steps": [
+        {
+          "StepId": "report_to_alex",
+          "Name": "Talk to Alex Gibbs",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555B4365_report_to_alex",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Alex Gibbs.",
+              "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4366",
+      "Title": "Talk to Stan Goodman",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-171317 packet #1628",
+      "SourceNpcIdentity": "SimpleChar:78E0FC65",
+      "InitialStepId": "talk_to_stan_goodman",
+      "Steps": [
+        {
+          "StepId": "talk_to_stan_goodman",
+          "Name": "Talk to Stan Goodman",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555B4366_talk_to_stan",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Stan Goodman.",
+              "TargetIdentity": "SimpleChar:78E0FC65",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BD124",
+      "Title": "Buy a Lockpick",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-goldman raw-packets.csv #1498",
+      "SourceNpcIdentity": "SimpleChar:78E0FC63",
+      "InitialStepId": "buy_a_lockpick",
+      "Steps": [
+        {
+          "StepId": "buy_a_lockpick",
+          "Name": "Buy a Lockpick",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BD124_buy_lockpick",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Buy a Lock Pick from ICC Tech Supplies.",
+              "TargetIdentity": "SimpleChar:78E0FC63",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9C5",
+      "Title": "Take the contents of the Strongbox",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-lockpick raw-packets.csv #582",
+      "SourceNpcIdentity": "SimpleChar:78E0FC63",
+      "InitialStepId": "take_strongbox_contents",
+      "Steps": [
+        {
+          "StepId": "take_strongbox_contents",
+          "Name": "Take the contents of the Strongbox",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9C5_strongbox",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Use Lock Pick on Merchant's Strongbox.",
+              "TargetIdentity": "SimpleChar:78E0FC63",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F2",
+      "Title": "Deliver Antonio's Adaptation Factory",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-afgter dog lockpick goodman raw-packets.csv #456",
+      "SourceNpcIdentity": "SimpleChar:78E0FC63",
+      "InitialStepId": "deliver_antonio_factory",
+      "Steps": [
+        {
+          "StepId": "deliver_antonio_factory",
+          "Name": "Deliver Antonio's Adaptation Factory",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F2_deliver_factory",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Bring Antonio's Adaptation Factory to Stan Goodman.",
+              "TargetIdentity": "SimpleChar:78E0FC65",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F3",
+      "Title": "Talk to Sarah Greene",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-afgter dog lockpick goodman raw-packets.csv #923",
+      "SourceNpcIdentity": "SimpleChar:78E0FC63",
+      "InitialStepId": "talk_to_sarah_greene",
+      "Steps": [
+        {
+          "StepId": "talk_to_sarah_greene",
+          "Name": "Talk to Sarah Greene",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F3_talk_sarah",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Sarah Greene.",
+              "TargetIdentity": "SimpleChar:78E0FC63",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F4",
+      "Title": "Buy some Nano Programs",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260721-afgter dog lockpick goodman raw-packets.csv #925",
+      "SourceNpcIdentity": "SimpleChar:78E0FC65",
+      "InitialStepId": "buy_nano_programs",
+      "Steps": [
+        {
+          "StepId": "buy_nano_programs",
+          "Name": "Buy some Nano Programs",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555BE9F4_buy_nano",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Talk to Marco Spida and buy a Nanoprogram Container.",
+              "TargetIdentity": "SimpleChar:78E0FC65",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4367",
+      "Title": "Tradeskilling (1/4): Assemble a Nano Sensor",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-171317 packet #1729",
+      "SourceNpcIdentity": "SimpleChar:78E0FC61",
+      "InitialStepId": "tradeskill_assemble_nano_sensor",
+      "Steps": [
+        {
+          "StepId": "tradeskill_assemble_nano_sensor",
+          "Name": "Assemble a Nano Sensor",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555B4367_assemble_nano_sensor",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Assemble a Nano Sensor via tradeskill kit.",
+              "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4368",
+      "Title": "Tradeskilling (2/4): Assemble a Basic Robot Brain",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-190432",
+      "SourceNpcIdentity": "SimpleChar:78E0FC61",
+      "InitialStepId": "tradeskill_assemble_basic_brain",
+      "Steps": [
+        {
+          "StepId": "tradeskill_assemble_basic_brain",
+          "Name": "Assemble a Basic Robot Brain",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555B4368_assemble_basic_brain",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Assemble a Basic Robot Brain via tradeskill kit.",
+              "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4369",
+      "Title": "Tradeskilling (3/4): Assemble a Personalized Basic Robot Brain",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-190432",
+      "SourceNpcIdentity": "SimpleChar:78E0FC61",
+      "InitialStepId": "tradeskill_assemble_personalized_brain",
+      "Steps": [
+        {
+          "StepId": "tradeskill_assemble_personalized_brain",
+          "Name": "Assemble a Personalized Basic Robot Brain",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555B4369_assemble_personalized_brain",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Assemble a Personalized Basic Robot Brain via tradeskill kit.",
+              "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B436A",
+      "Title": "Tradeskilling (4/4): Show the Personalized Computer Brain to Alex",
+      "TitleConfidence": "decoded-from-QuestFullUpdate 20260720-190432",
+      "SourceNpcIdentity": "SimpleChar:78E0FC61",
+      "InitialStepId": "tradeskill_show_brain_to_alex",
+      "Steps": [
+        {
+          "StepId": "tradeskill_show_brain_to_alex",
+          "Name": "Show the Personalized Computer Brain to Alex",
+          "Objectives": [
+            {
+              "ObjectiveId": "mission_555B436A_show_brain",
+              "Type": "CapturedPreviewObjective",
+              "Description": "Give the Personalized Basic Robot Brain to Alex Gibbs.",
+              "TargetIdentity": "SimpleChar:78E0FC61",
+              "RequiredCount": 1,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Actions": []
+        }
+      ]
+    }
+  ]
+}

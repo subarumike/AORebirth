@@ -1,0 +1,326 @@
+{
+  "Identity": {
+    "Id": "arete-alex-gibbs-dialogue-20260720-074847",
+    "Version": "captured-alex-bio-com-and-report-171317",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-074847/chat-dialogue.log; 20260720-171317"
+  },
+  "SourceCaptures": [
+    "20260720-074847",
+    "20260720-171317"
+  ],
+  "Npcs": [
+    {
+      "Id": "alex-gibbs",
+      "NpcIdentity": "SimpleChar:78E0FC61",
+      "Name": "Alex Gibbs",
+      "RootNodeId": "alex_074847_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC61)"
+      ],
+      "Nodes": [
+        {
+          "Id": "alex_074847_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-074847; options-only",
+          "Options": [
+            {
+              "Id": "alex_074847_001_option_0",
+              "Index": 0,
+              "Text": "I was told to bring you this device so you could help me get an ID.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:12.6825399Z; StartTrade follows Answer=0",
+              "NextNodeId": "alex_074847_trade",
+              "Actions": []
+            },
+            {
+              "Id": "alex_074847_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:12.6825399Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_074847_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_074847_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "Options": [
+            {
+              "Id": "alex_074847_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → AnswerList I will get it done",
+              "NextNodeId": "alex_074847_002",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_074847_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "alex_074847_002_option_0",
+              "Index": 0,
+              "Text": "I will get it done.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:19.8940923Z",
+              "NextNodeId": "alex_074847_003",
+              "Actions": []
+            },
+            {
+              "Id": "alex_074847_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:19.8940923Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_074847_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_074847_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "Options": [
+            {
+              "Id": "alex_074847_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:23.5338476Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_074847_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_171317_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-171317; options-only",
+          "Options": [
+            {
+              "Id": "alex_171317_001_option_0",
+              "Index": 0,
+              "Text": "I don't think you will need to worry about Calitri any longer.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:05.3530388Z",
+              "NextNodeId": "alex_171317_002",
+              "Actions": []
+            },
+            {
+              "Id": "alex_171317_001_option_1",
+              "Index": 1,
+              "Text": "I have some questions.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:05.3530388Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_171317_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close until question tree captured"
+                }
+              ]
+            },
+            {
+              "Id": "alex_171317_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:05.3530388Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_171317_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_171317_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-171317; options-only",
+          "Options": [
+            {
+              "Id": "alex_171317_002_option_0",
+              "Index": 0,
+              "Text": "Can you tell me how to make a Personalized Robot Brain?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:11.1304757Z",
+              "NextNodeId": "alex_171317_003",
+              "Actions": []
+            },
+            {
+              "Id": "alex_171317_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:11.1304757Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_171317_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_171317_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-171317; options-only",
+          "Options": [
+            {
+              "Id": "alex_171317_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:18.2354430Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_171317_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_190432_brain_turnin",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-190432; options-only",
+          "Options": [
+            {
+              "Id": "alex_190432_brain_turnin_option_0",
+              "Index": 0,
+              "Text": "I built a Personalized Robot Brain!",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z",
+              "NextNodeId": "alex_190432_brain_trade",
+              "Actions": []
+            },
+            {
+              "Id": "alex_190432_brain_turnin_option_1",
+              "Index": 1,
+              "Text": "Can you teach me how to tradeskill items?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z",
+              "NextNodeId": "alex_171317_002",
+              "Actions": []
+            },
+            {
+              "Id": "alex_190432_brain_turnin_option_2",
+              "Index": 2,
+              "Text": "I have some questions.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_190432_brain_turnin_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close until question tree captured"
+                }
+              ]
+            },
+            {
+              "Id": "alex_190432_brain_turnin_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_190432_brain_turnin_option_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_190432_brain_trade",
+          "PromptText": "",
+          "PromptTextConfidence": "trade-hold; StartTrade follows Answer=0 in 20260720-190432",
+          "Options": [
+            {
+              "Id": "alex_190432_brain_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → AnswerList without brain option",
+              "NextNodeId": "alex_190432_brain_done",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_190432_brain_done",
+          "PromptText": "",
+          "PromptTextConfidence": "KnuBotAnswerList after RejectedItems 2026-07-20T17:08:15.7485804Z",
+          "Options": [
+            {
+              "Id": "alex_190432_brain_done_option_0",
+              "Index": 0,
+              "Text": "Can you teach me how to tradeskill items?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:15.7485804Z",
+              "NextNodeId": "alex_171317_002",
+              "Actions": []
+            },
+            {
+              "Id": "alex_190432_brain_done_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:15.7485804Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "alex_190432_brain_done_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close after brain turn-in"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

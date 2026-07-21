@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="N3MessageType.cs" company="SmokeLounge">
-//   Copyright © 2013 SmokeLounge.
+//   Copyright ï¿½ 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
 //   the extent permitted by applicable law. You can redistribute it
 //   and/or modify it under the terms of the Do What The Fuck You Want
@@ -112,7 +112,10 @@ namespace SmokeLounge.AOtomation.Messaging.Messages
 
         InfromPlayer = 0x3301337a, 
 
-        Mail = 0x333b2867, 
+        Mail = 0x333b2867,
+
+        /// <summary>GMI vault deposit/withdraw. Capture 20260715-GMI.</summary>
+        MarketSend = 0x470B2E14,
 
         ApplySpells = 0x342c1d1d, 
 

@@ -204,6 +204,87 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
+        /// XP still needed to finish the current level bar (0 at max Rubi-Ka level).
+        /// </summary>
+        internal static int GetXpNeededForNextLevel(ICharacter character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            int level = GetCurrentLevel(character);
+            int required = GetNextXpRequiredForLevel(level);
+            if (required <= 0)
+            {
+                return 0;
+            }
+
+            uint progress = GetBarProgress(character);
+            if (progress >= (uint)required)
+            {
+                return required;
+            }
+
+            return required - (int)progress;
+        }
+
+        /// <summary>
+        /// Non-combat XP grant using the same cumulative/level-up wire as kills.
+        /// </summary>
+        internal static bool AwardDirectXp(ICharacter character, int xpReward, string source)
+        {
+            if (character == null || xpReward <= 0
+                || !(character.Controller is Controllers.PlayerController))
+            {
+                return false;
+            }
+
+            IZoneClient client = character.Controller.Client;
+            if (client == null)
+            {
+                return false;
+            }
+
+            int levelBefore = GetCurrentLevel(character);
+            if (levelBefore >= MaxRubikaLevel)
+            {
+                return false;
+            }
+
+            string sourceTag = string.IsNullOrWhiteSpace(source) ? "direct" : source.Trim();
+            uint floorXp = GetCumulativeXpForLevelStart(levelBefore);
+            uint progressBefore = GetBarProgress(character);
+            uint newProgress = AddClamped(progressBefore, xpReward);
+
+            SetXpStat(character, StatIds.xp, floorXp + newProgress, sourceTag + "-add-cumulative");
+            SetXpStat(character, StatIds.lastxp, (uint)xpReward, sourceTag + "-add-lastxp");
+            SetXpStat(character, StatIds.unsavedxp, newProgress, sourceTag + "-add-unsaved");
+            EnsureLevelXpThresholds(character, sourceTag + "-thresholds");
+
+            bool leveledUp = ApplyPendingLevelUps(character, levelBefore);
+            if (leveledUp)
+            {
+                SendLevelUpPreFeedbackPackets(client, character, levelBefore);
+                PersistLevelStat(character);
+            }
+            else
+            {
+                SendNormalKillXpPacket(client, character);
+            }
+
+            ClearManualXpWireStatChangedFlags(character, leveledUp);
+            WriteXpStatsToDb(character, leveledUp ? sourceTag + "-levelup" : sourceTag + "-complete");
+            LogXpTrace(
+                character,
+                leveledUp ? sourceTag + "-levelup" : sourceTag + "-complete",
+                "reward=" + xpReward.ToString(CultureInfo.InvariantCulture)
+                + " levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + GetCurrentLevel(character).ToString(CultureInfo.InvariantCulture));
+            return true;
+        }
+
+        /// <summary>
         /// On death /terminate: clip XP to Insurance SavedXP watermark (or level floor), and for
         /// levels under 220 move the lost amount into UnsavedXP as a death recovery pool.
         /// Each later kill recovers 5% of that pool + mob XP until the pool hits 0.
@@ -267,6 +348,111 @@ namespace ZoneEngine.Core
             }
 
             WriteXpStatsToDb(character, "death-xp-loss");
+        }
+
+        /// <summary>
+        /// Insurance Terminal SaveChar: move current XP into SavedXP watermark and current SK into
+        /// LastSK. UnsavedXP death pool is kept for kill recovery; otherwise UnsavedXP mirrors bar
+        /// progress (same convention as kill/login). Capture: 20260716-141512.
+        /// </summary>
+        /// <returns>SavedXP watermark value used in the "XP saved" feedback.</returns>
+        internal static uint ApplyInsuranceTerminalSave(ICharacter character, out uint savedSk)
+        {
+            savedSk = 0;
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return 0;
+            }
+
+            uint cumulativeXp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
+            uint deathPool = GetDeathXpPool(character);
+            int level = GetCurrentLevel(character);
+            uint floor = GetCumulativeXpForLevelStart(level);
+            uint progress = cumulativeXp >= floor ? cumulativeXp - floor : 0;
+
+            // Unsaved/at-risk XP → SavedXP (death watermark).
+            SetXpStat(character, StatIds.savedxp, cumulativeXp, "insurance-save-watermark");
+
+            if (deathPool > 0)
+            {
+                SetXpStat(character, StatIds.unsavedxp, deathPool, "insurance-save-keep-death-pool");
+            }
+            else
+            {
+                SetXpStat(character, StatIds.unsavedxp, progress, "insurance-save-unsaved-progress");
+            }
+
+            // SK → LastSK (saved Shadowknowledge place).
+            savedSk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
+            SetXpStat(character, StatIds.lastsk, savedSk, "insurance-save-lastsk");
+
+            LogXpTrace(
+                character,
+                "insurance-save",
+                "savedXp=" + cumulativeXp.ToString(CultureInfo.InvariantCulture)
+                + " progress=" + progress.ToString(CultureInfo.InvariantCulture)
+                + " deathPool=" + deathPool.ToString(CultureInfo.InvariantCulture)
+                + " savedSk=" + savedSk.ToString(CultureInfo.InvariantCulture));
+
+            WriteXpStatsToDb(character, "insurance-save");
+
+            IZoneClient client = character.Controller.Client;
+            if (client != null)
+            {
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.savedxp, cumulativeXp);
+                StatMessageHandler.Default.SendSingle(
+                    character,
+                    (int)StatIds.unsavedxp,
+                    deathPool > 0 ? deathPool : progress);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.lastsk, savedSk);
+            }
+
+            // Clear manual XP-wire changed flags (same as the kill path) so later CharDCMove stat
+            // flushes do not re-push XP/SK every frame — that spammed blank reward chat lines while
+            // standing on the garden save pad.
+            ClearManualXpWireStatChangedFlags(character, false);
+            ClearStatChangedFlag(character, StatIds.lastsk);
+            ClearStatChangedFlag(character, StatIds.sk);
+
+            return cumulativeXp;
+        }
+
+        /// <summary>First Shadowlevel: 201+ earn Shadowknowledge (SK) instead of XP.</summary>
+        private const int ShadowLevelStart = 201;
+
+        /// <summary>
+        /// Save-reward feedback text shared by the insurance terminal and the garden save pad.
+        /// - Level 201+ (Shadowlevels) earn SK, not XP, so never show the huge cumulative XP total.
+        /// - Level 220 (max) earns neither XP nor SK, so only confirm the store with no number.
+        /// </summary>
+        internal static string BuildSaveRewardText(int level, uint savedXp, uint savedSk)
+        {
+            if (level >= MaxLevel)
+            {
+                return "Character stored.";
+            }
+
+            if (level >= ShadowLevelStart)
+            {
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Character stored. {0} Shadowknowledge saved.",
+                    savedSk);
+            }
+
+            if (savedSk > 0)
+            {
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Character stored. {0} XP saved. {1} Shadowknowledge saved.",
+                    savedXp,
+                    savedSk);
+            }
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "Character stored. {0} XP saved.",
+                savedXp);
         }
 
         internal static void PrepareXpStatsForLogin(ICharacter character)
@@ -527,7 +713,8 @@ namespace ZoneEngine.Core
                 + " dbSaved=" + NormalizeStatValue(character.Stats[StatIds.savedxp].BaseValue).ToString(CultureInfo.InvariantCulture)
                 + " floor=" + floor.ToString(CultureInfo.InvariantCulture));
 
-            // Stats 334/372 are not used for manual save XP yet; discard any legacy DB floor values.
+            // LastSaveXP (372) is level-up floor wire only. SavedXP (334) is Insurance watermark —
+            // do not clear it here.
             ClearDbManagedFloorStats(character, "login-normalize-clear-db-floor");
 
             // Prefer cumulative XP as bar source of truth. UnsavedXP may hold a death recovery

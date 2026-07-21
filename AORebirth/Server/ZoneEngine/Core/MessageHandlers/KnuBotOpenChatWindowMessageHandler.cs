@@ -1,31 +1,8 @@
 #region License
 
 // Copyright (c) 2005-2014, CellAO Team
-// 
-// 
+//
 // All rights reserved.
-// 
-// 
-// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-// 
-// 
-//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-// 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
 
 #endregion
 
@@ -35,15 +12,22 @@ namespace ZoneEngine.Core.MessageHandlers
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
+    using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using Utility;
+
     using ZoneEngine.Core.Arete.Dialogue;
+    using ZoneEngine.Core.Controllers;
 
     #endregion
 
     /// <summary>
+    /// Outbound: server opens KnuBot window.
+    /// Inbound: client opens chat with NPC (capture 20260716-Reset-perks / Thrak Veronica —
+    /// KnubotOpenChatWindow, not Trade Open).
     /// </summary>
     [MessageHandler(MessageHandlerDirection.All)]
     public class KnuBotOpenChatWindowMessageHandler :
@@ -51,18 +35,52 @@ namespace ZoneEngine.Core.MessageHandlers
     {
         public override void Receive(MessageWrapper<KnuBotOpenChatWindowMessage> messageWrapper)
         {
-            ICharacter source = messageWrapper.Client.Controller.Character;
-            ContentDrivenNpcDialogueRouter.TryStartDialogueForTarget(
-                source,
-                messageWrapper.MessageBody.Target);
+            if (messageWrapper == null || messageWrapper.MessageBody == null || messageWrapper.Client == null
+                || messageWrapper.Client.Controller == null
+                || messageWrapper.Client.Controller.Character == null)
+            {
+                return;
+            }
+
+            ICharacter player = messageWrapper.Client.Controller.Character;
+            Identity npcIdentity = messageWrapper.MessageBody.Target;
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(player.Playfield.Identity, npcIdentity);
+            if (npc == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.KnuBot,
+                    "KnuBotOpenChatWindow inbound: NPC not found " + npcIdentity.ToString(true));
+                return;
+            }
+
+            // Content-driven NPCs (Rex / Windcaller / Tailor / Thrak) have no attached KnuBot; client still
+            // opens them with KnubotOpenChatWindow (capture 20260718-185306 Veronica).
+            if (ContentDrivenNpcDialogueRouter.TryStartDialogueForTarget(player, npcIdentity))
+            {
+                return;
+            }
+
+            NPCController controller = npc.Controller as NPCController;
+            if (controller == null || controller.KnuBot == null)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.KnuBot,
+                    "KnuBotOpenChatWindow inbound: no KnuBot on " + npc.Name);
+                return;
+            }
+
+            messageWrapper.Client.Server.Info(
+                messageWrapper.Client,
+                "KnuBotOpenChatWindow inbound player={0} npc={1}",
+                player.Identity,
+                npc.Identity);
+
+            controller.FaceDialoguePartner(player);
+            // Allow re-open even if a previous conversation partner was left set.
+            controller.KnuBot.Character = new Utility.WeakReference<ICharacter>(null);
+            controller.KnuBot.StartDialog(player);
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="character">
-        /// </param>
-        /// <param name="knubotTarget">
-        /// </param>
         public void Send(ICharacter character, Identity knubotTarget)
         {
             this.Send(character, knubotTarget, 1);
@@ -73,14 +91,6 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.KnuBotOpenWindow(character, knubotTarget, unknown2), false);
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="character">
-        /// </param>
-        /// <param name="knubotTarget">
-        /// </param>
-        /// <returns>
-        /// </returns>
         private MessageDataFiller KnuBotOpenWindow(
             ICharacter character,
             Identity knubotTarget,

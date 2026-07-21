@@ -17,6 +17,7 @@ namespace AORebirth.Core.Playfields
     using Utility;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Navigation;
     using ZoneEngine.Core.Playfields;
@@ -54,6 +55,8 @@ namespace AORebirth.Core.Playfields
         private readonly WorldPopulationController worldPopulation;
 
         private readonly CapturedSubwayEncounterRuntimeService capturedSubwayEncounters;
+
+        private readonly NascenceCoreHecklerSpawnOrchestrator nascenceCoreHecklers;
 
         private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();
 
@@ -102,12 +105,21 @@ namespace AORebirth.Core.Playfields
                     this.playfield,
                     this.dynelRegistry,
                     this.ActivateNpc);
+            this.nascenceCoreHecklers = new NascenceCoreHecklerSpawnOrchestrator(this.ActivateNpc);
         }
 
         internal void ActivateNpc(ICharacter character)
         {
             this.dynelRegistry.Register(character);
             this.RegisterNpcHome(character);
+        }
+
+        internal void EnsureAreteCapturePopulation()
+        {
+            AreteLandingPopulationEnsure.Tick(
+                this.playfield,
+                this.playfield.Identity,
+                this.ActivateNpc);
         }
 
         internal void ClearRuntimeState()
@@ -127,6 +139,15 @@ namespace AORebirth.Core.Playfields
             this.capturedSubwayEncounters.ClearRuntimeState();
             this.npcHomeStates.Clear();
             this.corpseDespawnTicks.Clear();
+            AndromedaIccHqIdleGestureRuntime.Clear();
+            AndromedaIccHqSpawn.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteLandingSpawn.ClearPlayfield(this.playfield.Identity.Instance);
+            MarcusPadAmbientCombat.ClearPlayfield(this.playfield.Identity.Instance);
+            JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            SurveillanceDroidRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteLandingPopulationEnsure.ClearPlayfield(this.playfield.Identity.Instance);
+            HoloDeckSpawn.ClearPlayfield(this.playfield.Identity.Instance);
         }
 
         internal void RegisterNpcHome(ICharacter character)
@@ -179,6 +200,80 @@ namespace AORebirth.Core.Playfields
         internal void SpawnCapturedNpcContent(Identity playfieldIdentity)
         {
             this.capturedAreteRobotSpawns.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            PerkResetServiceProviderSpawn.SpawnForPlayfield(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
+            this.nascenceCoreHecklers.SpawnForPlayfield(this.playfield, playfieldIdentity);
+            NascenceLifeSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            ThrakOmniGardenSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            RomeBlueCitySpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            AndromedaIccHqSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            try
+            {
+                AreteLandingSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteLandingSpawn batch failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                MarcusPadAmbientCombat.StartForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "MarcusPadAmbientCombat start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                // Capture 20260720-212302: Arete Cleaning Robot population (mesh/attack/loot).
+                JunkyardCleaningRobotRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "JunkyardCleaningRobotRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                // Capture 20260720-212302: Alex-pad Docker / Waste / Flea / Cleanmeister.
+                AlexAreaMobRuntime.StartForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AlexAreaMobRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                SurveillanceDroidRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "SurveillanceDroidRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            HoloDeckSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            MissionInstanceSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
             this.worldPopulation.ActivatePlayfield(playfieldIdentity);
             this.capturedSubwayEncounters.ActivatePlayfield(playfieldIdentity);
         }
@@ -209,6 +304,8 @@ namespace AORebirth.Core.Playfields
             this.ordinaryEnemies.ProcessExpiredSupportNanoEffects(utcNow);
             this.worldPopulation.ProcessDue(utcNow);
             this.capturedSubwayEncounters.ProcessDue(utcNow, this.AcquireAggro);
+            this.nascenceCoreHecklers.ProcessDue(utcNow);
+            AndromedaIccHqIdleGestureRuntime.ProcessDue(utcNow);
         }
 
         internal void ClearNpcCorpseDespawn(int corpseInstance)
@@ -247,6 +344,7 @@ namespace AORebirth.Core.Playfields
             this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
             this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
             this.worldPopulation.NotifyDeath(target, corpseIdentity, diedAtUtc);
+            this.nascenceCoreHecklers.NotifyDeath(target, diedAtUtc);
 
             foreach (ICharacter summon in this.capturedSubwayEncounters.NotifyDeath(target, diedAtUtc))
             {
@@ -290,6 +388,7 @@ namespace AORebirth.Core.Playfields
             DateTime utcNow = DateTime.UtcNow;
             this.worldPopulation.NotifyNpcDespawn(target, utcNow);
             this.capturedSubwayEncounters.NotifyNpcDespawn(target, utcNow);
+            this.nascenceCoreHecklers.NotifyNpcDespawn(target);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             OrdinaryEnemyRuntimeRegistry.Remove(target.Identity.Instance);
@@ -451,11 +550,68 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        /// <summary>
+        /// Force retarget for TauntNpc nanos (Mongo Slam). Steals aggro from other players.
+        /// </summary>
+        internal void ForceTauntAggro(ICharacter taunter, ICharacter target)
+        {
+            if (taunter == null || target == null)
+            {
+                return;
+            }
+
+            NPCController npcController = target.Controller as NPCController;
+            if (npcController == null
+                || npcController.KnuBot != null
+                || target.Stats[StatIds.health].Value <= 0)
+            {
+                return;
+            }
+
+            CapturedEnemyCombatContract capturedContract;
+            CapturedEnemyCombatRuntimeRegistry.TryGet(target.Identity.Instance, out capturedContract);
+
+            this.StartCombatWithAcquiredTarget(taunter, target, capturedContract);
+            LogUtil.Debug(
+                DebugInfoDetail.GameFunctions,
+                string.Format(
+                    "ForceTauntAggro taunter={0} npc={1} previousTargetStolen=true",
+                    taunter.Identity,
+                    target.Identity));
+        }
+
         internal void ProcessPatrolTick(ICharacter character)
         {
             if (character == null || !(character.Controller is NPCController))
             {
                 return;
+            }
+
+            if (this.playfield != null
+                && this.playfield.Identity.Instance == 6553
+                && string.Equals(character.Name, "Marcus Stone", StringComparison.OrdinalIgnoreCase))
+            {
+                MarcusPadAmbientCombat.TickRespawn(
+                    this.playfield,
+                    this.playfield.Identity,
+                    this.ActivateNpc);
+                MarcusWoundedWorkersQuestRuntime.TickHealRecoveries(this.playfield);
+            }
+
+            if (this.playfield != null && this.playfield.Identity.Instance == 6553)
+            {
+                SurveillanceDroidRuntime.TickEnsurePresent(
+                    this.playfield,
+                    this.playfield.Identity,
+                    this.ActivateNpc);
+                JunkyardCleaningRobotRuntime.TickRespawn(
+                    this.playfield,
+                    this.playfield.Identity,
+                    this.ActivateNpc);
+                AlexAreaMobRuntime.TickRespawn(
+                    this.playfield,
+                    this.playfield.Identity,
+                    this.ActivateNpc);
             }
 
             PetCommandService.ProcessPetHealTick(character);
@@ -478,7 +634,10 @@ namespace AORebirth.Core.Playfields
             }
 
             ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
-                                         ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character);
+                                         ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
+                                         ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
+                                         ?? ZoneEngine.Core.Missions.MissionInstanceMobCombat.FindAutomaticAggroTarget(
+                                             character);
             if (automaticTarget != null)
             {
                 this.AcquireAggro(automaticTarget, character);

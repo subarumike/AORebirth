@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="KnuBotFinishTradeMessage.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -39,6 +39,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         [AoMember(2)]
         public int Decline { get; set; }
+
+        /// <summary>
+        /// Credits offered in trade. Capture 20260716-Reset-perks Amount=20000000.
+        /// </summary>
+        [AoMember(3)]
+        public int Amount { get; set; }
 
         #endregion
     }

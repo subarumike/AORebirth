@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CharacterFlags.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -25,7 +25,17 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         // 0000 0000 0100 0000 0000 0000 0000 0000
         HasVisibleName = 0x00400000,
 
-        // 0000 0000 1000 0000 0000 0000 0000 0000
+        /// <summary>
+        /// Bit 23. On player SCFU this paints a blue nametag (Mike 2026-07-19).
+        /// LTC / quest-style blue — not ARK/GM green.
+        /// </summary>
         HasBlueName = 0x00800000,
+
+        /// <summary>
+        /// Bit 28. Common on live NPC SCFU CharacterFlags; does not color player
+        /// nametags (Mike 2026-07-19: white with [GM] suffix). Retained for
+        /// decode/docs only — not a green-name bit.
+        /// </summary>
+        NpcStyleFlag28 = 0x10000000,
     }
 }

@@ -1,0 +1,311 @@
+grants=310 noGrant=681 missingTemplate=1
+P1292 AOID=252494 action=252487 hash=OPSH slot=11292 Atrox Primary Genome 3
+P1299 AOID=252501 action=252490 hash=MGRE slot=11299 Atrox Primary Genome 10
+P1302 AOID=252514 action=252511 hash=WOOF slot=11302 Atrox Secondary Genome 3
+P1309 AOID=252521 action=252508 hash=WFOT slot=11309 Atrox Secondary Genome 10
+P240 AOID=211748 action=227421 hash=ELTE slot=10240 Cartographer 1
+P1174 AOID=253112 action=253104 hash=CXWZ slot=11174 Champion of Heavy Artillery 5
+P1179 AOID=253117 action=253107 hash=FRFR slot=11179 Champion of Heavy Artillery 10
+P1144 AOID=253068 action=253060 hash=USVH slot=11144 Champion of Heavy Infantry 5
+P1149 AOID=253073 action=253063 hash=GUYI slot=11149 Champion of Heavy Infantry 10
+P1164 AOID=253097 action=253090 hash=COLL slot=11164 Champion of Light Artillery 5
+P1169 AOID=253102 action=253092 hash=MPLO slot=11169 Champion of Light Artillery 10
+P1154 AOID=253083 action=253075 hash=AOQO slot=11154 Champion of Light Infantry 5
+P1159 AOID=253088 action=253078 hash=KLVO slot=11159 Champion of Light Infantry 10
+P1184 AOID=253127 action=253119 hash=NNFA slot=11184 Champion of Nano Combat 5
+P1189 AOID=253132 action=253122 hash=YGXT slot=11189 Champion of Nano Combat 10
+P1273 AOID=253143 action=253134 hash=IISR slot=11273 Combat Knowledge 4
+P1277 AOID=253147 action=253137 hash=RELA slot=11277 Combat Knowledge 8
+P334 AOID=211797 action=227236 hash=REDN slot=10334 Enhance DNA 5
+P339 AOID=211802 action=227237 hash=VIWP slot=10339 Enhance DNA 10
+P381 AOID=211813 action=227476 hash=EXTE slot=10381 Explorer 2
+P401 AOID=211820 action=227223 hash=BDNB slot=10401 First Aid 2
+P430 AOID=211853 action=227712 hash=BFEI slot=10430 Freak Strength 1
+P431 AOID=211854 action=227713 hash=EARH slot=10431 Freak Strength 2
+P432 AOID=211855 action=227714 hash=GIOC slot=10432 Freak Strength 3
+P461 AOID=211867 action=214068 hash=RGNN slot=10461 Genius 2
+P512 AOID=211903 action=226797 hash=TRHN slot=10512 Kung-Fu Master 3
+P514 AOID=211905 action=227151 hash=XHJU slot=10514 Kung-Fu Master 5
+P1200 AOID=252387 action=252367 hash=MLOT slot=11200 Nanomorph 1
+P1205 AOID=252392 action=252383 hash=ASTR slot=11205 Nanomorph 6
+P1209 AOID=252396 action=252386 hash=PELA slot=11209 Nanomorph 10
+P580 AOID=212133 action=227500 hash=ZANA slot=10580 Notum Repulsor 1
+P582 AOID=212135 action=227194 hash=NNSH slot=10582 Notum Repulsor 3
+P585 AOID=212138 action=227219 hash=STNA slot=10585 Notum Repulsor 6
+P587 AOID=212140 action=227218 hash=AINO slot=10587 Notum Repulsor 8
+P1243 AOID=252482 action=252475 hash=OPKN slot=11243 Opportunist 4
+P1245 AOID=252484 action=252478 hash=COCC slot=11245 Opportunist 6
+P1312 AOID=252529 action=252523 hash=SWYI slot=11312 Opifex Primary Genome 3
+P1319 AOID=252536 action=252526 hash=ERIV slot=11319 Opifex Primary Genome 10
+P1322 AOID=252544 action=252539 hash=RIVA slot=11322 Opifex Secondary Genome 3
+P1329 AOID=252551 action=252541 hash=DIHI slot=11329 Opifex Secondary Genome 10
+P1332 AOID=252562 action=254313 hash=FNXF slot=11332 Nanobreed Primary Genome 3
+P1339 AOID=252569 action=252559 hash=NRQU slot=11339 Nanobreed Primary Genome 10
+P1342 AOID=253020 action=253014 hash=PENR slot=11342 Nanobreed Secondary Genome 3
+P1349 AOID=253027 action=253017 hash=NOSD slot=11349 Nanobreed Secondary Genome 10
+P1352 AOID=253036 action=253030 hash=TAHC slot=11352 Solitus Alpha Genome 3
+P1359 AOID=253043 action=253033 hash=SPHE slot=11359 Solitus Alpha Genome 10
+P1362 AOID=253051 action=253045 hash=MOHB slot=11362 Solitus Beta Genome 3
+P1369 AOID=253058 action=253048 hash=SURV slot=11369 Solitus Beta Genome 10
+P501 AOID=211892 action=225876 hash=AMPI slot=10501 Infantry 2
+P504 AOID=211895 action=225882 hash=FDTF slot=10504 Infantry 5
+P509 AOID=216629 action=226732 hash=XDGJ slot=10509 Infantry 10
+P542 AOID=211928 action=227190 hash=ENIS slot=10542 Mountaineer 3
+P544 AOID=211930 action=227191 hash=DTSN slot=10544 Mountaineer 5
+P556 AOID=211937 action=225470 hash=SHRM slot=10556 Nano Doctorate 7
+P559 AOID=229960 action=225471 hash=SURE slot=10559 Nano Doctorate 10
+P650 AOID=211987 action=226852 hash=ERGI slot=10650 Power Up 1
+P652 AOID=213399 action=225821 hash=POVO slot=10652 Power Up 3
+P654 AOID=213401 action=225828 hash=POSH slot=10654 Power Up 5
+P657 AOID=213404 action=226506 hash=POBL slot=10657 Power Up 8
+P659 AOID=213410 action=226513 hash=PWCO slot=10659 Power Up 10
+P1190 AOID=252356 action=252344 hash=EARS slot=11190 Ranger 1
+P1195 AOID=252361 action=252352 hash=POPS slot=11195 Ranger 6
+P1199 AOID=254418 action=252355 hash=RSIG slot=11199 Ranger 10
+P1233 AOID=252466 action=252461 hash=HOTA slot=11233 The Unknown Factor 4
+P1237 AOID=252470 action=252462 hash=CTAU slot=11237 The Unknown Factor 8
+P141 AOID=210843 action=214202 hash=RANQ slot=10141 Assassin 2
+P143 AOID=210845 action=226918 hash=TISC slot=10143 Assassin 4
+P146 AOID=210848 action=226490 hash=CCSH slot=10146 Assassin 7
+P149 AOID=210851 action=226496 hash=SSIN slot=10149 Assassin 10
+P180 AOID=211692 action=227700 hash=CHMD slot=10180 Black Ops 1
+P182 AOID=211694 action=226679 hash=SOUP slot=10182 Black Ops 3
+P185 AOID=211697 action=225834 hash=PNSI slot=10185 Black Ops 6
+P188 AOID=211700 action=225840 hash=DTSI slot=10188 Black Ops 9
+P1090 AOID=251285 action=251274 hash=ECAL slot=11090 Made 1
+P1095 AOID=251290 action=251281 hash=SIPL slot=11095 Made 6
+P1099 AOID=251294 action=251284 hash=TTSH slot=11099 Made 10
+P662 AOID=211999 action=226237 hash=FAAM slot=10662 Shadowsneak 3
+P665 AOID=212002 action=226231 hash=SDBU slot=10665 Shadowsneak 6
+P669 AOID=212006 action=226225 hash=NIKI slot=10669 Shadowsneak 10
+P681 AOID=212014 action=226201 hash=SNSH slot=10681 Sharpshooter 2
+P684 AOID=212017 action=226207 hash=SPS2 slot=10684 Sharpshooter 5
+P201 AOID=211713 action=226519 hash=QUBS slot=10320 Blunt Mastery 2 [slotPacket=320]
+P204 AOID=225939 action=226528 hash=CUBO slot=10323 Blunt Mastery 5 [slotPacket=323]
+P207 AOID=225942 action=226536 hash=BITP slot=10326 Blunt Mastery 8 [slotPacket=326]
+P209 AOID=225944 action=226537 hash=DVBL slot=10328 Blunt Mastery 10 [slotPacket=328]
+P600 AOID=211947 action=227312 hash=ACNO slot=10600 Notum Source 1
+P603 AOID=211950 action=227320 hash=BLNN slot=10603 Notum Source 4
+P606 AOID=211953 action=227322 hash=STNT slot=10606 Notum Source 7
+P609 AOID=211956 action=227324 hash=NOOV slot=10609 Notum Source 10
+P641 AOID=211978 action=226238 hash=QISH slot=10641 Pistol Mastery 2
+P644 AOID=211981 action=226244 hash=DBSH slot=10644 Pistol Mastery 5
+P648 AOID=216633 action=226347 hash=NOSM slot=10648 Pistol Mastery 9
+P760 AOID=212107 action=227348 hash=DZWI slot=10760 Starfall 1
+P762 AOID=212109 action=226148 hash=WRTK slot=10762 Starfall 3
+P765 AOID=212112 action=226141 hash=TEDT slot=10765 Starfall 6
+P769 AOID=212116 action=226134 hash=PERN slot=10769 Starfall 10
+P782 AOID=212081 action=227358 hash=QUCN slot=10782 Theoretical Research 3
+P785 AOID=212084 action=226128 hash=AEDE slot=10785 Theoretical Research 6
+P788 AOID=212087 action=227359 hash=KNEN slot=10788 Theoretical Research 9
+P1120 AOID=252301 action=252296 hash=KEFI slot=11120 Ancient Knowledge 1
+P1125 AOID=252306 action=252298 hash=KESI slot=11125 Ancient Knowledge 6
+P1129 AOID=252310 action=252300 hash=KAMN slot=11129 Ancient Knowledge 10
+P250 AOID=211753 action=227693 hash=CNRE slot=10250 Channel Rage 1
+P721 AOID=211126 action=241166 hash=STOB slot=10721 Soothing Spirits 2
+P723 AOID=211128 action=241258 hash=SPOU slot=10723 Soothing Spirits 4
+P111 AOID=211656 action=214399 hash=LIMB slot=10111 Acrobat 2
+P113 AOID=211658 action=211453 hash=DAOF slot=10113 Acrobat 4
+P170 AOID=211666 action=215568 hash=BISI slot=10170 Bio Shielding 1
+P172 AOID=211668 action=215577 hash=BICC slot=10172 Bio Shielding 3
+P176 AOID=211672 action=215578 hash=BIRJ slot=10176 Bio Shielding 7
+P179 AOID=211675 action=215599 hash=BIRG slot=10179 Bio Shielding 10
+P1212 AOID=252405 action=252399 hash=FUFR slot=11212 Counterweight 3
+P1215 AOID=252408 action=252402 hash=NFIN slot=11215 Counterweight 6
+P320 AOID=211660 action=225788 hash=QUCT slot=10320 Edged Mastery 1
+P323 AOID=211663 action=225794 hash=WQTV slot=10323 Edged Mastery 4
+P326 AOID=212173 action=225801 hash=FYOC slot=10326 Edged Mastery 7
+P328 AOID=212175 action=225807 hash=RIFE slot=10328 Edged Mastery 9
+P441 AOID=212124 action=225474 hash=GLQD slot=10441 Spatial Displacement 2
+P443 AOID=212126 action=225475 hash=MDID slot=10443 Spatial Displacement 4
+P445 AOID=212128 action=225476 hash=TTEI slot=10445 Spatial Displacement 6
+P447 AOID=212130 action=225477 hash=LVSF slot=10447 Spatial Displacement 8
+P449 AOID=212132 action=225479 hash=GRPU slot=10449 Spatial Displacement 10
+P390 AOID=211816 action=227365 hash=POMW slot=10390 Ferocity of Nature 1
+P391 AOID=211817 action=227363 hash=BLWO slot=10391 Ferocity of Nature 2
+P392 AOID=211818 action=227364 hash=GUBL slot=10392 Ferocity of Nature 3
+P921 AOID=281535 action=281519 hash=LIBU slot=10921 Lightstalker 2
+P923 AOID=281537 action=281526 hash=PGOT slot=10923 Lightstalker 4
+P925 AOID=281539 action=281528 hash=LIKL slot=10925 Lightstalker 6
+P612 AOID=212143 action=227326 hash=ONEW slot=10612 Outdoorsman 3
+P671 AOID=212008 action=226213 hash=SHSB slot=10671 Shadowstalker 2
+P673 AOID=212010 action=227328 hash=BGON slot=10673 Shadowstalker 4
+P675 AOID=212012 action=226219 hash=SHKL slot=10675 Shadowstalker 6
+P1080 AOID=251244 action=251230 hash=PTXJ slot=11080 The Call 1
+P1085 AOID=251249 action=251234 hash=BISK slot=11085 The Call 6
+P1089 AOID=251253 action=251237 hash=AWAK slot=11089 The Call 10
+P120 AOID=211676 action=214366 hash=TAWO slot=10120 Alchemist 1
+P121 AOID=211677 action=214368 hash=CHBI slot=10121 Alchemist 2
+P123 AOID=211679 action=214367 hash=PSSI slot=10123 Alchemist 4
+P125 AOID=211681 action=214369 hash=SLWU slot=10125 Alchemist 6
+P1222 AOID=252450 action=252444 hash=GUES slot=11222 Illogical Patterns 3
+P1227 AOID=252455 action=252447 hash=MESC slot=11227 Illogical Patterns 8
+P702 AOID=216637 action=226500 hash=LGSH slot=10702 Shotgun Mastery 3
+P706 AOID=216641 action=225813 hash=EASH slot=10706 Shotgun Mastery 7
+P709 AOID=216644 action=302068 hash=JBWB slot=10709 Shotgun Mastery 10
+P801 AOID=212094 action=212997 hash=SAQA slot=10801 Tinkerer 2
+P803 AOID=212096 action=213010 hash=IGFL slot=10803 Tinkerer 4
+P1110 AOID=251906 action=251899 hash=ERRU slot=11110 Creative Mind 1
+P1115 AOID=251911 action=251902 hash=EDAL slot=11115 Creative Mind 6
+P1119 AOID=251915 action=251905 hash=OPBO slot=11119 Creative Mind 10
+P861 AOID=211824 action=229898 hash=ISEX slot=10861 Demolitions 2
+P863 AOID=211826 action=229920 hash=INNO slot=10863 Demolitions 4
+P866 AOID=211829 action=227360 hash=SRPI slot=10866 Demolitions 7
+P869 AOID=211832 action=227361 hash=TRPR slot=10869 Demolitions 10
+P451 AOID=211857 action=229119 hash=ECON slot=10451 Gadgeteer 2
+P454 AOID=211860 action=229132 hash=TABX slot=10454 Gadgeteer 5
+P456 AOID=211862 action=229658 hash=SPBX slot=10456 Gadgeteer 7
+P459 AOID=211865 action=227788 hash=CTER slot=10459 Gadgeteer 10
+P532 AOID=211918 action=229660 hash=REPE slot=10532 Mechanic 3
+P535 AOID=211921 action=229669 hash=TRUC slot=10535 Mechanic 6
+P272 AOID=211765 action=216602 hash=BNOI slot=10272 Colossal Health 3
+P274 AOID=211767 action=216612 hash=LIFE slot=10274 Colossal Health 5
+P278 AOID=211771 action=216613 hash=DRBO slot=10278 Colossal Health 9
+P711 AOID=212020 action=213438 hash=RESL slot=10711 SMG Mastery 2
+P714 AOID=212023 action=213977 hash=JABU slot=10714 SMG Mastery 5
+P716 AOID=212025 action=213978 hash=SLSU slot=10716 SMG Mastery 7
+P719 AOID=212028 action=213979 hash=NESL slot=10719 SMG Mastery 10
+P481 AOID=211874 action=226688 hash=LAPI slot=10481 Heavy Ranged 2
+P482 AOID=211875 action=225869 hash=WEBS slot=10482 Heavy Ranged 3
+P484 AOID=211877 action=226699 hash=TRTA slot=10484 Heavy Ranged 5
+P486 AOID=211879 action=226700 hash=NPSR slot=10486 Heavy Ranged 7
+P1020 AOID=248165 action=248183 hash=SPHO slot=11020 Power In Numbers 1
+P1025 AOID=248170 action=248196 hash=CLFE slot=11025 Power In Numbers 6
+P1029 AOID=248174 action=248201 hash=MZOV slot=11029 Power In Numbers 10
+P730 AOID=212029 action=227329 hash=FEBN slot=10730 Special Forces 1
+P732 AOID=212031 action=226184 hash=TRAC slot=10732 Special Forces 3
+P735 AOID=212034 action=226195 hash=CNBU slot=10735 Special Forces 6
+P737 AOID=212036 action=227336 hash=EEED slot=10737 Special Forces 8
+P739 AOID=212038 action=227338 hash=ARDI slot=10739 Special Forces 10
+P890 AOID=225946 action=226032 hash=CLEA slot=10890 Reaver 1
+P893 AOID=225949 action=226038 hash=RANS slot=10893 Reaver 4
+P896 AOID=225952 action=226053 hash=PALA slot=10896 Reaver 7
+P898 AOID=225954 action=226044 hash=SAAI slot=10898 Reaver 9
+P190 AOID=211702 action=215791 hash=LAON slot=10190 Blessing 1
+P193 AOID=211705 action=215856 hash=DEAM slot=10193 Blessing 4
+P195 AOID=211707 action=215864 hash=CUTO slot=10195 Blessing 6
+P1130 AOID=252332 action=252312 hash=FOOP slot=11130 Crusade 1
+P1135 AOID=252337 action=252324 hash=JGTG slot=11135 Crusade 6
+P1139 AOID=252341 action=252331 hash=UKGF slot=11139 Crusade 10
+P490 AOID=211881 action=226895 hash=MKOV slot=10490 Holy Mark 1
+P493 AOID=211884 action=226881 hash=MAOS slot=10493 Holy Mark 4
+P496 AOID=211887 action=226900 hash=MKOH slot=10496 Holy Mark 7
+P499 AOID=211890 action=226903 hash=MEOU slot=10499 Holy Mark 10
+P770 AOID=212069 action=226376 hash=DECT slot=10770 Street Samurai 1
+P773 AOID=212072 action=226853 hash=BLWR slot=10773 Street Samurai 4
+P775 AOID=212074 action=226854 hash=HOTH slot=10775 Street Samurai 6
+P778 AOID=212077 action=226382 hash=QJOP slot=10778 Street Samurai 9
+P230 AOID=211738 action=214181 hash=EAST slot=10230 Careful in Battle 1
+P870 AOID=211967 action=225581 hash=IXUL slot=10870 Piercing Mastery 1
+P871 AOID=211968 action=225618 hash=DOSA slot=10871 Piercing Mastery 2
+P873 AOID=211970 action=225589 hash=PERF slot=10873 Piercing Mastery 4
+P874 AOID=211971 action=225629 hash=LACE slot=10874 Piercing Mastery 5
+P876 AOID=211973 action=225599 hash=IMPA slot=10876 Piercing Mastery 7
+P877 AOID=211974 action=225641 hash=KAWP slot=10877 Piercing Mastery 8
+P879 AOID=211976 action=225651 hash=ECAT slot=10879 Piercing Mastery 10
+P880 AOID=212144 action=226356 hash=TROP slot=10880 Shade Touch 1
+P881 AOID=212145 action=239839 hash=COTS slot=10881 Shade Touch 2
+P883 AOID=212147 action=226363 hash=DOTO slot=10883 Shade Touch 4
+P886 AOID=212150 action=226369 hash=SPDL slot=10886 Shade Touch 7
+P1000 AOID=248115 action=248113 hash=JJRM slot=11000 Shadow 1
+P1005 AOID=248120 action=248125 hash=DIFF slot=11005 Shadow 6
+P1009 AOID=248124 action=248127 hash=MKOP slot=11009 Shadow 10
+P630 AOID=212049 action=225439 hash=CPVI slot=10630 Spirit Phylactery 1
+P631 AOID=212050 action=225465 hash=UABL slot=10631 Spirit Phylactery 2
+P633 AOID=212052 action=225440 hash=CPES slot=10633 Spirit Phylactery 4
+P634 AOID=212053 action=225469 hash=UNPS slot=10634 Spirit Phylactery 5
+P636 AOID=212055 action=225455 hash=CPSI slot=10636 Spirit Phylactery 7
+P638 AOID=212057 action=225468 hash=UNCG slot=10638 Spirit Phylactery 9
+P639 AOID=212058 action=225456 hash=CTVI slot=10639 Spirit Phylactery 10
+P690 AOID=212151 action=216947 hash=EXUL slot=10690 Sublime Rapport 1
+P691 AOID=212152 action=216948 hash=ETTO slot=10691 Sublime Rapport 2
+P693 AOID=212154 action=216958 hash=DIFI slot=10693 Sublime Rapport 4
+P695 AOID=212156 action=225266 hash=ISOR slot=10695 Sublime Rapport 6
+P697 AOID=212158 action=225275 hash=CNTM slot=10697 Sublime Rapport 8
+P699 AOID=212160 action=225286 hash=YMBI slot=10699 Sublime Rapport 10
+P810 AOID=212097 action=225317 hash=RLOD slot=10810 Totemic Rites 1
+P811 AOID=212098 action=225341 hash=DEVI slot=10811 Totemic Rites 2
+P813 AOID=212100 action=225323 hash=RTOZ slot=10813 Totemic Rites 4
+P814 AOID=212101 action=225347 hash=DEES slot=10814 Totemic Rites 5
+P816 AOID=212103 action=225329 hash=RUOS slot=10816 Totemic Rites 7
+P817 AOID=212104 action=225353 hash=DOVI slot=10817 Totemic Rites 8
+P819 AOID=212106 action=225335 hash=RTOB slot=10819 Totemic Rites 10
+P1050 AOID=248967 action=248818 hash=PWBL slot=11050 Dark Kin 1
+P1055 AOID=248972 action=248962 hash=YEQE slot=11055 Dark Kin 6
+P1059 AOID=248976 action=248966 hash=IPPP slot=11059 Dark Kin 10
+P910 AOID=239812 action=239811 hash=DCSN slot=10910 Defensive Stance 1
+P470 AOID=211869 action=214069 hash=NUBO slot=10470 Grid NCU Extension 1
+P931 AOID=283678 action=283665 hash=TGHA slot=10931 Hit and Run 2
+P935 AOID=283682 action=283671 hash=ETBU slot=10935 Hit and Run 6
+P792 AOID=212091 action=214386 hash=EJXL slot=10792 Thief 3
+P844 AOID=223614 action=225472 hash=ONFP slot=10844 Worm ICE 5
+P849 AOID=223619 action=225473 hash=UVGQ slot=10849 Worm ICE 10
+P310 AOID=211773 action=227641 hash=RALI slot=10310 Distill Life 1
+P315 AOID=211778 action=226685 hash=LOOD slot=10315 Distill Life 6
+P318 AOID=211781 action=226687 hash=VASK slot=10318 Distill Life 9
+P1030 AOID=248245 action=248233 hash=TAVI slot=11030 Volunteer 1
+P1035 AOID=248250 action=248242 hash=OIOB slot=11035 Volunteer 6
+P1039 AOID=248254 action=248244 hash=PUHE slot=11039 Volunteer 10
+P150 AOID=211682 action=215456 hash=BTHA slot=10150 Assault Force Medic 1
+P154 AOID=211686 action=215457 hash=BAHL slot=10154 Assault Force Medic 5
+P155 AOID=211687 action=215724 hash=VICO slot=10155 Assault Force Medic 6
+P157 AOID=211689 action=215458 hash=BTHE slot=10157 Assault Force Medic 8
+P159 AOID=211691 action=215459 hash=BTH4 slot=10159 Assault Force Medic 10
+P1010 AOID=248130 action=248140 hash=REAT slot=11010 Embrace 1
+P1015 AOID=248135 action=248144 hash=QDAF slot=11015 Embrace 6
+P1019 AOID=248139 action=248164 hash=NTTS slot=10019 Embrace 10 [slotPacket=19]
+P560 AOID=211941 action=227036 hash=EHHA slot=10560 Nano Surgeon 1
+P563 AOID=211944 action=214129 hash=TAHA slot=10563 Nano Surgeon 4
+P564 AOID=211945 action=227040 hash=MAPO slot=10564 Nano Surgeon 5
+P565 AOID=211946 action=214120 hash=TRTR slot=10565 Nano Surgeon 6
+P740 AOID=212039 action=225481 hash=IILW slot=10740 Specialist Healer 1
+P742 AOID=212041 action=225483 hash=MTHM slot=10742 Specialist Healer 3
+P744 AOID=212043 action=225482 hash=MLIG slot=10744 Specialist Healer 5
+P746 AOID=212045 action=225484 hash=STIV slot=10746 Specialist Healer 7
+P748 AOID=212047 action=225505 hash=HAAD slot=10748 Specialist Healer 9
+P749 AOID=212048 action=225506 hash=TEHL slot=10749 Specialist Healer 10
+P211 AOID=211723 action=225847 hash=BISM slot=10211 Brawler 2
+P213 AOID=211725 action=225855 hash=FLSS slot=10213 Brawler 4
+P215 AOID=211727 action=225862 hash=BIBW slot=10215 Brawler 6
+P901 AOID=225961 action=226104 hash=PULV slot=10901 Bone Crusher 2
+P904 AOID=225964 action=227493 hash=HMAD slot=10904 Bone Crusher 5
+P907 AOID=225967 action=226110 hash=OEMG slot=10907 Bone Crusher 8
+P909 AOID=225969 action=226119 hash=SMSM slot=10909 Bone Crusher 10
+P422 AOID=211845 action=227068 hash=TRFO slot=10422 Form of Troll 3
+P424 AOID=211847 action=227070 hash=DINT slot=10424 Form of Troll 5
+P426 AOID=211849 action=227072 hash=SNFI slot=10426 Form of Troll 7
+P428 AOID=211851 action=227076 hash=AVAL slot=10428 Form of Troll 9
+P520 AOID=211906 action=227152 hash=GDZH slot=10520 Manners of Mongo 1
+P521 AOID=211907 action=227817 hash=BXUX slot=10521 Manners of Mongo 2
+P523 AOID=211909 action=227809 hash=TXXD slot=10523 Manners of Mongo 4
+P525 AOID=211911 action=227158 hash=NMWT slot=10525 Manners of Mongo 6
+P528 AOID=211914 action=227807 hash=GOKK slot=10528 Manners of Mongo 9
+P1070 AOID=251205 action=251184 hash=AUAN slot=11070 Mutate 1
+P1075 AOID=251210 action=251190 hash=CSOA slot=11075 Mutate 6
+P1079 AOID=251214 action=251204 hash=IGHW slot=11079 Mutate 10
+P220 AOID=211728 action=227062 hash=DOTE slot=10220 Bureaucratic Shuffle 1
+P223 AOID=211731 action=227065 hash=UCCU slot=10223 Bureaucratic Shuffle 4
+P226 AOID=211734 action=227066 hash=CNWI slot=10226 Bureaucratic Shuffle 7
+P293 AOID=223633 action=225575 hash=EADE slot=10293 Directorship 4
+P295 AOID=223635 action=225577 hash=GOVE slot=10295 Directorship 6
+P299 AOID=223639 action=225578 hash=THDI slot=10299 Directorship 10
+P620 AOID=236593 action=236592 hash=ISCL slot=10620 Insurance Agent 1
+P1100 AOID=251790 action=251297 hash=PUPP slot=11100 Loophole 1
+P1105 AOID=251795 action=251766 hash=NTIT slot=11105 Loophole 6
+P1109 AOID=251799 action=251789 hash=VERR slot=11109 Loophole 10
+P306 AOID=211789 action=227044 hash=BAOY slot=10306 Disharmony 7
+P751 AOID=212060 action=226177 hash=RAGO slot=10751 Spiritual Master 2
+P754 AOID=212063 action=226170 hash=CICD slot=10754 Spiritual Master 5
+P756 AOID=212065 action=226169 hash=INCA slot=10756 Spiritual Master 7
+P758 AOID=212067 action=226162 hash=FLQI slot=10758 Spiritual Master 9
+P759 AOID=212068 action=226155 hash=OBLI slot=10759 Spiritual Master 10
+P1040 AOID=248731 action=254454 hash=REDW slot=11040 Xuyun 1
+P1045 AOID=248736 action=248727 hash=OONM slot=11045 Xuyun 6
+P1049 AOID=248740 action=248729 hash=REDU slot=11049 Xuyun 10
+P1060 AOID=250663 action=250649 hash=FLFC slot=11060 Ancient Matrix 1
+P1065 AOID=250668 action=250651 hash=UTIL slot=11065 Ancient Matrix 6
+P1069 AOID=250672 action=250661 hash=PROV slot=11069 Ancient Matrix 10
+P363 AOID=212120 action=213413 hash=BRDE slot=10363 Enhanced Nano Damage 4
+P370 AOID=211809 action=233837 hash=TAHL slot=10370 Essence of Notum 1
+P593 AOID=223603 action=227634 hash=FAAG slot=10593 Notum Siphon 4
+P596 AOID=223606 action=227221 hash=TANT slot=10596 Notum Siphon 7

@@ -153,7 +153,8 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             return firstWord == (int)IdentityType.Door ||
                    firstWord == (int)IdentityType.Terminal ||
                    firstWord == (int)IdentityType.VendingMachine ||
-                   firstWord == unchecked((int)0x0000C77D);
+                   firstWord == unchecked((int)0x0000C77D) ||
+                   firstWord == unchecked((int)0x0000C79F);
         }
     }
 }

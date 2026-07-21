@@ -27,10 +27,12 @@ namespace ZoneEngine.Core
 
     using Utility;
 
+    using ZoneEngine.Core.Arete.Quests;
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.Functions;
     using ZoneEngine.Core.Functions.GameFunctions;
+    using ZoneEngine.Core.Thrak.Quests;
 
     using MsgPack;
 
@@ -943,13 +945,24 @@ namespace ZoneEngine.Core
                 return true;
             }
 
+            // Capture 20260721-lockpick: Use sealed Lock Pick package (295999) → grant 95577 + tip.
+            if (StanGoodmanQuestRuntime.TryHandleSealedLockpickUse(character, itemPosition, item))
+            {
+                return true;
+            }
+
             TemplateActionMessageHandler.Default.Send(
                 character,
                 item,
                 (int)itemPosition.Type,
                 itemPosition.Instance);
 
-            if (ItemLoader.ItemList[item.HighID].IsConsumable()
+            // Sacred Thrak garden key (226994) is permanent — never consumed on Use.
+            bool isSacredGardenKey =
+                ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(item.LowID, item.HighID);
+
+            if (!isSacredGardenKey
+                && ItemLoader.ItemList[item.HighID].IsConsumable()
                 && !this.IsHealthAndNanoRecharger(item))
             {
                 item.MultipleCount--;
@@ -1258,8 +1271,41 @@ namespace ZoneEngine.Core
             }
         }
 
-        public void DeleteInventoryItemAction(ICharacter character, CharacterActionMessage message)
+        public bool DeleteInventoryItemAction(ICharacter character, CharacterActionMessage message)
         {
+            if (character == null || message == null || message.Target == null)
+            {
+                return false;
+            }
+
+            IItem existing = null;
+            try
+            {
+                IInventoryPage page;
+                if (character.BaseInventory != null
+                    && character.BaseInventory.Pages.TryGetValue((int)message.Target.Type, out page)
+                    && page != null)
+                {
+                    existing = page[message.Target.Instance];
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            // Client may send DeleteItem when using a CanFlags-consumable template; sacred key stays.
+            if (existing != null
+                && ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(existing.LowID, existing.HighID))
+            {
+                return false;
+            }
+
+            // Parameter1/2 sometimes carry the template ids on client-initiated deletes.
+            if (ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(message.Parameter1, message.Parameter2))
+            {
+                return false;
+            }
+
             ItemDao.Instance.Delete(
                 new
                 {
@@ -1271,6 +1317,7 @@ namespace ZoneEngine.Core
             character.BaseInventory.RemoveItem(
                 (int)message.Target.Type,
                 message.Target.Instance);
+            return true;
         }
 
         public void SplitInventoryItemStackAction(ICharacter character, CharacterActionMessage message)
@@ -1535,35 +1582,112 @@ namespace ZoneEngine.Core
                 return false;
             }
 
-            IItem item =
-                Pool.Instance.GetObject<IInventoryPage>(
-                    new Identity()
-                    {
-                        Type = (IdentityType)client.Controller.Character.Identity.Instance,
-                        Instance = (int)message.Target[0].Type
-                    })[message.Target[0].Instance];
-            client.Controller.Character.Stats[StatIds.secondaryitemtemplate].Value = item.LowID;
+            if (message.Target == null || message.Target.Length < 2)
+            {
+                return false;
+            }
+
+            IInventoryPage sourcePage = null;
+            ICharacter character = client.Controller.Character;
+            if (character.BaseInventory == null
+                || !character.BaseInventory.Pages.TryGetValue((int)message.Target[0].Type, out sourcePage)
+                || sourcePage == null)
+            {
+                sourcePage =
+                    Pool.Instance.GetObject<IInventoryPage>(
+                        new Identity()
+                        {
+                            Type = (IdentityType)character.Identity.Instance,
+                            Instance = (int)message.Target[0].Type
+                        });
+            }
+
+            if (sourcePage == null)
+            {
+                return false;
+            }
+
+            IItem item = sourcePage[message.Target[0].Instance];
+            if (item == null)
+            {
+                return false;
+            }
+
+            character.Stats[StatIds.secondaryitemtemplate].Value = item.LowID;
             //client.Controller.Character.Stats[StatIds.secondaryitemtype]
+            character.DoNotDoTimers = false;
+            try
+            {
+                character.Stats[StatIds.expansion].Value =
+                    character.Stats[StatIds.expansion].Value | 2;
+            }
+            catch
+            {
+            }
+
             if (Pool.Instance.Contains(message.Target[1]))
             {
                 StaticDynel temp =
                     Pool.Instance.GetObject<StaticDynel>(
-                        client.Controller.Character.Playfield.Identity,
+                        character.Playfield.Identity,
                         message.Target[1]);
-                if (temp != null)
+                if (temp == null)
                 {
-                    Event ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnUseItemOn);
-                    if (ev != null)
+                    return false;
+                }
+
+                Event ev = temp.Events.FirstOrDefault(x => x.EventType == EventType.OnUseItemOn);
+                if (ev == null)
+                {
+                    return false;
+                }
+
+                int playfieldId = character.Playfield.Identity.Instance;
+                bool zoneStatueUse =
+                    NascenceStatueTeleportCatalog.IsShadowlandsZonePlayfield(playfieldId)
+                    && message.Target[1].Type == IdentityType.Terminal;
+
+                // Consume insignias used on a Shadowlands zone statue BEFORE the teleport.
+                // Real AO order is DeleteItem → N3Teleport (capture 20260716-using insignia).
+                // The teleport reloads the character's inventory, so consuming afterwards operated on a
+                // stale item reference and never removed the insignia.
+                // Sacred Thrak garden key (226994) is permanent and must NOT be consumed.
+                if (zoneStatueUse
+                    && !ThrakGardenKeyInteractionRules.IsSacredGardenKeyItem(item.LowID, item.HighID))
+                {
+                    Item concreteItem = item as Item;
+                    if (concreteItem != null)
                     {
-                        ev.Perform(client.Controller.Character, temp);
+                        int statueTemplateId = temp.Template != null ? temp.Template.ID : 0;
+                        this.ConsumeInventoryStackItem(
+                            character,
+                            message.Target[0],
+                            concreteItem);
+                        client.Server.Info(
+                            client,
+                            "Shadowlands statue insignia consumed char={0} item={1} statue={2} slot={3}",
+                            character.Identity,
+                            item.LowID,
+                            statueTemplateId,
+                            message.Target[0]);
                     }
                 }
-            }
-            else
-            {
-                client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);
+
+                ev.Perform(character, temp);
+
+                return true;
             }
 
+            // Pool miss: zone-return statues belong to Nascence handler (consume + catalog teleport).
+            if (character.Playfield != null
+                && NascenceStatueTeleportCatalog.IsShadowlandsZonePlayfield(
+                    character.Playfield.Identity.Instance)
+                && message.Target[1].Type == IdentityType.Terminal)
+            {
+                return false;
+            }
+
+            client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);
             return true;
         }
 
@@ -1585,6 +1709,39 @@ namespace ZoneEngine.Core
             IItem itemFrom = sendingPage[fromPlacement];
             if (itemFrom == null)
             {
+                // Client phantom HUD/equipment: slot looks filled client-side but server page is empty.
+                // ACK + UnEquip so the client clears the stuck visual and unequip can proceed.
+                if (sendingPage is WeaponInventoryPage || this.IsAppearanceEquipmentPage(sendingPage))
+                {
+                    IInventoryPage phantomTarget =
+                        this.ResolveMoveTargetPage(character, message.TargetPlacement);
+                    int phantomAck = message.TargetPlacement;
+                    if (phantomTarget != null)
+                    {
+                        int phantomSlot = this.ResolveConcreteTargetSlot(
+                            phantomTarget,
+                            message.TargetPlacement);
+                        if (phantomSlot >= 0)
+                        {
+                            phantomAck = phantomSlot;
+                        }
+                    }
+
+                    UnEquip.Send(client, sendingPage, fromPlacement);
+                    this.SendMoveItemToInventoryAck(
+                        character,
+                        message.SourceContainer,
+                        phantomAck);
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "ClientMoveItemToInventory cleared phantom equip source={0} targetPlacement={1} character={2}",
+                            message.SourceContainer,
+                            message.TargetPlacement,
+                            character.Identity));
+                    return true;
+                }
+
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     string.Format(
@@ -1624,12 +1781,8 @@ namespace ZoneEngine.Core
                     itemFrom.HighID,
                     itemFrom.Quality));
 
-            int ackTargetPlacement = message.TargetPlacement;
-            int toPlacement = message.TargetPlacement;
-            if (toPlacement == (int)IdentityType.TradeWindow)
-            {
-                toPlacement = receivingPage.FindFreeSlot();
-            }
+            int toPlacement = this.ResolveConcreteTargetSlot(receivingPage, message.TargetPlacement);
+            int ackTargetPlacement = toPlacement >= 0 ? toPlacement : message.TargetPlacement;
 
             if (toPlacement < 0)
             {
@@ -1807,11 +1960,7 @@ namespace ZoneEngine.Core
                 return true;
             }
 
-            int toPlacement = message.TargetPlacement;
-            if (toPlacement == (int)IdentityType.TradeWindow)
-            {
-                toPlacement = receivingPage.FindFreeSlot();
-            }
+            int toPlacement = this.ResolveConcreteTargetSlot(receivingPage, message.TargetPlacement);
 
             if (toPlacement < 0)
             {
@@ -1906,7 +2055,12 @@ namespace ZoneEngine.Core
 
         public IInventoryPage ResolveMoveTargetPage(ICharacter character, int targetPlacement)
         {
-            if (targetPlacement == (int)IdentityType.TradeWindow)
+            // Client often sends page-type markers (Inventory=0x68, Overflow=0x6E, 0x6F) instead of
+            // a concrete inventory slot when unequipping HUD/weapons into the bag.
+            if (targetPlacement == (int)IdentityType.TradeWindow
+                || targetPlacement == (int)IdentityType.Inventory
+                || targetPlacement == (int)IdentityType.OverflowWindow
+                || targetPlacement == 0x6F)
             {
                 return character.BaseInventory.Pages[character.BaseInventory.StandardPage];
             }
@@ -1917,8 +2071,52 @@ namespace ZoneEngine.Core
             }
             catch (Exception)
             {
+                // Fallback: treat unknown high placements as "into inventory".
+                if (targetPlacement > 94)
+                {
+                    IInventoryPage inventory;
+                    if (character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventory))
+                    {
+                        return inventory;
+                    }
+                }
+
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Normalize unequip/equip destination when the client sent a page marker or an occupied slot.
+        /// </summary>
+        private int ResolveConcreteTargetSlot(IInventoryPage receivingPage, int requestedPlacement)
+        {
+            if (receivingPage == null)
+            {
+                return -1;
+            }
+
+            bool isPageMarker = requestedPlacement == (int)IdentityType.TradeWindow
+                                || requestedPlacement == (int)IdentityType.Inventory
+                                || requestedPlacement == (int)IdentityType.OverflowWindow
+                                || requestedPlacement == 0x6F
+                                || requestedPlacement < receivingPage.FirstSlotNumber
+                                || requestedPlacement >= receivingPage.FirstSlotNumber + receivingPage.MaxSlots;
+
+            if (!isPageMarker)
+            {
+                try
+                {
+                    if (receivingPage[requestedPlacement] == null)
+                    {
+                        return requestedPlacement;
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            return receivingPage.FindFreeSlot();
         }
 
         private bool CanEquipToPage(ICharacter character, IInventoryPage page, IItem item)

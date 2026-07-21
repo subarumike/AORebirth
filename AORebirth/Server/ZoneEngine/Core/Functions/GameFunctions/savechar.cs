@@ -23,13 +23,19 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
 
     /// <summary>
-    /// Insurance Terminal SaveChar (53032). Capture evidence: 20260714-164349 Borealis Terminal.
-    /// Fee = Rubi-Ka level × 100. Binds death respawn + SavedXP watermark.
+    /// Insurance Terminal SaveChar (53032).
+    /// Capture evidence:
+    /// - 20260714-164349 Borealis Terminal (fee = level × 100)
+    /// - 20260716-141512 Omni-Trade Terminal:C005028F PF655:
+    ///   Cash → "{fee} credits were deducted..." → SocialStatus=12 →
+    ///   "Character stored. {SavedXP} XP saved." → GenericCmd Use ACK
+    /// Unsaved XP → SavedXP watermark; SK → LastSK.
     /// </summary>
     internal class savechar : FunctionPrototype
     {
@@ -75,13 +81,18 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 character,
                 string.Format(CultureInfo.InvariantCulture, "{0} credits were deducted from your account.", fee));
 
-            SendSocialStatus(character, 4);
+            // Live Omni-Trade Insurance: SocialStatus=12.
+            SendSocialStatus(character, 12);
 
             SaveRespawnPoint(character);
-            ApplyInsuranceXpWatermark(character);
-            character.Stats.Write();
 
-            SendFeedback(character, "Character stored. 0 Shadowknowledge saved.");
+            uint savedSk;
+            uint savedXp = CombatXpRuntimeService.ApplyInsuranceTerminalSave(character, out savedSk);
+
+            // Level 201+ (Shadowlevels) earn SK not XP; 220 (max) earns neither. Shared with the
+            // garden save pad so the giant cumulative XP total is never shown to high-level chars.
+            SendFeedback(character, CombatXpRuntimeService.BuildSaveRewardText(level, savedXp, savedSk));
+
             return true;
         }
 
@@ -102,17 +113,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             character.Stats[StatIds.tempsavey].Set((uint)Math.Max(0, saveZ));
             character.Stats[StatIds.insurancepercentage].Set(100);
             character.Stats[StatIds.insurancetime].Set((uint)Math.Max(0, Environment.TickCount));
-        }
-
-        private static void ApplyInsuranceXpWatermark(ICharacter character)
-        {
-            uint cumulativeXp = character.Stats[StatIds.xp].BaseValue;
-            if (cumulativeXp == 1234567890u)
-            {
-                cumulativeXp = 0;
-            }
-
-            character.Stats[StatIds.savedxp].Set(cumulativeXp);
+            character.Stats.Write();
         }
 
         private static void SendSocialStatus(ICharacter character, int value)

@@ -879,6 +879,57 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         /// <summary>
+        /// Capture 20260719-182611 Inspect Equipment: Weapon/Armor/Implant/Social pages only.
+        /// </summary>
+        public static InventorySlot[] BuildEquipmentInspectSlots(ICharacter character)
+        {
+            var inventory = new List<InventorySlot>();
+            if (character == null || character.BaseInventory == null)
+            {
+                return inventory.ToArray();
+            }
+
+            foreach (IInventoryPage ivp in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
+            {
+                if (!IsEquipmentInspectPage(ivp))
+                {
+                    continue;
+                }
+
+                foreach (KeyValuePair<int, IItem> kv in ivp.List())
+                {
+                    if (kv.Value == null)
+                    {
+                        continue;
+                    }
+
+                    inventory.Add(
+                        new InventorySlot
+                        {
+                            Placement = kv.Key,
+                            Flags = GetInventorySlotFlags(kv.Value),
+                            Count = (short)kv.Value.MultipleCount,
+                            Identity = GetInventorySlotIdentity(ivp, kv.Key, kv.Value),
+                            ItemLowId = kv.Value.LowID,
+                            ItemHighId = kv.Value.HighID,
+                            Quality = kv.Value.Quality,
+                            Unknown = kv.Value.Nothing
+                        });
+                }
+            }
+
+            return inventory.ToArray();
+        }
+
+        private static bool IsEquipmentInspectPage(IInventoryPage page)
+        {
+            return page is WeaponInventoryPage
+                   || page is ArmorInventoryPage
+                   || page is ImplantInventoryPage
+                   || page is SocialArmorInventoryPage;
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="client">
         /// </param>
@@ -940,7 +991,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
             }
 
-            if (IsWeaponItem(page, item))
+            if (IsCombatWeaponItem(page, item, placement))
             {
                 return WeaponItemIdentity.GetOrCreate(item);
             }
@@ -969,10 +1020,15 @@ namespace ZoneEngine.Core.MessageHandlers
             return (short)flags;
         }
 
-        private static bool IsWeaponItem(IInventoryPage page, IItem item)
+        private static bool IsCombatWeaponItem(IInventoryPage page, IItem item, int slot)
         {
-            return page is WeaponInventoryPage
-                   || item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
+            // HUD/Util/NCU/Belt on WeaponPage are utilities, not combat weapons.
+            if (page is WeaponInventoryPage)
+            {
+                return slot == (int)WeaponSlots.Righthand || slot == (int)WeaponSlots.LeftHand;
+            }
+
+            return item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
                    || HasWeaponStats(item);
         }
 

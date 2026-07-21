@@ -139,7 +139,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 || (mission.State != MissionLifecycleState.Active
                     && mission.State != MissionLifecycleState.Completed))
             {
-                return true;
+                // Not our quested cargo use — let coordinator emit capture-backed reject.
+                return false;
             }
 
             string observationKey = "terminal-use:" + target.ToString(true);

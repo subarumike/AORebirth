@@ -84,6 +84,11 @@ namespace ZoneEngine.Core.Playfields
 
             bool changed = false;
 
+            if (MongoSlamRuntimeService.ProcessHotTick(dynel))
+            {
+                changed = true;
+            }
+
             StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
 
             int healIntervalSeconds = healInterval.Value;
