@@ -173,13 +173,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
 
                 resolvedCount++;
-                CapturedEnemyCombatPacketFixture fixture = fixtures[profile.ProfileId];
+                CapturedEnemyCombatProfileDefinition selectedProfile =
+                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                        value => value.MatchesKey(
+                                     profile.ResourceId,
+                                     profile.Name,
+                                     profile.MonsterData,
+                                     profile.Level)
+                                 && value.CaptureRuntimeEvidenceSafe
+                                 && value.Evidence == resolved.Evidence
+                                 && value.ContainsSource(resolved.EvidenceSourceIdentity));
+                CapturedEnemyCombatPacketFixture fixture = fixtures[selectedProfile.ProfileId];
                 CapturedEnemySpecialAttackWeaponPacketFixture saw =
                     fixture.SpecialAttackWeaponPackets.FirstOrDefault(
                         value => value.SourceIdentity == resolved.EvidenceSourceIdentity
                                  && value.Unknown5
                                     == resolved.SpecialAttackWeaponUnknown5);
-                Assert.IsNotNull(saw, profile.ProfileId + " resolved SAW evidence");
+                Assert.IsNotNull(saw, selectedProfile.ProfileId + " resolved SAW evidence");
                 Identity source = IdentityOf(saw.SourceType, saw.SourceIdentity);
                 AssertHex(
                     saw.BodyHex,
@@ -190,7 +200,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
                 CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.FirstOrDefault(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
-                Assert.IsNotNull(attack, profile.ProfileId + " resolved Attack evidence");
+                Assert.IsNotNull(attack, selectedProfile.ProfileId + " resolved Attack evidence");
                 AssertHex(
                     attack.BodyHex,
                     CapturedEnemyCombatPacketFactory.CreateAttack(
@@ -208,7 +218,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  && value.Energy
                                     == resolved.WeaponDefinition.InitialEnergy
                                  && value.MultipleCount == capturedMultipleCount);
-                    Assert.IsNotNull(weapon, profile.ProfileId + " resolved WIFU evidence");
+                    Assert.IsNotNull(weapon, selectedProfile.ProfileId + " resolved WIFU evidence");
                     AssertHex(
                         weapon.BodyHex,
                         CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
@@ -238,7 +248,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                          value.Amount));
                     Assert.IsNotNull(
                         attackInfo,
-                        profile.ProfileId + " resolved AttackInfo evidence");
+                        selectedProfile.ProfileId + " resolved AttackInfo evidence");
                     AssertHex(
                         attackInfo.BodyHex,
                         CapturedEnemyCombatPacketFactory.CreateAttackInfo(
