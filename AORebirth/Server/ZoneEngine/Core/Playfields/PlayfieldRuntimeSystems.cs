@@ -124,6 +124,7 @@ namespace ZoneEngine.Core.Playfields
                 new AreteContentModule(),
                 new MontroyalContentModule(),
                 new SubwayContentModule(),
+                new TempleOfThreeWindsContentModule(),
                 new JobePlatformContentModule(),
                 new NascenceCoreContentModule(),
                 new NascenceLifeContentModule(),
