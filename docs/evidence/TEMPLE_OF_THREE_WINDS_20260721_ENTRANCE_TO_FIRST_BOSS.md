@@ -14,15 +14,17 @@ finalized official-live capture folders are:
 - `20260721-033006`
 
 All five captures pass the capture analyzer and NPC lifecycle decoder without a
-recapture or offline-decode requirement. The dungeon resource/playfield binding
-is `647`. The observed `Playfield2:938000` value is a live runtime instance and
-is not used as the server content key.
+recapture or offline-decode requirement. Private-server and official-live
+extended-location evidence establishes resource `1931` as the Temple room
+content binding. PF647 is the preceding transfer/gateway, while the observed
+`Playfield2:938000` value is a live runtime instance and is not used as the
+server content key.
 
 ## Dedicated dungeon boundary
 
 Temple content is owned by
 `CapturedTempleOfThreeWindsContentProvider`. It contributes only `totw.*`
-profiles and spawns for playfield `647`. Existing Subway construction remains
+profiles and spawns for playfield `1931`. Existing Subway construction remains
 owned by its PF127 providers. The common ordinary-enemy catalog and lifecycle
 services are shared infrastructure, not shared dungeon data.
 
@@ -66,7 +68,7 @@ flags, and exact SCFU appearance shape.
   policy uses the existing conservative seven-meter ordinary aggro radius.
 - Observed survivors chased as far as `60.421` world units and returned to
   approximately one unit from their spawn anchors.
-- PF647 has no promoted collision/navigation provider. Temple Cultists use the
+- PF1931 has no promoted collision/navigation provider. Temple Cultists use the
   generic chase owner and do not reuse PF127 Subway collision assumptions.
 
 ## Respawn, loot, and credits
@@ -92,7 +94,7 @@ same-name 74-outcome mapping as an explicit policy.
 
 - The first boss, named NPCs, their drops, and boss-room encounter scripting.
 - Exact automatic and social aggro thresholds.
-- PF647 collision geometry and wall-aware line of sight/navigation.
+- PF1931 collision geometry and wall-aware line of sight/navigation.
 - Exact leash/reset distance and timing beyond the captured chase/return proof.
 - Temple-specific empty, unlooted, and looted corpse lifetimes; the current
   ordinary project defaults remain in use.

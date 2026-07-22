@@ -23,7 +23,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(templeProfiles.All(value => !value.BossOrScripted));
             Assert.AreEqual(7, templeProfiles.Count(value => value.DisplayName == "Cultist"));
             Assert.AreEqual(1, templeProfiles.Count(value => value.DisplayName == "Eternal Sentinel"));
-            Assert.IsTrue(templeSpawns.All(value => value.PlayfieldInstance == 647));
+            Assert.IsTrue(templeSpawns.All(value => value.PlayfieldInstance == 1931));
             Assert.IsTrue(templeSpawns.All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsFalse(templeSpawns.Any(value => value.SpawnKey.Contains("subway")));
 
@@ -32,10 +32,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedSubwayOrdinaryContentProvider(),
                 temple);
             Assert.AreEqual(322, catalog.GetRuntimeSpawns(127).Length);
-            Assert.AreEqual(125, catalog.GetRuntimeSpawns(647).Length);
+            Assert.AreEqual(0, catalog.GetRuntimeSpawns(647).Length);
+            Assert.AreEqual(125, catalog.GetRuntimeSpawns(1931).Length);
             Assert.AreEqual(447, catalog.GetSpawns().Length);
             Assert.IsTrue(catalog.GetRuntimeSpawns(127).All(value => !value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
-            Assert.IsTrue(catalog.GetRuntimeSpawns(647).All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
+            Assert.IsTrue(catalog.GetRuntimeSpawns(1931).All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
         }
 
         [TestMethod]
@@ -193,7 +194,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey,
                 CapturedTempleOfThreeWindsLootDefinitions.BetanyEncounterKey));
             Assert.AreEqual(5, registry.Assignments().Length);
-            Assert.IsTrue(registry.Assignments().All(value => value.PlayfieldId.Value == 647));
+            Assert.IsTrue(registry.Assignments().All(value => value.PlayfieldId.Value == 1931));
 
             Assert.AreEqual(5, CapturedTempleOfThreeWindsLootDefinitions.BuildYatilaLootTable().ObservedCorpseSnapshots[0].Entries.Length);
             Assert.AreEqual(2, CapturedTempleOfThreeWindsLootDefinitions.BuildGulardLootTable().ObservedCorpseSnapshots.Length);

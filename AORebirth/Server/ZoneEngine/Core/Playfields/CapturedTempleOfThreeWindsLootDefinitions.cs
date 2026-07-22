@@ -4,7 +4,7 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedTempleOfThreeWindsLootDefinitions
     {
-        internal const int PlayfieldInstance = 647;
+        internal const int PlayfieldInstance = 1931;
 
         internal const string DefenderProfileKey = "totw.647.boss.defender-of-the-three";
         internal const string DefenderEncounterKey = "totw.647.encounter.defender-of-the-three";

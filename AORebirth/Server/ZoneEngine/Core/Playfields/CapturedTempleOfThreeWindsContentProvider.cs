@@ -7,7 +7,7 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedTempleOfThreeWindsContentProvider
     {
-        internal const int PlayfieldInstance = 647;
+        internal const int PlayfieldInstance = 1931;
         internal const int ExpectedCultistProfileCount = 7;
         internal const int ExpectedCultistSpawnCount = 122;
         internal const int ExpectedProfileCount = 8;

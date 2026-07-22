@@ -1,6 +1,6 @@
 # Temple of Three Winds: Yatila Through Betany
 
-Scope: PF647 capture-backed slice after Defender of the Three. The runtime content in this slice is owned by the Temple module and does not share Subway or ICC encounter definitions.
+Scope: PF1931 capture-backed room slice after Defender of the Three. PF647 is the preceding transfer/gateway. The runtime content in this slice is owned by the Temple module and does not share Subway or ICC encounter definitions.
 
 ## Capture set
 
@@ -40,7 +40,7 @@ Three captured Eternal Sentinel spawns are active:
 - L20, HP 280 at `(89.83454, 11.4112511, 306.880341)`.
 - L18, HP 247 at `(59.7886162, 13.16832, 283.302765)`.
 
-They use the exact MD 41690 / mesh 81804 / CATMesh 41664 profile, captured 17-18 normal damage, and captured empty-loot evidence. The existing PF647 ordinary 300-second post-NPC-despawn policy is reused and remains policy rather than a new respawn claim.
+They use the exact MD 41690 / mesh 81804 / CATMesh 41664 profile, captured 17-18 normal damage, and captured empty-loot evidence. The existing PF1931 ordinary 300-second post-NPC-despawn policy is reused and remains policy rather than a new respawn claim.
 
 ## Deliberately unresolved
 
