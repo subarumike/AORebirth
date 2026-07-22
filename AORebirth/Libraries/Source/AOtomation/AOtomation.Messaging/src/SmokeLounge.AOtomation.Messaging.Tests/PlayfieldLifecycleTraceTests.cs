@@ -1775,6 +1775,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void TempleContentModuleActivatesCapturedNpcSpawnsOnlyForPf1931()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string moduleText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\TempleOfThreeWindsContentModule.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+
+            Assert.IsTrue(
+                moduleText.Contains("public sealed class TempleOfThreeWindsContentModule : IPlayfieldContentModule"));
+            Assert.IsTrue(
+                moduleText.Contains("private const int TempleOfThreeWindsPlayfieldInstance = 1931"));
+            Assert.IsTrue(moduleText.Contains("registration.RegisterCapturedNpcSpawns();"));
+            Assert.IsTrue(
+                moduleText.Contains("return false;"),
+                "Temple content activation must not suppress unrelated DB mob spawns.");
+            Assert.IsFalse(
+                moduleText.Contains("647"),
+                "PF647 is the Temple gateway and must not activate PF1931 dungeon content.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(runtimeSystemsText, "new TempleOfThreeWindsContentModule()"),
+                "PlayfieldRuntimeSystems must register the Temple content module exactly once.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\Content\TempleOfThreeWindsContentModule.cs"),
+                "ZoneEngine must compile the Temple content module.");
+        }
+
+        [TestMethod]
         public void SubwayExistingPopulationAndPatrolReplayRemainLoaded()
         {
             string repositoryRoot = FindRepositoryRoot();
@@ -4719,6 +4752,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "AreteContentModule",
                     "MontroyalContentModule",
                     "SubwayContentModule",
+                    "TempleOfThreeWindsContentModule",
                     "PrivateCityContentModule"
                 };
 

@@ -4,6 +4,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- PF1931 Temple content now has a dedicated `TempleOfThreeWindsContentModule`.
+  Live ZoneEngine evidence showed a player entering playfield `1931` while the
+  content coordinator registered captured NPC startup only for Subway PF127;
+  consequently the validated Temple catalogs and named encounters never reached
+  their activation path. PF1931 now invokes the shared captured-NPC startup
+  boundary, while PF647 remains gateway-only. Private-client population
+  visibility after the rebuilt engine restart remains the final live check.
+
 - Murial the Faithful is active in the PF1931 Temple ordinary provider from
   identity-linked captures `20260721-232051` and `20260721-234614`. His exact
   L34/1,535-health SCFU, appearance, 26-point melee stream, CATMesh `5927`, and
