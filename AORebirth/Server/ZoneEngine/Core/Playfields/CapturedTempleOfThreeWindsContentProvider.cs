@@ -9,9 +9,9 @@ namespace AORebirth.Core.Playfields
     {
         internal const int PlayfieldInstance = 1931;
         internal const int ExpectedCultistProfileCount = 7;
-        internal const int ExpectedCultistSpawnCount = 122;
+        internal const int ExpectedCultistSpawnCount = 144;
         internal const int ExpectedProfileCount = 8;
-        internal const int ExpectedSpawnCount = 125;
+        internal const int ExpectedSpawnCount = 147;
         internal const double CapturedDeathToRespawnSeconds = 310.0;
         internal const double RuntimeRespawnAfterNpcDespawnSeconds = 300.0;
         internal const double PolicyAutomaticAggroRadius = 7.0;
@@ -235,7 +235,29 @@ namespace AORebirth.Core.Playfields
             new SpawnSeed(0x7984B3D9, "totw.cultist.26147", 34, 1535, 0, 102, 234, 224.826416f, 31.011248f, 259.7224f, 0f, 0.983969f, 0f, 0.178342f, 0x020A4ACBu, null, null, null, "20260721-033006"),
             new SpawnSeed(0x7984B3DF, "totw.cultist.26135", 26, 943, 0, 101, 179, 215.4928f, 31.011248f, 267.682159f, 0f, 0.992772f, 0f, 0.120012f, 0x020A4ACBu, null, null, null, "20260721-033006"),
             new SpawnSeed(0x7984B3E0, "totw.cultist.26082", 32, 1387, 0, 102, 220, 235.172958f, 31.011251f, 250.139069f, 0f, 0.996917f, 0f, 0.078459f, 0x022A4ACBu, null, null, null, "20260721-033006"),
-            new SpawnSeed(0x7984B3E2, "totw.cultist.26147", 31, 1313, 0, 102, 213, 123.0731f, 31.011248f, 258.01f, 0f, -0.999334f, 0f, 0.036483f, 0x020A4ACBu, null, null, null, "20260721-033006")
+            new SpawnSeed(0x7984B3E2, "totw.cultist.26147", 31, 1313, 0, 102, 213, 123.0731f, 31.011248f, 258.01f, 0f, -0.999334f, 0f, 0.036483f, 0x020A4ACBu, null, null, null, "20260721-033006"),
+            new SpawnSeed(0x79872FF8, "totw.cultist.26103", 35, 1609, 0, 102, 241, 277.759766f, 13.0112505f, 419.312653f, 0f, -0.235538915f, 0f, 0.9718649f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853117, "totw.cultist.26137", 30, 1239, 0, 101, 207, 294.619049f, 13.0112486f, 420.059723f, 0f, 0.495895177f, 0f, -0.8683823f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x798537AE, "totw.cultist.26137", 34, 1535, 0, 102, 235, 262.548645f, 13.0112486f, 420.299744f, 0f, -0.6943271f, 0f, 0.719659567f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985316C, "totw.cultist.26137", 31, 1313, 0, 102, 214, 255.822342f, 13.01125f, 420.540833f, 0f, 0.3972707f, 0f, 0.9177015f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853114, "totw.cultist.26137", 33, 1461, 0, 102, 228, 287.086426f, 13.0112486f, 421.421326f, 0f, -0.492755979f, 0f, 0.870167553f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872FF6, "totw.cultist.26103", 35, 1609, 0, 102, 241, 276.220032f, 13.611248f, 422.302643f, 0f, 0.137652934f, 0f, -0.990480661f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853113, "totw.cultist.26082", 31, 1313, 0, 102, 214, 287.152863f, 13.611248f, 428.220673f, 0f, 0.539935768f, 0f, 0.8417061f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x798537A2, "totw.cultist.26082", 35, 1609, 0, 102, 241, 262.945557f, 13.61125f, 429.4401f, 0f, -0.958094537f, 0f, 0.286452144f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985316D, "totw.cultist.26082", 35, 1609, 0, 102, 241, 254.66925f, 13.61125f, 429.587067f, 0f, -0.6924637f, 0f, -0.721452832f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853112, "totw.cultist.26082", 32, 1387, 0, 102, 221, 295.30304f, 13.6112509f, 429.75824f, 0f, 0.234202445f, 0f, 0.9721879f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985311C, "totw.cultist.26135", 33, 1461, 0, 102, 228, 294.89502f, 14.2112474f, 436.322937f, 0f, -0.896634161f, 0f, 0.442771882f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EE29, "totw.cultist.26135", 35, 1609, 0, 102, 241, 287.561737f, 14.2112474f, 437.217072f, 0f, 0.9344767f, 0f, 0.356024384f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853173, "totw.cultist.26135", 32, 1387, 0, 102, 221, 262.896973f, 14.21125f, 437.424042f, 0f, -0.8354441f, 0f, 0.549575448f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853171, "totw.cultist.26135", 32, 1387, 0, 102, 221, 254.702057f, 14.21125f, 437.480072f, 0f, 0.819409f, 0f, 0.573209465f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872BFA, "totw.cultist.26074", 35, 1609, 0, 102, 241, 315.4626f, 14.8112507f, 455.269684f, 0f, -0.441970348f, 0f, 0.8970295f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872BFD, "totw.cultist.26074", 31, 1313, 0, 102, 214, 316.699829f, 14.8112478f, 455.793945f, 0f, -0.3131113f, 0f, 0.9497163f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872FE9, "totw.cultist.26074", 33, 1461, 0, 102, 228, 231.665878f, 14.8112507f, 455.814026f, 0f, 0.565479636f, 0f, 0.8247623f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872FE7, "totw.cultist.26074", 30, 1239, 0, 101, 207, 232.771423f, 14.8112478f, 456.466858f, 0f, 0.4041237f, 0f, 0.914704263f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872BFB, "totw.cultist.26147", 32, 1387, 0, 102, 221, 296.812653f, 14.8112478f, 461.4856f, 0f, 0.9871818f, 0f, -0.159603521f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EE30, "totw.cultist.26147", 35, 1609, 0, 102, 241, 298.160858f, 14.8112478f, 462.1114f, 0f, -0.980698645f, 0f, 0.195519745f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EC38, "totw.cultist.26147", 30, 1239, 0, 101, 207, 253.299545f, 14.8112507f, 462.163544f, 0f, 0.9830487f, 0f, 0.183342665f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EC35, "totw.cultist.26147", 34, 1535, 0, 102, 235, 254.258942f, 14.8112507f, 462.420776f, 0f, -0.9902503f, 0f, -0.139300823f, 0x020A4ACBu, null, null, null, "20260721-230426")
         };
 
         internal OrdinaryEnemyProfile[] GetProfiles()

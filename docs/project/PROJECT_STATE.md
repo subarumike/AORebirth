@@ -4,6 +4,19 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Guardian of Tomorrow and Gartua the Doorkeeper are active PF1931 Temple bosses.
+  Captures `20260721-230426` and `20260721-230824` provide exact SCFUs, combat,
+  corpses, and atomic loot snapshots. Mike's measured ten-minute respawns are
+  represented by the named-Temple 600-second post-NPC-despawn policy; Guardian
+  keeps a 1,800-second unlooted corpse and Gartua keeps 120 seconds. Gartua's
+  nano `205590` preserves its observed self-targeting without inventing its
+  downstream stat effect. The same room evidence adds 22 exact Cultist anchors,
+  bringing PF1931 ordinary content to eight profiles / `147` anchors. Capture
+  `20260721-231151` corroborates the 300-second post-NPC-despawn ordinary respawn
+  policy with three approximately 310-second death-to-replacement chains.
+  Uklesh and the remaining named main-room actors remain evidence-only. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_GUARDIAN_GARTUA_MAIN_ROOM.md`.
+
 - The Curator and Nematet the Custodian of Time are active as the next PF1931
   Temple named encounters. Finalized capture `20260721-052115` supplies their
   exact SCFU appearance shapes; new fights `20260721-225404` and
@@ -22,7 +35,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   atomic loot snapshots. The Re-Animator uses its exact level-60 generation;
   nano `205604` refills one of two captured Reanimated Corpse slots and living
   encounter adds are cleaned up with the boss. Three exact Eternal Sentinel
-  room spawns bring PF1931 ordinary content to eight profiles / `125` anchors.
+  room spawns were the first extension of PF1931 ordinary content.
   The reported 23-point poison row and Gulard health changes remain effect-
   unresolved because packet ownership is not safe. The broader
   `20260721-052115` survey is evidence-only and does not activate deeper bosses.
@@ -45,7 +58,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 - Temple of Three Winds construction has begun as a dedicated PF1931 room module,
   separate from Subway PF127 content. Five finalized entrance-to-first-boss-room
-  captures contribute seven exact regular-Cultist profiles and `122` spawn
+  captures plus the main-room SCFUs contribute seven exact regular-Cultist profiles and `144` spawn
   anchors, including `16` two-point patrols. Combat uses the observed `15..32`
   normal envelope and `4.635295`-second median; automatic aggression uses an
   explicit conservative seven-meter policy while chase/return is capture-backed.
