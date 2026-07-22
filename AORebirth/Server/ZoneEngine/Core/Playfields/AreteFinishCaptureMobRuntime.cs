@@ -145,6 +145,14 @@ namespace ZoneEngine.Core.Playfields
             }
 
             mob.Coordinates(new Coordinate { x = x, y = y, z = z });
+            string combatFailure;
+            CapturedEnemyCombatRuntime.Prepare(
+                mob,
+                controller,
+                CapturedEnemyCombatContract.Unresolved(
+                    "20260721-finish Engineer Automaton I 0x7985CD86 has no source-local WIFU/attack-start/AttackInfo contract mapped",
+                    true),
+                out combatFailure);
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);

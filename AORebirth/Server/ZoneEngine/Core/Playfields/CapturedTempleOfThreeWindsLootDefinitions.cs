@@ -4,7 +4,7 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedTempleOfThreeWindsLootDefinitions
     {
-        internal const int PlayfieldInstance = 647;
+        internal const int PlayfieldInstance = 1931;
 
         internal const string DefenderProfileKey = "totw.647.boss.defender-of-the-three";
         internal const string DefenderEncounterKey = "totw.647.encounter.defender-of-the-three";
@@ -16,6 +16,14 @@ namespace AORebirth.Core.Playfields
         internal const string ReAnimatorEncounterKey = "totw.647.encounter.the-re-animator";
         internal const string BetanyProfileKey = "totw.647.named.acolyte-betany";
         internal const string BetanyEncounterKey = "totw.647.encounter.acolyte-betany";
+        internal const string CuratorProfileKey = "totw.647.boss.the-curator";
+        internal const string CuratorEncounterKey = "totw.647.encounter.the-curator";
+        internal const string NematetProfileKey = "totw.647.boss.nematet-the-custodian-of-time";
+        internal const string NematetEncounterKey = "totw.647.encounter.nematet-the-custodian-of-time";
+        internal const string GuardianProfileKey = "totw.1931.boss.guardian-of-tomorrow";
+        internal const string GuardianEncounterKey = "totw.1931.encounter.guardian-of-tomorrow";
+        internal const string GartuaProfileKey = "totw.1931.boss.gartua-the-doorkeeper";
+        internal const string GartuaEncounterKey = "totw.1931.encounter.gartua-the-doorkeeper";
 
         internal const int DefenderCredits = 1450;
         internal const int DefenderFirstItem = 204750;
@@ -37,6 +45,19 @@ namespace AORebirth.Core.Playfields
         private const string BetanyEvidence =
             "official-live capture 20260721-044256: exact Acolyte Betany corpse snapshot with "
             + "634 credits, 291082/291083 QL32 x50, 291043/291044 QL32 x25, and 204572 QL1 x1";
+        private const string CuratorEvidence =
+            "official-live capture 20260721-225404: exact The Curator corpse snapshot with "
+            + "377 credits and 287143 QL200, 204758 QL1, and 204651 QL1, all x1";
+        private const string NematetEvidence =
+            "official-live capture 20260721-225743: exact Nematet the Custodian of Time corpse "
+            + "snapshot with 2711 credits and 287143 QL200, 204651 QL1, 204706 QL1, and "
+            + "204595 QL1, all x1";
+        private const string GuardianEvidence =
+            "official-live capture 20260721-230426: exact Guardian of Tomorrow corpse snapshot "
+            + "with 2830 credits and 287143 QL200, 204596 QL1, 204756 QL1, and 204601 QL1, all x1";
+        private const string GartuaEvidence =
+            "official-live capture 20260721-230824: exact Gartua the Doorkeeper corpse snapshot "
+            + "with 1592 credits and 204650 QL1 plus 204598 QL1, both x1";
 
         internal static bool TryRegister(
             LootTableRegistry registry,
@@ -71,6 +92,22 @@ namespace AORebirth.Core.Playfields
                 case BetanyProfileKey:
                     table = BuildBetanyLootTable();
                     evidence = BetanyEvidence;
+                    break;
+                case CuratorProfileKey:
+                    table = BuildCuratorLootTable();
+                    evidence = CuratorEvidence;
+                    break;
+                case NematetProfileKey:
+                    table = BuildNematetLootTable();
+                    evidence = NematetEvidence;
+                    break;
+                case GuardianProfileKey:
+                    table = BuildGuardianLootTable();
+                    evidence = GuardianEvidence;
+                    break;
+                case GartuaProfileKey:
+                    table = BuildGartuaLootTable();
+                    evidence = GartuaEvidence;
                     break;
                 default:
                     return false;
@@ -186,6 +223,71 @@ namespace AORebirth.Core.Playfields
                     Entry(key, 291082, 291083, 32, 50, BetanyEvidence),
                     Entry(key, 291043, 291044, 32, 25, BetanyEvidence),
                     Entry(key, 204572, 204572, 1, 1, BetanyEvidence)));
+        }
+
+        internal static LootTableDefinition BuildCuratorLootTable()
+        {
+            const string key = "capture.20260721-225404.curator";
+            return Table(
+                CuratorProfileKey,
+                "The Curator captured corpse snapshot",
+                CuratorEvidence,
+                Snapshot(
+                    key,
+                    377,
+                    CuratorEvidence,
+                    Entry(key, 287143, 287143, 200, 1, CuratorEvidence),
+                    Entry(key, 204758, 204758, 1, 1, CuratorEvidence),
+                    Entry(key, 204651, 204651, 1, 1, CuratorEvidence)));
+        }
+
+        internal static LootTableDefinition BuildNematetLootTable()
+        {
+            const string key = "capture.20260721-225743.nematet";
+            return Table(
+                NematetProfileKey,
+                "Nematet the Custodian of Time captured corpse snapshot",
+                NematetEvidence,
+                Snapshot(
+                    key,
+                    2711,
+                    NematetEvidence,
+                    Entry(key, 287143, 287143, 200, 1, NematetEvidence),
+                    Entry(key, 204651, 204651, 1, 1, NematetEvidence),
+                    Entry(key, 204706, 204706, 1, 1, NematetEvidence),
+                    Entry(key, 204595, 204595, 1, 1, NematetEvidence)));
+        }
+
+        internal static LootTableDefinition BuildGuardianLootTable()
+        {
+            const string key = "capture.20260721-230426.guardian";
+            return Table(
+                GuardianProfileKey,
+                "Guardian of Tomorrow captured corpse snapshot",
+                GuardianEvidence,
+                Snapshot(
+                    key,
+                    2830,
+                    GuardianEvidence,
+                    Entry(key, 287143, 287143, 200, 1, GuardianEvidence),
+                    Entry(key, 204596, 204596, 1, 1, GuardianEvidence),
+                    Entry(key, 204756, 204756, 1, 1, GuardianEvidence),
+                    Entry(key, 204601, 204601, 1, 1, GuardianEvidence)));
+        }
+
+        internal static LootTableDefinition BuildGartuaLootTable()
+        {
+            const string key = "capture.20260721-230824.gartua";
+            return Table(
+                GartuaProfileKey,
+                "Gartua the Doorkeeper captured corpse snapshot",
+                GartuaEvidence,
+                Snapshot(
+                    key,
+                    1592,
+                    GartuaEvidence,
+                    Entry(key, 204650, 204650, 1, 1, GartuaEvidence),
+                    Entry(key, 204598, 204598, 1, 1, GartuaEvidence)));
         }
 
         private static LootTableDefinition Table(

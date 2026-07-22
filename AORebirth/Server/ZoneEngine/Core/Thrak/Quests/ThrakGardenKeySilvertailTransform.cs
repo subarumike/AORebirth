@@ -162,6 +162,14 @@ namespace ZoneEngine.Core.Thrak.Quests
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)CursedVisualFlags);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterscale, (uint)CursedScale);
             mob.Coordinates(position);
+            string combatFailure;
+            CapturedEnemyCombatRuntime.Prepare(
+                mob,
+                npcController,
+                CapturedEnemyCombatContract.Unresolved(
+                    "20260718-185306 Cursed Silvertail has no source-local WIFU/attack-start/AttackInfo contract mapped",
+                    true),
+                out combatFailure);
             mob.DoNotDoTimers = false;
 
             playfield.ActivateNpc(mob);

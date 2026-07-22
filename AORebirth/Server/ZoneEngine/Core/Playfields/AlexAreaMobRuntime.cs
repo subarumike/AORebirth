@@ -480,7 +480,13 @@ namespace ZoneEngine.Core.Playfields
                 2.0,
                 1,
                 0,
-                1279612721);
+                1279612721,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
             // FixedAttackOnSight sets Aggressive; restore capture AI (Passive except fleas).

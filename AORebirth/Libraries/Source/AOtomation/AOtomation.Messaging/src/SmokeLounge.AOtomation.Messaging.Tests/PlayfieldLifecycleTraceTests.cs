@@ -286,6 +286,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string npcCombatTickText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string capturedPacketFactoryText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string clientConnectedText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
 
@@ -301,9 +303,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 playfieldText.Contains("new AttackInfoMessage")
                 && playfieldText.Contains("Unknown = 0,")
-                && npcCombatTickText.Contains("new AttackInfoMessage")
-                && npcCombatTickText.Contains("Unknown = 0,"),
-                "Player and NPC AttackInfo packets must use the live-captured base Unknown=0 shape.");
+                && capturedPacketFactoryText.Contains("return new AttackInfoMessage")
+                && capturedPacketFactoryText.Contains("Unknown = n3Unknown,")
+                && npcCombatTickText.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo(")
+                && npcCombatTickText.Contains("attackSource.AttackInfoN3Unknown"),
+                "Player AttackInfo must retain Unknown=0 while capture-backed NPC AttackInfo preserves the exact captured N3 byte through the shared packet factory.");
+            Assert.IsFalse(
+                npcCombatTickText.Contains("SendIncomingHitChatIfPlayer")
+                || npcCombatTickText.Contains(" hit you for "),
+                "NPC damage must not emit a second synthetic incoming-hit chat line beside the captured combat packet.");
             Assert.IsTrue(
                 npcCombatTickText.Contains("NpcCombatAttackRules.DefaultCombatTickSeconds")
                 && npcCombatTickText.Contains("now + TimeSpan.FromSeconds(initialDelaySeconds)")
@@ -402,20 +410,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 contractText.Contains("case 26092:")
-                && contractText.Contains("HasCapturedAttackStartContext = true")
-                && contractText.Contains("HasCapturedEquippedAttackInfo = true")
-                && contractText.Contains("HasCapturedCombatStopSequence = true")
-                && contractText.Contains("SendStopFightOnDeath = sendStopFightOnDeath")
-                && contractText.Contains("ApplyCapturedEquippedAttackDisplayStats(character, weapon)")
-                && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.defaultattacktype)")
-                && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.damagetype)")
-                && contractText.Contains("ApplyWeaponStatIfPresent(character, weapon, StatIds.weapontype)")
+                && contractText.Contains("if (level != 5)")
+                && contractText.Contains("EquippedWeaponWithCapturedPacketSequence(")
+                && contractText.Contains("unchecked((int)0x795B5DB2u)")
+                && contractText.Contains(".WithCapturedWeapon(ThiefCapturedWeaponDefinition(thiefEvidence))")
                 && contractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
                 && contractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
                 && contractText.Contains("CapturedSubwayThiefAttackInfoUnknown")
-                && contractText.Contains("CapturedSubwayThiefWeaponDamageMinimumOverride")
-                && contractText.Contains("CapturedSubwayThiefWeaponDamageMaximumOverride"),
-                "MonsterData 26092 must retain the live-derived Thief attack contract and captured weapon display stats while using the equipped weapon roll for damage.");
+                && contractText.Contains("CapturedSubwayThiefSpecialAttackWeaponUnknown5"),
+                "MonsterData 26092 must retain its exact level-5, source-owned packet contract and captured weapon definition while using the equipped weapon roll for damage.");
 
             Assert.IsTrue(
                 coordinatorText.Contains("pendingCapturedAttackStarts")
@@ -486,6 +489,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string capturedPacketFactoryText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
             string catalogText = File.ReadAllText(
@@ -496,8 +501,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 coordinatorText.Contains("this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);")
                 && coordinatorText.Contains("private void AnnounceCapturedSpecialAttackSequenceContext(")
                 && coordinatorText.Contains("CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence)")
-                && coordinatorText.Contains("Specials = new SpecialAttack[0]")
-                && coordinatorText.Contains("Unknown = 0,")
+                && coordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(")
+                && coordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateAttack(")
+                && coordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo(")
+                && capturedPacketFactoryText.Contains("Specials = (definitions ?? new CapturedEnemySpecialAttackDefinition[0]).Select(")
+                && capturedPacketFactoryText.Contains("Unknown = n3Unknown,")
                 && coordinatorText.Contains("pendingCapturedMovementTransitions")
                 && coordinatorText.Contains("capturedContract.MovementTransitionDelaySeconds")
                 && coordinatorText.Contains("hasCapturedEquippedAttackInfo")
@@ -510,7 +518,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);",
                 StringComparison.Ordinal);
             int poisonContextIndex = coordinatorText.IndexOf(
-                "CreateCapturedSpecialAttacks(specialAttackSequence.SpecialAttacks)",
+                "CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(",
                 StringComparison.Ordinal);
             int attackInfoIndex = coordinatorText.IndexOf(
                 "this.AnnounceCombatDamage(",
@@ -539,8 +547,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 providerText,
                 "private static CapturedSubwaySpawnDefinition FilthFlea");
             Assert.IsTrue(
-                filthFleaFactory.Contains("respawnDelaySeconds: 240.0"),
-                "Filth Flea must retain the captured four-minute post-despawn respawn schedule.");
+                !filthFleaFactory.Contains("respawnDelaySeconds:")
+                && catalogText.Contains("SubwayOrdinaryRespawnSeconds = 240.0")
+                && catalogText.Contains("SubwayOrdinaryRespawnPolicy()")
+                && catalogText.Contains("WorldRespawnPolicyAssignment.Inherit("),
+                "Filth Flea must inherit the shared captured four-minute Subway respawn schedule.");
             Assert.IsTrue(
                 catalogText.Contains("bool preserveFilthFleaFallback = monsterData == 17657;")
                 && catalogText.Contains("preserveFilthFleaFallback ? 23 : (int?)null")
@@ -1775,6 +1786,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void TempleContentModuleActivatesCapturedNpcSpawnsOnlyForPf1931()
+        {
+            string repositoryRoot = FindRepositoryRoot();
+            string moduleText = File.ReadAllText(
+                Path.Combine(
+                    repositoryRoot,
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\TempleOfThreeWindsContentModule.cs"));
+            string runtimeSystemsText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
+            string projectText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+
+            Assert.IsTrue(
+                moduleText.Contains("public sealed class TempleOfThreeWindsContentModule : IPlayfieldContentModule"));
+            Assert.IsTrue(
+                moduleText.Contains("private const int TempleOfThreeWindsPlayfieldInstance = 1931"));
+            Assert.IsTrue(moduleText.Contains("registration.RegisterCapturedNpcSpawns();"));
+            Assert.IsTrue(
+                moduleText.Contains("return false;"),
+                "Temple content activation must not suppress unrelated DB mob spawns.");
+            Assert.IsFalse(
+                moduleText.Contains("647"),
+                "PF647 is the Temple gateway and must not activate PF1931 dungeon content.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(runtimeSystemsText, "new TempleOfThreeWindsContentModule()"),
+                "PlayfieldRuntimeSystems must register the Temple content module exactly once.");
+            Assert.IsTrue(
+                projectText.Contains(@"Core\Playfields\Content\TempleOfThreeWindsContentModule.cs"),
+                "ZoneEngine must compile the Temple content module.");
+        }
+
+        [TestMethod]
         public void SubwayExistingPopulationAndPatrolReplayRemainLoaded()
         {
             string repositoryRoot = FindRepositoryRoot();
@@ -2111,12 +2155,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(archetype)")
                 && combatContractText.Contains("internal static CapturedEnemyCombatContract ForOrdinary(")
-                && combatContractText.Contains("if (combat == null || !combat.Observed)")
-                && combatContractText.Contains("return CapturedEnemyCombatContract.FixedAttack(")
-                && combatContractText.Contains("combat.MinDamage")
-                && combatContractText.Contains("combat.MaxDamage")
-                && combatContractText.Contains("combat.RechargeSeconds"),
-                "Ordinary combat must use the shared captured contract and fail closed when AttackInfo is unobserved.");
+                && catalogText.Contains("CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)")
+                && catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(")
+                && catalogText.Contains("No coherent same-capture Subway attack chain for source")
+                && combatContractText.Contains("case CapturedEnemyAttackModel.FixedAttackInfo:")
+                && combatContractText.Contains("return false;")
+                && combatContractText.Contains("this.EvidenceSourceIdentity > 0")
+                && combatContractText.Contains("this.WeaponDefinition != null"),
+                "Ordinary combat must resolve by exact source identity and fail closed unless one coherent captured packet chain owns the complete combat presentation.");
             Assert.IsTrue(
                 catalogText.Contains("DropGroupHash = \"ordinary-enemy-profile\"")
                 && globalLootText.Contains("EnsureOrdinary"),
@@ -2170,7 +2216,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && !orchestratorText.Contains("30379")
                 && orchestratorText.Contains("ApplyStats(character, variant, profile);")
                 && catalogText.Contains("BloodcreeperAutomaticAggroRadius = 7.0")
-                && catalogText.Contains("RespawnPolicyKey = \"ordinary.bloodcreeper.240\"")
+                && catalogText.Contains("new OrdinaryEnemySpawnPolicyConfiguration(")
+                && catalogText.Contains("SubwayOrdinaryRespawnPolicy()")
+                && catalogText.Contains("WorldRespawnPolicyAssignment.Inherit(")
+                && !catalogText.Contains("ordinary.bloodcreeper.240")
                 && catalogText.Contains("OrdinaryEnemyEvidenceState.Policy")
                 && profileText.Contains("this.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy")
                 && populationText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
@@ -2505,6 +2554,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
             string movementCoordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string capturedPacketFactoryText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string movementRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
             string ordinaryProfileText = File.ReadAllText(
@@ -2785,7 +2836,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && combatContractText.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence(")
                 && attackRulesText.Contains("CapturedSubwayFilthFleaMonsterData = 17657")
                 && movementCoordinatorText.Contains("AnnounceCapturedSpecialAttackSequenceContext(")
-                && movementCoordinatorText.Contains("CreateCapturedSpecialAttacks(")
+                && movementCoordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(")
+                && capturedPacketFactoryText.Contains("Specials = (definitions ?? new CapturedEnemySpecialAttackDefinition[0]).Select(")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && catalogText.Contains("source.MonsterData == 17657")
@@ -2931,7 +2983,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .Where(value => value.ProfileKey == infectedAttendant.ProfileKey)
                 .ToArray();
             Assert.AreEqual(5, infectedAttendantSpawns.Length);
-            Assert.IsTrue(infectedAttendant.Combat.Contract.IsCombatReady);
+            Assert.IsFalse(infectedAttendant.Combat.Contract.IsCombatReady);
+            Assert.IsTrue(infectedAttendant.Combat.Contract.IsQuarantined);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(
+                infectedAttendant.Combat.Contract.QuarantineReason));
             Assert.AreEqual(
                 CapturedEnemyAttackModel.FixedAttackInfo,
                 infectedAttendant.Combat.Contract.AttackModel);
@@ -3131,23 +3186,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CapturedEnemyCombatContract contract = workmanStriker.Combat.ResolveContract(
                         spawn.SourceIdentity,
                         variant);
-                    Assert.AreEqual(
-                        CapturedEnemyAttackModel.EquippedWeapon,
-                        contract.AttackModel,
+                    Assert.IsFalse(contract.IsCombatReady, contract.Evidence);
+                    Assert.IsTrue(contract.IsQuarantined, contract.Evidence);
+                    Assert.IsFalse(
+                        string.IsNullOrWhiteSpace(contract.QuarantineReason),
                         contract.Evidence);
-                    Assert.IsTrue(contract.IsCombatReady);
-                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
-                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
-                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
-                    Assert.AreEqual(6, contract.WeaponInventorySlot);
-                    Assert.AreEqual(0, contract.MinDamage);
-                    Assert.AreEqual(0, contract.MaxDamage);
-                    Assert.AreEqual(0.0, contract.RechargeSeconds);
-                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
-                    Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
-                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
-                    Assert.AreEqual(0, contract.AttackInfoUnknown);
-                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
                 }
             }
 
@@ -3196,12 +3239,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, looter.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 looterSpawns.All(
-                    value => looter.Combat.ResolveContract(
-                            value.SourceIdentity,
-                            value.Level).AttackModel
-                        == CapturedEnemyAttackModel.EquippedWeapon)
+                    value =>
+                        {
+                            CapturedEnemyCombatContract contract =
+                                looter.Combat.ResolveContract(
+                                    value.SourceIdentity,
+                                    value.Level);
+                            return !contract.IsCombatReady
+                                   && contract.IsQuarantined
+                                   && !string.IsNullOrWhiteSpace(contract.QuarantineReason);
+                        })
                 && CountOccurrences(ordinaryProviderText, ", 203745, 17870,") == 11
-                && catalogText.Contains("archetype.MonsterData == LooterMonsterData")
+                && catalogText.Contains("CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)")
                 && looterCombatContract.Contains("ForSourceSpecificWeaponArchetype")
                 && ordinaryCombatContract.Contains("aggregate weapon fallback is forbidden")
                 && sourceSpecificWeaponCombatContract.Contains("if (matches != 1 || matched == null)")
@@ -3268,24 +3317,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemyCombatContract contract = mugger.Combat.ResolveContract(
                     spawn.SourceIdentity,
                     spawn.Level);
-                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
-                Assert.IsTrue(contract.IsCombatReady);
-                Assert.IsTrue(contract.RequiresDamageLineOfSight);
-                Assert.AreEqual(121567, contract.WeaponLowId);
-                Assert.AreEqual(121567, contract.WeaponHighId);
-                Assert.AreEqual(1, contract.WeaponQuality);
-                Assert.AreEqual(6, contract.WeaponInventorySlot);
-                Assert.AreEqual(0, contract.MinDamage);
-                Assert.AreEqual(0, contract.MaxDamage);
-                Assert.AreEqual(0.0, contract.RechargeSeconds);
-                Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
-                Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
-                Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
-                Assert.AreEqual(0, contract.AttackInfoUnknown);
-                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
-                Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
-                Assert.IsFalse(contract.HasCapturedAttackStartContext);
-                Assert.IsFalse(contract.HasCapturedCombatStopSequence);
+                Assert.IsFalse(contract.IsCombatReady, contract.Evidence);
+                Assert.IsTrue(contract.IsQuarantined, contract.Evidence);
+                Assert.IsFalse(
+                    string.IsNullOrWhiteSpace(contract.QuarantineReason),
+                    contract.Evidence);
             }
             Assert.AreEqual(
                 CapturedEnemyAttackModel.Unresolved,
@@ -3394,7 +3430,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, derangedShopper.Combat.Contract.AttackModel);
             Assert.IsFalse(derangedShopper.Combat.Contract.IsCombatReady);
             Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, derangedShopperContract.AttackModel);
-            Assert.IsTrue(derangedShopperContract.IsCombatReady);
+            Assert.IsFalse(derangedShopperContract.IsCombatReady);
+            Assert.IsTrue(derangedShopperContract.IsQuarantined);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(
+                derangedShopperContract.QuarantineReason));
             Assert.AreEqual(125454, derangedShopperContract.WeaponLowId);
             Assert.AreEqual(125455, derangedShopperContract.WeaponHighId);
             Assert.AreEqual(8, derangedShopperContract.WeaponQuality);
@@ -3524,7 +3563,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 CapturedEnemyAttackModel.FixedAttackInfo,
                 discardedPet.Combat.Contract.AttackModel);
-            Assert.IsTrue(discardedPet.Combat.Contract.IsCombatReady);
+            Assert.IsFalse(discardedPet.Combat.Contract.IsCombatReady);
+            Assert.IsTrue(discardedPet.Combat.Contract.IsQuarantined);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(
+                discardedPet.Combat.Contract.QuarantineReason));
             Assert.AreEqual(9, discardedPet.Combat.Contract.MinDamage);
             Assert.AreEqual(18, discardedPet.Combat.Contract.MaxDamage);
             Assert.AreEqual(5.089763, discardedPet.Combat.Contract.RechargeSeconds);
@@ -3822,7 +3864,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 OrdinaryEnemyDamageSource.CapturedFixed,
                 uncontrollableAnger.Combat.DamageSource);
             Assert.IsFalse(uncontrollableAnger.Combat.VisibleWeapon);
-            Assert.IsTrue(uncontrollableAnger.Combat.Contract.IsCombatReady);
+            Assert.IsFalse(uncontrollableAnger.Combat.Contract.IsCombatReady);
+            Assert.IsTrue(uncontrollableAnger.Combat.Contract.IsQuarantined);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(
+                uncontrollableAnger.Combat.Contract.QuarantineReason));
             Assert.AreEqual(
                 CapturedEnemyAttackModel.FixedAttackInfo,
                 uncontrollableAnger.Combat.Contract.AttackModel);
@@ -3935,8 +3980,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  variant => incompleteRebuild.Combat.ResolveContract(
                                                 spawn.SourceIdentity,
                                                 variant)
-                                            .IsCombatReady)),
-                "Accepted Subway Incomplete Rebuild must preserve all ten exact sources, 23 atomic capture-reviewed generations, exact per-generation weapons, and private four-minute respawn together.");
+                                            .IsQuarantined)),
+                "Subway Incomplete Rebuild must preserve all ten exact sources, 23 atomic capture-reviewed generations, and private four-minute respawn while incomplete combat remains quarantined.");
             Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, incompleteRebuild.Aggression.Mode);
             Assert.AreEqual(7.0, incompleteRebuild.Aggression.AutomaticAggroRadius.Value);
             Assert.IsTrue(incompleteRebuild.Aggression.Chase);
@@ -4013,20 +4058,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         fragmentedSoul.Combat.ResolveContract(
                             spawn.SourceIdentity,
                             variant);
-                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
-                    Assert.IsTrue(contract.IsCombatReady);
-                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
-                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
-                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
-                    Assert.AreEqual(6, contract.WeaponInventorySlot);
-                    Assert.AreEqual(0, contract.MinDamage);
-                    Assert.AreEqual(0, contract.MaxDamage);
-                    Assert.AreEqual(0.0, contract.RechargeSeconds);
-                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
-                    Assert.AreEqual(24, contract.AttackInfoAmmoCount);
-                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
-                    Assert.AreEqual(0, contract.AttackInfoUnknown);
-                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                    Assert.IsFalse(contract.IsCombatReady, contract.Evidence);
+                    Assert.IsTrue(contract.IsQuarantined, contract.Evidence);
+                    Assert.IsFalse(
+                        string.IsNullOrWhiteSpace(contract.QuarantineReason),
+                        contract.Evidence);
                 }
             }
             Assert.AreEqual(OrdinaryEnemyAggressionMode.Retaliate, fragmentedSoul.Aggression.Mode);
@@ -4108,8 +4144,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  variant => redundantScan.Combat.ResolveContract(
                                                 spawn.SourceIdentity,
                                                 variant)
-                                            .IsCombatReady)),
-                "Accepted Subway Redundant Scan must preserve four exact sources, ten atomic capture-reviewed generations, exact per-generation weapons, captured movement, and private inherited respawn together.");
+                                            .IsQuarantined)),
+                "Subway Redundant Scan must preserve four exact sources, ten atomic capture-reviewed generations, captured movement, and private inherited respawn while incomplete combat remains quarantined.");
             Assert.AreEqual(OrdinaryEnemyAggressionMode.Auto, redundantScan.Aggression.Mode);
             Assert.AreEqual(7.0, redundantScan.Aggression.AutomaticAggroRadius.Value);
             Assert.IsTrue(redundantScan.Aggression.Chase);
@@ -4719,6 +4755,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "AreteContentModule",
                     "MontroyalContentModule",
                     "SubwayContentModule",
+                    "TempleOfThreeWindsContentModule",
                     "PrivateCityContentModule"
                 };
 

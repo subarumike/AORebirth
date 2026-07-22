@@ -19,6 +19,26 @@ namespace AOSharpCaptureAnalyzer
         private const string ReplacementInfectorPacketHex =
             "099F000A000100D900000DB47944C065271B3A6B0000C35079607AD0003A022A4A430015300843A7038C42933C6442C617A4000000003F374729000000003F32BB6F000004C809496E666563746F7200100812010000000096000A00001803C80000007CA50046001F000000001C0000000000000000800000000301000100010001000100000002000069000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F1000000020000";
 
+        // Capture 20260613-181432, packets.hex.log sequence 669.
+        private const string CharacterTowerFlagPacketHex =
+            "610F000A000100EA00000DAD70CBBEF3271B3A6B0000C350782DE56F003A0A2A4A4300074B50455DF01841050A3D4450368200000000BF34917E800000003F35781F000004CB1B5368697070696E67204D616E6966657374205465726D696E616C00108A12010000000089000000001902D400000442900064001F000000001C8000000000000000000000000101000100010001000100000002000056000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F10000000000";
+
+        // Capture 20260623-045431, packets.hex.log sequence 24.
+        private const string LegacyVersion57PlayerPacketHex =
+            "0007000A000101120000035600000012271B3A6B0000C35000000012003904006AC00012400D440480424323414844113FBE000000003F80000000000000B33BBD310000062A084D696B65646F63000008124102D2007F0000056E00000000000500C801320132013201320132000B54657374696E67204F72670A051400000000000064003F000000002A80000000000000008000000003010001000100010001000000030000000000000000000000000000000000009EE909C4000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000007E20000009EE900000000040000000000";
+
+        // Capture 20260614-195107, packets.hex.log sequence 719.
+        private const string MultipleTerminalSpecialAttackSlotsPacketHex =
+            "63E8000A0001016000000DAD78CB984B271B3A6B0000C35078D3ACFF003A0A204F5300074B50456292F64206C7AD445B596000000000BF4F45D1000000003F163F1D0000A4CB174275726E696E6720436C65616E696E6720526F626F7400100C12010000000003FA0BB8000000030023220004883F00C8001F000000001C800000000000000080000000010100010001000100010000000200000D0000C35078671D5800000BD36D64726F6E6531000000000000000000000000000000000000000000000000000004894200000000000000006D64726F6E653200000000000000000000000000000000000000000000000000000489430000000000000000000003F1000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000003F1000007E2000495EB000495EC514B5349514B53490000000000";
+
+        // Capture 20260614-200850, packets.hex.log sequence 5999.
+        private const string DeclaredSlotBeforePlayerOpaqueExtensionPacketHex =
+            "AB29000A0001017300000DAD78CB984B271B3A6B0000C35078D2E016003A00204FCA00074B5045611DE642508A3D4444846F00000000BF7C8EDC000000003E275A500000A58009436875636B666F6F0000081241000001BF0000002000000000000500120009000D0006000600060200550A00000000006E001F000000002A80000000000000008000000003010001000100010001000000030000000000000000000000000000000000009CAF0A0000C35078D3AE0000000BD30000CF1B00049D11000000000000EA600000919B0000CF1B0004614600000000002BF200002B1533000017A600000000000000000000000000000001000000000000000000000002000024BF0000000000000003000000000000000000000004000024B90000000000000BD3000003942700000000000000009CAF000000000400000FC40003399800033999000000644D4141540000A4310000A430000000904449495400011294000112950000008E425241570000000000";
+
+        // Capture 20260614-215831, packets.hex.log sequence 11888.
+        private const string TerminalOneByteSpecialAttackUnknown6PacketHex =
+            "975A000A0001014D00000DAD78CB984B271B3A6B0000C35078D30B0B003A0A2B6F4B00074B504579FBE53C23D70A4427896200000000BF291CB1800000003F4030B60000A6281353414E4453544F524D204D61726175646572001008120100000000640000000007028A00000461F1005E001F000000001CC0D62D813EEB24C83F5BC9590302010100010001000100000002000001F40000C35078D45949000003F10000C35078D30B0B000000024579FBE53C23D70A442789624576D8E73F7453A94427957F000017A60000000000040DAC000000000000000100040DA8000000000000000200040DAA000000000000000300040DB0000000000000000400040DAE00000000000007E20000040E30000000000200000FC40003F81C0003F81D49444C5949444C590003F8190003F81A5146434B5146434B0003F8160003F8174251494F4251494F0000000000";
+
         private static int Main(string[] args)
         {
             Console.WriteLine(
@@ -1183,6 +1203,113 @@ namespace AOSharpCaptureAnalyzer
                     0,
                     terminalSpecialAttack.Unknown4.GetValueOrDefault(),
                     "Observed terminal special-attack Unknown4 preserved");
+
+                RawSimpleCharFullUpdate characterTowerFlag =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(
+                        FromHex(CharacterTowerFlagPacketHex));
+                Assert(
+                    characterTowerFlag.DecodeFullyConsumed,
+                    "CharacterTower flag without a wire byte fully decoded");
+                AssertEqual(
+                    "Shipping Manifest Terminal",
+                    characterTowerFlag.Name,
+                    "CharacterTower fixture name");
+                AssertEqual(25, characterTowerFlag.Level, "CharacterTower fixture level");
+                AssertEqual(724, characterTowerFlag.Health, "CharacterTower fixture health");
+                AssertEqual(
+                    279184,
+                    (int)characterTowerFlag.MonsterData,
+                    "CharacterTower fixture monster data");
+                Assert(
+                    !characterTowerFlag.TowerUnknown.HasValue,
+                    "CharacterTower flag does not invent an absent byte");
+
+                RawSimpleCharFullUpdate legacyVersion57Player =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(
+                        FromHex(LegacyVersion57PlayerPacketHex));
+                Assert(
+                    legacyVersion57Player.DecodeFullyConsumed,
+                    "Legacy version-57 player layout fully decoded");
+                AssertEqual(57, legacyVersion57Player.Version, "Legacy player version");
+                AssertEqual("Mikedoc", legacyVersion57Player.Name, "Legacy player name");
+                Assert(legacyVersion57Player.Player != null, "Legacy player metadata present");
+                AssertEqual(
+                    "Testing Org",
+                    legacyVersion57Player.Player.OrgName,
+                    "Legacy player int16 organization name");
+                AssertEqual(10, legacyVersion57Player.Level, "Legacy player level");
+                AssertEqual(1300, legacyVersion57Player.Health, "Legacy player health");
+                AssertEqual(42, legacyVersion57Player.Unknown1.Length, "Legacy player Unknown1 length");
+
+                RawSimpleCharFullUpdate multipleTerminalSlots =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(
+                        FromHex(MultipleTerminalSpecialAttackSlotsPacketHex));
+                Assert(
+                    multipleTerminalSlots.DecodeFullyConsumed,
+                    "Multiple omitted terminal special-attack slots fully decoded");
+                Assert(
+                    multipleTerminalSlots.TerminalSpecialAttackSlotOmitted,
+                    "Multiple omitted terminal special-attack slots recorded");
+                AssertEqual(
+                    4,
+                    multipleTerminalSlots.SpecialAttacks.Length,
+                    "Multiple omitted terminal special-attack declared count");
+                Assert(
+                    multipleTerminalSlots.SpecialAttacks[0] != null,
+                    "Multiple omitted terminal special-attack first record present");
+                AssertEqual(
+                    "QKSI",
+                    multipleTerminalSlots.SpecialAttacks[0].Name,
+                    "Multiple omitted terminal special-attack name");
+                Assert(
+                    multipleTerminalSlots.SpecialAttacks[2] == null
+                    && multipleTerminalSlots.SpecialAttacks[3] == null,
+                    "Multiple omitted terminal special-attack records remain absent");
+                AssertEqual(
+                    0,
+                    multipleTerminalSlots.Unknown4.GetValueOrDefault(),
+                    "Multiple omitted terminal special-attack final flag preserved");
+
+                RawSimpleCharFullUpdate declaredSlotBeforeOpaque =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(
+                        FromHex(DeclaredSlotBeforePlayerOpaqueExtensionPacketHex));
+                Assert(
+                    declaredSlotBeforeOpaque.DecodeFullyConsumed,
+                    "Declared slot before player opaque extension fully decoded");
+                Assert(
+                    declaredSlotBeforeOpaque.TerminalSpecialAttackSlotOmitted,
+                    "Declared slot before player opaque extension recorded");
+                AssertEqual(
+                    3,
+                    declaredSlotBeforeOpaque.SpecialAttacks.Length,
+                    "Player opaque fixture declared special-attack count");
+                Assert(
+                    declaredSlotBeforeOpaque.SpecialAttacks[0] != null
+                    && declaredSlotBeforeOpaque.SpecialAttacks[1] != null
+                    && declaredSlotBeforeOpaque.SpecialAttacks[2] == null,
+                    "Player opaque fixture preserves two observed records");
+                AssertEqual(
+                    15,
+                    declaredSlotBeforeOpaque.OpaqueExtension.Length,
+                    "Player opaque fixture extension length");
+
+                RawSimpleCharFullUpdate terminalOneByteUnknown6 =
+                    RawSimpleCharFullUpdateDecoder.DecodePacket(
+                        FromHex(TerminalOneByteSpecialAttackUnknown6PacketHex));
+                Assert(
+                    terminalOneByteUnknown6.DecodeFullyConsumed,
+                    "Terminal one-byte special-attack Unknown6 fully decoded");
+                AssertEqual(
+                    3,
+                    terminalOneByteUnknown6.SpecialAttacks.Length,
+                    "Terminal one-byte special-attack declared count");
+                Assert(
+                    terminalOneByteUnknown6.SpecialAttacks[2] != null,
+                    "Terminal one-byte special-attack final record present");
+                AssertEqual(
+                    0,
+                    terminalOneByteUnknown6.SpecialAttacks[2].Unknown6,
+                    "Terminal one-byte special-attack Unknown6 value");
 
                 var truncated = new byte[infectorPacket.Length - 1];
                 Buffer.BlockCopy(infectorPacket, 0, truncated, 0, truncated.Length);
