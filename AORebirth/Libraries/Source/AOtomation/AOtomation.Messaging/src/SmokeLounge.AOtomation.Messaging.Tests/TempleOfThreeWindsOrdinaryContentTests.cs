@@ -18,7 +18,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemySpawnDefinition[] templeSpawns = temple.GetSpawns();
 
             Assert.AreEqual(8, templeProfiles.Length);
-            Assert.AreEqual(147, templeSpawns.Length);
+            Assert.AreEqual(152, templeSpawns.Length);
             Assert.IsTrue(templeProfiles.All(value => value.ProfileKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(templeProfiles.All(value => !value.BossOrScripted));
             Assert.AreEqual(7, templeProfiles.Count(value => value.DisplayName == "Cultist"));
@@ -33,8 +33,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 temple);
             Assert.AreEqual(322, catalog.GetRuntimeSpawns(127).Length);
             Assert.AreEqual(0, catalog.GetRuntimeSpawns(647).Length);
-            Assert.AreEqual(147, catalog.GetRuntimeSpawns(1931).Length);
-            Assert.AreEqual(469, catalog.GetSpawns().Length);
+            Assert.AreEqual(152, catalog.GetRuntimeSpawns(1931).Length);
+            Assert.AreEqual(474, catalog.GetSpawns().Length);
             Assert.IsTrue(catalog.GetRuntimeSpawns(127).All(value => !value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(catalog.GetRuntimeSpawns(1931).All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
         }
@@ -64,14 +64,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(cultists.All(value => value.Appearance.AppearanceValue == appearances[value.MonsterData]));
             Assert.IsTrue(cultists.All(value => value.Corpse.CapturedCatMesh.Value == corpseMeshes[value.MonsterData]));
             Assert.AreEqual(16, cultistSpawns.Count(value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
-            Assert.AreEqual(128, cultistSpawns.Count(value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            Assert.AreEqual(133, cultistSpawns.Count(value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
             Assert.IsTrue(cultistSpawns.Where(value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol).All(value => value.Waypoints.Length == 2));
             Assert.AreEqual(20, cultistSpawns.Min(value => value.Level));
             Assert.AreEqual(35, cultistSpawns.Max(value => value.Level));
-            Assert.AreEqual(6, cultistSpawns.Select(value => value.SourceCapture).Distinct(StringComparer.Ordinal).Count());
+            Assert.AreEqual(7, cultistSpawns.Select(value => value.SourceCapture).Distinct(StringComparer.Ordinal).Count());
             Assert.AreEqual(22, cultistSpawns.Count(value => value.SourceCapture == "20260721-230426"));
             Assert.IsTrue(cultistSpawns.Where(value => value.SourceCapture == "20260721-230426")
                 .All(value => value.Z >= 419.0f && value.Z <= 463.0f));
+            Assert.AreEqual(5, cultistSpawns.Count(value => value.SourceCapture == "20260721-232051"));
+            Assert.IsTrue(cultistSpawns.Where(value => value.SourceCapture == "20260721-232051")
+                .All(value => value.Z >= 404.0f && value.Z <= 410.0f));
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Explicit));
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.ExplicitPolicy.DelayStartsAt == RespawnDelayStartsAt.NpcDespawn));
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value == 300.0));

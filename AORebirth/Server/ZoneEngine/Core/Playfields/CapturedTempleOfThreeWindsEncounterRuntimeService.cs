@@ -810,6 +810,12 @@ namespace AORebirth.Core.Playfields
                     new CapturedSubwayMeshDefinition(0, 40105u, 0, 4),
                     new CapturedSubwayMeshDefinition(1, 96336u, 0, 2)
                 },
+                waypoints: new[]
+                {
+                    new CapturedSubwayWaypointDefinition(275.379242f, 13.0112476f, 417.979675f),
+                    new CapturedSubwayWaypointDefinition(274.75f, 14.0012474f, 408.15f),
+                    new CapturedSubwayWaypointDefinition(271.116425f, 14.0112476f, 409.686f)
+                },
                 maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
         }
 
