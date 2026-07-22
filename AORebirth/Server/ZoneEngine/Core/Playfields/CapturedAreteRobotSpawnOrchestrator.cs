@@ -97,6 +97,17 @@ namespace AORebirth.Core.Playfields
             SetCapturedMobStat(mobCharacter, StatIds.runspeed, spawn.RunSpeed);
             mobCharacter.Coordinates(new Coordinate { x = spawn.X, y = spawn.Y, z = spawn.Z });
             AssignCapturedPatrolWaypoints(mobCharacter, spawn);
+            string combatFailure;
+            CapturedEnemyCombatRuntime.Prepare(
+                mobCharacter,
+                npcController,
+                CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "20260629-193121 source 0x{0:X8} has no source-local WIFU/attack-start/AttackInfo contract mapped",
+                        spawn.SourceInstance),
+                    true),
+                out combatFailure);
             PlayfieldLifecycleTrace.Record(
                 PlayfieldLifecycleTrace.FlowCapturedAreteRobotSpawn,
                 PlayfieldLifecycleTrace.StageCapturedAreteRobotSpawnCreated,

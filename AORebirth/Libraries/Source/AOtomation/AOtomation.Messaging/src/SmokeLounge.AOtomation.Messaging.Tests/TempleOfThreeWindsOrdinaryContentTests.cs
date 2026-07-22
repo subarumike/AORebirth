@@ -121,44 +121,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Dictionary<string, OrdinaryEnemyProfile> profilesByKey = profiles.ToDictionary(
                 value => value.ProfileKey,
                 StringComparer.Ordinal);
-            var cultistContextByLevel = new Dictionary<int, int>
-            {
-                { 20, 305 }, { 21, 320 }, { 22, 336 }, { 23, 351 },
-                { 24, 367 }, { 25, 382 }, { 26, 400 }, { 27, 416 },
-                { 28, 434 }, { 29, 450 }, { 30, 468 }, { 31, 484 },
-                { 32, 502 }, { 33, 518 }, { 34, 535 }, { 35, 552 }
-            };
-
             Assert.IsTrue(profiles.All(value => value.Aggression.Mode == OrdinaryEnemyAggressionMode.Auto));
             Assert.IsTrue(profiles.All(value => value.Aggression.AutomaticAggroRadius.Value == 7.0));
             Assert.IsTrue(profiles.All(value => value.Aggression.Chase && value.Aggression.ReturnToSpawn));
             Assert.IsTrue(profiles.All(value => value.Aggression.EvidenceState == OrdinaryEnemyEvidenceState.Policy));
             Assert.IsTrue(profiles.All(value => value.Combat.EvidenceState == OrdinaryEnemyEvidenceState.Observed));
-            foreach (OrdinaryEnemySpawnDefinition spawn in spawns.Where(
-                value => value.ProfileKey.StartsWith("totw.cultist.", StringComparison.Ordinal)))
+            OrdinaryEnemySpawnDefinition[] cultistSpawns = spawns.Where(
+                value => value.ProfileKey.StartsWith("totw.cultist.", StringComparison.Ordinal)).ToArray();
+            CapturedEnemyCombatContract[] cultistContracts = cultistSpawns.Select(
+                spawn => profilesByKey[spawn.ProfileKey].Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level)).ToArray();
+            Assert.AreEqual(14, cultistContracts.Count(value => value.IsCombatReady));
+            Assert.AreEqual(135, cultistContracts.Count(value => value.IsQuarantined));
+            foreach (CapturedEnemyCombatContract contract in cultistContracts.Where(
+                value => value.IsCombatReady))
             {
-                OrdinaryEnemyProfile profile = profilesByKey[spawn.ProfileKey];
-                CapturedEnemyCombatContract contract = profile.Combat.ResolveContract(spawn.Level);
-                CapturedEnemySpecialAttackSequenceDefinition sequence = contract.SpecialAttackSequence;
-                int contextValue = cultistContextByLevel[spawn.Level];
-                Assert.AreEqual(CapturedEnemyAttackModel.Specialized, contract.AttackModel);
-                Assert.IsNotNull(sequence);
-                Assert.AreEqual(2.129326, sequence.InitialAttackDelaySeconds);
-                Assert.AreEqual(15, sequence.RepeatingAttack.MinDamage);
-                Assert.AreEqual(32, sequence.RepeatingAttack.MaxDamage);
-                Assert.AreEqual(4.635295, sequence.RepeatingAttack.RechargeSeconds);
-                Assert.AreEqual(-1, sequence.RepeatingAttack.AttackInfoAmmoCount);
-                Assert.AreEqual(6, sequence.RepeatingAttack.AttackInfoWeaponSlot);
-                Assert.AreEqual(0, sequence.RepeatingAttack.AttackInfoWeaponInstance);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsNull(contract.SpecialAttackSequence);
                 Assert.AreEqual(
-                    NpcCombatAttackRules.NormalAttackInfoHitType,
-                    sequence.RepeatingAttack.AttackInfoHitType);
-                Assert.AreEqual(contextValue, sequence.SpecialAttackWeaponUnknown2);
-                Assert.AreEqual(contextValue, sequence.SpecialAttackWeaponUnknown3);
+                    CapturedTempleOfThreeWindsCombatCatalog.CultistFirstSuccessfulHitDelaySeconds,
+                    contract.FirstHitDelaySeconds);
+                Assert.AreEqual(15, contract.MinDamage);
+                Assert.AreEqual(32, contract.MaxDamage);
                 Assert.AreEqual(
-                    profile.MonsterData == 26135 ? contextValue + 20 : contextValue,
-                    sequence.SpecialAttackWeaponUnknown1);
-                Assert.AreEqual(0, sequence.SpecialAttackWeaponUnknown5);
+                    CapturedTempleOfThreeWindsCombatCatalog.CultistRechargeSeconds,
+                    contract.RechargeSeconds);
+                Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                Assert.AreEqual(3, contract.AttackInfoHitType);
+                Assert.AreEqual(0, contract.AttackInfoN3Unknown);
+                Assert.IsNotNull(contract.WeaponDefinition);
+                Assert.AreEqual(contract.EvidenceSourceIdentity, contract.WeaponDefinition.EvidenceSourceIdentity);
+                Assert.IsTrue(
+                    contract.SpecialAttackWeaponUnknown5 == 0
+                    || contract.SpecialAttackWeaponUnknown5 == 5);
             }
             Assert.AreEqual(74, cultists.Sum(value => value.Loot.ObservedCompleteInventories));
             Assert.AreEqual(57, cultists.Sum(value => value.Loot.ObservedEmptyInventories));
@@ -172,20 +169,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             foreach (OrdinaryEnemySpawnDefinition sentinelSpawn in spawns.Where(
                 value => value.ProfileKey == sentinel.ProfileKey))
             {
-                CapturedEnemySpecialAttackSequenceDefinition sequence = sentinel.Combat
-                    .ResolveContract(sentinelSpawn.Level)
-                    .SpecialAttackSequence;
-                Assert.AreEqual(17, sequence.RepeatingAttack.MinDamage);
-                Assert.AreEqual(18, sequence.RepeatingAttack.MaxDamage);
-                Assert.AreEqual(5.67, sequence.RepeatingAttack.RechargeSeconds);
-                Assert.AreEqual(6, sequence.RepeatingAttack.AttackInfoWeaponSlot);
-                Assert.AreEqual(0, sequence.RepeatingAttack.AttackInfoWeaponInstance);
-                Assert.AreEqual(
-                    NpcCombatAttackRules.NormalAttackInfoHitType,
-                    sequence.RepeatingAttack.AttackInfoHitType);
-                Assert.AreEqual(
-                    sentinelSpawn.Level >= 20 ? 109 : 103,
-                    sequence.SpecialAttackWeaponUnknown1);
+                Assert.IsFalse(
+                    sentinel.Combat.ResolveContract(
+                        sentinelSpawn.SourceIdentity,
+                        sentinelSpawn.Level).IsCombatReady);
             }
             Assert.AreEqual(5, sentinel.Loot.ObservedCompleteInventories);
             Assert.AreEqual(5, sentinel.Loot.ObservedEmptyInventories);
@@ -193,18 +180,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(124, sentinel.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 20).MaximumCredits);
 
             OrdinaryEnemyProfile murial = profiles.Single(value => value.DisplayName == "Murial the Faithful");
-            CapturedEnemySpecialAttackSequenceDefinition murialSequence =
-                murial.Combat.Contract.SpecialAttackSequence;
-            Assert.AreEqual(26, murialSequence.RepeatingAttack.MinDamage);
-            Assert.AreEqual(26, murialSequence.RepeatingAttack.MaxDamage);
-            Assert.AreEqual(6, murialSequence.RepeatingAttack.AttackInfoWeaponSlot);
-            Assert.AreEqual(
-                NpcCombatAttackRules.NormalAttackInfoHitType,
-                murialSequence.RepeatingAttack.AttackInfoHitType);
-            Assert.AreEqual(1.5397, murialSequence.InitialAttackDelaySeconds);
-            Assert.AreEqual(3.7885, murialSequence.RepeatingAttack.RechargeSeconds);
-            Assert.AreEqual(258, murialSequence.SpecialAttackWeaponUnknown1);
-            Assert.AreEqual(21, murialSequence.SpecialAttackWeaponUnknown4);
+            OrdinaryEnemySpawnDefinition murialSpawn = spawns.Single(
+                value => value.ProfileKey == murial.ProfileKey);
+            Assert.IsFalse(
+                murial.Combat.ResolveContract(
+                    murialSpawn.SourceIdentity,
+                    murialSpawn.Level).IsCombatReady);
         }
 
         [TestMethod]
@@ -213,7 +194,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatContract combat =
                 CapturedTempleOfThreeWindsCombatCatalog.DefenderOfTheThree();
             Assert.AreEqual(CapturedEnemyAttackModel.Specialized, combat.AttackModel);
-            Assert.IsTrue(combat.IsCombatReady);
+            Assert.IsFalse(combat.IsCombatReady);
             Assert.AreEqual(10.915985, combat.SpecialAttackSequence.InitialAttackDelaySeconds);
             Assert.AreEqual(43, combat.SpecialAttackSequence.RepeatingAttack.MinDamage);
             Assert.AreEqual(43, combat.SpecialAttackSequence.RepeatingAttack.MaxDamage);

@@ -346,8 +346,10 @@ namespace AORebirth.Core.Playfields
                     false,
                     EternalSentinelCombat,
                     OrdinaryEnemyEvidenceState.Observed,
-                    contractResolver: level =>
-                        CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel(level)),
+                    sourceContractResolver: (sourceIdentity, level) =>
+                        CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel(
+                            sourceIdentity,
+                            level)),
                 BuildEternalSentinelLoot(evidence),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,
@@ -636,14 +638,15 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyScfuProfile.CapturedExact),
                 CultistAggression,
                 new OrdinaryEnemyCombatProfile(
-                    OrdinaryEnemyCombatMode.UnarmedMelee,
+                    OrdinaryEnemyCombatMode.EquippedRanged,
                     OrdinaryEnemyDamageSource.CapturedFixed,
-                    false,
+                    true,
                     CultistCombat,
                     OrdinaryEnemyEvidenceState.Observed,
-                    contractResolver: level =>
+                    sourceContractResolver: (sourceIdentity, level) =>
                         CapturedTempleOfThreeWindsCombatCatalog.Cultist(
                             seed.MonsterData,
+                            sourceIdentity,
                             level)),
                 BuildLoot(seed.MonsterData),
                 new OrdinaryEnemyCorpseProfile(

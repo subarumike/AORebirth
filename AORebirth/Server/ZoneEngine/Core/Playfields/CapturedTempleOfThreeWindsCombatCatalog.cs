@@ -1,5 +1,7 @@
 namespace AORebirth.Core.Playfields
 {
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.Core.Playfields;
 
     internal static class CapturedTempleOfThreeWindsCombatCatalog
@@ -47,6 +49,7 @@ namespace AORebirth.Core.Playfields
                 0,
                 NpcCombatAttackRules.NormalAttackInfoHitType,
                 DefenderAttackInfoWeaponInstance,
+                0,
                 true);
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
                 "20260721-035526/040324: two normal local-player AttackInfo outcomes, both 43; "
@@ -70,6 +73,9 @@ namespace AORebirth.Core.Playfields
                     239,
                     239,
                     25,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -120,6 +126,9 @@ namespace AORebirth.Core.Playfields
                     413,
                     413,
                     33,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -181,6 +190,9 @@ namespace AORebirth.Core.Playfields
                     381,
                     381,
                     31,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -215,6 +227,9 @@ namespace AORebirth.Core.Playfields
                     494,
                     494,
                     38,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -244,6 +259,9 @@ namespace AORebirth.Core.Playfields
                     511,
                     511,
                     39,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -262,6 +280,9 @@ namespace AORebirth.Core.Playfields
                     382,
                     382,
                     37,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -275,56 +296,116 @@ namespace AORebirth.Core.Playfields
                 6,
                 0,
                 0,
-                -1);
+                -1,
+                0,
+                0);
         }
 
         internal static CapturedEnemyCombatContract EternalSentinel()
         {
-            return EternalSentinel(20);
+            return CapturedEnemyCombatContract.Unresolved(
+                "Eternal Sentinel requires one coherent source-identity combat chain",
+                true);
         }
 
         internal static CapturedEnemyCombatContract EternalSentinel(int level)
         {
-            int contextValue = level >= 20 ? 109 : 103;
-            int contextUnknown4 = level >= 20 ? 12 : 11;
-            return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260721-043204: Eternal Sentinel attack start sends an empty "
-                + "SpecialAttackWeapon context and Attack before slot-6, instance-0, normal "
-                + "AttackInfo; level 19 used 103/103/103/11/0 and level 20 used "
-                + "109/109/109/12/0; active level-18 anchors use the captured level-19 "
-                + "context as an explicit nearest-generation packet-shape policy",
-                new CapturedEnemySpecialAttackSequenceDefinition(
-                    EternalSentinelFirstSuccessfulHitDelaySeconds,
-                    null,
-                    Attack(17, 18, EternalSentinelRechargeSeconds, 6, -1, 0),
-                    new CapturedEnemySpecialAttackDefinition[0],
-                    contextValue,
-                    contextValue,
-                    contextValue,
-                    contextUnknown4,
-                    0));
+            return CapturedEnemyCombatContract.Unresolved(
+                "Eternal Sentinel level-only combat lookup is forbidden; requested level " + level,
+                true);
+        }
+
+        internal static CapturedEnemyCombatContract EternalSentinel(int sourceIdentity, int level)
+        {
+            return CapturedEnemyCombatContract.Unresolved(
+                "No coherent same-capture Eternal Sentinel chain for source 0x"
+                + sourceIdentity.ToString("X8") + " level " + level,
+                true);
         }
 
         internal static CapturedEnemyCombatContract Cultist(int monsterData, int level)
         {
-            int contextValue = CultistContextValue(level);
-            int contextUnknown1 = monsterData == 26135
-                                      ? contextValue + 20
-                                      : contextValue;
-            return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260721 Temple capture corpus: ordinary Cultists send an empty "
-                + "SpecialAttackWeapon context and Attack before slot-6, instance-0, "
-                + "normal AttackInfo; level 20..35 context values are fully observed",
-                new CapturedEnemySpecialAttackSequenceDefinition(
-                    CultistFirstSuccessfulHitDelaySeconds,
-                    null,
-                    Attack(15, 32, CultistRechargeSeconds, 6, -1, 0),
-                    new CapturedEnemySpecialAttackDefinition[0],
-                    contextUnknown1,
-                    contextValue,
-                    contextValue,
-                    CultistContextUnknown4(level),
-                    0));
+            return CapturedEnemyCombatContract.Unresolved(
+                "Temple Cultist combat requires exact source identity; monsterData="
+                + monsterData + " level=" + level,
+                true);
+        }
+
+        internal static CapturedEnemyCombatContract Cultist(
+            int monsterData,
+            int sourceIdentity,
+            int level)
+        {
+            switch (unchecked((uint)sourceIdentity))
+            {
+                case 0x79834EC1u:
+                    return CultistFixture(monsterData, level, 26137, 28, sourceIdentity,
+                        "20260721-052115 raw 604/605,8311/8312,8358", 67109921, 204747, 204747, 1, -1,
+                        434, 434, 434, 17, 0, -1, 3, 1.6365208);
+                case 0x79834EC3u:
+                    return CultistFixture(monsterData, level, 26082, 33, sourceIdentity,
+                        "20260721-052115 raw 606/607,8764/8765,8834", 1027, 130164, 130164, 34, -1,
+                        518, 518, 518, 19, 0, -1, 3, 1.6545747);
+                case 0x79834ECCu:
+                    return CultistFixture(monsterData, level, 26103, 30, sourceIdentity,
+                        "20260721-052115 raw 608/609,4956/4957,5660", 1027, 129028, 129029, 29, -1,
+                        468, 468, 468, 18, 0, -1, 3, 13.4882616);
+                case 0x79834ECDu:
+                    return CultistFixture(monsterData, level, 26137, 26, sourceIdentity,
+                        "20260721-052115 raw 596/597,5098/5099,5423", 67109921, 204747, 204747, 1, -1,
+                        400, 400, 400, 16, 0, -1, 3, 6.7575341);
+                case 0x79834ECFu:
+                    return CultistFixture(monsterData, level, 26147, 23, sourceIdentity,
+                        "20260721-052115 raw 598/599,5293/5294,5432", 1027, 144103, 144104, 26, 15,
+                        351, 351, 351, 13, 5, 14, 3, 3.0200282);
+                case 0x7983FB93u:
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "20260721-032547 source 0x7983FB93 has only a critical wire value 4 outcome; "
+                        + "normal/critical selection is not capture-proven",
+                        true);
+                case 0x7983FB96u:
+                    return CultistFixture(monsterData, level, 26074, 31, sourceIdentity,
+                        "20260721-032547 raw 28/29,2019/2020,2059", 67109921, 204747, 204747, 1, -1,
+                        484, 484, 484, 18, 0, -1, 3, 2.0012955);
+                case 0x7983FB98u:
+                    return CultistFixture(monsterData, level, 26147, 27, sourceIdentity,
+                        "20260721-032547 raw 30/31,2285/2286,2437", 1027, 144103, 144104, 25, 15,
+                        416, 416, 416, 16, 0, 14, 3, 8.7926267);
+                case 0x7983FB9Bu:
+                    return CultistFixture(monsterData, level, 26137, 23, sourceIdentity,
+                        "20260721-032547 raw 40/41,2562/2563,2609", 67109921, 204747, 204747, 1, -1,
+                        351, 351, 351, 13, 0, -1, 3, 3.1704871);
+                case 0x7983FBDFu:
+                    return CultistFixture(monsterData, level, 26135, 29, sourceIdentity,
+                        "20260721-052115 raw 602/603,5419/5420,5565", 1027, 158298, 158299, 34, -1,
+                        470, 450, 450, 17, 0, -1, 3, 2.4264815);
+                case 0x7983FC37u:
+                    return CultistFixture(monsterData, level, 26137, 28, sourceIdentity,
+                        "20260721-052115 raw 610/611,7987/7988,8044", 67109921, 204747, 204747, 1, -1,
+                        434, 434, 434, 17, 0, -1, 3, 1.7271208);
+                case 0x7984B374u:
+                    return CultistFixture(monsterData, level, 26137, 28, sourceIdentity,
+                        "20260721-031913 raw 58/59,334/335,348", 67109921, 204747, 204747, 1, -1,
+                        434, 434, 434, 17, 0, -1, 3, 2.0595459);
+                case 0x7984B375u:
+                    return CultistFixture(monsterData, level, 26103, 34, sourceIdentity,
+                        "20260721-031913 raw 60/61,397/398,418", 1027, 129028, 129029, 37, -1,
+                        535, 535, 535, 20, 0, -1, 3, 2.3195167);
+                case 0x7984B379u:
+                    return CultistFixture(monsterData, level, 26147, 20, sourceIdentity,
+                        "20260721-031913 raw 66/67,547/548,559/637", 1027, 144103, 144104, 24, 15,
+                        305, 305, 305, 12, 0, 14, 3, 2.1303261);
+                case 0x7984B37Cu:
+                    return CultistFixture(monsterData, level, 26149, 30, sourceIdentity,
+                        "20260721-031913 raw 70/71,1063/1064,1075", 1027, 124314, 124314, 32, 20,
+                        468, 468, 468, 18, 0, 19, 3, 1.8387221);
+                default:
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "No coherent same-capture Cultist attack chain for source 0x"
+                        + sourceIdentity.ToString("X8") + "; monsterData=" + monsterData
+                        + " level=" + level,
+                        true);
+            }
         }
 
         internal static CapturedEnemyCombatContract MurialTheFaithful()
@@ -344,6 +425,9 @@ namespace AORebirth.Core.Playfields
                     258,
                     258,
                     21,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -411,6 +495,9 @@ namespace AORebirth.Core.Playfields
                     specialUnknown,
                     specialUnknown,
                     specialUnknown4,
+                    0,
+                    0,
+                    0,
                     0));
         }
 
@@ -434,67 +521,103 @@ namespace AORebirth.Core.Playfields
                 0,
                 NpcCombatAttackRules.NormalAttackInfoHitType,
                 weaponInstance,
+                0,
                 true);
         }
 
-        private static int CultistContextValue(int level)
+        private static CapturedEnemyCombatContract CultistFixture(
+            int actualMonsterData,
+            int actualLevel,
+            int expectedMonsterData,
+            int expectedLevel,
+            int sourceIdentity,
+            string evidence,
+            int weaponFlags,
+            int weaponLowId,
+            int weaponHighId,
+            int weaponQuality,
+            int weaponEnergy,
+            int specialUnknown1,
+            int specialUnknown2,
+            int specialUnknown3,
+            int specialUnknown4,
+            int specialUnknown5,
+            int firstAttackInfoAmmo,
+            int hitTypeWireValue,
+            double firstHitDelaySeconds)
         {
-            switch (level)
+            if (actualMonsterData != expectedMonsterData || actualLevel != expectedLevel)
             {
-                case 20: return 305;
-                case 21: return 320;
-                case 22: return 336;
-                case 23: return 351;
-                case 24: return 367;
-                case 25: return 382;
-                case 26: return 400;
-                case 27: return 416;
-                case 28: return 434;
-                case 29: return 450;
-                case 30: return 468;
-                case 31: return 484;
-                case 32: return 502;
-                case 33: return 518;
-                case 34: return 535;
-                case 35: return 552;
-                default:
-                    throw new System.InvalidOperationException(
-                        "No captured Temple Cultist attack context for level " + level + ".");
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Cross-enemy Cultist combat substitution rejected for source 0x"
+                    + sourceIdentity.ToString("X8") + "; expected monsterData="
+                    + expectedMonsterData + " level=" + expectedLevel
+                    + " actual monsterData=" + actualMonsterData + " level=" + actualLevel,
+                    true);
             }
+
+            CapturedEnemyCombatContract contract =
+                CapturedEnemyCombatContract.EquippedWeaponWithCapturedPacketSequence(
+                evidence,
+                sourceIdentity,
+                weaponLowId,
+                weaponHighId,
+                weaponQuality,
+                6,
+                false,
+                15,
+                32,
+                0,
+                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                0,
+                0,
+                CultistFirstSuccessfulHitDelaySeconds,
+                CultistRechargeSeconds,
+                false,
+                false,
+                firstAttackInfoAmmo,
+                0,
+                specialUnknown1,
+                specialUnknown2,
+                specialUnknown3,
+                specialUnknown4,
+                specialUnknown5,
+                hitTypeWireValue,
+                0,
+                0,
+                0,
+                0);
+            return contract.WithCapturedWeapon(
+                new CapturedEnemyWeaponDefinition(
+                    evidence,
+                    sourceIdentity,
+                    0,
+                    11,
+                    6,
+                    1000015,
+                    0,
+                    262,
+                    new[]
+                    {
+                        WeaponStat(CharacterStat.Flags, weaponFlags),
+                        WeaponStat(CharacterStat.StaticInstance, weaponLowId),
+                        WeaponStat(CharacterStat.ACGItemLevel, weaponQuality),
+                        WeaponStat(CharacterStat.ACGItemTemplateID, weaponLowId),
+                        WeaponStat(CharacterStat.ACGItemTemplateID2, weaponHighId),
+                        WeaponStat(CharacterStat.MultipleCount, 1),
+                        WeaponStat(CharacterStat.Energy, weaponEnergy),
+                        WeaponStat(CharacterStat.AttackDelay, 235),
+                        WeaponStat(CharacterStat.RechargeDelay, 235)
+                    },
+                    0));
         }
 
-        private static int CultistContextUnknown4(int level)
+        private static CapturedEnemyWeaponStatDefinition WeaponStat(
+            CharacterStat stat,
+            int value)
         {
-            switch (level)
-            {
-                case 20:
-                case 21:
-                    return 12;
-                case 22:
-                case 23:
-                    return 13;
-                case 24:
-                case 25:
-                    return 14;
-                case 26:
-                case 27:
-                    return 16;
-                case 28:
-                case 29:
-                    return 17;
-                case 30:
-                case 31:
-                    return 18;
-                case 32:
-                case 33:
-                    return 19;
-                case 34:
-                case 35:
-                    return 20;
-                default:
-                    throw new System.InvalidOperationException(
-                        "No captured Temple Cultist attack context for level " + level + ".");
-            }
+            return new CapturedEnemyWeaponStatDefinition(stat, unchecked((uint)value));
         }
+
     }
 }

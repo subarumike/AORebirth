@@ -9299,6 +9299,16 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
+            string combatFailure;
+            CapturedEnemyCombatRuntime.Prepare(
+                mob,
+                npcController,
+                CapturedEnemyCombatContract.Unresolved(
+                    "NascenceLifeSpawn capture-backed actor has no source-local WIFU/attack-start/AttackInfo contract mapped; source NPC="
+                    + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
+                    true),
+                out combatFailure);
+
             activateNpc(mob);
             return true;
         }

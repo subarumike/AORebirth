@@ -4,14 +4,23 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- Temple combat no longer abbreviates captured attack packets to damage amounts
-  alone. The official corpus proves that ordinary Cultists send an empty,
-  level/profile-specific `SpecialAttackWeapon` context and `Attack` before
-  slot-6, instance-0, normal-hit-type AttackInfo. All Cultist levels `20..35`
-  now resolve those exact context values, and the shared Temple named-attack
-  builder emits captured normal hit type `3`. This addresses the private-client
-  nanobot `unknown damage` symptom systemically for promoted Temple combat;
-  live client text after restart remains the final acceptance check.
+- Capture-backed NPC combat is now source-local and fail-closed. One shared
+  runtime factory owns exact owner-linked WIFU, `SpecialAttackWeapon`, `Attack`,
+  and `AttackInfo` construction; per-actor Energy state preserves finite ammo,
+  raw N3 fields and numeric hit-wire values are not normalized, and synthetic
+  incoming-hit chat has been removed. The initial-active audit covers `1,496`
+  hostile/retaliatory
+  actors: the live-proven level-5 Subway Thief and fourteen exact Temple Cultist
+  identities are runtime-certified and `1,481` are passive/quarantined; two
+  later Subway Infector slots raise the maximum to `1,498`, with `1,483`
+  quarantined. No Subway, named Temple, Nascence, Arete-family, Marcus ambient,
+  cleaning-robot, or dynamic-mission mapping other than that Thief generation currently passes the literal
+  complete-own-source contract. This gate supersedes older combat-active claims
+  below while preserving their noncombat spawn, appearance, patrol, corpse, and
+  loot evidence. Exact fixtures and audit assertions pass; the Debug build and
+  engine restart passed with ports `6996`, `7012`, `7500`, and `7501` listening.
+  Official-client text remains unverified. Evidence:
+  `docs/evidence/CAPTURE_BACKED_NPC_COMBAT_AUDIT_20260722.md`.
 
 - PF1931 Temple content now has a dedicated `TempleOfThreeWindsContentModule`.
   Live ZoneEngine evidence showed a player entering playfield `1931` while the

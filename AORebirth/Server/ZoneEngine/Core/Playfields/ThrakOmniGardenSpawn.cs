@@ -245,6 +245,16 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
+            string combatFailure;
+            CapturedEnemyCombatRuntime.Prepare(
+                mob,
+                npcController,
+                CapturedEnemyCombatContract.Unresolved(
+                    "20260718-165625 Thrak garden captured actor has no source-local WIFU/attack-start/AttackInfo contract mapped; npc="
+                    + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
+                    true),
+                out combatFailure);
+
             activateNpc(mob);
             return true;
         }

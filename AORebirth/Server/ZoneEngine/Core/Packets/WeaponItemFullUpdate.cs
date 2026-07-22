@@ -40,6 +40,7 @@ namespace ZoneEngine.Core.Packets
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -129,6 +130,20 @@ namespace ZoneEngine.Core.Packets
                 return new WeaponItemFullUpdateMessage[0];
             }
 
+            WeaponItemFullUpdateMessage captured = CreateCapturedWeaponDefinition(character);
+            if (captured != null)
+            {
+                return new[] { captured };
+            }
+
+            CapturedEnemyCombatContract registeredContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out registeredContract))
+            {
+                return new WeaponItemFullUpdateMessage[0];
+            }
+
             var messages = new List<WeaponItemFullUpdateMessage>();
             foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
             {
@@ -152,6 +167,20 @@ namespace ZoneEngine.Core.Packets
                 return null;
             }
 
+            WeaponItemFullUpdateMessage captured = CreateCapturedWeaponDefinition(character);
+            if (captured != null)
+            {
+                return captured;
+            }
+
+            CapturedEnemyCombatContract registeredContract;
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out registeredContract))
+            {
+                return null;
+            }
+
             IInventoryPage weaponPage;
             if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
             {
@@ -159,6 +188,58 @@ namespace ZoneEngine.Core.Packets
             }
 
             return CreateForSlot(character, weaponPage, (int)WeaponSlots.Righthand);
+        }
+
+        private static WeaponItemFullUpdateMessage CreateCapturedWeaponDefinition(ICharacter character)
+        {
+            CapturedEnemyCombatContract contract;
+            if (character == null
+                || character.BaseInventory == null
+                || !CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    character.Identity.Instance,
+                    out contract)
+                || contract == null
+                || !contract.IsCombatReady
+                || contract.WeaponDefinition == null)
+            {
+                return null;
+            }
+
+            IItem item;
+            string weaponFailure;
+            if (!CapturedEnemyCombatRuntime.TryValidateLiveCapturedWeapon(
+                    character,
+                    contract,
+                    out item,
+                    out weaponFailure))
+            {
+                CapturedEnemyCombatRuntimeRegistry.QuarantineRuntime(
+                    character,
+                    weaponFailure + " during visibility");
+                return null;
+            }
+
+            int currentEnergy;
+            if (!CapturedEnemyCombatRuntimeRegistry.TryGetCapturedWeaponEnergy(
+                    character.Identity.Instance,
+                    out currentEnergy))
+            {
+                CapturedEnemyCombatRuntimeRegistry.QuarantineRuntime(
+                    character,
+                    "captured weapon Energy state is unavailable during visibility");
+                return null;
+            }
+
+            return CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                new Identity
+                {
+                    Type = IdentityType.CanbeAffected,
+                    Instance = character.Identity.Instance
+                },
+                character.Playfield.Identity.Instance,
+                WeaponItemIdentity.GetOrCreate(item),
+                contract.WeaponDefinition,
+                currentEnergy);
         }
 
         public static void SendRightHandWeaponDefinition(ICharacter character, bool announceToPlayfield = false)
