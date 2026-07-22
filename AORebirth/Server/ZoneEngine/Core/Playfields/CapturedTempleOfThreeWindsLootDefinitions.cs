@@ -16,6 +16,10 @@ namespace AORebirth.Core.Playfields
         internal const string ReAnimatorEncounterKey = "totw.647.encounter.the-re-animator";
         internal const string BetanyProfileKey = "totw.647.named.acolyte-betany";
         internal const string BetanyEncounterKey = "totw.647.encounter.acolyte-betany";
+        internal const string CuratorProfileKey = "totw.647.boss.the-curator";
+        internal const string CuratorEncounterKey = "totw.647.encounter.the-curator";
+        internal const string NematetProfileKey = "totw.647.boss.nematet-the-custodian-of-time";
+        internal const string NematetEncounterKey = "totw.647.encounter.nematet-the-custodian-of-time";
 
         internal const int DefenderCredits = 1450;
         internal const int DefenderFirstItem = 204750;
@@ -37,6 +41,13 @@ namespace AORebirth.Core.Playfields
         private const string BetanyEvidence =
             "official-live capture 20260721-044256: exact Acolyte Betany corpse snapshot with "
             + "634 credits, 291082/291083 QL32 x50, 291043/291044 QL32 x25, and 204572 QL1 x1";
+        private const string CuratorEvidence =
+            "official-live capture 20260721-225404: exact The Curator corpse snapshot with "
+            + "377 credits and 287143 QL200, 204758 QL1, and 204651 QL1, all x1";
+        private const string NematetEvidence =
+            "official-live capture 20260721-225743: exact Nematet the Custodian of Time corpse "
+            + "snapshot with 2711 credits and 287143 QL200, 204651 QL1, 204706 QL1, and "
+            + "204595 QL1, all x1";
 
         internal static bool TryRegister(
             LootTableRegistry registry,
@@ -71,6 +82,14 @@ namespace AORebirth.Core.Playfields
                 case BetanyProfileKey:
                     table = BuildBetanyLootTable();
                     evidence = BetanyEvidence;
+                    break;
+                case CuratorProfileKey:
+                    table = BuildCuratorLootTable();
+                    evidence = CuratorEvidence;
+                    break;
+                case NematetProfileKey:
+                    table = BuildNematetLootTable();
+                    evidence = NematetEvidence;
                     break;
                 default:
                     return false;
@@ -186,6 +205,39 @@ namespace AORebirth.Core.Playfields
                     Entry(key, 291082, 291083, 32, 50, BetanyEvidence),
                     Entry(key, 291043, 291044, 32, 25, BetanyEvidence),
                     Entry(key, 204572, 204572, 1, 1, BetanyEvidence)));
+        }
+
+        internal static LootTableDefinition BuildCuratorLootTable()
+        {
+            const string key = "capture.20260721-225404.curator";
+            return Table(
+                CuratorProfileKey,
+                "The Curator captured corpse snapshot",
+                CuratorEvidence,
+                Snapshot(
+                    key,
+                    377,
+                    CuratorEvidence,
+                    Entry(key, 287143, 287143, 200, 1, CuratorEvidence),
+                    Entry(key, 204758, 204758, 1, 1, CuratorEvidence),
+                    Entry(key, 204651, 204651, 1, 1, CuratorEvidence)));
+        }
+
+        internal static LootTableDefinition BuildNematetLootTable()
+        {
+            const string key = "capture.20260721-225743.nematet";
+            return Table(
+                NematetProfileKey,
+                "Nematet the Custodian of Time captured corpse snapshot",
+                NematetEvidence,
+                Snapshot(
+                    key,
+                    2711,
+                    NematetEvidence,
+                    Entry(key, 287143, 287143, 200, 1, NematetEvidence),
+                    Entry(key, 204651, 204651, 1, 1, NematetEvidence),
+                    Entry(key, 204706, 204706, 1, 1, NematetEvidence),
+                    Entry(key, 204595, 204595, 1, 1, NematetEvidence)));
         }
 
         private static LootTableDefinition Table(

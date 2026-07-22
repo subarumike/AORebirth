@@ -15,6 +15,13 @@ namespace AORebirth.Core.Playfields
         internal const double TempleNamedMeleeRechargePolicySeconds = 3.2;
         internal const double YatilaOnePerFightStreamRechargePolicySeconds = 600.0;
         internal const double EternalSentinelRechargeSeconds = 5.67;
+        internal const double CuratorFirstSuccessfulHitDelaySeconds = 3.3000414;
+        internal const double CuratorRechargeSeconds = 5.8796741;
+        internal const double NematetSlotTwoFirstHitDelaySeconds = 18.9557914;
+        internal const double NematetSlotTwoRechargeSeconds = 40.0845743;
+        internal const double NematetSlotZeroFirstHitDelaySeconds = 38.8398163;
+        internal const double NematetSlotZeroRechargeSeconds = 10.06033;
+        internal const double NematetSlotOneFirstHitDelaySeconds = 68.208179;
 
         internal static CapturedEnemyCombatContract DefenderOfTheThree()
         {
@@ -141,6 +148,66 @@ namespace AORebirth.Core.Playfields
                 27);
         }
 
+        internal static CapturedEnemyCombatContract TheCurator()
+        {
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260721-225404: The Curator initiated combat before the player attacked, "
+                + "then emitted one 33-point opening hit and two 57-point normal hits at "
+                + "slot 0 with ammo -1 and weapon instance 1465538645; SpecialAttackWeapon "
+                + "contained 205877/205878 tag 1465538645 name WZXU and 381/381/381/31/0",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    CuratorFirstSuccessfulHitDelaySeconds,
+                    Attack(33, 33, CuratorRechargeSeconds, 0, -1, 1465538645),
+                    Attack(57, 57, CuratorRechargeSeconds, 0, -1, 1465538645),
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(
+                            205877,
+                            205878,
+                            1465538645,
+                            "WZXU")
+                    },
+                    381,
+                    381,
+                    381,
+                    31,
+                    0));
+        }
+
+        internal static CapturedEnemyCombatContract NematetTheCustodianOfTime()
+        {
+            return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                "20260721-225743: Nematet emitted captured local-player normal streams at "
+                + "slot 2 for 82, slot 0 for 70, and slot 1 for 152; the four-entry "
+                + "SpecialAttackWeapon packet contained FUGB, YHUU, KHBC, and USW1 with "
+                + "494/494/494/38/0; stream start and repeat timing preserve the observed fight",
+                new CapturedEnemyParallelAttackSequenceDefinition(
+                    new[]
+                    {
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            NematetSlotTwoFirstHitDelaySeconds,
+                            Attack(82, 82, NematetSlotTwoRechargeSeconds, 2, -1, 1497912661)),
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            NematetSlotZeroFirstHitDelaySeconds,
+                            Attack(70, 70, NematetSlotZeroRechargeSeconds, 0, -1, 1431525169)),
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            NematetSlotOneFirstHitDelaySeconds,
+                            Attack(152, 152, YatilaOnePerFightStreamRechargePolicySeconds, 1, -1, 1263026755))
+                    },
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(207327, 207328, 1179993922, "FUGB"),
+                        new CapturedEnemySpecialAttackDefinition(207324, 207325, 1497912661, "YHUU"),
+                        new CapturedEnemySpecialAttackDefinition(207321, 207322, 1263026755, "KHBC"),
+                        new CapturedEnemySpecialAttackDefinition(163491, 163492, 1431525169, "USW1")
+                    },
+                    494,
+                    494,
+                    494,
+                    38,
+                    0));
+        }
+
         internal static CapturedEnemyCombatContract ReanimatedCorpse()
         {
             return CapturedEnemyCombatContract.FixedAttack(
@@ -181,6 +248,10 @@ namespace AORebirth.Core.Playfields
                     return ReAnimator();
                 case CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey:
                     return AcolyteBetany();
+                case CapturedTempleOfThreeWindsLootDefinitions.CuratorProfileKey:
+                    return TheCurator();
+                case CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey:
+                    return NematetTheCustodianOfTime();
                 case "totw.647.encounter.re-animator.reanimated-corpse":
                     return ReanimatedCorpse();
                 default:
