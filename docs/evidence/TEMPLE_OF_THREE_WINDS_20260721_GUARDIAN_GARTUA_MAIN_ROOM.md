@@ -7,6 +7,7 @@
   - `20260721-230426`: Guardian of Tomorrow fight, corpse, loot, and complete nearby main-room SCFUs
   - `20260721-230824`: Gartua the Doorkeeper fight, corpse, and loot
   - `20260721-231151`: main-room fight and respawn slice
+  - `20260721-232051`: additional main-room respawns, five hallway Cultists, and Gartua waypoints
 - PF647 remains only the Temple transfer/gateway. All actors in this document run in PF1931.
 
 ## Guardian of Tomorrow
@@ -27,18 +28,33 @@
 - Exact corpse: CATMesh `23366`, 1,592 credits.
 - Exact available-loot snapshot: `204650` QL1 and `204598` QL1, both quantity one.
 - Mike's measured lifecycle annotation is ten-minute respawn and 120-second unlooted loot-bearing corpse lifetime.
+- `20260721-232051` adds an exact identity-linked three-point path for Gartua
+  `(SimpleChar:7987F148)`: `(275.379242,13.0112476,417.979675)`,
+  `(274.75,14.0012474,408.15)`, and `(271.116425,14.0112476,409.686)`.
+  The runtime adds this path to Gartua's earlier clean spawn generation instead
+  of replacing that generation with the new damaged/in-motion SCFU.
 
 ## Main-room population and lifecycle
 
 - `20260721-230426` contains 22 complete, unique Cultist SCFUs from the room band `z=419.313..462.421`. Those exact anchors are active in the existing Temple ordinary provider and reuse only the already capture-backed Cultist appearance, combat, aggro, corpse, loot, and credit profiles for their MonsterData values.
 - `20260721-231151` contains complete replacement SCFUs for Acolyte Kalen, Acolyte Verona, Cyth the Faithful, Reverend Saxx, and Reverend Dashell.
 - Three strict chains correlate death, corpse removal, and replacement: Kalen `309.825` seconds death-to-replacement, Verona `309.699`, and Dashell `310.066`. Their replacement occurs about 125 seconds after corpse removal, corroborating the existing ordinary Temple policy of 300 seconds after the engine's ten-second dead-NPC despawn boundary.
+- `20260721-232051` adds three more strict chains: Acolyte Kalen
+  `(7987F0AC -> 7987F125)` at `310.104` seconds, Acolyte Verona
+  `(7987F0B2 -> 7987F12A)` at `309.974`, and Windcaller Donnel
+  `(7987F0CC -> 7987F12E)` at `310.044`. These replacements appear
+  `125.725..126.685` seconds after corpse removal and independently corroborate
+  the same 300-second post-NPC-despawn policy.
+- Five complete static Cultist SCFUs from the `z=404.832..409.260` hallway band
+  are newly active: identities `7987F143`, `7987F145`, `7987F146`, `7987F147`,
+  and `7987F149`. Identity `7987F107` overlaps the already promoted
+  `x=315/z=455` anchor and is intentionally deduplicated.
 - Uklesh the Frozen and the remaining named main-room actors are not activated by this slice. Their visible generations are preserved as evidence, but Uklesh has no completed fight/death capture and the wider named-actor loot/respawn set is incomplete.
 
 ## Unresolved
 
 - Guardian and Gartua loot probabilities beyond their exact observed snapshots.
-- Guardian and Gartua social aggro and exact reset/leash boundaries.
+- Guardian and Gartua social aggro and exact reset/leash boundaries beyond the captured Gartua path.
 - Gartua nano `205590` downstream stat ownership/effect.
 - Remaining named main-room actor promotion and Uklesh combat.
 - PF1931 collision/line-of-sight geometry.

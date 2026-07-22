@@ -9,9 +9,9 @@ namespace AORebirth.Core.Playfields
     {
         internal const int PlayfieldInstance = 1931;
         internal const int ExpectedCultistProfileCount = 7;
-        internal const int ExpectedCultistSpawnCount = 144;
+        internal const int ExpectedCultistSpawnCount = 149;
         internal const int ExpectedProfileCount = 8;
-        internal const int ExpectedSpawnCount = 147;
+        internal const int ExpectedSpawnCount = 152;
         internal const double CapturedDeathToRespawnSeconds = 310.0;
         internal const double RuntimeRespawnAfterNpcDespawnSeconds = 300.0;
         internal const double PolicyAutomaticAggroRadius = 7.0;
@@ -257,7 +257,12 @@ namespace AORebirth.Core.Playfields
             new SpawnSeed(0x79872BFB, "totw.cultist.26147", 32, 1387, 0, 102, 221, 296.812653f, 14.8112478f, 461.4856f, 0f, 0.9871818f, 0f, -0.159603521f, 0x020A4ACBu, null, null, null, "20260721-230426"),
             new SpawnSeed(0x7985EE30, "totw.cultist.26147", 35, 1609, 0, 102, 241, 298.160858f, 14.8112478f, 462.1114f, 0f, -0.980698645f, 0f, 0.195519745f, 0x020A4ACBu, null, null, null, "20260721-230426"),
             new SpawnSeed(0x7985EC38, "totw.cultist.26147", 30, 1239, 0, 101, 207, 253.299545f, 14.8112507f, 462.163544f, 0f, 0.9830487f, 0f, 0.183342665f, 0x020A4ACBu, null, null, null, "20260721-230426"),
-            new SpawnSeed(0x7985EC35, "totw.cultist.26147", 34, 1535, 0, 102, 235, 254.258942f, 14.8112507f, 462.420776f, 0f, -0.9902503f, 0f, -0.139300823f, 0x020A4ACBu, null, null, null, "20260721-230426")
+            new SpawnSeed(0x7985EC35, "totw.cultist.26147", 34, 1535, 0, 102, 235, 254.258942f, 14.8112507f, 462.420776f, 0f, -0.9902503f, 0f, -0.139300823f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7987F143, "totw.cultist.26103", 28, 1091, 0, 101, 194, 268.2534f, 13.0112486f, 407.211945f, 0f, -0.7193397f, 0f, 0.694658458f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F145, "totw.cultist.26103", 28, 1091, 0, 101, 194, 281.933f, 13.0112476f, 407.28537f, 0f, 0.707106769f, 0f, 0.7071068f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F146, "totw.cultist.26149", 25, 869, 0, 100, 173, 270.8954f, 13.0112505f, 409.030029f, 0f, 0f, 0f, 1f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F147, "totw.cultist.26149", 30, 1239, 0, 101, 207, 279.2826f, 13.0112505f, 409.259735f, 0f, 0f, 0f, 1f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F149, "totw.cultist.26103", 33, 1461, 0, 102, 228, 271.259277f, 13.0112476f, 404.832031f, 0f, 1f, 0f, -0.00000004371139f, 0x020A4ACBu, null, null, null, "20260721-232051")
         };
 
         internal OrdinaryEnemyProfile[] GetProfiles()

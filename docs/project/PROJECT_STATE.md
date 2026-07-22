@@ -10,10 +10,11 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   represented by the named-Temple 600-second post-NPC-despawn policy; Guardian
   keeps a 1,800-second unlooted corpse and Gartua keeps 120 seconds. Gartua's
   nano `205590` preserves its observed self-targeting without inventing its
-  downstream stat effect. The same room evidence adds 22 exact Cultist anchors,
-  bringing PF1931 ordinary content to eight profiles / `147` anchors. Capture
-  `20260721-231151` corroborates the 300-second post-NPC-despawn ordinary respawn
-  policy with three approximately 310-second death-to-replacement chains.
+  downstream stat effect. Room evidence now supplies 27 exact Cultist anchors,
+  bringing PF1931 ordinary content to eight profiles / `152` anchors. Capture
+  `20260721-232051` adds five hallway anchors, Gartua's exact three-point path,
+  and three more approximately 310-second death-to-replacement chains that
+  corroborate the 300-second post-NPC-despawn ordinary respawn policy.
   Uklesh and the remaining named main-room actors remain evidence-only. Evidence:
   `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_GUARDIAN_GARTUA_MAIN_ROOM.md`.
 
@@ -58,7 +59,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 - Temple of Three Winds construction has begun as a dedicated PF1931 room module,
   separate from Subway PF127 content. Five finalized entrance-to-first-boss-room
-  captures plus the main-room SCFUs contribute seven exact regular-Cultist profiles and `144` spawn
+  captures plus the main-room SCFUs contribute seven exact regular-Cultist profiles and `149` spawn
   anchors, including `16` two-point patrols. Combat uses the observed `15..32`
   normal envelope and `4.635295`-second median; automatic aggression uses an
   explicit conservative seven-meter policy while chase/return is capture-backed.
