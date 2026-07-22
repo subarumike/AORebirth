@@ -39,6 +39,24 @@ namespace AORebirth.CaptureProtocol
         private const int Flags2Unknown3 = 0x00000040;
         private const int SimpleCharIdentityType = 0x0000C350;
 
+        private static readonly byte[] PlayerFlags2Fc4OpaqueExtension =
+        {
+            0x12, 0x95, 0x00, 0x00, 0x00, 0x8E, 0x42, 0x52,
+            0x41, 0x57, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        private static readonly byte[] PetFlags2Bd3OpaqueExtension =
+        {
+            0x3D, 0x00, 0x01, 0xD7, 0x3E, 0x4D, 0x45, 0x57,
+            0x31, 0x4D, 0x45, 0x57, 0x31, 0x00, 0x00, 0x00,
+            0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00
+        };
+
+        private static readonly byte[] PetFlags27e2OpaqueExtension =
+        {
+            0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00
+        };
+
         internal static bool TryDecodePacket(
             byte[] packet,
             out RawSimpleCharFullUpdate result,
@@ -162,36 +180,63 @@ namespace AORebirth.CaptureProtocol
                     PsychicBase = reader.ReadInt16("PlayerPsychicBase")
                 };
 
-                if (Has(result.Flags, HasOrgName))
+                if (result.Version == 57)
                 {
-                    player.OrgMetadata = reader.ReadInt32("PlayerOrgMetadata");
-                    player.OrgMetadataUnknown = reader.ReadByte("PlayerOrgMetadataUnknown");
-                }
+                    if (Has(result.CharacterFlags, CharacterHasVisibleName))
+                    {
+                        player.FirstName = reader.ReadAscii(
+                            reader.ReadInt16("LegacyPlayerFirstNameLength"),
+                            true,
+                            "LegacyPlayerFirstName");
+                        player.LastName = reader.ReadAscii(
+                            reader.ReadInt16("LegacyPlayerLastNameLength"),
+                            true,
+                            "LegacyPlayerLastName");
+                    }
 
-                if (Has(result.CharacterFlags, CharacterHasVisibleName))
-                {
-                    player.FirstName = reader.ReadAscii(
-                        reader.ReadByte("PlayerFirstNameLength"),
-                        true,
-                        "PlayerFirstName");
-                    player.LastName = reader.ReadAscii(
-                        reader.ReadByte("PlayerLastNameLength"),
-                        true,
-                        "PlayerLastName");
+                    if (Has(result.Flags, HasOrgName))
+                    {
+                        player.OrgName = reader.ReadAscii(
+                            reader.ReadInt16("LegacyPlayerOrgNameLength"),
+                            true,
+                            "LegacyPlayerOrgName");
+                    }
                 }
-
-                if (Has(result.Flags, HasOrgName))
+                else
                 {
-                    player.OrgName = reader.ReadAscii(
-                        reader.ReadByte("PlayerOrgNameLength"),
-                        true,
-                        "PlayerOrgName");
+                    if (Has(result.Flags, HasOrgName))
+                    {
+                        player.OrgMetadata = reader.ReadInt32("PlayerOrgMetadata");
+                        player.OrgMetadataUnknown = reader.ReadByte("PlayerOrgMetadataUnknown");
+                    }
+
+                    if (Has(result.CharacterFlags, CharacterHasVisibleName))
+                    {
+                        player.FirstName = reader.ReadAscii(
+                            reader.ReadByte("PlayerFirstNameLength"),
+                            true,
+                            "PlayerFirstName");
+                        player.LastName = reader.ReadAscii(
+                            reader.ReadByte("PlayerLastNameLength"),
+                            true,
+                            "PlayerLastName");
+                    }
+
+                    if (Has(result.Flags, HasOrgName))
+                    {
+                        player.OrgName = reader.ReadAscii(
+                            reader.ReadByte("PlayerOrgNameLength"),
+                            true,
+                            "PlayerOrgName");
+                    }
                 }
 
                 result.Player = player;
             }
 
-            if (Has(result.CharacterFlags, CharacterTower))
+            if (Has(result.CharacterFlags, CharacterTower)
+                && !HasValidUnknown1LengthAtLevelOffset(reader, result.Flags, 0)
+                && HasValidUnknown1LengthAtLevelOffset(reader, result.Flags, 1))
             {
                 result.TowerUnknown = reader.ReadByte("TowerUnknown");
             }
@@ -359,6 +404,12 @@ namespace AORebirth.CaptureProtocol
                 var attacks = new RawScfuSpecialAttack[count];
                 for (int i = 0; i < count; i++)
                 {
+                    if (IsObservedOpaqueExtensionBeforeDeclaredSpecialAttackSlots(result, reader))
+                    {
+                        result.TerminalSpecialAttackSlotOmitted = true;
+                        break;
+                    }
+
                     if (IsObservedTerminalSpecialAttackSlotOmission(result, reader, i, count))
                     {
                         // The final byte is the flags2 Unknown1 field which follows
@@ -382,7 +433,7 @@ namespace AORebirth.CaptureProtocol
                         Unknown4 = reader.ReadInt16("SpecialAttackUnknown4"),
                         Unknown5 = reader.ReadInt16("SpecialAttackUnknown5"),
                         Name = reader.ReadAscii(4, false, "SpecialAttackName"),
-                        Unknown6 = reader.ReadInt16("SpecialAttackUnknown6")
+                        Unknown6 = ReadSpecialAttackUnknown6(result, reader, i, count)
                     };
                 }
 
@@ -465,6 +516,33 @@ namespace AORebirth.CaptureProtocol
                    && IsValidX3F1Marker(reader.PeekInt32(2));
         }
 
+        private static bool HasValidUnknown1LengthAtLevelOffset(
+            BigEndianReader reader,
+            int flags,
+            int prefixBytes)
+        {
+            int levelWidth = Has(flags, HasExtendedLevel) ? 2 : 1;
+            int healthWidth = Has(flags, HasSmallHealth) ? 2 : 4;
+            int healthDamageWidth = Has(flags, HasSmallHealthDamage)
+                                        ? 1
+                                        : Has(flags, HasSmallHealth) ? 2 : 4;
+            int lengthOffset = prefixBytes
+                               + levelWidth
+                               + healthWidth
+                               + healthDamageWidth
+                               + 4
+                               + 2
+                               + 2
+                               + 1;
+            if (reader.Remaining < lengthOffset + 4)
+            {
+                return false;
+            }
+
+            int length = reader.PeekInt32(lengthOffset);
+            return length >= 0 && length <= reader.Remaining - lengthOffset - 4;
+        }
+
         private static bool IsValidX3F1Marker(int marker)
         {
             if (marker < 0x3F1 || marker % 0x3F1 != 0)
@@ -484,38 +562,53 @@ namespace AORebirth.CaptureProtocol
         {
             return result.Flags2 == 0x000007E2
                    && Has(result.Flags, IsNpc)
-                   && !Has(result.Flags, IsPet)
                    && Has(result.Flags2, Flags2Unknown1)
-                   && index == count - 1
+                   && index < count
                    && reader.Remaining == 1
                    && reader.PeekByte(0) == 0;
+        }
+
+        private static bool IsObservedOpaqueExtensionBeforeDeclaredSpecialAttackSlots(
+            RawSimpleCharFullUpdate result,
+            BigEndianReader reader)
+        {
+            return result.Flags2 == 0x00000FC4
+                   && reader.RemainingEquals(PlayerFlags2Fc4OpaqueExtension);
+        }
+
+        private static short ReadSpecialAttackUnknown6(
+            RawSimpleCharFullUpdate result,
+            BigEndianReader reader,
+            int index,
+            int count)
+        {
+            if (result.Flags2 == 0x00000FC4
+                && Has(result.Flags, IsNpc)
+                && Has(result.Flags, IsPet)
+                && index == count - 1
+                && reader.Remaining == 1
+                && reader.PeekByte(0) == 0)
+            {
+                reader.ReadByte("TerminalSpecialAttackUnknown6");
+                return 0;
+            }
+
+            return reader.ReadInt16("SpecialAttackUnknown6");
         }
 
         private static byte[] ReadObservedOpaqueExtension(
             RawSimpleCharFullUpdate result,
             BigEndianReader reader)
         {
-            byte[] playerFlags2Fc4 =
-            {
-                0x12, 0x95, 0x00, 0x00, 0x00, 0x8E, 0x42, 0x52,
-                0x41, 0x57, 0x00, 0x00, 0x00, 0x00, 0x00
-            };
-            byte[] petFlags2Bd3 =
-            {
-                0x3D, 0x00, 0x01, 0xD7, 0x3E, 0x4D, 0x45, 0x57,
-                0x31, 0x4D, 0x45, 0x57, 0x31, 0x00, 0x00, 0x00,
-                0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00
-            };
-            byte[] petFlags27e2 = { 0x04, 0x79, 0x1C, 0x10, 0x0D, 0x00 };
-
             bool observedFamily =
-                (result.Flags2 == 0x00000FC4 && reader.RemainingEquals(playerFlags2Fc4))
+                (result.Flags2 == 0x00000FC4
+                    && reader.RemainingEquals(PlayerFlags2Fc4OpaqueExtension))
                 || (result.Flags2 == 0x00000BD3
                     && Has(result.Flags, IsPet)
-                    && reader.RemainingEquals(petFlags2Bd3))
+                    && reader.RemainingEquals(PetFlags2Bd3OpaqueExtension))
                 || (result.Flags2 == 0x000007E2
                     && Has(result.Flags, IsPet)
-                    && reader.RemainingEquals(petFlags27e2));
+                    && reader.RemainingEquals(PetFlags27e2OpaqueExtension));
             return observedFamily ? reader.ReadRemaining() : new byte[0];
         }
 

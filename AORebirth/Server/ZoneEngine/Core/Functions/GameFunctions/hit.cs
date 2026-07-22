@@ -22,6 +22,8 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using Utility;
+
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
@@ -160,6 +162,21 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 affected.Stats[StatIds.health].Value = current + applied;
                 SendStats(affected);
                 AnnounceHeal(source, affected, applied);
+                return true;
+            }
+
+            CapturedEnemyCombatContract capturedContract;
+            if (source != null
+                && CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    source.Identity.Instance,
+                    out capturedContract))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "CapturedEnemyCombatFunctionHitQuarantined source=" + source.Identity
+                    + " target=" + affected.Identity
+                    + " reason=FunctionType.Hit packet/chat semantics are not part of the proven combat contract"
+                    + " evidence=" + (capturedContract == null ? string.Empty : capturedContract.Evidence));
                 return true;
             }
 

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This evidence record covers the dedicated playfield-647 `Defender of the Three`
+This evidence record covers the dedicated playfield-1931 `Defender of the Three`
 encounter from finalized official-live captures:
 
 - `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-035526`
@@ -58,7 +58,7 @@ death-to-NPC-despawn phase.
   HealthDamage traffic could not be isolated safely to either nano.
 - Defender chased at least `34.469125` horizontal units from the captured
   anchor. No reset/return boundary was captured. Runtime retains the generic
-  `40`-unit leash policy, with no invented PF647 navigation geometry.
+  `40`-unit leash policy, with no invented PF1931 navigation geometry.
 
 ## Corpse and loot
 
@@ -84,8 +84,8 @@ independently roll their item rows.
 ## Runtime boundary
 
 Defender is owned by the dedicated Temple encounter, combat, and loot classes
-under `Core/Playfields` and is keyed only to `totw.defender_of_the_three` on
-playfield `647`. Subway encounter and loot definitions remain independently
+under `Core/Playfields` and uses stable `totw.*` keys on playfield `1931`.
+Subway encounter and loot definitions remain independently
 scoped to their `subway.*` keys on playfield `127`; only generic runtime
 infrastructure is shared.
 
@@ -95,5 +95,5 @@ infrastructure is shared.
 - repeat weapon cadence
 - automatic/social aggro threshold
 - reset and return behavior
-- PF647 collision/navigation geometry
+- PF1931 collision/navigation geometry
 - complete loot pool and snapshot probabilities

@@ -138,6 +138,7 @@ namespace AORebirth.Core.Playfields
                 if (character.Controller is NPCController)
                 {
                     this.combatTick.ClearTracking(character.Identity);
+                    CapturedEnemyCombatRuntimeRegistry.Remove(character.Identity.Instance);
                 }
             }
 
@@ -674,7 +675,20 @@ namespace AORebirth.Core.Playfields
             }
 
             CapturedEnemyCombatContract capturedContract;
-            CapturedEnemyCombatRuntimeRegistry.TryGet(target.Identity.Instance, out capturedContract);
+            if (CapturedEnemyCombatRuntimeRegistry.TryGet(
+                    target.Identity.Instance,
+                    out capturedContract)
+                && !capturedContract.IsCombatReady)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    string.Format(
+                        "Captured enemy taunt refused npc={0} taunter={1} reason=contract-incomplete evidence={2}",
+                        target.Identity,
+                        taunter.Identity,
+                        capturedContract.Evidence));
+                return;
+            }
 
             this.StartCombatWithAcquiredTarget(taunter, target, capturedContract);
             LogUtil.Debug(

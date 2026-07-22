@@ -577,7 +577,13 @@ namespace ZoneEngine.Core.Playfields
                 2.0,
                 0,
                 0,
-                1279612721);
+                1279612721,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
             // Capture: not attack-on-sight; retaliate + nearby assist only.
@@ -627,7 +633,13 @@ namespace ZoneEngine.Core.Playfields
                 2.0,
                 0,
                 0,
-                1279612721);
+                1279612721,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
             controller.AiProfile = NpcAiProfile.Aggressive;

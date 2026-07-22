@@ -7,16 +7,18 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedTempleOfThreeWindsContentProvider
     {
-        internal const int PlayfieldInstance = 647;
+        internal const int PlayfieldInstance = 1931;
         internal const int ExpectedCultistProfileCount = 7;
-        internal const int ExpectedCultistSpawnCount = 122;
-        internal const int ExpectedProfileCount = 8;
-        internal const int ExpectedSpawnCount = 125;
+        internal const int ExpectedCultistSpawnCount = 149;
+        internal const int ExpectedProfileCount = 9;
+        internal const int ExpectedSpawnCount = 153;
         internal const double CapturedDeathToRespawnSeconds = 310.0;
         internal const double RuntimeRespawnAfterNpcDespawnSeconds = 300.0;
         internal const double PolicyAutomaticAggroRadius = 7.0;
         internal const double CapturedMaximumObservedChaseDistance = 60.421;
         internal const double CapturedMedianAttackIntervalSeconds = 4.635295;
+        internal const string MurialProfileKey =
+            "totw.ordinary.main-room.murial-the-faithful.26090";
 
         private const string EvidenceReference =
             "20260721-030515,20260721-031913,20260721-032247,20260721-032547,20260721-033006";
@@ -30,18 +32,13 @@ namespace AORebirth.Core.Playfields
                 OrdinaryEnemyEvidenceState.Policy);
 
         private static readonly CapturedEnemyCombatContract CultistCombat =
-            CapturedEnemyCombatContract.FixedAttack(
-                EvidenceReference + ":60 normal local-player hits 15..32;2 criticals 42..58 report-only",
-                15,
-                32,
-                CapturedMedianAttackIntervalSeconds,
-                6,
-                0,
-                0,
-                -1);
+            CapturedTempleOfThreeWindsCombatCatalog.Cultist(26074, 20);
 
         private static readonly CapturedEnemyCombatContract EternalSentinelCombat =
             CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel();
+
+        private static readonly CapturedEnemyCombatContract MurialCombat =
+            CapturedTempleOfThreeWindsCombatCatalog.MurialTheFaithful();
 
         private static readonly RespawnPolicyDefinition CultistRespawn =
             new RespawnPolicyDefinition
@@ -235,14 +232,41 @@ namespace AORebirth.Core.Playfields
             new SpawnSeed(0x7984B3D9, "totw.cultist.26147", 34, 1535, 0, 102, 234, 224.826416f, 31.011248f, 259.7224f, 0f, 0.983969f, 0f, 0.178342f, 0x020A4ACBu, null, null, null, "20260721-033006"),
             new SpawnSeed(0x7984B3DF, "totw.cultist.26135", 26, 943, 0, 101, 179, 215.4928f, 31.011248f, 267.682159f, 0f, 0.992772f, 0f, 0.120012f, 0x020A4ACBu, null, null, null, "20260721-033006"),
             new SpawnSeed(0x7984B3E0, "totw.cultist.26082", 32, 1387, 0, 102, 220, 235.172958f, 31.011251f, 250.139069f, 0f, 0.996917f, 0f, 0.078459f, 0x022A4ACBu, null, null, null, "20260721-033006"),
-            new SpawnSeed(0x7984B3E2, "totw.cultist.26147", 31, 1313, 0, 102, 213, 123.0731f, 31.011248f, 258.01f, 0f, -0.999334f, 0f, 0.036483f, 0x020A4ACBu, null, null, null, "20260721-033006")
+            new SpawnSeed(0x7984B3E2, "totw.cultist.26147", 31, 1313, 0, 102, 213, 123.0731f, 31.011248f, 258.01f, 0f, -0.999334f, 0f, 0.036483f, 0x020A4ACBu, null, null, null, "20260721-033006"),
+            new SpawnSeed(0x79872FF8, "totw.cultist.26103", 35, 1609, 0, 102, 241, 277.759766f, 13.0112505f, 419.312653f, 0f, -0.235538915f, 0f, 0.9718649f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853117, "totw.cultist.26137", 30, 1239, 0, 101, 207, 294.619049f, 13.0112486f, 420.059723f, 0f, 0.495895177f, 0f, -0.8683823f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x798537AE, "totw.cultist.26137", 34, 1535, 0, 102, 235, 262.548645f, 13.0112486f, 420.299744f, 0f, -0.6943271f, 0f, 0.719659567f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985316C, "totw.cultist.26137", 31, 1313, 0, 102, 214, 255.822342f, 13.01125f, 420.540833f, 0f, 0.3972707f, 0f, 0.9177015f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853114, "totw.cultist.26137", 33, 1461, 0, 102, 228, 287.086426f, 13.0112486f, 421.421326f, 0f, -0.492755979f, 0f, 0.870167553f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872FF6, "totw.cultist.26103", 35, 1609, 0, 102, 241, 276.220032f, 13.611248f, 422.302643f, 0f, 0.137652934f, 0f, -0.990480661f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853113, "totw.cultist.26082", 31, 1313, 0, 102, 214, 287.152863f, 13.611248f, 428.220673f, 0f, 0.539935768f, 0f, 0.8417061f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x798537A2, "totw.cultist.26082", 35, 1609, 0, 102, 241, 262.945557f, 13.61125f, 429.4401f, 0f, -0.958094537f, 0f, 0.286452144f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985316D, "totw.cultist.26082", 35, 1609, 0, 102, 241, 254.66925f, 13.61125f, 429.587067f, 0f, -0.6924637f, 0f, -0.721452832f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853112, "totw.cultist.26082", 32, 1387, 0, 102, 221, 295.30304f, 13.6112509f, 429.75824f, 0f, 0.234202445f, 0f, 0.9721879f, 0x022A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985311C, "totw.cultist.26135", 33, 1461, 0, 102, 228, 294.89502f, 14.2112474f, 436.322937f, 0f, -0.896634161f, 0f, 0.442771882f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EE29, "totw.cultist.26135", 35, 1609, 0, 102, 241, 287.561737f, 14.2112474f, 437.217072f, 0f, 0.9344767f, 0f, 0.356024384f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853173, "totw.cultist.26135", 32, 1387, 0, 102, 221, 262.896973f, 14.21125f, 437.424042f, 0f, -0.8354441f, 0f, 0.549575448f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79853171, "totw.cultist.26135", 32, 1387, 0, 102, 221, 254.702057f, 14.21125f, 437.480072f, 0f, 0.819409f, 0f, 0.573209465f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872BFA, "totw.cultist.26074", 35, 1609, 0, 102, 241, 315.4626f, 14.8112507f, 455.269684f, 0f, -0.441970348f, 0f, 0.8970295f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872BFD, "totw.cultist.26074", 31, 1313, 0, 102, 214, 316.699829f, 14.8112478f, 455.793945f, 0f, -0.3131113f, 0f, 0.9497163f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872FE9, "totw.cultist.26074", 33, 1461, 0, 102, 228, 231.665878f, 14.8112507f, 455.814026f, 0f, 0.565479636f, 0f, 0.8247623f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872FE7, "totw.cultist.26074", 30, 1239, 0, 101, 207, 232.771423f, 14.8112478f, 456.466858f, 0f, 0.4041237f, 0f, 0.914704263f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x79872BFB, "totw.cultist.26147", 32, 1387, 0, 102, 221, 296.812653f, 14.8112478f, 461.4856f, 0f, 0.9871818f, 0f, -0.159603521f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EE30, "totw.cultist.26147", 35, 1609, 0, 102, 241, 298.160858f, 14.8112478f, 462.1114f, 0f, -0.980698645f, 0f, 0.195519745f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EC38, "totw.cultist.26147", 30, 1239, 0, 101, 207, 253.299545f, 14.8112507f, 462.163544f, 0f, 0.9830487f, 0f, 0.183342665f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7985EC35, "totw.cultist.26147", 34, 1535, 0, 102, 235, 254.258942f, 14.8112507f, 462.420776f, 0f, -0.9902503f, 0f, -0.139300823f, 0x020A4ACBu, null, null, null, "20260721-230426"),
+            new SpawnSeed(0x7987F143, "totw.cultist.26103", 28, 1091, 0, 101, 194, 268.2534f, 13.0112486f, 407.211945f, 0f, -0.7193397f, 0f, 0.694658458f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F145, "totw.cultist.26103", 28, 1091, 0, 101, 194, 281.933f, 13.0112476f, 407.28537f, 0f, 0.707106769f, 0f, 0.7071068f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F146, "totw.cultist.26149", 25, 869, 0, 100, 173, 270.8954f, 13.0112505f, 409.030029f, 0f, 0f, 0f, 1f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F147, "totw.cultist.26149", 30, 1239, 0, 101, 207, 279.2826f, 13.0112505f, 409.259735f, 0f, 0f, 0f, 1f, 0x020A4ACBu, null, null, null, "20260721-232051"),
+            new SpawnSeed(0x7987F149, "totw.cultist.26103", 33, 1461, 0, 102, 228, 271.259277f, 13.0112476f, 404.832031f, 0f, 1f, 0f, -0.00000004371139f, 0x020A4ACBu, null, null, null, "20260721-232051")
         };
 
         internal OrdinaryEnemyProfile[] GetProfiles()
         {
             OrdinaryEnemyProfile[] profiles = ProfileSeeds
                 .Select(BuildProfile)
-                .Concat(new[] { BuildEternalSentinelProfile() })
+                .Concat(new[] { BuildEternalSentinelProfile(), BuildMurialProfile() })
                 .OrderBy(value => value.ProfileKey, StringComparer.Ordinal)
                 .ToArray();
             if (profiles.Length != ExpectedProfileCount)
@@ -261,6 +285,7 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnDefinition[] spawns = SpawnSeeds
                 .Select(seed => BuildSpawn(seed, profiles[seed.ProfileKey]))
                 .Concat(BuildEternalSentinelSpawns())
+                .Concat(new[] { BuildMurialSpawn() })
                 .OrderBy(value => value.SourceIdentity)
                 .ToArray();
             if (spawns.Length != ExpectedSpawnCount
@@ -320,7 +345,11 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyDamageSource.CapturedFixed,
                     false,
                     EternalSentinelCombat,
-                    OrdinaryEnemyEvidenceState.Observed),
+                    OrdinaryEnemyEvidenceState.Observed,
+                    sourceContractResolver: (sourceIdentity, level) =>
+                        CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel(
+                            sourceIdentity,
+                            level)),
                 BuildEternalSentinelLoot(evidence),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,
@@ -436,6 +465,136 @@ namespace AORebirth.Core.Playfields
                 WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
         }
 
+        private static OrdinaryEnemyProfile BuildMurialProfile()
+        {
+            const string evidence =
+                "20260721-232051/234614: identity-linked Murial SCFU, melee outcomes, "
+                + "corpse lifecycle, and complete 20-destination patrol loop";
+            return new OrdinaryEnemyProfile(
+                MurialProfileKey,
+                "totw.ordinary.main-room.faithful",
+                "Murial the Faithful",
+                26090,
+                OrdinaryEnemyConstructionMode.CapturedDirect,
+                string.Empty,
+                new OrdinaryEnemyAppearanceProfile(
+                    3,
+                    1,
+                    1,
+                    3,
+                    1,
+                    268964353,
+                    0,
+                    0,
+                    136,
+                    0,
+                    31,
+                    1,
+                    1835u,
+                    40629,
+                    true,
+                    false,
+                    new[]
+                    {
+                        new OrdinaryEnemyTextureProfile(0, 0, 0),
+                        new OrdinaryEnemyTextureProfile(1, 161711, 0),
+                        new OrdinaryEnemyTextureProfile(2, 161716, 0),
+                        new OrdinaryEnemyTextureProfile(3, 161706, 0),
+                        new OrdinaryEnemyTextureProfile(4, 161726, 0)
+                    },
+                    new[]
+                    {
+                        new OrdinaryEnemyMeshProfile(0, 20091u, 161721, 2),
+                        new OrdinaryEnemyMeshProfile(0, 40629u, 0, 4),
+                        new OrdinaryEnemyMeshProfile(1, 7818u, 0, 2)
+                    },
+                    OrdinaryEnemyScfuProfile.CapturedExact),
+                CultistAggression,
+                new OrdinaryEnemyCombatProfile(
+                    OrdinaryEnemyCombatMode.EquippedMelee,
+                    OrdinaryEnemyDamageSource.CapturedFixed,
+                    true,
+                    MurialCombat,
+                    OrdinaryEnemyEvidenceState.Observed),
+                new OrdinaryEnemyLootProfile(
+                    OrdinaryEnemyLootEvidence.NoneProven,
+                    new OrdinaryEnemyLootEntry[0],
+                    OrdinaryEnemyEvidenceState.Unresolved,
+                    null,
+                    null),
+                new OrdinaryEnemyCorpseProfile(
+                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    30.0,
+                    180.0,
+                    30.0,
+                    5927,
+                    evidence),
+                new[] { evidence },
+                false,
+                false);
+        }
+
+        private static OrdinaryEnemySpawnDefinition BuildMurialSpawn()
+        {
+            OrdinaryEnemyWaypoint[] waypoints =
+            {
+                new OrdinaryEnemyWaypoint(266.339355f, 16.0112476f, 513.76355f),
+                new OrdinaryEnemyWaypoint(266.067688f, 16.611248f, 516.280029f),
+                new OrdinaryEnemyWaypoint(269.56897f, 16.611248f, 519.147278f),
+                new OrdinaryEnemyWaypoint(269.653076f, 16.611248f, 516.142517f),
+                new OrdinaryEnemyWaypoint(269.670929f, 16.0112476f, 513.885925f),
+                new OrdinaryEnemyWaypoint(269.878021f, 15.4112473f, 505.860809f),
+                new OrdinaryEnemyWaypoint(270.092896f, 15.4112473f, 500.121277f),
+                new OrdinaryEnemyWaypoint(270.125061f, 14.8112478f, 497.849426f),
+                new OrdinaryEnemyWaypoint(270.672424f, 14.8112478f, 481.155884f),
+                new OrdinaryEnemyWaypoint(270.995483f, 14.8112478f, 469.628174f),
+                new OrdinaryEnemyWaypoint(272.536194f, 14.8112478f, 458.825562f),
+                new OrdinaryEnemyWaypoint(271.761108f, 14.81108f, 446.147522f),
+                new OrdinaryEnemyWaypoint(271.621277f, 14.8112478f, 459.03479f),
+                new OrdinaryEnemyWaypoint(270.055664f, 14.8112478f, 469.769257f),
+                new OrdinaryEnemyWaypoint(259.240417f, 14.8112478f, 474.301025f),
+                new OrdinaryEnemyWaypoint(269.505005f, 14.8112478f, 481.484863f),
+                new OrdinaryEnemyWaypoint(268.258362f, 14.8112478f, 497.378784f),
+                new OrdinaryEnemyWaypoint(267.785797f, 15.4112473f, 500.433655f),
+                new OrdinaryEnemyWaypoint(267.371582f, 15.4112473f, 505.721039f),
+                new OrdinaryEnemyWaypoint(267.127625f, 16.0112476f, 508.234467f)
+            };
+            return new OrdinaryEnemySpawnDefinition(
+                "totw.ordinary.7987F12D",
+                unchecked((int)0x7987F12Du),
+                MurialProfileKey,
+                PlayfieldInstance,
+                34,
+                1535,
+                0,
+                102,
+                118,
+                271.4782f,
+                14.8112507f,
+                445.842255f,
+                0f,
+                0.04537062f,
+                0f,
+                0.9989702f,
+                OrdinaryEnemyMovementMode.Patrol,
+                waypoints,
+                false,
+                false,
+                true,
+                0x020B4ACBu,
+                0,
+                HexToBytes("00000000000000000000000003010001000100010001000000020000"),
+                0,
+                OrdinaryEnemyEvidenceState.Policy,
+                RuntimeRespawnAfterNpcDespawnSeconds,
+                OrdinaryEnemyRuntimeDisposition.Active,
+                string.Empty,
+                "20260721-232051,20260721-234614",
+                "2026-07-22T04:36:41.2783126Z",
+                null,
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
+        }
+
         private static OrdinaryEnemyProfile BuildProfile(ProfileSeed seed)
         {
             uint appearance = seed.AppearanceValue;
@@ -479,11 +638,16 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyScfuProfile.CapturedExact),
                 CultistAggression,
                 new OrdinaryEnemyCombatProfile(
-                    OrdinaryEnemyCombatMode.UnarmedMelee,
+                    OrdinaryEnemyCombatMode.EquippedRanged,
                     OrdinaryEnemyDamageSource.CapturedFixed,
-                    false,
+                    true,
                     CultistCombat,
-                    OrdinaryEnemyEvidenceState.Observed),
+                    OrdinaryEnemyEvidenceState.Observed,
+                    sourceContractResolver: (sourceIdentity, level) =>
+                        CapturedTempleOfThreeWindsCombatCatalog.Cultist(
+                            seed.MonsterData,
+                            sourceIdentity,
+                            level)),
                 BuildLoot(seed.MonsterData),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,

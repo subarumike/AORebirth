@@ -238,7 +238,10 @@ namespace ZoneEngine.Core.Playfields
                 NascenceCoreHecklerContentProvider.RechargeSeconds,
                 3,
                 0,
-                NascenceCoreHecklerContentProvider.PrimaryWeaponInstance);
+                NascenceCoreHecklerContentProvider.PrimaryWeaponInstance,
+                0,
+                0,
+                0);
 
             string combatFailure;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out combatFailure);

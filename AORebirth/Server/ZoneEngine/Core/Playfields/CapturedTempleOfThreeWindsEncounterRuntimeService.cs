@@ -31,6 +31,10 @@ namespace AORebirth.Core.Playfields
         internal const int GulardMonsterData = 26147;
         internal const int ReAnimatorMonsterData = 26155;
         internal const int BetanyMonsterData = 26143;
+        internal const int CuratorMonsterData = 22802;
+        internal const int NematetMonsterData = 26159;
+        internal const int GuardianMonsterData = 22798;
+        internal const int GartuaMonsterData = 159085;
         internal const int ReanimatedMonsterData = 41690;
 
         internal const string DefenderProfileKey =
@@ -43,6 +47,14 @@ namespace AORebirth.Core.Playfields
             CapturedTempleOfThreeWindsLootDefinitions.ReAnimatorProfileKey;
         internal const string BetanyProfileKey =
             CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey;
+        internal const string CuratorProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.CuratorProfileKey;
+        internal const string NematetProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey;
+        internal const string GuardianProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey;
+        internal const string GartuaProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey;
         internal const string ReanimatedProfileKey = "totw.647.encounter.re-animator.reanimated-corpse";
 
         internal const int DefenderPrimaryNanoId = 205389;
@@ -53,9 +65,15 @@ namespace AORebirth.Core.Playfields
         internal const int GulardNanoId = 205584;
         internal const int ReAnimatorNanoId = 205604;
         internal const int BetanyNanoId = 205383;
+        internal const int CuratorNanoId = 205565;
+        internal const int NematetPrimaryNanoId = 205395;
+        internal const int NematetSecondaryNanoId = 205563;
+        internal const int NematetTertiaryNanoId = 205592;
+        internal const int GartuaNanoId = 205590;
 
         internal const double NamedRespawnAfterNpcDespawnSeconds = 600.0;
         internal const double NamedUnlootedCorpseLifetimePolicySeconds = 120.0;
+        internal const double GuardianUnlootedCorpseLifetimeSeconds = 1800.0;
         internal const double DefenderLootedCleanupSeconds = 1.277;
         internal const double YatilaLootedCleanupSeconds = 1.640;
         internal const double GulardLootedCleanupSeconds = 1.772;
@@ -73,6 +91,12 @@ namespace AORebirth.Core.Playfields
         private const double ReAnimatorNanoRepeatSeconds = 10.291;
         private const double BetanyInitialNanoDelaySeconds = 6.444;
         private const double BetanyNanoRepeatSeconds = 10.116;
+        private const double CuratorInitialNanoDelaySeconds = 15.4643854;
+        private const double CuratorNanoRepeatSeconds = 10.1841983;
+        private const double NematetInitialNanoDelaySeconds = 1.1071981;
+        private const double NematetNanoRepeatSeconds = 10.1701624;
+        private const double GartuaInitialNanoDelaySeconds = 1.3091279;
+        private const double GartuaNanoRepeatSeconds = 41.5473945;
         private const double ReanimatedSpawnAfterCastSeconds = 1.578;
         private const double ReanimatedSpawnAfterNpcDespawnSeconds = 1.123;
         private const double ReanimatedResetRefillSeconds = 1.0;
@@ -101,6 +125,18 @@ namespace AORebirth.Core.Playfields
             YatilaPrimaryNanoId,
             YatilaSecondaryNanoId,
             YatilaTertiaryNanoId
+        };
+
+        private static readonly int[] NematetNanoCycle =
+        {
+            NematetPrimaryNanoId,
+            NematetSecondaryNanoId,
+            NematetSecondaryNanoId,
+            NematetSecondaryNanoId,
+            NematetSecondaryNanoId,
+            NematetPrimaryNanoId,
+            NematetTertiaryNanoId,
+            NematetSecondaryNanoId
         };
 
         private readonly Playfield playfield;
@@ -153,7 +189,36 @@ namespace AORebirth.Core.Playfields
                     true,
                     new[] { BetanyNanoId },
                     BetanyInitialNanoDelaySeconds,
-                    BetanyNanoRepeatSeconds)
+                    BetanyNanoRepeatSeconds),
+                new NamedEncounterState(
+                    CreateCuratorDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.TheCurator(),
+                    true,
+                    new[] { CuratorNanoId },
+                    CuratorInitialNanoDelaySeconds,
+                    CuratorNanoRepeatSeconds),
+                new NamedEncounterState(
+                    CreateNematetDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.NematetTheCustodianOfTime(),
+                    false,
+                    NematetNanoCycle,
+                    NematetInitialNanoDelaySeconds,
+                    NematetNanoRepeatSeconds),
+                new NamedEncounterState(
+                    CreateGuardianDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.GuardianOfTomorrow(),
+                    false,
+                    new int[0],
+                    0.0,
+                    0.0),
+                new NamedEncounterState(
+                    CreateGartuaDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.GartuaTheDoorkeeper(),
+                    true,
+                    new[] { GartuaNanoId },
+                    GartuaInitialNanoDelaySeconds,
+                    GartuaNanoRepeatSeconds,
+                    true)
             };
             this.reanimatedSlots = new[]
             {
@@ -257,7 +322,9 @@ namespace AORebirth.Core.Playfields
 
             state.CombatActive = true;
             state.Dead = false;
-            state.NextNanoAtUtc = utcNow.AddSeconds(state.InitialNanoDelaySeconds);
+            state.NextNanoAtUtc = state.NanoCycle.Length == 0
+                                      ? (DateTime?)null
+                                      : utcNow.AddSeconds(state.InitialNanoDelaySeconds);
         }
 
         internal ICharacter[] NotifyCombatReset(ICharacter npc)
@@ -540,6 +607,218 @@ namespace AORebirth.Core.Playfields
                 + "three nano 205383 casts, greater-than-35-unit leash, corpse and loot");
         }
 
+        internal static CapturedEncounterRuntimeDefinition CreateCuratorDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                CuratorProfileKey,
+                "totw.647.boss.the-curator.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.CuratorEncounterKey,
+                "The Curator",
+                CuratorMonsterData,
+                true,
+                false,
+                52,
+                9740,
+                106,
+                198,
+                205,
+                0,
+                3,
+                121.159302f,
+                34.0749969f,
+                352.137634f,
+                0f,
+                -0.0102066733f,
+                0f,
+                0.9999479f,
+                1227u,
+                unchecked((int)0x022A4A43),
+                0,
+                HexToBytes("80000000000000000000000003010001000100010001000000020000"),
+                0,
+                21499,
+                NamedUnlootedCorpseLifetimePolicySeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260721-052115 exact SCFU appearance; 225404 exact level-52/9740-health "
+                + "visible generation, approximately four-unit proactive aggro, 33/57 combat, "
+                + "nano 205565 sequence, death, corpse, and exact loot snapshot",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 6,
+                sex: 0,
+                race: 1,
+                headMesh: 0,
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
+        internal static CapturedEncounterRuntimeDefinition CreateNematetDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                NematetProfileKey,
+                "totw.647.boss.nematet-the-custodian-of-time.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.NematetEncounterKey,
+                "Nematet the Custodian of Time",
+                NematetMonsterData,
+                true,
+                false,
+                66,
+                25318,
+                107,
+                255,
+                263,
+                0,
+                3,
+                171.324936f,
+                36.0112457f,
+                340.074097f,
+                0f,
+                -0.7193397f,
+                0f,
+                0.694658458f,
+                1643u,
+                unchecked((int)0x022A6ACB),
+                0,
+                HexToBytes("80000000000000008000000003010001000100010001000000020000"),
+                0,
+                17909,
+                NamedUnlootedCorpseLifetimePolicySeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260721-052115 exact SCFU appearance; 225743 exact level-66/25318-health "
+                + "visible generation, player-initiated fight, three captured weapon streams, "
+                + "nanos 205395/205563/205592, chase, death, corpse, and exact loot snapshot",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 3,
+                sex: 2,
+                race: 1,
+                headMesh: 40173,
+                textures: new[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 0, 0),
+                    new CapturedSubwayTextureDefinition(1, 161708, 0),
+                    new CapturedSubwayTextureDefinition(2, 161713, 0),
+                    new CapturedSubwayTextureDefinition(3, 161703, 0),
+                    new CapturedSubwayTextureDefinition(4, 161723, 0)
+                },
+                meshes: new[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 20040u, 161718, 2),
+                    new CapturedSubwayMeshDefinition(0, 40173u, 0, 4)
+                },
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
+        internal static CapturedEncounterRuntimeDefinition CreateGuardianDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                GuardianProfileKey,
+                "totw.1931.boss.guardian-of-tomorrow.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.GuardianEncounterKey,
+                "Guardian of Tomorrow",
+                GuardianMonsterData,
+                true,
+                false,
+                68,
+                26500,
+                108,
+                264,
+                263,
+                0,
+                3,
+                274.823364f,
+                13.01125f,
+                388.980774f,
+                0f,
+                0.379739523f,
+                0f,
+                -0.925093353f,
+                1227u,
+                unchecked((int)0x022A6A43),
+                0,
+                HexToBytes("80000000000000000000000003010001000100010001000000020000"),
+                0,
+                21082,
+                GuardianUnlootedCorpseLifetimeSeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260721-230426 exact level-68/26500-health SCFU, player-initiated dual-stream "
+                + "fight, death, corpse, and exact loot; Mike measured a ten-minute respawn and "
+                + "a 30-minute unlooted corpse lifetime",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 6,
+                sex: 0,
+                race: 1,
+                headMesh: 0,
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
+        internal static CapturedEncounterRuntimeDefinition CreateGartuaDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                GartuaProfileKey,
+                "totw.1931.boss.gartua-the-doorkeeper.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.GartuaEncounterKey,
+                "Gartua the Doorkeeper",
+                GartuaMonsterData,
+                true,
+                false,
+                65,
+                14130,
+                107,
+                229,
+                228,
+                0,
+                3,
+                274.99f,
+                14.2112513f,
+                426.642548f,
+                0f,
+                1f,
+                0f,
+                -0.00000004371139f,
+                1419u,
+                unchecked((int)0x020A4ACB),
+                0,
+                HexToBytes("80000000000000008000000002010001000100010001000000020000"),
+                0,
+                23366,
+                NamedUnlootedCorpseLifetimePolicySeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260721-230426 exact SCFU; 20260721-230824 proactive attack, 76..114 combat, "
+                + "self-cast nano 205590, death, corpse, and exact loot; Mike measured a "
+                + "ten-minute respawn and a 120-second unlooted corpse lifetime",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 4,
+                sex: 1,
+                race: 1,
+                headMesh: 40105,
+                textures: new[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 0, 0),
+                    new CapturedSubwayTextureDefinition(1, 21827, 0),
+                    new CapturedSubwayTextureDefinition(2, 0, 0),
+                    new CapturedSubwayTextureDefinition(3, 21822, 0),
+                    new CapturedSubwayTextureDefinition(4, 19698, 0)
+                },
+                meshes: new[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 40105u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 96336u, 0, 2)
+                },
+                waypoints: new[]
+                {
+                    new CapturedSubwayWaypointDefinition(275.379242f, 13.0112476f, 417.979675f),
+                    new CapturedSubwayWaypointDefinition(274.75f, 14.0012474f, 408.15f),
+                    new CapturedSubwayWaypointDefinition(271.116425f, 14.0112476f, 409.686f)
+                },
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
         private static CapturedEncounterRuntimeDefinition HumanDefinition(
             string profileKey,
             string spawnKey,
@@ -687,7 +966,9 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            ICharacter target = this.playfield.FindByIdentity<ICharacter>(actor.FightingTarget);
+            ICharacter target = state.NanoTargetsSelf
+                                    ? actor
+                                    : this.playfield.FindByIdentity<ICharacter>(actor.FightingTarget);
             if (target == null || target.Stats[StatIds.health].Value <= 0)
             {
                 return;
@@ -698,7 +979,7 @@ namespace AORebirth.Core.Playfields
             state.PendingNano = new PendingTempleNano(
                 nanoId,
                 target.Identity,
-                utcNow.AddSeconds(NanoCastSeconds(nanoId)));
+                utcNow.AddSeconds(NanoCastSeconds(state, nanoId)));
             state.NextNanoAtUtc = utcNow.AddSeconds(state.NanoRepeatSeconds);
             CastNanoSpellMessageHandler.Default.SendCapturedNpcCast(actor, nanoId, target.Identity);
         }
@@ -722,8 +1003,9 @@ namespace AORebirth.Core.Playfields
             }
 
             // Captures prove the cast IDs and finish timing. Gulard's nearby
-            // health changes and the reported 23-point poison tick do not have
-            // safe packet ownership, so no unproven stat effect is applied.
+            // health changes, the reported 23-point poison tick, and the
+            // Curator/Nematet nano effects do not have safe packet ownership,
+            // so no unproven stat effect is applied.
         }
 
         private void RequestNextReanimation(DateTime finishedAtUtc)
@@ -1051,8 +1333,22 @@ namespace AORebirth.Core.Playfields
                            slot => slot.Identity == character.Identity);
         }
 
-        private static double NanoCastSeconds(int nanoId)
+        private static double NanoCastSeconds(NamedEncounterState state, int nanoId)
         {
+            if (state != null
+                && string.Equals(
+                    state.Definition.ProfileKey,
+                    NematetProfileKey,
+                    StringComparison.Ordinal))
+            {
+                switch (nanoId)
+                {
+                    case NematetPrimaryNanoId: return 5.2211694;
+                    case NematetSecondaryNanoId: return 5.6058988;
+                    case NematetTertiaryNanoId: return 3.6813144;
+                }
+            }
+
             switch (nanoId)
             {
                 case DefenderPrimaryNanoId: return 5.28395;
@@ -1063,6 +1359,8 @@ namespace AORebirth.Core.Playfields
                 case GulardNanoId: return 4.562;
                 case ReAnimatorNanoId: return 7.04;
                 case BetanyNanoId: return 5.337;
+                case CuratorNanoId: return 6.2402402;
+                case GartuaNanoId: return 0.960617;
                 default: throw new InvalidOperationException("Unknown Temple nano id.");
             }
         }
@@ -1096,7 +1394,8 @@ namespace AORebirth.Core.Playfields
                 bool automaticAggro,
                 int[] nanoCycle,
                 double initialNanoDelaySeconds,
-                double nanoRepeatSeconds)
+                double nanoRepeatSeconds,
+                bool nanoTargetsSelf = false)
             {
                 this.Definition = definition;
                 this.Combat = combat;
@@ -1104,6 +1403,7 @@ namespace AORebirth.Core.Playfields
                 this.NanoCycle = nanoCycle;
                 this.InitialNanoDelaySeconds = initialNanoDelaySeconds;
                 this.NanoRepeatSeconds = nanoRepeatSeconds;
+                this.NanoTargetsSelf = nanoTargetsSelf;
                 this.Identity = Identity.None;
             }
 
@@ -1113,6 +1413,7 @@ namespace AORebirth.Core.Playfields
             internal int[] NanoCycle { get; private set; }
             internal double InitialNanoDelaySeconds { get; private set; }
             internal double NanoRepeatSeconds { get; private set; }
+            internal bool NanoTargetsSelf { get; private set; }
             internal Identity Identity { get; set; }
             internal DateTime? RespawnDueAtUtc { get; set; }
             internal DateTime? NextNanoAtUtc { get; set; }

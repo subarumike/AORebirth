@@ -4,23 +4,91 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- The next PF647 Temple slice is active from Windcaller Yatila through Acolyte
+- Capture-backed NPC combat is now source-local and fail-closed. One shared
+  runtime factory owns exact owner-linked WIFU, `SpecialAttackWeapon`, `Attack`,
+  and `AttackInfo` construction; per-actor Energy state preserves finite ammo,
+  raw N3 fields and numeric hit-wire values are not normalized, and synthetic
+  incoming-hit chat has been removed. Per-actor, per-observation-array cursors
+  keep parallel captured attack streams independent. The fixed initial-active
+  audit covers `1,496` hostile/retaliatory actors: `85` are runtime-certified
+  and `1,411` remain passive/quarantined (`755` merged profiles: `85` certified,
+  `670` unresolved). The deterministic corpus result covers `364` sessions,
+  `348` canonical sessions, `2,647` complete chains, `243` capture-certified
+  profiles, `92` runtime-ready profiles, `290` semantic definitions, and `100`
+  runtime-ready definitions, with zero recoverable-evidence blockers. A
+  repository guard also accounts for all `16` production combat-prepare files /
+  `18` call sites; conditional Cursed Silvertail remains explicitly unresolved
+  because cited capture `20260718-185306` is absent. Exact-byte and audit checks
+  pass. The complete messaging suite is `447/480`, with `33` unrelated existing
+  damage/visibility/population failures. The Debug build and engine restart
+  pass, and ports `6996`, `7012`, `7500`, and `7501` listen. Official-client
+  behavior remains unverified. Evidence:
+  `docs/generated/capture_backed_npc_combat_inventory.json`,
+  `docs/generated/capture_backed_npc_combat_active_coverage.json`,
+  `docs/generated/capture_backed_npc_secondary_evidence_audit.json`,
+  `docs/generated/capture_backed_npc_attack_range_audit.json`, and
+  `docs/evidence/CAPTURE_BACKED_NPC_COMBAT_AUDIT_20260722.md`.
+
+- PF1931 Temple content now has a dedicated `TempleOfThreeWindsContentModule`.
+  Live ZoneEngine evidence showed a player entering playfield `1931` while the
+  content coordinator registered captured NPC startup only for Subway PF127;
+  consequently the validated Temple catalogs and named encounters never reached
+  their activation path. PF1931 now invokes the shared captured-NPC startup
+  boundary, while PF647 remains gateway-only. Private-client population
+  visibility after the rebuilt engine restart remains the final live check.
+
+- Murial the Faithful is active in the PF1931 Temple ordinary provider from
+  identity-linked captures `20260721-232051` and `20260721-234614`. His exact
+  L34/1,535-health SCFU, appearance, 26-point melee stream, CATMesh `5927`, and
+  ordered 20-destination patrol are promoted. Two complete official-live loops
+  took `104.2935936` and `107.0382618` seconds; the generic private waypoint
+  runtime now needs in-client timing verification. PF1931 ordinary content is
+  now nine profiles / `153` anchors. Murial loot, nano `70294`, and exact
+  Murial-specific respawn remain unresolved; runtime uses the shared 300-second
+  ordinary policy. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_MURIAL_PATROL.md`.
+
+- Guardian of Tomorrow and Gartua the Doorkeeper are active PF1931 Temple bosses.
+  Captures `20260721-230426` and `20260721-230824` provide exact SCFUs, combat,
+  corpses, and atomic loot snapshots. Mike's measured ten-minute respawns are
+  represented by the named-Temple 600-second post-NPC-despawn policy; Guardian
+  keeps a 1,800-second unlooted corpse and Gartua keeps 120 seconds. Gartua's
+  nano `205590` preserves its observed self-targeting without inventing its
+  downstream stat effect. Room evidence supplies 27 exact Cultist anchors. Capture
+  `20260721-232051` adds five hallway anchors, Gartua's exact three-point path,
+  and three more approximately 310-second death-to-replacement chains that
+  corroborate the 300-second post-NPC-despawn ordinary respawn policy.
+  Uklesh and the other remaining named main-room actors remain evidence-only. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_GUARDIAN_GARTUA_MAIN_ROOM.md`.
+
+- The Curator and Nematet the Custodian of Time are active as the next PF1931
+  Temple named encounters. Finalized capture `20260721-052115` supplies their
+  exact SCFU appearance shapes; new fights `20260721-225404` and
+  `20260721-225743` supply the newest L52/9,740-HP Curator and L66/25,318-HP
+  Nematet generations, proactive-versus-player-initiated aggro evidence,
+  capture-timed multi-stream combat, nanos `205565`, `205395`, `205563`, and
+  `205592`, chase/death/corpse evidence, and exact atomic loot snapshots.
+  Nano effects, exact respawn, complete loot probabilities, PF1931 collision,
+  and the alternate-generation selection rule remain unresolved. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_CURATOR_AND_NEMATET.md`.
+
+- The next PF1931 Temple room slice is active from Windcaller Yatila through Acolyte
   Betany. Captures `20260721-041439`, `20260721-042139`, `20260721-042705`,
   `20260721-043204`, and `20260721-044256` provide exact named SCFU generations,
   combat streams, nano timing, leash/reset evidence, corpses, credits, and
   atomic loot snapshots. The Re-Animator uses its exact level-60 generation;
   nano `205604` refills one of two captured Reanimated Corpse slots and living
   encounter adds are cleaned up with the boss. Three exact Eternal Sentinel
-  room spawns bring PF647 ordinary content to eight profiles / `125` anchors.
+  room spawns were the first extension of PF1931 ordinary content.
   The reported 23-point poison row and Gulard health changes remain effect-
   unresolved because packet ownership is not safe. The broader
   `20260721-052115` survey is evidence-only and does not activate deeper bosses.
-  Focused Temple tests and the full Debug build pass. Runtime restart is blocked
-  before port `7501` by the existing interactive SQL-table creation prompt;
-  no schema creation was authorized. Evidence:
+  Focused Temple tests and the full Debug build pass. ZoneEngine SQL tables were
+  initialized with Mike's approval and the standard engine restart completed on
+  ports `6996`/`7012`, `7500`, and `7501`. Evidence:
   `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_YATILA_TO_BETANY.md`.
 
-- Defender of the Three is the first dedicated named PF647 Temple encounter.
+- Defender of the Three is the first dedicated named PF1931 Temple encounter.
   Finalized captures `20260721-035526`, `20260721-040249`, and
   `20260721-040324` provide the exact L42/7091-health spawn, two landed `43`
   weapon hits, special-weapon context, nanos `205389` and `205561`, a
@@ -28,13 +96,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   two exact atomic loot snapshots with `1450` credits. Temple encounter,
   combat, and loot definitions are isolated from Subway definitions; shared
   runtime registries stay profile-key scoped. Nano effects, repeat attack
-  cadence, auto/social aggro, reset/return, PF647 geometry, and wider loot
+  cadence, auto/social aggro, reset/return, PF1931 geometry, and wider loot
   probabilities remain unresolved. Evidence:
   `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_DEFENDER_OF_THE_THREE.md`.
 
-- Temple of Three Winds construction has begun as a dedicated PF647 module,
+- Temple of Three Winds construction has begun as a dedicated PF1931 room module,
   separate from Subway PF127 content. Five finalized entrance-to-first-boss-room
-  captures contribute seven exact regular-Cultist profiles and `122` spawn
+  captures plus the main-room SCFUs contribute seven exact regular-Cultist profiles and `149` spawn
   anchors, including `16` two-point patrols. Combat uses the observed `15..32`
   normal envelope and `4.635295`-second median; automatic aggression uses an
   explicit conservative seven-meter policy while chase/return is capture-backed.

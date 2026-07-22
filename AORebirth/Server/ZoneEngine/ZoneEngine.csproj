@@ -445,6 +445,7 @@
     <Compile Include="Core\Playfields\Content\PlayfieldContentRegistration.cs" />
     <Compile Include="Core\Playfields\Content\PrivateCityContentModule.cs" />
     <Compile Include="Core\Playfields\Content\SubwayContentModule.cs" />
+    <Compile Include="Core\Playfields\Content\TempleOfThreeWindsContentModule.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerContentProvider.cs" />
@@ -477,6 +478,10 @@
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
+    <Compile Include="Core\Playfields\CapturedIntObservationCursor.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatProfileCatalog.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatProfileCatalog.g.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatPacketFactory.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCatalog.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />

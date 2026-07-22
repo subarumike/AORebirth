@@ -12,6 +12,8 @@ namespace AORebirth.Core.Playfields
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using Utility;
+
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields;
@@ -22,6 +24,152 @@ namespace AORebirth.Core.Playfields
         FixedAttackInfo,
         EquippedWeapon,
         Specialized
+    }
+
+    internal sealed class CapturedEnemyWeaponStatDefinition
+    {
+        internal CapturedEnemyWeaponStatDefinition(CharacterStat stat, uint value)
+        {
+            this.Stat = stat;
+            this.Value = value;
+        }
+
+        internal CharacterStat Stat { get; private set; }
+
+        internal uint Value { get; private set; }
+    }
+
+    internal sealed class CapturedEnemyWeaponDefinition
+    {
+        private static readonly CharacterStat[] RequiredStatOrder =
+        {
+            CharacterStat.Flags,
+            CharacterStat.StaticInstance,
+            CharacterStat.ACGItemLevel,
+            CharacterStat.ACGItemTemplateID,
+            CharacterStat.ACGItemTemplateID2,
+            CharacterStat.MultipleCount,
+            CharacterStat.Energy,
+            CharacterStat.AttackDelay,
+            CharacterStat.RechargeDelay
+        };
+
+        internal CapturedEnemyWeaponDefinition(
+            string evidence,
+            int evidenceSourceIdentity,
+            byte n3Unknown,
+            int unknown1,
+            int inventorySlot,
+            int stateMachineType,
+            int stateMachineInstance,
+            short unknown2,
+            CapturedEnemyWeaponStatDefinition[] stats,
+            int unknown3)
+        {
+            this.Evidence = evidence ?? string.Empty;
+            this.EvidenceSourceIdentity = evidenceSourceIdentity;
+            this.N3Unknown = n3Unknown;
+            this.Unknown1 = unknown1;
+            this.InventorySlot = inventorySlot;
+            this.StateMachineType = stateMachineType;
+            this.StateMachineInstance = stateMachineInstance;
+            this.Unknown2 = unknown2;
+            this.Stats = stats ?? new CapturedEnemyWeaponStatDefinition[0];
+            this.Unknown3 = unknown3;
+        }
+
+        internal string Evidence { get; private set; }
+
+        internal int EvidenceSourceIdentity { get; private set; }
+
+        internal byte N3Unknown { get; private set; }
+
+        internal int Unknown1 { get; private set; }
+
+        internal int InventorySlot { get; private set; }
+
+        internal int StateMachineType { get; private set; }
+
+        internal int StateMachineInstance { get; private set; }
+
+        internal short Unknown2 { get; private set; }
+
+        internal CapturedEnemyWeaponStatDefinition[] Stats { get; private set; }
+
+        internal int Unknown3 { get; private set; }
+
+        internal int LowId
+        {
+            get { return this.SignedStatValue(CharacterStat.ACGItemTemplateID); }
+        }
+
+        internal int HighId
+        {
+            get { return this.SignedStatValue(CharacterStat.ACGItemTemplateID2); }
+        }
+
+        internal int Quality
+        {
+            get { return this.SignedStatValue(CharacterStat.ACGItemLevel); }
+        }
+
+        internal int InitialEnergy
+        {
+            get { return this.SignedStatValue(CharacterStat.Energy); }
+        }
+
+        internal bool IsValid
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(this.Evidence)
+                    || this.EvidenceSourceIdentity == 0
+                    || this.Unknown1 != 0x0b
+                    || this.InventorySlot <= 0
+                    || this.StateMachineType == 0
+                    || this.Unknown2 != (short)(0x0100 | (this.InventorySlot & 0xff))
+                    || this.Stats.Length != RequiredStatOrder.Length)
+                {
+                    return false;
+                }
+
+                for (int index = 0; index < RequiredStatOrder.Length; index++)
+                {
+                    if (this.Stats[index] == null || this.Stats[index].Stat != RequiredStatOrder[index])
+                    {
+                        return false;
+                    }
+                }
+
+                return this.LowId > 0
+                       && this.HighId > 0
+                       && this.Quality > 0
+                       && this.SignedStatValue(CharacterStat.StaticInstance) == this.LowId
+                       && this.SignedStatValue(CharacterStat.MultipleCount) > 0;
+            }
+        }
+
+        internal int SignedStatValue(CharacterStat stat)
+        {
+            CapturedEnemyWeaponStatDefinition value = this.Stats.SingleOrDefault(
+                candidate => candidate != null && candidate.Stat == stat);
+            return value == null ? 0 : unchecked((int)value.Value);
+        }
+
+        internal CapturedEnemyWeaponDefinition WithEvidenceSourceIdentity(int sourceIdentity)
+        {
+            return new CapturedEnemyWeaponDefinition(
+                this.Evidence,
+                sourceIdentity,
+                this.N3Unknown,
+                this.Unknown1,
+                this.InventorySlot,
+                this.StateMachineType,
+                this.StateMachineInstance,
+                this.Unknown2,
+                this.Stats,
+                this.Unknown3);
+        }
     }
 
     internal sealed class CapturedEnemyCombatAttackDefinition
@@ -38,7 +186,9 @@ namespace AORebirth.Core.Playfields
             int attackInfoUnknown,
             int attackInfoHitType,
             int attackInfoWeaponInstance,
-            bool sendAttackInfo)
+            byte attackInfoN3Unknown,
+            bool sendAttackInfo,
+            int[] capturedDamageObservations = null)
         {
             this.MinDamage = minDamage;
             this.MaxDamage = maxDamage;
@@ -51,7 +201,11 @@ namespace AORebirth.Core.Playfields
             this.AttackInfoUnknown = attackInfoUnknown;
             this.AttackInfoHitType = attackInfoHitType;
             this.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            this.AttackInfoN3Unknown = attackInfoN3Unknown;
             this.SendAttackInfo = sendAttackInfo;
+            this.CapturedDamageObservations = capturedDamageObservations == null
+                                                  ? new int[0]
+                                                  : capturedDamageObservations.ToArray();
         }
 
         internal int MinDamage { get; private set; }
@@ -76,7 +230,31 @@ namespace AORebirth.Core.Playfields
 
         internal int AttackInfoWeaponInstance { get; private set; }
 
+        internal byte AttackInfoN3Unknown { get; private set; }
+
         internal bool SendAttackInfo { get; private set; }
+
+        internal int[] CapturedDamageObservations { get; private set; }
+
+        internal CapturedEnemyCombatAttackDefinition WithCapturedDamageObservations(
+            int[] capturedDamageObservations)
+        {
+            return new CapturedEnemyCombatAttackDefinition(
+                this.MinDamage,
+                this.MaxDamage,
+                this.DamageBonus,
+                this.Range,
+                this.RechargeSeconds,
+                this.UsesEquippedWeapon,
+                this.AttackInfoAmmoCount,
+                this.AttackInfoWeaponSlot,
+                this.AttackInfoUnknown,
+                this.AttackInfoHitType,
+                this.AttackInfoWeaponInstance,
+                this.AttackInfoN3Unknown,
+                this.SendAttackInfo,
+                capturedDamageObservations);
+        }
 
         internal bool IsValid
         {
@@ -124,7 +302,10 @@ namespace AORebirth.Core.Playfields
             int specialAttackWeaponUnknown2,
             int specialAttackWeaponUnknown3,
             int specialAttackWeaponUnknown4,
-            int specialAttackWeaponUnknown5)
+            int specialAttackWeaponUnknown5,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction)
         {
             this.InitialAttackDelaySeconds = initialAttackDelaySeconds;
             this.OpeningAttack = openingAttack;
@@ -135,6 +316,9 @@ namespace AORebirth.Core.Playfields
             this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
             this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
             this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+            this.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
+            this.AttackN3Unknown = attackN3Unknown;
+            this.AttackAction = attackAction;
         }
 
         internal double InitialAttackDelaySeconds { get; private set; }
@@ -154,6 +338,12 @@ namespace AORebirth.Core.Playfields
         internal int SpecialAttackWeaponUnknown4 { get; private set; }
 
         internal int SpecialAttackWeaponUnknown5 { get; private set; }
+
+        internal byte SpecialAttackWeaponN3Unknown { get; private set; }
+
+        internal byte AttackN3Unknown { get; private set; }
+
+        internal byte AttackAction { get; private set; }
 
         internal bool IsValid
         {
@@ -201,7 +391,10 @@ namespace AORebirth.Core.Playfields
             int specialAttackWeaponUnknown2,
             int specialAttackWeaponUnknown3,
             int specialAttackWeaponUnknown4,
-            int specialAttackWeaponUnknown5)
+            int specialAttackWeaponUnknown5,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction)
         {
             this.Streams = streams ?? new CapturedEnemyParallelAttackStreamDefinition[0];
             this.SpecialAttacks = specialAttacks ?? new CapturedEnemySpecialAttackDefinition[0];
@@ -210,6 +403,9 @@ namespace AORebirth.Core.Playfields
             this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
             this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
             this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+            this.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
+            this.AttackN3Unknown = attackN3Unknown;
+            this.AttackAction = attackAction;
         }
 
         internal CapturedEnemyParallelAttackStreamDefinition[] Streams { get; private set; }
@@ -225,6 +421,12 @@ namespace AORebirth.Core.Playfields
         internal int SpecialAttackWeaponUnknown4 { get; private set; }
 
         internal int SpecialAttackWeaponUnknown5 { get; private set; }
+
+        internal byte SpecialAttackWeaponN3Unknown { get; private set; }
+
+        internal byte AttackN3Unknown { get; private set; }
+
+        internal byte AttackAction { get; private set; }
 
         internal bool IsValid
         {
@@ -262,6 +464,32 @@ namespace AORebirth.Core.Playfields
 
         internal CapturedEnemyAttackModel AttackModel { get; private set; }
 
+        internal int EvidenceSourceIdentity { get; private set; }
+
+        internal int EvidenceSourceIdentityHint { get; private set; }
+
+        internal bool HasCapturedRequiredPacketFields { get; private set; }
+
+        internal bool UsesEquippedWeaponDamage { get; private set; }
+
+        internal int CapturedDamageBonus { get; private set; }
+
+        internal double? CapturedAttackRange { get; private set; }
+
+        internal int[] CapturedDamageObservations { get; private set; }
+
+        internal double[] CapturedAttackStartDelayObservationsSeconds { get; private set; }
+
+        internal double[] CapturedFirstHitDelayObservationsSeconds { get; private set; }
+
+        internal double[] CapturedLandedIntervalObservationsSeconds { get; private set; }
+
+        internal bool CapturedUsesEquippedWeapon { get; private set; }
+
+        internal bool SendCapturedAttackInfo { get; private set; }
+
+        internal bool HasCapturedFixedAttackBehavior { get; private set; }
+
         internal int MinDamage { get; private set; }
 
         internal int MaxDamage { get; private set; }
@@ -282,7 +510,13 @@ namespace AORebirth.Core.Playfields
 
         internal int WeaponInventorySlot { get; private set; }
 
+        internal CapturedEnemyWeaponDefinition WeaponDefinition { get; private set; }
+
         internal bool HasEmptySpecialAttackWeaponContext { get; private set; }
+
+        internal bool HasCapturedSpecialAttackWeaponContext { get; private set; }
+
+        internal CapturedEnemySpecialAttackDefinition[] CapturedSpecialAttacks { get; private set; }
 
         internal bool HasCapturedAttackStartContext { get; private set; }
 
@@ -291,6 +525,16 @@ namespace AORebirth.Core.Playfields
         internal bool HasCapturedCombatStopSequence { get; private set; }
 
         internal int AttackInfoAmmoCount { get; private set; }
+
+        internal int AttackInfoHitType { get; private set; }
+
+        internal byte AttackInfoN3Unknown { get; private set; }
+
+        internal byte SpecialAttackWeaponN3Unknown { get; private set; }
+
+        internal byte AttackN3Unknown { get; private set; }
+
+        internal byte AttackAction { get; private set; }
 
         internal int SpecialAttackWeaponUnknown1 { get; private set; }
 
@@ -328,21 +572,455 @@ namespace AORebirth.Core.Playfields
                 switch (this.AttackModel)
                 {
                     case CapturedEnemyAttackModel.FixedAttackInfo:
-                        return this.MinDamage > 0 && this.MaxDamage >= this.MinDamage;
+                        return this.EvidenceSourceIdentity > 0
+                               && this.HasCapturedRequiredPacketFields
+                               && this.HasCapturedSpecialAttackWeaponContext
+                               && this.HasCapturedAttackStartContext
+                               && this.MinDamage > 0
+                               && this.MaxDamage >= this.MinDamage
+                               && this.RechargeSeconds > 0
+                               && this.HasCompleteCapturedFixedRuntimeObservations()
+                               && this.FixedAttackHasCompleteSource()
+                               && (this.WeaponDefinition == null
+                                   || (this.WeaponDefinition.IsValid
+                                       && this.WeaponDefinition.EvidenceSourceIdentity
+                                          == this.EvidenceSourceIdentity
+                                       && this.AttackInfoAmmoMatchesCapturedEnergy()));
                     case CapturedEnemyAttackModel.EquippedWeapon:
-                        return this.WeaponLowId > 0
+                        return this.EvidenceSourceIdentity > 0
+                               && this.HasCapturedRequiredPacketFields
+                               && this.HasCapturedEquippedAttackInfo
+                               && this.HasCapturedAttackStartContext
+                               && this.WeaponDefinition != null
+                               && this.WeaponDefinition.IsValid
+                               && this.WeaponDefinition.EvidenceSourceIdentity
+                               == this.EvidenceSourceIdentity
+                               && this.WeaponLowId > 0
                                && this.WeaponHighId > 0
                                && this.WeaponQuality > 0
-                               && this.WeaponInventorySlot > 0;
+                               && this.WeaponInventorySlot > 0
+                               && this.WeaponDefinition.LowId == this.WeaponLowId
+                               && this.WeaponDefinition.HighId == this.WeaponHighId
+                               && this.WeaponDefinition.Quality == this.WeaponQuality
+                               && this.WeaponDefinition.InventorySlot == this.WeaponInventorySlot
+                               && this.AttackInfoWeaponSlot == this.WeaponInventorySlot
+                               && this.AttackInfoWeaponInstance == 0
+                               && this.FirstHitDelaySeconds > 0
+                               && this.RechargeSeconds > 0
+                               && (this.UsesEquippedWeaponDamage
+                                   || (this.MinDamage > 0
+                                       && this.MaxDamage >= this.MinDamage
+                                       && this.HasExplicitCapturedAttackRange()))
+                               && this.AttackInfoAmmoMatchesCapturedEnergy();
                     case CapturedEnemyAttackModel.Specialized:
-                        return (this.SpecialAttackSequence != null
-                                && this.SpecialAttackSequence.IsValid)
-                               || (this.ParallelAttackSequence != null
-                                   && this.ParallelAttackSequence.IsValid);
+                        return this.EvidenceSourceIdentity > 0
+                               && (this.HasCompleteSpecialAttackSequence()
+                                   || this.HasCompleteParallelAttackSequence());
                     default:
                         return false;
                 }
             }
+        }
+
+        internal bool IsQuarantined
+        {
+            get { return !this.IsCombatReady; }
+        }
+
+        internal string QuarantineReason
+        {
+            get
+            {
+                if (!this.Retaliates)
+                {
+                    return "retaliation is not capture-proven";
+                }
+
+                if (this.AttackModel == CapturedEnemyAttackModel.Unresolved)
+                {
+                    return "captured attack contract is unresolved";
+                }
+
+                if (this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
+                {
+                    return "fixed/generic AttackInfo lacks a complete capture-certified packet sequence";
+                }
+
+                if (this.EvidenceSourceIdentity == 0)
+                {
+                    return "capture source identity is missing";
+                }
+
+                if (this.RequiresPhysicalWeaponDefinition() && this.WeaponDefinition == null)
+                {
+                    return "owner-linked WeaponItemFullUpdate evidence is missing";
+                }
+
+                if (this.WeaponDefinition != null && !this.WeaponDefinition.IsValid)
+                {
+                    return "owner-linked WeaponItemFullUpdate evidence is invalid";
+                }
+
+                return "captured attack packet context is incomplete";
+            }
+        }
+
+        internal CapturedEnemyCombatContract WithCapturedWeapon(
+            CapturedEnemyWeaponDefinition weaponDefinition)
+        {
+            this.WeaponDefinition = weaponDefinition;
+            this.ApplyCapturedWeaponIdentity(weaponDefinition);
+            return this;
+        }
+
+        internal CapturedEnemyCombatContract WithEvidenceSourceHint(int sourceIdentity)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.EvidenceSourceIdentityHint = sourceIdentity;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithCapturedSpecializedDamageObservations(
+            int[][] capturedDamageObservationsByAttack)
+        {
+            if (this.AttackModel != CapturedEnemyAttackModel.Specialized
+                || capturedDamageObservationsByAttack == null)
+            {
+                return null;
+            }
+
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            if (this.SpecialAttackSequence != null)
+            {
+                CapturedEnemySpecialAttackSequenceDefinition sequence = this.SpecialAttackSequence;
+                int expectedAttackCount = sequence.OpeningAttack == null ? 1 : 2;
+                if (capturedDamageObservationsByAttack.Length != expectedAttackCount)
+                {
+                    return null;
+                }
+
+                int observationIndex = 0;
+                CapturedEnemyCombatAttackDefinition openingAttack = sequence.OpeningAttack == null
+                                                                          ? null
+                                                                          : sequence.OpeningAttack.WithCapturedDamageObservations(
+                                                                              capturedDamageObservationsByAttack[observationIndex++]);
+                CapturedEnemyCombatAttackDefinition repeatingAttack =
+                    sequence.RepeatingAttack.WithCapturedDamageObservations(
+                        capturedDamageObservationsByAttack[observationIndex]);
+                clone.SpecialAttackSequence = new CapturedEnemySpecialAttackSequenceDefinition(
+                    sequence.InitialAttackDelaySeconds,
+                    openingAttack,
+                    repeatingAttack,
+                    sequence.SpecialAttacks,
+                    sequence.SpecialAttackWeaponUnknown1,
+                    sequence.SpecialAttackWeaponUnknown2,
+                    sequence.SpecialAttackWeaponUnknown3,
+                    sequence.SpecialAttackWeaponUnknown4,
+                    sequence.SpecialAttackWeaponUnknown5,
+                    sequence.SpecialAttackWeaponN3Unknown,
+                    sequence.AttackN3Unknown,
+                    sequence.AttackAction);
+                return clone;
+            }
+
+            if (this.ParallelAttackSequence == null
+                || capturedDamageObservationsByAttack.Length
+                   != this.ParallelAttackSequence.Streams.Length)
+            {
+                return null;
+            }
+
+            CapturedEnemyParallelAttackSequenceDefinition parallelSequence =
+                this.ParallelAttackSequence;
+            var enrichedStreams = new CapturedEnemyParallelAttackStreamDefinition[
+                parallelSequence.Streams.Length];
+            for (int index = 0; index < parallelSequence.Streams.Length; index++)
+            {
+                CapturedEnemyParallelAttackStreamDefinition stream = parallelSequence.Streams[index];
+                enrichedStreams[index] = new CapturedEnemyParallelAttackStreamDefinition(
+                    stream.InitialDelaySeconds,
+                    stream.Attack.WithCapturedDamageObservations(
+                        capturedDamageObservationsByAttack[index]));
+            }
+
+            clone.ParallelAttackSequence = new CapturedEnemyParallelAttackSequenceDefinition(
+                enrichedStreams,
+                parallelSequence.SpecialAttacks,
+                parallelSequence.SpecialAttackWeaponUnknown1,
+                parallelSequence.SpecialAttackWeaponUnknown2,
+                parallelSequence.SpecialAttackWeaponUnknown3,
+                parallelSequence.SpecialAttackWeaponUnknown4,
+                parallelSequence.SpecialAttackWeaponUnknown5,
+                parallelSequence.SpecialAttackWeaponN3Unknown,
+                parallelSequence.AttackN3Unknown,
+                parallelSequence.AttackAction);
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithCaptureCertification(
+            string generatedEvidence,
+            int evidenceSourceIdentity,
+            CapturedEnemyWeaponDefinition weaponDefinition)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.Evidence = string.IsNullOrWhiteSpace(generatedEvidence)
+                                 ? this.Evidence
+                                 : generatedEvidence;
+            clone.EvidenceSourceIdentity = evidenceSourceIdentity;
+            clone.WeaponDefinition = weaponDefinition;
+            clone.ApplyCapturedWeaponIdentity(weaponDefinition);
+            return clone;
+        }
+
+        internal bool MatchesCapturedWeapon(IItem item)
+        {
+            if (item == null
+                || this.WeaponDefinition == null
+                || item.LowID != this.WeaponLowId
+                || item.HighID != this.WeaponHighId
+                || item.Quality != this.WeaponQuality)
+            {
+                return false;
+            }
+
+            foreach (CapturedEnemyWeaponStatDefinition stat in this.WeaponDefinition.Stats)
+            {
+                int expected = unchecked((int)stat.Value);
+                switch (stat.Stat)
+                {
+                    case CharacterStat.Flags:
+                        if (item.Flags != expected) return false;
+                        break;
+                    case CharacterStat.StaticInstance:
+                    case CharacterStat.ACGItemTemplateID:
+                        if (item.LowID != expected) return false;
+                        break;
+                    case CharacterStat.ACGItemLevel:
+                        if (item.Quality != expected) return false;
+                        break;
+                    case CharacterStat.ACGItemTemplateID2:
+                        if (item.HighID != expected) return false;
+                        break;
+                    case CharacterStat.MultipleCount:
+                        if (item.MultipleCount != expected) return false;
+                        break;
+                    case CharacterStat.Energy:
+                        if (item.GetAttribute((int)StatIds.energy) != expected) return false;
+                        break;
+                    case CharacterStat.AttackDelay:
+                        if (item.GetAttribute((int)StatIds.itemdelay) != expected) return false;
+                        break;
+                    case CharacterStat.RechargeDelay:
+                        if (item.GetAttribute((int)StatIds.rechargedelay) != expected) return false;
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        internal bool RequiresPhysicalWeaponPresentation
+        {
+            get { return this.RequiresPhysicalWeaponDefinition(); }
+        }
+
+        private bool AttackInfoAmmoMatchesCapturedEnergy()
+        {
+            if (this.WeaponDefinition == null)
+            {
+                return false;
+            }
+
+            int energy = this.WeaponDefinition.InitialEnergy;
+            return energy == -1
+                       ? this.AttackInfoAmmoCount == -1
+                       : energy == 0
+                             ? this.AttackInfoAmmoCount == 0
+                             : energy > 0 && this.AttackInfoAmmoCount == energy - 1;
+        }
+
+        private bool HasCompleteCapturedFixedRuntimeObservations()
+        {
+            return this.HasCapturedFixedAttackBehavior
+                   && this.SendCapturedAttackInfo
+                   && (this.HasExplicitCapturedAttackRange()
+                       || this.HasCapturedWeaponAttackRangeSource())
+                   && this.CapturedDamageObservations != null
+                   && this.CapturedDamageObservations.Length > 0
+                   && this.CapturedDamageObservations.All(value => value > 0)
+                   && this.CapturedDamageObservations.Min() == this.MinDamage
+                   && this.CapturedDamageObservations.Max() == this.MaxDamage
+                   && this.CapturedAttackStartDelayObservationsSeconds != null
+                   && this.CapturedAttackStartDelayObservationsSeconds.Length > 0
+                   && this.CapturedAttackStartDelayObservationsSeconds.All(
+                       value => !double.IsNaN(value)
+                                && !double.IsInfinity(value)
+                                && value >= 0.0d)
+                   && this.CapturedFirstHitDelayObservationsSeconds != null
+                   && this.CapturedFirstHitDelayObservationsSeconds.Length > 0
+                   && this.CapturedFirstHitDelayObservationsSeconds.All(
+                       value => !double.IsNaN(value)
+                                && !double.IsInfinity(value)
+                                && value >= 0.0d)
+                   && this.CapturedAttackStartDelayObservationsSeconds.Length
+                      == this.CapturedFirstHitDelayObservationsSeconds.Length
+                   && this.CapturedLandedIntervalObservationsSeconds != null
+                   && this.CapturedLandedIntervalObservationsSeconds.Length > 0
+                   && this.CapturedLandedIntervalObservationsSeconds.All(
+                       value => !double.IsNaN(value)
+                                && !double.IsInfinity(value)
+                                && value > 0.0d)
+                   && Math.Abs(
+                       this.AttackStartDelaySeconds
+                       - this.CapturedAttackStartDelayObservationsSeconds[0]) < 0.000001d
+                   && Math.Abs(
+                       this.FirstHitDelaySeconds
+                       - this.CapturedFirstHitDelayObservationsSeconds[0]) < 0.000001d
+                   && Math.Abs(
+                       this.RechargeSeconds
+                       - this.CapturedLandedIntervalObservationsSeconds[0]) < 0.000001d;
+        }
+
+        private bool HasExplicitCapturedAttackRange()
+        {
+            return this.CapturedAttackRange.HasValue
+                   && this.CapturedAttackRange.Value > 0.0d
+                   && !double.IsNaN(this.CapturedAttackRange.Value)
+                   && !double.IsInfinity(this.CapturedAttackRange.Value);
+        }
+
+        private bool HasCapturedWeaponAttackRangeSource()
+        {
+            return !this.CapturedAttackRange.HasValue
+                   && this.CapturedUsesEquippedWeapon
+                   && this.AttackInfoWeaponInstance == 0
+                   && this.WeaponDefinition != null
+                   && this.WeaponDefinition.IsValid
+                   && this.AttackInfoWeaponSlot == this.WeaponDefinition.InventorySlot
+                   && this.WeaponInventorySlot == this.WeaponDefinition.InventorySlot
+                   && this.WeaponLowId == this.WeaponDefinition.LowId
+                   && this.WeaponHighId == this.WeaponDefinition.HighId
+                   && this.WeaponQuality == this.WeaponDefinition.Quality;
+        }
+
+        private void ApplyCapturedWeaponIdentity(CapturedEnemyWeaponDefinition weaponDefinition)
+        {
+            if (weaponDefinition == null)
+            {
+                return;
+            }
+
+            this.WeaponLowId = weaponDefinition.LowId;
+            this.WeaponHighId = weaponDefinition.HighId;
+            this.WeaponQuality = weaponDefinition.Quality;
+            this.WeaponInventorySlot = weaponDefinition.InventorySlot;
+        }
+
+        private bool HasCompleteSpecialAttackSequence()
+        {
+            if (this.SpecialAttackSequence == null || !this.SpecialAttackSequence.IsValid)
+            {
+                return false;
+            }
+
+            return this.AttackHasCompleteSource(
+                       this.SpecialAttackSequence.OpeningAttack,
+                       this.SpecialAttackSequence.SpecialAttacks)
+                   && this.AttackHasCompleteSource(
+                       this.SpecialAttackSequence.RepeatingAttack,
+                       this.SpecialAttackSequence.SpecialAttacks);
+        }
+
+        private bool FixedAttackHasCompleteSource()
+        {
+            if (this.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
+                && this.AttackInfoWeaponInstance == 0)
+            {
+                return this.WeaponDefinition != null
+                       && this.WeaponDefinition.IsValid
+                       && this.WeaponDefinition.InventorySlot == this.AttackInfoWeaponSlot;
+            }
+
+            if (this.AttackInfoWeaponInstance == 0)
+            {
+                return this.AttackInfoWeaponSlot == 0;
+            }
+
+            return this.CapturedSpecialAttacks != null
+                   && this.CapturedSpecialAttacks.Any(
+                       value => value != null && value.Tag == this.AttackInfoWeaponInstance);
+        }
+
+        private bool HasCompleteParallelAttackSequence()
+        {
+            if (this.ParallelAttackSequence == null || !this.ParallelAttackSequence.IsValid)
+            {
+                return false;
+            }
+
+            return this.ParallelAttackSequence.Streams.All(
+                stream => this.AttackHasCompleteSource(
+                    stream.Attack,
+                    this.ParallelAttackSequence.SpecialAttacks));
+        }
+
+        private bool AttackHasCompleteSource(
+            CapturedEnemyCombatAttackDefinition attack,
+            CapturedEnemySpecialAttackDefinition[] specials)
+        {
+            if (attack == null)
+            {
+                return true;
+            }
+
+            if (attack.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
+                && attack.AttackInfoWeaponInstance == 0)
+            {
+                return this.WeaponDefinition != null
+                       && this.WeaponDefinition.IsValid
+                       && this.WeaponDefinition.InventorySlot == attack.AttackInfoWeaponSlot;
+            }
+
+            if (attack.AttackInfoWeaponInstance == 0)
+            {
+                return attack.AttackInfoWeaponSlot == 0;
+            }
+
+            return specials != null
+                   && specials.Any(value => value != null && value.Tag == attack.AttackInfoWeaponInstance);
+        }
+
+        private bool RequiresPhysicalWeaponDefinition()
+        {
+            if (this.AttackModel == CapturedEnemyAttackModel.EquippedWeapon)
+            {
+                return true;
+            }
+
+            if (this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
+            {
+                return this.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
+                       && this.AttackInfoWeaponInstance == 0;
+            }
+
+            if (this.SpecialAttackSequence != null)
+            {
+                return (this.SpecialAttackSequence.OpeningAttack != null
+                        && this.SpecialAttackSequence.OpeningAttack.AttackInfoWeaponSlot
+                        == (int)WeaponSlots.Righthand
+                        && this.SpecialAttackSequence.OpeningAttack.AttackInfoWeaponInstance == 0)
+                       || (this.SpecialAttackSequence.RepeatingAttack != null
+                           && this.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot
+                           == (int)WeaponSlots.Righthand
+                           && this.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance == 0);
+            }
+
+            return this.ParallelAttackSequence != null
+                   && this.ParallelAttackSequence.Streams.Any(
+                       stream => stream.Attack.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
+                                 && stream.Attack.AttackInfoWeaponInstance == 0);
         }
 
         internal static CapturedEnemyCombatContract FixedAttack(
@@ -353,7 +1031,9 @@ namespace AORebirth.Core.Playfields
             int weaponSlot,
             int attackInfoUnknown,
             int weaponInstance,
-            int attackInfoAmmoCount = 0)
+            int attackInfoAmmoCount,
+            int attackInfoHitType,
+            byte attackInfoN3Unknown)
         {
             return new CapturedEnemyCombatContract
             {
@@ -367,7 +1047,9 @@ namespace AORebirth.Core.Playfields
                 AttackInfoAmmoCount = attackInfoAmmoCount,
                 AttackInfoWeaponSlot = weaponSlot,
                 AttackInfoUnknown = attackInfoUnknown,
-                AttackInfoWeaponInstance = weaponInstance
+                AttackInfoWeaponInstance = weaponInstance,
+                AttackInfoHitType = attackInfoHitType,
+                AttackInfoN3Unknown = attackInfoN3Unknown
             };
         }
 
@@ -383,7 +1065,13 @@ namespace AORebirth.Core.Playfields
             double rechargeSeconds,
             int weaponSlot,
             int attackInfoUnknown,
-            int weaponInstance)
+            int weaponInstance,
+            int attackInfoAmmoCount,
+            int attackInfoHitType,
+            byte attackInfoN3Unknown,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction)
         {
             return new CapturedEnemyCombatContract
             {
@@ -399,8 +1087,115 @@ namespace AORebirth.Core.Playfields
                 AttackInfoWeaponSlot = weaponSlot,
                 AttackInfoUnknown = attackInfoUnknown,
                 AttackInfoWeaponInstance = weaponInstance,
+                AttackInfoAmmoCount = attackInfoAmmoCount,
+                AttackInfoHitType = attackInfoHitType,
+                AttackInfoN3Unknown = attackInfoN3Unknown,
+                SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown,
+                AttackN3Unknown = attackN3Unknown,
+                AttackAction = attackAction,
                 HasCapturedAttackStartContext = true,
-                HasEmptySpecialAttackWeaponContext = true
+                HasEmptySpecialAttackWeaponContext = true,
+                HasCapturedSpecialAttackWeaponContext = true,
+                CapturedSpecialAttacks = new CapturedEnemySpecialAttackDefinition[0]
+            };
+        }
+
+        internal static CapturedEnemyCombatContract CapturedFixedPacketSequence(
+            string evidence,
+            int evidenceSourceIdentity,
+            NpcAiProfile aiProfile,
+            int minDamage,
+            int maxDamage,
+            double rechargeSeconds,
+            CapturedEnemySpecialAttackDefinition[] specialAttacks,
+            byte specialAttackWeaponN3Unknown,
+            int specialAttackWeaponUnknown1,
+            int specialAttackWeaponUnknown2,
+            int specialAttackWeaponUnknown3,
+            int specialAttackWeaponUnknown4,
+            int specialAttackWeaponUnknown5,
+            byte attackN3Unknown,
+            byte attackAction,
+            int attackInfoAmmoCount,
+            int attackInfoWeaponSlot,
+            int attackInfoDamageTypeWire,
+            int attackInfoHitTypeWire,
+            int attackInfoWeaponInstance,
+            byte attackInfoN3Unknown,
+            bool requiresDamageLineOfSight,
+            int[] capturedDamageObservations = null,
+            double[] capturedAttackStartDelayObservationsSeconds = null,
+            double[] capturedFirstHitDelayObservationsSeconds = null,
+            double[] capturedLandedIntervalObservationsSeconds = null,
+            int? capturedDamageBonus = null,
+            bool? capturedUsesEquippedWeapon = null,
+            double? capturedAttackRange = null,
+            bool? capturedSendAttackInfo = null)
+        {
+            int[] damageObservations = capturedDamageObservations == null
+                                           ? new int[0]
+                                           : capturedDamageObservations.ToArray();
+            double[] attackStartDelayObservations =
+                capturedAttackStartDelayObservationsSeconds == null
+                    ? new double[0]
+                    : capturedAttackStartDelayObservationsSeconds.ToArray();
+            double[] firstHitDelayObservations =
+                capturedFirstHitDelayObservationsSeconds == null
+                    ? new double[0]
+                    : capturedFirstHitDelayObservationsSeconds.ToArray();
+            double[] landedIntervalObservations =
+                capturedLandedIntervalObservationsSeconds == null
+                    ? new double[0]
+                    : capturedLandedIntervalObservationsSeconds.ToArray();
+            return new CapturedEnemyCombatContract
+            {
+                Evidence = evidence,
+                EvidenceSourceIdentity = evidenceSourceIdentity,
+                Retaliates = true,
+                AiProfile = aiProfile,
+                AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
+                MinDamage = minDamage,
+                MaxDamage = maxDamage,
+                RechargeSeconds = rechargeSeconds,
+                CapturedDamageObservations = damageObservations,
+                CapturedAttackStartDelayObservationsSeconds = attackStartDelayObservations,
+                CapturedFirstHitDelayObservationsSeconds = firstHitDelayObservations,
+                CapturedLandedIntervalObservationsSeconds = landedIntervalObservations,
+                AttackStartDelaySeconds = attackStartDelayObservations.Length == 0
+                                              ? 0.0d
+                                              : attackStartDelayObservations[0],
+                FirstHitDelaySeconds = firstHitDelayObservations.Length == 0
+                                           ? 0.0d
+                                           : firstHitDelayObservations[0],
+                CapturedDamageBonus = capturedDamageBonus ?? 0,
+                CapturedUsesEquippedWeapon = capturedUsesEquippedWeapon ?? false,
+                CapturedAttackRange = capturedAttackRange,
+                SendCapturedAttackInfo = capturedSendAttackInfo ?? false,
+                HasCapturedFixedAttackBehavior = capturedDamageBonus.HasValue
+                                                 && capturedUsesEquippedWeapon.HasValue
+                                                 && capturedSendAttackInfo.HasValue,
+                CapturedSpecialAttacks = specialAttacks
+                                           ?? new CapturedEnemySpecialAttackDefinition[0],
+                HasCapturedRequiredPacketFields = true,
+                HasCapturedSpecialAttackWeaponContext = true,
+                HasEmptySpecialAttackWeaponContext = specialAttacks == null
+                                                     || specialAttacks.Length == 0,
+                HasCapturedAttackStartContext = true,
+                SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown,
+                SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1,
+                SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2,
+                SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3,
+                SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4,
+                SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5,
+                AttackN3Unknown = attackN3Unknown,
+                AttackAction = attackAction,
+                AttackInfoAmmoCount = attackInfoAmmoCount,
+                AttackInfoWeaponSlot = attackInfoWeaponSlot,
+                AttackInfoUnknown = attackInfoDamageTypeWire,
+                AttackInfoHitType = attackInfoHitTypeWire,
+                AttackInfoWeaponInstance = attackInfoWeaponInstance,
+                AttackInfoN3Unknown = attackInfoN3Unknown,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
             };
         }
 
@@ -434,6 +1229,8 @@ namespace AORebirth.Core.Playfields
             int attackInfoWeaponSlot,
             int attackInfoUnknown,
             int attackInfoWeaponInstance,
+            int attackInfoHitType,
+            byte attackInfoN3Unknown,
             bool requiresDamageLineOfSight = false)
         {
             CapturedEnemyCombatContract contract = EquippedWeapon(
@@ -447,6 +1244,82 @@ namespace AORebirth.Core.Playfields
             contract.AttackInfoWeaponSlot = attackInfoWeaponSlot;
             contract.AttackInfoUnknown = attackInfoUnknown;
             contract.AttackInfoWeaponInstance = attackInfoWeaponInstance;
+            contract.AttackInfoHitType = attackInfoHitType;
+            contract.AttackInfoN3Unknown = attackInfoN3Unknown;
+            contract.RequiresDamageLineOfSight = requiresDamageLineOfSight;
+            return contract;
+        }
+
+        internal static CapturedEnemyCombatContract EquippedWeaponWithCapturedPacketSequence(
+            string evidence,
+            int evidenceSourceIdentity,
+            int lowId,
+            int highId,
+            int quality,
+            int inventorySlot,
+            bool usesEquippedWeaponDamage,
+            int minDamage,
+            int maxDamage,
+            int damageBonus,
+            double attackRange,
+            double attackStartDelaySeconds,
+            double movementTransitionDelaySeconds,
+            double firstHitDelaySeconds,
+            double rechargeSeconds,
+            bool hasCapturedCombatStopSequence,
+            bool sendStopFightOnDeath,
+            int attackInfoAmmoCount,
+            int attackInfoUnknown,
+            int specialAttackWeaponUnknown1,
+            int specialAttackWeaponUnknown2,
+            int specialAttackWeaponUnknown3,
+            int specialAttackWeaponUnknown4,
+            int specialAttackWeaponUnknown5,
+            int attackInfoHitType,
+            byte attackInfoN3Unknown,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction,
+            bool requiresDamageLineOfSight = false)
+        {
+            CapturedEnemyCombatContract contract = EquippedWeapon(
+                evidence,
+                lowId,
+                highId,
+                quality,
+                inventorySlot);
+            contract.EvidenceSourceIdentity = evidenceSourceIdentity;
+            contract.HasCapturedRequiredPacketFields = true;
+            contract.UsesEquippedWeaponDamage = usesEquippedWeaponDamage;
+            contract.MinDamage = minDamage;
+            contract.MaxDamage = maxDamage;
+            contract.CapturedDamageBonus = damageBonus;
+            contract.CapturedAttackRange = attackRange;
+            contract.HasEmptySpecialAttackWeaponContext = true;
+            contract.HasCapturedSpecialAttackWeaponContext = true;
+            contract.CapturedSpecialAttacks = new CapturedEnemySpecialAttackDefinition[0];
+            contract.HasCapturedAttackStartContext = true;
+            contract.HasCapturedEquippedAttackInfo = true;
+            contract.HasCapturedCombatStopSequence = hasCapturedCombatStopSequence;
+            contract.AttackInfoAmmoCount = attackInfoAmmoCount;
+            contract.AttackInfoWeaponSlot = inventorySlot;
+            contract.AttackInfoUnknown = attackInfoUnknown;
+            contract.AttackInfoWeaponInstance = 0;
+            contract.AttackInfoHitType = attackInfoHitType;
+            contract.AttackInfoN3Unknown = attackInfoN3Unknown;
+            contract.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
+            contract.AttackN3Unknown = attackN3Unknown;
+            contract.AttackAction = attackAction;
+            contract.AttackStartDelaySeconds = attackStartDelaySeconds;
+            contract.MovementTransitionDelaySeconds = movementTransitionDelaySeconds;
+            contract.FirstHitDelaySeconds = firstHitDelaySeconds;
+            contract.RechargeSeconds = rechargeSeconds;
+            contract.SendStopFightOnDeath = sendStopFightOnDeath;
+            contract.SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1;
+            contract.SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2;
+            contract.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
+            contract.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
+            contract.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
             contract.RequiresDamageLineOfSight = requiresDamageLineOfSight;
             return contract;
         }
@@ -471,6 +1344,11 @@ namespace AORebirth.Core.Playfields
             int unknown3,
             int unknown4,
             int unknown5,
+            int attackInfoHitType,
+            byte attackInfoN3Unknown,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction,
             bool requiresDamageLineOfSight = false)
         {
             CapturedEnemyCombatContract contract = EquippedWeapon(
@@ -480,6 +1358,8 @@ namespace AORebirth.Core.Playfields
                 quality,
                 inventorySlot);
             contract.HasEmptySpecialAttackWeaponContext = true;
+            contract.HasCapturedSpecialAttackWeaponContext = true;
+            contract.CapturedSpecialAttacks = new CapturedEnemySpecialAttackDefinition[0];
             contract.HasCapturedAttackStartContext = true;
             contract.HasCapturedEquippedAttackInfo = true;
             contract.HasCapturedCombatStopSequence = true;
@@ -487,6 +1367,11 @@ namespace AORebirth.Core.Playfields
             contract.AttackInfoWeaponSlot = inventorySlot;
             contract.AttackInfoUnknown = attackInfoUnknown;
             contract.AttackInfoWeaponInstance = 0;
+            contract.AttackInfoHitType = attackInfoHitType;
+            contract.AttackInfoN3Unknown = attackInfoN3Unknown;
+            contract.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
+            contract.AttackN3Unknown = attackN3Unknown;
+            contract.AttackAction = attackAction;
             contract.MinDamage = minDamage;
             contract.MaxDamage = maxDamage;
             contract.AttackStartDelaySeconds = attackStartDelaySeconds;
@@ -552,11 +1437,39 @@ namespace AORebirth.Core.Playfields
         private static readonly Dictionary<int, CapturedEnemyCombatContract> Contracts =
             new Dictionary<int, CapturedEnemyCombatContract>();
 
-        internal static void Register(int serverInstance, CapturedEnemyCombatContract contract)
+        private static readonly Dictionary<int, int> CapturedWeaponEnergy =
+            new Dictionary<int, int>();
+
+        private static readonly Dictionary<int, IItem> CapturedWeaponItems =
+            new Dictionary<int, IItem>();
+
+        internal static void Register(
+            int serverInstance,
+            CapturedEnemyCombatContract contract,
+            IItem capturedWeapon = null)
         {
             lock (Sync)
             {
                 Contracts[serverInstance] = contract;
+                if (contract != null
+                    && contract.WeaponDefinition != null
+                    && contract.WeaponDefinition.IsValid)
+                {
+                    CapturedWeaponEnergy[serverInstance] = contract.WeaponDefinition.InitialEnergy;
+                    if (capturedWeapon != null)
+                    {
+                        CapturedWeaponItems[serverInstance] = capturedWeapon;
+                    }
+                    else
+                    {
+                        CapturedWeaponItems.Remove(serverInstance);
+                    }
+                }
+                else
+                {
+                    CapturedWeaponEnergy.Remove(serverInstance);
+                    CapturedWeaponItems.Remove(serverInstance);
+                }
             }
         }
 
@@ -573,6 +1486,98 @@ namespace AORebirth.Core.Playfields
             lock (Sync)
             {
                 Contracts.Remove(serverInstance);
+                CapturedWeaponEnergy.Remove(serverInstance);
+                CapturedWeaponItems.Remove(serverInstance);
+            }
+        }
+
+        internal static void QuarantineRuntime(ICharacter character, string reason)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            CapturedEnemyCombatContract current;
+            string evidence = TryGet(character.Identity.Instance, out current) && current != null
+                                  ? current.Evidence
+                                  : string.Empty;
+            var controller = character.Controller as NPCController;
+            if (controller != null)
+            {
+                controller.AiProfile = NpcAiProfile.Passive;
+            }
+
+            Register(
+                character.Identity.Instance,
+                CapturedEnemyCombatContract.Unresolved(
+                    evidence + "; runtime quarantine=" + reason,
+                    true));
+            LogUtil.Debug(
+                DebugInfoDetail.Error,
+                "CapturedEnemyCombatRuntimeQuarantined actor=" + character.Identity
+                + " reason=" + reason);
+        }
+
+        internal static bool TryConsumeCapturedWeaponAmmo(int serverInstance, out int ammoCount)
+        {
+            lock (Sync)
+            {
+                int energy;
+                if (!CapturedWeaponEnergy.TryGetValue(serverInstance, out energy))
+                {
+                    ammoCount = 0;
+                    return false;
+                }
+
+                if (energy == -1)
+                {
+                    ammoCount = -1;
+                    return true;
+                }
+
+                if (energy == 0)
+                {
+                    CapturedEnemyCombatContract contract;
+                    if (Contracts.TryGetValue(serverInstance, out contract)
+                        && contract != null
+                        && contract.WeaponDefinition != null
+                        && contract.WeaponDefinition.InitialEnergy == 0)
+                    {
+                        ammoCount = 0;
+                        return true;
+                    }
+
+                    ammoCount = 0;
+                    return false;
+                }
+
+                if (energy < 0)
+                {
+                    ammoCount = 0;
+                    return false;
+                }
+
+                energy--;
+                CapturedWeaponEnergy[serverInstance] = energy;
+                ammoCount = energy;
+                return true;
+            }
+        }
+
+        internal static bool TryGetCapturedWeaponEnergy(int serverInstance, out int energy)
+        {
+            lock (Sync)
+            {
+                return CapturedWeaponEnergy.TryGetValue(serverInstance, out energy);
+            }
+        }
+
+        internal static bool TryGetCapturedWeaponItem(int serverInstance, out IItem item)
+        {
+            lock (Sync)
+            {
+                return CapturedWeaponItems.TryGetValue(serverInstance, out item);
             }
         }
     }
@@ -594,44 +1599,136 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (contract.Retaliates)
+            {
+                CapturedEnemyCombatContract resolved;
+                string resolutionFailure;
+                if (CapturedEnemyCombatProfileCatalog.TryResolve(
+                    character,
+                    contract,
+                    out resolved,
+                    out resolutionFailure))
+                {
+                    contract = resolved;
+                }
+                else
+                {
+                    contract = CapturedEnemyCombatContract.Unresolved(
+                        contract.Evidence + "; corpus resolution="
+                        + (string.IsNullOrWhiteSpace(resolutionFailure)
+                               ? "selected retaliatory contract was not capture-certified"
+                               : resolutionFailure),
+                        true);
+                }
+            }
+
             if (!contract.IsCombatReady)
             {
+                controller.AiProfile = NpcAiProfile.Passive;
                 CapturedEnemyCombatRuntimeRegistry.Register(character.Identity.Instance, contract);
-                failure = "captured attack source is unresolved; evidence=" + contract.Evidence;
-                return false;
+                failure = "captured combat quarantined: " + contract.QuarantineReason
+                          + "; evidence=" + contract.Evidence;
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "CapturedEnemyCombatQuarantined actor=" + character.Identity
+                    + " reason=" + failure);
+                return true;
             }
 
             controller.AiProfile = contract.AiProfile;
-            if (contract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
+            IItem capturedWeapon = null;
+            if (contract.WeaponDefinition != null
+                && !TryEquipCapturedWeapon(character, contract, out capturedWeapon, out failure))
             {
-                SetMobStat(character, StatIds.mindamage, contract.MinDamage);
-                SetMobStat(character, StatIds.maxdamage, contract.MaxDamage);
-                // Client combat text uses damagetype (91 = Melee). Leave 0 → "UNKNOWN damage".
-                SetMobStat(character, StatIds.damagetype, (int)StatIds.meleeac);
-                SetMobStat(character, StatIds.damageoverridetype, (int)StatIds.meleeac);
-                SetMobStat(character, StatIds.defaultattacktype, 0);
-                SetMobStat(character, StatIds.weapontype, 0);
-            }
-            else if (contract.AttackModel == CapturedEnemyAttackModel.EquippedWeapon
-                     && !TryEquipCapturedWeapon(character, contract, out failure))
-            {
+                controller.AiProfile = NpcAiProfile.Passive;
                 CapturedEnemyCombatRuntimeRegistry.Register(
                     character.Identity.Instance,
                     CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; runtime failure=" + failure,
                         contract.Retaliates));
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "CapturedEnemyCombatQuarantined actor=" + character.Identity
+                    + " reason=" + failure);
+                return true;
+            }
+
+            CapturedEnemyCombatRuntimeRegistry.Register(
+                character.Identity.Instance,
+                contract,
+                capturedWeapon);
+            return true;
+        }
+
+        internal static bool TryValidateLiveCapturedWeapon(
+            ICharacter character,
+            CapturedEnemyCombatContract contract,
+            out IItem item,
+            out string failure)
+        {
+            item = null;
+            failure = string.Empty;
+            if (character == null || contract == null || !contract.RequiresPhysicalWeaponPresentation)
+            {
+                failure = "character or physical captured contract is unavailable";
                 return false;
             }
 
-            CapturedEnemyCombatRuntimeRegistry.Register(character.Identity.Instance, contract);
+            IInventoryPage weaponPage;
+            if (character.BaseInventory == null
+                || !character.BaseInventory.Pages.TryGetValue(
+                    (int)IdentityType.WeaponPage,
+                    out weaponPage)
+                || !weaponPage.ValidSlot(contract.WeaponInventorySlot))
+            {
+                failure = "required captured weapon page or slot is unavailable";
+                return false;
+            }
+
+            item = weaponPage[contract.WeaponInventorySlot];
+            IItem registeredItem;
+            if (item == null
+                || !CapturedEnemyCombatRuntimeRegistry.TryGetCapturedWeaponItem(
+                    character.Identity.Instance,
+                    out registeredItem)
+                || !ReferenceEquals(item, registeredItem))
+            {
+                failure = "required captured weapon object is missing or was replaced";
+                return false;
+            }
+
+            if (!contract.MatchesCapturedWeapon(item))
+            {
+                failure = "required captured weapon fields no longer match WIFU evidence";
+                return false;
+            }
+
+            int currentEnergy;
+            if (!CapturedEnemyCombatRuntimeRegistry.TryGetCapturedWeaponEnergy(
+                    character.Identity.Instance,
+                    out currentEnergy))
+            {
+                failure = "captured weapon Energy state is unavailable";
+                return false;
+            }
+
+            if (currentEnergy < -1
+                || (currentEnergy == 0 && contract.WeaponDefinition.InitialEnergy > 0))
+            {
+                failure = "captured weapon Energy is exhausted";
+                return false;
+            }
+
             return true;
         }
 
         private static bool TryEquipCapturedWeapon(
             Character character,
             CapturedEnemyCombatContract contract,
+            out IItem capturedWeapon,
             out string failure)
         {
+            capturedWeapon = null;
             failure = string.Empty;
             if (!ItemLoader.ItemList.ContainsKey(contract.WeaponLowId)
                 || !ItemLoader.ItemList.ContainsKey(contract.WeaponHighId))
@@ -665,6 +1762,23 @@ namespace AORebirth.Core.Playfields
             {
                 MultipleCount = 1
             };
+            ApplyCapturedWeaponStats(weapon, contract.WeaponDefinition);
+            if (!contract.MatchesCapturedWeapon(weapon))
+            {
+                failure = "constructed weapon does not exactly match captured WIFU templates/QL/stats";
+                return false;
+            }
+
+            if (contract.RequiresPhysicalWeaponPresentation)
+            {
+                int rawRange = weapon.GetAttribute((int)StatIds.attackrange);
+                if (rawRange == MissingItemStatValue || rawRange <= 0)
+                {
+                    failure = "captured weapon template has no valid attackrange";
+                    return false;
+                }
+            }
+
             InventoryError result = weaponPage.Add(contract.WeaponInventorySlot, weapon);
             if (result != InventoryError.OK)
             {
@@ -672,12 +1786,48 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            if (contract.HasCapturedEquippedAttackInfo)
+            if (contract.HasCapturedEquippedAttackInfo || contract.WeaponDefinition != null)
             {
                 ApplyCapturedEquippedAttackDisplayStats(character, weapon);
             }
 
+            capturedWeapon = weapon;
             return true;
+        }
+
+        private static void ApplyCapturedWeaponStats(
+            Item weapon,
+            CapturedEnemyWeaponDefinition definition)
+        {
+            if (weapon == null || definition == null)
+            {
+                return;
+            }
+
+            foreach (CapturedEnemyWeaponStatDefinition stat in definition.Stats)
+            {
+                int value = unchecked((int)stat.Value);
+                if (stat.Stat == CharacterStat.Flags)
+                {
+                    weapon.Flags = value;
+                }
+                else if (stat.Stat == CharacterStat.MultipleCount)
+                {
+                    weapon.MultipleCount = value;
+                }
+                else if (stat.Stat == CharacterStat.Energy)
+                {
+                    weapon.SetAttribute((int)StatIds.energy, value);
+                }
+                else if (stat.Stat == CharacterStat.AttackDelay)
+                {
+                    weapon.SetAttribute((int)StatIds.itemdelay, value);
+                }
+                else if (stat.Stat == CharacterStat.RechargeDelay)
+                {
+                    weapon.SetAttribute((int)StatIds.rechargedelay, value);
+                }
+            }
         }
 
         private static void ApplyCapturedEquippedAttackDisplayStats(ICharacter character, IItem weapon)
@@ -801,6 +1951,11 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown3,
                         NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown4,
                         NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown5,
+                        3,
+                        0,
+                        0,
+                        0,
+                        0,
                         requiresDamageLineOfSight: true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
@@ -823,6 +1978,11 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
                         NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponValue,
                         NpcCombatAttackRules.CapturedSubwayVergilSpecialAttackWeaponLastValue,
+                        3,
+                        0,
+                        0,
+                        0,
+                        0,
                         requiresDamageLineOfSight: true);
                 case 155962:
                     CapturedEnemyCombatAttackDefinition abmouthXopzAttack =
@@ -838,6 +1998,7 @@ namespace AORebirth.Core.Playfields
                             0,
                             NpcCombatAttackRules.NormalAttackInfoHitType,
                             NpcCombatAttackRules.CapturedSubwayAbmouthXopzTag,
+                            0,
                             true);
                     CapturedEnemyCombatAttackDefinition abmouthDenwAttack =
                         new CapturedEnemyCombatAttackDefinition(
@@ -852,6 +2013,7 @@ namespace AORebirth.Core.Playfields
                             0,
                             NpcCombatAttackRules.NormalAttackInfoHitType,
                             NpcCombatAttackRules.CapturedSubwayAbmouthDenwTag,
+                            0,
                             true);
                     return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
                         "20260712-224840/232137 and 20260720-053802: Abmouth XOPZ paired stream, DENW stream, captured SIW context, and one 21.8-second combat warp cast (nano 286237) that teleports the engaged player and owned pets to Abmouth",
@@ -885,7 +2047,10 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponLastValue));
+                            NpcCombatAttackRules.CapturedSubwayAbmouthSpecialAttackWeaponLastValue,
+                            0,
+                            0,
+                            0));
                 case 31909:
                     return CapturedEnemyCombatContract.CapturedSpecialSequence(
                         "20260712-224840/232137: Abmouth-owned Infector DMXF attacks, 21-26 player damage, and 3.7-second cadence",
@@ -904,6 +2069,7 @@ namespace AORebirth.Core.Playfields
                                 0,
                                 NpcCombatAttackRules.NormalAttackInfoHitType,
                                 NpcCombatAttackRules.CapturedSubwayAbmouthInfectorTag,
+                                0,
                                 true),
                             new[]
                             {
@@ -917,7 +2083,10 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponLastValue));
+                            NpcCombatAttackRules.CapturedSubwayAbmouthInfectorSpecialAttackWeaponLastValue,
+                            0,
+                            0,
+                            0));
                 case 17657:
                     return CapturedEnemyCombatContract.CapturedSpecialSequence(
                         "20260708-004038 and 20260709-193914: Filth Flea normal slot rolls with criticals excluded",
@@ -935,6 +2104,7 @@ namespace AORebirth.Core.Playfields
                                 0,
                                 NpcCombatAttackRules.NormalAttackInfoHitType,
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                                0,
                                 true),
                             new CapturedEnemyCombatAttackDefinition(
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMinimumDamage,
@@ -948,6 +2118,7 @@ namespace AORebirth.Core.Playfields
                                 0,
                                 NpcCombatAttackRules.NormalAttackInfoHitType,
                                 NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                                0,
                                 true),
                             new[]
                             {
@@ -966,7 +2137,10 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue));
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
+                            0,
+                            0,
+                            0));
                 case 17720:
                     return CapturedEnemyCombatContract.FixedAttack(
                         "20260708-143600 and 20260709-210452: 37 normal local-player Discarded Pet SIW1 hits span 9..18; four 30..33 criticals remain report-only; 30 same-source landed-hit intervals span 4.609299..5.950416 seconds with conventional median 5.089763; AttackInfo uses ammo -1, slot 0, unknown 0, and instance SIW1; raw SpecialAttackWeapon first four fields are exact by level while the varying fifth field remains unresolved and is not synthesized",
@@ -976,7 +2150,9 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponSlot,
                         0,
                         NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponTag,
-                        -1);
+                        -1,
+                        0,
+                        0);
                 case 17649:
                     return ForDisobedientBot(level);
                 case 30379:
@@ -999,6 +2175,7 @@ namespace AORebirth.Core.Playfields
                                         0,
                                         NpcCombatAttackRules.NormalAttackInfoHitType,
                                         NpcCombatAttackRules.CapturedSubwayBloodcreeperSpitTag,
+                                        0,
                                         true)),
                                 new CapturedEnemyParallelAttackStreamDefinition(
                                     NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteInitialSeconds,
@@ -1014,6 +2191,7 @@ namespace AORebirth.Core.Playfields
                                         0,
                                         NpcCombatAttackRules.NormalAttackInfoHitType,
                                         NpcCombatAttackRules.CapturedSubwayBloodcreeperBiteTag,
+                                        0,
                                         true))
                             },
                             new[]
@@ -1033,62 +2211,101 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue));
+                            NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue,
+                            0,
+                            0,
+                            0));
                 case 203734:
                     return CapturedEnemyCombatContract.Unresolved(
                         "Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
                         true);
                 case 26092:
-                    return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260711-170337 packets 301-654: Thief attack start, movement transition, three landed projectile hits, and six-second repeat cadence; 2026-07-12 private validation proved the weapon context renders projectile damage",
-                        121567,
-                        121567,
-                        1,
-                        (int)WeaponSlots.Righthand,
-                        NpcCombatAttackRules.CapturedSubwayThiefWeaponDamageMinimumOverride,
-                        NpcCombatAttackRules.CapturedSubwayThiefWeaponDamageMaximumOverride,
-                        NpcCombatAttackRules.CapturedSubwayThiefAttackStartDelaySeconds,
-                        NpcCombatAttackRules.CapturedSubwayThiefMovementTransitionDelaySeconds,
-                        NpcCombatAttackRules.CapturedSubwayThiefFirstHitDelaySeconds,
-                        NpcCombatAttackRules.CapturedSubwayThiefRechargeSeconds,
-                        true,
-                        NpcCombatAttackRules.CapturedSubwayThiefAttackInfoAmmoCount,
-                        NpcCombatAttackRules.CapturedSubwayThiefAttackInfoUnknown,
-                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown1,
-                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown2,
-                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown3,
-                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4,
-                        NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5);
+                {
+                    if (level != 5)
+                    {
+                        return CapturedEnemyCombatContract.Unresolved(
+                            "20260711-170337 proves the complete Thief packet contract only for level 5; requested level="
+                            + (level.HasValue ? level.Value.ToString() : "missing"),
+                            true);
+                    }
+
+                    const string thiefEvidence =
+                        "20260711-170337 raw 155/156,301/302,480/564/654: level-5 Thief owner-linked WIFU, exact attack start, three projectile hits, and six-second repeat cadence; 2026-07-12 private validation proved the weapon context renders projectile damage";
+                    return CapturedEnemyCombatContract.EquippedWeaponWithCapturedPacketSequence(
+                            thiefEvidence,
+                            unchecked((int)0x795B5DB2u),
+                            121567,
+                            121567,
+                            1,
+                            (int)WeaponSlots.Righthand,
+                            true,
+                            0,
+                            0,
+                            0,
+                            0,
+                            NpcCombatAttackRules.CapturedSubwayThiefAttackStartDelaySeconds,
+                            NpcCombatAttackRules.CapturedSubwayThiefMovementTransitionDelaySeconds,
+                            NpcCombatAttackRules.CapturedSubwayThiefFirstHitDelaySeconds,
+                            NpcCombatAttackRules.CapturedSubwayThiefRechargeSeconds,
+                            true,
+                            true,
+                            NpcCombatAttackRules.CapturedSubwayThiefAttackInfoAmmoCount,
+                            NpcCombatAttackRules.CapturedSubwayThiefAttackInfoUnknown,
+                            NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown1,
+                            NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown2,
+                            NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown3,
+                            NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown4,
+                            NpcCombatAttackRules.CapturedSubwayThiefSpecialAttackWeaponUnknown5,
+                            3,
+                            0,
+                            0,
+                            0,
+                            0)
+                        .WithCapturedWeapon(ThiefCapturedWeaponDefinition(thiefEvidence));
+                }
                 case 203733:
-                    return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                        "Official-live captures 20260719-010047 and 20260719-020104 prove repeated Violent Vagabond attack attempts, all misses, a 4.5802404-second corpus cadence, AttackInfo 0/6/0/0, and SpecialAttackWeapon 32/35/29/31/0. Landed damage is unavailable because the Vagabonds could not hit the test character, so the private-project playability policy uses the adjacent same-level Subway Mugger normal range of 9..12. QL1 template 130590 is Red Wine and remains excluded from combat.",
-                        new CapturedEnemySpecialAttackSequenceDefinition(
-                            NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds,
-                            null,
-                            new CapturedEnemyCombatAttackDefinition(
-                                NpcCombatAttackRules.PolicySubwayViolentVagabondMinimumDamage,
-                                NpcCombatAttackRules.PolicySubwayViolentVagabondMaximumDamage,
-                                0,
-                                NpcCombatAttackRules.MaxMeleeCombatDistance,
-                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds,
-                                false,
-                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoAmmoCount,
-                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponSlot,
-                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoUnknown,
-                                NpcCombatAttackRules.NormalAttackInfoHitType,
-                                NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponInstance,
-                                true),
-                            new CapturedEnemySpecialAttackDefinition[0],
-                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown1,
-                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown2,
-                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown3,
-                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown4,
-                            NpcCombatAttackRules.CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown5));
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "20260719-010047/020104 contain Violent Vagabond misses but no landed own-source damage; adjacent Mugger damage substitution is forbidden",
+                        true);
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
                         "No captured combat contract for " + name + " monsterData=" + monsterData,
                         false);
             }
+        }
+
+        private static CapturedEnemyWeaponDefinition ThiefCapturedWeaponDefinition(
+            string evidence)
+        {
+            return new CapturedEnemyWeaponDefinition(
+                evidence,
+                unchecked((int)0x795B5DB2u),
+                0,
+                11,
+                (int)WeaponSlots.Righthand,
+                1000015,
+                0,
+                262,
+                new[]
+                {
+                    CapturedWeaponStat(CharacterStat.Flags, 67109889),
+                    CapturedWeaponStat(CharacterStat.StaticInstance, 121567),
+                    CapturedWeaponStat(CharacterStat.ACGItemLevel, 1),
+                    CapturedWeaponStat(CharacterStat.ACGItemTemplateID, 121567),
+                    CapturedWeaponStat(CharacterStat.ACGItemTemplateID2, 121567),
+                    CapturedWeaponStat(CharacterStat.MultipleCount, 1),
+                    CapturedWeaponStat(CharacterStat.Energy, -1),
+                    CapturedWeaponStat(CharacterStat.AttackDelay, 235),
+                    CapturedWeaponStat(CharacterStat.RechargeDelay, 235)
+                },
+                0);
+        }
+
+        private static CapturedEnemyWeaponStatDefinition CapturedWeaponStat(
+            CharacterStat stat,
+            int value)
+        {
+            return new CapturedEnemyWeaponStatDefinition(stat, unchecked((uint)value));
         }
 
         private static CapturedEnemyCombatContract ForDisobedientBot(int? level)
@@ -1140,6 +2357,7 @@ namespace AORebirth.Core.Playfields
                         0,
                         NpcCombatAttackRules.NormalAttackInfoHitType,
                         NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                        0,
                         true),
                     new[]
                     {
@@ -1153,7 +2371,10 @@ namespace AORebirth.Core.Playfields
                     specialAttackWeaponValue,
                     specialAttackWeaponValue,
                     specialAttackWeaponValue,
-                    specialAttackWeaponLastValue));
+                    specialAttackWeaponLastValue,
+                    0,
+                    0,
+                    0));
         }
 
         private static CapturedEnemyCombatContract ForWorkmanStriker(
@@ -1219,6 +2440,8 @@ namespace AORebirth.Core.Playfields
                 (int)WeaponSlots.Righthand,
                 -1,
                 (int)WeaponSlots.Righthand,
+                0,
+                0,
                 0,
                 0);
         }
@@ -1295,6 +2518,8 @@ namespace AORebirth.Core.Playfields
                 9,
                 (int)WeaponSlots.Righthand,
                 0,
+                0,
+                0,
                 0);
         }
 
@@ -1352,6 +2577,8 @@ namespace AORebirth.Core.Playfields
                 9,
                 (int)WeaponSlots.Righthand,
                 0,
+                0,
+                0,
                 0);
         }
 
@@ -1387,6 +2614,8 @@ namespace AORebirth.Core.Playfields
                 (int)WeaponSlots.Righthand,
                 -1,
                 (int)WeaponSlots.Righthand,
+                0,
+                0,
                 0,
                 0);
         }
@@ -1447,6 +2676,8 @@ namespace AORebirth.Core.Playfields
                 17,
                 (int)WeaponSlots.Righthand,
                 0,
+                0,
+                0,
                 0);
         }
 
@@ -1501,6 +2732,8 @@ namespace AORebirth.Core.Playfields
                 (int)WeaponSlots.Righthand,
                 24,
                 (int)WeaponSlots.Righthand,
+                0,
+                0,
                 0,
                 0);
         }
@@ -1558,6 +2791,8 @@ namespace AORebirth.Core.Playfields
                 (int)WeaponSlots.Righthand,
                 17,
                 (int)WeaponSlots.Righthand,
+                0,
+                0,
                 0,
                 0);
         }
@@ -1665,6 +2900,8 @@ namespace AORebirth.Core.Playfields
                 (int)WeaponSlots.Righthand,
                 -1,
                 (int)WeaponSlots.Righthand,
+                0,
+                0,
                 0,
                 0,
                 true);
@@ -1919,7 +3156,10 @@ namespace AORebirth.Core.Playfields
                 combat.RechargeSeconds,
                 combat.WeaponSlot,
                 combat.AttackInfoUnknown,
-                combat.WeaponInstance);
+                combat.WeaponInstance,
+                0,
+                0,
+                0);
         }
 
         internal static CapturedEnemyCombatContract ForOrdinary(
