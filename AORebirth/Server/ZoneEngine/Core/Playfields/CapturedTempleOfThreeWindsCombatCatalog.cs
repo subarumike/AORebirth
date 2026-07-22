@@ -22,6 +22,11 @@ namespace AORebirth.Core.Playfields
         internal const double NematetSlotZeroFirstHitDelaySeconds = 38.8398163;
         internal const double NematetSlotZeroRechargeSeconds = 10.06033;
         internal const double NematetSlotOneFirstHitDelaySeconds = 68.208179;
+        internal const double GuardianSlotOneFirstHitDelaySeconds = 2.5179671;
+        internal const double GuardianSlotZeroFirstHitDelaySeconds = 3.8369566;
+        internal const double GuardianAttackRechargeSeconds = 4.25;
+        internal const double GartuaFirstHitDelaySeconds = 5.3602725;
+        internal const double GartuaAttackRechargeSeconds = 5.3;
 
         internal static CapturedEnemyCombatContract DefenderOfTheThree()
         {
@@ -208,6 +213,53 @@ namespace AORebirth.Core.Playfields
                     0));
         }
 
+        internal static CapturedEnemyCombatContract GuardianOfTomorrow()
+        {
+            return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                "20260721-230426: Guardian was engaged by the player and emitted two independent "
+                + "normal streams: slot 1 opened for 36 then repeated for 75 with weapon instance "
+                + "1297107795, while slot 0 repeated for 75 with weapon instance 1397118030; "
+                + "the two 173-point criticals remain report-only",
+                new CapturedEnemyParallelAttackSequenceDefinition(
+                    new[]
+                    {
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            GuardianSlotOneFirstHitDelaySeconds,
+                            Attack(36, 75, GuardianAttackRechargeSeconds, 1, -1, 1297107795)),
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            GuardianSlotZeroFirstHitDelaySeconds,
+                            Attack(75, 75, GuardianAttackRechargeSeconds, 0, -1, 1397118030))
+                    },
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(208298, 208299, 1297107795, "MPKS"),
+                        new CapturedEnemySpecialAttackDefinition(208302, 208296, 1397118030, "SFTN")
+                    },
+                    511,
+                    511,
+                    511,
+                    39,
+                    0));
+        }
+
+        internal static CapturedEnemyCombatContract GartuaTheDoorkeeper()
+        {
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260721-230824: Gartua initiated combat and emitted eight normal local-player "
+                + "hits from 76..114 at slot 6, ammo -1, weapon instance 0; the empty "
+                + "SpecialAttackWeapon list carried 382/382/382/37/0",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    GartuaFirstHitDelaySeconds,
+                    null,
+                    Attack(76, 114, GartuaAttackRechargeSeconds, 6, -1, 0),
+                    new CapturedEnemySpecialAttackDefinition[0],
+                    382,
+                    382,
+                    382,
+                    37,
+                    0));
+        }
+
         internal static CapturedEnemyCombatContract ReanimatedCorpse()
         {
             return CapturedEnemyCombatContract.FixedAttack(
@@ -252,6 +304,10 @@ namespace AORebirth.Core.Playfields
                     return TheCurator();
                 case CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey:
                     return NematetTheCustodianOfTime();
+                case CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey:
+                    return GuardianOfTomorrow();
+                case CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey:
+                    return GartuaTheDoorkeeper();
                 case "totw.647.encounter.re-animator.reanimated-corpse":
                     return ReanimatedCorpse();
                 default:

@@ -18,7 +18,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemySpawnDefinition[] templeSpawns = temple.GetSpawns();
 
             Assert.AreEqual(8, templeProfiles.Length);
-            Assert.AreEqual(125, templeSpawns.Length);
+            Assert.AreEqual(147, templeSpawns.Length);
             Assert.IsTrue(templeProfiles.All(value => value.ProfileKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(templeProfiles.All(value => !value.BossOrScripted));
             Assert.AreEqual(7, templeProfiles.Count(value => value.DisplayName == "Cultist"));
@@ -33,8 +33,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 temple);
             Assert.AreEqual(322, catalog.GetRuntimeSpawns(127).Length);
             Assert.AreEqual(0, catalog.GetRuntimeSpawns(647).Length);
-            Assert.AreEqual(125, catalog.GetRuntimeSpawns(1931).Length);
-            Assert.AreEqual(447, catalog.GetSpawns().Length);
+            Assert.AreEqual(147, catalog.GetRuntimeSpawns(1931).Length);
+            Assert.AreEqual(469, catalog.GetSpawns().Length);
             Assert.IsTrue(catalog.GetRuntimeSpawns(127).All(value => !value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(catalog.GetRuntimeSpawns(1931).All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
         }
@@ -64,11 +64,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(cultists.All(value => value.Appearance.AppearanceValue == appearances[value.MonsterData]));
             Assert.IsTrue(cultists.All(value => value.Corpse.CapturedCatMesh.Value == corpseMeshes[value.MonsterData]));
             Assert.AreEqual(16, cultistSpawns.Count(value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
-            Assert.AreEqual(106, cultistSpawns.Count(value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            Assert.AreEqual(128, cultistSpawns.Count(value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
             Assert.IsTrue(cultistSpawns.Where(value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol).All(value => value.Waypoints.Length == 2));
             Assert.AreEqual(20, cultistSpawns.Min(value => value.Level));
             Assert.AreEqual(35, cultistSpawns.Max(value => value.Level));
-            Assert.AreEqual(5, cultistSpawns.Select(value => value.SourceCapture).Distinct(StringComparer.Ordinal).Count());
+            Assert.AreEqual(6, cultistSpawns.Select(value => value.SourceCapture).Distinct(StringComparer.Ordinal).Count());
+            Assert.AreEqual(22, cultistSpawns.Count(value => value.SourceCapture == "20260721-230426"));
+            Assert.IsTrue(cultistSpawns.Where(value => value.SourceCapture == "20260721-230426")
+                .All(value => value.Z >= 419.0f && value.Z <= 463.0f));
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.Mode == WorldRespawnPolicyAssignmentMode.Explicit));
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.ExplicitPolicy.DelayStartsAt == RespawnDelayStartsAt.NpcDespawn));
             Assert.IsTrue(spawns.All(value => value.RespawnPolicy.ExplicitPolicy.FixedDelaySeconds.Value == 300.0));
@@ -175,6 +178,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(494, nematet.ParallelAttackSequence.SpecialAttackWeaponUnknown1);
             Assert.AreEqual(38, nematet.ParallelAttackSequence.SpecialAttackWeaponUnknown4);
 
+            CapturedEnemyCombatContract guardian =
+                CapturedTempleOfThreeWindsCombatCatalog.GuardianOfTomorrow();
+            Assert.AreEqual(2, guardian.ParallelAttackSequence.Streams.Length);
+            Assert.AreEqual(36, guardian.ParallelAttackSequence.Streams[0].Attack.MinDamage);
+            Assert.AreEqual(75, guardian.ParallelAttackSequence.Streams[0].Attack.MaxDamage);
+            Assert.AreEqual(1, guardian.ParallelAttackSequence.Streams[0].Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, guardian.ParallelAttackSequence.Streams[1].Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(2, guardian.ParallelAttackSequence.SpecialAttacks.Length);
+            Assert.AreEqual("MPKS", guardian.ParallelAttackSequence.SpecialAttacks[0].Name);
+            Assert.AreEqual("SFTN", guardian.ParallelAttackSequence.SpecialAttacks[1].Name);
+            Assert.AreEqual(511, guardian.ParallelAttackSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(39, guardian.ParallelAttackSequence.SpecialAttackWeaponUnknown4);
+
+            CapturedEnemyCombatContract gartua =
+                CapturedTempleOfThreeWindsCombatCatalog.GartuaTheDoorkeeper();
+            Assert.AreEqual(76, gartua.SpecialAttackSequence.RepeatingAttack.MinDamage);
+            Assert.AreEqual(114, gartua.SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(6, gartua.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot);
+            Assert.AreEqual(382, gartua.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(37, gartua.SpecialAttackSequence.SpecialAttackWeaponUnknown4);
+
             LootTableDefinition table =
                 CapturedTempleOfThreeWindsLootDefinitions.BuildDefenderLootTable();
             Assert.AreEqual(2, table.ObservedCorpseSnapshots.Length);
@@ -224,7 +248,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 registry,
                 CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey,
                 CapturedTempleOfThreeWindsLootDefinitions.NematetEncounterKey));
-            Assert.AreEqual(7, registry.Assignments().Length);
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.GuardianEncounterKey));
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.GartuaEncounterKey));
+            Assert.AreEqual(9, registry.Assignments().Length);
             Assert.IsTrue(registry.Assignments().All(value => value.PlayfieldId.Value == 1931));
 
             Assert.AreEqual(5, CapturedTempleOfThreeWindsLootDefinitions.BuildYatilaLootTable().ObservedCorpseSnapshots[0].Entries.Length);
@@ -233,6 +265,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(50, CapturedTempleOfThreeWindsLootDefinitions.BuildBetanyLootTable().ObservedCorpseSnapshots[0].Entries[0].MinimumQuantity);
             Assert.AreEqual(377, CapturedTempleOfThreeWindsLootDefinitions.BuildCuratorLootTable().ObservedCorpseSnapshots[0].Credits);
             Assert.AreEqual(2711, CapturedTempleOfThreeWindsLootDefinitions.BuildNematetLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(2830, CapturedTempleOfThreeWindsLootDefinitions.BuildGuardianLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(4, CapturedTempleOfThreeWindsLootDefinitions.BuildGuardianLootTable().ObservedCorpseSnapshots[0].Entries.Length);
+            Assert.AreEqual(1592, CapturedTempleOfThreeWindsLootDefinitions.BuildGartuaLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(2, CapturedTempleOfThreeWindsLootDefinitions.BuildGartuaLootTable().ObservedCorpseSnapshots[0].Entries.Length);
             Assert.AreEqual(
                 200,
                 CapturedTempleOfThreeWindsLootDefinitions.BuildNematetLootTable().ObservedCorpseSnapshots[0].Entries[0].FixedQuality);
