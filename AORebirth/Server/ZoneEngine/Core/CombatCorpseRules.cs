@@ -286,11 +286,13 @@ namespace ZoneEngine.Core
             return true;
         }
 
-        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);
+        // Fully emptied corpses despawn immediately after last item/credits leave.
+        public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero;
 
-        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);
+        public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.Zero;
 
-        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(2);
+        // Unlooted corpses despawn after 60 seconds.
+        public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromSeconds(60);
 
         public static readonly TimeSpan MajorBossCorpseLifetime = TimeSpan.FromMinutes(30);
 
@@ -483,6 +485,10 @@ namespace ZoneEngine.Core
                 { 247832, 247821 },
                 { 31114, 31102 },
                 { 17649, 15215 },
+                // Capture 20260722-cap-mob-drop-cred corpse-full-updates: Waste Collector / Supreme.
+                { 17714, 17316 },
+                // Capture 20260722-cap-mob-drop-cred: Garbage Flea corpse CATMesh.
+                { 17657, 15231 },
                 { 30379, 26978 },
                 { 203748, 5921 }
             };

@@ -456,8 +456,12 @@
     <Compile Include="Core\Playfields\AndromedaIccHqSpawn.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />
+    <Compile Include="Core\Playfields\AreteRoboticGuardDogRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteIccPeacekeeperPatrolRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingPopulationEnsure.cs" />
     <Compile Include="Core\Playfields\MarcusPadAmbientCombat.cs" />
+    <Compile Include="Core\Playfields\CapturedSpellListVisualEffects.cs" />
+    <Compile Include="Core\Playfields\AmbientRestorationAuraRuntime.cs" />
     <Compile Include="Core\Playfields\JunkyardCleaningRobotRuntime.cs" />
     <Compile Include="Core\AndromedaIccHqArrivalSaveRuntime.cs" />
     <Compile Include="Core\Playfields\AlexAreaMobRuntime.cs" />

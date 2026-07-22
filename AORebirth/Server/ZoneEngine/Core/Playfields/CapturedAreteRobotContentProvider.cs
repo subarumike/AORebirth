@@ -24,18 +24,23 @@ namespace ZoneEngine.Core.Playfields
             @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv";
 
         public const string EvidenceCapturePatrolReplayRelativePath =
-            @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260719-Rex-Markus-stone\movement-packets.csv";
+            @"tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260721-Rox-robots\movement-packets.csv";
 
-        // Capture 20260719-Rex-Markus-stone: top FollowTarget robot movers near Rex platform.
+        // Capture 20260721-Rox-robots: 11 concurrent Malfunctioning Cleaning Robots
+        // on Rex platform (lifecycle pet=False). Excludes Burning/Cleaning Robot / pets.
         private static readonly CapturedAreteRobotSpawnDefinition[] SpawnDefinitions =
         {
-            new CapturedAreteRobotSpawnDefinition(0x797D36A5, 3596.81177f, 51.7449989f, 788.208923f, 12, 1, 6, 3596.05518f, 51.7449989f, 788.482483f),
-            new CapturedAreteRobotSpawnDefinition(0x79543CB6, 3596.979f, 51.7449989f, 783.935852f, 12, 1, 6, 3596.10522f, 51.7449989f, 783.924805f),
-            new CapturedAreteRobotSpawnDefinition(0x797DD296, 3620.68066f, 51.7449989f, 784.900879f, 12, 1, 6, 3612.13159f, 52.5f, 787.730408f),
-            new CapturedAreteRobotSpawnDefinition(0x797D3006, 3620.33472f, 40.9849968f, 831.181335f, 12, 1, 6, 3623.6228f, 40.8608131f, 826.366272f),
-            new CapturedAreteRobotSpawnDefinition(0x797DD2CB, 3607.10815f, 51.7350006f, 777.613159f, 12, 1, 6, 3610.70728f, 52.5f, 777.934021f),
-            new CapturedAreteRobotSpawnDefinition(0x797DD29C, 3610.57544f, 52.1349983f, 779.039978f, 12, 1, 6, 3611.19849f, 52.5f, 778.225037f),
-            new CapturedAreteRobotSpawnDefinition(0x797DD2C1, 3621.08472f, 51.7449989f, 784.294983f, 12, 1, 6, 3598.04736f, 52.5f, 785.703796f)
+            new CapturedAreteRobotSpawnDefinition(0x79866553, 3594.546000f, 51.745000f, 799.167700f, 12, 1, 6, 3621.257320f, 52.500000f, 784.154419f),
+            new CapturedAreteRobotSpawnDefinition(0x79866565, 3595.688480f, 51.745000f, 798.922058f, 12, 1, 6, 3594.186770f, 52.500000f, 799.765198f),
+            new CapturedAreteRobotSpawnDefinition(0x797D36A5, 3596.811770f, 51.745000f, 788.208900f, 12, 1, 6, 3596.055660f, 52.244999f, 788.684570f),
+            new CapturedAreteRobotSpawnDefinition(0x79543CB6, 3596.979000f, 51.745000f, 783.935852f, 12, 1, 6, 3596.105220f, 51.744999f, 783.924805f),
+            new CapturedAreteRobotSpawnDefinition(0x79866547, 3602.961000f, 52.135000f, 787.817261f, 12, 1, 6, 3596.975100f, 52.500000f, 772.298950f),
+            new CapturedAreteRobotSpawnDefinition(0x7986655E, 3609.403810f, 52.135000f, 791.897034f, 12, 1, 6, 3622.765380f, 52.500000f, 798.812988f),
+            new CapturedAreteRobotSpawnDefinition(0x7986653C, 3612.843260f, 52.135000f, 787.514200f, 12, 1, 6, 3612.093260f, 52.135000f, 787.764200f),
+            new CapturedAreteRobotSpawnDefinition(0x79866562, 3612.874510f, 52.135000f, 787.537500f, 12, 1, 6, 3611.219730f, 52.500000f, 778.204224f),
+            new CapturedAreteRobotSpawnDefinition(0x79866518, 3612.924000f, 52.135000f, 787.641200f, 12, 1, 6, 3598.853520f, 52.500000f, 787.261780f),
+            new CapturedAreteRobotSpawnDefinition(0x79866560, 3617.227780f, 51.745000f, 785.991800f, 12, 1, 6, 3599.246580f, 52.500000f, 786.828979f),
+            new CapturedAreteRobotSpawnDefinition(0x7986655D, 3622.508540f, 51.745000f, 798.139500f, 12, 1, 6, 3612.194090f, 52.500000f, 787.771240f),
         };
 
         private readonly object replayLock = new object();

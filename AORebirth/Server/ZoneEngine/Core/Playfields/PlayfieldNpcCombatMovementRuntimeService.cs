@@ -24,8 +24,6 @@ namespace ZoneEngine.Core.Playfields
 
         private const double MaxMeleeFollowHoldDistance = 3.0;
 
-        private const string CapturedCleaningRobotName = "Malfunctioning Cleaning Robot";
-
         private const int CapturedCleaningRobotMonsterData = 297023;
 
         private const double CapturedCleaningRobotFollowStopDistance = 0.0;
@@ -215,9 +213,14 @@ namespace ZoneEngine.Core.Playfields
 
         internal static bool IsCapturedCleaningRobot(ICharacter character)
         {
-            return character != null
-                   && string.Equals(character.Name, CapturedCleaningRobotName, StringComparison.OrdinalIgnoreCase)
-                   && character.Stats[StatIds.monsterdata].Value == CapturedCleaningRobotMonsterData;
+            if (character == null
+                || character.Stats[StatIds.monsterdata].Value != CapturedCleaningRobotMonsterData)
+            {
+                return false;
+            }
+
+            string name = character.Name ?? string.Empty;
+            return name.IndexOf("Cleaning Robot", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static AORebirth.Core.Vector.Vector3 GetCombatPosition(ICharacter character)

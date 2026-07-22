@@ -100,12 +100,21 @@ namespace ZoneEngine.Core.Arete.Quests
 
             // Inventory is authoritative: tip 4 may be missing from MissionRuntime after
             // a combine when OfferMission lagged, but the crafted brain is still held.
-            if (HasPersonalizedBrain(source) || IsTipActive(source, Tip4QuestId))
+            if (HasPersonalizedBrain(source) || IsShowBrainTipActive(source))
             {
                 return AlexBrainTurnInNodeId;
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Tip 4/4 “Show the Personalized Robot Brain to Alex” — used by BioCom to avoid
+        /// swallowing Alex FinishTrade while Deliver tip is wrongly still Active.
+        /// </summary>
+        public static bool IsShowBrainTipActive(ICharacter source)
+        {
+            return IsTipActive(source, Tip4QuestId);
         }
 
         public static bool TryHandleAlexDialogueAnswer(ICharacter source, string previousNodeId, int answerIndex)
@@ -383,6 +392,10 @@ namespace ZoneEngine.Core.Arete.Quests
                 MissionRuntime.Service.CompleteMission(source.Identity.Instance, Tip1QuestId);
 
                 // Never leave early-chain tips after Tip 4 (Surveillance Uplink is first Alex tip).
+                // B19C Deliver BioCom can linger Active and steal Tip-4 FinishTrade
+                // (ZoneEngineLog 2026-07-22 20:32: alex-finish ignored).
+                MissionRuntime.Service.CompleteMission(source.Identity.Instance, "Mission:5514B19B");
+                MissionRuntime.Service.CompleteMission(source.Identity.Instance, "Mission:5514B19C");
                 MissionRuntime.Service.CompleteMission(source.Identity.Instance, "Mission:5514B19D");
                 MissionRuntime.Service.CompleteMission(source.Identity.Instance, "Mission:5514B19E");
                 MissionRuntime.Service.CompleteMission(source.Identity.Instance, "Mission:5514B19F");
@@ -391,6 +404,8 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x555A4A49));
+            FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x5514B19B));
+            FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x5514B19C));
             FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x5514B19D));
             FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x555A4E3B));
             FlintKneecappingTipWire.TryDeleteTip(source, unchecked((int)0x555A4E3C));

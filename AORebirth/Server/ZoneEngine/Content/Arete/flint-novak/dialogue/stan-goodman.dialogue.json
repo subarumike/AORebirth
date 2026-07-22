@@ -1,10 +1,12 @@
 {
   "Identity": {
-    "Id": "arete-stan-goodman-dialogue-20260720-goldman",
-    "Version": "captured-stan-deliver-factory-20260721-afgter-dog-lockpick-goodman",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-goldman; 20260721-afgter dog lockpick goodman/chat-dialogue.log"
+    "Id": "arete-stan-goodman-dialogue-20260722-212421",
+    "Version": "captured-stan-deliver-dialog-20260722-212421",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-212421; 20260722-210219; 20260720-goldman; 20260721-afgter dog lockpick goodman"
   },
   "SourceCaptures": [
+    "20260722-212421",
+    "20260722-210219",
     "20260720-goldman",
     "20260721-afgter dog lockpick goodman"
   ],
@@ -20,14 +22,14 @@
       "Nodes": [
         {
           "Id": "stan_goldman_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only",
+          "PromptText": "Hello there, stranger.\\n\\nThe name is Stan, and I am a man who likes to deal in previously-owned merchandise.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 raw-packets.csv 19:02:36.443 Unknown2=0",
           "Options": [
             {
               "Id": "stan_goldman_001_option_0",
               "Index": 0,
               "Text": "I heard you could help me out... So, do you have any work for me?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:03.0743051Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:36.4440634Z",
               "NextNodeId": "stan_goldman_002",
               "Actions": []
             },
@@ -35,45 +37,167 @@
               "Id": "stan_goldman_001_option_1",
               "Index": 1,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:03.0743051Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_goldman_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until question tree captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:36.4440634Z",
+              "NextNodeId": "stan_questions_001",
+              "Actions": []
             },
             {
               "Id": "stan_goldman_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:03.0743051Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_goldman_001_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:36.4440634Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
+          "Id": "stan_questions_001",
+          "PromptText": "What do you want to know?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:02:39.462 Unknown2=0",
+          "Options": [
+            {
+              "Id": "stan_questions_001_option_0",
+              "Index": 0,
+              "Text": "Do you know anyone of interest if this place?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:39.4632008Z (capture spelling if)",
+              "NextNodeId": "stan_q_interest",
+              "Actions": []
+            },
+            {
+              "Id": "stan_questions_001_option_1",
+              "Index": 1,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:39.4632008Z",
+              "NextNodeId": "stan_q_who",
+              "Actions": []
+            },
+            {
+              "Id": "stan_questions_001_option_2",
+              "Index": 2,
+              "Text": "What do you have to sell?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:39.4632008Z",
+              "NextNodeId": "stan_q_sell",
+              "Actions": []
+            },
+            {
+              "Id": "stan_questions_001_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:39.4632008Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_q_interest",
+          "PromptText": "You might be interested in talking to a friend of mine, his name is Marco Spida. He sells Nanoprogram Containers, you should probably buy one.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:02:41.324 Unknown2=0",
+          "Options": [
+            {
+              "Id": "stan_q_interest_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:41.3270518Z",
+              "NextNodeId": "stan_q_who",
+              "Actions": []
+            },
+            {
+              "Id": "stan_q_interest_option_1",
+              "Index": 1,
+              "Text": "What do you have to sell?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:41.3270518Z",
+              "NextNodeId": "stan_q_sell",
+              "Actions": []
+            },
+            {
+              "Id": "stan_q_interest_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:41.3270518Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_q_who",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "That all depends who is asking. To some, I am just another face in a crowded shuttleport, to others, I am a person of interest. ",
+              "Unknown2": 0
+            },
+            {
+              "Text": "I believe that is because I am just so interesting.\\n\\nI take no side in the conflict that fuels this planet, I just use the blind loyalty of others for my own benefit. Some say there is no place for neutrality on this planet, but I am not sure I prescribe to that idea.\\n\\nThat is all I will say on the subject. Now, where were we?",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:02:43.258 + 19:02:44.364 Unknown2=0/0",
+          "Options": [
+            {
+              "Id": "stan_q_who_option_0",
+              "Index": 0,
+              "Text": "What do you have to sell?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:44.3641789Z",
+              "NextNodeId": "stan_q_sell",
+              "Actions": []
+            },
+            {
+              "Id": "stan_q_who_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:44.3641789Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_q_sell",
+          "PromptText": "Nothing you need to worry about, kid. I only sell my things to trustworthy people and I'm not sure if you are one of them.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:02:46.627 Unknown2=0",
+          "Options": [
+            {
+              "Id": "stan_q_sell_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:02:46.6277836Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_goodbye",
+          "PromptText": "Watch your back!",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:02:55.465 then KnubotCloseChatWindow",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "stan_goodbye_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after Watch your back!"
+            }
+          ]
+        },
+        {
           "Id": "stan_goldman_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only",
+          "PromptText": "My my... Aren't we eager? Ambition is something that is dreadfully lacking from new colonists, but... Oh dear. You have a <i>problem</i> don't you?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:03:00.701 Unknown2=0",
           "Options": [
             {
               "Id": "stan_goldman_002_option_0",
               "Index": 0,
               "Text": "I arrived here without an ID and Alex said you could help me...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:05.7405949Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:03:00.7021036Z",
               "NextNodeId": "stan_goldman_003",
               "Actions": []
             },
@@ -81,30 +205,23 @@
               "Id": "stan_goldman_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:05.7405949Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_goldman_002_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:03:00.7021036Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "stan_goldman_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only",
+          "PromptText": "You aren't the first one to wander through here with that particular issue as of late. As it so happens, you're in the right place and speaking to the right man... and if you can scratch my back, we'll see about relieving that itch on yours too.\\nThere's a... particular strongbox being kept in a small shack nearby. I <i>would</i> get it myself, but I only facilitate procurement, not enact. Get me whats in that box and I will help you out.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:03:02.985 Unknown2=0",
           "Options": [
             {
               "Id": "stan_goldman_003_option_0",
               "Index": 0,
               "Text": "I suppose I don't have much choice...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:07.6374251Z; Answer=0 → Action59+Delete TalkStan + QFU Buy a Lockpick",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:03:02.9866935Z; Answer=0 → Action59+Delete TalkStan + QFU Buy a Lockpick",
               "NextNodeId": "stan_goldman_004",
               "Actions": []
             },
@@ -112,53 +229,39 @@
               "Id": "stan_goldman_003_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:07.6374251Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_goldman_003_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:03:02.9866935Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "stan_goldman_004",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-goldman; options-only after tip handoff",
+          "PromptText": "No, no you don't. Now, I'll be uploading the target's location to your NCU.\\n\\nThe work itself is relatively simple:\\n1: Buy a lockpick.\\n2: Sneak into the small building undetected. Locate the strongbox your NCU directs you toward and clean it out. Inside you'll find an Adaptation Factory.\\n3: Once you've procurred this item, return to me and we'll see about creating your unique ID chip.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-210219 19:03:05.923 Unknown2=0 (capture spelling procurred)",
           "Options": [
             {
               "Id": "stan_goldman_004_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T19:42:09.7131448Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_goldman_004_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:03:05.9248823Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "stan_deliver_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only 20260721-afgter dog lockpick goodman",
+          "PromptText": "Good to see you again... Did you find Antonio's Adaption Factory?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-212421 19:25:03.703 Unknown2=0",
           "Options": [
             {
               "Id": "stan_deliver_001_option_0",
               "Index": 0,
               "Text": "I think I have what you were looking for.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:04:53.9991386Z; Answer=0 → StartTrade 4 slots",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:03.7040592Z; Answer=0 → AppendText then StartTrade 4 slots",
               "NextNodeId": "stan_deliver_trade",
               "Actions": []
             },
@@ -166,39 +269,25 @@
               "Id": "stan_deliver_001_option_1",
               "Index": 1,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:04:53.9991386Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_deliver_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until question tree captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:03.7040592Z",
+              "NextNodeId": "stan_questions_001",
+              "Actions": []
             },
             {
               "Id": "stan_deliver_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:04:53.9991386Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_deliver_001_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:03.7040592Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "stan_deliver_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "PromptText": "Excellent, I was starting to get worried. I didn't want to deal with ICC and their incessant questioning again.\\n\\nLets go ahead and get at least part of your identification issue settled! I'll need the Nano Transmitter, the Blank Info Chip, and the Encryption Compiler and ofcourse the Adaptation Factory if you please.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-212421 19:25:07.417 then KnubotStartTrade",
           "Options": [
             {
               "Id": "stan_deliver_trade_option_0",
@@ -213,29 +302,32 @@
         },
         {
           "Id": "stan_deliver_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after factory turn-in",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "He pockets the adaptation factory before turning his attention to the three pieces of your future ID chip, plugging them all together.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "It would seem my instincts were correct about you. You're a natural. All it needs now is some additional information and security clearance codes and you should be ready to go. Visit Sarah Greene an 'associate' of mine, and if you're smart you'd do well to leave out my name. \\nAlso if you haven't done so already you should see my good friend Marco Spida and buy a Nanoprogram Container.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-212421 19:25:19.097 Unknown2=1 then 0",
           "Options": [
             {
               "Id": "stan_deliver_002_option_0",
               "Index": 0,
               "Text": "Thanks, it was fun.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:09.4201077Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_deliver_002_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:19.0985640Z",
+              "NextNodeId": "stan_deliver_thanks",
+              "Actions": []
             },
             {
               "Id": "stan_deliver_002_option_1",
               "Index": 1,
               "Text": "I can't believe I just did that.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:09.4201077Z; Answer=1 → Goodbye-only node",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:19.0985640Z; Answer=1 → Goodbye-only node",
               "NextNodeId": "stan_deliver_003",
               "Actions": []
             },
@@ -243,16 +335,25 @@
               "Id": "stan_deliver_002_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:09.4201077Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_deliver_002_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:19.0985640Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "stan_deliver_thanks",
+          "PromptText": "I am glad to hear it. As I said, should you ever decide you want slightly more... stable, if not entirely *legal* employment, you know where to find me.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-212421 19:25:23.902 Unknown2=0",
+          "Options": [
+            {
+              "Id": "stan_deliver_thanks_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:25:23.9026006Z",
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
@@ -260,22 +361,15 @@
         {
           "Id": "stan_deliver_003",
           "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "PromptTextConfidence": "no-knubot-append-text; options-only after can't believe",
           "Options": [
             {
               "Id": "stan_deliver_003_option_0",
               "Index": 0,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-20T23:05:15.6582749Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "stan_deliver_003_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "NextNodeId": "stan_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []

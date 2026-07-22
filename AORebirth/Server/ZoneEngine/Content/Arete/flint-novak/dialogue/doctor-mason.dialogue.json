@@ -1,11 +1,13 @@
 {
   "Identity": {
-    "Id": "arete-doctor-mason-dialogue-20260721-Mason",
-    "Version": "captured-mason-implant-20260721-Mason",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-Mason/chat-dialogue.log"
+    "Id": "arete-doctor-mason-dialogue-20260722-231133",
+    "Version": "captured-mason-show-chip-20260722-230902-231133",
+    "Source": "20260722-225905 questions/help; 20260722-230902 show implant; 20260722-231133 chip turn-in"
   },
   "SourceCaptures": [
-    "20260721-Mason"
+    "20260722-225905",
+    "20260722-230902",
+    "20260722-231133"
   ],
   "Npcs": [
     {
@@ -19,14 +21,14 @@
       "Nodes": [
         {
           "Id": "mason_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "PromptText": "Good day to you! If you've come looking to improve your quality of life through the power of bodily augmentation, you have come to the right place.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:18.909 Unknown2=0",
           "Options": [
             {
               "Id": "mason_001_option_0",
               "Index": 0,
               "Text": "I heard you might be able to help me...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:01; Answer=0 → Assemble Implant (1/3)",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:19.7965298Z; Answer=0 → Assemble Implant tip",
               "NextNodeId": "mason_002",
               "Actions": []
             },
@@ -34,22 +36,15 @@
               "Id": "mason_001_option_1",
               "Index": 1,
               "Text": "I have some questions...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:01",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "mason_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until questions captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:19.7965298Z",
+              "NextNodeId": "mason_questions",
+              "Actions": []
             },
             {
               "Id": "mason_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:01",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:19.7965298Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -64,15 +59,510 @@
           "EnterActions": []
         },
         {
+          "Id": "mason_questions",
+          "PromptText": "What do you wish to know?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:22.353 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_questions_option_0",
+              "Index": 0,
+              "Text": "Can you tell me about Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:22.3539525Z",
+              "NextNodeId": "mason_q_implants",
+              "Actions": []
+            },
+            {
+              "Id": "mason_questions_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:22.3539525Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_questions_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_implants",
+          "PromptText": "Certainly, they are my purpose in this world. Is there anything in particular you wanted to know about them?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:24.641 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_q_implants_option_0",
+              "Index": 0,
+              "Text": "Can you give me an overview on Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:24.6425401Z",
+              "NextNodeId": "mason_q_overview",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_implants_option_1",
+              "Index": 1,
+              "Text": "Where can Implants be installed?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:24.6425401Z",
+              "NextNodeId": "mason_q_where",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_implants_option_2",
+              "Index": 2,
+              "Text": "How do I install an Implant?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:24.6425401Z",
+              "NextNodeId": "mason_q_how",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_implants_option_3",
+              "Index": 3,
+              "Text": "Can you tell me about Implant Clusters?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:24.6425401Z",
+              "NextNodeId": "mason_q_clusters",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_implants_option_4",
+              "Index": 4,
+              "Text": "Are there any kinds of implants that you don't offer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:24.6425401Z",
+              "NextNodeId": "mason_q_alt",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_implants_option_5",
+              "Index": 5,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:24.6425401Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_implants_option_5_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_overview",
+          "PromptText": "Certainly, I would love to. Implants are carefully crafted devices that are installed into key locations all throughout your body. They significantly enhance specific attributes and abilities, depending on how they are configured.\\n\\nA single implant can improve up to 3 skills. The skills that can be improved by an implant are based on the location of the implant. For example, a augmentation to your Right Hand could increase your proficiency with a pistol, or hand-to-hand combat. The skills that an implant boosts depends on the \"clusters\" that are imbued inside of it.\\n\\nTo install an implant, it is easiest to utilize one of the stationary surgery clinics, such as the one here in this facility. After paying a small fee, you will be able to install your own implants. Of course, you can only have one implant per location, and you must remove the old one before installing a new one.\\n\\nImplants can make the seemingly impossible possible, by improving all aspects of your physical or mental prowess.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:26.908 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_q_overview_option_0",
+              "Index": 0,
+              "Text": "Where can Implants be installed?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:26.9091426Z",
+              "NextNodeId": "mason_q_where",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_overview_option_1",
+              "Index": 1,
+              "Text": "How do I install an Implant?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:26.9091426Z",
+              "NextNodeId": "mason_q_how",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_overview_option_2",
+              "Index": 2,
+              "Text": "Can you tell me about Implant Clusters?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:26.9091426Z",
+              "NextNodeId": "mason_q_clusters",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_overview_option_3",
+              "Index": 3,
+              "Text": "Are there any kinds of implants that you don't offer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:26.9091426Z",
+              "NextNodeId": "mason_q_alt",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_overview_option_4",
+              "Index": 4,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:26.9091426Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_overview_option_4_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_where",
+          "PromptText": "There are 13 locations that can receive an implant: Eyes, Head, Ears, Right Arm, Left Arm, Chest, Right Wrist, Left Wrist, Waist, Right Hand, Left Hand, Legs, and Feet.\\n\\nThe skills available to be boosted are related to the intended location of the augmentation. You will find that implants that improve your ability to control nanomachines, for example, will mostly be placed in the head, ears, or eyes, while combat skills are focused around the arms and hands.\\n\\nDue to physical limitations, a body can only receive a single implant in each location. As good as it'd be for business, it would just be too dangerous to install so many augmentations in one location.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:29.276 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_q_where_option_0",
+              "Index": 0,
+              "Text": "How do I install an Implant?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:29.2776821Z",
+              "NextNodeId": "mason_q_how",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_where_option_1",
+              "Index": 1,
+              "Text": "Can you tell me about Implant Clusters?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:29.2776821Z",
+              "NextNodeId": "mason_q_clusters",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_where_option_2",
+              "Index": 2,
+              "Text": "Are there any kinds of implants that you don't offer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:29.2776821Z",
+              "NextNodeId": "mason_q_alt",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_where_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:29.2776821Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_where_option_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_how",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "To install an implant, you will need to utilize a Surgery Clinic. I recommend the stationary devices, such as the one located here.",
+              "Unknown2": 0
+            },
+            {
+              "Text": "\\n\\nIn addition to needing access to a Surgery Clinic, you will also need some medical proficiency in treating wounds and injuries. With appropriate Treatment, and a strong enough body to withstand the implants, you will be able to insert implants into vacant places within your body. As a reminder, only 1 implant can be in a single location.\\n\\nWith the right skills, all you need to do is use a Clinic and then begin inserting your augmentations.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:31.020 + 20:59:32.117 Unknown2=0/0",
+          "Options": [
+            {
+              "Id": "mason_q_how_option_0",
+              "Index": 0,
+              "Text": "Can you tell me about Implant Clusters?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:32.1189299Z",
+              "NextNodeId": "mason_q_clusters",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_how_option_1",
+              "Index": 1,
+              "Text": "Are there any kinds of implants that you don't offer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:32.1189299Z",
+              "NextNodeId": "mason_q_alt",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_how_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:32.1189299Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_how_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_clusters",
+          "PromptText": "There are 3 kinds of augmentation \"clusters,\" and those are, by order of power: Shiny, Bright, and Faded. It is very important to note that an implant can have a maximum of only 1 of each type of cluster. It is impossible to assemble an implant with more than 3 clusers, and more than 1 of each flavor of cluster.\\n\\nAll skills have clusters available in all 3 types. That being said, no single implant can contain multiple clusters of the same skill. Instead, in order to receive the maximum available improvement for a particular skill, you will need to spread it over 3 different implants. This often presents interesting decisions that need to be made...will you improve your body's overall power, or will you refine a specific skill?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:34.038 Unknown2=0 (capture spelling clusers)",
+          "Options": [
+            {
+              "Id": "mason_q_clusters_option_0",
+              "Index": 0,
+              "Text": "Are there any kinds of implants that you don't offer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:34.0387456Z",
+              "NextNodeId": "mason_q_alt",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_clusters_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:34.0387456Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_clusters_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_alt",
+          "PromptText": "That's a strange sort of question. I offer implants, and that is all you will find here on Rubi-Ka. There are alternatives to implants, but you will only find those if you happen to fall through one of those JAME-powered gateways into the \"Shadowlands.\"\\n\\nThey told me that those \"Symbiants\" would be the death of the implants business...but I'm still here! Also, I can't forget those who, instead of using good, healthy augmentations, implant their bodies with the ghastly remains of fallen foes. It makes me wonder if anyone cares about what they put into their bodies anymore. At least my implants are sterile and brand new!",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:35.797 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_q_alt_option_0",
+              "Index": 0,
+              "Text": "What is a \"symbiant?\"",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:35.7976623Z",
+              "NextNodeId": "mason_q_symbiant",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_alt_option_1",
+              "Index": 1,
+              "Text": "What \"ghastly\" things are you talking about?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:35.7976623Z",
+              "NextNodeId": "mason_q_ghastly",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_alt_option_2",
+              "Index": 2,
+              "Text": "What is \"JAME?\"",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:35.7976623Z",
+              "NextNodeId": "mason_q_jame",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_alt_option_3",
+              "Index": 3,
+              "Text": "Can you tell me about Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:35.7976623Z",
+              "NextNodeId": "mason_q_implants_again",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_alt_option_4",
+              "Index": 4,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:35.7976623Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_alt_option_4_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_symbiant",
+          "PromptText": "Something that you'll only find in the Shadowlands. They are like Implants, except without the attractive modular qualities. While you can't define which skills they amplify, however, they do often affect more than just 3.\\n\\nYou sacrifice the freedom of customization for implants that are pre-defined. I do not offer any of these things at my shop.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:38.852 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_q_symbiant_option_0",
+              "Index": 0,
+              "Text": "What \"ghastly\" things are you talking about?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:38.8537761Z",
+              "NextNodeId": "mason_q_ghastly",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_symbiant_option_1",
+              "Index": 1,
+              "Text": "What is \"JAME?\"",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:38.8537761Z",
+              "NextNodeId": "mason_q_jame",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_symbiant_option_2",
+              "Index": 2,
+              "Text": "Can you tell me about Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:38.8537761Z",
+              "NextNodeId": "mason_q_implants_again",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_symbiant_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:38.8537761Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_symbiant_option_3_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_ghastly",
+          "PromptText": "I know very little about them, but those who can't allow their bodies to be enhanced by implants or symbiants use \"spirits.\" These objects are just absorbed or extracted from the body, instead of requiring medical training. It defies my understanding of the body, quite remarkable.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:41.174 Unknown2=0",
+          "Options": [
+            {
+              "Id": "mason_q_ghastly_option_0",
+              "Index": 0,
+              "Text": "What is \"JAME?\"",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:41.1753452Z",
+              "NextNodeId": "mason_q_jame",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_ghastly_option_1",
+              "Index": 1,
+              "Text": "Can you tell me about Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:41.1753452Z",
+              "NextNodeId": "mason_q_implants_again",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_ghastly_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:41.1753452Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_ghastly_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_jame",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Dr. Mason snorts",
+              "Unknown2": 1
+            },
+            {
+              "Text": "The JAME are the Jobe Association of Metaphysical Exploration. They live up on their floating city of Jobe in their white uniforms, looking down on everyone.\\n\\nThey are behind all of the incursions into the regions known as the Shadowlands. I don't know too much more about them, except they're just a group of secluded scientists.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:43.304 Unknown2=1 then 0",
+          "Options": [
+            {
+              "Id": "mason_q_jame_option_0",
+              "Index": 0,
+              "Text": "Can you tell me about Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:43.3180242Z",
+              "NextNodeId": "mason_q_implants_again",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_jame_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:43.3180242Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_jame_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "mason_q_implants_again",
+          "PromptText": "Certainly, they are my purpose in this world. Is there anything in particular you wanted to know about them?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:45.426 Unknown2=0; AnswerList Goodbye-only after alt branch",
+          "Options": [
+            {
+              "Id": "mason_q_implants_again_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:45.4267223Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_implants_again_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
           "Id": "mason_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after accept",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "You spend a few moments explaining your situation to the patient doctor.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Ah, yes, another one. I should say that forging an ID chip is rather illegal and somewhat risky... but truthfully I'd rather lend a hand against the bureaucratic red-tape-nonsense than be a stickler for the law. \\n\\nHowever, I won't help you without a little hand in return. Trust me, the task I have for you is mutually beneficial.. ",
+              "Unknown2": 0
+            },
+            {
+              "Text": "See my fine selection of vending machines? ICC wants me to make more money, and that is where you come in. Assemble a Leg Implant: Agility, Shiny, I will upload the recipe to your ncu. Show it to me when you are done.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:53.911 Unknown2=1/0/0",
           "Options": [
             {
               "Id": "mason_002_option_0",
               "Index": 0,
               "Text": "I'll come back when I'm done.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:05",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:53.9124902Z",
               "NextNodeId": "mason_003",
               "Actions": []
             },
@@ -80,7 +570,7 @@
               "Id": "mason_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:05",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:53.9124902Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -96,14 +586,14 @@
         },
         {
           "Id": "mason_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "PromptText": "Sounds good. I'll be here.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-225905 20:59:57.586 Unknown2=0",
           "Options": [
             {
               "Id": "mason_003_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:55:07",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T20:59:57.5862236Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -119,14 +609,14 @@
         },
         {
           "Id": "mason_show_001",
-          "PromptText": "",
-          "PromptTextConfidence": "show implant visit",
+          "PromptText": "Welcome back, I hope you were successful.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-230902 21:10:06.459 Unknown2=0",
           "Options": [
             {
               "Id": "mason_show_001_option_0",
               "Index": 0,
               "Text": "I finished that implant.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:38; Answer=0 → StartTrade 1 slot",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:06.4599519Z; Answer=0 → AppendText then StartTrade 1 slot",
               "NextNodeId": "mason_show_trade",
               "Actions": []
             },
@@ -134,22 +624,15 @@
               "Id": "mason_show_001_option_1",
               "Index": 1,
               "Text": "I have some questions...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:38",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "mason_show_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:06.4599519Z",
+              "NextNodeId": "mason_questions",
+              "Actions": []
             },
             {
               "Id": "mason_show_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:38",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:06.4599519Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -165,14 +648,14 @@
         },
         {
           "Id": "mason_show_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade 1 slot",
+          "PromptText": "Good, let's see how you did. Please give it to me.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-230902 21:10:08.577 then StartTrade 1 slot",
           "Options": [
             {
               "Id": "mason_show_trade_option_0",
               "Index": 0,
               "Text": "(Continue after trade)",
-              "TextEvidence": "Synthetic; post RejectedItems → How do I install?",
+              "TextEvidence": "Synthetic; post RejectedItems → install tip",
               "NextNodeId": "mason_show_002",
               "Actions": []
             }
@@ -181,29 +664,22 @@
         },
         {
           "Id": "mason_show_002",
-          "PromptText": "",
-          "PromptTextConfidence": "after show implant",
+          "PromptText": "Not bad for a beginner. Now, I think you should install it. Use the Surgery Clinic in the corner.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-230902 21:10:13.414 Unknown2=0",
           "Options": [
             {
               "Id": "mason_show_002_option_0",
               "Index": 0,
               "Text": "How do I install an Implant?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:46",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "mason_show_002_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close after install question"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:13.4146631Z",
+              "NextNodeId": "mason_q_how_after_show",
+              "Actions": []
             },
             {
               "Id": "mason_show_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:56:46",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:13.4146631Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -218,15 +694,80 @@
           "EnterActions": []
         },
         {
+          "Id": "mason_q_how_after_show",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "To install an implant, you will need to utilize a Surgery Clinic. I recommend the stationary devices, such as the one located here.",
+              "Unknown2": 0
+            },
+            {
+              "Text": "\\n\\nIn addition to needing access to a Surgery Clinic, you will also need some medical proficiency in treating wounds and injuries. With appropriate Treatment, and a strong enough body to withstand the implants, you will be able to insert implants into vacant places within your body. As a reminder, only 1 implant can be in a single location.\\n\\nWith the right skills, all you need to do is use a Clinic and then begin inserting your augmentations.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-230902 21:10:16.700 + 21:10:17.389; AnswerList overview/where/clusters/alt/goodbye",
+          "Options": [
+            {
+              "Id": "mason_q_how_after_show_option_0",
+              "Index": 0,
+              "Text": "Can you give me an overview on Implants?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:17.4042026Z",
+              "NextNodeId": "mason_q_overview",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_how_after_show_option_1",
+              "Index": 1,
+              "Text": "Where can Implants be installed?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:17.4042026Z",
+              "NextNodeId": "mason_q_where",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_how_after_show_option_2",
+              "Index": 2,
+              "Text": "Can you tell me about Implant Clusters?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:17.4042026Z",
+              "NextNodeId": "mason_q_clusters",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_how_after_show_option_3",
+              "Index": 3,
+              "Text": "Are there any kinds of implants that you don't offer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:17.4042026Z",
+              "NextNodeId": "mason_q_alt",
+              "Actions": []
+            },
+            {
+              "Id": "mason_q_how_after_show_option_4",
+              "Index": 4,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:10:17.4042026Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "mason_q_how_after_show_option_4_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
           "Id": "mason_chip_001",
-          "PromptText": "",
-          "PromptTextConfidence": "after install tip complete",
+          "PromptText": "Welcome back, I hope you were successful.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-231133 21:11:43.825 Unknown2=0",
           "Options": [
             {
               "Id": "mason_chip_001_option_0",
               "Index": 0,
               "Text": "I have installed the implant and I have all the items we need for the chip.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:04; Answer=0 → StartTrade 2 slots",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:11:43.8269044Z; Answer=0 → AppendText then StartTrade 2 slots",
               "NextNodeId": "mason_chip_trade",
               "Actions": []
             },
@@ -234,22 +775,15 @@
               "Id": "mason_chip_001_option_1",
               "Index": 1,
               "Text": "I have some questions...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:04",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "mason_chip_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:11:43.8269044Z",
+              "NextNodeId": "mason_questions",
+              "Actions": []
             },
             {
               "Id": "mason_chip_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:04",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:11:43.8269044Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -265,14 +799,24 @@
         },
         {
           "Id": "mason_chip_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade 2 slots",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "The good doctor clasps his hands together with a big smile, nodding to himself.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Excellent, then let's get started. I'll need the Blank ICC ID Chip and the Biological Survey Nanobots, if you please.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-231133 21:11:46.368 Unknown2=1/0 then StartTrade 2 slots",
           "Options": [
             {
               "Id": "mason_chip_trade_option_0",
               "Index": 0,
               "Text": "(Continue after trade)",
-              "TextEvidence": "Synthetic; post RejectedItems → Thank you",
+              "TextEvidence": "Synthetic; post RejectedItems → DNA unlock / Lorelei",
               "NextNodeId": "mason_chip_002",
               "Actions": []
             }
@@ -281,14 +825,24 @@
         },
         {
           "Id": "mason_chip_002",
-          "PromptText": "",
-          "PromptTextConfidence": "after chip turn-in",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Without any warning he pokes the side of your neck with the DNA-Unlocking device. A little droplet of blood runs down the outside of your throat.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "And... there we have it, one personalized ID chip, ready to be used in a card. \\nLorelei down at the bar has a... slight side business. Speak with her, and she should be able to help out with the final step.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-231133 21:11:53.530 Unknown2=1/0",
           "Options": [
             {
               "Id": "mason_chip_002_option_0",
               "Index": 0,
               "Text": "Thank you for all the help.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:15",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:11:53.5309199Z",
               "NextNodeId": "mason_chip_003",
               "Actions": []
             },
@@ -296,7 +850,7 @@
               "Id": "mason_chip_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:15",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:11:53.5309199Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -312,14 +866,14 @@
         },
         {
           "Id": "mason_chip_003",
-          "PromptText": "",
-          "PromptTextConfidence": "final goodbye",
+          "PromptText": "More than happy to. Like I said, if I have to bend the rules a little to help out those who've been passed over by the bureacracy, I'm more than happy to do so. At any rate, Lorelei should be able to help you from here - Best of luck, sincerely.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-231133 21:11:57.044 Unknown2=0 (capture spelling bureacracy)",
           "Options": [
             {
               "Id": "mason_chip_003_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T15:57:19",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:11:57.0447536Z",
               "NextNodeId": "close",
               "Actions": [
                 {

@@ -127,6 +127,7 @@ namespace AORebirth.Core.Playfields
                 this.playfield,
                 this.playfield.Identity,
                 this.ActivateNpc);
+            this.capturedAreteRobotSpawns.TickRespawn(this.playfield, this.playfield.Identity);
         }
 
         internal void ClearRuntimeState()
@@ -150,7 +151,9 @@ namespace AORebirth.Core.Playfields
             AndromedaIccHqIdleGestureRuntime.Clear();
             AndromedaIccHqSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteLandingSpawn.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteIccPeacekeeperPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             MarcusPadAmbientCombat.ClearPlayfield(this.playfield.Identity.Instance);
+            this.capturedAreteRobotSpawns.ClearPlayfield(this.playfield.Identity.Instance);
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             LoreleiOasisMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
@@ -177,6 +180,11 @@ namespace AORebirth.Core.Playfields
             {
                 maximumNpcDistanceFromHome =
                     encounterDefinition.MaximumNpcLeashDistanceFromHome.Value;
+            }
+            else if (AreteRoboticGuardDogRuntime.IsRegisteredDog(character))
+            {
+                maximumNpcDistanceFromHome =
+                    AreteRoboticGuardDogRuntime.MaximumNpcDistanceFromHomeMeters;
             }
 
             this.npcHomeStates[character.Identity.Instance] =
@@ -478,6 +486,18 @@ namespace AORebirth.Core.Playfields
             this.ClearCombatTracking(
                 character.Identity,
                 NpcChaseInvalidationReason.TargetLost);
+
+            // Player death / combat end left Follow set → ProcessPatrolTick kept DoFollow
+            // and never resumed captured patrol replay. Clear follow and restore patrol.
+            NPCController npcController = character.Controller as NPCController;
+            if (npcController != null)
+            {
+                npcController.StopFollow();
+                if (character.Waypoints != null && character.Waypoints.Count > 0)
+                {
+                    npcController.State = CharacterState.Patrolling;
+                }
+            }
         }
 
         internal void StopDyingNpcCombatState(ICharacter target)
@@ -565,8 +585,7 @@ namespace AORebirth.Core.Playfields
 
             if (npcController.KnuBot != null
                 || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
-                || target.Stats[StatIds.health].Value <= 0
-                || target.FightingTarget.Instance != 0)
+                || target.Stats[StatIds.health].Value <= 0)
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Network,
@@ -579,6 +598,27 @@ namespace AORebirth.Core.Playfields
                         target.Stats[StatIds.health].Value,
                         target.FightingTarget));
                 return;
+            }
+
+            if (target.FightingTarget.Instance != 0)
+            {
+                if (target.FightingTarget.Instance == attacker.Identity.Instance)
+                {
+                    return;
+                }
+
+                // Player/pet can pull NPC off ambient NPC-vs-NPC fights (Marcus pad robot).
+                if (!PlayerVersusPlayerCombatRules.IsPlayerControlledCombatant(attacker))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Network,
+                        string.Format(
+                            "NPC combat refused npc={0} attacker={1} reason=already-fighting fightingTarget={2}",
+                            target.Identity,
+                            attacker.Identity,
+                            target.FightingTarget));
+                    return;
+                }
             }
 
             this.StartCombatWithAcquiredTarget(attacker, target, capturedContract);
@@ -600,10 +640,22 @@ namespace AORebirth.Core.Playfields
             {
                 this.AcquireAggro(attacker, ally, false);
             }
+
+            // Capture 20260722-235510: ICC Peacekeeper attacks the hostile that aggroed the player.
+            if (PlayerVersusPlayerCombatRules.IsPlayerControlledCombatant(attacker))
+            {
+                foreach (ICharacter peacekeeper in AreteIccPeacekeeperPatrolRuntime.FindPlayerDefenseAllies(
+                    attacker,
+                    target))
+                {
+                    this.AcquireAggro(target, peacekeeper, false);
+                }
+            }
         }
 
         /// <summary>
         /// Force retarget for TauntNpc nanos (Mongo Slam). Steals aggro from other players.
+        /// Social / quest NPCs (Rex, Marcus, etc.) must never be pulled — Mongo is combat-mob only.
         /// </summary>
         internal void ForceTauntAggro(ICharacter taunter, ICharacter target)
         {
@@ -615,6 +667,7 @@ namespace AORebirth.Core.Playfields
             NPCController npcController = target.Controller as NPCController;
             if (npcController == null
                 || npcController.KnuBot != null
+                || !NpcAiProfiles.CanRetaliate(npcController.AiProfile)
                 || target.Stats[StatIds.health].Value <= 0)
             {
                 return;
@@ -668,6 +721,8 @@ namespace AORebirth.Core.Playfields
                     this.playfield,
                     this.playfield.Identity,
                     this.ActivateNpc);
+                // Burn→explode lifecycle for Malfunctioning Cleaning Robots (also via EnsureArete).
+                this.capturedAreteRobotSpawns.TickRespawn(this.playfield, this.playfield.Identity);
             }
 
             PetCommandService.ProcessPetHealTick(character);
@@ -689,11 +744,20 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            // Capture 20260722-235510: PK assists when a hostile fighting a player enters range
+            // (not only at the instant of first aggro).
+            ICharacter defenseHostile = AreteIccPeacekeeperPatrolRuntime.FindDefenseHostile(character);
+            if (defenseHostile != null)
+            {
+                this.AcquireAggro(defenseHostile, character, false);
+            }
+
             ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.capturedTempleEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
                                          ?? LoreleiOasisMobRuntime.FindAutomaticAggroTarget(character)
+                                         ?? AreteRoboticGuardDogRuntime.FindAutomaticAggroTarget(character)
                                          ?? ZoneEngine.Core.Missions.MissionInstanceMobCombat.FindAutomaticAggroTarget(
                                              character);
             if (automaticTarget != null)

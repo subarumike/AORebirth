@@ -1651,6 +1651,12 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (target.Controller is NPCController)
+            {
+                this.AcquireNpcAggro(attacker, target);
+                this.SuspendNpcRegen(target);
+            }
+
             this.nextCombatTicks[attacker.Identity.Instance] =
                 DateTime.UtcNow + TimeSpan.FromSeconds(attackSource.RechargeSeconds);
         }
@@ -2443,6 +2449,94 @@ namespace AORebirth.Core.Playfields
                 this.DespawnCorpse,
                 itemLootLifetime,
                 emptyCleanupDelay);
+        }
+
+        /// <summary>
+        /// Delete/destroy an item while the corpse loot window is open.
+        /// Accepts Backpack packed handle+slot (same as loot), Corpse+slot, or Corpse identity + Parameter1 slot.
+        /// Fully emptied corpses despawn immediately.
+        /// </summary>
+        public bool TryDeleteCorpseLootItem(
+            ICharacter looter,
+            Identity target,
+            int parameter1,
+            int parameter2)
+        {
+            if (looter == null || target == null)
+            {
+                return false;
+            }
+
+            CorpseState corpse = null;
+            int slot = 0;
+
+            if (target.Type == IdentityType.Backpack)
+            {
+                int handle = (target.Instance >> 16) & 0xffff;
+                slot = target.Instance & 0xffff;
+                corpse = this.corpses.Values.FirstOrDefault(x => x.InventoryHandle == handle);
+            }
+            else if (target.Type == IdentityType.Corpse)
+            {
+                if (this.corpses.TryGetValue(target.Instance, out corpse))
+                {
+                    slot = parameter1 > 0 ? parameter1 : parameter2;
+                }
+                else
+                {
+                    slot = target.Instance & 0xffff;
+                    corpse = this.corpses.Values.FirstOrDefault(
+                        x => x.Opened && FindCorpseLootItem(x, slot) != null);
+                }
+            }
+            else if (target.Type == IdentityType.Inventory)
+            {
+                slot = target.Instance;
+                corpse = this.corpses.Values.FirstOrDefault(
+                    x => x.Opened && FindCorpseLootItem(x, slot) != null);
+            }
+
+            if (corpse == null || slot < 0)
+            {
+                return false;
+            }
+
+            CorpseLootItem lootItem = FindCorpseLootItem(corpse, slot);
+            if (lootItem == null || lootItem.Looted)
+            {
+                return false;
+            }
+
+            if (!this.corpseInventoryService.RemoveItem(corpse.CorpseIdentity, lootItem.Slot, DateTime.UtcNow))
+            {
+                return false;
+            }
+
+            this.corpseInventoryService.MarkOpened(corpse.CorpseIdentity, true, DateTime.UtcNow);
+            this.SendCorpseInventoryUpdate(looter, corpse);
+
+            if (corpse.IsEmpty)
+            {
+                this.ScheduleCorpseDespawn(
+                    corpse,
+                    CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay,
+                    "deleted-empty");
+            }
+            else
+            {
+                this.ExtendCorpseLifetime(corpse, corpse.ItemLootLifetime, "delete-remaining");
+            }
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "CorpseDelete accepted corpse={0} looter={1} slot={2} remaining={3}",
+                    corpse.CorpseIdentity,
+                    looter.Identity,
+                    lootItem.Slot,
+                    corpse.LootItems.Count(x => !x.Looted)));
+            return true;
         }
 
         private void SendCorpseContainerAddItem(ICharacter looter, Identity sourceContainer, int targetPlacement)

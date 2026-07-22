@@ -60,6 +60,15 @@ namespace ZoneEngine.Core.Packets
         private const int CapturedSubwayEumenidesMonsterDataOffset = 332;
         private const int CapturedSubwayEumenidesTailDeadNpcInstanceOffset = 344;
 
+        // Capture 20260722-210219 / 20260722-cap-mob-drop-cred: Waste Collector corpse.
+        // Generic Rhinoman template lacks Material #22 → client shows male body / unusable corpse.
+        private const int CapturedAreteWasteMonsterData = 17714;
+        private const int CapturedAreteWasteOriginalEncodedNameLength = 38;
+        private const int CapturedAreteWasteMonsterDataOffset = 341;
+        private const int CapturedAreteWasteTailDeadNpcInstanceOffset = 353;
+        private const int CapturedAreteWasteOriginalSuffixOffset =
+            NameOffset + CapturedAreteWasteOriginalEncodedNameLength;
+
         private static readonly byte[] Template = HexToBytes(
             "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d000000000000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
 
@@ -124,6 +133,18 @@ namespace ZoneEngine.Core.Packets
             + "656D61696E73206F662045756D656E69646573000000000200000032000003F100000003000007E20000CF273983C39B000000040000000000000001"
             + "0000000000000000000000000000000000000000000001F6000000010000000400031BCE000000000000C35079702234000017A60000000000002594"
             + "00000000000000010000258C0000000000000002000025920000000000000003000185C30000000000000004000025990000000000000000");
+
+        // Capture 20260722-210219 corpse-full-updates Supreme Collector of Waste (Material #22).
+        // Leading 0000 pads AOSharp seq-stripped 000A… frame to CorpseFullUpdate template layout.
+        private static readonly byte[] CapturedAreteWasteTemplate = HexToBytes(
+            "0000000A000101D900000DC1797E30D74F474E050000C76A00F5F80B00000000080000000B00000000000000004559EB4F410825574469553700000000"
+            + "BF5BD8DB000000003F032943000FF02D0000000000000000006F000046F200000000001818050000001700000000000002BD00000000000002BE000000"
+            + "00000002BF000000000000019C0000000100000168000000A0000000DF000000000000003B00000001000000040000000600000059000000010000019F"
+            + "0000C350000001A0798A239E0000002A000043A40000003D000000000000000800020788000000220000003C0000002652656D61696E73206F66205375"
+            + "7072656D6520436F6C6C6563746F72206F66205761737465000000000200000032000003F100000003000007E20000CF2739917EDF0000000400000000"
+            + "000000010000000000000000000000000000000000000000000001F6000000010000000400004532000000000000C350798A239E000017A60000000000"
+            + "00000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000000010000"
+            + "07E24D6174657269616C2023323200000000000000000000000000000000000000000001768D0000000000000001");
 
         public static byte[] Build(
             ICharacter deadNpc,
@@ -205,6 +226,18 @@ namespace ZoneEngine.Core.Packets
                 == OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea)
             {
                 return BuildCapturedSubwayFilthFlea(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
+            if (deadNpc != null && corpseMonsterData == CapturedAreteWasteMonsterData)
+            {
+                return BuildCapturedAreteWaste(
                     deadNpc,
                     corpseIdentity,
                     receiver,
@@ -431,6 +464,56 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(
                 buffer,
                 CapturedSubwayFilthFleaTailDeadNpcInstanceOffset,
+                deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        private static byte[] BuildCapturedAreteWaste(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            string corpseName = "Remains of " + deadNpc.Name;
+            byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
+            int encodedNameLength = nameBytes.Length + 1;
+            int newSuffixOffset = NameOffset + encodedNameLength;
+            int afterNameDelta = newSuffixOffset - CapturedAreteWasteOriginalSuffixOffset;
+            byte[] buffer = new byte[CapturedAreteWasteTemplate.Length + afterNameDelta];
+
+            Buffer.BlockCopy(CapturedAreteWasteTemplate, 0, buffer, 0, NameOffset);
+            Buffer.BlockCopy(nameBytes, 0, buffer, NameOffset, nameBytes.Length);
+            Buffer.BlockCopy(
+                CapturedAreteWasteTemplate,
+                CapturedAreteWasteOriginalSuffixOffset,
+                buffer,
+                newSuffixOffset,
+                CapturedAreteWasteTemplate.Length - CapturedAreteWasteOriginalSuffixOffset);
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);
+            WriteInt32(buffer, SexOffset, deadNpc.Stats[StatIds.sex].Value);
+            WriteInt32(buffer, BreedOffset, deadNpc.Stats[StatIds.breed].Value);
+            WriteInt32(buffer, RaceOffset, deadNpc.Stats[StatIds.race].Value);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, NameLengthOffset, encodedNameLength);
+            WriteInt32(buffer, CapturedAreteWasteMonsterDataOffset + afterNameDelta, corpseMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedAreteWasteTailDeadNpcInstanceOffset + afterNameDelta,
                 deadNpc.Identity.Instance);
 
             return buffer;

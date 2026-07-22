@@ -84,8 +84,9 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 yield return pet;
             }
 
-            // If no pets and no other target, fall back to self (true self/team cast with empty pet list).
-            if (yielded.Count == 0)
+            // Always include self for Wearer/User TeamCastNano (Ambient Restoration 302365 etc.).
+            // Previously only fell back to self when no pets — pet owners got zero self heal.
+            if (!yielded.Contains(character.Identity.Instance))
             {
                 yield return character;
             }

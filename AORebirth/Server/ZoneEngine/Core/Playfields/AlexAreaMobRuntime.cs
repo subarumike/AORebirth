@@ -179,35 +179,50 @@ namespace ZoneEngine.Core.Playfields
                 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-        // Capture 20260720-204431 (Alex pad) + 20260720-goldman combat extras + 30s respawn.
+        // Capture 20260722-cap-mob-drop-cred exact Alex-pad spots (3m cluster) + prior oasis fleas.
         private static readonly MobSlot[] Slots =
             {
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3520.2432f, 5.315f, 872.97473f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3502.3074f, 5.1100006f, 857.66364f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3521.3774f, 5.1100006f, 876.4073f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3522.3467f, 5.1100006f, 874.9996f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3523.994f, 5.1100006f, 880.1992f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3495.174f, 5.1100006f, 879.16656f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0f, 3492.6052f, 5.1100006f, 878.40924f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0f, 3513.9517f, 5.1100006f, 865.63983f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0f, 3514.402f, 5.1100006f, 866.71875f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0f, 3510.8594f, 5.1100006f, 864.0514f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0f, 3492.674f, 5.1100006f, 866.95435f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1f, 3529.97f, 5.1100006f, 894.44257f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1f, 3499.842f, 5.1100006f, 898.7892f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1f, 3559.97f, 5.1100006f, 865.22f),
-                new MobSlot("IIV-X Advanced Docker", MobKind.Docker, 17649, 4, 323, 1019, 110, 15, NpcAiProfile.Passive, 0f, 3515.6375f, 5.3050003f, 905.0099f),
-                new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 100, 13, NpcAiProfile.Passive, 0f, 3544.5f, 5.31f, 872.4f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3514.95f, 5.11f, 914.61f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3523.71f, 5.11f, 897.75f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3514.13f, 5.11f, 884.92f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3511.82f, 5.11f, 891.78f),
-                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3494.28f, 5.24f, 906.53f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3531.89f, 6.81f, 906.31f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3555.44f, 8.29f, 919.14f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3545.62f, 6.73f, 897.12f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3516.64f, 7.78f, 930.04f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.75f, 5.11f, 891.65f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3489.426f, 5.110f, 875.835f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3493.492f, 5.110f, 892.886f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3494.314f, 5.223f, 906.400f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3495.097f, 5.110f, 880.632f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3495.464f, 5.110f, 890.018f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3496.017f, 5.110f, 903.404f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3498.525f, 7.730f, 913.251f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3499.633f, 5.110f, 855.734f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3503.399f, 5.110f, 888.679f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3512.169f, 5.110f, 892.637f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3516.197f, 5.110f, 914.061f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3523.440f, 5.110f, 898.358f),
+                new MobSlot("32-V Docker", MobKind.Docker, 17649, 3, 35, 1019, 110, 11, NpcAiProfile.Passive, 0.0f, 3524.225f, 5.110f, 879.666f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3492.532f, 5.110f, 866.601f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3497.703f, 9.380f, 918.384f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3506.614f, 5.110f, 891.661f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3507.345f, 8.185f, 930.825f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3510.761f, 5.110f, 864.661f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3510.884f, 7.982f, 923.173f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3519.717f, 9.080f, 940.067f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3526.509f, 9.501f, 951.883f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3539.143f, 9.087f, 942.056f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3542.399f, 8.045f, 890.165f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3549.620f, 7.396f, 906.258f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3555.855f, 8.336f, 915.219f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3558.766f, 8.575f, 927.072f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3567.060f, 8.218f, 918.754f),
+                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3585.885f, 6.998f, 921.242f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.315f, 5.110f, 902.829f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.761f, 5.110f, 891.211f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3509.731f, 7.394f, 926.952f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3529.015f, 5.110f, 891.201f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3541.526f, 8.190f, 892.471f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3549.231f, 9.371f, 938.996f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3554.468f, 8.074f, 919.910f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3562.391f, 5.110f, 864.537f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3565.514f, 8.356f, 913.615f),
+                new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 100, 13, NpcAiProfile.Passive, 0.0f, 3549.280f, 5.110f, 864.321f),
+                new MobSlot("IIV-X Advanced Docker", MobKind.Docker, 17649, 4, 323, 1019, 110, 15, NpcAiProfile.Passive, 0.0f, 3515.109f, 5.305f, 904.289f),
+                new MobSlot("Supreme Collector of Waste", MobKind.WasteCollector, 17714, 4, 370, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3506.573f, 11.074f, 943.099f),
+                // Prior oasis fleas (outside this capture cluster).
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3452.36f, 0.01f, 809.73f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3452.59f, 0.01f, 858.98f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3452.62f, 0.01f, 884.29f),
@@ -216,15 +231,6 @@ namespace ZoneEngine.Core.Playfields
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3425.29f, 0.01f, 818.4f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3437.13f, 0.01f, 803.59f),
                 new MobSlot("Mutated Garbage Flea", MobKind.GarbageFlea, 17657, 7, 559, 25, 200, 23, NpcAiProfile.Aggressive, 1.0f, 3422.907f, 0.01f, 878.7842f),
-                new MobSlot("Supreme Collector of Waste", MobKind.WasteCollector, 17714, 4, 60, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3505.91f, 11.02f, 943.13f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3548.63f, 6.93f, 906.13f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3567.44f, 8.14f, 919.03f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3543.79f, 7.4f, 889.6f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3556.35f, 8.37f, 915.44f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3507.55f, 5.11f, 891.72f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3511.22f, 7.78f, 923.88f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3507.34f, 8.4f, 931.53f),
-                new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3498.86f, 9.26f, 918.92f),
             };
 
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
@@ -461,18 +467,18 @@ namespace ZoneEngine.Core.Playfields
             ApplyCaptureStats(mob, slot);
             controller.AiProfile = slot.AiProfile;
 
-            // Capture 20260720-204431: AttackInfo WeaponInstance 1279612721 / 1279612722;
-            // Docker hits 4–14, Waste ~8, Cleanmeister ~6, Flea 6–8.
+            // Capture 20260722-cap-mob-drop-cred AttackInfo vs player:
+            // Amount=6.. AmmoCount=-1 WeaponSlot=1 HitType=Normal WeaponInstance=1279612721/22
+            // → client red "You got hit … damage" text.
             int minDamage;
             int maxDamage;
             ResolveCaptureDamage(slot, out minDamage, out maxDamage);
-            // Capture AttackInfo start context for all; only fleas use Aggressive AiProfile.
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "alex-area-20260720-204431",
+                "alex-area-20260722-cap-mob-drop-cred",
                 minDamage,
                 maxDamage,
                 2.0,
-                0,
+                1,
                 0,
                 1279612721);
             string unused;
@@ -534,6 +540,14 @@ namespace ZoneEngine.Core.Playfields
             SetStat(mob, StatIds.fatness, 1);
             // Capture 20260720-204431: Docker +400 XP, Waste ~347/316, Flea +316.
             SetStat(mob, StatIds.xp, ResolveCaptureXp(slot));
+            int minDamage;
+            int maxDamage;
+            ResolveCaptureDamage(slot, out minDamage, out maxDamage);
+            SetStat(mob, StatIds.mindamage, minDamage);
+            SetStat(mob, StatIds.maxdamage, maxDamage);
+            // Capture AttackInfo HitType=Normal → client red hit line uses damagetype.
+            SetStat(mob, StatIds.damagetype, 1);
+            SetStat(mob, StatIds.defaultattacktype, 1);
             if (slot.Kind == MobKind.GarbageFlea)
             {
                 SetStat(mob, StatIds.catmesh, 15231);

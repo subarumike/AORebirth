@@ -368,6 +368,7 @@
     <Compile Include="Serialization\Serializers\Custom\FollowInfoSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\GenericCmdSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\MailMessageSerializer.cs" />
+    <Compile Include="Serialization\Serializers\Custom\SpellListMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\MarketSendMessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\IdentityOnlyN3MessageSerializer.cs" />
     <Compile Include="Serialization\Serializers\Custom\N3TeleportMessageSerializer.cs" />

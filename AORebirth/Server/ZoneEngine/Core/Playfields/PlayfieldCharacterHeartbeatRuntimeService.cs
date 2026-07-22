@@ -89,6 +89,8 @@ namespace ZoneEngine.Core.Playfields
                 changed = true;
             }
 
+            AmbientRestorationAuraRuntime.ProcessTick(dynel);
+
             StatHealInterval healInterval = (StatHealInterval)dynel.Stats[StatIds.healinterval];
 
             int healIntervalSeconds = healInterval.Value;
@@ -283,6 +285,12 @@ namespace ZoneEngine.Core.Playfields
         private bool IsNpcRegenBlocked(ICharacter npc)
 
         {
+            // Capture 20260722-134750: Wounded Dockworkers stay at 12/32 HP while Sit.
+            if (npc != null
+                && string.Equals(npc.Name, "Wounded Dockworker", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
 
             if (this.IsNpcUnderAttack(npc))
 

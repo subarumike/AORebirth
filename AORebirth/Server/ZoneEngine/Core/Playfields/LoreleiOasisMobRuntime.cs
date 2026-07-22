@@ -26,6 +26,7 @@ namespace ZoneEngine.Core.Playfields
     /// <summary>
     /// Capture 20260721-loralei: desert oasis Reets + Rollerrats + quest Lolly (7985CAEC).
     /// Reets are passive until attacked; nearby reets assist (social aggro).
+    /// Rollerrats are attack-on-sight (capture 20260722-233205: Attack before player Attack).
     /// Lorelei bartender spawn is handled by AreteLandingSpawn.
     /// </summary>
     internal static class LoreleiOasisMobRuntime
@@ -67,6 +68,9 @@ namespace ZoneEngine.Core.Playfields
         private const int RollerratMonsterData = 17687;
 
         private const float SocialAggroRadiusMeters = 12f;
+
+        // Capture 20260722-233205: first Rollerrat AOS FollowTarget path ~12–18m to player.
+        private const float RollerratAutomaticAggroRadiusMeters = 15f;
 
         private const double RespawnSeconds = 30.0;
 
@@ -137,6 +141,8 @@ namespace ZoneEngine.Core.Playfields
 
         private static readonly HashSet<int> OasisReetInstances = new HashSet<int>();
 
+        private static readonly HashSet<int> OasisRollerratInstances = new HashSet<int>();
+
         private static readonly MobSlot[] DesertReetSlots =
             {
                 new MobSlot("Desert Reet", 5, 58, 93, 3285.676760f, 4.930795f, 689.824500f),
@@ -181,8 +187,56 @@ namespace ZoneEngine.Core.Playfields
 
         public static ICharacter FindAutomaticAggroTarget(ICharacter npc)
         {
-            // Capture behavior: Reets are not attack-on-sight.
-            return null;
+            if (npc == null || npc.Playfield == null || npc.Stats[StatIds.health].Value <= 0)
+            {
+                return null;
+            }
+
+            if (npc.FightingTarget.Instance != 0)
+            {
+                return null;
+            }
+
+            lock (OasisGate)
+            {
+                if (!OasisRollerratInstances.Contains(npc.Identity.Instance))
+                {
+                    // Capture behavior: Reets are not attack-on-sight.
+                    return null;
+                }
+            }
+
+            Playfield playfield = npc.Playfield as Playfield;
+            if (playfield == null || npc.RawCoordinates == null)
+            {
+                return null;
+            }
+
+            Coordinate npcCoord = npc.Coordinates();
+            ICharacter best = null;
+            double bestDistance = RollerratAutomaticAggroRadiusMeters;
+            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, RollerratAutomaticAggroRadiusMeters);
+            for (int i = 0; i < inRange.Count; i++)
+            {
+                ICharacter candidate = inRange[i];
+                if (candidate == null
+                    || candidate.Identity.Instance == npc.Identity.Instance
+                    || !(candidate.Controller is PlayerController)
+                    || candidate.Stats[StatIds.health].Value <= 0
+                    || candidate.RawCoordinates == null)
+                {
+                    continue;
+                }
+
+                double distance = candidate.Coordinates().Distance3D(npcCoord);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    best = candidate;
+                }
+            }
+
+            return best;
         }
 
         public static ICharacter[] FindSocialAggroAllies(ICharacter npc, ICharacter target)
@@ -382,6 +436,7 @@ namespace ZoneEngine.Core.Playfields
             lock (OasisGate)
             {
                 OasisReetInstances.Clear();
+                OasisRollerratInstances.Clear();
             }
         }
 
@@ -542,7 +597,7 @@ namespace ZoneEngine.Core.Playfields
             int slotIndex)
         {
             MobSlot slot = RollerratSlots[slotIndex];
-            NPCController controller = new NPCController { AiProfile = NpcAiProfile.Passive };
+            NPCController controller = new NPCController { AiProfile = NpcAiProfile.Aggressive };
             Character mob = SpawnMobWithTemplateFallback(
                 playfieldIdentity,
                 new Coordinate { x = slot.X, y = slot.Y, z = slot.Z },
@@ -561,12 +616,12 @@ namespace ZoneEngine.Core.Playfields
             CombatTestMobArchetype.Prepare(mob, CombatTestMobArchetype.StowawayRollerrat);
             mob.Name = slot.Name;
             ApplyRollerratStats(mob, slot);
-            controller.AiProfile = NpcAiProfile.Passive;
+            controller.AiProfile = NpcAiProfile.Aggressive;
 
             int minDamage = 5;
             int maxDamage = slot.Level >= 7 ? 9 : 7;
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "lorelei-rollerrat-20260721-loralei",
+                "lorelei-rollerrat-20260722-233205",
                 minDamage,
                 maxDamage,
                 2.0,
@@ -575,10 +630,11 @@ namespace ZoneEngine.Core.Playfields
                 1279612721);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            controller.AiProfile = NpcAiProfile.Passive;
+            controller.AiProfile = NpcAiProfile.Aggressive;
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;
             activateNpc(mob);
+            RegisterOasisRollerrat(mob.Identity.Instance);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
             return mob;
         }
@@ -852,6 +908,19 @@ namespace ZoneEngine.Core.Playfields
             lock (OasisGate)
             {
                 OasisReetInstances.Add(npcInstance);
+            }
+        }
+
+        private static void RegisterOasisRollerrat(int npcInstance)
+        {
+            if (npcInstance == 0)
+            {
+                return;
+            }
+
+            lock (OasisGate)
+            {
+                OasisRollerratInstances.Add(npcInstance);
             }
         }
 

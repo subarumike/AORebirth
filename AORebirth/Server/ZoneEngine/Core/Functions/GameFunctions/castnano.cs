@@ -99,17 +99,24 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             bool hasScript = nano.Events != null && nano.Events.Count > 0;
             if (hasScript)
             {
-                // AreaCastNano / TeamCastNano pass each victim as preferredTarget. Bind SelectedTarget
-                // so nested functions with target=3 (TauntNpc on Mongo Slam 100194) hit that NPC
-                // instead of resolving back to the caster (capture 20260719-Rex-Markus-stone).
-                if (recipient != null
-                    && recipient.Identity.Instance != 0
-                    && recipient.Identity.Instance != character.Identity.Instance)
+                // Always bind SelectedTarget to the TeamCastNano/CastNano recipient for nested OnUse.
+                // Ambient Restoration (302365 → 300495..300498, capture 20260722-keeper-exect-nano)
+                // uses Hit target=3; without binding self, heals land on the selected enemy instead.
+                // Also required for AreaCastNano nested TauntNpc (Mongo Slam 100194).
+                Identity previousSelected = character.SelectedTarget;
+                try
                 {
-                    character.SetTarget(recipient.Identity);
-                }
+                    if (recipient != null && recipient.Identity.Instance != 0)
+                    {
+                        character.SetTarget(recipient.Identity);
+                    }
 
-                NanoEventRuntimeService.Default.ExecuteOnUseEvents(character, nano);
+                    NanoEventRuntimeService.Default.ExecuteOnUseEvents(character, nano);
+                }
+                finally
+                {
+                    character.SetTarget(previousSelected);
+                }
             }
 
             int duration = nano.getItemAttribute(8);

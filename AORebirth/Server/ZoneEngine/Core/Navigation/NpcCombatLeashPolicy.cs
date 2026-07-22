@@ -45,7 +45,21 @@ namespace ZoneEngine.Core.Navigation
             ChaseNavigationPoint target,
             double maximumNpcDistanceFromHome)
         {
-            if (!Applies(playfieldResource, isPlayerOwnedPet))
+            if (isPlayerOwnedPet)
+            {
+                return false;
+            }
+
+            // PF127 always leashes. Explicit short custom leashes (e.g. Arete
+            // Robotic Guard Dog) also enforce on any playfield.
+            bool subwayApplies = playfieldResource == SubwayPlayfieldResource;
+            bool customShortLeash =
+                maximumNpcDistanceFromHome > 0.0
+                && maximumNpcDistanceFromHome
+                   < SubwayDefaultMaximumNpcDistanceFromHome
+                && !double.IsNaN(maximumNpcDistanceFromHome)
+                && !double.IsInfinity(maximumNpcDistanceFromHome);
+            if (!subwayApplies && !customShortLeash)
             {
                 return false;
             }
@@ -60,8 +74,16 @@ namespace ZoneEngine.Core.Navigation
                 return true;
             }
 
+            // Subway keeps the separate 100m target boundary (captured short
+            // NPC travel limits still use that target safety).
+            // Short custom leashes use the same home radius for target so a
+            // fleeing player cannot keep a guard dog in combat across the zone.
+            double maximumTargetDistanceFromHome = subwayApplies
+                                                       ? SubwayMaximumTargetDistanceFromHome
+                                                       : maximumNpcDistanceFromHome;
+
             return home.Distance2D(npc) > maximumNpcDistanceFromHome
-                   || home.Distance2D(target) > SubwayMaximumTargetDistanceFromHome;
+                   || home.Distance2D(target) > maximumTargetDistanceFromHome;
         }
 
         internal static bool HasReturnedHome(

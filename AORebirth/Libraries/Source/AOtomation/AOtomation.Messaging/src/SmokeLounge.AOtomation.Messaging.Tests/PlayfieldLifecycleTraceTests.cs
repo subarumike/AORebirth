@@ -192,7 +192,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     PlayfieldLifecycleTrace.StageCharacterActionDeathParameter2,
                     PlayfieldLifecycleTrace.MessageCharacterActionDeath,
                     robot,
-                    "Parameter2=500");
+                    "Parameter2=503");
                 PlayfieldLifecycleTrace.Record(
                     PlayfieldLifecycleTrace.FlowCleaningRobotDeathCorpseDespawn,
                     PlayfieldLifecycleTrace.StageCorpseSpawnScheduled,
@@ -229,8 +229,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     PlayfieldLifecycleTrace.StageCharacterActionDeathParameter2,
                     PlayfieldLifecycleTrace.StageCorpseFullUpdate);
                 Assert.IsTrue(
-                    HasDetail(capture.Events, PlayfieldLifecycleTrace.StageCharacterActionDeathParameter2, "Parameter2=500"),
-                    "Robot death trace must preserve captured CharacterAction Death Parameter2=500.");
+                    HasDetail(capture.Events, PlayfieldLifecycleTrace.StageCharacterActionDeathParameter2, "Parameter2=503"),
+                    "Robot death trace must preserve captured CharacterAction Death Parameter2=503.");
             }
         }
 
@@ -331,9 +331,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 (int)NpcCorpseLifecycleRules.DeadNpcDespawnDelay.TotalMilliseconds,
                 "Dead NPC despawn delay must stay capture-backed.");
             Assert.AreEqual(
-                500,
+                503,
                 NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2,
-                "Cleaning robot CharacterAction Death Parameter2 must stay capture-backed.");
+                "Cleaning robot CharacterAction Death Parameter2 must stay capture-backed (20260722-keeper-exect-nano).");
         }
 
         [TestMethod]
@@ -2473,14 +2473,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Every regular Subway row must inherit the same 240-second respawn policy.");
             Assert.IsTrue(
                 profiles.All(
-                    value => value.Corpse.EmptyLifetimeSeconds == 30.0
-                             && value.Corpse.UnlootedLifetimeSeconds == 120.0
-                             && value.Corpse.LootedCleanupSeconds == 30.0),
+                    value => value.Corpse.EmptyLifetimeSeconds == 0.0
+                             && value.Corpse.UnlootedLifetimeSeconds == 60.0
+                             && value.Corpse.LootedCleanupSeconds == 0.0),
                 "Every regular Subway profile must use the shared 30/120/30 corpse policy.");
             Assert.IsTrue(
-                corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)")
+                corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)")
                 && populationText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0"),
                 "Shared regular-mob lifecycle constants must remain exact.");
             Assert.IsTrue(
@@ -2810,8 +2810,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && catalogText.Contains("PF127 Subway regular mobs use the shared 240-second respawn policy")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Slum Runner must keep its 24 exact spawns, expanded captured attack cadence and loot sample, shared chase, CATMesh/credits, shared four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.IsTrue(
@@ -2829,8 +2829,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && ordinaryProviderText.Contains("203746, 5921")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Molested Molecules must keep its nine exact spawns, captured attack range/cadence, shared chase, three strict loot outcomes, CATMesh/credits, private four-minute respawn policy, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
@@ -2858,8 +2858,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Shadow must keep 31 exact spawns, fixed normal-only combat, report-only criticals, shared chase, 15 strict incomplete-pool loot outcomes, CATMesh/credits, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
@@ -2887,8 +2887,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted ordinary Subway Infector must keep 12 exact spawns, 23 exact credit corpses, its generic fixed normal contract isolated from Abmouth-owned specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
@@ -2921,8 +2921,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Architect Striker must keep seven exact spawns, its captured fixed normal contract without an invented weapon, report-only critical, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile infectedAttendant = ordinaryProfiles.Single(
@@ -3041,8 +3041,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Melded Patterns must keep ten exact spawns, exact QL20 weapon-owned damage/recharge without invented attack context, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
@@ -3104,8 +3104,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Workman Striker must keep 22 exact sources, 31 capture-reviewed atomic generations, item-owned normal damage/recharge, captured AttackInfo, report-only critical/SIW evidence, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             CapturedSubwayCombatEvidenceDefinition workmanCombatEvidence =
@@ -3191,9 +3191,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(17870, looter.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, looter.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, looter.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, looter.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, looter.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, looter.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, looter.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 looterSpawns.All(
                     value => looter.Combat.ResolveContract(
@@ -3217,8 +3217,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Looter must keep eight exact source weapons and dispositions, fail-closed aggregate/missing/conflicting/unknown selection, item-owned visible weapon damage/recharge, report-only critical, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile mugger = ordinaryProfiles.Single(value => value.DisplayName == "Mugger");
@@ -3319,9 +3319,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(17534, mugger.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, mugger.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, mugger.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, mugger.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, mugger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, mugger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, mugger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 muggerSpawns.All(
                     value => mugger.Combat.ResolveContract(
@@ -3351,8 +3351,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; LOS-gated automatic and same-profile social aggro; strict 18-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile derangedShopper = ordinaryProfiles.Single(
@@ -3445,9 +3445,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(5927, derangedShopper.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, derangedShopper.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, derangedShopper.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, derangedShopper.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, derangedShopper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, derangedShopper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, derangedShopper.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 ordinaryCombatContract.Contains("DerangedShopperMonsterData")
                 && derangedShopperCombatContract.Contains("evidence.Length != 1")
@@ -3492,8 +3492,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Deranged Shopper must keep its one active source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, ten normal hits at 7..15, report-only critical, seven aggregate misses, evidence-only SIW/start/stop/death context, strict three-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile discardedPet = ordinaryProfiles.Single(
@@ -3581,9 +3581,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(15929, discardedPet.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, discardedPet.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, discardedPet.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, discardedPet.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, discardedPet.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, discardedPet.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, discardedPet.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 combatContractText.Contains("case 17720:")
                 && combatContractText.Contains("AttackInfoAmmoCount = attackInfoAmmoCount")
@@ -3601,8 +3601,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && discardedPetCombatReport.Contains("\"medianRechargeSeconds\": 5.079568")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Discarded Pet must keep all 29 exact active spawns, captured SIW1 9..18 normal roll and cadence, report-only critical observations, retaliatory chase without proactive aggro or return-to-spawn, strict 16-open incomplete-pool loot, exact CATMesh/level credits, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile bloodcreeper = ordinaryProfiles.Single(value => value.DisplayName == "Bloodcreeper");
@@ -3637,9 +3637,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(150, bloodcreeper.Loot.LevelCreditRules[0].MaximumCredits);
             Assert.AreEqual(3, bloodcreeper.Loot.LevelCreditRules[0].ObservedCorpses);
             Assert.AreEqual(26978, bloodcreeper.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, bloodcreeper.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, bloodcreeper.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, bloodcreeper.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, bloodcreeper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, bloodcreeper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, bloodcreeper.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 CountOccurrences(ordinaryProviderText, ", 30379, 26978,") == 1
                 && combatContractText.Contains("CapturedSubwayBloodcreeperSpitInitialSeconds")
@@ -3651,8 +3651,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Bloodcreeper must keep its one exact active spawn, L15..25 generation policy, auto aggro and chase, dual captured natural attacks, strict incomplete-pool loot, L24 exact/private-band credit policy, CATMesh, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile stimFiend = ordinaryProfiles.Single(value => value.DisplayName == "Stim Fiend");
@@ -3698,9 +3698,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .ToArray());
             Assert.IsFalse(stimFiend.Loot.LevelCreditRules.Any(value => value.EnemyLevel == 17));
             Assert.AreEqual(5907, stimFiend.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, stimFiend.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, stimFiend.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, stimFiend.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, stimFiend.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, stimFiend.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, stimFiend.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 CountOccurrences(ordinaryProviderText, ", 203739, 5907,") == 15
                 && generatedCombatReportText.Contains("\"Stim Fiend\":")
@@ -3712,8 +3712,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Stim Fiend must keep 15 exact spawn dispositions, captured fixed normal-only combat, strict incomplete-pool loot, only observed level-credit rows with L17 unresolved, CATMesh, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile neuralBurnout = ordinaryProfiles.Single(value => value.DisplayName == "Neural Burnout");
@@ -3758,9 +3758,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .ToArray());
             Assert.IsFalse(neuralBurnout.Loot.LevelCreditRules.Any(value => value.EnemyLevel == 22));
             Assert.AreEqual(5941, neuralBurnout.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, neuralBurnout.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, neuralBurnout.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, neuralBurnout.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, neuralBurnout.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, neuralBurnout.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, neuralBurnout.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 CountOccurrences(ordinaryProviderText, ", 203730, 5941,") == 9
                 && generatedCombatReportText.Contains("\"Neural Burnout\":")
@@ -3774,8 +3774,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Neural Burnout must keep seven exact active spawns, captured fixed normal combat with report-only critical, strict incomplete-pool loot, only observed level-credit rows with L22 unresolved, CATMesh, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile uncontrollableAnger = ordinaryProfiles.Single(
@@ -3879,9 +3879,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 uncontrollableAnger.Loot.LevelCreditRules.Any(
                     value => value.EnemyLevel == 23));
             Assert.AreEqual(96177, uncontrollableAnger.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, uncontrollableAnger.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, uncontrollableAnger.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, uncontrollableAnger.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, uncontrollableAnger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, uncontrollableAnger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, uncontrollableAnger.Corpse.LootedCleanupSeconds);
             Assert.IsTrue(
                 CountOccurrences(ordinaryProviderText, ", 96195, 96177,") == 8
                 && uncontrollableAngerCombatReport.Contains("\"retaliationRows\": 12")
@@ -3907,8 +3907,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue")
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Uncontrollable Anger must keep six exact active spawns, two captured patrols, local-player damage separated from Killer-pet and other-player evidence, the reviewed full cadence window, strict loot and exact observed credits, CATMesh, shared chase, inherited private respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile incompleteRebuild = ordinaryProfiles.Single(
@@ -3969,9 +3969,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.EvidenceState))
                     .ToArray());
             Assert.AreEqual(5921, incompleteRebuild.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, incompleteRebuild.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, incompleteRebuild.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, incompleteRebuild.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, incompleteRebuild.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, incompleteRebuild.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, incompleteRebuild.Corpse.LootedCleanupSeconds);
 
             OrdinaryEnemyProfile fragmentedSoul = ordinaryProfiles.Single(
                 value => value.DisplayName == "Fragmented Soul");
@@ -4076,9 +4076,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.EvidenceState))
                     .ToArray());
             Assert.AreEqual(5921, fragmentedSoul.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, fragmentedSoul.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, fragmentedSoul.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, fragmentedSoul.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, fragmentedSoul.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, fragmentedSoul.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, fragmentedSoul.Corpse.LootedCleanupSeconds);
 
             OrdinaryEnemyProfile redundantScan = ordinaryProfiles.Single(
                 value => value.DisplayName == "Redundant Scan");
@@ -4146,9 +4146,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value.MinimumCredits))
                     .ToArray());
             Assert.AreEqual(23370, redundantScan.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, redundantScan.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, redundantScan.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, redundantScan.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, redundantScan.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, redundantScan.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, redundantScan.Corpse.LootedCleanupSeconds);
 
             Assert.AreEqual(
                 12,
@@ -4203,8 +4203,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3")
                 && catalogText.Contains("20260719-020104")
                 && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)"),
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
                 "Accepted Subway Disobedient Bot must preserve strict weighted loot evidence, exact credits, CATMesh behavior, and ordinary corpse lifetimes.");
             Assert.IsTrue(
                 disobedientBotCombatReport.Contains("\"20260708-143600\"")
@@ -4297,12 +4297,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
                 && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.FromSeconds(30)")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromMinutes(2)")
+                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
+                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.Zero")
+                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)")
                 && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
-                && CountOccurrences(catalogText, "30.0,\n                120.0,\n                30.0") == 3,
-                "Accepted Subway Thief must keep its captured corpse visual, two-minute loot-bearing lifetime across close/reopen, and universal 30-second empty cleanup.");
+                && CountOccurrences(catalogText, "0.0,\n                60.0,\n                0.0") == 3,
+                "Accepted Subway Thief must keep its captured corpse visual, 60-second loot-bearing lifetime across close/reopen, and instant empty cleanup.");
         }
 
         [TestMethod]
@@ -6155,13 +6155,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 !registerCorpse.Contains("if (!state.HasUnlootedItems)")
                 && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(30);")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.FromSeconds(30);")
-                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromMinutes(2);")
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero;")
+                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.Zero;")
+                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromSeconds(60);")
                 && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
                 && corpseRulesText.Contains("unlootedItemCount <= 0 && unlootedCredits <= 0")
-                && CountOccurrences(ordinaryCatalogText, "30.0,\n                120.0,\n                30.0") == 3,
-                "Regular loot-bearing corpses must retain two minutes, while every born-empty or fully emptied corpse uses exactly 30 seconds.");
+                && CountOccurrences(ordinaryCatalogText, "0.0,\n                60.0,\n                0.0") == 3,
+                "Regular loot-bearing corpses must retain 60 seconds, while every born-empty or fully emptied corpse despawns immediately.");
             AssertTextBefore(
                 registerCorpse,
                 "this.corpseInventoryService.Create(state);",

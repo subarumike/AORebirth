@@ -387,6 +387,12 @@ namespace AORebirth.Core.Entities
 
         internal Coordinate CalculatePredictedPosition()
         {
+            // Incomplete / mid-despawn dynels can have null RawCoordinates; never NRE the PF heartbeat.
+            if (this.RawCoordinates == null)
+            {
+                return new Coordinate(0f, 0f, 0f);
+            }
+
             if ((this.moveDirection == MoveDirections.None) && (this.strafeDirection == SpinOrStrafeDirections.None))
             {
                 return new Coordinate(this.RawCoordinates);
@@ -693,11 +699,19 @@ namespace AORebirth.Core.Entities
         /// <summary>
         /// Reload trained perk PacketIDs from charactersperks.
         /// Required on reconnect (CreateCharacter skips Read) and safe after Read.
+        /// NPCs never train perks — skip DB + log spam during playfield population.
         /// </summary>
         public int ReloadTrainedPerksFromDatabase()
         {
             this.EnsureTrainedPerks();
             this.TrainedPerkPacketIds.Clear();
+
+            // NPCController.SaveToDatabase == false; players == true.
+            if (this.Controller == null || !this.Controller.SaveToDatabase)
+            {
+                return 0;
+            }
+
             try
             {
                 List<int> loaded = CharacterPerksDao.Instance.ReadPacketIds(this.Identity.Instance).ToList();
@@ -706,9 +720,13 @@ namespace AORebirth.Core.Entities
                     this.TrainedPerkPacketIds.Add(packetId);
                 }
 
-                LogUtil.Debug(
-                    DebugInfoDetail.Engine,
-                    "PERK_PERSIST reload char=" + this.Identity.Instance + " count=" + loaded.Count);
+                if (loaded.Count > 0)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        "PERK_PERSIST reload char=" + this.Identity.Instance + " count=" + loaded.Count);
+                }
+
                 return loaded.Count;
             }
             catch (Exception ex)

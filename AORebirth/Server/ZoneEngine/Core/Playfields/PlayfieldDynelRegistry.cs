@@ -179,10 +179,17 @@ namespace ZoneEngine.Core.Playfields
                 return result.AsReadOnly();
             }
 
+            if (dynel.RawCoordinates == null)
+            {
+                return result.AsReadOnly();
+            }
+
             Coordinate coord = dynel.Coordinates();
             foreach (IDynel entity in this.DynelsSnapshot())
             {
-                if (entity == dynel || entity.Identity.Type != IdentityType.CanbeAffected)
+                if (entity == dynel
+                    || entity.Identity.Type != IdentityType.CanbeAffected
+                    || entity.RawCoordinates == null)
                 {
                     continue;
                 }
@@ -201,7 +208,7 @@ namespace ZoneEngine.Core.Playfields
             this.RefreshFromPool();
 
             var result = new List<ICharacter>();
-            if (dynel == null)
+            if (dynel == null || dynel.RawCoordinates == null)
             {
                 return result.AsReadOnly();
             }
@@ -209,7 +216,9 @@ namespace ZoneEngine.Core.Playfields
             Coordinate coord = dynel.Coordinates();
             foreach (ICharacter entity in this.Characters())
             {
-                if (entity == dynel || entity.Identity.Type != IdentityType.CanbeAffected)
+                if (entity == dynel
+                    || entity.Identity.Type != IdentityType.CanbeAffected
+                    || entity.RawCoordinates == null)
                 {
                     continue;
                 }

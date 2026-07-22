@@ -43,10 +43,6 @@ namespace ZoneEngine.Core.Playfields
         // Capture 20260721-sara: Remains of Shop Thief (itemnames 295620).
         private const int RemainsOfShopThiefTemplateId = 295620;
 
-        // Capture 20260721-loralei / finish: Exit Arete Landing (itemnames 297303).
-        // ResolveMissingProps injects only when missing — do not duplicate if DB already has it.
-        private const int ExitAreteLandingTemplateId = 297303;
-
         private const int CargoBoxFlags = 139265;
 
         // Capture Flags=-2146819551 for Gas Fire SIFU.
@@ -62,8 +58,6 @@ namespace ZoneEngine.Core.Playfields
         private const int MerchantsStrongboxFlags = unchecked((int)0x80003201);
 
         private const int RemainsOfShopThiefFlags = unchecked((int)0x80003201);
-
-        private const int ExitAreteLandingFlags = unchecked((int)0x80003201);
 
         private sealed class PropDefinition
         {
@@ -270,22 +264,8 @@ namespace ZoneEngine.Core.Playfields
                 Hw = 1f,
                 Evidence = "20260721-sara Remains of Shop Thief Terminal:574187CF"
             },
-            new PropDefinition
-            {
-                // Capture 20260721-loralei / finish Terminal:574187C3 — Exit Arete Landing.
-                // Injected only when absent from DB (ResolveMissingProps skips existing keys).
-                Instance = unchecked((int)0x574187C3),
-                TemplateId = ExitAreteLandingTemplateId,
-                Flags = ExitAreteLandingFlags,
-                X = 3365.311f,
-                Y = 17.10994f,
-                Z = 838.0364f,
-                Hx = 0f,
-                Hy = 0f,
-                Hz = 0f,
-                Hw = 1f,
-                Evidence = "20260721-loralei Exit Arete Landing Terminal:574187C3"
-            },
+            // Exit Arete Landing is playfields.dat Terminal:C0001999 (tpl 297303) — do not inject
+            // a second StaticDynel (duplicate + wrong facing). Use is wired in VaughnHammondQuestRuntime.
         };
 
         internal static IEnumerable<PlayfieldStaticDynelDefinition> ResolveMissingProps(

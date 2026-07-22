@@ -991,57 +991,103 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             PaceKnuBotPackets();
 
-            // Capture 20260720-190432 / 074847: Answer → StartTrade only.
-            // Do not emit trade-hold dialogue after StartTrade — that leaves the
-            // drag/drop instruction with no slots/Accept (dialogue chrome stuck).
-            if (TryOpenAlexTradeHoldWithoutDialogue(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity))
+            // Capture 20260722-Alex-dialog / 074847: AppendText then StartTrade only.
+            // Do not emit AnswerList after StartTrade — that leaves the drag/drop
+            // instruction with no slots/Accept (dialogue chrome stuck).
+            if (IsAlexTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
-                return true;
+                // Capture 20260722-Alex-dialog #45→#46: prompt before trade chrome.
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryOpenAlexTradeHoldWithoutDialogue(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
             }
 
-            if (TryHandleStanTradeHoldSideEffect(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity))
+            // Capture 20260722-bill-dialog #151→#144: AppendText then StartTrade.
+            if (IsBillTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
-                return true;
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleBillTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
             }
 
-            if (TryHandleSarahTradeHoldSideEffect(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity))
+            // Capture 20260722-212421: AppendText (Excellent...) then StartTrade.
+            if (IsStanTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
-                return true;
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleStanTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
             }
 
-            if (TryHandleVernonTradeHoldSideEffect(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity))
+            // Capture 20260722-214957: AppendText (clap / passin' it over) then StartTrade.
+            if (IsSarahTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
-                return true;
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleSarahTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
             }
 
-            if (TryHandleDoctorMasonTradeHoldSideEffect(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity))
+            // Capture 20260722-214957: AppendText (Very well, leave it here) then StartTrade.
+            if (IsVernonTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
-                return true;
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleVernonTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
+            }
+
+            // Capture 20260722-230902 / 231133: AppendText then StartTrade (show 1 slot / chip 2 slots).
+            if (IsDoctorMasonTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleDoctorMasonTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
             }
 
             if (TryHandleLoreleiTradeHoldSideEffect(
@@ -1063,14 +1109,20 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
-            if (TryHandleVaughnTradeHoldSideEffect(
-                    source,
-                    registration,
-                    previousNodeId,
-                    answerIndex,
-                    targetIdentity))
+            // Capture 20260722-233205: AppendText ("Very well then, let's see it.") then StartTrade.
+            if (IsVaughnTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
-                return true;
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleVaughnTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
             }
 
             if (TryHandleShippingManifestTradeHoldSideEffect(
@@ -1318,19 +1370,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             Identity liveAlexIdentity)
         {
-            if (!IsRegistration(registration, AlexGibbsRegistration) || answerIndex != 0)
-            {
-                return false;
-            }
-
-            if (!string.Equals(
-                    previousNodeId,
-                    FlintBioComQuestRuntime.AlexTradeOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(
-                    previousNodeId,
-                    PersonalizedRobotBrainQuestRuntime.AlexBrainTurnInNodeId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!IsAlexTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
                 return false;
             }
@@ -1353,6 +1393,26 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return FlintBioComQuestRuntime.TryBeginAlexTrade(source, tradeTarget);
+        }
+
+        private static bool IsAlexTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, AlexGibbsRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       FlintBioComQuestRuntime.AlexTradeOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(
+                       previousNodeId,
+                       PersonalizedRobotBrainQuestRuntime.AlexBrainTurnInNodeId,
+                       StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool TryHandleAlexTradeHoldSideEffect(
@@ -1379,15 +1439,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             Identity liveBillIdentity)
         {
-            if (!IsRegistration(registration, BillRegistration) || answerIndex != 0)
-            {
-                return false;
-            }
-
-            if (!string.Equals(
-                    previousNodeId,
-                    SurveillanceUplinkQuestRuntime.BillTradeOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!IsBillTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
                 return false;
             }
@@ -1399,6 +1451,42 @@ namespace ZoneEngine.Core.Arete.Dialogue
             }
 
             return SurveillanceUplinkQuestRuntime.TryBeginBillTrade(source, tradeTarget);
+        }
+
+        private static bool IsBillTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, BillRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            // Trade option can be selected from root or any question hub (index 0 = Alex/HC-12).
+            return string.Equals(
+                       previousNodeId,
+                       SurveillanceUplinkQuestRuntime.BillTradeOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(previousNodeId, "bill_intro", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(previousNodeId, "bill_what_do", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(previousNodeId, "bill_locations", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsStanTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, StanGoodmanRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                previousNodeId,
+                StanGoodmanQuestRuntime.DeliverOfferNodeId,
+                StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool TryHandleStanTradeHoldSideEffect(
@@ -1430,6 +1518,22 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return StanGoodmanQuestRuntime.TryBeginStanTrade(source, tradeTarget);
         }
 
+        private static bool IsSarahTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, SarahGreeneRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                previousNodeId,
+                SarahGreeneQuestRuntime.DeliverOfferNodeId,
+                StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool TryHandleSarahTradeHoldSideEffect(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
@@ -1437,15 +1541,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             Identity liveSarahIdentity)
         {
-            if (!IsRegistration(registration, SarahGreeneRegistration) || answerIndex != 0)
-            {
-                return false;
-            }
-
-            if (!string.Equals(
-                    previousNodeId,
-                    SarahGreeneQuestRuntime.DeliverOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!IsSarahTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
                 return false;
             }
@@ -1459,6 +1555,30 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return SarahGreeneQuestRuntime.TryBeginSarahTrade(source, tradeTarget);
         }
 
+        private static bool IsVernonTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, VernonGodfrayRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       VernonGodfrayQuestRuntime.HackOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(
+                       previousNodeId,
+                       "vernon_hack_first",
+                       StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(
+                       previousNodeId,
+                       VernonGodfrayQuestRuntime.ReturnOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool TryHandleVernonTradeHoldSideEffect(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
@@ -1466,19 +1586,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             Identity liveVernonIdentity)
         {
-            if (!IsRegistration(registration, VernonGodfrayRegistration) || answerIndex != 0)
-            {
-                return false;
-            }
-
-            if (!string.Equals(
-                    previousNodeId,
-                    VernonGodfrayQuestRuntime.HackOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(
-                    previousNodeId,
-                    VernonGodfrayQuestRuntime.ReturnOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!IsVernonTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
                 return false;
             }
@@ -1500,6 +1608,26 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return VernonGodfrayQuestRuntime.TryBeginVernonHackTrade(source, tradeTarget);
         }
 
+        private static bool IsDoctorMasonTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, DoctorMasonRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                       previousNodeId,
+                       DoctorMasonQuestRuntime.ShowOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(
+                       previousNodeId,
+                       DoctorMasonQuestRuntime.ChipOfferNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool TryHandleDoctorMasonTradeHoldSideEffect(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
@@ -1507,19 +1635,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             Identity liveMasonIdentity)
         {
-            if (!IsRegistration(registration, DoctorMasonRegistration) || answerIndex != 0)
-            {
-                return false;
-            }
-
-            if (!string.Equals(
-                    previousNodeId,
-                    DoctorMasonQuestRuntime.ShowOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(
-                    previousNodeId,
-                    DoctorMasonQuestRuntime.ChipOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!IsDoctorMasonTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
                 return false;
             }
@@ -1580,6 +1696,22 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return false;
         }
 
+        private static bool IsVaughnTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            if (!IsRegistration(registration, VaughnHammondRegistration) || answerIndex != 0)
+            {
+                return false;
+            }
+
+            return string.Equals(
+                previousNodeId,
+                VaughnHammondQuestRuntime.IdOfferNodeId,
+                StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool TryHandleVaughnTradeHoldSideEffect(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
@@ -1587,15 +1719,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             int answerIndex,
             Identity liveVaughnIdentity)
         {
-            if (!IsRegistration(registration, VaughnHammondRegistration) || answerIndex != 0)
-            {
-                return false;
-            }
-
-            if (!string.Equals(
-                    previousNodeId,
-                    VaughnHammondQuestRuntime.IdOfferNodeId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!IsVaughnTradeHoldAnswer(registration, previousNodeId, answerIndex))
             {
                 return false;
             }
@@ -2151,35 +2275,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return;
             }
 
-            DialogueNode node = result.CurrentNode;
-            bool sentPromptSegment = false;
-            if (node != null && node.PromptSegments != null && node.PromptSegments.Count > 0)
-            {
-                foreach (DialoguePromptSegment segment in node.PromptSegments)
-                {
-                    if (segment == null || segment.Text == null)
-                    {
-                        continue;
-                    }
-
-                    KnuBotAppendTextMessageHandler.Default.Send(
-                        source,
-                        registration.NpcIdentity,
-                        NormalizeDialoguePromptText(segment.Text),
-                        segment.Unknown2);
-                    PaceKnuBotPackets();
-                    sentPromptSegment = true;
-                }
-            }
-
-            if (!sentPromptSegment && node != null && !string.IsNullOrWhiteSpace(node.PromptText))
-            {
-                KnuBotAppendTextMessageHandler.Default.Send(
-                    source,
-                    registration.NpcIdentity,
-                    NormalizeDialoguePromptText(node.PromptText));
-                PaceKnuBotPackets();
-            }
+            SendDialoguePromptOnly(source, result, registration);
 
             string[] choices = result.AvailableOptions
                 .OrderBy(option => option.Index)
@@ -2200,6 +2296,47 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 "sent node=" + (result.CurrentNode == null ? "<none>" : result.CurrentNode.Id)
                 + " options=" + choices.Length
                 + " character=" + source.Identity.ToString(true));
+        }
+
+        private static void SendDialoguePromptOnly(
+            ICharacter source,
+            DialogueSessionResult result,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            DialogueNode node = result == null ? null : result.CurrentNode;
+            bool sentPromptSegment = false;
+            if (node != null && node.PromptSegments != null && node.PromptSegments.Count > 0)
+            {
+                foreach (DialoguePromptSegment segment in node.PromptSegments)
+                {
+                    if (segment == null || segment.Text == null)
+                    {
+                        continue;
+                    }
+
+                    KnuBotAppendTextMessageHandler.Default.Send(
+                        source,
+                        registration.NpcIdentity,
+                        FormatDialoguePromptText(source, segment.Text),
+                        segment.Unknown2);
+                    PaceKnuBotPackets();
+                    sentPromptSegment = true;
+                }
+            }
+
+            if (!sentPromptSegment && node != null && !string.IsNullOrWhiteSpace(node.PromptText))
+            {
+                KnuBotAppendTextMessageHandler.Default.Send(
+                    source,
+                    registration.NpcIdentity,
+                    FormatDialoguePromptText(source, node.PromptText));
+                PaceKnuBotPackets();
+            }
+        }
+
+        private static string FormatDialoguePromptText(ICharacter source, string text)
+        {
+            return FormatDialogueOptionText(source, NormalizeDialoguePromptText(text));
         }
 
         private static bool CloseRegisteredDialogueSafely(

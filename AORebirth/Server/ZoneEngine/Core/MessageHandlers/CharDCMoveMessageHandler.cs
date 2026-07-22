@@ -43,6 +43,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using Utility;
 
     using ZoneEngine.Core.InternalMessages;
+    using ZoneEngine.Core.Playfields;
 
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
@@ -139,6 +140,7 @@ namespace ZoneEngine.Core.MessageHandlers
             */
 
             client.Controller.Move(moveType, coordinates, heading);
+            AreteRoboticGuardDogRuntime.NoteMoveType(client.Controller.Character, rawMoveType);
 
             // Garden save: only when standing on the save pad (once per visit).
             ZoneEngine.Core.ShadowlandsGardenSaveRuntimeService.TryApplyWhenOnSavePad(

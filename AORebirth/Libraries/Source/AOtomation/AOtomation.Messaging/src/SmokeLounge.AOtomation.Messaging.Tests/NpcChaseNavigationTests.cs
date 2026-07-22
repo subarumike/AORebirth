@@ -398,6 +398,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CustomShortLeashEnforcesOnNonSubwayPlayfields()
+        {
+            ChaseNavigationPoint home = Point(0, 0);
+            const double shortLeash = 8.0;
+
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    65527,
+                    false,
+                    home,
+                    Point(shortLeash, 0),
+                    Point(shortLeash, 0),
+                    shortLeash));
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    65527,
+                    false,
+                    home,
+                    Point(shortLeash + 0.01, 0),
+                    Point(0, 0),
+                    shortLeash));
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    65527,
+                    false,
+                    home,
+                    Point(0, 0),
+                    Point(shortLeash + 0.01, 0),
+                    shortLeash));
+        }
+
+        [TestMethod]
         public void SubwayLeashReturnCompletesOnlyNearHome()
         {
             ChaseNavigationPoint home = Point(0, 0);

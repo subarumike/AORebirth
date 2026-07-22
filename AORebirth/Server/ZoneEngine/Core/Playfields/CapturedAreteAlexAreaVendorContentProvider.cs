@@ -59,6 +59,7 @@ namespace ZoneEngine.Core.Playfields
                     }),
                 // Capture 20260721-lockpick: VendingMachine:12E77208 ICC Tech Supplies @ merchant storage.
                 // Slot 3 = sealed Lock Pick package (295999); Use opens to Lock Pick (95577).
+                // Capture VendingMachineFullUpdate Rotation Y=0.7057894 W=-0.7084217 (not identity).
                 new CapturedAreteAlexAreaVendorDefinition(
                     "ICC Tech Supplies",
                     317157896,
@@ -66,6 +67,10 @@ namespace ZoneEngine.Core.Playfields
                     3442.931f,
                     12.27642f,
                     822.4964f,
+                    0.0f,
+                    0.7057894f,
+                    0.0f,
+                    -0.7084217f,
                     new[]
                     {
                         new CapturedAreteAlexAreaVendorStockDefinition(0, 87810, 87810, 1),

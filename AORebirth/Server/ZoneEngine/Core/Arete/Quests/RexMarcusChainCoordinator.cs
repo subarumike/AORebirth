@@ -70,6 +70,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string MarcusReturnCardGrantedFlag = "marcus-return-item-296569";
 
+        private const string MarcusReturnXpCreditsFlag = "marcus-return-xp-credits-1281-1080";
+
         private static readonly Dictionary<int, MarcusTradeSession> TradeSessionsByCharacter =
             new Dictionary<int, MarcusTradeSession>();
 
@@ -945,22 +947,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 + " phase="
                 + GetPhase(source));
 
-            // Capture 20260719-224226 stim return: wait for FinishTrade Accept — do not auto-take.
-            if (kind == MarcusTradeKind.Stim || stimReturnTip || isStim)
-            {
-                return true;
-            }
-
-            // Suppressant path: private client often never Accepts — complete on drag to Marcus only.
-            if (isMarcus && (isSuppressant || stolenRepair || returnTip || (session != null && session.HasSuppressant)))
-            {
-                ApplyMarcusTradeTurnIn(
-                    source,
-                    message.Target,
-                    message.Container,
-                    "KnuBotTrade");
-            }
-
+            // Capture 20260719-224226 stim return + Mike: wait for FinishTrade Accept — do not auto-take.
+            // Suppressant return uses the same Accept gate (StartTrade text already asks for Accept).
             return true;
         }
 
@@ -1298,8 +1286,19 @@ namespace ZoneEngine.Core.Arete.Quests
                     ForceCompleteIfNeeded(characterId, MissionRuntime.RexB194QuestId);
                     ForceCompleteIfNeeded(characterId, MissionRuntime.RexB18EQuestId);
 
-                    ApplyMarcusReturnRewards(source);
-                    SendMarcusReturnRewardFeedback(source);
+                    if (MissionRuntime.Service.GetFlag(
+                            characterId,
+                            MissionRuntime.RexB196QuestId,
+                            MarcusReturnXpCreditsFlag) == null)
+                    {
+                        ApplyMarcusReturnRewards(source);
+                        SendMarcusReturnRewardFeedback(source);
+                        MissionRuntime.Service.SetFlag(
+                            characterId,
+                            MissionRuntime.RexB196QuestId,
+                            MarcusReturnXpCreditsFlag,
+                            "xp:" + MarcusReturnXpReward + "+credits:" + MarcusReturnCreditReward);
+                    }
 
                     MissionRuntime.Service.OfferMission(characterId, MissionRuntime.RexFlintQuestId);
                     MissionRuntime.Service.AcceptMission(characterId, MissionRuntime.RexFlintQuestId);
@@ -1636,6 +1635,12 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             if (source == null)
             {
+                return;
+            }
+
+            if (MarcusWoundedWorkersQuestRuntime.HasCompletedStimReturn(source))
+            {
+                ForgetTradeSession(source);
                 return;
             }
 

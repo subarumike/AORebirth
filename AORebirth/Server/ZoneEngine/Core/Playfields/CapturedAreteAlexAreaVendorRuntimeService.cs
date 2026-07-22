@@ -142,7 +142,11 @@ namespace ZoneEngine.Core.Playfields
                 vendor.Name = definition.DisplayName;
                 vendor.NpcIdentity = Identity.None;
                 vendor.RawCoordinates = new Vector3(definition.X, definition.Y, definition.Z);
-                vendor.Heading = new Quaternion(0.0, 0.0, 0.0, 1.0);
+                vendor.Heading = new Quaternion(
+                    definition.HeadingX,
+                    definition.HeadingY,
+                    definition.HeadingZ,
+                    definition.HeadingW);
                 vendor.Playfield = playfield;
                 vendor.Stats[(int)StatIds.staticinstance].Value = captureTemplateId;
 

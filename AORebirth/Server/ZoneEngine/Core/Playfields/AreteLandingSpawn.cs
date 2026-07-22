@@ -26,6 +26,7 @@ namespace AORebirth.Core.Playfields
     /// <summary>
     /// Capture-backed Arete Landing (PF 6553) humanoid NPCs.
     /// Quest NPCs (Rex/Marcus/Flint/Alex/Bill/wounded) from prior captures.
+    /// Wounded Dockworkers (Sit + 12/32 HP): capture 20260722-134750 (six identities).
     /// Ground protest cluster: ONLY tagged identities from capture 20260720-151642.
     /// Surveillance Droid owned solely by SurveillanceDroidRuntime (capture 78E0FC8A @ 3567).
     /// Bruiser @ 3556 is a separate tagged NPC.
@@ -36,7 +37,15 @@ namespace AORebirth.Core.Playfields
     {
         private const int AreteLandingPlayfieldId = 6553;
 
+        /// <summary>Presence radius for multi-slot same-name NPCs (capture pad slots).</summary>
+        private const float MultiSpawnPresenceRadius = 2.5f;
+
         private static readonly HashSet<int> SpawnedPlayfields = new HashSet<int>();
+
+        // CaptureInstance → live pool Instance. Pool ids ≠ capture ids, so FindByIdentity(capture)
+        // never hits; without this, patrolling multi-slot NPCs (ICC Peacekeeper) leave the 2.5m
+        // pad check and TickEnsure respawns forever (~100 stacked).
+        private static readonly Dictionary<int, int> LivingCaptureSlots = new Dictionary<int, int>();
 
         private const string TemplateHash = "BART";
 
@@ -194,6 +203,19 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                // Capture 20260722-134750 7988CC87 Bruiser
+                Name = "Bruiser",
+                CaptureInstance = unchecked((int)0x7988CC87),
+                Level = 5, Health = 138, MonsterData = 26088, Scale = 93, VisualFlags = 31, HeadMesh = 40687, RunSpeed = 19,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 269226497, AppearanceValue = 1576,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3525.66f, Y = 5.11000061f, Z = 829.66f,
+                Hx = 0f, Hy = -0.9218881f, Hz = 0f, Hw = 0.3874562f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 81912 }, new[] { 2, 81914 }, new[] { 3, 81909 }, new[] { 4, 81917 } },
+                Meshes = new[] { new[] { 0, 40687, 0, 4 }, new[] { 1, 7826, 0, 2 } },
+            },
+            new AreteNpc
+            {
                 // Capture 20260720-171317 Kneebreaker Alfonzo Rizzolo (SimpleChar:7981F40C)
                 Name = "Kneebreaker Alfonzo Rizzolo",
                 CaptureInstance = unchecked((int)0x7981F40C),
@@ -214,6 +236,19 @@ namespace AORebirth.Core.Playfields
                 NpcFamily = 103, LosHeight = 0, CharacterFlags = 269226497, AppearanceValue = 1672,
                 Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
                 X = 3573.05371f, Y = 5.11000061f, Z = 817.9967f,
+                Hx = 0f, Hy = -0.577261448f, Hz = 0f, Hw = 0.8165594f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 81912 }, new[] { 2, 81914 }, new[] { 3, 81909 }, new[] { 4, 81917 } },
+                Meshes = new[] { new[] { 0, 40117, 0, 4 }, new[] { 1, 7826, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260722-134750 7987C7AE Obedience Enforcement
+                Name = "Obedience Enforcement",
+                CaptureInstance = unchecked((int)0x7987C7AE),
+                Level = 5, Health = 138, MonsterData = 165196, Scale = 110, VisualFlags = 31, HeadMesh = 40117, RunSpeed = 19,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 269226497, AppearanceValue = 1672,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3602.18f, Y = 5.11000061f, Z = 805.87f,
                 Hx = 0f, Hy = -0.577261448f, Hz = 0f, Hw = 0.8165594f,
                 Textures = new[] { new[] { 0, 0 }, new[] { 1, 81912 }, new[] { 2, 81914 }, new[] { 3, 81909 }, new[] { 4, 81917 } },
                 Meshes = new[] { new[] { 0, 40117, 0, 4 }, new[] { 1, 7826, 0, 2 } },
@@ -272,7 +307,34 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260719-Rex-Markus-stone 78E0FC6E (Marcus pad)
+                // Capture 20260722-134750 7985C910 Protester
+                Name = "Protester",
+                CaptureInstance = unchecked((int)0x7985C910),
+                Level = 2, Health = 48, MonsterData = 203740, Scale = 91, VisualFlags = 31, HeadMesh = 40127, RunSpeed = 10,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3523.32f, Y = 6.52f, Z = 780.90f,
+                Hx = 0f, Hy = 0.9942326f, Hz = 0f, Hw = 0.107245035f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40127, 0, 4 }, new[] { 1, 284183, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260722-134750 797FD582 Protester
+                Name = "Protester",
+                CaptureInstance = unchecked((int)0x797FD582),
+                Level = 2, Health = 48, MonsterData = 203740, Scale = 91, VisualFlags = 31, HeadMesh = 40127, RunSpeed = 10,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3562.63f, Y = 6.91f, Z = 777.90f,
+                Hx = 0f, Hy = 0.9942326f, Hz = 0f, Hw = 0.107245035f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40127, 0, 4 }, new[] { 1, 284183, 0, 2 } },
+            },
+            // Capture 20260722-134750: six Wounded Dockworkers, Sit (MovementMode=8), HP 12/32.
+            new AreteNpc
+            {
+                CaptureInstance = unchecked((int)0x78E0FC6E),
                 Name = "Wounded Dockworker",
                 Level = 1, Health = 32, CurrentHealth = 12, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
                 NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
@@ -284,6 +346,7 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                CaptureInstance = unchecked((int)0x78E0FC6F),
                 Name = "Wounded Dockworker",
                 Level = 1, Health = 32, CurrentHealth = 12, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
                 NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
@@ -295,6 +358,7 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                CaptureInstance = unchecked((int)0x78E0FC72),
                 Name = "Wounded Dockworker",
                 Level = 1, Health = 32, CurrentHealth = 12, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
                 NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
@@ -306,17 +370,45 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                CaptureInstance = unchecked((int)0x78E0FC5F),
+                Name = "Wounded Dockworker",
+                Level = 1, Health = 32, CurrentHealth = 12, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
+                NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 1, Race = 1, Fatness = 1, MovementMode = 8,
+                X = 3547.33618f, Y = 5.505f, Z = 809.1123f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40130, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260722-134750 79666CF1 (Marcus pad standing dockworker)
+                CaptureInstance = unchecked((int)0x79666CF1),
                 Name = "Dockworker",
                 Level = 3, Health = 3495, MonsterData = 26137, Scale = 92, VisualFlags = 31, HeadMesh = 40209, RunSpeed = 13,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 42824,
                 Side = 0, Breed = 2, Gender = 3, Race = 41, Fatness = 1, MovementMode = 3,
-                X = 3586.60522f, Y = 40.9649963f, Z = 844.243f,
+                X = 3589.06f, Y = 40.9649963f, Z = 842.77f,
                 Hx = 0.0f, Hy = -0.7891955f, Hz = 0.0f, Hw = 0.6141474f,
                 Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
                 Meshes = new[] { new[] { 0, 205112, 0, 2 }, new[] { 0, 40209, 0, 4 }, new[] { 1, 292936, 0, 2 } },
             },
             new AreteNpc
             {
+                // Capture 20260722-134750 797DD44C (ramp standing dockworker)
+                CaptureInstance = unchecked((int)0x797DD44C),
+                Name = "Dockworker",
+                Level = 3, Health = 3495, MonsterData = 26137, Scale = 92, VisualFlags = 31, HeadMesh = 40209, RunSpeed = 13,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 42824,
+                Side = 0, Breed = 2, Gender = 3, Race = 41, Fatness = 1, MovementMode = 3,
+                X = 3620.593f, Y = 31.205f, Z = 875.2614f,
+                Hx = 0.0f, Hy = -0.7891955f, Hz = 0.0f, Hw = 0.6141474f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205112, 0, 2 }, new[] { 0, 40209, 0, 4 }, new[] { 1, 292936, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                CaptureInstance = unchecked((int)0x78E0FC70),
                 Name = "Wounded Dockworker",
                 Level = 1, Health = 32, CurrentHealth = 12, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
                 NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
@@ -328,6 +420,7 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                CaptureInstance = unchecked((int)0x78E0FC71),
                 Name = "Wounded Dockworker",
                 Level = 1, Health = 32, CurrentHealth = 12, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
                 NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
@@ -521,6 +614,19 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
+                // Capture 20260722-235242 797D337E FollowTarget loop (elevator approach)
+                CaptureInstance = unchecked((int)0x797D337E),
+                Name = "ICC Peacekeeper",
+                Level = 40, Health = 1650, MonsterData = 26092, Scale = 103, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 137,
+                NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3391.324f, Y = 12.910f, Z = 801.860f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 286229 }, new[] { 1, 286227 }, new[] { 2, 286228 }, new[] { 3, 286226 }, new[] { 4, 286225 } },
+                Meshes = new[] { new[] { 0, 265793, 286562, 2 }, new[] { 0, 40694, 0, 4 }, new[] { 1, 262556, 0, 2 }, new[] { 3, 286446, 0, 0 } },
+            },
+            new AreteNpc
+            {
                 // Capture 20260720-goldman 7962A325 (scfu)
                 CaptureInstance = unchecked((int)0x7962A325),
                 Name = "ICC Peacekeeper",
@@ -534,13 +640,13 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260720-goldman 7962A3F9 (scfu)
+                // Capture 20260720-goldman 7962A3F9 (scfu); pathing 20260722-235242
                 CaptureInstance = unchecked((int)0x7962A3F9),
                 Name = "ICC Peacekeeper",
                 Level = 40, Health = 1650, MonsterData = 26092, Scale = 103, VisualFlags = 31, HeadMesh = 40694, RunSpeed = 137,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
-                X = 3440.05981f, Y = 4.36575f, Z = 780.853333f,
+                X = 3410.723f, Y = 3.393f, Z = 773.751f,
                 Hx = 0.0f, Hy = 0.7455374f, Hz = 0.0f, Hw = 0.6664638f,
                 Textures = new[] { new[] { 0, 286229 }, new[] { 1, 286227 }, new[] { 2, 286228 }, new[] { 3, 286226 }, new[] { 4, 286225 } },
                 Meshes = new[] { new[] { 0, 265793, 286562, 2 }, new[] { 0, 40694, 0, 4 }, new[] { 1, 262556, 0, 2 }, new[] { 3, 286446, 0, 0 } },
@@ -860,14 +966,15 @@ namespace AORebirth.Core.Playfields
             },
             new AreteNpc
             {
-                // Capture 20260720-goldman 78E0FC6A (dossier)
+                // Capture 20260720-goldman / 20260719-do-flint-bio-com 78E0FC6A (SCFU)
+                // Identity heading left the cargo-terminal mesh on its side (tilted plate).
                 CaptureInstance = unchecked((int)0x78E0FC6A),
                 Name = "Shipping Manifest Terminal",
                 Level = 25, Health = 724, MonsterData = 279184, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 87,
                 NpcFamily = 0, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
                 Side = 0, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
                 X = 3551.00586f, Y = 8.315f, Z = 832.852f,
-                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Hx = 0.0f, Hy = -0.7046964f, Hz = 0.0f, Hw = 0.709509f,
                 Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
                 Meshes = null,
             },
@@ -1136,6 +1243,7 @@ namespace AORebirth.Core.Playfields
         internal static void ClearPlayfield(int playfieldInstance)
         {
             SpawnedPlayfields.Remove(playfieldInstance);
+            LivingCaptureSlots.Clear();
         }
 
         public static void SpawnForPlayfield(
@@ -1186,7 +1294,7 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     "AreteLandingSpawn pf=" + playfieldIdentity.Instance + " spawned=" + spawned
-                    + "/" + Npcs.Length + " source=20260720-goldman+prior");
+                    + "/" + Npcs.Length + " source=20260722-134750+prior");
 
                 if (spawned == 0)
                 {
@@ -1241,6 +1349,23 @@ namespace AORebirth.Core.Playfields
         {
             if (def.CaptureInstance != 0)
             {
+                int poolInstance;
+                if (LivingCaptureSlots.TryGetValue(def.CaptureInstance, out poolInstance))
+                {
+                    ICharacter bySlot = playfield.FindByIdentity<ICharacter>(
+                        new Identity
+                        {
+                            Type = IdentityType.CanbeAffected,
+                            Instance = poolInstance
+                        });
+                    if (bySlot != null && bySlot.Stats[StatIds.health].Value > 0)
+                    {
+                        return true;
+                    }
+
+                    LivingCaptureSlots.Remove(def.CaptureInstance);
+                }
+
                 ICharacter byCaptureId = playfield.FindByIdentity<ICharacter>(
                     new Identity
                     {
@@ -1249,11 +1374,50 @@ namespace AORebirth.Core.Playfields
                     });
                 if (byCaptureId != null && byCaptureId.Stats[StatIds.health].Value > 0)
                 {
+                    LivingCaptureSlots[def.CaptureInstance] = byCaptureId.Identity.Instance;
                     return true;
                 }
             }
 
-            const float SameSlotMeters = 2.5f;
+            // Multi-slot same-name NPCs (Wounded Dockworkers, Protestors, etc.) must be
+            // matched by pad position — name-only presence collapsed them to one spawn.
+            if (AllowsMultipleSpawns(def.Name))
+            {
+                return IsLivingNamedNpcNear(playfield, def, MultiSpawnPresenceRadius);
+            }
+
+            // Unique Arete names (Rex/Marcus/Flint/…): name-only so a walk-off pad
+            // does not create a second copy (prior 2.5m bug).
+            foreach (ICharacter npc in playfield.EnumerateActiveCharacters())
+            {
+                if (npc == null || npc.Stats[StatIds.health].Value <= 0)
+                {
+                    continue;
+                }
+
+                if (string.Equals(npc.Name, def.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool AllowsMultipleSpawns(string name)
+        {
+            return string.Equals(name, "Wounded Dockworker", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Dockworker", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Protester", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Clan Protester", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Bruiser", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "Obedience Enforcement", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, "ICC Peacekeeper", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLivingNamedNpcNear(Playfield playfield, AreteNpc def, float radius)
+        {
+            double radiusSq = (double)radius * radius;
             foreach (ICharacter npc in playfield.EnumerateActiveCharacters())
             {
                 if (npc == null || npc.Stats[StatIds.health].Value <= 0)
@@ -1266,10 +1430,10 @@ namespace AORebirth.Core.Playfields
                     continue;
                 }
 
-                Coordinate pos = npc.Coordinates();
-                float dx = pos.x - def.X;
-                float dz = pos.z - def.Z;
-                if ((dx * dx) + (dz * dz) <= (SameSlotMeters * SameSlotMeters))
+                double dx = npc.Coordinates().x - def.X;
+                double dy = npc.Coordinates().y - def.Y;
+                double dz = npc.Coordinates().z - def.Z;
+                if ((dx * dx) + (dy * dy) + (dz * dz) <= radiusSq)
                 {
                     return true;
                 }
@@ -1332,6 +1496,8 @@ namespace AORebirth.Core.Playfields
             }
 
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, (uint)currentHealth);
+            mob.Stats[StatIds.health].Value = currentHealth;
+            mob.Stats[StatIds.life].Value = def.Health;
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)def.Level);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)def.VisualFlags);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.npcfamily, (uint)def.NpcFamily);
@@ -1352,11 +1518,13 @@ namespace AORebirth.Core.Playfields
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.profession, 0);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualprofession, 0);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.currentmovementmode, (uint)def.MovementMode);
+            mob.Stats[StatIds.currentmovementmode].Value = def.MovementMode;
             // Sit NPCs must restore to Run on StandUp (capture 20260720-064523 heal).
             uint previousMovementMode = def.MovementMode == (int)MoveModes.Sit
                                             ? (uint)MoveModes.Run
                                             : (uint)def.MovementMode;
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.prevmovementmode, previousMovementMode);
+            mob.Stats[StatIds.prevmovementmode].Value = (int)previousMovementMode;
             if (def.Scale > 0)
             {
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterscale, (uint)def.Scale);
@@ -1379,6 +1547,23 @@ namespace AORebirth.Core.Playfields
 
             ApplyAppearance(mob, def);
             mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
+            if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.DogName, StringComparison.OrdinalIgnoreCase))
+            {
+                ZoneEngine.Core.Playfields.AreteRoboticGuardDogRuntime.PrepareSpawnedDog(mob, npcController);
+            }
+
+            if (string.Equals(def.Name, ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PeacekeeperName, StringComparison.OrdinalIgnoreCase))
+            {
+                ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PrepareSpawnedPeacekeeper(mob, npcController);
+            }
+
+            ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.TryApplyPatrol(def.CaptureInstance, npcController);
+
+            if (def.CaptureInstance != 0)
+            {
+                LivingCaptureSlots[def.CaptureInstance] = mob.Identity.Instance;
+            }
+
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
@@ -1404,6 +1589,14 @@ namespace AORebirth.Core.Playfields
                 {
                     mob.MeshLayer.AddMesh(m[0], m[1], m[2], m[3]);
                     mob.SocialMeshLayer.AddMesh(m[0], m[1], m[2], m[3]);
+
+                    // Capture flamethrower mesh position 1 → WeaponMeshRight so AttackInfo slot 6
+                    // can drive the weapon texture animation VFX (Marcus / Dockworker 292936).
+                    if (m.Length >= 2 && m[0] == 1 && m[1] > 0)
+                    {
+                        mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.weaponmeshright, (uint)m[1]);
+                        mob.Stats[StatIds.weaponmeshright].Value = m[1];
+                    }
                 }
             }
             else if (def.HeadMesh > 0)

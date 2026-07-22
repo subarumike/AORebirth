@@ -477,6 +477,13 @@ namespace ZoneEngine.Core.Controllers
                     ChatTextMessageHandler.Default.Send(this.Character, hint);
                 }
             }
+            else if (AmbientRestorationAuraRuntime.IsAmbientRestorationNano(nanoId))
+            {
+                // Capture 20260722-keeper-exect-nano: 20s aura pulse
+                // (CastNanoSpell pair + SpellList red sparkles + heal Keeper and team).
+                // Do not ExecuteOnUse TeamCast of all four children — live ticks one tier.
+                AmbientRestorationAuraRuntime.StartOrRefresh(this.Character);
+            }
             else
             {
                 // Instant OnUse Hit/effects (e.g. Trader Weak/Patchy Health Funnel):
@@ -487,6 +494,8 @@ namespace ZoneEngine.Core.Controllers
                 }
 
                 NanoEventRuntimeService.Default.ExecuteOnUseEvents(this.Character, nano);
+                // Mongo Slam (100198) taunt AoE is in nanos.dat OnUse only.
+                // Do not inject slam effects onto Composite Utility Expertise (287046).
                 Character slamCaster = this.Character as Character;
                 if (slamCaster != null)
                 {
@@ -501,12 +510,6 @@ namespace ZoneEngine.Core.Controllers
                         target,
                         nanoId,
                         duration);
-                    if (slamCaster != null
-                        && nanoId == MongoSlamRuntimeService.UploadedMongoSlamNanoId)
-                    {
-                        // Duration is applied after OnUse; arm HoT now that the program is active.
-                        MongoSlamRuntimeService.BeginHotWhileProgramActive(slamCaster);
-                    }
                 }
             }
 
@@ -1268,6 +1271,36 @@ namespace ZoneEngine.Core.Controllers
             NotifyMembers(remainingMembers, character.Name + " left the team.");
             UpdateTeamMemberStats(teamId);
             return true;
+        }
+
+        /// <summary>
+        /// Returns current team roster (includes self) when character is on a team.
+        /// </summary>
+        public static bool TryGetTeamMembers(ICharacter character, out List<Identity> members)
+        {
+            members = null;
+            if (character == null)
+            {
+                return false;
+            }
+
+            lock (Sync)
+            {
+                int teamId;
+                if (!CharacterTeams.TryGetValue(character.Identity.Instance, out teamId))
+                {
+                    return false;
+                }
+
+                List<Identity> roster;
+                if (!TeamMembers.TryGetValue(teamId, out roster) || roster == null || roster.Count == 0)
+                {
+                    return false;
+                }
+
+                members = roster.ToList();
+                return true;
+            }
         }
 
         public static bool Kick(ICharacter leader, Identity targetIdentity)

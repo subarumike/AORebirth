@@ -139,6 +139,13 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
+            // Tip 4 brain show: never stage into BioCom session.
+            if (PersonalizedRobotBrainQuestRuntime.IsShowBrainTipActive(source)
+                || PersonalizedRobotBrainQuestRuntime.HasPersonalizedBrain(source))
+            {
+                return false;
+            }
+
             BeginAlexTrade(source, message.Target);
             AlexTradeSession session = GetTradeSession(source);
             if (session == null)
@@ -175,6 +182,13 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
+            // Tip 4 brain inspect shares Alex — do not swallow FinishTrade.
+            if (PersonalizedRobotBrainQuestRuntime.IsShowBrainTipActive(source)
+                || PersonalizedRobotBrainQuestRuntime.HasPersonalizedBrain(source))
+            {
+                return false;
+            }
+
             if (message.Decline != 0)
             {
                 ForgetTradeSession(source);
@@ -194,15 +208,8 @@ namespace ZoneEngine.Core.Arete.Quests
             if (!IsStagedBioCom(source, stagedContainer))
             {
                 Log("alex-finish ignored: Bio Analyzing Computer not staged in trade");
-                try
-                {
-                    KnuBotRejectedItemsMessageHandler.Default.Send(source, message.Target, new Item[0], 0);
-                }
-                catch (Exception)
-                {
-                }
-
-                return true;
+                // Return false so Tip-4 brain finish (or other Alex trades) can claim.
+                return false;
             }
 
             ApplyAlexTradeTurnIn(source, message.Target, stagedContainer);

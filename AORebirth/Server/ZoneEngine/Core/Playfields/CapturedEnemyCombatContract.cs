@@ -394,6 +394,8 @@ namespace AORebirth.Core.Playfields
                 MinDamage = minDamage,
                 MaxDamage = maxDamage,
                 RechargeSeconds = rechargeSeconds,
+                // Capture 20260722-cap-mob-drop-cred: AmmoCount=-1 WeaponSlot=1 unarmed robot melee.
+                AttackInfoAmmoCount = -1,
                 AttackInfoWeaponSlot = weaponSlot,
                 AttackInfoUnknown = attackInfoUnknown,
                 AttackInfoWeaponInstance = weaponInstance,

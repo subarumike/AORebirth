@@ -10,6 +10,7 @@ namespace ZoneEngine.Core.Arete.Quests
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
+    using AORebirth.Core.Statels;
     using AORebirth.Core.Vector;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
@@ -52,6 +53,15 @@ namespace ZoneEngine.Core.Arete.Quests
         // Older Arete chip ids that may still be in inventory on long-running chars.
         private const int LegacyUnprogrammedIdChipItemId = 296572;
 
+        // Capture 20260722-233205 FormatFeedback: Received reward: 2581 XP, 1040 credits.
+        private const int TalkToVaughnXpReward = 2581;
+
+        private const int TalkToVaughnCreditReward = 1040;
+
+        private const string TalkToVaughnRewardFeedback = "~&!!!\":$'O\"ui!!!?@i!!!-5~";
+
+        private const string TalkToVaughnXpCreditsFlag = "vaughn-talk-xp-credits-2581-1040";
+
         private const string TradePrompt =
             "Drag and drop the item(s) you want to give to Vaughn Hammond into one of the slots available and press \"accept\"";
 
@@ -64,8 +74,13 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static readonly HashSet<int> ClearedForIccHqExitByCharacter = new HashSet<int>();
 
-        // Capture 20260721-finish / 20260721-loralei: Exit Arete Landing Terminal:574187C3.
+        // Capture 20260721-finish Use target Terminal:574187C3 (live AO StaticDynel).
         public const int ExitAreteLandingTerminalInstance = unchecked((int)0x574187C3);
+
+        // playfields.dat Arete Terminal:C0001999 tpl=297303 — correct mesh heading (0,0.707,0,0.707).
+        public const int ExitAreteLandingPlayfieldStatelInstance = unchecked((int)0xC0001999);
+
+        private const int ExitAreteLandingTemplateId = 297303;
 
         private const int AndromedaIccHqPlayfieldId = 655;
 
@@ -100,8 +115,39 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public static bool IsExitAreteLandingTerminal(Identity target)
         {
-            return target.Type == IdentityType.Terminal
-                   && target.Instance == ExitAreteLandingTerminalInstance;
+            if (target.Type != IdentityType.Terminal)
+            {
+                return false;
+            }
+
+            if (target.Instance == ExitAreteLandingTerminalInstance
+                || target.Instance == ExitAreteLandingPlayfieldStatelInstance)
+            {
+                return true;
+            }
+
+            // Any Arete Exit Arete Landing terminal (template 297303).
+            PlayfieldData playfieldData;
+            if (!PlayfieldLoader.PFData.TryGetValue(AreteLandingPlayfieldId, out playfieldData)
+                || playfieldData == null
+                || playfieldData.Statels == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < playfieldData.Statels.Count; i++)
+            {
+                StatelData statel = playfieldData.Statels[i];
+                if (statel != null
+                    && statel.Identity.Type == IdentityType.Terminal
+                    && statel.Identity.Instance == target.Instance
+                    && statel.TemplateId == ExitAreteLandingTemplateId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static bool TryHandleExitAreteLandingUse(
@@ -415,6 +461,9 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
+            ApplyTalkToVaughnXpCredits(source);
+            TrySendTalkToVaughnRewardFeedback(source);
+
             MissionRuntime.Service.ObserveObjective(
                 new MissionObjectiveObservation
                 {
@@ -428,6 +477,108 @@ namespace ZoneEngine.Core.Arete.Quests
                     TargetIdentity = string.Empty
                 });
             MissionRuntime.Service.CompleteMission(characterId, TalkToVaughnQuestId);
+        }
+
+        private static void ApplyTalkToVaughnXpCredits(ICharacter source)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return;
+            }
+
+            int characterId = source.Identity.Instance;
+            if (MissionRuntime.Service.GetFlag(characterId, TalkToVaughnQuestId, TalkToVaughnXpCreditsFlag)
+                != null)
+            {
+                return;
+            }
+
+            MissionRewardDefinition definition = new MissionRewardDefinition
+                                                {
+                                                    RewardKey = "captured-vaughn-talk-xp-credits",
+                                                    RewardType = "character-stats",
+                                                    IsResolved = true,
+                                                    StatMutations =
+                                                        new[]
+                                                        {
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.cash,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = TalkToVaughnCreditReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.xp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = TalkToVaughnXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            },
+                                                            new MissionCharacterStatMutation
+                                                            {
+                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                StatId = (int)StatIds.unsavedxp,
+                                                                Kind = MissionStatMutationKind.AddClamped,
+                                                                Value = TalkToVaughnXpReward,
+                                                                MinimumValue = 0,
+                                                                MaximumValue = uint.MaxValue
+                                                            }
+                                                        }
+                                                };
+            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                characterId,
+                TalkToVaughnQuestId,
+                definition,
+                "capture:20260722-233205:vaughn-talk-xp-credits");
+            if (!result.Succeeded || result.StatValues == null)
+            {
+                return;
+            }
+
+            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            {
+                uint value = statValue.Value <= 0
+                                 ? 0
+                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                source.Stats[(StatIds)statValue.StatId].Set(value);
+            }
+
+            StatMessageHandler.Default.SendChanged(source);
+            MissionRuntime.Service.SetFlag(
+                characterId,
+                TalkToVaughnQuestId,
+                TalkToVaughnXpCreditsFlag,
+                "xp:" + TalkToVaughnXpReward + "+credits:" + TalkToVaughnCreditReward);
+        }
+
+        private static void TrySendTalkToVaughnRewardFeedback(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return;
+            }
+
+            try
+            {
+                source.Controller.Client.SendCompressed(
+                    new FormatFeedbackMessage
+                    {
+                        Identity = source.Identity,
+                        Unknown = 1,
+                        Unknown1 = 0,
+                        FormattedMessage = TalkToVaughnRewardFeedback,
+                        Unknown2 = 0
+                    });
+            }
+            catch (Exception ex)
+            {
+                Log("vaughn reward feedback failed: " + ex.Message);
+            }
         }
 
         private static void BeginTrade(ICharacter source, Identity npcIdentity)

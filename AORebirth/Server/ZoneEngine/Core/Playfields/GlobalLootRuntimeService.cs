@@ -31,9 +31,9 @@ namespace AORebirth.Core.Playfields
         private const int AlexFleaMonsterData = 17657;
         private const int AlexFleaCredits = 11;
         private const string AlexPadLootEvidence =
-            "AOSharpLiveCapture 20260720-204431/20260720-212302 corpse-loot-observations; Docker credits=4; Waste/Flea credits=11; Cleaning Robot credits=5 (empty or Robot Junk)";
+            "AOSharpLiveCapture 20260722-cap-mob-drop-cred corpse-loot-observations; Docker credits=4; Waste credits=11; Flea credits=5|11; Cleaning Robot credits=5";
         private const string CleaningRobotLootEvidence =
-            "AOSharpLiveCapture 20260720-212302 corpse-loot-observations; Cleaning Robot credits=5; 2x Robot Junk 42620; 3x empty";
+            "AOSharpLiveCapture 20260722-cap-mob-drop-cred; Cleaning Robot credits=5; Robot Junk 42620 / empty / misc";
         private const int CapturedAbmouthCredits = 587;
         private const int CapturedInfectorCredits = 150;
         private const int CapturedEumenidesCredits = 186;
@@ -525,32 +525,23 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            // Capture 20260720-204431: 6 corpse opens — credits always 4; 2 empty; items include Robot Junk.
+            // Capture 20260722-cap-mob-drop-cred: credits always 4; empty or 248307.
             ObservedCorpseSnapshotDefinition[] snapshots =
                 {
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-a", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-b", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-c", AlexDockerCredits),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.docker.empty-d", AlexDockerCredits),
                     ObservedCorpseSnapshot(
                         AlexPadLootEvidence,
-                        "capture.20260720-204431.docker.a",
+                        "capture.20260722.docker.a",
                         AlexDockerCredits,
-                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.a", 70560, 85688, 3, 1)),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.docker.a", 248307, 248307, 1, 1)),
                     ObservedCorpseSnapshot(
                         AlexPadLootEvidence,
-                        "capture.20260720-204431.docker.b",
+                        "capture.20260722.docker.b",
                         AlexDockerCredits,
-                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.b", 248307, 248307, 1, 1),
-                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.b", 70564, 85515, 3, 1)),
-                    ObservedCorpseSnapshot(
-                        AlexPadLootEvidence,
-                        "capture.20260720-204431.docker.c",
-                        AlexDockerCredits,
-                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.c", 248318, 248318, 1, 1)),
-                    ObservedCorpseSnapshot(
-                        AlexPadLootEvidence,
-                        "capture.20260720-204431.docker.d",
-                        AlexDockerCredits,
-                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260720-204431.docker.d", 42620, 42619, 3, 1)),
-                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.docker.empty-a", AlexDockerCredits),
-                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.docker.empty-b", AlexDockerCredits)
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.docker.b", 248307, 248307, 1, 1))
                 };
 
             this.RegisterAlexPadTable(
@@ -568,57 +559,45 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            // Capture 20260720-224646: Waste credits=11 (monsterData 17714). Guarantee Robot Junk
-            // so corpses are never item-empty (Mike: "no loot" on Waste Collector).
-            this.registry.RegisterTable(
-                new LootTableDefinition
+            // Capture 20260722-cap-mob-drop-cred: credits=11; items 248315/248319/248334/42620/70564…
+            ObservedCorpseSnapshotDefinition[] snapshots =
                 {
-                    LootTableKey = tableKey,
-                    DisplayName = "Waste Collector captured outcomes",
-                    TableType = LootTableType.EnemyType,
-                    RollGroups =
-                        new[]
-                        {
-                            new LootGroupDefinition
-                            {
-                                LootGroupKey = "captured-outcome",
-                                RollMode = LootRollMode.WeightedOne,
-                                RollCount = 1,
-                                EmptyWeight = 0,
-                                DropChanceBasisPoints = 10000,
-                                Entries =
-                                    new[]
-                                    {
-                                        FixedEntry(42620, 1, "waste.robot-junk", 4),
-                                        FixedEntry(70564, 1, "waste.armor-a", 1),
-                                        FixedEntry(155666, 1, "waste.misc-a", 1),
-                                        FixedEntry(70565, 1, "waste.armor-b", 1)
-                                    },
-                                Conditions = new string[0]
-                            }
-                        },
-                    CreditsPolicy = CreditsRange(
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.waste.empty", AlexWasteCredits),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.a",
                         AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.a", 248334, 248334, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.b",
                         AlexWasteCredits,
-                        LootEvidenceConfidence.ProvenCapture),
-                    QualityPolicy = "captured-fixed",
-                    Evidence = AlexPadLootEvidence,
-                    Confidence = LootEvidenceConfidence.ProvenCapture,
-                    Enabled = true
-                });
-            this.registry.RegisterAssignment(
-                new LootAssignmentDefinition
-                {
-                    AssignmentKey = tableKey,
-                    TargetType = LootAssignmentTargetType.EnemyType,
-                    TargetKey = AlexWasteProfileKey,
-                    LootTableKey = tableKey,
-                    Priority = 0,
-                    Evidence = AlexPadLootEvidence,
-                    Confidence = LootEvidenceConfidence.ProvenCapture,
-                    Enabled = true,
-                    Conditions = new string[0]
-                });
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.b", 248315, 248315, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.b", 42620, 42619, 2, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.c",
+                        AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.c", 248319, 248319, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.d",
+                        AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.d", 42620, 42619, 2, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.waste.e",
+                        AlexWasteCredits,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.e", 248315, 248315, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.e", 70564, 85515, 2, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.waste.e", 42620, 42619, 2, 1))
+                };
+
+            this.RegisterAlexPadTable(
+                tableKey,
+                "Waste Collector captured corpse",
+                AlexWasteProfileKey,
+                snapshots);
         }
 
         private void EnsureAlexGarbageFlea()
@@ -631,9 +610,21 @@ namespace AORebirth.Core.Playfields
 
             ObservedCorpseSnapshotDefinition[] snapshots =
                 {
-                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.flea.empty-a", AlexFleaCredits),
-                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-204431.flea.empty-b", AlexFleaCredits),
-                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260720-212302.flea.empty", AlexFleaCredits)
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-5a", 5),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-5b", 5),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-5c", 5),
+                    ObservedCorpseSnapshot(AlexPadLootEvidence, "capture.20260722.flea.empty-11", 11),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.flea.a",
+                        5,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.flea.a", 248322, 248322, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        AlexPadLootEvidence,
+                        "capture.20260722.flea.b",
+                        5,
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.flea.b", 70560, 70560, 1, 1),
+                        ObservedCorpseSnapshotEntry(AlexPadLootEvidence, "capture.20260722.flea.b", 248322, 248322, 1, 1))
                 };
 
             this.RegisterAlexPadTable(
@@ -691,14 +682,12 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            // Prior proven weighted outcomes + capture 20260720-212302 empty/junk weight.
+            // Capture 20260722-cap-mob-drop-cred: credits=5; empty / 42620 / misc.
             int[][] outcomes =
                 {
-                    new[] { 42620 }, new int[0], new[] { 36779, 84142 }, new int[0], new[] { 297289 },
-                    new int[0], new int[0], new[] { 70558, 155685 }, new[] { 297289, 150306 },
-                    new int[0], new[] { 155666 }, new int[0], new[] { 70564 }, new[] { 155666 },
-                    new[] { 155687 }, new[] { 70565 }, new[] { 155684 }, new int[0],
-                    new[] { 42620 }, new int[0], new int[0], new int[0]
+                    new[] { 42620 }, new int[0], new[] { 42620 }, new int[0],
+                    new[] { 155666, 70560, 42620 }, new[] { 84148 }, new[] { 36783 },
+                    new int[0], new[] { 42620 }, new int[0]
                 };
             var entries = new List<LootEntryDefinition>();
             int emptyWeight = 0;

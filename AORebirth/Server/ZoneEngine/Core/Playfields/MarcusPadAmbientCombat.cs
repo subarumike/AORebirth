@@ -8,6 +8,7 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Core.Entities;
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Playfields;
+    using AORebirth.Core.Textures;
     using AORebirth.Core.Vector;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
@@ -60,9 +61,23 @@ namespace ZoneEngine.Core.Playfields
 
         private const double RobotRechargeSeconds = 4.0;
 
-        private const double RobotRespawnSeconds = 20.0;
+        // Mike: soft-respawn ~60s after Burning Cleaning Robot death.
+        private const double RobotRespawnSeconds = 60.0;
 
         private const double FlamethrowerAnimRefreshSeconds = 6.0;
+
+        // Capture 20260721-marcus-animation-texture-dialogtext SpecialAttackWeapon on Marcus.
+        private const int MarcusSpecialAttackWeaponUnknown1 = 121;
+
+        private const int MarcusSpecialAttackWeaponUnknown2 = 121;
+
+        private const int MarcusSpecialAttackWeaponUnknown3 = 121;
+
+        private const int MarcusSpecialAttackWeaponUnknown4 = 83;
+
+        private const int MarcusSpecialAttackWeaponUnknown5 = 50;
+
+        private const int MarcusFlamethrowerMeshId = 292936;
 
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
 
@@ -70,11 +85,14 @@ namespace ZoneEngine.Core.Playfields
 
         private static readonly Dictionary<int, DateTime> NextFlamethrowerAnimUtc = new Dictionary<int, DateTime>();
 
+        private static readonly Dictionary<int, DateTime> NextFireSpellListUtc = new Dictionary<int, DateTime>();
+
         public static void ClearPlayfield(int playfieldInstance)
         {
             LinkedPlayfields.Remove(playfieldInstance);
             NextRobotRespawnUtc.Remove(playfieldInstance);
             NextFlamethrowerAnimUtc.Remove(playfieldInstance);
+            NextFireSpellListUtc.Remove(playfieldInstance);
         }
 
         public static void StartForPlayfield(Playfield playfield, Identity playfieldIdentity, Action<ICharacter> activateNpc)
@@ -103,6 +121,9 @@ namespace ZoneEngine.Core.Playfields
             }
 
             LinkFight(playfield, marcus, robot);
+            CapturedSpellListVisualEffects.AnnounceBurningRobotFire(robot);
+            NextFireSpellListUtc[playfieldIdentity.Instance] =
+                DateTime.UtcNow + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 "MarcusPadAmbientCombat linked Marcus="
@@ -133,11 +154,16 @@ namespace ZoneEngine.Core.Playfields
                         || marcus.FightingTarget.Instance != robot.Identity.Instance)
                     {
                         LinkFight(playfield, marcus, robot);
+                        CapturedSpellListVisualEffects.AnnounceBurningRobotFire(robot);
+                        NextFireSpellListUtc[playfieldIdentity.Instance] =
+                            DateTime.UtcNow
+                            + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
                         return;
                     }
                 }
 
                 MaybeRefreshFlamethrowerAnim(playfield, playfieldIdentity, marcus, robot);
+                MaybeRefreshBurningFireSpellList(playfieldIdentity, robot);
                 return;
             }
 
@@ -168,6 +194,9 @@ namespace ZoneEngine.Core.Playfields
 
             LinkFight(playfield, marcusForRespawn, spawned);
             NextRobotRespawnUtc.Remove(playfieldIdentity.Instance);
+            CapturedSpellListVisualEffects.AnnounceBurningRobotFire(spawned);
+            NextFireSpellListUtc[playfieldIdentity.Instance] =
+                DateTime.UtcNow + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 "MarcusPadAmbientCombat respawned robot="
@@ -193,6 +222,9 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
+            EnsureMarcusFlamethrowerWeaponMesh(marcus);
+            // Capture: SpecialAttackWeapon (texture VFX) then AttackInfo WeaponSlot=6 (~6s cadence).
+            AnnounceMarcusFlamethrowerTextureVfx(playfield, marcus);
             playfield.Announce(
                 new AttackInfoMessage
                 {
@@ -208,6 +240,26 @@ namespace ZoneEngine.Core.Playfields
                 });
             NextFlamethrowerAnimUtc[playfieldIdentity.Instance] =
                 DateTime.UtcNow + TimeSpan.FromSeconds(FlamethrowerAnimRefreshSeconds);
+        }
+
+        private static void MaybeRefreshBurningFireSpellList(Identity playfieldIdentity, Character robot)
+        {
+            if (robot == null || robot.Stats[StatIds.health].Value <= 0)
+            {
+                return;
+            }
+
+            DateTime nextFire;
+            if (NextFireSpellListUtc.TryGetValue(playfieldIdentity.Instance, out nextFire)
+                && nextFire > DateTime.UtcNow)
+            {
+                return;
+            }
+
+            CapturedSpellListVisualEffects.AnnounceBurningRobotFire(robot);
+            NextFireSpellListUtc[playfieldIdentity.Instance] =
+                DateTime.UtcNow
+                + TimeSpan.FromSeconds(CapturedSpellListVisualEffects.BurningFireIntervalSeconds);
         }
 
         private static void LinkFight(Playfield playfield, Character marcus, Character robot)
@@ -233,10 +285,13 @@ namespace ZoneEngine.Core.Playfields
                 LogUtil.Debug(DebugInfoDetail.Error, "MarcusPadAmbientCombat robot combat prepare: " + failure);
             }
 
+            EnsureMarcusFlamethrowerWeaponMesh(marcus);
             marcus.SetFightingTarget(robot.Identity);
             robot.SetFightingTarget(marcus.Identity);
             playfield.ResetCombatTick(marcus.Identity);
             playfield.ResetCombatTick(robot.Identity);
+            // Capture 20260721: SpecialAttackWeapon then Attack (Marcus texture VFX 121/121/121/83/50).
+            AnnounceMarcusFlamethrowerTextureVfx(playfield, marcus);
             playfield.Announce(
                 new AttackMessage
                 {
@@ -268,6 +323,60 @@ namespace ZoneEngine.Core.Playfields
                 });
         }
 
+        private static void AnnounceMarcusFlamethrowerTextureVfx(Playfield playfield, Character marcus)
+        {
+            if (playfield == null || marcus == null)
+            {
+                return;
+            }
+
+            playfield.Announce(
+                new SpecialAttackWeaponMessage
+                {
+                    Identity = marcus.Identity,
+                    Unknown = 0,
+                    Specials = new SpecialAttack[0],
+                    Unknown1 = MarcusSpecialAttackWeaponUnknown1,
+                    Unknown2 = MarcusSpecialAttackWeaponUnknown2,
+                    Unknown3 = MarcusSpecialAttackWeaponUnknown3,
+                    Unknown4 = MarcusSpecialAttackWeaponUnknown4,
+                    Unknown5 = MarcusSpecialAttackWeaponUnknown5
+                });
+        }
+
+        private static void EnsureMarcusFlamethrowerWeaponMesh(Character marcus)
+        {
+            if (marcus == null)
+            {
+                return;
+            }
+
+            // AttackInfo WeaponSlot=6 (Righthand) needs WeaponMeshRight for client texture animation.
+            if (marcus.Stats[StatIds.weaponmeshright].Value != MarcusFlamethrowerMeshId)
+            {
+                marcus.Stats.SetBaseValueWithoutTriggering(
+                    (int)StatIds.weaponmeshright,
+                    (uint)MarcusFlamethrowerMeshId);
+                marcus.Stats[StatIds.weaponmeshright].Value = MarcusFlamethrowerMeshId;
+            }
+
+            AOMeshs existing = marcus.MeshLayer.GetMeshAtPosition(1);
+            if (existing == null || existing.Mesh != MarcusFlamethrowerMeshId)
+            {
+                if (existing != null && existing.Mesh > 0 && existing.Mesh != 1234567890)
+                {
+                    marcus.MeshLayer.RemoveMesh(
+                        existing.Position,
+                        existing.Mesh,
+                        existing.OverrideTexture,
+                        existing.Layer);
+                }
+
+                marcus.MeshLayer.AddMesh(1, MarcusFlamethrowerMeshId, 0, 2);
+                marcus.SocialMeshLayer.AddMesh(1, MarcusFlamethrowerMeshId, 0, 2);
+            }
+        }
+
         private static CapturedEnemyCombatContract CreateMarcusFlamethrowerContract()
         {
             CapturedEnemyCombatAttackDefinition repeatingAttack = new CapturedEnemyCombatAttackDefinition(
@@ -283,18 +392,21 @@ namespace ZoneEngine.Core.Playfields
                 3,
                 0,
                 true);
+            // Capture 20260721-marcus-animation-texture-dialogtext:
+            // SpecialAttackWeapon Specials=[] Unknown1/2/3=121 Unknown4=83 Unknown5=50
+            // (texture animation VFX on Marcus while fighting the Burning Cleaning Robot).
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
-                "20260720-064523 Marcus flamethrower AttackInfo WeaponSlot=6 vs Burning Cleaning Robot",
+                "20260721-marcus-animation-texture-dialogtext Marcus SpecialAttackWeapon 121/121/121/83/50 + AttackInfo WeaponSlot=6",
                 new CapturedEnemySpecialAttackSequenceDefinition(
                     0.5,
                     null,
                     repeatingAttack,
                     new CapturedEnemySpecialAttackDefinition[0],
-                    0,
-                    0,
-                    0,
-                    0,
-                    0));
+                    MarcusSpecialAttackWeaponUnknown1,
+                    MarcusSpecialAttackWeaponUnknown2,
+                    MarcusSpecialAttackWeaponUnknown3,
+                    MarcusSpecialAttackWeaponUnknown4,
+                    MarcusSpecialAttackWeaponUnknown5));
         }
 
         private static CapturedEnemyCombatContract CreateBurningRobotContract()

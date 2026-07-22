@@ -52,15 +52,18 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            // Alex BioCom before Marcus: B196 returnTip must not steal Alex Accept.
-            if (FlintBioComQuestRuntime.TryFinishAlexTrade(
+            // Alex Personalized Robot Brain inspect BEFORE BioCom Deliver.
+            // ZoneEngineLog 2026-07-22 20:32:17: BioCom claimed FinishTrade while Tip 4
+            // was active ("alex-finish ignored") → brain tip never completed / item not returned.
+            if (PersonalizedRobotBrainQuestRuntime.TryFinishBrainTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
             {
                 return;
             }
 
-            if (PersonalizedRobotBrainQuestRuntime.TryFinishBrainTrade(
+            // Alex BioCom before Marcus: B196 returnTip must not steal Alex Accept.
+            if (FlintBioComQuestRuntime.TryFinishAlexTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))
             {
