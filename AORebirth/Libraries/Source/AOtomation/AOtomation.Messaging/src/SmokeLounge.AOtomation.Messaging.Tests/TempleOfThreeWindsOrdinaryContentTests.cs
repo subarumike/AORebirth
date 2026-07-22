@@ -152,6 +152,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(72, CapturedTempleOfThreeWindsCombatCatalog.ReAnimator().SpecialAttackSequence.RepeatingAttack.MaxDamage);
             Assert.AreEqual(30, CapturedTempleOfThreeWindsCombatCatalog.AcolyteBetany().SpecialAttackSequence.RepeatingAttack.MaxDamage);
 
+            CapturedEnemyCombatContract curator =
+                CapturedTempleOfThreeWindsCombatCatalog.TheCurator();
+            Assert.AreEqual(33, curator.SpecialAttackSequence.OpeningAttack.MinDamage);
+            Assert.AreEqual(57, curator.SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(0, curator.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1465538645, curator.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance);
+            Assert.AreEqual(381, curator.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(31, curator.SpecialAttackSequence.SpecialAttackWeaponUnknown4);
+
+            CapturedEnemyCombatContract nematet =
+                CapturedTempleOfThreeWindsCombatCatalog.NematetTheCustodianOfTime();
+            Assert.AreEqual(3, nematet.ParallelAttackSequence.Streams.Length);
+            Assert.AreEqual(82, nematet.ParallelAttackSequence.Streams[0].Attack.MinDamage);
+            Assert.AreEqual(2, nematet.ParallelAttackSequence.Streams[0].Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(70, nematet.ParallelAttackSequence.Streams[1].Attack.MinDamage);
+            Assert.AreEqual(0, nematet.ParallelAttackSequence.Streams[1].Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(152, nematet.ParallelAttackSequence.Streams[2].Attack.MinDamage);
+            Assert.AreEqual(1, nematet.ParallelAttackSequence.Streams[2].Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(4, nematet.ParallelAttackSequence.SpecialAttacks.Length);
+            Assert.AreEqual("USW1", nematet.ParallelAttackSequence.SpecialAttacks[3].Name);
+            Assert.AreEqual(494, nematet.ParallelAttackSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(38, nematet.ParallelAttackSequence.SpecialAttackWeaponUnknown4);
+
             LootTableDefinition table =
                 CapturedTempleOfThreeWindsLootDefinitions.BuildDefenderLootTable();
             Assert.AreEqual(2, table.ObservedCorpseSnapshots.Length);
@@ -193,13 +216,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 registry,
                 CapturedTempleOfThreeWindsLootDefinitions.BetanyProfileKey,
                 CapturedTempleOfThreeWindsLootDefinitions.BetanyEncounterKey));
-            Assert.AreEqual(5, registry.Assignments().Length);
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.CuratorProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.CuratorEncounterKey));
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.NematetProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.NematetEncounterKey));
+            Assert.AreEqual(7, registry.Assignments().Length);
             Assert.IsTrue(registry.Assignments().All(value => value.PlayfieldId.Value == 1931));
 
             Assert.AreEqual(5, CapturedTempleOfThreeWindsLootDefinitions.BuildYatilaLootTable().ObservedCorpseSnapshots[0].Entries.Length);
             Assert.AreEqual(2, CapturedTempleOfThreeWindsLootDefinitions.BuildGulardLootTable().ObservedCorpseSnapshots.Length);
             Assert.AreEqual(2357, CapturedTempleOfThreeWindsLootDefinitions.BuildReAnimatorLootTable().ObservedCorpseSnapshots[0].Credits);
             Assert.AreEqual(50, CapturedTempleOfThreeWindsLootDefinitions.BuildBetanyLootTable().ObservedCorpseSnapshots[0].Entries[0].MinimumQuantity);
+            Assert.AreEqual(377, CapturedTempleOfThreeWindsLootDefinitions.BuildCuratorLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(2711, CapturedTempleOfThreeWindsLootDefinitions.BuildNematetLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(
+                200,
+                CapturedTempleOfThreeWindsLootDefinitions.BuildNematetLootTable().ObservedCorpseSnapshots[0].Entries[0].FixedQuality);
         }
     }
 }

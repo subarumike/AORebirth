@@ -4,6 +4,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- The Curator and Nematet the Custodian of Time are active as the next PF1931
+  Temple named encounters. Finalized capture `20260721-052115` supplies their
+  exact SCFU appearance shapes; new fights `20260721-225404` and
+  `20260721-225743` supply the newest L52/9,740-HP Curator and L66/25,318-HP
+  Nematet generations, proactive-versus-player-initiated aggro evidence,
+  capture-timed multi-stream combat, nanos `205565`, `205395`, `205563`, and
+  `205592`, chase/death/corpse evidence, and exact atomic loot snapshots.
+  Nano effects, exact respawn, complete loot probabilities, PF1931 collision,
+  and the alternate-generation selection rule remain unresolved. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_CURATOR_AND_NEMATET.md`.
+
 - The next PF1931 Temple room slice is active from Windcaller Yatila through Acolyte
   Betany. Captures `20260721-041439`, `20260721-042139`, `20260721-042705`,
   `20260721-043204`, and `20260721-044256` provide exact named SCFU generations,

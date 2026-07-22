@@ -23,4 +23,4 @@
 4. Stan factory deliver with active tip
 
 ### Upstream (merged from origin)
-Subway PF127 + Temple of Three Winds continue on master. PF647 is the Temple transfer/gateway; PF1931 owns the dungeon rooms, population, and loot. See `docs/project/PROJECT_STATE.md` and TOTW evidence docs for that track.
+Subway PF127 + Temple of Three Winds continue on master. PF647 is the Temple transfer/gateway; PF1931 owns the dungeon rooms, population, and loot, now including The Curator and Nematet fight slices. See `docs/project/PROJECT_STATE.md` and TOTW evidence docs for that track.
