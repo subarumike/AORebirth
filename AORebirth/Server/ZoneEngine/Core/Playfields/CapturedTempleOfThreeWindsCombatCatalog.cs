@@ -27,6 +27,8 @@ namespace AORebirth.Core.Playfields
         internal const double GuardianAttackRechargeSeconds = 4.25;
         internal const double GartuaFirstHitDelaySeconds = 5.3602725;
         internal const double GartuaAttackRechargeSeconds = 5.3;
+        internal const double MurialFirstHitDelaySeconds = 1.5397;
+        internal const double MurialAttackRechargeSeconds = 3.7885;
 
         internal static CapturedEnemyCombatContract DefenderOfTheThree()
         {
@@ -286,6 +288,26 @@ namespace AORebirth.Core.Playfields
                 -1);
         }
 
+        internal static CapturedEnemyCombatContract MurialTheFaithful()
+        {
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260721-232051: Murial emitted five exact 26-point normal hits at slot 6, "
+                + "ammo -1, weapon instance 0; first successful hit followed attack start by "
+                + "1.5397 seconds and the observed repeat intervals were 3.8501, 3.7214, "
+                + "3.7885, and 3.7896 seconds; empty SpecialAttackWeapon metadata was "
+                + "258/258/258/21/0; nano 70294 remains unresolved",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    MurialFirstHitDelaySeconds,
+                    null,
+                    Attack(26, 26, MurialAttackRechargeSeconds, 6, -1, 0),
+                    new CapturedEnemySpecialAttackDefinition[0],
+                    258,
+                    258,
+                    258,
+                    21,
+                    0));
+        }
+
         internal static CapturedEnemyCombatContract For(string profileKey)
         {
             switch (profileKey)
@@ -308,6 +330,8 @@ namespace AORebirth.Core.Playfields
                     return GuardianOfTomorrow();
                 case CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey:
                     return GartuaTheDoorkeeper();
+                case CapturedTempleOfThreeWindsContentProvider.MurialProfileKey:
+                    return MurialTheFaithful();
                 case "totw.647.encounter.re-animator.reanimated-corpse":
                     return ReanimatedCorpse();
                 default:

@@ -17,12 +17,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemyProfile[] templeProfiles = temple.GetProfiles();
             OrdinaryEnemySpawnDefinition[] templeSpawns = temple.GetSpawns();
 
-            Assert.AreEqual(8, templeProfiles.Length);
-            Assert.AreEqual(152, templeSpawns.Length);
+            Assert.AreEqual(9, templeProfiles.Length);
+            Assert.AreEqual(153, templeSpawns.Length);
             Assert.IsTrue(templeProfiles.All(value => value.ProfileKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(templeProfiles.All(value => !value.BossOrScripted));
             Assert.AreEqual(7, templeProfiles.Count(value => value.DisplayName == "Cultist"));
             Assert.AreEqual(1, templeProfiles.Count(value => value.DisplayName == "Eternal Sentinel"));
+            Assert.AreEqual(1, templeProfiles.Count(value => value.DisplayName == "Murial the Faithful"));
             Assert.IsTrue(templeSpawns.All(value => value.PlayfieldInstance == 1931));
             Assert.IsTrue(templeSpawns.All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsFalse(templeSpawns.Any(value => value.SpawnKey.Contains("subway")));
@@ -33,8 +34,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 temple);
             Assert.AreEqual(322, catalog.GetRuntimeSpawns(127).Length);
             Assert.AreEqual(0, catalog.GetRuntimeSpawns(647).Length);
-            Assert.AreEqual(152, catalog.GetRuntimeSpawns(1931).Length);
-            Assert.AreEqual(474, catalog.GetSpawns().Length);
+            Assert.AreEqual(153, catalog.GetRuntimeSpawns(1931).Length);
+            Assert.AreEqual(475, catalog.GetSpawns().Length);
             Assert.IsTrue(catalog.GetRuntimeSpawns(127).All(value => !value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(catalog.GetRuntimeSpawns(1931).All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
         }
@@ -88,6 +89,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(3, sentinelSpawns.Length);
             Assert.AreEqual(18, sentinelSpawns.Min(value => value.Level));
             Assert.AreEqual(20, sentinelSpawns.Max(value => value.Level));
+
+            OrdinaryEnemyProfile murial = profiles.Single(value => value.DisplayName == "Murial the Faithful");
+            OrdinaryEnemySpawnDefinition murialSpawn = spawns.Single(
+                value => value.ProfileKey == CapturedTempleOfThreeWindsContentProvider.MurialProfileKey);
+            Assert.AreEqual(26090, murial.MonsterData);
+            Assert.AreEqual(1835u, murial.Appearance.AppearanceValue);
+            Assert.AreEqual(40629, murial.Appearance.HeadMesh);
+            Assert.AreEqual(5927, murial.Corpse.CapturedCatMesh.Value);
+            Assert.AreEqual(OrdinaryEnemyLootEvidence.NoneProven, murial.Loot.Evidence);
+            Assert.AreEqual(OrdinaryEnemyEvidenceState.Unresolved, murial.Loot.CreditEvidence);
+            Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, murialSpawn.MovementMode);
+            Assert.AreEqual(20, murialSpawn.Waypoints.Length);
+            Assert.IsFalse(murialSpawn.UseSpawnAsPatrolStart);
+            Assert.AreEqual(34, murialSpawn.Level);
+            Assert.AreEqual(1535, murialSpawn.Health);
+            Assert.AreEqual(118, murialSpawn.RunSpeed);
+            Assert.AreEqual(266.339355f, murialSpawn.Waypoints[0].X);
+            Assert.AreEqual(513.76355f, murialSpawn.Waypoints[0].Z);
+            Assert.AreEqual(267.127625f, murialSpawn.Waypoints[19].X);
+            Assert.AreEqual(508.234467f, murialSpawn.Waypoints[19].Z);
         }
 
         [TestMethod]
@@ -120,6 +141,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(5, sentinel.Loot.ObservedEmptyInventories);
             Assert.AreEqual(111, sentinel.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 18).MinimumCredits);
             Assert.AreEqual(124, sentinel.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 20).MaximumCredits);
+
+            OrdinaryEnemyProfile murial = profiles.Single(value => value.DisplayName == "Murial the Faithful");
+            CapturedEnemySpecialAttackSequenceDefinition murialSequence =
+                murial.Combat.Contract.SpecialAttackSequence;
+            Assert.AreEqual(26, murialSequence.RepeatingAttack.MinDamage);
+            Assert.AreEqual(26, murialSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(6, murialSequence.RepeatingAttack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1.5397, murialSequence.InitialAttackDelaySeconds);
+            Assert.AreEqual(3.7885, murialSequence.RepeatingAttack.RechargeSeconds);
+            Assert.AreEqual(258, murialSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(21, murialSequence.SpecialAttackWeaponUnknown4);
         }
 
         [TestMethod]
