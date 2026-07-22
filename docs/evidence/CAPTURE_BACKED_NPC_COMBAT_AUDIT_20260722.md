@@ -2,9 +2,16 @@
 
 ## Scope and acceptance rule
 
-This audit covers every configured capture-backed hostile or retaliating NPC in the implemented Subway, Temple of Three Winds, Nascence, Arete-family, Rome Blue, and Thrak Garden content, including Subway merchants, Cursed Silvertail, and dynamic mission mobs. A runtime packet-context contract passes only when one identified capture actor owns the complete packet definition and the content resolver binds it to the same proven enemy generation without a nearest-level or cross-enemy substitution. A generic hand, enum label, or another enemy profile's packet is not certification. Temple uses exact source-identity binding because same-name Cultists vary by source; the known-good level-5 Thief uses its independently live-proven level/monster-data generation binding because runtime respawns do not retain the official capture identity. Existing capture-backed damage and cadence policies are deliberately held constant under the task's no-gameplay-change rule.
+This audit covers every configured capture-backed hostile or retaliating NPC in the implemented Subway, Temple of Three Winds, Nascence, Arete-family, Rome Blue, and Thrak Garden content, with supplemental audits for Subway merchants, Cursed Silvertail, cleaning robots, and dynamic mission mobs. A runtime packet-context contract passes only when one identified capture actor owns the complete packet definition and the content resolver binds it to the same proven enemy generation without a nearest-level or cross-enemy substitution. A generic hand, enum label, or another enemy profile's packet is not certification. Temple uses exact source-identity binding because same-name Cultists vary by source; the known-good level-5 Thief uses its independently live-proven level/monster-data generation binding because runtime respawns do not retain the official capture identity. Existing capture-backed damage and cadence policies are deliberately held constant under the task's no-gameplay-change rule.
 
 Unsupported actors remain spawned and visible but are registered with a passive, quarantined combat contract. The shared combat tick refuses every registered quarantined contract.
+
+The generated active-coverage guard accounts for all `16` production
+`CapturedEnemyCombatRuntime.Prepare` files / `18` direct call sites. Conditional
+Cursed Silvertail (`PF4677`, level `8`, MonsterData `208922`) is explicitly
+quarantined after an exhaustive `364`-session search: its cited capture
+`20260718-185306` is absent, leaving WIFU, `SpecialAttackWeapon`, `Attack`,
+`AttackInfo`, proven maximum range, and runtime binding unresolved.
 
 ## Authoritative good-versus-bad trace
 

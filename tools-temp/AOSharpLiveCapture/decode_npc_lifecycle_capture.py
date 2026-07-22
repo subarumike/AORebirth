@@ -89,20 +89,26 @@ def parse_packet_record(
     raw_hex = (raw_hex or "").strip().upper()
     if not raw_hex or len(raw_hex) % 2:
         raise ValueError("raw hex is empty or has an odd number of characters")
-    try:
-        data = bytes.fromhex(raw_hex)
-    except ValueError as exc:
-        raise ValueError("raw hex is not valid hexadecimal") from exc
-    if declared_length != len(data):
+    if raw_hex.strip("0123456789ABCDEF"):
+        raise ValueError("raw hex is not valid hexadecimal")
+    packet_length = len(raw_hex) // 2
+    if declared_length != packet_length:
         raise ValueError(
-            f"declared length {declared_length} does not match raw length {len(data)}"
+            f"declared length {declared_length} does not match raw length {packet_length}"
         )
-    message = packet_type_name(data)
+    message_type = int(raw_hex[32:40], 16) if packet_length >= 20 else None
+    if message_type == SIMPLE_CHAR_FULL_UPDATE:
+        message = SCFU_MESSAGE_NAME
+    elif message_type == CORPSE_FULL_UPDATE:
+        message = "CorpseFullUpdate"
+    else:
+        message = "Unknown"
     if message in (SCFU_MESSAGE_NAME, "CorpseFullUpdate"):
+        data = bytes.fromhex(raw_hex)
         frame_length = struct.unpack_from(">H", data, 6)[0]
-        if frame_length != len(data):
+        if frame_length != packet_length:
             raise ValueError(
-                f"frame header length {frame_length} does not match raw length {len(data)}"
+                f"frame header length {frame_length} does not match raw length {packet_length}"
             )
     if global_ordinal not in (None, ""):
         try:
@@ -115,8 +121,9 @@ def parse_packet_record(
         "timestamp": (timestamp or "unknown").strip() or "unknown",
         "direction": direction,
         "sequence": sequence,
-        "length": len(data),
+        "length": packet_length,
         "rawHex": raw_hex,
+        "_rawFingerprint": raw_hex,
         "message": message,
         "globalOrdinal": global_ordinal,
         "source": source,
@@ -176,6 +183,7 @@ def new_source_state(path):
         "path": str(path),
         "exists": path.exists(),
         "records": {},
+        "fingerprints": {},
         "physicalRows": 0,
         "validRows": 0,
         "invalidRows": 0,
@@ -188,19 +196,36 @@ def new_source_state(path):
     }
 
 
-def add_source_record(state, record, row_number):
+def packet_fingerprint(record):
+    # Exact normalized raw hex is collision-free and substantially smaller than
+    # retaining the full parsed record for packets the caller does not consume.
+    # Avoid hashing here: the source reconciler needs equality, not a content
+    # address, and preserving the text makes conflict reports lossless.
+    return record.pop("_rawFingerprint")
+
+
+def add_source_record(state, record, row_number, retain_record=None):
     key = (record["direction"], record["sequence"])
-    existing = state["records"].get(key)
-    if existing is None:
-        state["records"][key] = record
+    fingerprint = packet_fingerprint(record)
+    existing_fingerprint = state["fingerprints"].get(key)
+    retain = retain_record is None or retain_record(record)
+    if existing_fingerprint is None:
+        state["fingerprints"][key] = fingerprint
+        if retain:
+            state["records"][key] = record
         state["validRows"] += 1
         return
-    if existing["rawHex"] == record["rawHex"]:
+    if existing_fingerprint == fingerprint:
         state["duplicateRows"] += 1
-        if existing["globalOrdinal"] is None:
-            existing["globalOrdinal"] = record["globalOrdinal"]
-        if existing["timestamp"] == "unknown" and record["timestamp"] != "unknown":
-            existing["timestamp"] = record["timestamp"]
+        existing = state["records"].get(key)
+        if existing is None:
+            if retain:
+                state["records"][key] = record
+        else:
+            if existing["globalOrdinal"] is None:
+                existing["globalOrdinal"] = record["globalOrdinal"]
+            if existing["timestamp"] == "unknown" and record["timestamp"] != "unknown":
+                existing["timestamp"] = record["timestamp"]
         return
     state["internalConflictCount"] += 1
     state["issues"].append(
@@ -227,12 +252,14 @@ def inside_capture_window(timestamp, capture_info):
 
 def packet_log_record_is_partial(match, error):
     """Return true only for a structurally valid row with a truncated payload."""
-    raw_hex = match.group("hex")
+    raw_hex = match["hex"] if isinstance(match, dict) else match.group("hex")
     if len(raw_hex) % 2:
         return str(error) == "raw hex is empty or has an odd number of characters"
     try:
         raw_length = len(bytes.fromhex(raw_hex))
-        declared_length = int(match.group("length"))
+        declared_length = int(
+            match["length"] if isinstance(match, dict) else match.group("length")
+        )
     except (TypeError, ValueError):
         return False
     return bool(
@@ -242,42 +269,74 @@ def packet_log_record_is_partial(match, error):
     )
 
 
-def load_packet_log_source(path, capture_info=None):
+def parse_source_packet_log_line(line):
+    """Parse one durable packet-log row without retaining regex match objects."""
+    parts = line.split()
+    if len(parts) != 6:
+        return None
+    timestamp, direction, sequence, length, message, raw_hex = parts
+    if (
+        direction not in ("IN", "OUT")
+        or not sequence.startswith("#")
+        or not sequence[1:].isdigit()
+        or not length.startswith("len=")
+        or not length[4:].isdigit()
+        or not (message.startswith("n3=") or message.startswith("type="))
+        or not raw_hex.startswith("hex=")
+    ):
+        return None
+    raw_hex = raw_hex[4:]
+    if not raw_hex:
+        return None
+    return {
+        "timestamp": timestamp,
+        "direction": direction,
+        "sequence": sequence[1:],
+        "length": length[4:],
+        "hex": raw_hex,
+    }
+
+
+def load_packet_log_source(path, capture_info=None, retain_record=None):
     state = new_source_state(path)
     if not state["exists"]:
         return state
-    lines = path.read_text(encoding="utf-8-sig", errors="replace").splitlines()
-    state["physicalRows"] = len(lines)
-    for row_number, line in enumerate(lines, 1):
-        match = SOURCE_PACKET_RE.match(line)
-        if not match:
-            state["invalidRows"] += 1
-            state["issues"].append(f"row {row_number}: malformed packet log row")
-            continue
-        if not inside_capture_window(match.group("timestamp"), capture_info):
-            state["outsideCaptureWindowRows"] += 1
-            continue
-        try:
-            record = parse_packet_record(
-                match.group("timestamp"),
-                match.group("direction"),
-                match.group("sequence"),
-                match.group("length"),
-                match.group("hex"),
-                "packets.hex.log",
-            )
-        except ValueError as exc:
-            state["invalidRows"] += 1
-            state["issues"].append(f"row {row_number}: {exc}")
-            if row_number == len(lines) and packet_log_record_is_partial(match, exc):
-                state["terminalPartialRows"] += 1
-                state["terminalPartialRowNumbers"].append(row_number)
-            continue
-        add_source_record(state, record, row_number)
+    terminal_partial_candidate = None
+    with path.open("r", encoding="utf-8-sig", errors="replace") as handle:
+        for row_number, raw_line in enumerate(handle, 1):
+            state["physicalRows"] = row_number
+            line = raw_line.rstrip("\r\n")
+            match = parse_source_packet_log_line(line)
+            if not match:
+                state["invalidRows"] += 1
+                state["issues"].append(f"row {row_number}: malformed packet log row")
+                continue
+            if not inside_capture_window(match["timestamp"], capture_info):
+                state["outsideCaptureWindowRows"] += 1
+                continue
+            try:
+                record = parse_packet_record(
+                    match["timestamp"],
+                    match["direction"],
+                    match["sequence"],
+                    match["length"],
+                    match["hex"],
+                    "packets.hex.log",
+                )
+            except ValueError as exc:
+                state["invalidRows"] += 1
+                state["issues"].append(f"row {row_number}: {exc}")
+                if packet_log_record_is_partial(match, exc):
+                    terminal_partial_candidate = row_number
+                continue
+            add_source_record(state, record, row_number, retain_record)
+    if terminal_partial_candidate == state["physicalRows"]:
+        state["terminalPartialRows"] += 1
+        state["terminalPartialRowNumbers"].append(terminal_partial_candidate)
     return state
 
 
-def load_raw_index_source(path, capture_info=None):
+def load_raw_index_source(path, capture_info=None, retain_record=None):
     state = new_source_state(path)
     if not state["exists"]:
         return state
@@ -307,7 +366,7 @@ def load_raw_index_source(path, capture_info=None):
                 state["invalidRows"] += 1
                 state["issues"].append(f"row {row_number}: {exc}")
                 continue
-            add_source_record(state, record, row_number)
+            add_source_record(state, record, row_number, retain_record)
     return state
 
 
@@ -334,7 +393,10 @@ def is_start_only_legacy_capture(capture_info):
 
 def source_has_salvageable_terminal_partial(state, capture_info):
     return bool(
-        is_start_only_legacy_capture(capture_info)
+        (
+            not capture_info["available"]
+            or is_start_only_legacy_capture(capture_info)
+        )
         and state["exists"]
         and state["validRows"] > 0
         and state["invalidRows"] == 1
@@ -385,12 +447,14 @@ def normalized_packet_line(record):
     )
 
 
-def load_packet_lines(capture):
-    """Reconcile both durable raw sinks into one validated chronological stream."""
+def load_packet_records(capture, retain_record=None):
+    """Reconcile both raw sinks, optionally retaining only selected records."""
     capture_info = load_capture_info(capture)
-    packet_log = load_packet_log_source(capture / "packets.hex.log", capture_info)
+    packet_log = load_packet_log_source(
+        capture / "packets.hex.log", capture_info, retain_record
+    )
     raw_index = load_raw_index_source(
-        capture / RAW_PACKET_INDEX_NAME, capture_info
+        capture / RAW_PACKET_INDEX_NAME, capture_info, retain_record
     )
     sources = [packet_log, raw_index]
     observed = capture_info["observedPackets"]
@@ -425,7 +489,8 @@ def load_packet_lines(capture):
                 complete[source["path"]] = bool(
                     source_is_clean(source)
                     and source["validRows"] > 0
-                    and set(source["records"]).issuperset(other["records"])
+                    and source["fingerprints"].keys()
+                    >= other["fingerprints"].keys()
                 )
 
     complete_sources = [source for source in sources if complete[source["path"]]]
@@ -435,19 +500,27 @@ def load_packet_lines(capture):
         if complete[source["path"]] or terminal_partial_candidates[source["path"]]
     ]
     conflicts = []
-    all_keys = set(packet_log["records"]) | set(raw_index["records"])
-    for key in sorted(all_keys):
-        left = packet_log["records"].get(key)
-        right = raw_index["records"].get(key)
-        if left and right and left["rawHex"] != right["rawHex"]:
-            conflicts.append(
-                {
-                    "direction": key[0],
-                    "sequence": key[1],
-                    "packetLogRawHex": left["rawHex"],
-                    "rawIndexRawHex": right["rawHex"],
-                }
-            )
+    if packet_log["exists"] and raw_index["exists"]:
+        conflict_keys = []
+        for key, left_fingerprint in packet_log["fingerprints"].items():
+            right_fingerprint = raw_index["fingerprints"].get(key)
+            if right_fingerprint is not None and left_fingerprint != right_fingerprint:
+                conflict_keys.append(key)
+        for key in sorted(conflict_keys):
+            left_fingerprint = packet_log["fingerprints"].get(key)
+            right_fingerprint = raw_index["fingerprints"].get(key)
+            conflict = {"direction": key[0], "sequence": key[1]}
+            left = packet_log["records"].get(key)
+            right = raw_index["records"].get(key)
+            if left is not None:
+                conflict["packetLogRawHex"] = left["rawHex"]
+            else:
+                conflict["packetLogRawHex"] = left_fingerprint
+            if right is not None:
+                conflict["rawIndexRawHex"] = right["rawHex"]
+            else:
+                conflict["rawIndexRawHex"] = right_fingerprint
+            conflicts.append(conflict)
 
     internal_conflicts = sum(source["internalConflictCount"] for source in sources)
     exactly_one_complete = len(complete_sources) == 1
@@ -461,19 +534,40 @@ def load_packet_lines(capture):
     if exactly_one_trusted:
         authoritative = trusted_sources[0]
         other = raw_index if authoritative is packet_log else packet_log
+        canonical_packet_count = len(authoritative["fingerprints"])
         for key, record in authoritative["records"].items():
-            canonical[key] = dict(record)
+            canonical[key] = record
             matching = other["records"].get(key)
-            if matching and matching["rawHex"] == record["rawHex"]:
+            if (
+                matching
+                and other["fingerprints"].get(key)
+                == authoritative["fingerprints"][key]
+            ):
                 if canonical[key]["globalOrdinal"] is None:
                     canonical[key]["globalOrdinal"] = matching["globalOrdinal"]
     else:
+        canonical_packet_count = len(packet_log["fingerprints"]) + sum(
+            key not in packet_log["fingerprints"]
+            for key in raw_index["fingerprints"]
+        )
+        canonical_retained_fingerprints = {}
         for source in sources:
             for key, record in source["records"].items():
+                fingerprint = source["fingerprints"][key]
+                existing_fingerprint = canonical_retained_fingerprints.get(key)
+                if existing_fingerprint is not None and fingerprint != existing_fingerprint:
+                    continue
                 existing = canonical.get(key)
                 if existing is None:
-                    canonical[key] = dict(record)
-                elif existing["rawHex"] == record["rawHex"]:
+                    if (
+                        source is raw_index
+                        and key in packet_log["fingerprints"]
+                        and packet_log["fingerprints"][key] != fingerprint
+                    ):
+                        continue
+                    canonical[key] = record
+                    canonical_retained_fingerprints[key] = fingerprint
+                else:
                     if existing["globalOrdinal"] is None:
                         existing["globalOrdinal"] = record["globalOrdinal"]
                     if existing["timestamp"] == "unknown" and record["timestamp"] != "unknown":
@@ -487,7 +581,7 @@ def load_packet_lines(capture):
         )
         canonical_valid = bool(
             finalized_sources_structurally_valid
-            and len(canonical) == observed
+            and canonical_packet_count == observed
             and not unresolved_conflicts
         )
     else:
@@ -529,7 +623,7 @@ def load_packet_lines(capture):
         "terminalPartialTailSalvaged": terminal_partial_salvaged,
         "captureInfo": capture_info,
         "observedPackets": observed,
-        "canonicalPackets": len(records),
+        "canonicalPackets": canonical_packet_count,
         "conflictCount": len(conflicts) + internal_conflicts,
         "conflicts": conflicts,
         "packetLog": public_source_summary(
@@ -547,6 +641,12 @@ def load_packet_lines(capture):
             and terminal_partial_candidates[raw_index["path"]],
         ),
     }
+    return records, source_summary
+
+
+def load_packet_lines(capture):
+    """Compatibility wrapper returning normalized canonical packet-log lines."""
+    records, source_summary = load_packet_records(capture)
     return [normalized_packet_line(record) for record in records], source_summary
 
 
@@ -1461,6 +1561,170 @@ def run_self_tests():
         )
         tests.append("union-order-dedupe")
 
+        filtered = root / "filtered-retention"
+        filtered.mkdir()
+        filtered_packets = [
+            make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, 8),
+            make_raw_packet(CORPSE_FULL_UPDATE, 9),
+        ]
+        filtered_capture_info = {
+            "captureStartUtc": "2026-01-01T00:00:01Z",
+            "captureEndUtc": "2026-01-01T00:00:02Z",
+            "packetCounts": {"inboundRaw": 2, "outboundRaw": 0},
+            "validation": {"status": "complete"},
+        }
+        (filtered / "capture_info.json").write_text(
+            json.dumps(filtered_capture_info), encoding="utf-8"
+        )
+        (filtered / "packets.hex.log").write_text(
+            "".join(
+                f"2026-01-01T00:00:0{index}Z IN #{70 + index} "
+                f"len=24 n3=Wrong hex={packet.hex()}\n"
+                for index, packet in enumerate(filtered_packets, 1)
+            ),
+            encoding="utf-8",
+        )
+        write_raw_index(
+            filtered / RAW_PACKET_INDEX_NAME,
+            [
+                {
+                    "CapturedUtc": f"2026-01-01T00:00:0{index}Z",
+                    "Direction": "IN",
+                    "GlobalOrdinal": index,
+                    "Sequence": 70 + index,
+                    "PacketLength": len(packet),
+                    "PreservationStatus": "raw_complete",
+                    "RawHex": packet.hex(),
+                }
+                for index, packet in enumerate(filtered_packets, 1)
+            ],
+        )
+        retained, source = load_packet_records(
+            filtered,
+            retain_record=lambda record: record["message"] == SCFU_MESSAGE_NAME,
+        )
+        self_test_check(
+            source["canonicalValid"]
+            and source["captureComplete"]
+            and source["canonicalPackets"] == 2
+            and source["packetLog"]["validRows"] == 2
+            and source["rawPacketIndex"]["validRows"] == 2
+            and len(retained) == 1
+            and retained[0]["message"] == SCFU_MESSAGE_NAME,
+            "filtered retention must preserve full-source completeness",
+        )
+
+        filtered_superset = root / "filtered-superset"
+        filtered_superset.mkdir()
+        (filtered_superset / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #71 len=24 n3=Wrong hex="
+            + filtered_packets[0].hex()
+            + "\n",
+            encoding="utf-8",
+        )
+        write_raw_index(
+            filtered_superset / RAW_PACKET_INDEX_NAME,
+            [
+                {
+                    "CapturedUtc": f"2026-01-01T00:00:0{index}Z",
+                    "Direction": "IN",
+                    "GlobalOrdinal": index,
+                    "Sequence": 70 + index,
+                    "PacketLength": len(packet),
+                    "PreservationStatus": "raw_complete",
+                    "RawHex": packet.hex(),
+                }
+                for index, packet in enumerate(filtered_packets, 1)
+            ],
+        )
+        retained, source = load_packet_records(
+            filtered_superset,
+            retain_record=lambda record: record["message"] == SCFU_MESSAGE_NAME,
+        )
+        self_test_check(
+            source["canonicalValid"]
+            and source["legacyInference"]
+            and not source["packetLog"]["complete"]
+            and source["rawPacketIndex"]["complete"]
+            and source["canonicalPackets"] == 2
+            and len(retained) == 1,
+            "filtered-out packets must remain covered by legacy superset checks",
+        )
+
+        filtered_conflict = root / "filtered-omitted-conflict"
+        filtered_conflict.mkdir()
+        (filtered_conflict / "capture_info.json").write_text(
+            json.dumps(filtered_capture_info), encoding="utf-8"
+        )
+        (filtered_conflict / "packets.hex.log").write_text(
+            (filtered / "packets.hex.log").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        conflicting_omitted_packet = make_raw_packet(CORPSE_FULL_UPDATE, 10)
+        write_raw_index(
+            filtered_conflict / RAW_PACKET_INDEX_NAME,
+            [
+                {
+                    "CapturedUtc": "2026-01-01T00:00:01Z",
+                    "Direction": "IN",
+                    "GlobalOrdinal": 1,
+                    "Sequence": 71,
+                    "PacketLength": len(filtered_packets[0]),
+                    "PreservationStatus": "raw_complete",
+                    "RawHex": filtered_packets[0].hex(),
+                },
+                {
+                    "CapturedUtc": "2026-01-01T00:00:02Z",
+                    "Direction": "IN",
+                    "GlobalOrdinal": 2,
+                    "Sequence": 72,
+                    "PacketLength": len(conflicting_omitted_packet),
+                    "PreservationStatus": "raw_complete",
+                    "RawHex": conflicting_omitted_packet.hex(),
+                },
+            ],
+        )
+        retained, source = load_packet_records(
+            filtered_conflict,
+            retain_record=lambda record: record["message"] == SCFU_MESSAGE_NAME,
+        )
+        self_test_check(
+            source["recaptureRequired"]
+            and source["conflictCount"] == 1
+            and source["canonicalPackets"] == 2
+            and len(retained) == 1
+            and "packetLogRawHex" in source["conflicts"][0]
+            and "rawIndexRawHex" in source["conflicts"][0],
+            "filtered-out packets must remain covered by cross-source conflicts",
+        )
+
+        filtered_internal = root / "filtered-internal-conflict"
+        filtered_internal.mkdir()
+        (filtered_internal / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #81 len=24 n3=Wrong hex="
+            + filtered_packets[0].hex()
+            + "\n2026-01-01T00:00:02Z IN #82 len=24 n3=Wrong hex="
+            + filtered_packets[1].hex()
+            + "\n2026-01-01T00:00:03Z IN #82 len=24 n3=Wrong hex="
+            + filtered_packets[1].hex()
+            + "\n2026-01-01T00:00:04Z IN #82 len=24 n3=Wrong hex="
+            + conflicting_omitted_packet.hex()
+            + "\n",
+            encoding="utf-8",
+        )
+        state = load_packet_log_source(
+            filtered_internal / "packets.hex.log",
+            retain_record=lambda record: record["message"] == SCFU_MESSAGE_NAME,
+        )
+        self_test_check(
+            state["validRows"] == 2
+            and state["duplicateRows"] == 1
+            and state["internalConflictCount"] == 1
+            and len(state["records"]) == 1,
+            "filtered-out packets must retain duplicate and internal-conflict checks",
+        )
+        tests.append("filtered-retention-full-validation")
+
         finalized_window = root / "finalized-window"
         finalized_window.mkdir()
         window_packets = [
@@ -1617,6 +1881,97 @@ def run_self_tests():
             "one final partial write must expose only the valid positive prefix",
         )
         tests.append("start-only-terminal-partial-positive-evidence")
+
+        absent_info_terminal_partial = root / "absent-info-terminal-partial"
+        absent_info_terminal_partial.mkdir()
+        (absent_info_terminal_partial / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #125 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n2026-01-01T00:00:02Z IN #126 len=24 n3=Wrong hex=001\n",
+            encoding="utf-8",
+        )
+        lines, source = load_packet_lines(absent_info_terminal_partial)
+        self_test_check(
+            source["canonicalValid"]
+            and not source["recaptureRequired"]
+            and not source["captureInfo"]["available"]
+            and source["terminalPartialTailSalvaged"]
+            and source["positiveEvidenceUsable"]
+            and source["positiveEvidenceOnly"]
+            and not source["captureComplete"]
+            and not source["absenceInferenceAllowed"]
+            and source["packetLog"]["terminalPartialSalvaged"]
+            and len(lines) == 1,
+            "absent capture metadata must allow only a clean terminal-partial positive prefix",
+        )
+        tests.append("absent-info-terminal-partial-positive-evidence")
+
+        absent_info_internal_partial = root / "absent-info-internal-partial"
+        absent_info_internal_partial.mkdir()
+        (absent_info_internal_partial / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #127 len=24 n3=Wrong hex=001\n"
+            "2026-01-01T00:00:02Z IN #128 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(absent_info_internal_partial)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and not source["terminalPartialTailSalvaged"],
+            "absent capture metadata must not salvage a nonterminal partial row",
+        )
+        tests.append("absent-info-internal-partial-fails-closed")
+
+        absent_info_multiple_partial = root / "absent-info-multiple-partial"
+        absent_info_multiple_partial.mkdir()
+        (absent_info_multiple_partial / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #129 len=24 n3=Wrong hex="
+            + packet_one.hex()
+            + "\n2026-01-01T00:00:02Z IN #130 len=24 n3=Wrong hex=001\n"
+            "2026-01-01T00:00:03Z IN #131 len=24 n3=Wrong hex=003\n",
+            encoding="utf-8",
+        )
+        _, source = load_packet_lines(absent_info_multiple_partial)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and source["packetLog"]["invalidRows"] == 2
+            and not source["terminalPartialTailSalvaged"],
+            "absent capture metadata must not salvage multiple partial rows",
+        )
+        tests.append("absent-info-multiple-partial-fails-closed")
+
+        absent_info_partial_conflict = root / "absent-info-terminal-partial-conflict"
+        absent_info_partial_conflict.mkdir()
+        absent_conflict_left = make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, 141)
+        absent_conflict_right = make_raw_packet(SIMPLE_CHAR_FULL_UPDATE, 142)
+        (absent_info_partial_conflict / "packets.hex.log").write_text(
+            "2026-01-01T00:00:01Z IN #133 len=24 n3=Wrong hex="
+            + absent_conflict_left.hex()
+            + "\n2026-01-01T00:00:02Z IN #134 len=24 n3=Wrong hex=001\n",
+            encoding="utf-8",
+        )
+        write_raw_index(
+            absent_info_partial_conflict / RAW_PACKET_INDEX_NAME,
+            [{
+                "CapturedUtc": "2026-01-01T00:00:01Z", "Direction": "IN",
+                "GlobalOrdinal": 1, "Sequence": 133,
+                "PacketLength": len(absent_conflict_right),
+                "PreservationStatus": "raw_complete",
+                "RawHex": absent_conflict_right.hex(),
+            }],
+        )
+        _, source = load_packet_lines(absent_info_partial_conflict)
+        self_test_check(
+            source["recaptureRequired"]
+            and not source["canonicalValid"]
+            and source["conflictCount"] == 1
+            and not source["terminalPartialTailSalvaged"],
+            "absent capture metadata must not let terminal salvage mask a conflict",
+        )
+        tests.append("absent-info-terminal-partial-conflict-fails-closed")
 
         internal_partial = root / "start-only-internal-partial"
         internal_partial.mkdir()

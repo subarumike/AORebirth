@@ -67,8 +67,16 @@
     </Compile>
     <Compile Include="DebuggingSerializerTests.cs" />
     <Compile Include="DamageCalculationTests.cs" />
+    <Compile Include="CapturedEnemyCombatActiveCoverageTests.cs" />
     <Compile Include="CapturedEnemyCombatContractTestStub.cs" />
     <Compile Include="CapturedEnemyCombatPacketFactoryTests.cs" />
+    <Compile Include="CapturedEnemyCombatGeneratedPacketFixtureTests.cs" />
+    <Compile Include="CapturedEnemyCombatProfileCatalogFixtures.g.cs" />
+    <Compile Include="CapturedEnemyCombatProfileCatalogTestStubs.cs" />
+    <Compile Include="CapturedEnemyCombatProfileCatalogTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedIntObservationCursor.cs">
+      <Link>CapturedIntObservationCursor.cs</Link>
+    </Compile>
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
@@ -195,6 +203,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs">
       <Link>CapturedEnemyCombatPacketFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.cs">
+      <Link>CapturedEnemyCombatProfileCatalog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.g.cs">
+      <Link>CapturedEnemyCombatProfileCatalog.g.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
       <Link>CapturedTempleOfThreeWindsLootDefinitions.cs</Link>

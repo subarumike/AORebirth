@@ -552,9 +552,10 @@ namespace AORebirth.Core.Playfields
 
         internal CapturedEnemyCombatContract ResolveContract(int sourceIdentity, int level)
         {
-            return this.sourceContractResolver == null
-                       ? this.ResolveContract(level)
-                       : this.sourceContractResolver(sourceIdentity, level);
+            CapturedEnemyCombatContract contract = this.sourceContractResolver == null
+                                                       ? this.ResolveContract(level)
+                                                       : this.sourceContractResolver(sourceIdentity, level);
+            return contract == null ? null : contract.WithEvidenceSourceHint(sourceIdentity);
         }
 
         internal CapturedEnemyCombatContract ResolveContract(
@@ -566,9 +567,10 @@ namespace AORebirth.Core.Playfields
                 throw new ArgumentNullException("variant");
             }
 
-            return this.sourceVariantContractResolver == null
-                       ? this.ResolveContract(sourceIdentity, variant.Level)
-                       : this.sourceVariantContractResolver(sourceIdentity, variant);
+            CapturedEnemyCombatContract contract = this.sourceVariantContractResolver == null
+                                                       ? this.ResolveContract(sourceIdentity, variant.Level)
+                                                       : this.sourceVariantContractResolver(sourceIdentity, variant);
+            return contract == null ? null : contract.WithEvidenceSourceHint(sourceIdentity);
         }
     }
 

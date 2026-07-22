@@ -13,7 +13,8 @@ namespace AORebirth.Core.Playfields
             int playfieldId,
             Identity weaponIdentity,
             CapturedEnemyWeaponDefinition definition,
-            int? currentEnergy = null)
+            int? currentEnergy = null,
+            int? currentMultipleCount = null)
         {
             if (definition == null || !definition.IsValid)
             {
@@ -40,7 +41,10 @@ namespace AORebirth.Core.Playfields
                         Value1 = value.Stat,
                         Value2 = value.Stat == CharacterStat.Energy && currentEnergy.HasValue
                                      ? unchecked((uint)currentEnergy.Value)
-                                     : value.Value
+                                     : value.Stat == CharacterStat.MultipleCount
+                                       && currentMultipleCount.HasValue
+                                           ? unchecked((uint)currentMultipleCount.Value)
+                                           : value.Value
                     }).ToArray(),
                 Unknown3 = definition.Unknown3
             };
@@ -92,14 +96,14 @@ namespace AORebirth.Core.Playfields
         {
             if (contract == null
                 || !contract.IsCombatReady
-                || !contract.HasEmptySpecialAttackWeaponContext)
+                || !contract.HasCapturedSpecialAttackWeaponContext)
             {
-                throw new InvalidOperationException("A complete captured empty attack-start context is required.");
+                throw new InvalidOperationException("A complete captured attack-start context is required.");
             }
 
             return CreateSpecialAttackWeapon(
                 attacker,
-                new CapturedEnemySpecialAttackDefinition[0],
+                contract.CapturedSpecialAttacks,
                 contract.SpecialAttackWeaponN3Unknown,
                 contract.SpecialAttackWeaponUnknown1,
                 contract.SpecialAttackWeaponUnknown2,

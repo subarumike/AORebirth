@@ -8,18 +8,25 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   runtime factory owns exact owner-linked WIFU, `SpecialAttackWeapon`, `Attack`,
   and `AttackInfo` construction; per-actor Energy state preserves finite ammo,
   raw N3 fields and numeric hit-wire values are not normalized, and synthetic
-  incoming-hit chat has been removed. The initial-active audit covers `1,496`
-  hostile/retaliatory
-  actors: the live-proven level-5 Subway Thief and fourteen exact Temple Cultist
-  identities are runtime-certified and `1,481` are passive/quarantined; two
-  later Subway Infector slots raise the maximum to `1,498`, with `1,483`
-  quarantined. No Subway, named Temple, Nascence, Arete-family, Marcus ambient,
-  cleaning-robot, or dynamic-mission mapping other than that Thief generation currently passes the literal
-  complete-own-source contract. This gate supersedes older combat-active claims
-  below while preserving their noncombat spawn, appearance, patrol, corpse, and
-  loot evidence. Exact fixtures and audit assertions pass; the Debug build and
-  engine restart passed with ports `6996`, `7012`, `7500`, and `7501` listening.
-  Official-client text remains unverified. Evidence:
+  incoming-hit chat has been removed. Per-actor, per-observation-array cursors
+  keep parallel captured attack streams independent. The fixed initial-active
+  audit covers `1,496` hostile/retaliatory actors: `85` are runtime-certified
+  and `1,411` remain passive/quarantined (`755` merged profiles: `85` certified,
+  `670` unresolved). The deterministic corpus result covers `364` sessions,
+  `348` canonical sessions, `2,647` complete chains, `243` capture-certified
+  profiles, `92` runtime-ready profiles, `290` semantic definitions, and `100`
+  runtime-ready definitions, with zero recoverable-evidence blockers. A
+  repository guard also accounts for all `16` production combat-prepare files /
+  `18` call sites; conditional Cursed Silvertail remains explicitly unresolved
+  because cited capture `20260718-185306` is absent. Exact-byte and audit checks
+  pass. The complete messaging suite is `447/480`, with `33` unrelated existing
+  damage/visibility/population failures. The Debug build and engine restart
+  pass, and ports `6996`, `7012`, `7500`, and `7501` listen. Official-client
+  behavior remains unverified. Evidence:
+  `docs/generated/capture_backed_npc_combat_inventory.json`,
+  `docs/generated/capture_backed_npc_combat_active_coverage.json`,
+  `docs/generated/capture_backed_npc_secondary_evidence_audit.json`,
+  `docs/generated/capture_backed_npc_attack_range_audit.json`, and
   `docs/evidence/CAPTURE_BACKED_NPC_COMBAT_AUDIT_20260722.md`.
 
 - PF1931 Temple content now has a dedicated `TempleOfThreeWindsContentModule`.

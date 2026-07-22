@@ -9,20 +9,28 @@
 - Synthetic incoming-hit chat is removed; the serialized combat packet is the
   only incoming combat-line source.
 - Unsupported contracts fail closed while their actors remain spawned and
-  visible. The current initial-active audit covers `1,496` hostile/retaliatory
-  actors: the proven
-  level-5 Subway Thief plus `14` exact Temple Cultist identities are
-  runtime-certified and `1,481` actors are passive and quarantined. Two later
-  Subway Infector slots raise the configured maximum to `1,498`, with `1,483`
-  quarantined.
-- The certified Thief and fourteen Temple sources use their own owner-linked physical
-  weapon definition and per-actor Energy sequence. Source `0x7984B379` preserves
-  Energy/ammo `15 -> 14 -> 13` and exact captured packet bodies.
-- Exact packet/audit tests and the Debug build pass. Chat, Login, and Zone were
-  restarted successfully and ports `6996`, `7012`, `7500`, and `7501` listen.
-  The official-client acceptance run remains unverified, so live client text is
-  not claimed fixed.
-- Full evidence and disposition ledger:
+  visible. The fixed initial-active audit covers `1,496` hostile/retaliatory
+  actors and `755` merged profile rows: `85` actors/profiles are
+  runtime-certified, while `1,411` actors across `670` profiles remain
+  passive and quarantined with exact missing-evidence records.
+- The deterministic corpus extractor audited `364` sessions (`348` canonical),
+  recovered `2,647` complete attack chains, and generated `243`
+  capture-certified profiles / `290` semantic definitions. Runtime safety gates
+  admit `92` profiles / `100` definitions and report zero recoverable-evidence
+  blockers. Per-actor, per-stream observation cursors preserve independent
+  captured damage and ammunition sequences.
+- Exact-byte replay, shared factory/catalog, fixed coverage, scripted-hostile
+  coverage, secondary-evidence, range, Temple, and Subway checks pass. The full
+  messaging suite is `447/480`; its remaining `33` failures are established
+  unrelated damage/visibility/population work and were not changed here. The
+  Debug build passes. Chat, Login, and Zone restarted successfully, with ports
+  `6996`, `7012`, `7500`, and `7501` listening. Official-client acceptance
+  remains unverified.
+- Generated evidence and disposition artifacts:
+  `docs/generated/capture_backed_npc_combat_inventory.json`,
+  `docs/generated/capture_backed_npc_combat_active_coverage.json`,
+  `docs/generated/capture_backed_npc_secondary_evidence_audit.json`, and
+  `docs/generated/capture_backed_npc_attack_range_audit.json`. Narrative trace:
   `docs/evidence/CAPTURE_BACKED_NPC_COMBAT_AUDIT_20260722.md`.
 
 ### Prior pushed Arete main quest + implant crafting work
