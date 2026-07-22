@@ -4,6 +4,15 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Temple combat no longer abbreviates captured attack packets to damage amounts
+  alone. The official corpus proves that ordinary Cultists send an empty,
+  level/profile-specific `SpecialAttackWeapon` context and `Attack` before
+  slot-6, instance-0, normal-hit-type AttackInfo. All Cultist levels `20..35`
+  now resolve those exact context values, and the shared Temple named-attack
+  builder emits captured normal hit type `3`. This addresses the private-client
+  nanobot `unknown damage` symptom systemically for promoted Temple combat;
+  live client text after restart remains the final acceptance check.
+
 - PF1931 Temple content now has a dedicated `TempleOfThreeWindsContentModule`.
   Live ZoneEngine evidence showed a player entering playfield `1931` while the
   content coordinator registered captured NPC startup only for Subway PF127;

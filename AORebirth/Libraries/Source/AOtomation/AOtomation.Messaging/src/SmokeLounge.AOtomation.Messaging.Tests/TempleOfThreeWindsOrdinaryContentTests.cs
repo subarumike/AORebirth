@@ -114,17 +114,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void TempleCultistCombatAggroLootAndCreditsStayCaptureBounded()
         {
-            OrdinaryEnemyProfile[] profiles = new CapturedTempleOfThreeWindsContentProvider().GetProfiles();
+            var provider = new CapturedTempleOfThreeWindsContentProvider();
+            OrdinaryEnemyProfile[] profiles = provider.GetProfiles();
+            OrdinaryEnemySpawnDefinition[] spawns = provider.GetSpawns();
             OrdinaryEnemyProfile[] cultists = profiles.Where(value => value.DisplayName == "Cultist").ToArray();
+            Dictionary<string, OrdinaryEnemyProfile> profilesByKey = profiles.ToDictionary(
+                value => value.ProfileKey,
+                StringComparer.Ordinal);
+            var cultistContextByLevel = new Dictionary<int, int>
+            {
+                { 20, 305 }, { 21, 320 }, { 22, 336 }, { 23, 351 },
+                { 24, 367 }, { 25, 382 }, { 26, 400 }, { 27, 416 },
+                { 28, 434 }, { 29, 450 }, { 30, 468 }, { 31, 484 },
+                { 32, 502 }, { 33, 518 }, { 34, 535 }, { 35, 552 }
+            };
 
             Assert.IsTrue(profiles.All(value => value.Aggression.Mode == OrdinaryEnemyAggressionMode.Auto));
             Assert.IsTrue(profiles.All(value => value.Aggression.AutomaticAggroRadius.Value == 7.0));
             Assert.IsTrue(profiles.All(value => value.Aggression.Chase && value.Aggression.ReturnToSpawn));
             Assert.IsTrue(profiles.All(value => value.Aggression.EvidenceState == OrdinaryEnemyEvidenceState.Policy));
             Assert.IsTrue(profiles.All(value => value.Combat.EvidenceState == OrdinaryEnemyEvidenceState.Observed));
-            Assert.IsTrue(cultists.All(value => value.Combat.Contract.MinDamage == 15));
-            Assert.IsTrue(cultists.All(value => value.Combat.Contract.MaxDamage == 32));
-            Assert.IsTrue(cultists.All(value => value.Combat.Contract.RechargeSeconds == 4.635295));
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns.Where(
+                value => value.ProfileKey.StartsWith("totw.cultist.", StringComparison.Ordinal)))
+            {
+                OrdinaryEnemyProfile profile = profilesByKey[spawn.ProfileKey];
+                CapturedEnemyCombatContract contract = profile.Combat.ResolveContract(spawn.Level);
+                CapturedEnemySpecialAttackSequenceDefinition sequence = contract.SpecialAttackSequence;
+                int contextValue = cultistContextByLevel[spawn.Level];
+                Assert.AreEqual(CapturedEnemyAttackModel.Specialized, contract.AttackModel);
+                Assert.IsNotNull(sequence);
+                Assert.AreEqual(2.129326, sequence.InitialAttackDelaySeconds);
+                Assert.AreEqual(15, sequence.RepeatingAttack.MinDamage);
+                Assert.AreEqual(32, sequence.RepeatingAttack.MaxDamage);
+                Assert.AreEqual(4.635295, sequence.RepeatingAttack.RechargeSeconds);
+                Assert.AreEqual(-1, sequence.RepeatingAttack.AttackInfoAmmoCount);
+                Assert.AreEqual(6, sequence.RepeatingAttack.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, sequence.RepeatingAttack.AttackInfoWeaponInstance);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    sequence.RepeatingAttack.AttackInfoHitType);
+                Assert.AreEqual(contextValue, sequence.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(contextValue, sequence.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(
+                    profile.MonsterData == 26135 ? contextValue + 20 : contextValue,
+                    sequence.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(0, sequence.SpecialAttackWeaponUnknown5);
+            }
             Assert.AreEqual(74, cultists.Sum(value => value.Loot.ObservedCompleteInventories));
             Assert.AreEqual(57, cultists.Sum(value => value.Loot.ObservedEmptyInventories));
             Assert.AreEqual(17, cultists.Sum(value => value.Loot.Entries.Sum(entry => entry.ObservedCount)));
@@ -134,9 +169,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(cultists.All(value => value.Loot.LevelCreditRules.Single(rule => rule.EnemyLevel == 35).MaximumCredits == 705));
 
             OrdinaryEnemyProfile sentinel = profiles.Single(value => value.DisplayName == "Eternal Sentinel");
-            Assert.AreEqual(17, sentinel.Combat.Contract.MinDamage);
-            Assert.AreEqual(18, sentinel.Combat.Contract.MaxDamage);
-            Assert.AreEqual(5.67, sentinel.Combat.Contract.RechargeSeconds);
+            foreach (OrdinaryEnemySpawnDefinition sentinelSpawn in spawns.Where(
+                value => value.ProfileKey == sentinel.ProfileKey))
+            {
+                CapturedEnemySpecialAttackSequenceDefinition sequence = sentinel.Combat
+                    .ResolveContract(sentinelSpawn.Level)
+                    .SpecialAttackSequence;
+                Assert.AreEqual(17, sequence.RepeatingAttack.MinDamage);
+                Assert.AreEqual(18, sequence.RepeatingAttack.MaxDamage);
+                Assert.AreEqual(5.67, sequence.RepeatingAttack.RechargeSeconds);
+                Assert.AreEqual(6, sequence.RepeatingAttack.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, sequence.RepeatingAttack.AttackInfoWeaponInstance);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    sequence.RepeatingAttack.AttackInfoHitType);
+                Assert.AreEqual(
+                    sentinelSpawn.Level >= 20 ? 109 : 103,
+                    sequence.SpecialAttackWeaponUnknown1);
+            }
             Assert.AreEqual(5, sentinel.Loot.ObservedCompleteInventories);
             Assert.AreEqual(5, sentinel.Loot.ObservedEmptyInventories);
             Assert.AreEqual(111, sentinel.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 18).MinimumCredits);
@@ -148,6 +198,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(26, murialSequence.RepeatingAttack.MinDamage);
             Assert.AreEqual(26, murialSequence.RepeatingAttack.MaxDamage);
             Assert.AreEqual(6, murialSequence.RepeatingAttack.AttackInfoWeaponSlot);
+            Assert.AreEqual(
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                murialSequence.RepeatingAttack.AttackInfoHitType);
             Assert.AreEqual(1.5397, murialSequence.InitialAttackDelaySeconds);
             Assert.AreEqual(3.7885, murialSequence.RepeatingAttack.RechargeSeconds);
             Assert.AreEqual(258, murialSequence.SpecialAttackWeaponUnknown1);
@@ -167,6 +220,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(-1, combat.SpecialAttackSequence.RepeatingAttack.AttackInfoAmmoCount);
             Assert.AreEqual(0, combat.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot);
             Assert.AreEqual(1465538645, combat.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance);
+            Assert.AreEqual(
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                combat.SpecialAttackSequence.RepeatingAttack.AttackInfoHitType);
             Assert.AreEqual(1, combat.SpecialAttackSequence.SpecialAttacks.Length);
             Assert.AreEqual(205877, combat.SpecialAttackSequence.SpecialAttacks[0].LowTemplate);
             Assert.AreEqual(205878, combat.SpecialAttackSequence.SpecialAttacks[0].HighTemplate);
@@ -182,13 +238,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(269, yatila.ParallelAttackSequence.Streams[1].Attack.MinDamage);
             Assert.AreEqual(65, yatila.ParallelAttackSequence.Streams[2].Attack.MinDamage);
             Assert.AreEqual(120, yatila.ParallelAttackSequence.Streams[3].Attack.MinDamage);
+            Assert.IsTrue(yatila.ParallelAttackSequence.Streams.All(
+                value => value.Attack.AttackInfoHitType
+                         == NpcCombatAttackRules.NormalAttackInfoHitType));
             Assert.AreEqual(3, yatila.ParallelAttackSequence.SpecialAttacks.Length);
             Assert.AreEqual(413, yatila.ParallelAttackSequence.SpecialAttackWeaponUnknown1);
             Assert.AreEqual(33, yatila.ParallelAttackSequence.SpecialAttackWeaponUnknown4);
 
-            Assert.AreEqual(37, CapturedTempleOfThreeWindsCombatCatalog.ReverendGulard().SpecialAttackSequence.RepeatingAttack.MaxDamage);
-            Assert.AreEqual(72, CapturedTempleOfThreeWindsCombatCatalog.ReAnimator().SpecialAttackSequence.RepeatingAttack.MaxDamage);
-            Assert.AreEqual(30, CapturedTempleOfThreeWindsCombatCatalog.AcolyteBetany().SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            CapturedEnemyCombatContract[] simpleNamedContracts =
+            {
+                CapturedTempleOfThreeWindsCombatCatalog.ReverendGulard(),
+                CapturedTempleOfThreeWindsCombatCatalog.ReAnimator(),
+                CapturedTempleOfThreeWindsCombatCatalog.AcolyteBetany()
+            };
+            Assert.AreEqual(37, simpleNamedContracts[0].SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(72, simpleNamedContracts[1].SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            Assert.AreEqual(30, simpleNamedContracts[2].SpecialAttackSequence.RepeatingAttack.MaxDamage);
+            Assert.IsTrue(simpleNamedContracts.All(
+                value => value.SpecialAttackSequence.RepeatingAttack.AttackInfoHitType
+                         == NpcCombatAttackRules.NormalAttackInfoHitType));
 
             CapturedEnemyCombatContract curator =
                 CapturedTempleOfThreeWindsCombatCatalog.TheCurator();
@@ -198,6 +266,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1465538645, curator.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance);
             Assert.AreEqual(381, curator.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
             Assert.AreEqual(31, curator.SpecialAttackSequence.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                curator.SpecialAttackSequence.RepeatingAttack.AttackInfoHitType);
 
             CapturedEnemyCombatContract nematet =
                 CapturedTempleOfThreeWindsCombatCatalog.NematetTheCustodianOfTime();
@@ -212,6 +283,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual("USW1", nematet.ParallelAttackSequence.SpecialAttacks[3].Name);
             Assert.AreEqual(494, nematet.ParallelAttackSequence.SpecialAttackWeaponUnknown1);
             Assert.AreEqual(38, nematet.ParallelAttackSequence.SpecialAttackWeaponUnknown4);
+            Assert.IsTrue(nematet.ParallelAttackSequence.Streams.All(
+                value => value.Attack.AttackInfoHitType
+                         == NpcCombatAttackRules.NormalAttackInfoHitType));
 
             CapturedEnemyCombatContract guardian =
                 CapturedTempleOfThreeWindsCombatCatalog.GuardianOfTomorrow();
@@ -225,6 +299,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual("SFTN", guardian.ParallelAttackSequence.SpecialAttacks[1].Name);
             Assert.AreEqual(511, guardian.ParallelAttackSequence.SpecialAttackWeaponUnknown1);
             Assert.AreEqual(39, guardian.ParallelAttackSequence.SpecialAttackWeaponUnknown4);
+            Assert.IsTrue(guardian.ParallelAttackSequence.Streams.All(
+                value => value.Attack.AttackInfoHitType
+                         == NpcCombatAttackRules.NormalAttackInfoHitType));
 
             CapturedEnemyCombatContract gartua =
                 CapturedTempleOfThreeWindsCombatCatalog.GartuaTheDoorkeeper();
@@ -233,6 +310,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(6, gartua.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot);
             Assert.AreEqual(382, gartua.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
             Assert.AreEqual(37, gartua.SpecialAttackSequence.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                gartua.SpecialAttackSequence.RepeatingAttack.AttackInfoHitType);
 
             LootTableDefinition table =
                 CapturedTempleOfThreeWindsLootDefinitions.BuildDefenderLootTable();

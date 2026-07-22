@@ -32,15 +32,7 @@ namespace AORebirth.Core.Playfields
                 OrdinaryEnemyEvidenceState.Policy);
 
         private static readonly CapturedEnemyCombatContract CultistCombat =
-            CapturedEnemyCombatContract.FixedAttack(
-                EvidenceReference + ":60 normal local-player hits 15..32;2 criticals 42..58 report-only",
-                15,
-                32,
-                CapturedMedianAttackIntervalSeconds,
-                6,
-                0,
-                0,
-                -1);
+            CapturedTempleOfThreeWindsCombatCatalog.Cultist(26074, 20);
 
         private static readonly CapturedEnemyCombatContract EternalSentinelCombat =
             CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel();
@@ -353,7 +345,9 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyDamageSource.CapturedFixed,
                     false,
                     EternalSentinelCombat,
-                    OrdinaryEnemyEvidenceState.Observed),
+                    OrdinaryEnemyEvidenceState.Observed,
+                    contractResolver: level =>
+                        CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel(level)),
                 BuildEternalSentinelLoot(evidence),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,
@@ -646,7 +640,11 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyDamageSource.CapturedFixed,
                     false,
                     CultistCombat,
-                    OrdinaryEnemyEvidenceState.Observed),
+                    OrdinaryEnemyEvidenceState.Observed,
+                    contractResolver: level =>
+                        CapturedTempleOfThreeWindsCombatCatalog.Cultist(
+                            seed.MonsterData,
+                            level)),
                 BuildLoot(seed.MonsterData),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,

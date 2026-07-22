@@ -13,8 +13,11 @@ namespace AORebirth.Core.Playfields
         internal const string DefenderSpecialAttackName = "WZXU";
 
         internal const double TempleNamedMeleeRechargePolicySeconds = 3.2;
+        internal const double CultistFirstSuccessfulHitDelaySeconds = 2.129326;
+        internal const double CultistRechargeSeconds = 4.635295;
         internal const double YatilaOnePerFightStreamRechargePolicySeconds = 600.0;
         internal const double EternalSentinelRechargeSeconds = 5.67;
+        internal const double EternalSentinelFirstSuccessfulHitDelaySeconds = 5.5659245;
         internal const double CuratorFirstSuccessfulHitDelaySeconds = 3.3000414;
         internal const double CuratorRechargeSeconds = 5.8796741;
         internal const double NematetSlotTwoFirstHitDelaySeconds = 18.9557914;
@@ -42,7 +45,7 @@ namespace AORebirth.Core.Playfields
                 -1,
                 0,
                 0,
-                0,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
                 DefenderAttackInfoWeaponInstance,
                 true);
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
@@ -277,15 +280,51 @@ namespace AORebirth.Core.Playfields
 
         internal static CapturedEnemyCombatContract EternalSentinel()
         {
-            return CapturedEnemyCombatContract.FixedAttack(
-                "20260721-041439/043204: Eternal Sentinel normal hits 17..18; critical 41 is report-only",
-                17,
-                18,
-                EternalSentinelRechargeSeconds,
-                6,
-                0,
-                0,
-                -1);
+            return EternalSentinel(20);
+        }
+
+        internal static CapturedEnemyCombatContract EternalSentinel(int level)
+        {
+            int contextValue = level >= 20 ? 109 : 103;
+            int contextUnknown4 = level >= 20 ? 12 : 11;
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260721-043204: Eternal Sentinel attack start sends an empty "
+                + "SpecialAttackWeapon context and Attack before slot-6, instance-0, normal "
+                + "AttackInfo; level 19 used 103/103/103/11/0 and level 20 used "
+                + "109/109/109/12/0; active level-18 anchors use the captured level-19 "
+                + "context as an explicit nearest-generation packet-shape policy",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    EternalSentinelFirstSuccessfulHitDelaySeconds,
+                    null,
+                    Attack(17, 18, EternalSentinelRechargeSeconds, 6, -1, 0),
+                    new CapturedEnemySpecialAttackDefinition[0],
+                    contextValue,
+                    contextValue,
+                    contextValue,
+                    contextUnknown4,
+                    0));
+        }
+
+        internal static CapturedEnemyCombatContract Cultist(int monsterData, int level)
+        {
+            int contextValue = CultistContextValue(level);
+            int contextUnknown1 = monsterData == 26135
+                                      ? contextValue + 20
+                                      : contextValue;
+            return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260721 Temple capture corpus: ordinary Cultists send an empty "
+                + "SpecialAttackWeapon context and Attack before slot-6, instance-0, "
+                + "normal AttackInfo; level 20..35 context values are fully observed",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    CultistFirstSuccessfulHitDelaySeconds,
+                    null,
+                    Attack(15, 32, CultistRechargeSeconds, 6, -1, 0),
+                    new CapturedEnemySpecialAttackDefinition[0],
+                    contextUnknown1,
+                    contextValue,
+                    contextValue,
+                    CultistContextUnknown4(level),
+                    0));
         }
 
         internal static CapturedEnemyCombatContract MurialTheFaithful()
@@ -393,9 +432,69 @@ namespace AORebirth.Core.Playfields
                 ammoCount,
                 weaponSlot,
                 0,
-                0,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
                 weaponInstance,
                 true);
+        }
+
+        private static int CultistContextValue(int level)
+        {
+            switch (level)
+            {
+                case 20: return 305;
+                case 21: return 320;
+                case 22: return 336;
+                case 23: return 351;
+                case 24: return 367;
+                case 25: return 382;
+                case 26: return 400;
+                case 27: return 416;
+                case 28: return 434;
+                case 29: return 450;
+                case 30: return 468;
+                case 31: return 484;
+                case 32: return 502;
+                case 33: return 518;
+                case 34: return 535;
+                case 35: return 552;
+                default:
+                    throw new System.InvalidOperationException(
+                        "No captured Temple Cultist attack context for level " + level + ".");
+            }
+        }
+
+        private static int CultistContextUnknown4(int level)
+        {
+            switch (level)
+            {
+                case 20:
+                case 21:
+                    return 12;
+                case 22:
+                case 23:
+                    return 13;
+                case 24:
+                case 25:
+                    return 14;
+                case 26:
+                case 27:
+                    return 16;
+                case 28:
+                case 29:
+                    return 17;
+                case 30:
+                case 31:
+                    return 18;
+                case 32:
+                case 33:
+                    return 19;
+                case 34:
+                case 35:
+                    return 20;
+                default:
+                    throw new System.InvalidOperationException(
+                        "No captured Temple Cultist attack context for level " + level + ".");
+            }
         }
     }
 }
