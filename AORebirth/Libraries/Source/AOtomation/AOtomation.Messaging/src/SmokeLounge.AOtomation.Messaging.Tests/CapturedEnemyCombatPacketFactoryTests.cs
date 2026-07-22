@@ -28,6 +28,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private const int LocalPlayerIdentity = unchecked((int)0x70CBBEF3);
 
         [TestMethod]
+        public void CapturedDamageObservationsAdvanceIndependentlyPerActorAndAttackStream()
+        {
+            var cursor = new CapturedIntObservationCursor();
+            int[] leftStream = { 11, 12 };
+            int[] rightStream = { 21, 22, 23 };
+
+            Assert.AreEqual(11, cursor.Select(100, leftStream));
+            Assert.AreEqual(21, cursor.Select(100, rightStream));
+            Assert.AreEqual(12, cursor.Select(100, leftStream));
+            Assert.AreEqual(22, cursor.Select(100, rightStream));
+            Assert.AreEqual(11, cursor.Select(200, leftStream));
+
+            cursor.Clear(100);
+            Assert.AreEqual(11, cursor.Select(100, leftStream));
+            Assert.AreEqual(21, cursor.Select(100, rightStream));
+        }
+
+        [TestMethod]
         public void KnownGoodSubwayThiefAndCultistUseTheSharedFactoryWithCaptureExactBytes()
         {
             Identity thief = SimpleChar(ThiefSourceIdentity);
@@ -72,6 +90,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     Weapon(unchecked((int)0x257EF84A)),
                     cultistContract.WeaponDefinition,
                     13));
+            AssertHex(
+                "3B1D22680000C74A257EF84A000000000B0000C3507984B379000E5010000F424F0000000001060000276A000000000000040300000017000232E7000002BD00000018000002BE000232E7000002BF000232E80000019C000000070000001A0000000D00000126000000EB000000D2000000EB00000000",
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    cultist,
+                    938000,
+                    Weapon(unchecked((int)0x257EF84A)),
+                    cultistContract.WeaponDefinition,
+                    13,
+                    7));
 
             CapturedEnemyCombatContract thiefStart = ThiefAttackStartContract();
             Assert.IsTrue(thiefStart.IsCombatReady);
@@ -211,6 +238,69 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     unchecked((int)0x7983FB93),
                     29).IsCombatReady,
                 "A critical-only observation must not be normalized into an ordinary-hit contract.");
+        }
+
+        [TestMethod]
+        public void MarcusCapturedZeroEnergyAndAmmoRemainStableWhileAmbiguousSawStateStaysQuarantined()
+        {
+            const int marcusSourceIdentity = unchecked((int)0x78E0FC62);
+            CapturedEnemyCombatProfileDefinition marcus =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ResourceId == 6553
+                             && value.Name == "Marcus Stone"
+                             && value.MonsterData == 258744
+                             && value.Level == 15
+                             && value.ContainsSource(marcusSourceIdentity));
+            CapturedEnemyCombatProfileStreamDefinition stream = marcus.Streams.Single(
+                value => value.DamageTypeWire == 0);
+
+            Assert.IsNotNull(marcus.WeaponDefinition);
+            Assert.AreEqual(0, marcus.WeaponDefinition.InitialEnergy);
+            Assert.AreEqual(0, stream.InitialAmmoCount);
+            Assert.IsTrue(marcus.CaptureEvidenceSafe);
+            Assert.IsFalse(marcus.DeterministicRuntimeInitializationProven);
+            Assert.IsFalse(marcus.CaptureRuntimeEvidenceSafe);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    marcus.ResourceId,
+                    marcus.Name,
+                    marcus.MonsterData,
+                    marcus.Level,
+                    marcusSourceIdentity,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "Marcus mutable-state quarantine test",
+                        true),
+                    out resolved,
+                    out failure));
+            StringAssert.Contains(failure, "explicitly unsafe for runtime replay");
+            Assert.IsFalse(resolved.IsCombatReady);
+
+            AttackInfoMessage attackInfo = CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                SimpleChar(marcusSourceIdentity),
+                SimpleChar(LocalPlayerIdentity),
+                stream.MinimumObservedDamage,
+                0,
+                stream.WeaponSlot,
+                stream.DamageTypeWire,
+                stream.HitTypeWire,
+                stream.WeaponInstance,
+                stream.N3Unknown);
+            Assert.AreEqual(0, attackInfo.Unknown2);
+
+            string runtime = File.ReadAllText(
+                Path.Combine(
+                    FindRepositoryRoot(),
+                    "AORebirth",
+                    "Server",
+                    "ZoneEngine",
+                    "Core",
+                    "Playfields",
+                    "CapturedEnemyCombatContract.cs"));
+            Assert.IsTrue(runtime.Contains("if (energy == 0)"));
+            Assert.IsFalse(runtime.Contains("currentEnergy != -1 && currentEnergy <= 0"));
         }
 
         [TestMethod]
@@ -412,6 +502,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo("));
             Assert.IsTrue(coordinator.Contains("CreateCapturedCleaningRobotSpecialAttacks(),"));
             Assert.IsTrue(visibility.Contains("CapturedEnemyCombatPacketFactory.CreateWeaponDefinition("));
+            Assert.IsTrue(visibility.Contains("item.MultipleCount"));
             Assert.IsFalse(coordinator.Contains("SendIncomingHitChatIfPlayer"));
             Assert.IsFalse(coordinator.Contains("hit you for"));
             Assert.IsFalse(templeCatalog.Contains("new AttackInfoMessage"));
@@ -438,18 +529,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(contractRuntime.Contains("internal bool MatchesCapturedWeapon(IItem item)"));
             Assert.IsTrue(contractRuntime.Contains("TryGetCapturedWeaponItem"));
             Assert.IsTrue(contractRuntime.Contains("ReferenceEquals(item, registeredItem)"));
-            Assert.IsTrue(contractRuntime.Contains("currentEnergy != -1 && currentEnergy <= 0"));
+            Assert.IsTrue(contractRuntime.Contains("if (energy == 0)"));
+            Assert.IsTrue(contractRuntime.Contains("if (currentEnergy < -1"));
+            Assert.IsFalse(contractRuntime.Contains("currentEnergy != -1 && currentEnergy <= 0"));
             Assert.IsTrue(contractRuntime.Contains("captured weapon Energy is exhausted"));
             Assert.IsTrue(functionHit.Contains("CapturedEnemyCombatFunctionHitQuarantined"));
             Assert.IsTrue(npcRuntime.Contains("Captured enemy taunt refused"));
             Assert.IsTrue(npcRuntime.Contains("!NpcAiProfiles.CanRetaliate(npcController.AiProfile)"));
             Assert.IsTrue(otherImplementedHostileEntryPoints.All(
                 path => File.ReadAllText(path).Contains("CapturedEnemyCombatRuntime.Prepare")));
-            Assert.AreEqual(2, sourceOwnedWeaponCallers.Length);
+            Assert.AreEqual(3, sourceOwnedWeaponCallers.Length);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
                     "CapturedEnemyCombatContract.cs",
+                    "CapturedEnemyCombatProfileCatalog.cs",
                     "CapturedTempleOfThreeWindsCombatCatalog.cs"
                 },
                 sourceOwnedWeaponCallers.Select(Path.GetFileName).ToArray());

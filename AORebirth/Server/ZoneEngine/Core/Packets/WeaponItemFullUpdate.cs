@@ -239,7 +239,8 @@ namespace ZoneEngine.Core.Packets
                 character.Playfield.Identity.Instance,
                 WeaponItemIdentity.GetOrCreate(item),
                 contract.WeaponDefinition,
-                currentEnergy);
+                currentEnergy,
+                item.MultipleCount);
         }
 
         public static void SendRightHandWeaponDefinition(ICharacter character, bool announceToPlayfield = false)
