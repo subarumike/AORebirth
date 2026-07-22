@@ -68,6 +68,7 @@
     <Compile Include="DebuggingSerializerTests.cs" />
     <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="CapturedEnemyCombatContractTestStub.cs" />
+    <Compile Include="CapturedEnemyCombatPacketFactoryTests.cs" />
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
@@ -191,6 +192,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs">
       <Link>CapturedTempleOfThreeWindsCombatCatalog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs">
+      <Link>CapturedEnemyCombatPacketFactory.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
       <Link>CapturedTempleOfThreeWindsLootDefinitions.cs</Link>

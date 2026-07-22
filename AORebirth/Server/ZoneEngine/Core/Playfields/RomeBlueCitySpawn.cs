@@ -328,6 +328,16 @@ namespace AORebirth.Core.Playfields
             ApplyAppearance(mob, def);
             mob.Coordinates(new Coordinate { x = def.X, y = def.Y, z = def.Z });
 
+            string combatFailure;
+            CapturedEnemyCombatRuntime.Prepare(
+                mob,
+                npcController,
+                CapturedEnemyCombatContract.Unresolved(
+                    "20260717-210219 Rome Blue captured actor has no source-local WIFU/attack-start/AttackInfo contract mapped; npc="
+                    + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
+                    true),
+                out combatFailure);
+
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);

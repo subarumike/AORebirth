@@ -86,7 +86,13 @@ namespace ZoneEngine.Core.Missions
                 2.0,
                 NpcCombatAttackRules.NpcUnarmedRightAttackInfoWeaponSlot,
                 0,
-                NpcCombatAttackRules.NpcUnarmedRightAttackInfoWeaponInstance);
+                NpcCombatAttackRules.NpcUnarmedRightAttackInfoWeaponInstance,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0);
             string failure;
             return CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out failure);
         }

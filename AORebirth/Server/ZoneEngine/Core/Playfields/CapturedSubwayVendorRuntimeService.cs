@@ -84,6 +84,7 @@ namespace ZoneEngine.Core.Playfields
                 Character character = entity as Character;
                 if (character != null)
                 {
+                    CapturedEnemyCombatRuntimeRegistry.Remove(character.Identity.Instance);
                     Pool.Instance.RemoveObject(character);
                     continue;
                 }
@@ -173,6 +174,18 @@ namespace ZoneEngine.Core.Playfields
                         new AORebirth.Core.Vector.Vector3(waypoint.X, waypoint.Y, waypoint.Z),
                         false);
                 }
+
+                string combatFailure;
+                CapturedEnemyCombatRuntime.Prepare(
+                    character,
+                    controller,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "Captured Subway merchant 0x"
+                        + definition.SourceNpcInstance.ToString("X8")
+                        + " has no source-local WIFU/attack-start/AttackInfo contract mapped; evidence="
+                        + definition.Evidence,
+                        true),
+                    out combatFailure);
 
                 character.DoNotDoTimers = true;
                 return character;

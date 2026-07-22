@@ -52,6 +52,41 @@ namespace AORebirth.Core.Playfields
         private static readonly Dictionary<string, OrdinaryEnemySpawnPolicyConfiguration>
             CapturedOrdinarySpawnPolicies = BuildCapturedOrdinarySpawnPolicies();
 
+        private static readonly HashSet<int> CoherentSubwayOrdinaryCombatSources =
+            new HashSet<int>
+            {
+                unchecked((int)0x7953A9BDu), unchecked((int)0x7953AFDAu),
+                unchecked((int)0x795451C5u), unchecked((int)0x79574527u),
+                unchecked((int)0x7954519Bu), unchecked((int)0x79513A8Fu),
+                unchecked((int)0x7954516Au), unchecked((int)0x795451AEu),
+                unchecked((int)0x795451BCu), unchecked((int)0x7953AA1Au),
+                unchecked((int)0x79545150u), unchecked((int)0x7954514Fu),
+                unchecked((int)0x79545153u), unchecked((int)0x795451A6u),
+                unchecked((int)0x795451C9u), unchecked((int)0x79545190u),
+                unchecked((int)0x79545196u), unchecked((int)0x79545187u),
+                unchecked((int)0x79545198u), unchecked((int)0x795451DDu),
+                unchecked((int)0x7954517Bu), unchecked((int)0x79545174u),
+                unchecked((int)0x795451B5u), unchecked((int)0x795451C2u),
+                unchecked((int)0x7953AA11u), unchecked((int)0x7957E5C7u),
+                unchecked((int)0x7957E5C8u), unchecked((int)0x7957E5C6u),
+                unchecked((int)0x7957E5CAu), unchecked((int)0x7954516Bu),
+                unchecked((int)0x7954516Cu), unchecked((int)0x7952880Bu),
+                unchecked((int)0x7952882Au), unchecked((int)0x7953AA55u),
+                unchecked((int)0x79528817u), unchecked((int)0x79528828u),
+                unchecked((int)0x7953AA1Cu), unchecked((int)0x7953AA53u),
+                unchecked((int)0x7953AA56u), unchecked((int)0x7953AA2Au),
+                unchecked((int)0x7953AA33u), unchecked((int)0x7953AA2Bu),
+                unchecked((int)0x7953AFF7u), unchecked((int)0x79545201u),
+                unchecked((int)0x7953A993u), unchecked((int)0x7953AF7Bu),
+                unchecked((int)0x7954506Fu), unchecked((int)0x79545083u),
+                unchecked((int)0x795450F8u), unchecked((int)0x7953AA4Bu),
+                unchecked((int)0x79545202u), unchecked((int)0x7953AA16u),
+                unchecked((int)0x7953AABEu), unchecked((int)0x7953AB03u),
+                unchecked((int)0x7953AFB8u), unchecked((int)0x7953AA77u),
+                unchecked((int)0x7953AFBCu), unchecked((int)0x7953AFDDu),
+                unchecked((int)0x79545000u)
+            };
+
         private static readonly OrdinaryEnemyAggressionProfile RetaliateChasingAggression =
             new OrdinaryEnemyAggressionProfile(
                 OrdinaryEnemyAggressionMode.Retaliate,
@@ -383,13 +418,21 @@ namespace AORebirth.Core.Playfields
                 uint appearance = archetype.AppearanceValue;
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
-                    archetype.MonsterData == DerangedShopperMonsterData
-                    || archetype.MonsterData == LooterMonsterData
+                    archetype.SourceWeaponEvidence.Length > 0
+                    || archetype.MonsterData
+                       == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
-                                CapturedSubwayCombatCatalog.ForOrdinary(
-                                    archetype,
-                                    sourceIdentity))
+                                CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
+                                    ? CapturedSubwayCombatCatalog.ForOrdinary(
+                                        archetype,
+                                        sourceIdentity)
+                                    : CapturedEnemyCombatContract.Unresolved(
+                                        string.Format(
+                                            CultureInfo.InvariantCulture,
+                                            "No coherent same-capture Subway attack chain for source 0x{0:X8}",
+                                            sourceIdentity),
+                                        archetype.Combat != null && archetype.Combat.Observed))
                         : null;
                 Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>
                     sourceVariantContractResolver =
@@ -399,13 +442,20 @@ namespace AORebirth.Core.Playfields
                         || archetype.MonsterData == FragmentedSoulMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
                                 (sourceIdentity, variant) =>
-                                    CapturedSubwayCombatCatalog.ForOrdinary(
-                                        archetype,
-                                        sourceIdentity,
-                                        variant,
-                                        content.GetGenerationVariants(
-                                            archetype.MonsterData,
-                                            sourceIdentity)))
+                                    CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
+                                        ? CapturedSubwayCombatCatalog.ForOrdinary(
+                                            archetype,
+                                            sourceIdentity,
+                                            variant,
+                                            content.GetGenerationVariants(
+                                                archetype.MonsterData,
+                                                sourceIdentity))
+                                        : CapturedEnemyCombatContract.Unresolved(
+                                            string.Format(
+                                                CultureInfo.InvariantCulture,
+                                                "No coherent same-capture Subway attack chain for source 0x{0:X8}",
+                                                sourceIdentity),
+                                            archetype.Combat != null && archetype.Combat.Observed))
                             : null;
                 CapturedSubwayStrictLootProfileDefinition strictLootProfile =
                     content.GetStrictLootProfile(archetype.MonsterData);
@@ -794,25 +844,8 @@ namespace AORebirth.Core.Playfields
                 value => value.MonsterData == ViolentVagabondMonsterData);
             CapturedEnemyCombatContract contract = profile.Combat.Contract;
             if (contract == null
-                || !contract.IsCombatReady
-                || contract.AttackModel != CapturedEnemyAttackModel.Specialized
-                || contract.WeaponLowId == 130590
-                || contract.WeaponHighId == 130590
-                || contract.SpecialAttackSequence == null
-                || contract.SpecialAttackSequence.OpeningAttack != null
-                || contract.SpecialAttackSequence.RepeatingAttack == null
-                || contract.SpecialAttackSequence.RepeatingAttack.MinDamage
-                   != NpcCombatAttackRules.PolicySubwayViolentVagabondMinimumDamage
-                || contract.SpecialAttackSequence.RepeatingAttack.MaxDamage
-                   != NpcCombatAttackRules.PolicySubwayViolentVagabondMaximumDamage
-                || contract.SpecialAttackSequence.RepeatingAttack.RechargeSeconds
-                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackSeconds
-                || contract.SpecialAttackSequence.RepeatingAttack.AttackInfoAmmoCount
-                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoAmmoCount
-                || contract.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot
-                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponSlot
-                || contract.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance
-                   != NpcCombatAttackRules.CapturedSubwayViolentVagabondAttackInfoWeaponInstance
+                || contract.IsCombatReady
+                || contract.AttackModel != CapturedEnemyAttackModel.Unresolved
                 || profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Retaliate
                 || profile.Aggression.AutomaticAggroRadius.HasValue
                 || !profile.Aggression.Chase
