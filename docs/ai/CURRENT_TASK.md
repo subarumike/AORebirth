@@ -23,4 +23,4 @@
 4. Stan factory deliver with active tip
 
 ### Upstream (merged from origin)
-Subway PF127 + Temple of Three Winds continue on master. PF647 is the Temple transfer/gateway; PF1931 owns the dungeon rooms, population, and loot, now including Guardian of Tomorrow, Gartua the Doorkeeper with his captured three-point path, and 27 added main-room/hallway Cultist anchors. Uklesh and the remaining named main-room actors are evidence-only. See `docs/project/PROJECT_STATE.md` and TOTW evidence docs for that track.
+Subway PF127 + Temple of Three Winds continue on master. PF647 is the Temple transfer/gateway; PF1931 owns the dungeon rooms, population, and loot, now including Guardian of Tomorrow, Gartua the Doorkeeper with his captured three-point path, Murial the Faithful with his complete 20-point patrol, and 27 added main-room/hallway Cultist anchors. Uklesh and the remaining named main-room actors are evidence-only. See `docs/project/PROJECT_STATE.md` and TOTW evidence docs for that track.

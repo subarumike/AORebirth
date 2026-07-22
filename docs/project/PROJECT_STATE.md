@@ -4,18 +4,28 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Murial the Faithful is active in the PF1931 Temple ordinary provider from
+  identity-linked captures `20260721-232051` and `20260721-234614`. His exact
+  L34/1,535-health SCFU, appearance, 26-point melee stream, CATMesh `5927`, and
+  ordered 20-destination patrol are promoted. Two complete official-live loops
+  took `104.2935936` and `107.0382618` seconds; the generic private waypoint
+  runtime now needs in-client timing verification. PF1931 ordinary content is
+  now nine profiles / `153` anchors. Murial loot, nano `70294`, and exact
+  Murial-specific respawn remain unresolved; runtime uses the shared 300-second
+  ordinary policy. Evidence:
+  `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_MURIAL_PATROL.md`.
+
 - Guardian of Tomorrow and Gartua the Doorkeeper are active PF1931 Temple bosses.
   Captures `20260721-230426` and `20260721-230824` provide exact SCFUs, combat,
   corpses, and atomic loot snapshots. Mike's measured ten-minute respawns are
   represented by the named-Temple 600-second post-NPC-despawn policy; Guardian
   keeps a 1,800-second unlooted corpse and Gartua keeps 120 seconds. Gartua's
   nano `205590` preserves its observed self-targeting without inventing its
-  downstream stat effect. Room evidence now supplies 27 exact Cultist anchors,
-  bringing PF1931 ordinary content to eight profiles / `152` anchors. Capture
+  downstream stat effect. Room evidence supplies 27 exact Cultist anchors. Capture
   `20260721-232051` adds five hallway anchors, Gartua's exact three-point path,
   and three more approximately 310-second death-to-replacement chains that
   corroborate the 300-second post-NPC-despawn ordinary respawn policy.
-  Uklesh and the remaining named main-room actors remain evidence-only. Evidence:
+  Uklesh and the other remaining named main-room actors remain evidence-only. Evidence:
   `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_GUARDIAN_GARTUA_MAIN_ROOM.md`.
 
 - The Curator and Nematet the Custodian of Time are active as the next PF1931

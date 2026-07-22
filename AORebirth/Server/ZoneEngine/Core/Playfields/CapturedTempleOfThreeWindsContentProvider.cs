@@ -10,13 +10,15 @@ namespace AORebirth.Core.Playfields
         internal const int PlayfieldInstance = 1931;
         internal const int ExpectedCultistProfileCount = 7;
         internal const int ExpectedCultistSpawnCount = 149;
-        internal const int ExpectedProfileCount = 8;
-        internal const int ExpectedSpawnCount = 152;
+        internal const int ExpectedProfileCount = 9;
+        internal const int ExpectedSpawnCount = 153;
         internal const double CapturedDeathToRespawnSeconds = 310.0;
         internal const double RuntimeRespawnAfterNpcDespawnSeconds = 300.0;
         internal const double PolicyAutomaticAggroRadius = 7.0;
         internal const double CapturedMaximumObservedChaseDistance = 60.421;
         internal const double CapturedMedianAttackIntervalSeconds = 4.635295;
+        internal const string MurialProfileKey =
+            "totw.ordinary.main-room.murial-the-faithful.26090";
 
         private const string EvidenceReference =
             "20260721-030515,20260721-031913,20260721-032247,20260721-032547,20260721-033006";
@@ -42,6 +44,9 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CapturedEnemyCombatContract EternalSentinelCombat =
             CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel();
+
+        private static readonly CapturedEnemyCombatContract MurialCombat =
+            CapturedTempleOfThreeWindsCombatCatalog.MurialTheFaithful();
 
         private static readonly RespawnPolicyDefinition CultistRespawn =
             new RespawnPolicyDefinition
@@ -269,7 +274,7 @@ namespace AORebirth.Core.Playfields
         {
             OrdinaryEnemyProfile[] profiles = ProfileSeeds
                 .Select(BuildProfile)
-                .Concat(new[] { BuildEternalSentinelProfile() })
+                .Concat(new[] { BuildEternalSentinelProfile(), BuildMurialProfile() })
                 .OrderBy(value => value.ProfileKey, StringComparer.Ordinal)
                 .ToArray();
             if (profiles.Length != ExpectedProfileCount)
@@ -288,6 +293,7 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnDefinition[] spawns = SpawnSeeds
                 .Select(seed => BuildSpawn(seed, profiles[seed.ProfileKey]))
                 .Concat(BuildEternalSentinelSpawns())
+                .Concat(new[] { BuildMurialSpawn() })
                 .OrderBy(value => value.SourceIdentity)
                 .ToArray();
             if (spawns.Length != ExpectedSpawnCount
@@ -459,6 +465,136 @@ namespace AORebirth.Core.Playfields
                 string.Empty,
                 "20260721-041439",
                 string.Empty,
+                null,
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
+        }
+
+        private static OrdinaryEnemyProfile BuildMurialProfile()
+        {
+            const string evidence =
+                "20260721-232051/234614: identity-linked Murial SCFU, melee outcomes, "
+                + "corpse lifecycle, and complete 20-destination patrol loop";
+            return new OrdinaryEnemyProfile(
+                MurialProfileKey,
+                "totw.ordinary.main-room.faithful",
+                "Murial the Faithful",
+                26090,
+                OrdinaryEnemyConstructionMode.CapturedDirect,
+                string.Empty,
+                new OrdinaryEnemyAppearanceProfile(
+                    3,
+                    1,
+                    1,
+                    3,
+                    1,
+                    268964353,
+                    0,
+                    0,
+                    136,
+                    0,
+                    31,
+                    1,
+                    1835u,
+                    40629,
+                    true,
+                    false,
+                    new[]
+                    {
+                        new OrdinaryEnemyTextureProfile(0, 0, 0),
+                        new OrdinaryEnemyTextureProfile(1, 161711, 0),
+                        new OrdinaryEnemyTextureProfile(2, 161716, 0),
+                        new OrdinaryEnemyTextureProfile(3, 161706, 0),
+                        new OrdinaryEnemyTextureProfile(4, 161726, 0)
+                    },
+                    new[]
+                    {
+                        new OrdinaryEnemyMeshProfile(0, 20091u, 161721, 2),
+                        new OrdinaryEnemyMeshProfile(0, 40629u, 0, 4),
+                        new OrdinaryEnemyMeshProfile(1, 7818u, 0, 2)
+                    },
+                    OrdinaryEnemyScfuProfile.CapturedExact),
+                CultistAggression,
+                new OrdinaryEnemyCombatProfile(
+                    OrdinaryEnemyCombatMode.EquippedMelee,
+                    OrdinaryEnemyDamageSource.CapturedFixed,
+                    true,
+                    MurialCombat,
+                    OrdinaryEnemyEvidenceState.Observed),
+                new OrdinaryEnemyLootProfile(
+                    OrdinaryEnemyLootEvidence.NoneProven,
+                    new OrdinaryEnemyLootEntry[0],
+                    OrdinaryEnemyEvidenceState.Unresolved,
+                    null,
+                    null),
+                new OrdinaryEnemyCorpseProfile(
+                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    30.0,
+                    180.0,
+                    30.0,
+                    5927,
+                    evidence),
+                new[] { evidence },
+                false,
+                false);
+        }
+
+        private static OrdinaryEnemySpawnDefinition BuildMurialSpawn()
+        {
+            OrdinaryEnemyWaypoint[] waypoints =
+            {
+                new OrdinaryEnemyWaypoint(266.339355f, 16.0112476f, 513.76355f),
+                new OrdinaryEnemyWaypoint(266.067688f, 16.611248f, 516.280029f),
+                new OrdinaryEnemyWaypoint(269.56897f, 16.611248f, 519.147278f),
+                new OrdinaryEnemyWaypoint(269.653076f, 16.611248f, 516.142517f),
+                new OrdinaryEnemyWaypoint(269.670929f, 16.0112476f, 513.885925f),
+                new OrdinaryEnemyWaypoint(269.878021f, 15.4112473f, 505.860809f),
+                new OrdinaryEnemyWaypoint(270.092896f, 15.4112473f, 500.121277f),
+                new OrdinaryEnemyWaypoint(270.125061f, 14.8112478f, 497.849426f),
+                new OrdinaryEnemyWaypoint(270.672424f, 14.8112478f, 481.155884f),
+                new OrdinaryEnemyWaypoint(270.995483f, 14.8112478f, 469.628174f),
+                new OrdinaryEnemyWaypoint(272.536194f, 14.8112478f, 458.825562f),
+                new OrdinaryEnemyWaypoint(271.761108f, 14.81108f, 446.147522f),
+                new OrdinaryEnemyWaypoint(271.621277f, 14.8112478f, 459.03479f),
+                new OrdinaryEnemyWaypoint(270.055664f, 14.8112478f, 469.769257f),
+                new OrdinaryEnemyWaypoint(259.240417f, 14.8112478f, 474.301025f),
+                new OrdinaryEnemyWaypoint(269.505005f, 14.8112478f, 481.484863f),
+                new OrdinaryEnemyWaypoint(268.258362f, 14.8112478f, 497.378784f),
+                new OrdinaryEnemyWaypoint(267.785797f, 15.4112473f, 500.433655f),
+                new OrdinaryEnemyWaypoint(267.371582f, 15.4112473f, 505.721039f),
+                new OrdinaryEnemyWaypoint(267.127625f, 16.0112476f, 508.234467f)
+            };
+            return new OrdinaryEnemySpawnDefinition(
+                "totw.ordinary.7987F12D",
+                unchecked((int)0x7987F12Du),
+                MurialProfileKey,
+                PlayfieldInstance,
+                34,
+                1535,
+                0,
+                102,
+                118,
+                271.4782f,
+                14.8112507f,
+                445.842255f,
+                0f,
+                0.04537062f,
+                0f,
+                0.9989702f,
+                OrdinaryEnemyMovementMode.Patrol,
+                waypoints,
+                false,
+                false,
+                true,
+                0x020B4ACBu,
+                0,
+                HexToBytes("00000000000000000000000003010001000100010001000000020000"),
+                0,
+                OrdinaryEnemyEvidenceState.Policy,
+                RuntimeRespawnAfterNpcDespawnSeconds,
+                OrdinaryEnemyRuntimeDisposition.Active,
+                string.Empty,
+                "20260721-232051,20260721-234614",
+                "2026-07-22T04:36:41.2783126Z",
                 null,
                 WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
         }
