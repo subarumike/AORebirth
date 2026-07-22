@@ -62,7 +62,17 @@ flags, and exact SCFU appearance shape.
   Two criticals at `42..58` remain report-only.
 - Twenty-four repeat intervals have a `4.635295`-second median. The captured
   AttackInfo shape is weapon slot `6`, unknown `0`, weapon instance `0`, and
-  ammo count `-1`.
+  normal hit type `3`; the bounded shared packet shape uses ammo count `-1`.
+- Cultist combat starts with an empty `SpecialAttackWeapon` packet followed by
+  `Attack`, not a bare `AttackInfo`. All levels `20..35` have observed context:
+  fields 2/3 are `305,320,336,351,367,382,400,416,434,450,468,484,502,518,535,552`
+  by level; field 1 matches those values except MonsterData `26135`, which has
+  the captured `+20`; field 4 is `12,12,13,13,14,14,16,16,17,17,18,18,19,19,20,20`;
+  field 5 uses an observed zero state. Nineteen direct attack-start samples up
+  to 3.2 seconds have a `2.129326`-second median to first successful hit.
+- Omitting that pre-hit context or replacing slot `6` / instance `0` with
+  generic unarmed-hand tags makes the current client report nanobot-driven
+  `unknown damage`; those abbreviated packet paths are not capture parity.
 - Enemy-first fights prove automatic aggression, chase, and return behavior.
   The exact acquisition threshold is unresolved, so the first private-server
   policy uses the existing conservative seven-meter ordinary aggro radius.
