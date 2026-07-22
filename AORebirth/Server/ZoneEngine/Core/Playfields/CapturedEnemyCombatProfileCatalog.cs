@@ -607,47 +607,51 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            CapturedEnemyCombatProfileDefinition[] compatibleMatches = keyMatches.Where(
+                value => value.CaptureRuntimeEvidenceSafe).ToArray();
+            if (compatibleMatches.Length == 0)
+            {
+                failure = "exact generated profiles are explicitly unsafe for runtime replay";
+                return false;
+            }
+
             CapturedEnemyCombatProfileDefinition[] selected;
             bool exactSourceSelected = false;
-            if (sourceIdentityHint != 0)
+            if (compatibleMatches.Length == 1)
             {
-                selected = keyMatches.Where(value => value.ContainsSource(sourceIdentityHint)).ToArray();
-                if (selected.Length == 1)
-                {
-                    exactSourceSelected = true;
-                }
-                else
-                {
-                    selected = keyMatches.Where(
-                        value => value.SemanticFallbackCaptureProven).ToArray();
-                    if (selected.Length != 1)
-                    {
-                        failure = string.Format(
-                            "captured source {0:X8} has no exact binding and the semantic profile has {1} variants for resource={2} name={3} MonsterData={4} level={5}",
-                            sourceIdentityHint,
-                            keyMatches.Length,
-                            resourceId,
-                            name,
-                            monsterData,
-                            level);
-                        return false;
-                    }
-                }
+                selected = compatibleMatches;
+                exactSourceSelected = sourceIdentityHint != 0
+                                      && selected[0].ContainsSource(sourceIdentityHint);
             }
-            else
+            else if (sourceIdentityHint != 0)
             {
-                selected = keyMatches.Where(value => value.SemanticFallbackCaptureProven).ToArray();
+                selected = compatibleMatches.Where(
+                    value => value.ContainsSource(sourceIdentityHint)).ToArray();
                 if (selected.Length != 1)
                 {
                     failure = string.Format(
-                        "semantic profile is ambiguous: {0} variants for resource={1} name={2} MonsterData={3} level={4}; captured source identity is required",
-                        keyMatches.Length,
+                        "captured source {0:X8} does not distinguish {1} compatible exact contracts for resource={2} name={3} MonsterData={4} level={5}",
+                        sourceIdentityHint,
+                        compatibleMatches.Length,
                         resourceId,
                         name,
                         monsterData,
                         level);
                     return false;
                 }
+
+                exactSourceSelected = true;
+            }
+            else
+            {
+                failure = string.Format(
+                    "exact generated combat profile is ambiguous: {0} compatible contracts for resource={1} name={2} MonsterData={3} level={4}; captured source identity is required",
+                    compatibleMatches.Length,
+                    resourceId,
+                    name,
+                    monsterData,
+                    level);
+                return false;
             }
 
             CapturedEnemyCombatProfileDefinition profile = selected[0];

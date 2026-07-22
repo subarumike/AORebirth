@@ -142,7 +142,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         out ambiguousFailure),
                     "Capture-distinct variants sharing one source must fail closed.");
                 Assert.IsFalse(ambiguousResolved.IsCombatReady);
-                StringAssert.Contains(ambiguousFailure, "no exact binding");
+                Assert.IsTrue(
+                    ambiguousFailure.IndexOf(
+                        "does not distinguish",
+                        StringComparison.Ordinal) >= 0
+                    || ambiguousFailure.IndexOf(
+                        "explicitly unsafe",
+                        StringComparison.Ordinal) >= 0,
+                    ambiguousFailure);
             }
 
             Assert.IsFalse(
@@ -416,10 +423,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void GeneratedRuntimeUnsafeProfilesCannotResolve()
+        public void GeneratedRuntimeUnsafeProfilesAreNeverSelected()
         {
+            CapturedEnemyCombatProfileDefinition[] allProfiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
             CapturedEnemyCombatProfileDefinition[] unsafeProfiles =
-                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                allProfiles.Where(
                     value => !value.CaptureRuntimeEvidenceSafe).ToArray();
             Assert.IsTrue(unsafeProfiles.Length > 0);
 
@@ -427,37 +436,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 CapturedEnemyCombatContract resolved;
                 string failure;
-                Assert.IsFalse(
-                    CapturedEnemyCombatProfileCatalog.TryResolve(
-                        profile.ResourceId,
-                        profile.Name,
-                        profile.MonsterData,
-                        profile.Level,
-                        profile.RepresentativeEvidenceSourceIdentity,
-                        CapturedEnemyCombatContract.Unresolved("runtime-safety test baseline", true),
-                        out resolved,
-                        out failure),
-                    profile.ProfileId);
-                if (failure.IndexOf(
-                        "explicitly unsafe for runtime replay",
-                        StringComparison.Ordinal) < 0)
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    profile.ResourceId,
+                    profile.Name,
+                    profile.MonsterData,
+                    profile.Level,
+                    profile.RepresentativeEvidenceSourceIdentity,
+                    CapturedEnemyCombatContract.Unresolved("runtime-safety test baseline", true),
+                    out resolved,
+                    out failure);
+                if (success)
                 {
-                    int exactVariantCount = CapturedEnemyCombatProfileCatalog
-                        .GetProfilesForTests()
-                        .Count(
-                            value => value.MatchesKey(
-                                         profile.ResourceId,
-                                         profile.Name,
-                                         profile.MonsterData,
-                                         profile.Level)
-                                     && value.ContainsSource(
-                                         profile.RepresentativeEvidenceSourceIdentity));
-                    Assert.IsTrue(
-                        exactVariantCount > 1,
-                        profile.ProfileId + " failed before its runtime-safety guard without exact capture ambiguity: " + failure);
-                    StringAssert.Contains(failure, "no exact binding");
+                    CapturedEnemyCombatProfileDefinition selected = allProfiles.Single(
+                        value => value.MatchesKey(
+                                     profile.ResourceId,
+                                     profile.Name,
+                                     profile.MonsterData,
+                                     profile.Level)
+                                 && value.CaptureRuntimeEvidenceSafe
+                                 && value.Evidence == resolved.Evidence
+                                 && value.ContainsSource(resolved.EvidenceSourceIdentity));
+                    Assert.AreNotEqual(profile.ProfileId, selected.ProfileId);
+                    Assert.IsTrue(resolved.IsCombatReady);
+                    continue;
                 }
+
                 Assert.IsFalse(resolved.IsCombatReady);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
             }
         }
 
@@ -519,9 +524,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatProfileDefinition[] singleStream = profiles.Where(
                 value => value.Streams.Length == 1).ToArray();
             Assert.IsTrue(singleStream.Length > 0);
-            CapturedEnemyCombatProfileDefinition semanticRepresentative = null;
-            var resolutionFailures = new List<string>();
-
+            CapturedEnemyCombatProfileDefinition uniqueCompatibleRepresentative =
+                singleStream.First(
+                    profile => profile.CaptureRuntimeEvidenceSafe
+                               && profiles.Count(
+                                   value => value.MatchesKey(
+                                                profile.ResourceId,
+                                                profile.Name,
+                                                profile.MonsterData,
+                                                profile.Level)
+                                            && value.CaptureRuntimeEvidenceSafe) == 1);
             foreach (CapturedEnemyCombatProfileDefinition profile in singleStream)
             {
                 foreach (int sourceIdentity in profile.SourceIdentities)
@@ -540,9 +552,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
                     if (!success)
                     {
-                        resolutionFailures.Add(
-                            profile.ProfileId + " source=" + sourceIdentity.ToString("X8")
-                            + " " + failure);
                         Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
                         Assert.IsTrue(
                             HasExactInventoryRecord(inventoryProfiles, profile, sourceIdentity),
@@ -554,32 +563,53 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     }
 
                     Assert.IsTrue(resolved.IsCombatReady);
-                    Assert.AreEqual(sourceIdentity, resolved.EvidenceSourceIdentity);
+                    CapturedEnemyCombatProfileDefinition selected = profiles.Single(
+                        value => value.MatchesKey(
+                                     profile.ResourceId,
+                                     profile.Name,
+                                     profile.MonsterData,
+                                     profile.Level)
+                                 && value.CaptureRuntimeEvidenceSafe
+                                 && value.Evidence == resolved.Evidence
+                                 && value.ContainsSource(resolved.EvidenceSourceIdentity));
+                    if (selected.ContainsSource(sourceIdentity))
+                    {
+                        Assert.AreEqual(sourceIdentity, resolved.EvidenceSourceIdentity);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(
+                            1,
+                            profiles.Count(
+                                value => value.MatchesKey(
+                                             profile.ResourceId,
+                                             profile.Name,
+                                             profile.MonsterData,
+                                             profile.Level)
+                                         && value.CaptureRuntimeEvidenceSafe));
+                        Assert.AreEqual(
+                            selected.RepresentativeEvidenceSourceIdentity,
+                            resolved.EvidenceSourceIdentity);
+                    }
+
                     if (resolved.WeaponDefinition != null)
                     {
                         Assert.AreEqual(
-                            sourceIdentity,
+                            resolved.EvidenceSourceIdentity,
                             resolved.WeaponDefinition.EvidenceSourceIdentity);
-                    }
-
-                    if (semanticRepresentative == null && profile.SemanticFallbackCaptureProven)
-                    {
-                        semanticRepresentative = profile;
                     }
                 }
             }
 
-            Assert.IsNotNull(
-                semanticRepresentative,
-                string.Join(" | ", resolutionFailures.Take(10).ToArray()));
+            Assert.IsNotNull(uniqueCompatibleRepresentative);
             CapturedEnemyCombatContract semantic;
             string semanticFailure;
             Assert.IsTrue(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
-                    semanticRepresentative.ResourceId,
-                    semanticRepresentative.Name,
-                    semanticRepresentative.MonsterData,
-                    semanticRepresentative.Level,
+                    uniqueCompatibleRepresentative.ResourceId,
+                    uniqueCompatibleRepresentative.Name,
+                    uniqueCompatibleRepresentative.MonsterData,
+                    uniqueCompatibleRepresentative.Level,
                     0,
                     CapturedEnemyCombatContract.Unresolved("test baseline", true),
                     out semantic,
@@ -590,28 +620,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatContract rejected;
             string rejectedFailure;
             int unknownLevel = FindUnknownLevel(
-                semanticRepresentative,
+                uniqueCompatibleRepresentative,
                 profiles);
             Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
-                    semanticRepresentative.ResourceId,
-                    semanticRepresentative.Name,
-                    semanticRepresentative.MonsterData,
+                    uniqueCompatibleRepresentative.ResourceId,
+                    uniqueCompatibleRepresentative.Name,
+                    uniqueCompatibleRepresentative.MonsterData,
                     unknownLevel,
-                    semanticRepresentative.SourceIdentities[0],
+                    uniqueCompatibleRepresentative.SourceIdentities[0],
                     CapturedEnemyCombatContract.Unresolved("test baseline", true),
                     out rejected,
                     out rejectedFailure));
             Assert.IsFalse(rejected.IsCombatReady);
             Assert.IsFalse(string.IsNullOrWhiteSpace(rejectedFailure));
 
-            int unknownSource = FindUnknownSource(semanticRepresentative.SourceIdentities);
+            int unknownSource = FindUnknownSource(
+                uniqueCompatibleRepresentative.SourceIdentities);
             Assert.IsTrue(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
-                    semanticRepresentative.ResourceId,
-                    semanticRepresentative.Name,
-                    semanticRepresentative.MonsterData,
-                    semanticRepresentative.Level,
+                    uniqueCompatibleRepresentative.ResourceId,
+                    uniqueCompatibleRepresentative.Name,
+                    uniqueCompatibleRepresentative.MonsterData,
+                    uniqueCompatibleRepresentative.Level,
                     unknownSource,
                     CapturedEnemyCombatContract.Unresolved("test baseline", true),
                     out rejected,
@@ -619,15 +650,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 rejectedFailure);
             Assert.IsTrue(rejected.IsCombatReady);
             Assert.AreEqual(
-                semanticRepresentative.RepresentativeEvidenceSourceIdentity,
+                uniqueCompatibleRepresentative.RepresentativeEvidenceSourceIdentity,
                 rejected.EvidenceSourceIdentity);
             Assert.AreNotEqual(unknownSource, rejected.EvidenceSourceIdentity);
 
             IGrouping<string, CapturedEnemyCombatProfileDefinition> ambiguous = profiles
                 .GroupBy(SemanticKey, StringComparer.Ordinal)
-                .First(group => group.Count() > 1
-                                && group.Count(value => value.SemanticFallbackCaptureProven) != 1);
-            CapturedEnemyCombatProfileDefinition ambiguousRepresentative = ambiguous.First();
+                .First(group => group.Count(value => value.CaptureRuntimeEvidenceSafe) > 1);
+            CapturedEnemyCombatProfileDefinition ambiguousRepresentative = ambiguous.First(
+                value => value.CaptureRuntimeEvidenceSafe);
             Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     ambiguousRepresentative.ResourceId,
@@ -640,6 +671,43 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     out rejectedFailure));
             Assert.IsFalse(rejected.IsCombatReady);
             StringAssert.Contains(rejectedFailure, "ambiguous");
+        }
+
+        [TestMethod]
+        public void UniqueCultistProfileResolvesWithoutCapturedSourceIdentityMatch()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x79834DCF);
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "5643a4bd8a3aaf44-9ce155283cfcc36c");
+            Assert.AreEqual(1931, profile.ResourceId);
+            Assert.AreEqual("Cultist", profile.Name);
+            Assert.AreEqual(26103, profile.MonsterData);
+            Assert.AreEqual(28, profile.Level);
+            Assert.IsFalse(profile.ContainsSource(runtimeSourceIdentity));
+            Assert.IsFalse(profile.SemanticFallbackCaptureProven);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    "Cultist",
+                    26103,
+                    28,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "active totw.cultist.26103 source 0x79834DCF",
+                        true),
+                    out resolved,
+                    out failure),
+                failure);
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(
+                profile.RepresentativeEvidenceSourceIdentity,
+                resolved.EvidenceSourceIdentity);
         }
 
         [TestMethod]
@@ -714,14 +782,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CapturedEnemyCombatProfileDefinition[] evidenceMatches = keyMatches.Where(
                         value => value.ContainsSource(
                             resolved.EvidenceSourceIdentity)).ToArray();
+                    CapturedEnemyCombatProfileDefinition[] compatibleKeyMatches =
+                        keyMatches.Where(value => value.CaptureRuntimeEvidenceSafe).ToArray();
                     Assert.AreEqual(1, evidenceMatches.Length);
-                    if (keyMatches.Any(value => value.ContainsSource(spawn.SourceIdentity)))
+                    if (compatibleKeyMatches.Any(
+                            value => value.ContainsSource(spawn.SourceIdentity)))
                     {
                         Assert.AreEqual(spawn.SourceIdentity, resolved.EvidenceSourceIdentity);
                     }
                     else
                     {
-                        Assert.IsTrue(evidenceMatches[0].SemanticFallbackCaptureProven);
+                        Assert.AreEqual(1, compatibleKeyMatches.Length);
                         Assert.AreEqual(
                             evidenceMatches[0].RepresentativeEvidenceSourceIdentity,
                             resolved.EvidenceSourceIdentity);
