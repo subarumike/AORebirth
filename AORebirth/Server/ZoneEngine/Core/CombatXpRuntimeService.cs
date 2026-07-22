@@ -33,6 +33,10 @@ namespace ZoneEngine.Core
     {
         private const int MaxLevel = 220;
         private const int MaxRubikaLevel = 200;
+        /// <summary>First level that uses Shadowknowledge (SK) instead of XP for progression.</summary>
+        private const int ShadowLevelFloor = 200;
+        /// <summary>AO-Universe chart convention: SK * 1000 ≈ XP for comparison.</summary>
+        private const int SkToXpFactor = 1000;
         private const int UnsetStatSentinel = 1234567890;
         private const int CapturedMalfunctioningCleaningRobotXp = 260;
         private const byte CapturedLevelUpStatUnknown = 1;
@@ -100,6 +104,19 @@ namespace ZoneEngine.Core
             LogXpRewardSource(xpRecipient, target, xpReward);
 
             int levelBefore = GetCurrentLevel(xpRecipient);
+            if (IsShadowLevelProgression(levelBefore))
+            {
+                AwardCombatSk(xpRecipient, client, xpReward, attacker.Identity.ToString());
+                AlienXpRuntimeService.AwardAlienXpOnKill(attacker, target);
+                return;
+            }
+
+            if (levelBefore >= MaxLevel)
+            {
+                LogXpTrace(xpRecipient, "kill-skip", "reason=max-level-220");
+                AlienXpRuntimeService.AwardAlienXpOnKill(attacker, target);
+                return;
+            }
 
             LogXpTrace(
                 xpRecipient,
@@ -247,12 +264,17 @@ namespace ZoneEngine.Core
             }
 
             int levelBefore = GetCurrentLevel(character);
-            if (levelBefore >= MaxRubikaLevel)
+            if (levelBefore >= MaxLevel)
             {
                 return false;
             }
 
             string sourceTag = string.IsNullOrWhiteSpace(source) ? "direct" : source.Trim();
+            if (IsShadowLevelProgression(levelBefore))
+            {
+                return AwardDirectSk(character, client, xpReward, sourceTag);
+            }
+
             uint floorXp = GetCumulativeXpForLevelStart(levelBefore);
             uint progressBefore = GetBarProgress(character);
             uint newProgress = AddClamped(progressBefore, xpReward);
@@ -417,7 +439,7 @@ namespace ZoneEngine.Core
             return cumulativeXp;
         }
 
-        /// <summary>First Shadowlevel: 201+ earn Shadowknowledge (SK) instead of XP.</summary>
+        /// <summary>Save-feedback: level 201+ show SK only (classic shadowlevels).</summary>
         private const int ShadowLevelStart = 201;
 
         /// <summary>
@@ -819,6 +841,10 @@ namespace ZoneEngine.Core
             }
 
             EnsureLevelXpThresholds(character, "login-normalize-thresholds");
+            if (GetCurrentLevel(character) >= ShadowLevelFloor)
+            {
+                EnsureLevelSkThresholds(character, "login-normalize-sk-thresholds");
+            }
 
             LogXpTrace(
                 character,
@@ -827,6 +853,11 @@ namespace ZoneEngine.Core
                 + " deathPool=" + deathPool.ToString(CultureInfo.InvariantCulture));
 
             ApplyPendingLevelUps(character, level);
+            int levelAfterXp = GetCurrentLevel(character);
+            if (levelAfterXp >= ShadowLevelFloor)
+            {
+                ApplyPendingSkLevelUps(character, levelAfterXp);
+            }
         }
 
         private static uint ResolveStoredProgress(int level, uint floor, uint xp, uint unsavedXp)
@@ -1002,6 +1033,260 @@ namespace ZoneEngine.Core
             }
 
             return (int)XPTable.TableRKXP[level - 1, 2];
+        }
+
+        /// <summary>
+        /// Levels 200-219 progress via Shadowknowledge (SK), not XP.
+        /// Table: XPTable.TableShadowLandsSK — AO-Universe / AOWiki values.
+        /// </summary>
+        private static bool IsShadowLevelProgression(int level)
+        {
+            return level >= ShadowLevelFloor && level < MaxLevel;
+        }
+
+        private static int ConvertXpRewardToSk(int xpReward)
+        {
+            if (xpReward <= 0)
+            {
+                return 0;
+            }
+
+            int sk = xpReward / SkToXpFactor;
+            return sk > 0 ? sk : 1;
+        }
+
+        private static uint GetCumulativeSkForLevelStart(int level)
+        {
+            if (level < ShadowLevelFloor)
+            {
+                return 0;
+            }
+
+            if (level > MaxLevel)
+            {
+                level = MaxLevel;
+            }
+
+            return (uint)XPTable.TableShadowLandsSK[level - ShadowLevelFloor, 1];
+        }
+
+        private static int GetNextSkRequiredForLevel(int level)
+        {
+            if (level < ShadowLevelFloor || level >= MaxLevel)
+            {
+                return 0;
+            }
+
+            return XPTable.TableShadowLandsSK[level - ShadowLevelFloor, 2];
+        }
+
+        private static uint GetSkBarProgress(ICharacter character)
+        {
+            int level = GetCurrentLevel(character);
+            uint floor = GetCumulativeSkForLevelStart(level);
+            uint sk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
+            if (sk >= floor)
+            {
+                return sk - floor;
+            }
+
+            return sk;
+        }
+
+        private static void AwardCombatSk(
+            ICharacter character,
+            IZoneClient client,
+            int xpEquivalentReward,
+            string attackerIdentity)
+        {
+            int skReward = ConvertXpRewardToSk(xpEquivalentReward);
+            if (skReward <= 0)
+            {
+                LogXpTrace(character, "sk-kill-skip", "reason=zero-sk-reward");
+                return;
+            }
+
+            int levelBefore = GetCurrentLevel(character);
+            uint floorSk = GetCumulativeSkForLevelStart(levelBefore);
+            uint progressBefore = GetSkBarProgress(character);
+            uint newProgress = AddClamped(progressBefore, skReward);
+
+            LogXpTrace(
+                character,
+                "sk-kill-start",
+                "xpReward=" + xpEquivalentReward.ToString(CultureInfo.InvariantCulture)
+                + " skReward=" + skReward.ToString(CultureInfo.InvariantCulture)
+                + " sourceAttacker=" + attackerIdentity
+                + " level=" + levelBefore.ToString(CultureInfo.InvariantCulture));
+
+            SetXpStat(character, StatIds.sk, floorSk + newProgress, "sk-kill-add-cumulative");
+            EnsureLevelSkThresholds(character, "sk-kill-thresholds");
+
+            bool leveledUp = ApplyPendingSkLevelUps(character, levelBefore);
+            if (leveledUp)
+            {
+                SendLevelUpPreFeedbackPackets(client, character, levelBefore);
+                SendSkProgressPackets(client, character);
+                PersistLevelStat(character);
+            }
+            else
+            {
+                SendSkProgressPackets(client, character);
+            }
+
+            ClearManualXpWireStatChangedFlags(character, leveledUp);
+            ClearStatChangedFlag(character, StatIds.sk);
+            ClearStatChangedFlag(character, StatIds.nextsk);
+            WriteXpStatsToDb(character, leveledUp ? "sk-kill-levelup" : "sk-kill-complete");
+            LogXpTrace(
+                character,
+                leveledUp ? "sk-kill-levelup" : "sk-kill-complete",
+                "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + GetCurrentLevel(character).ToString(CultureInfo.InvariantCulture)
+                + " sk=" + character.Stats[StatIds.sk].BaseValue.ToString(CultureInfo.InvariantCulture));
+        }
+
+        private static bool AwardDirectSk(
+            ICharacter character,
+            IZoneClient client,
+            int xpEquivalentReward,
+            string sourceTag)
+        {
+            int skReward = ConvertXpRewardToSk(xpEquivalentReward);
+            if (skReward <= 0)
+            {
+                return false;
+            }
+
+            int levelBefore = GetCurrentLevel(character);
+            uint floorSk = GetCumulativeSkForLevelStart(levelBefore);
+            uint progressBefore = GetSkBarProgress(character);
+            uint newProgress = AddClamped(progressBefore, skReward);
+
+            SetXpStat(character, StatIds.sk, floorSk + newProgress, sourceTag + "-sk-add");
+            EnsureLevelSkThresholds(character, sourceTag + "-sk-thresholds");
+
+            bool leveledUp = ApplyPendingSkLevelUps(character, levelBefore);
+            if (leveledUp)
+            {
+                SendLevelUpPreFeedbackPackets(client, character, levelBefore);
+                PersistLevelStat(character);
+            }
+
+            SendSkProgressPackets(client, character);
+            ClearManualXpWireStatChangedFlags(character, leveledUp);
+            ClearStatChangedFlag(character, StatIds.sk);
+            ClearStatChangedFlag(character, StatIds.nextsk);
+            WriteXpStatsToDb(character, leveledUp ? sourceTag + "-sk-levelup" : sourceTag + "-sk-complete");
+            LogXpTrace(
+                character,
+                leveledUp ? sourceTag + "-sk-levelup" : sourceTag + "-sk-complete",
+                "skReward=" + skReward.ToString(CultureInfo.InvariantCulture)
+                + " levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + GetCurrentLevel(character).ToString(CultureInfo.InvariantCulture));
+            return true;
+        }
+
+        private static bool ApplyPendingSkLevelUps(ICharacter character, int levelBefore)
+        {
+            int highestLevelReached = levelBefore;
+            int guard = 0;
+
+            while (guard++ < 20)
+            {
+                int currentLevel = GetCurrentLevel(character);
+                if (currentLevel >= MaxLevel)
+                {
+                    break;
+                }
+
+                if (!IsShadowLevelProgression(currentLevel))
+                {
+                    break;
+                }
+
+                int nextSkRequired = GetNextSkRequiredForLevel(currentLevel);
+                if (nextSkRequired <= 0)
+                {
+                    break;
+                }
+
+                uint barProgress = GetSkBarProgress(character);
+                if (barProgress < (uint)nextSkRequired)
+                {
+                    LogXpTrace(
+                        character,
+                        "sk-levelup-skip",
+                        "currentLevel=" + currentLevel.ToString(CultureInfo.InvariantCulture)
+                        + " progress=" + barProgress.ToString(CultureInfo.InvariantCulture)
+                        + " required=" + nextSkRequired.ToString(CultureInfo.InvariantCulture));
+                    break;
+                }
+
+                int newLevel = currentLevel + 1;
+                uint remainder = barProgress - (uint)nextSkRequired;
+                uint newFloor = GetCumulativeSkForLevelStart(newLevel);
+
+                LogXpTrace(
+                    character,
+                    "sk-levelup-apply",
+                    "fromLevel=" + currentLevel.ToString(CultureInfo.InvariantCulture)
+                    + " toLevel=" + newLevel.ToString(CultureInfo.InvariantCulture)
+                    + " progressBefore=" + barProgress.ToString(CultureInfo.InvariantCulture)
+                    + " threshold=" + nextSkRequired.ToString(CultureInfo.InvariantCulture)
+                    + " remainder=" + remainder.ToString(CultureInfo.InvariantCulture)
+                    + " newFloor=" + newFloor.ToString(CultureInfo.InvariantCulture));
+
+                SetXpStat(character, StatIds.level, (uint)newLevel, "sk-levelup-apply-level");
+                SetXpStat(character, StatIds.sk, newFloor + remainder, "sk-levelup-apply-cumulative");
+                SetXpStat(character, StatIds.nextxp, 0, "sk-levelup-clear-nextxp");
+                EnsureLevelSkThresholds(character, "sk-levelup-thresholds");
+                highestLevelReached = newLevel;
+            }
+
+            if (highestLevelReached <= levelBefore)
+            {
+                return false;
+            }
+
+            character.CalculateSkills();
+
+            int maxLife = Math.Max(1, character.Stats[StatIds.life].Value);
+            int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
+            character.Stats[StatIds.health].Set((uint)maxLife);
+            character.Stats[StatIds.currentnano].Set((uint)maxNano);
+
+            return true;
+        }
+
+        private static void EnsureLevelSkThresholds(ICharacter character, string source)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            // NextSK is computed from level (StatNextSK). Do not overwrite its base value.
+            LogXpTrace(
+                character,
+                "sk-thresholds",
+                "source=" + source
+                + " level=" + GetCurrentLevel(character).ToString(CultureInfo.InvariantCulture)
+                + " nextSk=" + GetNextSkRequiredForLevel(GetCurrentLevel(character)).ToString(CultureInfo.InvariantCulture)
+                + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue).ToString(CultureInfo.InvariantCulture));
+        }
+
+        private static void SendSkProgressPackets(IZoneClient client, ICharacter character)
+        {
+            if (client == null || character == null)
+            {
+                return;
+            }
+
+            uint sk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
+            uint nextSk = (uint)GetNextSkRequiredForLevel(GetCurrentLevel(character));
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.sk, sk);
+            StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextsk, nextSk);
         }
 
         private static void SendLevelUpPreFeedbackPackets(
@@ -1296,14 +1581,15 @@ namespace ZoneEngine.Core
         {
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "level54={0} xp52={1} unsaved592={2} lastsave372={3} saved334={4} next350={5} lastxp57={6}",
+                "level54={0} xp52={1} unsaved592={2} lastsave372={3} saved334={4} next350={5} lastxp57={6} sk573={7}",
                 character.Stats[StatIds.level].BaseValue,
                 character.Stats[StatIds.xp].BaseValue,
                 character.Stats[StatIds.unsavedxp].BaseValue,
                 character.Stats[StatIds.lastsavexp].BaseValue,
                 character.Stats[StatIds.savedxp].BaseValue,
                 character.Stats[StatIds.nextxp].BaseValue,
-                character.Stats[StatIds.lastxp].BaseValue);
+                character.Stats[StatIds.lastxp].BaseValue,
+                character.Stats[StatIds.sk].BaseValue);
         }
 
         private static string GetXpStatName(StatIds statId)
@@ -1326,6 +1612,12 @@ namespace ZoneEngine.Core
                     return "LastSaveXP";
                 case StatIds.unsavedxp:
                     return "UnsavedXP";
+                case StatIds.sk:
+                    return "SK";
+                case StatIds.lastsk:
+                    return "LastSK";
+                case StatIds.nextsk:
+                    return "NextSK";
                 default:
                     return statId.ToString();
             }

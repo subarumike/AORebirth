@@ -85,7 +85,7 @@ namespace AORebirth.Core.Playfields
             double initialDelaySeconds = specialAttackSequence != null
                                              ? specialAttackSequence.InitialAttackDelaySeconds
                                              : Playfield.IsCapturedCleaningRobot(attacker)
-                                                   ? NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds
+                                                   ? 0.5
                                                    : NpcCombatAttackRules.DefaultCombatTickSeconds;
             DateTime now = DateTime.UtcNow;
             if (parallelAttackSequence != null)
@@ -130,6 +130,21 @@ namespace AORebirth.Core.Playfields
             if (specialAttackSequence != null)
             {
                 this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);
+            }
+            else if (Playfield.IsCapturedCleaningRobot(attacker)
+                     && attacker.FightingTarget.Instance != 0)
+            {
+                // Immediate SpecialAttackWeapon + Attack so robots visibly fight back on aggro
+                // (capture LIW 8/8 / Marcus pad 43-shape). First damage still waits initialDelay.
+                ICharacter combatTarget =
+                    this.playfield.FindByIdentity<ICharacter>(attacker.FightingTarget);
+                if (combatTarget != null)
+                {
+                    this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(
+                        attacker,
+                        combatTarget,
+                        this.GetCombatAttackSource(attacker));
+                }
             }
             else if (!Playfield.IsCapturedCleaningRobot(attacker))
             {
@@ -992,7 +1007,7 @@ namespace AORebirth.Core.Playfields
             }
 
             string mobName = string.IsNullOrWhiteSpace(attacker.Name) ? "Something" : attacker.Name;
-            ChatTextMessageHandler.Default.Send(
+            ChatTextMessageHandler.Default.SendCombat(
                 target,
                 string.Format(
                     CultureInfo.InvariantCulture,

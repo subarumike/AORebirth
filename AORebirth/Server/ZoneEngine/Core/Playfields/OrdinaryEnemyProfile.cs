@@ -1829,9 +1829,9 @@ namespace AORebirth.Core.Playfields
 
                 if ((profile.ConstructionMode == OrdinaryEnemyConstructionMode.TemplateBacked
                      && string.IsNullOrWhiteSpace(profile.TemplateHash))
-                    || profile.Corpse.EmptyLifetimeSeconds <= 0.0
+                    || profile.Corpse.EmptyLifetimeSeconds < 0.0
                     || profile.Corpse.UnlootedLifetimeSeconds <= 0.0
-                    || profile.Corpse.LootedCleanupSeconds <= 0.0
+                    || profile.Corpse.LootedCleanupSeconds < 0.0
                     || (profile.Corpse.CapturedCatMesh.HasValue
                         && (profile.Corpse.CapturedCatMesh.Value <= 0
                             || profile.Corpse.CapturedCatMesh.Value == 1234567890

@@ -67,6 +67,15 @@ namespace ZoneEngine.Core.MessageHandlers
         }
 
         /// <summary>
+        /// Routes text to the client Combat chat window (Unknown1=1).
+        /// Used for incoming NPC hit spam so it does not flood main chat.
+        /// </summary>
+        public void SendCombat(ICharacter character, string text)
+        {
+            this.Send(character, text, 1, 0, 0);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="character">
         /// </param>

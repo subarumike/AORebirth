@@ -1,10 +1,12 @@
 {
   "Identity": {
-    "Id": "arete-sarah-greene-dialogue-20260721-sara",
-    "Version": "captured-sarah-armor-20260721-sara",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-sara/chat-dialogue.log"
+    "Id": "arete-sarah-greene-dialogue-20260722-214957",
+    "Version": "captured-sarah-deliver-20260722-214957",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-214957; 20260722-214351"
   },
   "SourceCaptures": [
+    "20260722-214957",
+    "20260722-214351",
     "20260721-sara"
   ],
   "Npcs": [
@@ -19,191 +21,234 @@
       "Nodes": [
         {
           "Id": "sarah_greene_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-sara; options-only",
+          "PromptText": "Well howdy, y'all. Welcome and step on up to Sarah Greene's Armor Imporium. As a new arrival you may not know that it's dangerous to go alone through the wilds of Rubi-Ka, without proper protection. Lucky for you, I've got the best custom-made protection available in the shuttleport!",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 / 20260722-214957 Unknown2=0",
           "Options": [
             {
               "Id": "sarah_greene_001_option_0",
               "Index": 0,
               "Text": "I heard that we might be able to help each other out...",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:00.3271586Z; Answer=0 → Action59+Delete TalkSarah + QFU Find the thief",
-              "NextNodeId": "sarah_greene_002",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:07.4507334Z",
+              "NextNodeId": "sarah_help_001",
               "Actions": []
             },
             {
               "Id": "sarah_greene_001_option_1",
               "Index": 1,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:00.3271586Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until question tree captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:07.4507334Z",
+              "NextNodeId": "sarah_questions_001",
+              "Actions": []
             },
             {
               "Id": "sarah_greene_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:00.3271586Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_001_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
-            }
-          ],
-          "EnterActions": []
-        },
-        {
-          "Id": "sarah_greene_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-sara; options-only",
-          "Options": [
-            {
-              "Id": "sarah_greene_002_option_0",
-              "Index": 0,
-              "Text": "Have you tried to contact ICC?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:05.0442476Z",
-              "NextNodeId": "sarah_greene_003",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:07.4507334Z",
+              "NextNodeId": "sarah_goodbye",
               "Actions": []
-            },
-            {
-              "Id": "sarah_greene_002_option_1",
-              "Index": 1,
-              "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:05.0442476Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_002_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
             }
           ],
           "EnterActions": []
         },
         {
-          "Id": "sarah_greene_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-sara; options-only",
+          "Id": "sarah_questions_001",
+          "PromptText": "Whats up?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 19:44:11.095 Unknown2=0",
           "Options": [
             {
-              "Id": "sarah_greene_003_option_0",
+              "Id": "sarah_questions_001_option_0",
               "Index": 0,
               "Text": "What do you have for sale?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:08.0993635Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_003_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until Sarah vendor Use captured separately"
-                }
-              ]
-            },
-            {
-              "Id": "sarah_greene_003_option_1",
-              "Index": 1,
-              "Text": "Do you know anyone I should talk to around here?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:08.0993635Z",
-              "NextNodeId": "sarah_greene_004",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:11.0964847Z",
+              "NextNodeId": "sarah_sale_with_anyone",
               "Actions": []
             },
             {
-              "Id": "sarah_greene_003_option_2",
+              "Id": "sarah_questions_001_option_1",
+              "Index": 1,
+              "Text": "Do you know anyone I should talk to around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:11.0964847Z",
+              "NextNodeId": "sarah_anyone_with_sale",
+              "Actions": []
+            },
+            {
+              "Id": "sarah_questions_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:08.0993635Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_003_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:11.0964847Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
-          "Id": "sarah_greene_004",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-sara; options-only",
+          "Id": "sarah_help_001",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "You spend a few moments explaining your basic plight, making sure to avoid mentioning Stan's name.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "I can help ya out. You got good timin' too, just came up on my own little crisis. Somebody done made off with one of my prototype suits I was workin' on. Ain't much they can <i>do</i> with it, bein' DNA-locked to me and all, but it's still a pretty significant amount of effort and time from my end that went into it so I ain't quite ready to just let it go that easy. You get this back for me and I'll see what I can do about helping with your own issues.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 19:44:26.058 Unknown2=1 then 0",
           "Options": [
             {
-              "Id": "sarah_greene_004_option_0",
+              "Id": "sarah_help_001_option_0",
               "Index": 0,
-              "Text": "Do you know anyone I should talk to around here?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:10.1391065Z",
-              "NextNodeId": "sarah_greene_005",
+              "Text": "Have you tried to contact ICC?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:26.0592550Z",
+              "NextNodeId": "sarah_help_icc",
               "Actions": []
             },
             {
-              "Id": "sarah_greene_004_option_1",
+              "Id": "sarah_help_001_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:10.1391065Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_004_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:26.0592550Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
-          "Id": "sarah_greene_005",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-sara; options-only",
+          "Id": "sarah_help_icc",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Sarah's eyes roll as she scoffs, head shaking side to side with unhidden disdain.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "That ain't gonna do me no good. Local patrols don't exactly have the best record of catchin' thieves; tell the truth I can't think of a single time that one of us vendors got ripped off and we got our stuff back, regardless of affiliation or standin'. Guess it just all comes with the territory.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 19:44:29.906 Unknown2=1 then 0",
           "Options": [
             {
-              "Id": "sarah_greene_005_option_0",
+              "Id": "sarah_help_icc_option_0",
+              "Index": 0,
+              "Text": "What do you have for sale?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:29.9088815Z",
+              "NextNodeId": "sarah_sale_with_anyone",
+              "Actions": []
+            },
+            {
+              "Id": "sarah_help_icc_option_1",
+              "Index": 1,
+              "Text": "Do you know anyone I should talk to around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:29.9088815Z",
+              "NextNodeId": "sarah_anyone_goodbye_only",
+              "Actions": []
+            },
+            {
+              "Id": "sarah_help_icc_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:29.9088815Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "sarah_sale_with_anyone",
+          "PromptText": "I offer several types of armor, some which aren't too common, and some which you won't find anywhere else. Come check out my wares.\\n\\n<font color=\"#ff0000\">Press the Shopping Cart icon towards the bottom of the chat window to engage trade with Sarah.</font>",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 Unknown2=0",
+          "Options": [
+            {
+              "Id": "sarah_sale_with_anyone_option_0",
+              "Index": 0,
+              "Text": "Do you know anyone I should talk to around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:33.9649162Z",
+              "NextNodeId": "sarah_anyone_goodbye_only",
+              "Actions": []
+            },
+            {
+              "Id": "sarah_sale_with_anyone_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:33.9649162Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "sarah_sale_goodbye_only",
+          "PromptText": "I offer several types of armor, some which aren't too common, and some which you won't find anywhere else. Come check out my wares.\\n\\n<font color=\"#ff0000\">Press the Shopping Cart icon towards the bottom of the chat window to engage trade with Sarah.</font>",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 19:44:18.416 Unknown2=0",
+          "Options": [
+            {
+              "Id": "sarah_sale_goodbye_only_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:49:12.2967750Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_greene_005_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:18.4169696Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "sarah_anyone_with_sale",
+          "PromptText": "You should talk to Remi Gallois. He ain't such a bad guy.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 19:44:15.520 Unknown2=0",
+          "Options": [
+            {
+              "Id": "sarah_anyone_with_sale_option_0",
+              "Index": 0,
+              "Text": "What do you have for sale?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:15.5217545Z",
+              "NextNodeId": "sarah_sale_goodbye_only",
+              "Actions": []
+            },
+            {
+              "Id": "sarah_anyone_with_sale_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:15.5217545Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "sarah_anyone_goodbye_only",
+          "PromptText": "You should talk to Remi Gallois. He ain't such a bad guy.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214351 19:44:35.510 Unknown2=0",
+          "Options": [
+            {
+              "Id": "sarah_anyone_goodbye_only_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:44:35.5109625Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "sarah_deliver_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only 20260721-sara",
+          "PromptText": "Well howdy, y'all. Welcome and step on up to Sarah Greene's Armor Imporium. As a new arrival you may not know that it's dangerous to go alone through the wilds of Rubi-Ka, without proper protection. Lucky for you, I've got the best custom-made protection available in the shuttleport!",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214957 19:50:01.527 Unknown2=0 (deliver root)",
           "Options": [
             {
               "Id": "sarah_deliver_001_option_0",
               "Index": 0,
               "Text": "I found the stolen armor.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:50:34.4481119Z; Answer=0 → StartTrade 1 slot",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:50:01.5281793Z; Answer=0 → AppendText then StartTrade",
               "NextNodeId": "sarah_deliver_trade",
               "Actions": []
             },
@@ -211,39 +256,35 @@
               "Id": "sarah_deliver_001_option_1",
               "Index": 1,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:50:34.4481119Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_deliver_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until question tree captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:50:01.5281793Z",
+              "NextNodeId": "sarah_questions_001",
+              "Actions": []
             },
             {
               "Id": "sarah_deliver_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:50:34.4481119Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_deliver_001_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:50:01.5281793Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "sarah_deliver_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Sarah claps her hands happily, beaming as you produce the stolen suit.",
+              "Unknown2": 1
+            },
+            {
+              "Text": " And you actually even brought it back! Well hot damn. If you don't mind passin' it over...?",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-214957 19:50:04.342 Unknown2=1 then 0 then StartTrade",
           "Options": [
             {
               "Id": "sarah_deliver_trade_option_0",
@@ -258,57 +299,71 @@
         },
         {
           "Id": "sarah_deliver_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after armor turn-in",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Yeeehaw, y' found it! I was startin' to think it was lost an' gone forever. I'm so happy I could kiss ya! But I won't, 'cause that's a little creepy.",
+              "Unknown2": 0
+            },
+            {
+              "Text": "With a small 'thud' she tosses a package onto the counter in front of you, heavy and thick.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "There ya go, a deal is a deal.\\nI'm sure Vernon Godfray should be able to help with aquiring more parts needed for your ID card.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-214957 19:50:09.177 Unknown2=0/1/0 (capture spelling aquiring)",
           "Options": [
             {
               "Id": "sarah_deliver_002_option_0",
               "Index": 0,
               "Text": "Thanks.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:50:42.5581110Z",
-              "NextNodeId": "sarah_deliver_003",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:50:09.1796251Z",
+              "NextNodeId": "sarah_deliver_thanks",
               "Actions": []
             },
             {
               "Id": "sarah_deliver_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:50:42.5581110Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_deliver_002_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:50:09.1796251Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
-          "Id": "sarah_deliver_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only",
+          "Id": "sarah_deliver_thanks",
+          "PromptText": "Good luck out there.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214957 19:50:12.983 Unknown2=0",
           "Options": [
             {
-              "Id": "sarah_deliver_003_option_0",
+              "Id": "sarah_deliver_thanks_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T11:50:45.3883655Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "sarah_deliver_003_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T19:50:12.9832784Z",
+              "NextNodeId": "sarah_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
+        },
+        {
+          "Id": "sarah_goodbye",
+          "PromptText": "Come back some time n' check out my wares.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-214957 19:50:15.403 Unknown2=0 then CloseChatWindow",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "sarah_goodbye_enter_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Auto-close after goodbye AppendText"
+            }
+          ]
         }
       ]
     }

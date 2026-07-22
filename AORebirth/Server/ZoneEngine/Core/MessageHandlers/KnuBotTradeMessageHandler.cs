@@ -34,14 +34,15 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         protected override void Read(KnuBotTradeMessage message, IZoneClient client)
         {
-            // Alex BioCom / brain BEFORE Marcus: Marcus B196 returnTip stole Alex drag
-            // (ZoneEngineLog 2026-07-21 13:02:42 marcus-trade-turnin on Alex + BioCom 156020).
-            if (FlintBioComQuestRuntime.TryStageAlexTradeItem(client.Controller.Character, message))
+            // Alex brain Tip 4 inspect BEFORE BioCom Deliver (same steal as FinishTrade).
+            if (PersonalizedRobotBrainQuestRuntime.TryStageBrainTradeItem(client.Controller.Character, message))
             {
                 return;
             }
 
-            if (PersonalizedRobotBrainQuestRuntime.TryStageBrainTradeItem(client.Controller.Character, message))
+            // Alex BioCom / brain BEFORE Marcus: Marcus B196 returnTip stole Alex drag
+            // (ZoneEngineLog 2026-07-21 13:02:42 marcus-trade-turnin on Alex + BioCom 156020).
+            if (FlintBioComQuestRuntime.TryStageAlexTradeItem(client.Controller.Character, message))
             {
                 return;
             }

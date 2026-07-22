@@ -110,7 +110,9 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             // Capture 20260721-finish: Exit Arete Landing → ICC HQ (not Insurance SaveChar).
+            // playfields.dat Terminal:C0001999 + live capture Terminal:574187C3 (tpl 297303).
             if (target.Instance == VaughnHammondQuestRuntime.ExitAreteLandingTerminalInstance
+                || target.Instance == VaughnHammondQuestRuntime.ExitAreteLandingPlayfieldStatelInstance
                 || templateId == 297303)
             {
                 return false;

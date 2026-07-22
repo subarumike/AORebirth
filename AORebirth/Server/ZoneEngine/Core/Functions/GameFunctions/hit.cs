@@ -207,7 +207,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 && affected.Controller.Client != null
                 && source.Identity != affected.Identity)
             {
-                ChatTextMessageHandler.Default.Send(
+                ChatTextMessageHandler.Default.SendCombat(
                     affected,
                     string.Format(
                         "<font color=#FF0000>{0} hit you for {1} points of damage.</font>",

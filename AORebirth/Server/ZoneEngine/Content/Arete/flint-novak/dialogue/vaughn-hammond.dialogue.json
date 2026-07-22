@@ -1,11 +1,11 @@
 {
   "Identity": {
-    "Id": "arete-vaughn-hammond-dialogue-20260721-finish",
-    "Version": "captured-vaughn-20260721-finish",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-finish/chat-dialogue.log"
+    "Id": "arete-vaughn-hammond-dialogue-20260722-233205",
+    "Version": "captured-vaughn-dialog-20260722-233205",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-233205"
   },
   "SourceCaptures": [
-    "20260721-finish"
+    "20260722-233205"
   ],
   "Npcs": [
     {
@@ -19,14 +19,24 @@
       "Nodes": [
         {
           "Id": "vaughn_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-finish; options-only",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "A low sigh comes from inside the Peackeeper's helmet.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Hello citizen, on behalf of the ICC, I welcome you to Rubi-Ka.\\n\\nPlease present your identification to proceed to the elevator.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:34:51.337 Unknown2=1/0 (capture spelling Peackeeper)",
           "Options": [
             {
               "Id": "vaughn_001_option_0",
               "Index": 0,
               "Text": "Here's my identification.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:44:52.9928675Z; Answer=0 → StartTrade",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:34:51.3370621Z; Answer=0 → AppendText then StartTrade",
               "NextNodeId": "vaughn_trade",
               "Actions": []
             },
@@ -34,7 +44,7 @@
               "Id": "vaughn_001_option_1",
               "Index": 1,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:44:52.9928675Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:34:51.3370621Z",
               "NextNodeId": "vaughn_questions",
               "Actions": []
             },
@@ -42,7 +52,7 @@
               "Id": "vaughn_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:44:52.9928675Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:34:51.3370621Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -58,14 +68,14 @@
         },
         {
           "Id": "vaughn_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "PromptText": "Very well then, let's see it.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:34:53.565 then StartTrade 1 slot",
           "Options": [
             {
               "Id": "vaughn_trade_option_0",
               "Index": 0,
               "Text": "(Continue after trade)",
-              "TextEvidence": "Synthetic; post RejectedItems → AnswerList How do I leave? | Goodbye",
+              "TextEvidence": "Synthetic; post RejectedItems → leave options",
               "NextNodeId": "vaughn_leave",
               "Actions": []
             }
@@ -74,22 +84,22 @@
         },
         {
           "Id": "vaughn_leave",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-finish; options-only",
+          "PromptText": "Everything...seems to be in order. I have uploaded your identity details to your NCU. You may leave Arete Landing whenever you are ready.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:34:58.880 Unknown2=0",
           "Options": [
             {
               "Id": "vaughn_leave_option_0",
               "Index": 0,
               "Text": "How do I leave?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:44:59.8666299Z",
-              "NextNodeId": "vaughn_questions",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:34:58.8814083Z",
+              "NextNodeId": "vaughn_how_leave",
               "Actions": []
             },
             {
               "Id": "vaughn_leave_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:44:59.8666299Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:34:58.8814083Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -104,47 +114,102 @@
           "EnterActions": []
         },
         {
+          "Id": "vaughn_how_leave",
+          "PromptText": "Simply use the elevator.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:35:02.356 Unknown2=0",
+          "Options": [
+            {
+              "Id": "vaughn_how_leave_option_0",
+              "Index": 0,
+              "Text": "What is ICC?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_icc",
+              "Actions": []
+            },
+            {
+              "Id": "vaughn_how_leave_option_1",
+              "Index": 1,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_who",
+              "Actions": []
+            },
+            {
+              "Id": "vaughn_how_leave_option_2",
+              "Index": 2,
+              "Text": "Why do you need an ID to leave this place?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_why_id",
+              "Actions": []
+            },
+            {
+              "Id": "vaughn_how_leave_option_3",
+              "Index": 3,
+              "Text": "What will I find in when I leave Arete Landing?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_find",
+              "Actions": []
+            },
+            {
+              "Id": "vaughn_how_leave_option_4",
+              "Index": 4,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "vaughn_how_leave_option_4_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
           "Id": "vaughn_questions",
           "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260721-finish; options-only",
+          "PromptTextConfidence": "Root 'I have some questions' option list; same FAQ as after How do I leave (prompt not separately captured)",
           "Options": [
             {
               "Id": "vaughn_questions_option_0",
               "Index": 0,
               "Text": "What is ICC?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:04.5967106Z",
-              "NextNodeId": "vaughn_q_after_icc",
+              "TextEvidence": "Same FAQ as 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_icc",
               "Actions": []
             },
             {
               "Id": "vaughn_questions_option_1",
               "Index": 1,
               "Text": "Who are you?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:04.5967106Z",
-              "NextNodeId": "vaughn_q_after_who",
+              "TextEvidence": "Same FAQ as 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_who",
               "Actions": []
             },
             {
               "Id": "vaughn_questions_option_2",
               "Index": 2,
               "Text": "Why do you need an ID to leave this place?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:04.5967106Z",
-              "NextNodeId": "vaughn_q_after_why_id",
+              "TextEvidence": "Same FAQ as 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_why_id",
               "Actions": []
             },
             {
               "Id": "vaughn_questions_option_3",
               "Index": 3,
               "Text": "What will I find in when I leave Arete Landing?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:04.5967106Z",
-              "NextNodeId": "vaughn_q_after_find",
+              "TextEvidence": "Same FAQ as 2026-07-22T21:35:02.3582636Z",
+              "NextNodeId": "vaughn_q_find",
               "Actions": []
             },
             {
               "Id": "vaughn_questions_option_4",
               "Index": 4,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:04.5967106Z",
+              "TextEvidence": "Same FAQ as 2026-07-22T21:35:02.3582636Z",
               "NextNodeId": "close",
               "Actions": [
                 {
@@ -159,43 +224,43 @@
           "EnterActions": []
         },
         {
-          "Id": "vaughn_q_after_icc",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after What is ICC?",
+          "Id": "vaughn_q_icc",
+          "PromptText": "ICC stands for Interstellar Confederation of Corporations. It is ICC that owns this planet.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:35:04.050 Unknown2=0",
           "Options": [
             {
-              "Id": "vaughn_q_after_icc_0",
+              "Id": "vaughn_q_icc_option_0",
               "Index": 0,
               "Text": "Who are you?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:07.6868064Z",
-              "NextNodeId": "vaughn_q_after_who",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:04.0512196Z",
+              "NextNodeId": "vaughn_q_who",
               "Actions": []
             },
             {
-              "Id": "vaughn_q_after_icc_1",
+              "Id": "vaughn_q_icc_option_1",
               "Index": 1,
               "Text": "Why do you need an ID to leave this place?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:07.6868064Z",
-              "NextNodeId": "vaughn_q_after_why_id",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:04.0512196Z",
+              "NextNodeId": "vaughn_q_why_id",
               "Actions": []
             },
             {
-              "Id": "vaughn_q_after_icc_2",
+              "Id": "vaughn_q_icc_option_2",
               "Index": 2,
               "Text": "What will I find in when I leave Arete Landing?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:07.6868064Z",
-              "NextNodeId": "vaughn_q_after_find",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:04.0512196Z",
+              "NextNodeId": "vaughn_q_find",
               "Actions": []
             },
             {
-              "Id": "vaughn_q_after_icc_3",
+              "Id": "vaughn_q_icc_option_3",
               "Index": 3,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:07.6868064Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:04.0512196Z",
               "NextNodeId": "close",
               "Actions": [
                 {
-                  "Id": "vaughn_q_after_icc_3_end",
+                  "Id": "vaughn_q_icc_option_3_end",
                   "Type": "EndDialogue",
                   "QuestId": null,
                   "Text": "Safe close"
@@ -206,35 +271,35 @@
           "EnterActions": []
         },
         {
-          "Id": "vaughn_q_after_who",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after Who are you?",
+          "Id": "vaughn_q_who",
+          "PromptText": "This information doesn't concern you.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:35:06.018 Unknown2=0",
           "Options": [
             {
-              "Id": "vaughn_q_after_who_0",
+              "Id": "vaughn_q_who_option_0",
               "Index": 0,
               "Text": "Why do you need an ID to leave this place?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:09.6126181Z",
-              "NextNodeId": "vaughn_q_after_why_id",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:06.0180065Z",
+              "NextNodeId": "vaughn_q_why_id",
               "Actions": []
             },
             {
-              "Id": "vaughn_q_after_who_1",
+              "Id": "vaughn_q_who_option_1",
               "Index": 1,
               "Text": "What will I find in when I leave Arete Landing?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:09.6126181Z",
-              "NextNodeId": "vaughn_q_after_find",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:06.0180065Z",
+              "NextNodeId": "vaughn_q_find",
               "Actions": []
             },
             {
-              "Id": "vaughn_q_after_who_2",
+              "Id": "vaughn_q_who_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:09.6126181Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:06.0180065Z",
               "NextNodeId": "close",
               "Actions": [
                 {
-                  "Id": "vaughn_q_after_who_2_end",
+                  "Id": "vaughn_q_who_option_2_end",
                   "Type": "EndDialogue",
                   "QuestId": null,
                   "Text": "Safe close"
@@ -245,27 +310,27 @@
           "EnterActions": []
         },
         {
-          "Id": "vaughn_q_after_why_id",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after Why ID?",
+          "Id": "vaughn_q_why_id",
+          "PromptText": "It is important to both ICC and Omni-Tek that all citizens of Rubi-ka are properly registered.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:35:07.986 Unknown2=0 (capture spelling Rubi-ka)",
           "Options": [
             {
-              "Id": "vaughn_q_after_why_id_0",
+              "Id": "vaughn_q_why_id_option_0",
               "Index": 0,
               "Text": "What will I find in when I leave Arete Landing?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:11.4714725Z",
-              "NextNodeId": "vaughn_q_after_find",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:07.9867929Z",
+              "NextNodeId": "vaughn_q_find",
               "Actions": []
             },
             {
-              "Id": "vaughn_q_after_why_id_1",
+              "Id": "vaughn_q_why_id_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:11.4714725Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:07.9867929Z",
               "NextNodeId": "close",
               "Actions": [
                 {
-                  "Id": "vaughn_q_after_why_id_1_end",
+                  "Id": "vaughn_q_why_id_option_1_end",
                   "Type": "EndDialogue",
                   "QuestId": null,
                   "Text": "Safe close"
@@ -276,19 +341,19 @@
           "EnterActions": []
         },
         {
-          "Id": "vaughn_q_after_find",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text; options-only after What will I find?",
+          "Id": "vaughn_q_find",
+          "PromptText": "ICC HQ is a city. You will find everything from vendors to citizens there.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-233205 21:35:09.983 Unknown2=0",
           "Options": [
             {
-              "Id": "vaughn_q_after_find_0",
+              "Id": "vaughn_q_find_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-21T17:45:13.3952844Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T21:35:09.9845608Z",
               "NextNodeId": "close",
               "Actions": [
                 {
-                  "Id": "vaughn_q_after_find_0_end",
+                  "Id": "vaughn_q_find_option_0_end",
                   "Type": "EndDialogue",
                   "QuestId": null,
                   "Text": "Safe close"

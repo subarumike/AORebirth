@@ -1,10 +1,11 @@
 {
   "Identity": {
-    "Id": "arete-icc-immigration-officer-bill-dialogue-20260720-105157",
-    "Version": "captured-bill-hc12-turnin-20260720-105157",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-105157/npc-interactions.log"
+    "Id": "arete-icc-immigration-officer-bill-dialogue-20260722-bill-dialog",
+    "Version": "captured-bill-full-dialog-20260722-bill-dialog",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-bill-dialog"
   },
   "SourceCaptures": [
+    "20260722-bill-dialog",
     "20260720-105157"
   ],
   "Npcs": [
@@ -19,54 +20,146 @@
       "Nodes": [
         {
           "Id": "bill_105157_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-105157; options-only",
+          "PromptText": "There have been a number of accidents in my shuttleport recently. I am told they are just that, accidents. I have lived here long enough to know that there are no accidents on this planet. These are actions of terrorists...some probably aren't even documented citizens.\\n\\nSpeaking of which, who are you?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #48",
           "Options": [
             {
               "Id": "bill_105157_001_option_0",
               "Index": 0,
               "Text": "Alex Gibbs thought you may be interested in seeing this?",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:53:53.0992964Z; StartTrade follows Answer=0",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:23:56.1126692Z; StartTrade follows after AppendText #151",
               "NextNodeId": "bill_105157_trade",
               "Actions": []
             },
             {
               "Id": "bill_105157_001_option_1",
               "Index": 1,
-              "Text": "My name is Mrhella. I am new to the planet.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:53:53.0992964Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "bill_105157_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "Text": "My name is {player}. I am new to the planet.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:23:56.1126692Z Answer=1",
+              "NextNodeId": "bill_intro",
+              "Actions": []
             },
             {
               "Id": "bill_105157_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:53:53.0992964Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "bill_105157_001_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:23:56.1126692Z",
+              "NextNodeId": "bill_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "bill_intro",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Hello {player}, if that is your real name. I have my eye on you. I will blow this string of crimes wide-open and finally make a name for myself. No longer will I just be an ICC Immigration Officer. It'll be Bill's time to shine. ",
+              "Unknown2": 0
+            },
+            {
+              "Text": "The ICC Officer rambles on for a few minutes. You can sneak away now or ask another question.",
+              "Unknown2": 1
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #83-#84 Unknown2=0/1",
+          "Options": [
+            {
+              "Id": "bill_intro_option_0",
+              "Index": 0,
+              "Text": "Alex Gibbs thought you may be interested in seeing this?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:01.6802340Z",
+              "NextNodeId": "bill_105157_trade",
+              "Actions": []
+            },
+            {
+              "Id": "bill_intro_option_1",
+              "Index": 1,
+              "Text": "What do you do around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:01.6802340Z Answer=1",
+              "NextNodeId": "bill_what_do",
+              "Actions": []
+            },
+            {
+              "Id": "bill_intro_option_2",
+              "Index": 2,
+              "Text": "What locations are nearby?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:01.6802340Z",
+              "NextNodeId": "bill_locations",
+              "Actions": []
+            },
+            {
+              "Id": "bill_intro_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:01.6802340Z",
+              "NextNodeId": "bill_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "bill_what_do",
+          "PromptText": "Me? I am an Immigration Officer. I...don't have any actual power over who actually can become a citizen of Rubi-Ka, I just point people towards various locations. If you want to exit the gateway into ICC HQ, you'll have to talk to Vaughn Hammond.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #114",
+          "Options": [
+            {
+              "Id": "bill_what_do_option_0",
+              "Index": 0,
+              "Text": "Alex Gibbs thought you may be interested in seeing this?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:05.3690040Z",
+              "NextNodeId": "bill_105157_trade",
+              "Actions": []
+            },
+            {
+              "Id": "bill_what_do_option_1",
+              "Index": 1,
+              "Text": "What locations are nearby?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:05.3690040Z Answer=1",
+              "NextNodeId": "bill_locations",
+              "Actions": []
+            },
+            {
+              "Id": "bill_what_do_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:05.3690040Z",
+              "NextNodeId": "bill_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "bill_locations",
+          "PromptText": "Down this main path, you'll find the market area. A few interesting characters are Remi Gallois, a weapons vendor, Sarah Greene, a trader of various armors, and of course, Antonio Stacklund, the owner of the General Store that is at the end of the strip.\\n\\nPast the end of the road, on top of the bridge, you'll find Dr. Mason's medical clinic...though he is more interested in selling his bodily augmentations than actually caring for patients. \\n\\nBeyond the clinic, you'll find an area where you may relax after your long voyage. Also, if you're still waiting for some final paperwork to finalize your citizenship on Rubi-Ka, that would be a good place to wait. Be careful though, I have heard that both Omni-Tek and the Clans have unofficially established themselves over there.\\n\\nAfter that, all that is left is the ICC Headquarters here on Rubi-Ka. Vaughn will be waiting at the gate.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #133",
+          "Options": [
+            {
+              "Id": "bill_locations_option_0",
+              "Index": 0,
+              "Text": "Alex Gibbs thought you may be interested in seeing this?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:07.2738286Z Answer=0 → trade",
+              "NextNodeId": "bill_105157_trade",
+              "Actions": []
+            },
+            {
+              "Id": "bill_locations_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:07.2738286Z",
+              "NextNodeId": "bill_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "bill_105157_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "PromptText": "Oh, please, the SecTec Monitor! Give it here at once! I have been waiting for this to arrive.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #151 then KnubotStartTrade #144",
           "Options": [
             {
               "Id": "bill_105157_trade_option_0",
@@ -81,14 +174,14 @@
         },
         {
           "Id": "bill_105157_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "PromptText": "This is just what she promised...oh wait...I am hearing something from Calitri's office.\\n\\nIt seems he wants to arrange an \"accident\" to befall one of the head workers, Cedric Harding. This is awful! I...I don't know what to do! I can't move forces, and by the time I find a superior officer, it could be all over.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #208",
           "Options": [
             {
               "Id": "bill_105157_002_option_0",
               "Index": 0,
               "Text": "I will take care of it.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:54:01.6570189Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:14.5833424Z",
               "NextNodeId": "bill_105157_003",
               "Actions": []
             },
@@ -96,42 +189,42 @@
               "Id": "bill_105157_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:54:01.6570189Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "bill_105157_002_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:14.5833424Z",
+              "NextNodeId": "bill_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "bill_105157_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "PromptText": "By yourself? That sounds dangerous.. Well, In that case you should take care of that guy he was talking to, \"Alfonzo Rizzolo.\"\\n\\nOh and by the way, I don't know you and I have not heard anything about these plans. Don't talk to me again, got it?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #254",
           "Options": [
             {
               "Id": "bill_105157_003_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T08:54:05.9363794Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "bill_105157_003_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T16:24:18.7947607Z",
+              "NextNodeId": "bill_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
+        },
+        {
+          "Id": "bill_goodbye",
+          "PromptText": "Take care of yourself.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-bill-dialog packets.hex.log #296 then KnubotCloseChatWindow #286",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "bill_goodbye_end_dialogue",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after captured Take care of yourself."
+            }
+          ]
         }
       ]
     }

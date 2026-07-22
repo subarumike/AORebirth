@@ -25,6 +25,9 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public const string AlexTradeskillOfferNodeId = "alex_171317_002";
 
+        // Capture 20260722-Alex-dialog: mid-quest reopen during Surveillance→Kneecapping.
+        public const string AlexFavorRootNodeId = "alex_favor_001";
+
         private const string KillTargetName = "Kneebreaker Alfonzo Rizzolo";
 
         // Capture 20260720-171317: 2560-Bit Encryption Compiler ql1
@@ -88,6 +91,16 @@ namespace ZoneEngine.Core.Arete.Quests
                 && !IsMissionCompleted(source, PersonalizedRobotBrainQuestRuntime.Tip4QuestId))
             {
                 return AlexTradeskillOfferNodeId;
+            }
+
+            // Capture 20260722-Alex-dialog: "How is that...favor..." while Alex favor chain
+            // is active (Surveillance Uplink → Plant → Deliver Bill → Kneecapping).
+            if (IsMissionActive(source, "Mission:5514B19D")
+                || IsMissionActive(source, "Mission:5514B19E")
+                || IsMissionActive(source, "Mission:5514B19F")
+                || IsMissionActive(source, "Mission:5514B1A0"))
+            {
+                return AlexFavorRootNodeId;
             }
 
             return null;

@@ -1,12 +1,14 @@
 {
   "Identity": {
-    "Id": "arete-alex-gibbs-dialogue-20260720-074847",
-    "Version": "captured-alex-bio-com-and-report-171317",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-074847/chat-dialogue.log; 20260720-171317"
+    "Id": "arete-alex-gibbs-dialogue-20260722-Alex-dialog",
+    "Version": "captured-alex-full-dialog-20260722-Alex-dialog",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-Alex-dialog"
   },
   "SourceCaptures": [
+    "20260722-Alex-dialog",
     "20260720-074847",
-    "20260720-171317"
+    "20260720-171317",
+    "20260720-190432"
   ],
   "Npcs": [
     {
@@ -20,14 +22,14 @@
       "Nodes": [
         {
           "Id": "alex_074847_001",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-074847; options-only",
+          "PromptText": "Hello there, what do you want?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #29",
           "Options": [
             {
               "Id": "alex_074847_001_option_0",
               "Index": 0,
               "Text": "I was told to bring you this device so you could help me get an ID.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:12.6825399Z; StartTrade follows Answer=0",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:04.9926785Z; StartTrade follows Answer=0 after AppendText #45",
               "NextNodeId": "alex_074847_trade",
               "Actions": []
             },
@@ -35,24 +37,17 @@
               "Id": "alex_074847_001_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:12.6825399Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_074847_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:04.9926785Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "alex_074847_trade",
-          "PromptText": "",
-          "PromptTextConfidence": "trade-hold; StartTrade message captured instead of AppendText",
+          "PromptText": "Wait.. You came onto Rubi-Ka without sufficient identification? What? I don't even... I need a moment to think... I am only experienced with providing identification to newly created automations. While the process is similar in nature, I can only provide you with the most basic identification board.\\n\\nTo imprint that with an actual identification that would be recognized by ICC, you would need to go elsewhere. I can help you with part of the process though... if you're willing to potentially give me a hand.. \\n\\nLet me see what you have for me...",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #45 then KnubotStartTrade #46",
           "Options": [
             {
               "Id": "alex_074847_trade_option_0",
@@ -67,14 +62,14 @@
         },
         {
           "Id": "alex_074847_002",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "PromptText": "It's only part of a broken robot and I already have this one.. Ah well, you have to do me a favour if I'm going to help you further with your ID problem. Have you heard of Desmond Calitri? He is the administrator who operates and oversees all the operations around this industrial area of Arete Landing and has been starting to cut budgets for my engineering work. I want you to find out why, simply remotely hack into one of his patrolling security droids, and then plant an audio recording device in his office.\\n\\nOnce you're done, talk to old Bill. He's the closest contact I have with the ICC officials. He is usually down at the Bronto Dog Kiosk this time of the day.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #112",
           "Options": [
             {
               "Id": "alex_074847_002_option_0",
               "Index": 0,
               "Text": "I will get it done.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:19.8940923Z",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:12.5090418Z",
               "NextNodeId": "alex_074847_003",
               "Actions": []
             },
@@ -82,39 +77,377 @@
               "Id": "alex_074847_002_option_1",
               "Index": 1,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:19.8940923Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_074847_002_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:12.5090418Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
         },
         {
           "Id": "alex_074847_003",
-          "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-capture",
+          "PromptText": "Thank you, {player}.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #167 (player name)",
           "Options": [
             {
               "Id": "alex_074847_003_option_0",
               "Index": 0,
               "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T05:49:23.5338476Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_074847_003_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:18.2924759Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_goodbye",
+          "PromptText": "Be careful out there. Remember: robots don't kill, but bad programming does!",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #182 then KnubotCloseChatWindow #183",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "alex_goodbye_end_dialogue",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after captured Be careful out there."
+            }
+          ]
+        },
+        {
+          "Id": "alex_favor_001",
+          "PromptText": "How is that...erm...favor I asked you to take care of? Did you need something?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #250; mid-quest reopen during Surveillance/Plant/Bill/Kneecapping",
+          "Options": [
+            {
+              "Id": "alex_favor_001_option_0",
+              "Index": 0,
+              "Text": "I have some questions.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:28.5261639Z",
+              "NextNodeId": "alex_questions_hub",
+              "Actions": []
+            },
+            {
+              "Id": "alex_favor_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:28.5261639Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_questions_hub",
+          "PromptText": "Sure, what do you want to know?",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #278",
+          "Options": [
+            {
+              "Id": "alex_questions_hub_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:32.2028961Z",
+              "NextNodeId": "alex_q_who",
+              "Actions": []
+            },
+            {
+              "Id": "alex_questions_hub_option_1",
+              "Index": 1,
+              "Text": "What do you do around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:32.2028961Z",
+              "NextNodeId": "alex_q_what_do",
+              "Actions": []
+            },
+            {
+              "Id": "alex_questions_hub_option_2",
+              "Index": 2,
+              "Text": "Have you been working here for a while?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:32.2028961Z; option visible but not selected in capture",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_questions_hub_option_3",
+              "Index": 3,
+              "Text": "What goes on here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:32.2028961Z; option visible but not selected in capture",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_questions_hub_option_4",
+              "Index": 4,
+              "Text": "Who is in charge around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:32.2028961Z",
+              "NextNodeId": "alex_q_in_charge",
+              "Actions": []
+            },
+            {
+              "Id": "alex_questions_hub_option_5",
+              "Index": 5,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:32.2028961Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_who",
+          "PromptText": "My name is Alex Gibbs, I am in charge of maintaining the automated help around this industrial park. An engineer by trade, robotics have been something I have specialized in for the majority of my life. Robots are so much simpler to deal with...one of these service droids will never break your heart! Well, they could literally, as they have sharp claws.\\n\\nIf anything mechanical breaks down, it ends up here, where it is serviced and restored to working order.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #301",
+          "Options": [
+            {
+              "Id": "alex_q_who_option_0",
+              "Index": 0,
+              "Text": "I didn't see too many robots working out in the yard.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:34.9711890Z",
+              "NextNodeId": "alex_q_robots",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_who_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:34.9711890Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_robots",
+          "PromptText": "I am working on that! You sound worse than my superiors. Yes, I know. There aren't any working robots... working. It is near impossible to keep up with the demand. The hazards of this area break them down faster than I can fix them...and then there are the people who come around and sabotage them for sport.\\n\\nI love my metal babies, and putting them together gives me great joy...it's just difficult to see them in such disrepair.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #321",
+          "Options": [
+            {
+              "Id": "alex_q_robots_option_0",
+              "Index": 0,
+              "Text": "What do you do around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:37.1658363Z",
+              "NextNodeId": "alex_q_what_do",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_robots_option_1",
+              "Index": 1,
+              "Text": "Have you been working here for a while?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:37.1658363Z; not selected",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_robots_option_2",
+              "Index": 2,
+              "Text": "What goes on here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:37.1658363Z; not selected",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_robots_option_3",
+              "Index": 3,
+              "Text": "Who is in charge around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:37.1658363Z",
+              "NextNodeId": "alex_q_in_charge",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_robots_option_4",
+              "Index": 4,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:37.1658363Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_what_do",
+          "PromptText": "I am in charge of building and repairing anything automated or mechanical around here. There isn't too much left, outside of this area or the junkyard, with the exception of boss Calitri's sentry robots, but I am working to fix that.\\n\\nSadly, funding is being gouged from my budget. Desmond Calitri, the appointed administrator of this industrial area, seems to believe in manpower over automated power.\\n\\nWhile...I suppose...admirable in thought...some jobs are just more suited for automated constructs which can...you know...be rebuilt. Desmond just keeps sending his army of disposable laborers into more and more risky situations to cut costs.\\n\\nI suppose I can appreciate the fleshy workers, but there's a place for the metal helpers as well...even if they may cost more to maintain and produce.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #350",
+          "Options": [
+            {
+              "Id": "alex_q_what_do_option_0",
+              "Index": 0,
+              "Text": "Where do these workers come from?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:39.4384343Z",
+              "NextNodeId": "alex_q_workers",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_what_do_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:39.4384343Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_workers",
+          "PromptText": "I am not really sure, but Desmond Calitri does not seem to have a problem finding some new Atrox dock workers when the need arises. We have always staffed a lot of them around here, but since Desmond Calitri came into power, they have almost phased out my robots.\\n\\nIt may be a cost-saving measure, or nepotism, but there have been many more accidents as of recently.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #364",
+          "Options": [
+            {
+              "Id": "alex_q_workers_option_0",
+              "Index": 0,
+              "Text": "Isn't it a good thing that Desmond Calitri is giving so many of these people work?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:40.9864808Z",
+              "NextNodeId": "alex_q_good_thing",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_workers_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:40.9864808Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_good_thing",
+          "PromptText": "You assume that these are citizens who have a life outside of their jobs. \\n\\nI suspect that Desmond Calitri has a contract with a facility who clones these workers, cheap, and for the sole purpose of this slave labor. It's impossible to prove, however...unless I could get a little closer.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #391",
+          "Options": [
+            {
+              "Id": "alex_q_good_thing_option_0",
+              "Index": 0,
+              "Text": "You sound like you have an idea in mind.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:42.8213483Z",
+              "NextNodeId": "alex_q_idea",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_good_thing_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:42.8213483Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_idea",
+          "PromptText": "Yes, actually. I have a scheme that should allow me to know what exactly is going on around here. If there is something going on, it shouldn't be too hard to uncover.\\n\\nBetween the phasing out of my robots, in addition to the protests from overworked Dockworkers, Desmond Calitri should be having a difficult time keeping all of his secrets locked down.\\n\\nIf you do want to help out, just let me know.",
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #412",
+          "Options": [
+            {
+              "Id": "alex_q_idea_option_0",
+              "Index": 0,
+              "Text": "What do you do around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:44.5592769Z",
+              "NextNodeId": "alex_q_what_do",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_idea_option_1",
+              "Index": 1,
+              "Text": "Have you been working here for a while?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:44.5592769Z; not selected",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_idea_option_2",
+              "Index": 2,
+              "Text": "What goes on here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:44.5592769Z; not selected",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_idea_option_3",
+              "Index": 3,
+              "Text": "Who is in charge around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:44.5592769Z Answer=3",
+              "NextNodeId": "alex_q_in_charge",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_idea_option_4",
+              "Index": 4,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:44.5592769Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_in_charge",
+          "PromptText": null,
+          "PromptSegments": [
+            {
+              "Text": "Alex sighs loudly.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "\\n\\nThat individual would be Desmond Calitri. A cutthroat, shrewd individual. He's currently in the business of overseeing this dock area, and is pushing the workers around like slaves.\\n\\nWhile sending all of my robots in for repair, and opting to limit our funding, he is breaking the backs of the laborforce.\\n\\nHe has an elevated office under the landing platforms. If you need to talk to him, it's hard to miss.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #466-#467 Unknown2=1/0",
+          "Options": [
+            {
+              "Id": "alex_q_in_charge_option_0",
+              "Index": 0,
+              "Text": "What do you do around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:51.5399724Z",
+              "NextNodeId": "alex_q_what_do",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_in_charge_option_1",
+              "Index": 1,
+              "Text": "Have you been working here for a while?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:51.5399724Z; not selected",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_in_charge_option_2",
+              "Index": 2,
+              "Text": "What goes on here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:51.5399724Z; not selected",
+              "NextNodeId": "alex_q_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "alex_q_in_charge_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:51.5399724Z",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "alex_q_uncaptured",
+          "PromptText": "",
+          "PromptTextConfidence": "option-text-only in 20260722-Alex-dialog; AppendText not captured for Have you been working / What goes on here",
+          "Options": [
+            {
+              "Id": "alex_q_uncaptured_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close until those question branches are captured",
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
@@ -122,7 +455,7 @@
         {
           "Id": "alex_171317_001",
           "PromptText": "",
-          "PromptTextConfidence": "no-knubot-append-text-in-20260720-171317; options-only",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260720-171317; options-only; not in 20260722-Alex-dialog",
           "Options": [
             {
               "Id": "alex_171317_001_option_0",
@@ -136,31 +469,17 @@
               "Id": "alex_171317_001_option_1",
               "Index": 1,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:05.3530388Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_171317_001_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until question tree captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:05.3530388Z; wired to questions hub from 20260722-Alex-dialog",
+              "NextNodeId": "alex_questions_hub",
+              "Actions": []
             },
             {
               "Id": "alex_171317_001_option_2",
               "Index": 2,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:05.3530388Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_171317_001_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
@@ -183,15 +502,8 @@
               "Index": 1,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:11.1304757Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_171317_002_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
@@ -206,15 +518,8 @@
               "Index": 0,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-20T15:14:18.2354430Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_171317_003_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
@@ -244,31 +549,17 @@
               "Id": "alex_190432_brain_turnin_option_2",
               "Index": 2,
               "Text": "I have some questions.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_190432_brain_turnin_option_2_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close until question tree captured"
-                }
-              ]
+              "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z; wired to questions hub from 20260722-Alex-dialog",
+              "NextNodeId": "alex_questions_hub",
+              "Actions": []
             },
             {
               "Id": "alex_190432_brain_turnin_option_3",
               "Index": 3,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:10.0480954Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_190432_brain_turnin_option_3_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close"
-                }
-              ]
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []
@@ -307,15 +598,8 @@
               "Index": 1,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-20T17:08:15.7485804Z",
-              "NextNodeId": "close",
-              "Actions": [
-                {
-                  "Id": "alex_190432_brain_done_option_1_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Safe close after brain turn-in"
-                }
-              ]
+              "NextNodeId": "alex_goodbye",
+              "Actions": []
             }
           ],
           "EnterActions": []

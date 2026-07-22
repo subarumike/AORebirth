@@ -148,6 +148,11 @@ namespace AORebirth.Core.Entities
         /// </summary>
         public virtual Coordinate Coordinates()
         {
+            if (this.RawCoordinates == null)
+            {
+                return new Coordinate(0f, 0f, 0f);
+            }
+
             return new Coordinate(this.RawCoordinates);
         }
 

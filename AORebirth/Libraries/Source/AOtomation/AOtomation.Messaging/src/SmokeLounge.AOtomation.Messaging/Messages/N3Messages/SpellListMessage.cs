@@ -38,6 +38,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(1)]
         public Identity Character { get; set; }
 
+        /// <summary>
+        /// Capture-backed nano display name (e.g. "Ambient Restoration").
+        /// Serialized by SpellListMessageSerializer after Character when set.
+        /// </summary>
+        public string NanoName { get; set; }
+
         #endregion
     }
 }

@@ -160,6 +160,11 @@ namespace AORebirth.Core.Playfields
         bool TryLootCorpseItem(ICharacter looter, Identity sourceContainer, Identity target, int targetPlacement);
 
         /// <summary>
+        /// Delete/destroy a loot item from an open corpse window.
+        /// </summary>
+        bool TryDeleteCorpseLootItem(ICharacter looter, Identity target, int parameter1, int parameter2);
+
+        /// <summary>
         /// </summary>
         void DisconnectAllClients();
 

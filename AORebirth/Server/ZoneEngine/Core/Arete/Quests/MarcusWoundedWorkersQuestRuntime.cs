@@ -33,7 +33,8 @@ namespace ZoneEngine.Core.Arete.Quests
     /// Optional Marcus side quest (stacks beside Talk to Flint Novak main tip):
     /// Are those wounded workers… → stim 297044 + QFU Use Stim (B199) →
     /// Use stim on Wounded Dockworker → Return to Marcus Stone (B19A) →
-    /// FinishTrade Accept only → rechargers 291082x50 + 291043x25.
+    /// FinishTrade Accept only → rechargers 291082x50 + 291043x25
+    /// + capture 20260719-224226 rewards: 1281 XP + 1040 credits.
     /// </summary>
     public static class MarcusWoundedWorkersQuestRuntime
     {
@@ -69,6 +70,8 @@ namespace ZoneEngine.Core.Arete.Quests
         private const string StimGrantedFlag = "marcus-wounded-stim-297044";
 
         private const string StimReturnRewardsFlag = "marcus-wounded-rechargers";
+
+        private const string StimReturnXpCreditsFlag = "marcus-wounded-xp-credits-1281-1040";
 
         private const string WoundedDockworkerName = "Wounded Dockworker";
 
@@ -141,7 +144,11 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             return MissionRuntime.Service.GetFlag(characterId, MissionRuntime.RexB19AQuestId, StimReturnRewardsFlag)
-                   != null;
+                   != null
+                   || MissionRuntime.Service.GetFlag(
+                          characterId,
+                          MissionRuntime.RexB19AQuestId,
+                          StimReturnXpCreditsFlag) != null;
         }
 
         public static bool TryHandleDialogueAnswer(
@@ -168,6 +175,12 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             if (source == null)
             {
+                return false;
+            }
+
+            if (HasCompletedStimReturn(source))
+            {
+                Log("stim-return-trade skipped: already completed character=" + source.Identity.ToString(true));
                 return false;
             }
 
@@ -284,6 +297,25 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             if (source == null)
             {
+                return;
+            }
+
+            if (HasCompletedStimReturn(source))
+            {
+                Log(
+                    "stim-return-turnin skipped: already rewarded character="
+                    + source.Identity.ToString(true)
+                    + " trigger="
+                    + trigger);
+                try
+                {
+                    KnuBotRejectedItemsMessageHandler.Default.Send(source, marcusTarget, new Item[0], 0);
+                }
+                catch (Exception)
+                {
+                }
+
+                SafeQuestFullUpdateSender.TrySendB19AQuestDeleteOnly(source);
                 return;
             }
 
@@ -611,67 +643,145 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static void ApplyStimReturnRewards(ICharacter source)
         {
-            var definition = new MissionRewardDefinition
-                             {
-                                 RewardKey = "captured-marcus-stim-return-xp-credits",
-                                 RewardType = "character-stats",
-                                 IsResolved = true,
-                                 StatMutations = new[]
-                                                 {
-                                                     new MissionCharacterStatMutation
-                                                     {
-                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                         StatId = (int)StatIds.cash,
-                                                         Kind = MissionStatMutationKind.AddClamped,
-                                                         Value = StimReturnCreditReward,
-                                                         MinimumValue = 0,
-                                                         MaximumValue = uint.MaxValue
-                                                     },
-                                                     new MissionCharacterStatMutation
-                                                     {
-                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                         StatId = (int)StatIds.xp,
-                                                         Kind = MissionStatMutationKind.AddClamped,
-                                                         Value = StimReturnXpReward,
-                                                         MinimumValue = 0,
-                                                         MaximumValue = uint.MaxValue
-                                                     },
-                                                     new MissionCharacterStatMutation
-                                                     {
-                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                         StatId = (int)StatIds.unsavedxp,
-                                                         Kind = MissionStatMutationKind.AddClamped,
-                                                         Value = StimReturnXpReward,
-                                                         MinimumValue = 0,
-                                                         MaximumValue = uint.MaxValue
-                                                     },
-                                                     new MissionCharacterStatMutation
-                                                     {
-                                                         StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                         StatId = (int)StatIds.lastxp,
-                                                         Kind = MissionStatMutationKind.Set,
-                                                         Value = StimReturnXpReward,
-                                                         MinimumValue = 0,
-                                                         MaximumValue = uint.MaxValue
-                                                     }
-                                                 }
-                             };
-            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                source.Identity.Instance,
-                MissionRuntime.RexB19AQuestId,
-                definition,
-                "capture:20260719-224226:marcus-b19a-xp-credits");
-            if (result.Succeeded && result.StatValues != null)
+            if (source == null)
             {
-                foreach (MissionCharacterStatValue statValue in result.StatValues)
+                return;
+            }
+
+            if (MissionRuntime.IsInitialized
+                && MissionRuntime.Service.GetFlag(
+                       source.Identity.Instance,
+                       MissionRuntime.RexB19AQuestId,
+                       StimReturnXpCreditsFlag) != null)
+            {
+                Log("stim-return xp/credits skipped: flag already set character=" + source.Identity.ToString(true));
+                return;
+            }
+
+            // Capture 20260719-224226 stim FinishTrade:
+            // FormatFeedback "Received reward: 1281 XP, 1040 credits."
+            bool appliedLive = false;
+            if (MissionRuntime.IsInitialized && MissionRuntime.Rewards != null)
+            {
+                try
                 {
-                    uint value = statValue.Value <= 0
-                                     ? 0
-                                     : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                    source.Stats[(StatIds)statValue.StatId].Set(value);
+                    var definition = new MissionRewardDefinition
+                                     {
+                                         RewardKey = "captured-marcus-stim-return-xp-credits",
+                                         RewardType = "character-stats",
+                                         IsResolved = true,
+                                         StatMutations = new[]
+                                                         {
+                                                             new MissionCharacterStatMutation
+                                                             {
+                                                                 StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                 StatId = (int)StatIds.cash,
+                                                                 Kind = MissionStatMutationKind.AddClamped,
+                                                                 Value = StimReturnCreditReward,
+                                                                 MinimumValue = 0,
+                                                                 MaximumValue = uint.MaxValue
+                                                             },
+                                                             new MissionCharacterStatMutation
+                                                             {
+                                                                 StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                 StatId = (int)StatIds.xp,
+                                                                 Kind = MissionStatMutationKind.AddClamped,
+                                                                 Value = StimReturnXpReward,
+                                                                 MinimumValue = 0,
+                                                                 MaximumValue = uint.MaxValue
+                                                             },
+                                                             new MissionCharacterStatMutation
+                                                             {
+                                                                 StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                 StatId = (int)StatIds.unsavedxp,
+                                                                 Kind = MissionStatMutationKind.AddClamped,
+                                                                 Value = StimReturnXpReward,
+                                                                 MinimumValue = 0,
+                                                                 MaximumValue = uint.MaxValue
+                                                             },
+                                                             new MissionCharacterStatMutation
+                                                             {
+                                                                 StatIdentityType = (int)IdentityType.CanbeAffected,
+                                                                 StatId = (int)StatIds.lastxp,
+                                                                 Kind = MissionStatMutationKind.Set,
+                                                                 Value = StimReturnXpReward,
+                                                                 MinimumValue = 0,
+                                                                 MaximumValue = uint.MaxValue
+                                                             }
+                                                         }
+                                     };
+                    MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                        source.Identity.Instance,
+                        MissionRuntime.RexB19AQuestId,
+                        definition,
+                        "capture:20260719-224226:marcus-b19a-xp-credits");
+                    if (result.Succeeded && result.StatValues != null)
+                    {
+                        foreach (MissionCharacterStatValue statValue in result.StatValues)
+                        {
+                            uint value = statValue.Value <= 0
+                                             ? 0
+                                             : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                            source.Stats[(StatIds)statValue.StatId].Set(value);
+                        }
+
+                        StatMessageHandler.Default.SendChanged(source);
+                        appliedLive = true;
+                    }
+                    else
+                    {
+                        Log(
+                            "stim-return rewards ledger status="
+                            + (result == null ? "null" : result.Status.ToString())
+                            + " msg="
+                            + (result == null ? string.Empty : result.Message));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log("stim-return rewards ledger failed: " + e.Message);
+                }
+            }
+
+            if (!appliedLive)
+            {
+                // Live session fallback so the player always receives capture amounts.
+                long cashBefore = source.Stats[StatIds.cash].Value;
+                long cashAfter = cashBefore + StimReturnCreditReward;
+                if (cashAfter > uint.MaxValue)
+                {
+                    cashAfter = uint.MaxValue;
                 }
 
+                source.Stats[StatIds.cash].Set((uint)cashAfter);
+                CombatXpRuntimeService.AwardDirectXp(
+                    source,
+                    StimReturnXpReward,
+                    "marcus-wounded-stim-return-1281xp");
                 StatMessageHandler.Default.SendChanged(source);
+                Log(
+                    "stim-return rewards live-fallback xp="
+                    + StimReturnXpReward
+                    + " credits="
+                    + StimReturnCreditReward
+                    + " cashNow="
+                    + source.Stats[StatIds.cash].Value);
+            }
+
+            if (MissionRuntime.IsInitialized)
+            {
+                try
+                {
+                    MissionRuntime.Service.SetFlag(
+                        source.Identity.Instance,
+                        MissionRuntime.RexB19AQuestId,
+                        StimReturnXpCreditsFlag,
+                        "xp:" + StimReturnXpReward + "+credits:" + StimReturnCreditReward);
+                }
+                catch (Exception e)
+                {
+                    Log("stim-return xp/credits flag failed: " + e.Message);
+                }
             }
         }
 

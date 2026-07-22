@@ -12,6 +12,7 @@ namespace ZoneEngine.Core.Playfields
 
         public static readonly TimeSpan CorpseSpawnDelay = TimeSpan.FromMilliseconds(600);
 
-        public const int CapturedCleaningRobotDeathActionParameter2 = 500;
+        // Capture 20260722-keeper-exect-nano / CombatTestMobArchetype: Death Parameter2=503 (0x1F7).
+        public const int CapturedCleaningRobotDeathActionParameter2 = 503;
     }
 }

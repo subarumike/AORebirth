@@ -13,6 +13,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using Utility;
 
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Controllers;
 
     /// <summary>
     /// FunctionType.AreaCastNano (53087).
@@ -112,6 +113,15 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                            || other.Controller is Controllers.NPCController;
             if (isNpc)
             {
+                // Social / quest NPCs (Rex, Marcus, vendors) must not receive Mongo-style
+                // AreaCastNano → TauntNpc. Combat Passive/Aggressive only.
+                NPCController npcController = other.Controller as NPCController;
+                if (npcController != null
+                    && !NpcAiProfiles.CanRetaliate(npcController.AiProfile))
+                {
+                    return false;
+                }
+
                 return true;
             }
 

@@ -51,6 +51,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using ZoneEngine.Core.Packets;
     using ZoneEngine.Core.PacketHandlers;
     using ZoneEngine.Core.Perks;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -335,6 +336,16 @@ namespace ZoneEngine.Core.MessageHandlers
                     break;
 
                 case CharacterActionType.DeleteItem: // Remove/Delete item
+                    if (client.Controller.Character.Playfield.TryDeleteCorpseLootItem(
+                            client.Controller.Character,
+                            message.Target,
+                            message.Parameter1,
+                            message.Parameter2))
+                    {
+                        this.AcknowledgeDelete(client.Controller.Character, message);
+                        break;
+                    }
+
                     if (!InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(
                             client.Controller.Character,
                             message))
@@ -370,7 +381,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     // TODO: IF SNEAKING IS ALLOWED RUN THIS CODE.
                     // TODO: Insert perception checks on receiving characters/mobs and then dont send to playfield
                     // Send Action 162 : Enable Sneak
-
+                    AreteRoboticGuardDogRuntime.NoteSneakStarted(client.Controller.Character);
                     this.Send(client.Controller.Character, this.Sneak(client.Controller.Character), true);
 
                     // End of Enable sneak
