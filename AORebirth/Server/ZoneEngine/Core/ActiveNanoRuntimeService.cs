@@ -776,6 +776,8 @@ namespace ZoneEngine.Core
                 PetRuntimeService.Default.DismissPetByStrain(character, strain);
             }
 
+            AdventurerMorphFlightRuntime.OnMorphNanoRemoved(character, nanoId);
+
             if (notifyClient)
             {
                 CharacterActionMessageHandler.Default.CompleteFriendlyNanoRemoval(

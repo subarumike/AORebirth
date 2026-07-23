@@ -2917,7 +2917,7 @@ namespace AORebirth.Stats
             this.accessCount = new Stat(this, 35, 1234567890, false, false, false);
             this.accessGrant = new Stat(this, 258, 1234567890, false, false, false);
             this.accessKey = new Stat(this, 195, 1234567890, false, false, false);
-            this.accountFlags = new Stat(this, 660, 1234567890, false, true, false);
+            this.accountFlags = new Stat(this, 660, 0, false, true, false);
             this.accumulatedDamage = new Stat(this, 222, 1234567890, false, false, false);
             this.acgEntranceStyles = new Stat(this, 384, 1234567890, false, false, false);
             this.acgItemCategoryId = new Stat(this, 704, 1234567890, false, false, false);
@@ -3106,7 +3106,7 @@ namespace AORebirth.Stats
             this.evade = new StatSkill(this, 155, 5, true, false, false);
             this.exitInstance = new Stat(this, 189, 1234567890, false, false, false);
             this.expansion = new StatExpansion(this, 389, 0, false, true, false);
-            this.expansionPlayfield = new Stat(this, 531, 1234567890, false, false, false);
+            this.expansionPlayfield = new Stat(this, 531, 0, false, false, false);
             this.externalDoorInstance = new Stat(this, 193, 1234567890, false, false, false);
             this.externalPlayfieldInstance = new Stat(this, 192, 1234567890, false, false, false);
             this.extendedFlags = new Stat(this, 598, 1234567890, false, false, false);

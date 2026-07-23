@@ -105,6 +105,11 @@ namespace ZoneEngine.Core.Packets
                     break;
                 default:
                     IItem item = page[slotNumber];
+                    if (item == null)
+                    {
+                        return;
+                    }
+
                     var templateActionMessage = new TemplateActionMessage()
                                                 {
                                                     Identity =

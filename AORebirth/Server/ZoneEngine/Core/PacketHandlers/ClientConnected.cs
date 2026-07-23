@@ -125,6 +125,14 @@ namespace ZoneEngine.Core.PacketHandlers
             PlayfieldAnarchyFMessageHandler.Default.Send(client.Controller.Character);
             MissionInstanceDoorReplay.SendForCharacter(client, client.Controller.Character);
 
+            // Sparrow Flight CanFly requires expansionplayfield==0 (RK). Set from playfield id.
+            if (client.Controller.Character.Playfield != null)
+            {
+                AdventurerMorphFlightRuntime.SyncExpansionPlayfield(
+                    client.Controller.Character,
+                    client.Controller.Character.Playfield.Identity.Instance);
+            }
+
 
             foreach (
 Vendor vendor in
