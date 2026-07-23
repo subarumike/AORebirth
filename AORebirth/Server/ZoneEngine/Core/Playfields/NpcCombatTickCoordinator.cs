@@ -683,6 +683,13 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (!this.playfield.EnsureNpcCombatVisibility(attacker, target))
+            {
+                this.nextLineOfSightRetryTicks[attacker.Identity.Instance] =
+                    utcNow + TimeSpan.FromSeconds(NpcCombatAttackRules.OutOfRangeRetrySeconds);
+                return false;
+            }
+
             this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);
             return true;
         }

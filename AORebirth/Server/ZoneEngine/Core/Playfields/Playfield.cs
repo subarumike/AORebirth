@@ -454,6 +454,21 @@ namespace AORebirth.Core.Playfields
             this.RefreshCorpseVisibilityForRecipient(character);
         }
 
+        internal bool EnsureNpcCombatVisibility(ICharacter attacker, ICharacter target)
+        {
+            if (attacker == null || target == null)
+            {
+                return false;
+            }
+
+            this.runtimeSystems.RefreshCharacterVisibility(
+                attacker,
+                this.SendVisibilityMessage,
+                this.SendVisibilityLeave);
+            return this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity).Any(
+                recipient => recipient.Identity == target.Identity);
+        }
+
         public void ForgetVisibilityRecipient(Identity recipientIdentity)
         {
             this.runtimeSystems.ForgetVisibilityRecipient(recipientIdentity);

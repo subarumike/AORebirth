@@ -119,6 +119,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void NpcDamageRequiresVisibilityEntryBeforeHealthMutation()
+        {
+            string playfieldText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string coordinatorText = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs");
+            string visibilityGate = ExtractBlock(
+                playfieldText,
+                "internal bool EnsureNpcCombatVisibility(ICharacter attacker, ICharacter target)");
+            string damageGate = ExtractBlock(
+                coordinatorText,
+                "private bool CanApplyNpcDamage(");
+            string combatTick = ExtractBlock(
+                coordinatorText,
+                "internal void ProcessCombatTick(ICharacter attacker)");
+
+            AssertBefore(
+                visibilityGate,
+                "this.runtimeSystems.RefreshCharacterVisibility(",
+                "this.runtimeSystems.VisibleRecipientsForSource(attacker.Identity)",
+                "The attacker SCFU/WIFU/CharInPlay sequence must be reconciled before visibility is accepted.");
+            Assert.IsTrue(
+                damageGate.Contains("this.playfield.EnsureNpcCombatVisibility(attacker, target)"),
+                "NPC damage must fail closed when the target has not received the attacker visibility sequence.");
+            AssertBefore(
+                combatTick,
+                "this.CanApplyNpcDamage(",
+                "int damage = this.CalculateCombatDamage(attacker, attackSource);",
+                "Visibility must be proven before damage is selected or player health changes.");
+        }
+
+        [TestMethod]
         public void KnownCharacterDespawnTargetsTrackedRecipientsAndCleansState()
         {
             string playfieldText = ReadRepositoryFile(
