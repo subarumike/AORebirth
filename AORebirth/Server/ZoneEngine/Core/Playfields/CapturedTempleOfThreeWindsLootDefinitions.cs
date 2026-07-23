@@ -24,6 +24,12 @@ namespace AORebirth.Core.Playfields
         internal const string GuardianEncounterKey = "totw.1931.encounter.guardian-of-tomorrow";
         internal const string GartuaProfileKey = "totw.1931.boss.gartua-the-doorkeeper";
         internal const string GartuaEncounterKey = "totw.1931.encounter.gartua-the-doorkeeper";
+        internal const string UkleshProfileKey = "totw.1931.boss.uklesh-the-frozen";
+        internal const string UkleshEncounterKey = "totw.1931.encounter.uklesh-the-frozen";
+        internal const string KhalumProfileKey = "totw.1931.boss.khalum";
+        internal const string KhalumEncounterKey = "totw.1931.encounter.khalum";
+        internal const string AzturProfileKey = "totw.1931.boss.aztur-the-immortal";
+        internal const string AzturEncounterKey = "totw.1931.encounter.aztur-the-immortal";
 
         internal const int DefenderCredits = 1450;
         internal const int DefenderFirstItem = 204750;
@@ -58,6 +64,16 @@ namespace AORebirth.Core.Playfields
         private const string GartuaEvidence =
             "official-live capture 20260721-230824: exact Gartua the Doorkeeper corpse snapshot "
             + "with 1592 credits and 204650 QL1 plus 204598 QL1, both x1";
+        private const string UkleshEvidence =
+            "official-live capture 20260722-045835: exact Uklesh the Frozen corpse snapshot "
+            + "with 625 credits, 204757 QL1 x2, and 204653 QL1 x1";
+        private const string KhalumEvidence =
+            "official-live capture 20260722-045835: exact Khalum corpse snapshot with "
+            + "625 credits, 204608 QL1 x2, and 204598 QL1 x1";
+        private const string AzturEvidence =
+            "official-live capture 20260722-045835: exact Aztur the Immortal corpse snapshot "
+            + "with 3184 credits, 287143 QL200 x1, 204593 QL1 x2, 204755 QL1 x1, "
+            + "and 204608 QL1 x1";
 
         internal static bool TryRegister(
             LootTableRegistry registry,
@@ -108,6 +124,18 @@ namespace AORebirth.Core.Playfields
                 case GartuaProfileKey:
                     table = BuildGartuaLootTable();
                     evidence = GartuaEvidence;
+                    break;
+                case UkleshProfileKey:
+                    table = BuildUkleshLootTable();
+                    evidence = UkleshEvidence;
+                    break;
+                case KhalumProfileKey:
+                    table = BuildKhalumLootTable();
+                    evidence = KhalumEvidence;
+                    break;
+                case AzturProfileKey:
+                    table = BuildAzturLootTable();
+                    evidence = AzturEvidence;
                     break;
                 default:
                     return false;
@@ -288,6 +316,53 @@ namespace AORebirth.Core.Playfields
                     GartuaEvidence,
                     Entry(key, 204650, 204650, 1, 1, GartuaEvidence),
                     Entry(key, 204598, 204598, 1, 1, GartuaEvidence)));
+        }
+
+        internal static LootTableDefinition BuildUkleshLootTable()
+        {
+            const string key = "capture.20260722-045835.uklesh";
+            return Table(
+                UkleshProfileKey,
+                "Uklesh the Frozen captured corpse snapshot",
+                UkleshEvidence,
+                Snapshot(
+                    key,
+                    625,
+                    UkleshEvidence,
+                    Entry(key, 204757, 204757, 1, 2, UkleshEvidence),
+                    Entry(key, 204653, 204653, 1, 1, UkleshEvidence)));
+        }
+
+        internal static LootTableDefinition BuildKhalumLootTable()
+        {
+            const string key = "capture.20260722-045835.khalum";
+            return Table(
+                KhalumProfileKey,
+                "Khalum captured corpse snapshot",
+                KhalumEvidence,
+                Snapshot(
+                    key,
+                    625,
+                    KhalumEvidence,
+                    Entry(key, 204608, 204608, 1, 2, KhalumEvidence),
+                    Entry(key, 204598, 204598, 1, 1, KhalumEvidence)));
+        }
+
+        internal static LootTableDefinition BuildAzturLootTable()
+        {
+            const string key = "capture.20260722-045835.aztur";
+            return Table(
+                AzturProfileKey,
+                "Aztur the Immortal captured corpse snapshot",
+                AzturEvidence,
+                Snapshot(
+                    key,
+                    3184,
+                    AzturEvidence,
+                    Entry(key, 287143, 287143, 200, 1, AzturEvidence),
+                    Entry(key, 204593, 204593, 1, 2, AzturEvidence),
+                    Entry(key, 204755, 204755, 1, 1, AzturEvidence),
+                    Entry(key, 204608, 204608, 1, 1, AzturEvidence)));
         }
 
         private static LootTableDefinition Table(

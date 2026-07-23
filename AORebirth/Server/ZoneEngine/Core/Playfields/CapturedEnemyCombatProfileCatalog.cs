@@ -123,18 +123,18 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            bool fixedRechargeCanReplayEveryObservation =
-                landedIntervalObservationsSeconds.All(
+            bool fixedRechargeMatchesCapturedObservation =
+                landedIntervalObservationsSeconds.Any(
                     value => NearlyEqual(value, attack.RechargeSeconds));
-            bool fixedAttackStartDelayCanReplayEveryObservation =
-                this.CapturedAttackStartDelayObservationsSeconds.All(
+            bool fixedAttackStartDelayMatchesCapturedObservation =
+                this.CapturedAttackStartDelayObservationsSeconds.Any(
                     value => NearlyEqual(value, attackStartDelaySeconds));
-            bool fixedFirstHitDelayCanReplayEveryObservation =
-                this.CapturedFirstHitDelayObservationsSeconds.All(
+            bool fixedFirstHitDelayMatchesCapturedObservation =
+                this.CapturedFirstHitDelayObservationsSeconds.Any(
                     value => NearlyEqual(value, firstHitDelaySeconds));
-            return fixedRechargeCanReplayEveryObservation
-                   && fixedAttackStartDelayCanReplayEveryObservation
-                   && fixedFirstHitDelayCanReplayEveryObservation
+            return fixedRechargeMatchesCapturedObservation
+                   && fixedAttackStartDelayMatchesCapturedObservation
+                   && fixedFirstHitDelayMatchesCapturedObservation
                    && attack.MinDamage == this.MinimumObservedDamage
                    && attack.MaxDamage == this.MaximumObservedDamage
                    && attack.DamageBonus == this.CapturedDamageBonus.Value
@@ -639,13 +639,20 @@ namespace AORebirth.Core.Playfields
             }
             else
             {
+                CapturedEnemyCombatProfileDefinition[] exactSpecializedMatches =
+                    current.AttackModel == CapturedEnemyAttackModel.Specialized
+                        ? compatibleMatches.Where(
+                            value => value.MatchesSpecialized(current)).ToArray()
+                        : new CapturedEnemyCombatProfileDefinition[0];
                 CapturedEnemyCombatProfileDefinition[] stableWeaponMatches =
                     compatibleMatches.Where(
                         value => value.MatchesStableWeaponProfile(current)).ToArray();
                 CapturedEnemyCombatProfileDefinition[] compatibleSelection =
-                    stableWeaponMatches.Length == 0
-                        ? compatibleMatches
-                        : stableWeaponMatches;
+                    exactSpecializedMatches.Length > 0
+                        ? exactSpecializedMatches
+                        : stableWeaponMatches.Length == 0
+                            ? compatibleMatches
+                            : stableWeaponMatches;
                 if (compatibleSelection.Length == 1)
                 {
                     selected = compatibleSelection;

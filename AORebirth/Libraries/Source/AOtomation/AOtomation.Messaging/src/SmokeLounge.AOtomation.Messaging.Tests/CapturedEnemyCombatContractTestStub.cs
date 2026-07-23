@@ -548,7 +548,26 @@ namespace AORebirth.Core.Playfields
             {
                 AttackModel = CapturedEnemyAttackModel.Specialized,
                 Evidence = evidence,
-                SpecialAttackSequence = specialAttackSequence
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
+                SpecialAttackSequence = specialAttackSequence,
+                HasCapturedSpecialAttackWeaponContext = true,
+                CapturedSpecialAttacks = specialAttackSequence.SpecialAttacks,
+                HasCapturedAttackStartContext = true,
+                SpecialAttackWeaponN3Unknown =
+                    specialAttackSequence.SpecialAttackWeaponN3Unknown,
+                SpecialAttackWeaponUnknown1 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown1,
+                SpecialAttackWeaponUnknown2 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown2,
+                SpecialAttackWeaponUnknown3 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown3,
+                SpecialAttackWeaponUnknown4 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown4,
+                SpecialAttackWeaponUnknown5 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown5,
+                AttackN3Unknown = specialAttackSequence.AttackN3Unknown,
+                AttackAction = specialAttackSequence.AttackAction
             };
             contract.RefreshSpecializedReadiness();
             return contract;
@@ -563,8 +582,27 @@ namespace AORebirth.Core.Playfields
             {
                 AttackModel = CapturedEnemyAttackModel.Specialized,
                 Evidence = evidence,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 ParallelAttackSequence = parallelAttackSequence,
-                RequiresDamageLineOfSight = requiresDamageLineOfSight
+                RequiresDamageLineOfSight = requiresDamageLineOfSight,
+                HasCapturedSpecialAttackWeaponContext = true,
+                CapturedSpecialAttacks = parallelAttackSequence.SpecialAttacks,
+                HasCapturedAttackStartContext = true,
+                SpecialAttackWeaponN3Unknown =
+                    parallelAttackSequence.SpecialAttackWeaponN3Unknown,
+                SpecialAttackWeaponUnknown1 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown1,
+                SpecialAttackWeaponUnknown2 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown2,
+                SpecialAttackWeaponUnknown3 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown3,
+                SpecialAttackWeaponUnknown4 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown4,
+                SpecialAttackWeaponUnknown5 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown5,
+                AttackN3Unknown = parallelAttackSequence.AttackN3Unknown,
+                AttackAction = parallelAttackSequence.AttackAction
             };
             contract.RefreshSpecializedReadiness();
             return contract;

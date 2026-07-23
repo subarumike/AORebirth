@@ -35,6 +35,9 @@ namespace AORebirth.Core.Playfields
         internal const int NematetMonsterData = 26159;
         internal const int GuardianMonsterData = 22798;
         internal const int GartuaMonsterData = 159085;
+        internal const int UkleshMonsterData = 40515;
+        internal const int KhalumMonsterData = 95352;
+        internal const int AzturMonsterData = 159966;
         internal const int ReanimatedMonsterData = 41690;
 
         internal const string DefenderProfileKey =
@@ -55,6 +58,12 @@ namespace AORebirth.Core.Playfields
             CapturedTempleOfThreeWindsLootDefinitions.GuardianProfileKey;
         internal const string GartuaProfileKey =
             CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey;
+        internal const string UkleshProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.UkleshProfileKey;
+        internal const string KhalumProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.KhalumProfileKey;
+        internal const string AzturProfileKey =
+            CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey;
         internal const string ReanimatedProfileKey = "totw.647.encounter.re-animator.reanimated-corpse";
 
         internal const int DefenderPrimaryNanoId = 205389;
@@ -80,6 +89,8 @@ namespace AORebirth.Core.Playfields
         internal const double NamedLootedCleanupPolicySeconds = 1.7;
         internal const double NamedLeashPolicyDistance = 40.0;
         internal const float NamedAutomaticAggroPolicyRadius = 7.0f;
+        internal const double KhalumSpawnAfterUkleshDeathSeconds = 0.6822027;
+        internal const double AzturSpawnAfterKhalumDeathSeconds = 0.211;
 
         private const double DefenderInitialNanoDelaySeconds = 1.147246;
         private const double DefenderNanoRepeatSeconds = 10.272;
@@ -218,7 +229,34 @@ namespace AORebirth.Core.Playfields
                     new[] { GartuaNanoId },
                     GartuaInitialNanoDelaySeconds,
                     GartuaNanoRepeatSeconds,
-                    true)
+                    true),
+                new NamedEncounterState(
+                    CreateUkleshDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.UkleshTheFrozen(),
+                    true,
+                    new int[0],
+                    0.0,
+                    0.0,
+                    spawnOnActivation: true,
+                    suppressIndependentRespawn: true),
+                new NamedEncounterState(
+                    CreateKhalumDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.Khalum(),
+                    true,
+                    new int[0],
+                    0.0,
+                    0.0,
+                    spawnOnActivation: false,
+                    suppressIndependentRespawn: true),
+                new NamedEncounterState(
+                    CreateAzturDefinition(),
+                    CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal(),
+                    true,
+                    new int[0],
+                    0.0,
+                    0.0,
+                    spawnOnActivation: false,
+                    suppressIndependentRespawn: true)
             };
             this.reanimatedSlots = new[]
             {
@@ -248,7 +286,9 @@ namespace AORebirth.Core.Playfields
 
             foreach (NamedEncounterState state in this.namedEncounters)
             {
-                if (state.Identity.Instance != 0 || state.RespawnDueAtUtc.HasValue)
+                if (!state.SpawnOnActivation
+                    || state.Identity.Instance != 0
+                    || state.RespawnDueAtUtc.HasValue)
                 {
                     continue;
                 }
@@ -363,13 +403,14 @@ namespace AORebirth.Core.Playfields
             return living;
         }
 
-        internal ICharacter[] NotifyDeath(ICharacter target)
+        internal ICharacter[] NotifyDeath(ICharacter target, DateTime diedAtUtc)
         {
             NamedEncounterState state = this.FindNamed(target);
             if (state != null)
             {
                 state.Dead = true;
                 state.ClearCombat();
+                this.ScheduleMainRoomSuccessor(state, diedAtUtc);
                 if (string.Equals(
                     state.Definition.ProfileKey,
                     ReAnimatorProfileKey,
@@ -396,7 +437,10 @@ namespace AORebirth.Core.Playfields
             if (state != null)
             {
                 state.Identity = Identity.None;
-                state.RespawnDueAtUtc = utcNow.AddSeconds(NamedRespawnAfterNpcDespawnSeconds);
+                state.RespawnDueAtUtc = state.SuppressIndependentRespawn
+                                            ? (DateTime?)null
+                                            : utcNow.AddSeconds(
+                                                NamedRespawnAfterNpcDespawnSeconds);
                 state.ClearCombat();
                 return;
             }
@@ -831,6 +875,143 @@ namespace AORebirth.Core.Playfields
                 maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
         }
 
+        internal static CapturedEncounterRuntimeDefinition CreateUkleshDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                UkleshProfileKey,
+                "totw.1931.boss.uklesh-the-frozen.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.UkleshEncounterKey,
+                "Uklesh the Frozen",
+                UkleshMonsterData,
+                true,
+                false,
+                73,
+                21039,
+                108,
+                283,
+                283,
+                0,
+                3,
+                274.950745f,
+                16.611248f,
+                531.1443f,
+                0f,
+                0.9149572f,
+                0f,
+                -0.4035505f,
+                1227u,
+                unchecked((int)0x022A6A43),
+                0,
+                HexToBytes("80000000000000008000000003010001000100010001000000020000"),
+                0,
+                40495,
+                NamedUnlootedCorpseLifetimePolicySeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260722-045421 exact SCFU; 20260722-045835 complete fight, exact "
+                + "two-stream combat, death, 0.6822027-second Khalum succession, corpse, "
+                + "625 credits, and exact loot snapshot",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 6,
+                sex: 0,
+                race: 1,
+                headMesh: 0,
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
+        internal static CapturedEncounterRuntimeDefinition CreateKhalumDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                KhalumProfileKey,
+                "totw.1931.boss.khalum.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.KhalumEncounterKey,
+                "Khalum",
+                KhalumMonsterData,
+                true,
+                false,
+                73,
+                25247,
+                108,
+                283,
+                283,
+                0,
+                3,
+                281.30542f,
+                16.611248f,
+                529.3965f,
+                0f,
+                0.9760028f,
+                0f,
+                0.217757955f,
+                1227u,
+                unchecked((int)0x022A6A43),
+                0,
+                HexToBytes("00000000000000008000000003010001000100010001000000020000"),
+                0,
+                95294,
+                NamedUnlootedCorpseLifetimePolicySeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260722-045835 exact post-Uklesh SCFU, two-stream combat, death, "
+                + "0.211-second Aztur succession, corpse, 625 credits, and exact loot snapshot",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 6,
+                sex: 0,
+                race: 1,
+                headMesh: 0,
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
+        internal static CapturedEncounterRuntimeDefinition CreateAzturDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                AzturProfileKey,
+                "totw.1931.boss.aztur-the-immortal.spawn",
+                CapturedTempleOfThreeWindsLootDefinitions.AzturEncounterKey,
+                "Aztur the Immortal",
+                AzturMonsterData,
+                true,
+                false,
+                74,
+                38630,
+                163,
+                522,
+                522,
+                0,
+                3,
+                280.845642f,
+                16.611248f,
+                518.7123f,
+                0f,
+                0.9622065f,
+                0f,
+                0.272320867f,
+                1419u,
+                unchecked((int)0x020A6A43),
+                0,
+                HexToBytes("00000000000000008000000003010001000100010001000000020000"),
+                0,
+                159384,
+                NamedUnlootedCorpseLifetimePolicySeconds,
+                NamedLootedCleanupPolicySeconds,
+                "20260722-045835 exact post-Khalum SCFU, complete three-stream fight, "
+                + "ordered mutable SAW state, death, corpse, 3184 credits, and exact loot",
+                npcFamily: 136,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 4,
+                sex: 1,
+                race: 1,
+                headMesh: 0,
+                meshes: new[]
+                {
+                    new CapturedSubwayMeshDefinition(1, 160016u, 0, 2)
+                },
+                maximumNpcLeashDistanceFromHome: NamedLeashPolicyDistance);
+        }
+
         private static CapturedEncounterRuntimeDefinition HumanDefinition(
             string profileKey,
             string spawnKey,
@@ -948,6 +1129,55 @@ namespace AORebirth.Core.Playfields
                     this.SpawnInitialReanimatedAdds();
                 }
             }
+        }
+
+        private void ScheduleMainRoomSuccessor(
+            NamedEncounterState state,
+            DateTime diedAtUtc)
+        {
+            string successorProfileKey;
+            double delaySeconds;
+            if (!TryGetMainRoomSuccessor(
+                    state.Definition.ProfileKey,
+                    out successorProfileKey,
+                    out delaySeconds))
+            {
+                return;
+            }
+
+            NamedEncounterState successor = this.FindNamed(successorProfileKey);
+            if (successor == null
+                || successor.Identity.Instance != 0
+                || successor.RespawnDueAtUtc.HasValue)
+            {
+                return;
+            }
+
+            successor.RespawnDueAtUtc = diedAtUtc.AddSeconds(delaySeconds);
+        }
+
+        internal static bool TryGetMainRoomSuccessor(
+            string profileKey,
+            out string successorProfileKey,
+            out double delaySeconds)
+        {
+            if (string.Equals(profileKey, UkleshProfileKey, StringComparison.Ordinal))
+            {
+                successorProfileKey = KhalumProfileKey;
+                delaySeconds = KhalumSpawnAfterUkleshDeathSeconds;
+                return true;
+            }
+
+            if (string.Equals(profileKey, KhalumProfileKey, StringComparison.Ordinal))
+            {
+                successorProfileKey = AzturProfileKey;
+                delaySeconds = AzturSpawnAfterKhalumDeathSeconds;
+                return true;
+            }
+
+            successorProfileKey = string.Empty;
+            delaySeconds = 0.0;
+            return false;
         }
 
         private void ProcessNamedNano(NamedEncounterState state, DateTime utcNow)
@@ -1408,7 +1638,9 @@ namespace AORebirth.Core.Playfields
                 int[] nanoCycle,
                 double initialNanoDelaySeconds,
                 double nanoRepeatSeconds,
-                bool nanoTargetsSelf = false)
+                bool nanoTargetsSelf = false,
+                bool spawnOnActivation = true,
+                bool suppressIndependentRespawn = false)
             {
                 this.Definition = definition;
                 this.Combat = combat;
@@ -1417,6 +1649,8 @@ namespace AORebirth.Core.Playfields
                 this.InitialNanoDelaySeconds = initialNanoDelaySeconds;
                 this.NanoRepeatSeconds = nanoRepeatSeconds;
                 this.NanoTargetsSelf = nanoTargetsSelf;
+                this.SpawnOnActivation = spawnOnActivation;
+                this.SuppressIndependentRespawn = suppressIndependentRespawn;
                 this.Identity = Identity.None;
             }
 
@@ -1427,6 +1661,8 @@ namespace AORebirth.Core.Playfields
             internal double InitialNanoDelaySeconds { get; private set; }
             internal double NanoRepeatSeconds { get; private set; }
             internal bool NanoTargetsSelf { get; private set; }
+            internal bool SpawnOnActivation { get; private set; }
+            internal bool SuppressIndependentRespawn { get; private set; }
             internal Identity Identity { get; set; }
             internal DateTime? RespawnDueAtUtc { get; set; }
             internal DateTime? NextNanoAtUtc { get; set; }

@@ -1430,7 +1430,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int templeQuarantined = 0;
 
             Assert.AreEqual(322, spawns.Count(value => value.PlayfieldInstance == 127));
-            Assert.AreEqual(153, spawns.Count(value => value.PlayfieldInstance == 1931));
+            Assert.AreEqual(167, spawns.Count(value => value.PlayfieldInstance == 1931));
             foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
             {
                 OrdinaryEnemyProfile profile = profiles[spawn.ProfileKey];

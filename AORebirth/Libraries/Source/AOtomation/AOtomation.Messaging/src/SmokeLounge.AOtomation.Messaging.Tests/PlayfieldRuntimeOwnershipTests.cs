@@ -186,15 +186,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void TemplePopulationContractRemainsOneHundredFiftyThreeOrdinaryAndElevenNamed()
+        public void TemplePopulationContractHasOneHundredSixtySevenOrdinaryAndTwelveInitiallyActiveNamed()
         {
             string repositoryRoot = FindRepositoryRoot();
             string encounterText = Read(
                 repositoryRoot,
                 @"Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs");
 
-            Assert.AreEqual(153, new CapturedTempleOfThreeWindsContentProvider().GetSpawns().Length);
-            Assert.AreEqual(9, CountOccurrences(encounterText, "new NamedEncounterState("));
+            Assert.AreEqual(167, new CapturedTempleOfThreeWindsContentProvider().GetSpawns().Length);
+            Assert.AreEqual(12, CountOccurrences(encounterText, "new NamedEncounterState("));
+            Assert.AreEqual(2, CountOccurrences(encounterText, "spawnOnActivation: false"));
             Assert.AreEqual(2, CountOccurrences(encounterText, "new ReanimatedSlotState("));
         }
 

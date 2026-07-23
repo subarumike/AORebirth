@@ -17,12 +17,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemyProfile[] templeProfiles = temple.GetProfiles();
             OrdinaryEnemySpawnDefinition[] templeSpawns = temple.GetSpawns();
 
-            Assert.AreEqual(9, templeProfiles.Length);
-            Assert.AreEqual(153, templeSpawns.Length);
+            Assert.AreEqual(10, templeProfiles.Length);
+            Assert.AreEqual(167, templeSpawns.Length);
             Assert.IsTrue(templeProfiles.All(value => value.ProfileKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(templeProfiles.All(value => !value.BossOrScripted));
             Assert.AreEqual(7, templeProfiles.Count(value => value.DisplayName == "Cultist"));
             Assert.AreEqual(1, templeProfiles.Count(value => value.DisplayName == "Eternal Sentinel"));
+            Assert.AreEqual(1, templeProfiles.Count(value => value.DisplayName == "Deathless Legionnaire"));
             Assert.AreEqual(1, templeProfiles.Count(value => value.DisplayName == "Murial the Faithful"));
             Assert.IsTrue(templeSpawns.All(value => value.PlayfieldInstance == 1931));
             Assert.IsTrue(templeSpawns.All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
@@ -34,10 +35,176 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 temple);
             Assert.AreEqual(322, catalog.GetRuntimeSpawns(127).Length);
             Assert.AreEqual(0, catalog.GetRuntimeSpawns(647).Length);
-            Assert.AreEqual(153, catalog.GetRuntimeSpawns(1931).Length);
-            Assert.AreEqual(475, catalog.GetSpawns().Length);
+            Assert.AreEqual(167, catalog.GetRuntimeSpawns(1931).Length);
+            Assert.AreEqual(489, catalog.GetSpawns().Length);
             Assert.IsTrue(catalog.GetRuntimeSpawns(127).All(value => !value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
             Assert.IsTrue(catalog.GetRuntimeSpawns(1931).All(value => value.SpawnKey.StartsWith("totw.", StringComparison.Ordinal)));
+        }
+
+        [TestMethod]
+        public void DeathlessLegionnairesUseExactFrontDoorAnchorsAndGeneratedCombat()
+        {
+            var provider = new CapturedTempleOfThreeWindsContentProvider();
+            OrdinaryEnemyProfile profile = provider.GetProfiles().Single(
+                value => value.ProfileKey
+                         == CapturedTempleOfThreeWindsContentProvider
+                             .DeathlessLegionnaireProfileKey);
+            OrdinaryEnemySpawnDefinition[] spawns = provider.GetSpawns().Where(
+                value => value.ProfileKey == profile.ProfileKey).ToArray();
+
+            Assert.AreEqual("Deathless Legionnaire", profile.DisplayName);
+            Assert.AreEqual(42981, profile.MonsterData);
+            Assert.AreEqual(1611u, profile.Appearance.AppearanceValue);
+            Assert.AreEqual(204735u, profile.Appearance.Meshes.Single().Id);
+            Assert.AreEqual(42952, profile.Corpse.CapturedCatMesh.Value);
+            Assert.AreEqual(14, spawns.Length);
+            Assert.AreEqual(4, spawns.Count(value => value.Level == 48));
+            Assert.AreEqual(3, spawns.Count(value => value.Level == 49));
+            Assert.AreEqual(7, spawns.Count(value => value.Level == 50));
+            Assert.AreEqual(5, spawns.Count(
+                value => value.MovementMode == OrdinaryEnemyMovementMode.Patrol));
+            Assert.AreEqual(9, spawns.Count(
+                value => value.MovementMode == OrdinaryEnemyMovementMode.Static));
+            Assert.IsTrue(spawns.All(value => value.SourceCapture == "20260722-042930"));
+            Assert.AreEqual(19, profile.Loot.ObservedCompleteInventories);
+            Assert.AreEqual(15, profile.Loot.ObservedEmptyInventories);
+            Assert.AreEqual(204746, profile.Loot.Entries.Single().LowId);
+            Assert.AreEqual(
+                1012,
+                profile.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 48)
+                    .MinimumCredits);
+            Assert.AreEqual(
+                1036,
+                profile.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 49)
+                    .MinimumCredits);
+            Assert.AreEqual(
+                1059,
+                profile.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 50)
+                    .MinimumCredits);
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns.Where(
+                value => value.Level >= 49))
+            {
+                CapturedEnemyCombatContract current =
+                    profile.Combat.ResolveContract(spawn.SourceIdentity, spawn.Level);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        profile.DisplayName,
+                        profile.MonsterData,
+                        spawn.Level,
+                        spawn.SourceIdentity,
+                        current,
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, resolved.AttackModel);
+                Assert.AreEqual(spawn.Level == 49 ? 41 : 42, resolved.MinDamage);
+                Assert.AreEqual(resolved.MinDamage, resolved.MaxDamage);
+                Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+                Assert.AreEqual(0, resolved.AttackInfoUnknown);
+                Assert.AreEqual(3, resolved.AttackInfoHitType);
+                Assert.IsNotNull(resolved.WeaponDefinition);
+                Assert.AreEqual(11, resolved.WeaponDefinition.Unknown1);
+                Assert.AreEqual(6, resolved.WeaponDefinition.InventorySlot);
+                Assert.AreEqual(1000015, resolved.WeaponDefinition.StateMachineType);
+                Assert.AreEqual(
+                    spawn.Level == 49 ? 789 : 806,
+                    resolved.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    spawn.Level == 49 ? 28 : 29,
+                    resolved.SpecialAttackWeaponUnknown4);
+            }
+
+            OrdinaryEnemySpawnDefinition level48 = spawns.First(
+                value => value.Level == 48);
+            CapturedEnemyCombatContract rejected;
+            string rejectedFailure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    profile.DisplayName,
+                    profile.MonsterData,
+                    level48.Level,
+                    level48.SourceIdentity,
+                    profile.Combat.ResolveContract(level48.SourceIdentity, level48.Level),
+                    out rejected,
+                    out rejectedFailure));
+            StringAssert.Contains(rejectedFailure, "no canonical raw combat profile");
+        }
+
+        [TestMethod]
+        public void AzturRoomBossCombatUsesTheCompleteCapture()
+        {
+            CapturedEnemyCombatContract ukleshCombat =
+                CapturedTempleOfThreeWindsCombatCatalog.UkleshTheFrozen();
+            Assert.IsTrue(ukleshCombat.IsCombatReady);
+            Assert.AreEqual(
+                unchecked((int)0x7987F730u),
+                ukleshCombat.EvidenceSourceIdentity);
+            Assert.AreEqual(2, ukleshCombat.ParallelAttackSequence.Streams.Length);
+            Assert.AreEqual(
+                127,
+                ukleshCombat.ParallelAttackSequence.Streams[0].Attack.MinDamage);
+            Assert.AreEqual(
+                58,
+                ukleshCombat.ParallelAttackSequence.Streams[1].Attack.MinDamage);
+            CollectionAssert.AreEqual(
+                new[] { 0, 20 },
+                ukleshCombat.CapturedSpecialAttackWeaponUnknown5Observations);
+
+            CapturedEnemyCombatContract khalumCombat;
+            CapturedEnemyCombatContract khalumBaseline =
+                CapturedTempleOfThreeWindsCombatCatalog.Khalum();
+            Assert.IsTrue(khalumBaseline.Retaliates);
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    "Khalum",
+                    95352,
+                    73,
+                    unchecked((int)0x7988C14Du),
+                    khalumBaseline,
+                    out khalumCombat,
+                    out failure),
+                failure);
+            Assert.IsTrue(khalumCombat.IsCombatReady);
+            Assert.AreEqual(2, khalumCombat.ParallelAttackSequence.Streams.Length);
+            Assert.IsTrue(khalumCombat.ParallelAttackSequence.Streams.All(
+                value => value.Attack.MinDamage == 58
+                         && value.Attack.MaxDamage == 58));
+
+            CapturedEnemyCombatContract azturCombat;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    "Aztur the Immortal",
+                    159966,
+                    74,
+                    unchecked((int)0x7988C153u),
+                    CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal(),
+                    out azturCombat,
+                    out failure),
+                failure);
+            Assert.IsTrue(azturCombat.IsCombatReady);
+            Assert.AreEqual(3, azturCombat.ParallelAttackSequence.Streams.Length);
+            Assert.AreEqual(
+                83,
+                azturCombat.ParallelAttackSequence.Streams[0].Attack.MinDamage);
+            Assert.AreEqual(
+                350,
+                azturCombat.ParallelAttackSequence.Streams[1].Attack.MinDamage);
+            Assert.AreEqual(
+                157,
+                azturCombat.ParallelAttackSequence.Streams[2].Attack.MinDamage);
+            CollectionAssert.AreEqual(
+                new[] { 0, 62, 62, 62, 62, 62, 62 },
+                azturCombat.CapturedSpecialAttackWeaponUnknown5Observations);
         }
 
         [TestMethod]
@@ -352,7 +519,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 registry,
                 CapturedTempleOfThreeWindsLootDefinitions.GartuaProfileKey,
                 CapturedTempleOfThreeWindsLootDefinitions.GartuaEncounterKey));
-            Assert.AreEqual(9, registry.Assignments().Length);
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.UkleshProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.UkleshEncounterKey));
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.KhalumProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.KhalumEncounterKey));
+            Assert.IsTrue(CapturedTempleOfThreeWindsLootDefinitions.TryRegister(
+                registry,
+                CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey,
+                CapturedTempleOfThreeWindsLootDefinitions.AzturEncounterKey));
+            Assert.AreEqual(12, registry.Assignments().Length);
             Assert.IsTrue(registry.Assignments().All(value => value.PlayfieldId.Value == 1931));
 
             Assert.AreEqual(5, CapturedTempleOfThreeWindsLootDefinitions.BuildYatilaLootTable().ObservedCorpseSnapshots[0].Entries.Length);
@@ -365,6 +544,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(4, CapturedTempleOfThreeWindsLootDefinitions.BuildGuardianLootTable().ObservedCorpseSnapshots[0].Entries.Length);
             Assert.AreEqual(1592, CapturedTempleOfThreeWindsLootDefinitions.BuildGartuaLootTable().ObservedCorpseSnapshots[0].Credits);
             Assert.AreEqual(2, CapturedTempleOfThreeWindsLootDefinitions.BuildGartuaLootTable().ObservedCorpseSnapshots[0].Entries.Length);
+            Assert.AreEqual(625, CapturedTempleOfThreeWindsLootDefinitions.BuildUkleshLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(2, CapturedTempleOfThreeWindsLootDefinitions.BuildUkleshLootTable().ObservedCorpseSnapshots[0].Entries[0].MinimumQuantity);
+            Assert.AreEqual(625, CapturedTempleOfThreeWindsLootDefinitions.BuildKhalumLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(2, CapturedTempleOfThreeWindsLootDefinitions.BuildKhalumLootTable().ObservedCorpseSnapshots[0].Entries[0].MinimumQuantity);
+            Assert.AreEqual(3184, CapturedTempleOfThreeWindsLootDefinitions.BuildAzturLootTable().ObservedCorpseSnapshots[0].Credits);
+            Assert.AreEqual(4, CapturedTempleOfThreeWindsLootDefinitions.BuildAzturLootTable().ObservedCorpseSnapshots[0].Entries.Length);
             Assert.AreEqual(
                 200,
                 CapturedTempleOfThreeWindsLootDefinitions.BuildNematetLootTable().ObservedCorpseSnapshots[0].Entries[0].FixedQuality);

@@ -10,8 +10,8 @@ namespace AORebirth.Core.Playfields
         internal const int PlayfieldInstance = 1931;
         internal const int ExpectedCultistProfileCount = 7;
         internal const int ExpectedCultistSpawnCount = 149;
-        internal const int ExpectedProfileCount = 9;
-        internal const int ExpectedSpawnCount = 153;
+        internal const int ExpectedProfileCount = 10;
+        internal const int ExpectedSpawnCount = 167;
         internal const double CapturedDeathToRespawnSeconds = 310.0;
         internal const double RuntimeRespawnAfterNpcDespawnSeconds = 300.0;
         internal const double PolicyAutomaticAggroRadius = 7.0;
@@ -19,6 +19,8 @@ namespace AORebirth.Core.Playfields
         internal const double CapturedMedianAttackIntervalSeconds = 4.635295;
         internal const string MurialProfileKey =
             "totw.ordinary.main-room.murial-the-faithful.26090";
+        internal const string DeathlessLegionnaireProfileKey =
+            "totw.ordinary.deathless-legionnaire.42981";
 
         private const string EvidenceReference =
             "20260721-030515,20260721-031913,20260721-032247,20260721-032547,20260721-033006";
@@ -39,6 +41,12 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CapturedEnemyCombatContract MurialCombat =
             CapturedTempleOfThreeWindsCombatCatalog.MurialTheFaithful();
+
+        private static readonly CapturedEnemyCombatContract DeathlessLegionnaireCombat =
+            CapturedEnemyCombatContract.Unresolved(
+                "20260722-044315: exact generated Deathless Legionnaire profiles resolve by "
+                + "PF1931/name/MonsterData/level; level 48 remains fail-closed",
+                true);
 
         private static readonly RespawnPolicyDefinition CultistRespawn =
             new RespawnPolicyDefinition
@@ -266,7 +274,13 @@ namespace AORebirth.Core.Playfields
         {
             OrdinaryEnemyProfile[] profiles = ProfileSeeds
                 .Select(BuildProfile)
-                .Concat(new[] { BuildEternalSentinelProfile(), BuildMurialProfile() })
+                .Concat(
+                    new[]
+                    {
+                        BuildEternalSentinelProfile(),
+                        BuildDeathlessLegionnaireProfile(),
+                        BuildMurialProfile()
+                    })
                 .OrderBy(value => value.ProfileKey, StringComparer.Ordinal)
                 .ToArray();
             if (profiles.Length != ExpectedProfileCount)
@@ -285,6 +299,7 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnDefinition[] spawns = SpawnSeeds
                 .Select(seed => BuildSpawn(seed, profiles[seed.ProfileKey]))
                 .Concat(BuildEternalSentinelSpawns())
+                .Concat(BuildDeathlessLegionnaireSpawns())
                 .Concat(new[] { BuildMurialSpawn() })
                 .OrderBy(value => value.SourceIdentity)
                 .ToArray();
@@ -460,6 +475,279 @@ namespace AORebirth.Core.Playfields
                 OrdinaryEnemyRuntimeDisposition.Active,
                 string.Empty,
                 "20260721-041439",
+                string.Empty,
+                null,
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
+        }
+
+        private static OrdinaryEnemyProfile BuildDeathlessLegionnaireProfile()
+        {
+            const string evidence =
+                "20260722-042930/043108/044315: 14 exact front-door SCFU anchors, "
+                + "identity-linked corpse mesh 42952, 19 complete corpse inventories, "
+                + "level-credit outcomes, and exact generated level 49/50 combat profiles";
+            return new OrdinaryEnemyProfile(
+                DeathlessLegionnaireProfileKey,
+                "totw.ordinary.deathless-legionnaire",
+                "Deathless Legionnaire",
+                42981,
+                OrdinaryEnemyConstructionMode.CapturedDirect,
+                string.Empty,
+                new OrdinaryEnemyAppearanceProfile(
+                    3,
+                    1,
+                    2,
+                    2,
+                    1,
+                    268964353,
+                    0,
+                    0,
+                    136,
+                    0,
+                    31,
+                    0,
+                    1611u,
+                    0,
+                    true,
+                    false,
+                    new[]
+                    {
+                        new OrdinaryEnemyTextureProfile(0, 0, 0),
+                        new OrdinaryEnemyTextureProfile(1, 0, 0),
+                        new OrdinaryEnemyTextureProfile(2, 0, 0),
+                        new OrdinaryEnemyTextureProfile(3, 0, 0),
+                        new OrdinaryEnemyTextureProfile(4, 0, 0)
+                    },
+                    new[]
+                    {
+                        new OrdinaryEnemyMeshProfile(1, 204735u, 0, 2)
+                    },
+                    OrdinaryEnemyScfuProfile.CapturedExact),
+                CultistAggression,
+                new OrdinaryEnemyCombatProfile(
+                    OrdinaryEnemyCombatMode.EquippedMelee,
+                    OrdinaryEnemyDamageSource.CapturedFixed,
+                    true,
+                    DeathlessLegionnaireCombat,
+                    OrdinaryEnemyEvidenceState.Observed),
+                new OrdinaryEnemyLootProfile(
+                    OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                    new[]
+                    {
+                        new OrdinaryEnemyLootEntry(
+                            204746,
+                            204746,
+                            1,
+                            0,
+                            1,
+                            4,
+                            0,
+                            OrdinaryEnemyLootEvidence.ObservedAvailableLoot,
+                            OrdinaryEnemyLootLinkageEvidence.ProvenEnemyCorpseItem,
+                            OrdinaryEnemyLootProbabilityEvidence.ExistingCapturePolicy,
+                            4,
+                            4,
+                            "20260722-043108/044315")
+                    },
+                    OrdinaryEnemyLootPoolMode.WeightedOne,
+                    15,
+                    true,
+                    19,
+                    15,
+                    "20260722-043108/044315",
+                    OrdinaryEnemyEvidenceState.Observed,
+                    null,
+                    null,
+                    new[]
+                    {
+                        new OrdinaryEnemyLevelCreditRule(
+                            48,
+                            1012,
+                            1012,
+                            4,
+                            "20260722-043108"),
+                        new OrdinaryEnemyLevelCreditRule(
+                            49,
+                            1036,
+                            1036,
+                            5,
+                            "20260722-043108/044315"),
+                        new OrdinaryEnemyLevelCreditRule(
+                            50,
+                            1059,
+                            1059,
+                            10,
+                            "20260722-043108/044315")
+                    }),
+                new OrdinaryEnemyCorpseProfile(
+                    OrdinaryEnemyCorpsePacketProfile.Generic,
+                    30.0,
+                    120.0,
+                    30.0,
+                    42952,
+                    evidence),
+                new[] { evidence },
+                false,
+                false);
+        }
+
+        private static OrdinaryEnemySpawnDefinition[] BuildDeathlessLegionnaireSpawns()
+        {
+            return new[]
+            {
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F605, 49, 5511, 218,
+                    53.9109039f, 12.0112476f, 242.7929f,
+                    0f, 0.0180717651f, 0f, 0.9998367f,
+                    0x020B4A53u,
+                    "3D5E077FBA7D1A893FBFDFD402020101000100010001000000020000",
+                    53.9986153f, 12.0112476f, 245.218781f),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F60C, 50, 5665, 222,
+                    53.9454079f, 12.2087889f, 210.01f,
+                    0f, 0.3758112f, 0f, 0.9266963f,
+                    0x020A4A53u,
+                    "00000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F615, 50, 5665, 222,
+                    57.7543526f, 11.8187656f, 213.499023f,
+                    0f, 0.7532555f, 0f, 0.657728f,
+                    0x020B4A53u,
+                    "3FA3B1FBBE95D412BE32236902020101000100010001000000020000",
+                    64.9677353f, 10.2176981f, 212.567429f),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F616, 50, 5665, 222,
+                    49.2491531f, 12.1401644f, 214.466156f,
+                    0f, 0.41997087f, 0f, 0.90753746f,
+                    0x020A4A53u,
+                    "00000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F61A, 48, 5357, 214,
+                    82.77551f, 8.136528f, 214.568268f,
+                    0f, 0.422463328f, 0f, 0.90638f,
+                    0x020A4A53u,
+                    "00000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F621, 48, 5357, 214,
+                    77.46245f, 8.01125f, 209.200241f,
+                    0f, 0.184936732f, 0f, -0.9827504f,
+                    0x020A4A53u,
+                    "80000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F624, 50, 5665, 222,
+                    82.8811f, 2.872638f, 243.438431f,
+                    0f, 0.804136455f, 0f, -0.59444505f,
+                    0x020A4A53u,
+                    "80000000000000008000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F625, 48, 5357, 214,
+                    78.21152f, 7.396465f, 219.1022f,
+                    0f, 0.999993742f, 0f, -0.00353823113f,
+                    0x020B4A53u,
+                    "BC2A98B73E953414BFBC564D02020101000100010001000000020000",
+                    78.1933f, 7.906478f, 216.523819f),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F628, 49, 5511, 218,
+                    77.39526f, 2.86146617f, 248.933075f,
+                    0f, 0.0485869758f, 0f, 0.998818934f,
+                    0x020A4A53u,
+                    "00000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F6B5, 50, 5665, 222,
+                    61.1754f, 2.096536f, 245.167953f,
+                    0f, -0.7259878f, 0f, 0.6877076f,
+                    0x020B4A53u,
+                    "BF8513FB3CC963BFBD66CB2302020101000100010001000000020000",
+                    66.23947f, 2.17955041f, 244.556473f),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F6B8, 50, 5665, 222,
+                    65.18642f, 2.0647018f, 237.493759f,
+                    0f, 0.337292552f, 0f, 0.9413999f,
+                    0x020A4A53u,
+                    "00000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F6C7, 50, 5665, 222,
+                    65.3643341f, 2.01124883f, 227.7775f,
+                    0f, 0.9670197f, 0f, 0.254701763f,
+                    0x020A4A53u,
+                    "00000000000000008000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F6CE, 48, 5357, 214,
+                    72.13198f, 2.0112474f, 237.0863f,
+                    0f, 0.423079848f, 0f, 0.9060924f,
+                    0x020A4A53u,
+                    "00000000000000000000000003010001000100010001000000020000"),
+                BuildDeathlessLegionnaireSpawn(
+                    0x7987F6DC, 49, 5511, 218,
+                    62.5415f, 2.0112474f, 225.986557f,
+                    0f, -0.0957044f, 0f, 0.9954098f,
+                    0x020B4A53u,
+                    "BE91F5AC396D721E3FBC026802020101000100010001000000020000",
+                    61.55899f, 2.0112474f, 234.267258f)
+            };
+        }
+
+        private static OrdinaryEnemySpawnDefinition BuildDeathlessLegionnaireSpawn(
+            int sourceIdentity,
+            int level,
+            int health,
+            int runSpeed,
+            float x,
+            float y,
+            float z,
+            float headingX,
+            float headingY,
+            float headingZ,
+            float headingW,
+            uint capturedScfuFlags,
+            string capturedScfuUnknown1Hex,
+            float? patrolX = null,
+            float? patrolY = null,
+            float? patrolZ = null)
+        {
+            OrdinaryEnemyWaypoint[] waypoints = patrolX.HasValue
+                ? new[]
+                    {
+                        new OrdinaryEnemyWaypoint(x, y, z),
+                        new OrdinaryEnemyWaypoint(
+                            patrolX.Value,
+                            patrolY.Value,
+                            patrolZ.Value)
+                    }
+                : new OrdinaryEnemyWaypoint[0];
+            return new OrdinaryEnemySpawnDefinition(
+                "totw.ordinary." + sourceIdentity.ToString("X8", CultureInfo.InvariantCulture),
+                sourceIdentity,
+                DeathlessLegionnaireProfileKey,
+                PlayfieldInstance,
+                level,
+                health,
+                0,
+                105,
+                runSpeed,
+                x,
+                y,
+                z,
+                headingX,
+                headingY,
+                headingZ,
+                headingW,
+                waypoints.Length > 0
+                    ? OrdinaryEnemyMovementMode.Patrol
+                    : OrdinaryEnemyMovementMode.Static,
+                waypoints,
+                false,
+                true,
+                true,
+                capturedScfuFlags,
+                0,
+                HexToBytes(capturedScfuUnknown1Hex),
+                0,
+                OrdinaryEnemyEvidenceState.Policy,
+                RuntimeRespawnAfterNpcDespawnSeconds,
+                OrdinaryEnemyRuntimeDisposition.Active,
+                string.Empty,
+                "20260722-042930",
                 string.Empty,
                 null,
                 WorldRespawnPolicyAssignment.Explicit(CultistRespawn));

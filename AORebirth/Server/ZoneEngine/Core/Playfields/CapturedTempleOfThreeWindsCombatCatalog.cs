@@ -34,6 +34,20 @@ namespace AORebirth.Core.Playfields
         internal const double GartuaAttackRechargeSeconds = 5.3;
         internal const double MurialFirstHitDelaySeconds = 1.5397;
         internal const double MurialAttackRechargeSeconds = 3.7885;
+        internal const double UkleshSlotZeroFirstHitDelaySeconds = 4.5141421;
+        internal const double UkleshSlotZeroRechargeSeconds = 5.5831374;
+        internal const double UkleshSlotOneFirstHitDelaySeconds = 12.4088183;
+        internal const double UkleshSlotOneRechargeSeconds = 2.4419644;
+        internal const double KhalumSlotZeroFirstHitDelaySeconds = 3.899589;
+        internal const double KhalumSlotZeroRechargeSeconds = 4.275072;
+        internal const double KhalumSlotOneFirstHitDelaySeconds = 2.220458;
+        internal const double KhalumSlotOneRechargeSeconds = 4.651178;
+        internal const double AzturSlotTwoFirstHitDelaySeconds = 7.638537;
+        internal const double AzturSlotTwoRechargeSeconds = 5.521231;
+        internal const double AzturSlotThreeFirstHitDelaySeconds = 5.433081;
+        internal const double AzturSlotThreeRechargeSeconds = 13.349405;
+        internal const double AzturSlotOneFirstHitDelaySeconds = 9.163576;
+        internal const double AzturSlotOneRechargeSeconds = 5.933442;
         internal const int ReanimatedFirstAnchorCaptureSourceIdentity =
             unchecked((int)0x7984B500);
         internal const int ReanimatedSecondAnchorCaptureSourceIdentity =
@@ -284,6 +298,180 @@ namespace AORebirth.Core.Playfields
                     382,
                     382,
                     37,
+                    0,
+                    0,
+                    0,
+                    0));
+        }
+
+        internal static CapturedEnemyCombatContract UkleshTheFrozen()
+        {
+            const string evidence =
+                "20260722-045835 source 0x7987F730: exact PKDW/LUZU "
+                + "SpecialAttackWeapon 551/551/551/42 with ordered mutable state 0 then 20; "
+                + "slot 0 normal 127 and slot 1 normal 58 streams";
+            return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                    evidence,
+                    new CapturedEnemyParallelAttackSequenceDefinition(
+                        new[]
+                        {
+                            new CapturedEnemyParallelAttackStreamDefinition(
+                                UkleshSlotZeroFirstHitDelaySeconds,
+                                Attack(
+                                    127,
+                                    127,
+                                    UkleshSlotZeroRechargeSeconds,
+                                    0,
+                                    -1,
+                                    1280662101)),
+                            new CapturedEnemyParallelAttackStreamDefinition(
+                                UkleshSlotOneFirstHitDelaySeconds,
+                                Attack(
+                                    58,
+                                    58,
+                                    UkleshSlotOneRechargeSeconds,
+                                    1,
+                                    -1,
+                                    1347109975))
+                        },
+                        new[]
+                        {
+                            new CapturedEnemySpecialAttackDefinition(
+                                208422,
+                                208423,
+                                1347109975,
+                                "PKDW"),
+                            new CapturedEnemySpecialAttackDefinition(
+                                205012,
+                                205013,
+                                1280662101,
+                                "LUZU")
+                        },
+                        551,
+                        551,
+                        551,
+                        42,
+                        0,
+                        0,
+                        0,
+                        0))
+                .WithCaptureCertification(
+                    evidence,
+                    unchecked((int)0x7987F730u),
+                    null)
+                .WithCapturedSpecialAttackWeaponUnknown5Observations(
+                    new[] { 0, 20 });
+        }
+
+        internal static CapturedEnemyCombatContract Khalum()
+        {
+            return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                "20260722-045835 source 0x7988C14D: exact MPKS/SFTN "
+                + "SpecialAttackWeapon 551/551/551/42/0 and two 58-point normal streams",
+                new CapturedEnemyParallelAttackSequenceDefinition(
+                    new[]
+                    {
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            KhalumSlotZeroFirstHitDelaySeconds,
+                            Attack(
+                                58,
+                                58,
+                                KhalumSlotZeroRechargeSeconds,
+                                0,
+                                -1,
+                                1397118030)),
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            KhalumSlotOneFirstHitDelaySeconds,
+                            Attack(
+                                58,
+                                58,
+                                KhalumSlotOneRechargeSeconds,
+                                1,
+                                -1,
+                                1297107795))
+                    },
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(
+                            208298,
+                            208299,
+                            1297107795,
+                            "MPKS"),
+                        new CapturedEnemySpecialAttackDefinition(
+                            208302,
+                            208296,
+                            1397118030,
+                            "SFTN")
+                    },
+                    551,
+                    551,
+                    551,
+                    42,
+                    0,
+                    0,
+                    0,
+                    0));
+        }
+
+        internal static CapturedEnemyCombatContract AzturTheImmortal()
+        {
+            return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                "20260722-045835 source 0x7988C153: exact FUGB/YHUU/KHBC "
+                + "SpecialAttackWeapon 840/840/840/840 with ordered mutable state "
+                + "0 then six 62 values; three normal streams",
+                new CapturedEnemyParallelAttackSequenceDefinition(
+                    new[]
+                    {
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            AzturSlotTwoFirstHitDelaySeconds,
+                            Attack(
+                                83,
+                                87,
+                                AzturSlotTwoRechargeSeconds,
+                                2,
+                                -1,
+                                1497912661)),
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            AzturSlotThreeFirstHitDelaySeconds,
+                            Attack(
+                                350,
+                                360,
+                                AzturSlotThreeRechargeSeconds,
+                                3,
+                                -1,
+                                1179993922)),
+                        new CapturedEnemyParallelAttackStreamDefinition(
+                            AzturSlotOneFirstHitDelaySeconds,
+                            Attack(
+                                157,
+                                175,
+                                AzturSlotOneRechargeSeconds,
+                                1,
+                                -1,
+                                1263026755))
+                    },
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(
+                            207327,
+                            207328,
+                            1179993922,
+                            "FUGB"),
+                        new CapturedEnemySpecialAttackDefinition(
+                            207324,
+                            207325,
+                            1497912661,
+                            "YHUU"),
+                        new CapturedEnemySpecialAttackDefinition(
+                            207321,
+                            207322,
+                            1263026755,
+                            "KHBC")
+                    },
+                    840,
+                    840,
+                    840,
+                    840,
                     0,
                     0,
                     0,
