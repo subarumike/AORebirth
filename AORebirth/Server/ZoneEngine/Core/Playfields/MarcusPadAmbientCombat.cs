@@ -391,6 +391,7 @@ namespace ZoneEngine.Core.Playfields
                 0,
                 3,
                 0,
+                0,
                 true);
             // Capture 20260721-marcus-animation-texture-dialogtext:
             // SpecialAttackWeapon Specials=[] Unknown1/2/3=121 Unknown4=83 Unknown5=50
@@ -406,7 +407,10 @@ namespace ZoneEngine.Core.Playfields
                     MarcusSpecialAttackWeaponUnknown2,
                     MarcusSpecialAttackWeaponUnknown3,
                     MarcusSpecialAttackWeaponUnknown4,
-                    MarcusSpecialAttackWeaponUnknown5));
+                    MarcusSpecialAttackWeaponUnknown5,
+                    0,
+                    0,
+                    0));
         }
 
         private static CapturedEnemyCombatContract CreateBurningRobotContract()
@@ -423,6 +427,7 @@ namespace ZoneEngine.Core.Playfields
                 0,
                 3,
                 0,
+                0,
                 false);
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
                 "20260720-064523 Burning Cleaning Robot SpecialAttackWeapon 43/43/43/3/0 + Attack Marcus",
@@ -435,6 +440,9 @@ namespace ZoneEngine.Core.Playfields
                     43,
                     43,
                     3,
+                    0,
+                    0,
+                    0,
                     0));
         }
 

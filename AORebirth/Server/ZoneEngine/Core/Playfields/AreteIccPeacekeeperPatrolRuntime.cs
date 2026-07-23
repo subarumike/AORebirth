@@ -106,6 +106,12 @@ namespace ZoneEngine.Core.Playfields
                 2.0,
                 6,
                 4,
+                0,
+                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                0,
+                0,
+                0,
                 0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);

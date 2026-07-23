@@ -308,6 +308,12 @@ namespace AORebirth.Core.Playfields
                 NpcCombatAttackRules.CapturedCleaningRobotCombatTickSeconds,
                 0,
                 0,
+                0,
+                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                0,
+                0,
+                0,
                 0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mobCharacter, npcController, contract, out unused);
