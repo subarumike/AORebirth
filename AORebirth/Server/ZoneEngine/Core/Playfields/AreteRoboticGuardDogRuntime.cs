@@ -118,6 +118,12 @@ namespace ZoneEngine.Core.Playfields
                 2.0,
                 1,
                 0,
+                0,
+                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                0,
+                0,
+                0,
                 0);
             CapturedEnemyCombatRuntime.Prepare(dog, controller, contract, out unused);
             controller.AiProfile = NpcAiProfile.Aggressive;
