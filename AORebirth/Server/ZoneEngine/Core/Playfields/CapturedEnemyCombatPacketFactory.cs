@@ -94,6 +94,17 @@ namespace AORebirth.Core.Playfields
             Identity attacker,
             CapturedEnemyCombatContract contract)
         {
+            return CreateSpecialAttackWeapon(
+                attacker,
+                contract,
+                contract == null ? 0 : contract.SpecialAttackWeaponUnknown5);
+        }
+
+        internal static SpecialAttackWeaponMessage CreateSpecialAttackWeapon(
+            Identity attacker,
+            CapturedEnemyCombatContract contract,
+            int specialAttackWeaponUnknown5)
+        {
             if (contract == null
                 || !contract.IsCombatReady
                 || !contract.HasCapturedSpecialAttackWeaponContext)
@@ -109,7 +120,7 @@ namespace AORebirth.Core.Playfields
                 contract.SpecialAttackWeaponUnknown2,
                 contract.SpecialAttackWeaponUnknown3,
                 contract.SpecialAttackWeaponUnknown4,
-                contract.SpecialAttackWeaponUnknown5);
+                specialAttackWeaponUnknown5);
         }
 
         internal static AttackMessage CreateAttack(

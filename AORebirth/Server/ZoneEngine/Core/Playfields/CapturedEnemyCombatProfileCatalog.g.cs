@@ -122,7 +122,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(3, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 9, 9, 3, 9, 9 }, new[] { 0d, 0d, 0d }, new[] { 0.599459d, 4.509288d, 10.299181d }, new[] { 5.862109d, 5.848035d, 5.671753d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 19, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0431c023f99bef27-23c23adecd714e60",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|31|58d169dfb982; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|2285|5eb816f26af8; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|2286|775672736639; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|2437|a4a1824e226b",
@@ -235,7 +236,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(16, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 21, 25, 18, 16, 19, 16 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 2.616253d, 1.73302d, 0.165996d, 1.048506d, 0.407d }, new[] { 4.747813d, 4.756757d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 26, 46, 46, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0ab4af8e83e1830c-3a0c8a332a7b85e6",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|78|c5d3d8b24bc2; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|2462|8142331a7b2b; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|2463|3d1142168662; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|2509|968f370ffd5e",
@@ -364,7 +366,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(17, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 17, 18, 22, 21, 23, 19, 23, 17, 20 }, new[] { 0d, 0d, 0d }, new[] { 2.782583d, 2.147533d, 4.727441d }, new[] { 5.516767d, 5.40271d, 5.729758d, 9.935585d, 5.011241d, 5.017353d, 5.333642d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 40, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0ac86e2a75cc7c24-df0976124ed11f60",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|603|60901a571f96; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5419|2063260f05c5; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5420|7bd5145d8680; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5565|3f55bb54985d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5764|0566f46c1085,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5969|88c2e2e6a332,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6298|e47dea0cf019",
@@ -500,7 +503,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(5, 5, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 5, 5, 5, 5, 5, 5, 5, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 0.199447d, 0.133081d, 1.81557d, 2.032495d, 1.466639d }, new[] { 3.849203d, 4.532257d, 4.167738d, 3.799364d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 34, 34, 34, 0, 30 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "10c6d98a3958873b-8b3ed5484c9eb997",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|607|52009df46c6b; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|8764|022d63c8eb3e; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|8765|d4019ad295b7; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|8834|e5e575aeb235",
@@ -830,7 +834,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(13, 30, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 27, 18, 20, 30, 24, 20, 19, 13, 21, 26, 18, 16, 26, 15 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.349856d, 2.333317d, 2.169894d, 2.367499d, 1.06611d, 1.349442d, 2.39994d, 3.332467d }, new[] { 5.415843d, 5.016862d, 5.04936d, 5.033394d, 5.20036d, 10.932678d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 40, 0, 25, 40, 45, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1e007834c1a9f26d-854b8cd4351e812b",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|2842|bbb49a74ef7b; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3443|ee963226b2a3; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3444|cfe54d4daa6b; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3535|aaadd745be1e",
@@ -916,7 +921,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22, 22, 22, 22, 22, 22 }, new[] { 0d, 0d }, new[] { 3.572753d, 2.820452d }, new[] { 10.931524d, 8.031616d, 2.580166d, 5.459417d, 5.414749d, 2.878734d, 2.586037d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 52 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1f9bcd8f10a573fe-18e6692741ae1557",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4237|fb2f43b75519; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|7489|8d494a183f7d; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|7490|f8cb1585ddb8; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|7500|67efb8191311",
@@ -1906,7 +1912,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d, 0d }, new[] { 26.183548d, 1.440116d, 2.723211d }, new[] { 3.555659d, 6.985429d, 3.450754d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 20, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "31deaf88c6cc3395-51d0a02033e2bde1",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7704|b3e4382035b6; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|9629|3c952e8e4316; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|9630|d501cdbd0653; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|9704|a778343195c5",
@@ -2196,7 +2203,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(71, 72, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 72, 72, 72, 72, 72, 72, 72, 72, 71, 72, 72, 71, 72, 72, 72, 72, 72, 71, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 11.565297d, 5.455176d, 1.272211d, 1.671575d, 10.234902d, 9.607733d, 3.959063d }, new[] { 8.737399d, 5.968302d, 9.079117d, 9.063101d, 6.022915d, 9.096392d, 15.091584d, 9.157161d, 5.991891d, 12.425963d, 5.889292d, 10.064874d, 9.3318d, 9.066454d, 5.996008d, 18.156333d, 6.306792d, 8.793594d, 6.327258d, 8.97837d, 6.373249d, 8.942356d, 9.018282d, 15.168308d, 9.067466d, 6.018171d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 62, 62, 62, 62, 62, 62 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3d2df0c70c1adc8a-42554a1c70a69759",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|7996|1821cb9e8672,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|8064|9c53aabbaa86,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11617|5c92290eec56,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|8369|a615469f2d8b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|1639|a00a22f9f7fa,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|1831|2fb619fae62d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|3439|06d29491e4f6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|5473|258006183aee; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|7998|687278bedff2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|8066|f9a3f72af668,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11619|c9c7727c9dc1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|8371|e52e6ce0ab88,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|1641|6bc4603546ae,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|1833|16b894828776,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|3441|47cc4a11f8ad,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|5475|dd40d3efc0db; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|8007|0cb918f10f80,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|8157|277fcfe17427,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|1906|ed462e72d533,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|5564|d8d85fa2c01f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|8111|31f1a28c43cd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|8221|93e5f567ceab,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|8398|0974fa372b71,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11674|60e6ef0b0b92,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|1714|bf3ef07d8ccd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-221915|IN|3484|504a2b866bf4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|8422|63537ff7005f",
@@ -2363,7 +2371,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(11, 16, -1, 0, 0, 3, 1397315377, (byte)0, 5.214425d, new[] { 11, 16, 16, 13 }, new[] { 0d, 0d, 0d }, new[] { 8.255845d, 3.041422d, 0.885464d }, new[] { 5.214425d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3fb47a16c3e0d523-34d5dfe5ced96cb2",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|10891|c5a025976551,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7791|29fef74126c7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7793|8dca5ec652a4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7797|b344cb7193c6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8280|3732aab5e2cf,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2999|9a445b10229f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3001|3515bbd92cd9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3008|bb8bc28e28cf; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|10892|b928ce8e1d3f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7792|49f2ee54f612,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7794|fdb4ad955c20,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7798|daeb651231dc,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8281|64d72309d6b5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3000|15bab4a1083b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3002|3c5830b25eeb,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3009|da0cfe20cd63; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7907|69e09f28f988,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7934|c6d6b552e328,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7947|a3c731a0f3f1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7963|821b2f047233,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7976|ebac171ce6d7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7996|db268e9b32c1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8027|5b8397e1b455,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8041|385fa30ecdfa,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8059|ae6dddea087d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8072|59a6b2d682d4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8128|c9b62615e35a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8293|b07205284b11,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8336|4abb6c33c776,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8407|c73e09ce84f8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8526|a6657b64b3ec,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|11194|ca60e8d1f5c1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|11337|08b595783d4f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3150|991015b86680,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3173|13f5fcc542d0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3209|b382654302bd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3290|c01666449406,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7910|030eb0ac9c6d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8243|64bcb75ba77a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8491|0e55e5558904,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|10946|e3bda546c4cb,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3122|be43994eb807,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3139|aef393272740,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3146|5fe67faf1462",
@@ -2881,7 +2890,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(22, 28, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 25, 28 }, new[] { 0d, 0d }, new[] { 0.483201d, 5.433583d }, new[] { 4.533262d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 49, 58 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "482e1dfb88bf8b42-e33cc2e9d71eaf8f",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18964|9b1f4d73e195,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19096|cd744c095f2e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19367|71a42b2a0988,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19588|d0f2e3b94231,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19964|2df3589d7aee,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20368|56d357901605,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20457|c592ed49d710; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18965|fb6f8da5c5e5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19097|3ae3b17356d1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19368|e3e67c8801b0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19589|f83db7e63325,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19965|86a2a3b3b8d3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20369|f1a4a403f7c9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20458|bf4578680830; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19749|df219cbf718d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20484|92f25241cc5a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19260|016aca4fd79d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20187|e273630009df,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18981|96bfccafe435,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19113|6e65bd7f04e2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19190|989ae63b21c7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19444|534144fb4fa3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19609|f50760cb07e3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19666|4c323ed4bb29,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19976|2188d8f6c7b4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20043|ad9a6b4d5bed,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20112|3f143d98b346,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20394|35c58c26ce7c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20460|4c818aa5f6fe,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18998|ad092ef807a6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19135|e0d0ec9e0fa0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19623|b2539eaa608a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19999|989f5ffd676c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20070|04e5bb28e4e9",
@@ -2978,7 +2988,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(10, 16, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 15, 11, 12, 12, 11, 12, 16, 11, 10, 10, 10, 10, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.580252d, 2.290035d, 3.282449d, 2.949127d, 2.233925d, 38.413531d, 14.780678d, 2.465018d, 3.865449d, 4.412292d }, new[] { 10.289926d, 4.949966d, 5.23978d, 5.070269d, 4.949051d, 5.25103d, 5.080262d, 5.782971d, 5.816469d, 5.900159d, 5.865325d, 5.936468d, 5.930901d, 5.926769d, 5.916142d, 6.242033d, 5.740198d, 5.739814d, 5.937508d, 6.112736d, 5.802653d, 5.962508d, 6.15224d, 5.926776d, 5.916132d, 35.574945d, 6.450082d, 5.847298d, 18.687501d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 0, 0, 31, 0, 0, 25, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4959f101d04c692a-51b5785995ac28cc",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|1882|46480899b629,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|1006|4b22bc0104a3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11828|bc4bc1d4f993,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2260|6c4f7bdebdf1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4862|3b83e6dfe499,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8182|249ae8daf0c2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|6150|6c4069545cc9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|8736|26fac7f0f25e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17882|fc1ada6d2032; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|1884|b7b51ed0a10b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|1008|651061e1ae34,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11830|3685e8c3e553,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2262|e92a63bdcfa7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4864|9f14b0b14638,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8184|e6c96f6daf5a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|6152|fa9448d11020,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|8738|021d6afb1d6a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17884|8f6e5580a91b; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|1933|8a85a8e7a11b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|2153|397c80220236,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|1363|fc2b1d16890d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2733|0fe876d6886d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|5549|b20285b436a3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8313|dc5a506cd38c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8549|f9827a0121ad,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8887|56c009f10650,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|9245|6f26045a6aea,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12223|ea99d01cdca7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12531|2e8bbbaa3549,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|6293|b7dfa019a594,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|9259|99a2d6d51687,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|19293|8ce90fe41159",
@@ -3003,7 +3014,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(2, 8, -1, 0, 0, 3, 1363891017, (byte)0, 0d, new[] { 5, 6, 4, 4, 5, 8, 5, 6, 2, 8, 8, 4, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.14001d, 9.29727d, 11.076602d, 17.404324d, 2.91661d, 10.281737d, 3.085295d, 23.360728d, 29.124915d }, new[] { 7.020001d, 6.604071d, 6.528517d, 6.654186d, 6.918119d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 40, 20, 60, 26, 26, 20, 26, 20, 26 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "49c0eeb92a467fed-4fb159dd28d1cf6f",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4052|353eb33eea95,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4282|17e038ec4322; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4054|497fb1a72ef9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4284|53a7eed1506d; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4165|e4d73ffc7436,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4123|3b0b6ffa459a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4345|afb21905fc0b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914|IN|4346|afb21905fc0b",
@@ -3254,7 +3266,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(12, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 18, 17, 21, 16, 12, 12, 17, 14, 17, 12, 12, 12, 12, 12, 12, 12, 12 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.888675d, 1.30051d, 0.239457d, 3.240101d, 3.9608d, 2.95068d, 4.183866d, 3.4003d, 3.070025d }, new[] { 5.13031d, 4.980591d, 5.049824d, 5.079922d, 11.190787d, 5.983913d, 5.182505d, 18.947554d, 15.203374d, 6.820043d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 49, 37, 37, 49, 0, 0, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4db8a3f68126e173-d145cda7a8fe6d07",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5495|5930f78fc9cf,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5869|9b83467f1bfa,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6010|c560c19b94e5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6111|ccf147ee9dc4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6330|3a53468f159c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6397|7b0694a53d51,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6565|26c36bf7449e; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5496|c3a1d99fa958,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5870|3edc0790680d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6011|77e6b7482dda,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6112|283e1b5857e8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6331|4865885861dc,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6398|0718f4a48012,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6566|b41468a9ce5d; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5577|34e4af1bb3d9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6016|d58a33d7d499,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6123|3b1e2248f01f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6188|057b7c7f5105,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6358|05b9f5e48770,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6463|dbc522d1b38f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6481|b0a2be9f1ebb,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430|IN|6600|77f93db9bab6",
@@ -3279,7 +3292,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(14, 33, -1, 0, 0, 3, 1397315377, (byte)0, 10.105348d, new[] { 33, 14, 16, 16, 16, 16, 16, 16 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.382415d, 3.632561d, 3.892266d, 2.871904d, 0.841145d, 3.006953d, 2.447736d }, new[] { 10.105348d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 20, 40, 31, 61, 81, 71, 101 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5007e6560bf8f010-0b1b1f1616ca04ad",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|29|3e9f89c070e0; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|2019|ff66ad7e5c4b; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|2020|573626907ad1; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|IN|2059|01e6ecc5a01e",
@@ -3692,7 +3706,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(6, 9, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 7, 6, 8, 7, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.916609d, 2.850022d, 1.717637d, 0.483794d, 1.800832d, 1.979921d, 0.134157d }, new[] { 4.549839d, 4.049853d, 6.99842d, 3.616379d, 3.249557d, 3.209219d, 2.612625d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 0, 0, 14, 8, 53 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "54d40b70fa1a801a-064305180fc7f1ad",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7613|d4f1a2d4ae13; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73",
@@ -3853,7 +3868,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(18, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 22 }, new[] { 0d, 0d }, new[] { 11.975001d, 0.348506d }, new double[0], 0, true, null, true)
-                    }),
+                    },
+                    new[] { 8, 14 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5643a4bd8a3aaf44-9ce155283cfcc36c",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13189|1d66e7e7947a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13292|7231578c3427; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13902|9a79b96cff3a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13985|682941fad4e1; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13903|e943fe76a9e6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13986|ba03cf14f0a5; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|13975|1bccd5280d0f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|14098|0be45953d219,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|14163|6538b9309ca3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-232051|IN|14220|f438cdc202c2",
@@ -4062,7 +4078,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(10, 25, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11, 15, 18, 19, 13, 19, 13, 12, 19, 16, 18, 17, 12, 13, 12, 18, 16, 13, 14, 18, 17, 16, 16, 12, 13, 10, 14, 11, 11, 11, 25, 11, 11, 17 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 7.818686d, 3.280454d, 2.080391d, 2.948748d, 2.46657d, 1.483583d, 2.698234d, 6.183733d, 1.583255d }, new[] { 5.009837d, 5.000774d, 5.34923d, 5.180712d, 4.890166d, 5.02951d, 5.090054d, 5.7001d, 5.56923d, 5.330241d, 5.679988d, 5.329901d, 5.380693d, 5.418725d, 5.450551d, 5.450085d, 5.419841d, 5.45073d, 5.389345d, 5.040686d, 5.03927d, 5.080804d, 5.684366d, 5.666535d, 5.716103d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 0, 0, 14, 31, 0, 0, 34 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5afa57a3942cdcb2-3cf4fdf06205701e",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3179|903a6363cb07; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3762|b12539c25f30; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3763|76722f621dc7; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3831|e79ea159eb58,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3929|bba5f4a50c23,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3986|e2045961354b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|4143|07b526aceaae",
@@ -4234,7 +4251,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(17, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 18, 18, 19, 18 }, new[] { 0d, 0d }, new[] { 2.281966d, 1.273308d }, new[] { 5.092328d, 5.159818d, 5.139163d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 43 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5db002948ad46e4a-7e0f1c6357377ab1",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5668|b5072c99daec,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4531|b5072c99daec; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16351|8ea3936dcdb1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16373|a3241493b0f9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15214|8ea3936dcdb1; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16352|ae41641a2440,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16374|486b272f15be,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15215|ae41641a2440; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15226|9057ff0f93f7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16363|9057ff0f93f7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16404|63aa697db4c0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16458|a32bfadd7046",
@@ -4320,7 +4338,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(14, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 18, 18, 15, 15, 15, 15, 15, 14, 14, 17, 16, 17, 17, 17, 14, 17, 17, 21, 21, 26, 26, 15, 15, 15 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.994045d, 34.35908d, 2.729266d, 2.729266d, 4.229095d, 2.819475d, 2.819474d }, new[] { 5.379305d, 5.405085d, 5.382509d, 5.405527d, 5.393216d, 5.389392d, 5.733061d, 5.075868d, 5.363497d, 5.10965d, 5.000935d, 5.172508d, 4.900963d, 5.722057d, 20.549952d, 10.073472d, 4.977298d, 4.977297d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 40, 40, 43, 43, 43 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5db002948ad46e4a-9ecd091aef937ca8",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|12922|88a2126fa085; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13364|7faac76561d4; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13365|c1442e691117; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13415|98d4fbd7dde2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13498|e161ecd5209c",
@@ -4536,7 +4555,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(13, 21, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 16, 13, 14, 16, 15, 14, 13, 13, 16, 16, 15, 15, 14, 20, 20, 21, 14, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 35.355025d, 2.408485d, 1.567625d, 1.566122d, 0.280511d, 3.226016d, 3.226016d, 1.516299d, 2.166543d, 4.62766d }, new[] { 5.497376d, 5.466013d, 5.488971d, 5.804573d, 5.193014d, 5.496595d, 5.466575d, 5.466576d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 40, 40, 40, 40, 40, 40, 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "67f518afac8fd529-88660aa55a7b2d5c",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7491|3ef7e2bc2bd4; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7903|dafa91521296; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7904|b910dadd3ed4; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7971|864813ac9c4a",
@@ -4803,7 +4823,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(17, 36, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 17, 17, 17, 17, 17, 17, 28, 23, 33, 33, 36, 34, 36, 17 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.066887d, 12.43415d, 2.416235d, 0.614675d }, new[] { 4.916206d, 4.600114d, 4.366017d, 4.498798d, 5.023192d, 5.103398d, 9.946453d, 4.976588d, 4.531896d, 4.666914d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 20, 60 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "732a7adfa30e43ad-ce643a368f0eddc5",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6262|61dd2a6c6b37; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6892|ea05849ea120; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6893|dfcbc52ff7ca; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7010|8a01c1b5a222,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7145|cbe11f40fcc8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7303|83497f0f6fa0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7411|3f33b616d2f5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7700|172ccd63d423,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7805|51f69c7657f4",
@@ -4889,7 +4910,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(21, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 24, 24, 25, 25, 24, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 7.487872d, 1.310481d, 4.123114d, 0.630019d, 1.598211d }, new[] { 8.247285d, 2.839547d, 3.320531d, 2.783645d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 46, 46, 1, 46, 1 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "74af62ea08cc19d6-2c2762baa2d8ec8d",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3804|4eb0c3937030; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3818|5f0e50d88b04; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3819|3705201e0226; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3851|4f6e19514574,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3908|ea09355fc829",
@@ -5043,7 +5065,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(17, 26, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 18, 26, 24, 23, 23, 17, 17, 17 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.348724d, 0.48754d, 1.913988d, 1.093142d, 6.130228d }, new[] { 4.750109d, 3.152607d, 3.215117d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 105, 105, 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "76842c25578f7757-3ece59f3d788220e",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7699|eabbcea199e9; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|8719|666a9732559f; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|8720|7fcd0165a6dd; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|8786|4f85c6b6c9f7",
@@ -5129,7 +5152,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(21, 42, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 37, 28, 23, 21, 22, 40, 24, 42 }, new[] { 0d, 0d, 0d, 0d }, new[] { 7.99409d, 0.834217d, 2.868432d, 2.564781d }, new[] { 4.730687d, 4.76446d, 4.458606d, 4.350832d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 66, 66, 77 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "76842c25578f7757-481470fb8a9a189f",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|10245|87f8575df408; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|14528|0a19429ccd8d; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|14529|5b9c5f4906c8; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|14914|f0b16c0db5e2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|15035|ea139fd4a42f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|15153|1999eaa6e4cd",
@@ -5693,7 +5717,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(19, 48, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 35, 32, 48, 19 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.900881d, 0.449456d, 0.66644d, 2.750667d }, new double[0], 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 66, 66, 66 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "87e024977a9bf698-b24b30ff459855f6",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|762|e8c391ed81b1; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5342|f0e38cb49900,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5928|beec54b681c1; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5343|46c38501baaa,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5929|7df86bce91d9; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|5479|4c5f960a7c10,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6345|f4c99a48ccdc,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6781|cf9765e6d599,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6885|dfd6479fffc6",
@@ -5908,7 +5933,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(11, 11, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 11, 11, 11 }, new[] { 0d, 0d, 0d }, new[] { 3.983442d, 2.80084d, 1.816868d }, new double[0], 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 34, 31 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "88f2ebfb159544bc-6deee5ec018243fe",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|835|9d823c82767d; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|1353|2203a86c6aee; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|1354|876fe1394d91; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|1808|5ad4f57de147,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|1934|c04948ed159b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|2051|94765e844548",
@@ -6019,7 +6045,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(7, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10, 7, 7, 7, 7, 7, 7 }, new[] { 0d, 0d, 0d }, new[] { 10.783174d, 1.643506d, 1.98083d }, new[] { 4.314854d, 3.19006d, 3.056973d, 3.099916d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 11, 11 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8b40ecdf74edf8a9-83aff052355f400c",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|246|954c6d075442; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|254|aa3318a52b8c; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|255|242c78578c24; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|313|8a8e12d51328,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|358|6db7ca60d7b3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|404|9fe706ef63a2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250|IN|533|bce91dcaa43f",
@@ -6148,7 +6175,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(21, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 22, 22, 21, 22, 27, 22, 27, 27, 26 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.683513d, 16.239949d, 2.504744d, 2.071096d, 2.44958d, 1.128116d }, new[] { 2.621023d, 3.107952d, 2.713657d, 3.241507d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 52, 52, 7, 52, 52, 52 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8bd8ca936bf5aab4-78471b95becc1d68",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5820|8cf274138b90; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11781|d31e712b8436; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11782|84284cbbf1c6; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11838|29c441ca3f02",
@@ -6277,7 +6305,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14, 14, 14 }, new[] { 0d, 0d }, new[] { 13.66264d, 0.790509d }, new[] { 4.45973d, 4.551471d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 13 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8dc794414961f6e6-63cd3e499be4e58b",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17899|e38aea1cf3ae,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9460|2fc16ab6aa22,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9507|439ff73c3ba8; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17878|e21944516ef0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17900|c4218f93e4fd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9461|028b09b12471,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9508|49326339c9ec; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17925|f752bb1d2a89,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17957|29f19ea67e8a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9483|ea78ded6d6c8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9524|59f3aca583c3",
@@ -6302,7 +6331,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(11, 26, -1, 0, 0, 3, 1397315377, (byte)0, 5.070275d, new[] { 16, 16, 16, 11, 26 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.619144d, 3.600325d, 2.68383d, 1.916506d }, new[] { 5.070275d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 49, 0, 37 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "91251aa18cd96ec5-6d07601f79a79e03",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5811|14196df4d570; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11760|b6687ce2d784; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11761|3d082a2e453b; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11811|daf10c2f08c6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|11896|d94aff128256",
@@ -6526,7 +6556,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(11, 15, -1, 0, 0, 3, 1397315377, (byte)0, 4.78033d, new[] { 11, 11, 15 }, new[] { 0d, 0d }, new[] { 3.218993d, 2.769441d }, new[] { 4.78033d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "948a95b63e704b43-9cd24c294cf5a604",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9953|47f631fb6260; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9975|eade46e9c493; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9976|41af6f3db4a0; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|10136|cf90f53a1a11",
@@ -6594,7 +6625,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(10, 24, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14, 13, 12, 17, 10, 12, 16, 18, 14, 14, 15, 18, 18, 24, 17, 13, 17 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.850385d, 3.419242d, 0.17078d, 1.071171d, 3.119991d, 0.54004d, 1.460018d, 5.159765d, 2.019877d, 2.819851d }, new[] { 5.271904d, 4.610298d, 4.950035d, 4.878814d, 5.299685d, 5.200288d, 4.940604d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 49, 49, 0, 46, 46, 46, 46, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "95d8c2e7b3adc00c-2059dbf720dfebaa",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7020|00ded6318e7b; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9391|31113216435a; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9392|b67b9860dcac; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9538|a4ed8148b9a1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9724|f41b27900b3f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|9904|9718090dd53e",
@@ -6801,7 +6833,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(21, 44, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 21, 37, 44, 36, 37, 37, 37, 37, 37, 37 }, new[] { 0d, 0d, 0d }, new[] { 3.290825d, 0.940504d, 2.708413d }, new[] { 3.172961d, 6.044739d, 2.964833d, 2.962448d, 2.999983d, 2.975759d, 3.031188d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 82, 37 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9bae68ee0c83d53c-b09613f4cecce262",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-033006|IN|7810|350d0f9064af; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-033006|IN|8470|227a4f68ac7a; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-033006|IN|8471|894086527643; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-033006|IN|8519|68bda0398ae8",
@@ -6869,7 +6902,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(12, 22, -1, 0, 0, 3, 1145919558, (byte)0, 5.633024d, new[] { 15, 15, 12, 12, 12, 12, 22, 22 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.516121d, 8.516121d, 2.191522d, 2.19152d, 5.299939d, 5.300941d }, new[] { 5.633024d, 5.633024d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 34, 34, 34, 34 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9c5706fc671cbac5-57c871f8212c0bb1",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|621|2a0db5cff5ce; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3406|e3c72280cda2; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3407|d60c36b13968; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3460|b91c16ebcd91,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3659|aaffb596d51c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3855|029d0553e2a2",
@@ -7299,7 +7333,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(11, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 13, 13, 11, 11, 12, 12, 12, 12, 11, 12, 12, 13, 14, 12, 12, 12, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 14.546393d, 8.145801d, 8.860334d, 8.143801d, 1.100508d, 1.099508d, 0.100001d, 1.616741d, 0.684506d, 0.683506d, 0.150999d, 1.600447d }, new[] { 11.600187d, 5.733082d, 5.867102d, 5.684055d, 5.798597d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 0, 0, 28, 28, 28, 28, 28, 28, 28, 28 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a9d8950a9c1ecc18-7f2f30e11d41b30e",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12675|ecd59d345b2e; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12676|f3adf23eef06; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12692|047254f9ad48",
@@ -7460,7 +7495,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(3, 13, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 13, 13, 10, 10, 13, 9, 9, 9, 3 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.409764d, 0.26124d, 2.250801d, 2.100407d, 2.948759d }, new[] { 5.950416d, 5.079568d, 5.730171d, 11.578849d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 43, 31, 0, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "afffbb2bcf18d9b9-e33cc2e9d71eaf8f",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17030|16939f354911,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13469|196d509c98c7; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17032|8b0450c3112b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13471|26fa8970fcea; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17129|b00793e0d610,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13524|d9c47ff47b1e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13628|847e07c20e2a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13706|81e876c73e5e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13564|52245c1d2670,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|13658|f3ddfb3d6218",
@@ -7852,7 +7888,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(15, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 30, 30, 15, 21, 16 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 2.34399d, 2.330989d, 1.166525d, 1.931003d, 4.484472d }, new[] { 4.816895d, 4.816895d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 46, 46, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b808b0f2aeddf6bd-c64492f613e72516",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54577|f9926171004f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55343|275870c9112e; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54649|9bf7583fa5a0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55421|02f5d3cb571a; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54651|3509e4187784,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55423|d11304349ac6; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54668|61731aaa4301,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55476|6a446963f70e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55506|53bf406aaa52,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55536|49e563ba0ef0",
@@ -7920,7 +7957,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(16, 37, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 26, 30, 21, 26, 17, 35, 37, 26, 33, 22, 21, 27, 28, 29, 21, 26, 26, 17, 16, 25, 21, 28, 29, 20 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.066056d, 0.450198d, 1.565946d, 0.699288d, 0.684001d, 7.233228d, 3.499382d, 1.850209d, 2.666747d, 1.499178d, 0d }, new[] { 5.516322d, 5.566738d, 5.549458d, 5.350113d, 4.699938d, 5.13347d, 5.166038d, 5.166757d, 4.749752d, 4.81585d, 4.766319d, 4.700482d, 4.865792d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 37, 66, 57, 42, 0, 42, 42, 42, 42, 42 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "ba0dc14f053cc59f-71ed92b48bc9d461",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|236|281615128f5d; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|241|9190b3c11b3d; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|242|99a005df6c38; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|279|d31b78aa899a",
@@ -8212,7 +8250,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1145196631, (byte)0, 3.783895d, new[] { 6, 7, 9, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 7.115817d, 0.466314d, 1.999918d, 1.484254d }, new[] { 3.783895d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 5, 51, 27, 45 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "cbd8ef7ed2163a25-8e68c3bec42b6bfa",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|11447|6e07d701e753,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|14239|56ad590a3891,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43061|a01e47f49c69,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59049|fb072169233a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203038|IN|2578|b38a30bf8b4d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|14545|dacb835da622,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15281|6bed77688655,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15379|47afbf3489cc,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|2349|0f74c6399ede,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|9773|5f6c101549f9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|13940|9636c9f216b2; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|11449|73c97de2d28e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|14241|2bed76d94cf4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43063|b81788ef61ca,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59051|e626e9cda955,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203038|IN|2580|feb4da48b18d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|14547|50be0d194d25,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15283|792d2d8f4d2c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15381|8db1f522ba74,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|2351|5bb255de56ce,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|9775|f0f9ae2da702,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|13942|c4e48b6a1dd9; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|11684|fcf39605b04d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|14322|32bb710cbd0d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43168|644ed445a74c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43370|6fcef5329e13,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43476|0c6ffacd102f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43536|bfee78fadbc1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43850|011a259d600f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43930|9824acfefb36,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|44016|616a842df478,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59148|7e26561e90a1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59260|de22400423c9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59368|f4ac204dd437,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59490|bd4bc8e1c5ed,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203038|IN|2867|ed344ff5539e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|9970|0dde6842d368,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|10090|c005beac3760,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|14752|ee2bd857da0c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|14898|12cd37e8ca10,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15036|defbdd053a15,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14063|36e83f0c8ae5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14159|e68a542e1801,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14295|dd4f4544b3f7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14385|04fe68a6085f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14649|b06edfafda97,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|11826|7c83f86b74b6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|14428|0327cbc4df3b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43224|35f83305c962,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43284|707e8d79a686,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43344|02531ed9db89,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43404|a40e24aed711,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43405|a40e24aed711,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43456|a9f2f3d3e669,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43648|a4dbce7e8ffd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43752|70a6b0f0b3f9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43810|17743ac607e6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43898|6968a2eedf9c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|43990|4a158514b941,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59098|df0d0af7527b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|59324|70dd751655a4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203038|IN|2671|ca51c3935732,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203038|IN|2751|3f9272fc802e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|2728|fa075811078d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|9916|4b2ae9ca3d3b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|10044|1ed74f584682,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|10336|d94494947426,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|14850|8e8f8c00f4da,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15114|41a3312d08e4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15426|9752bc704ea8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14137|f646b03b882b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14229|4b03caf26f5c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14359|2543e2b54109,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|14523|ea90aeab6c8c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15460|d768a8ceb2ae,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|44064|0ccfbdf9d621,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-203631|IN|15294|1e56619d7abe",
@@ -8309,7 +8348,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 0, 0, 3, 1397315377, (byte)0, 4.599295d, new[] { 17, 17, 17 }, new[] { 0d, 0d }, new[] { 3.049364d, 12.412219d }, new[] { 4.599295d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "cf3233957f32e56f-5ba592afcf44fdff",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|5356|bb866281f760; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|5357|3a67e475fc9e; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|5437|b1933e3f8c0a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|5523|300776983458,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|5421|2371f24ed641",
@@ -8775,7 +8815,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18, 18, 18, 18, 18, 18, 18, 18 }, new[] { 0d, 0d, 0d }, new[] { 47.708953d, 5.566928d, 1.168017d }, new[] { 22.983961d, 22.457241d, 5.679403d, 5.694163d, 18.635806d, 5.596612d, 34.031458d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 20, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e037cf6f4165eff5-c036f50d1289554a",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3024|9e82756f808d; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3028|da91f3bcc5c7; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3029|4126389b47d8; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3097|3aad564f9979,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3144|a36ff1bf465e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3235|bcb61ff877e3",
@@ -8843,7 +8884,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(11, 16, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 13, 16, 14, 14, 11, 11, 11, 13, 13, 12, 13, 12, 12, 15, 16, 12, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 13.06634d, 23.61475d, 3.31414d, 7.968703d, 2.300356d, 3.048613d, 3.265114d }, new[] { 5.1162d, 5.333747d, 5.199945d, 5.299287d, 5.382157d, 5.168252d, 5.667345d, 5.673376d, 5.666802d, 5.478578d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 0, 0, 0, 0, 11 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e0af63ed4c2ef5d3-63cd3e499be4e58b",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2840|1a57b5585e4a; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2841|4a81b88a6c59; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2931|aa9a091a9d40",
@@ -9041,7 +9083,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(7, 11, -1, 0, 0, 3, 1145196631, (byte)0, 6.655393d, new[] { 11, 10, 7, 7 }, new[] { 0d, 0d, 0d }, new[] { 10.582758d, 1.867606d, 6.947857d }, new[] { 6.655393d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 20 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e9d7651ce1c37bf6-0d385e2afb1c234c",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4848|55fa43ca50e5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5127|fbd3441700c0; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4849|589ba397f5d9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5128|7e2bbeac8772; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4911|6569b8572329,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5177|00db0dc2eda5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5290|d31983a55d88,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5492|f8da27430631,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5897|4231680c0e79",
@@ -9066,7 +9109,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(18, 42, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 18, 42, 25, 27, 27 }, new[] { 0d, 0d }, new[] { 2.866162d, 1.949295d }, new[] { 5.116551d, 5.167153d, 10.099345d }, 0, false, null, true)
-                    }),
+                    },
+                    new[] { 0, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "edb12e5b12e79255-09584c35fff4ac6a",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|704|83967f9a3121,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|6056|46bcad2525d3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|15048|a8bfef8b12f9; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11766|215951684431,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2562|e289484742f3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|5748|4b598eafa927,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8470|54d09531dc76,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|7094|a996c57f5d99,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17908|cc4fefd20c34; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11768|dc1ed5600197,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2564|2baaec09f58e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|5750|e2137be82612,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8472|2abf769f8ecb,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|7096|0bd4f3174c36,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17910|10da6ce3fd4a; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2703|c685882a4df2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2989|b811a7d313d4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|3277|05618f479ebf,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|3751|ad9fc8e25b2f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|5867|55f09f29285d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|6171|e5592a872c24,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8597|c09036a31ef7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8957|3ce4053f444d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|9375|3a571aa8e0e8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|9699|79313a406c7e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|9985|34c7c8f514a0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11869|1590ea5f46b3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12145|b4697995fa09,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12425|6de9815c56e2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12761|0e29ecae6cde,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|13079|62e6d0b135b8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|7425|4f9829c4193c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|18039|434f7803122a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|18323|329691578661,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|18611|e88ae25dcb6e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|18963|b59d765ea0d6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|6693|b8629e3ff1f6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|10247|e7ae4af25325,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|13371|86f0119c2e04",
@@ -9524,7 +9568,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(10, 11, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 10, 11, 11 }, new[] { 0d, 0d, 0d }, new[] { 2.515425d, 4.565539d, 1.333144d }, new double[0], 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 28, 34 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "fa6fc8256e910451-c850f3966b62b38e",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753|IN|7127|72438d27df2e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|23919|52da34920d0e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|48621|ff37159f00d9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|49043|c3dc922bd2d6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|57283|c68dd833b27c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|7914|af25a1b57dee,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|8392|2c8eff1a3c64,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|17834|d2d0c9ae5738,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|19230|4209f4a2d26c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21202|42ef0ebfb195,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22146|64bb5c0fc38f; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753|IN|7129|48e71ded54dd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|23921|b9d2b2574540,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|48623|41a637a8d38f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|49045|02e85287e918,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|57285|5a63f3ff94c5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|7916|458d0b5f43c0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|8394|29aea89993d4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|17836|ba7def39475d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|19232|45df93305a20,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21204|7c0cc7cabbdd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22148|6c7d891540cf; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753|IN|7196|4b3b19914f50,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753|IN|7304|66bc12a4edf3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|57330|623952c21267,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|8033|e08a367a5fe6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|17943|db2f6e222aac,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|19289|db0ec28773f0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|19437|07ef2e22e265,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21283|d1c0aa92feab,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21429|bdfd962b447d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21595|cde876a1f134,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22227|ab543b6facf4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22385|f144c2c570ec,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22549|9e3236226e22,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|23946|3185b42cc57e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|48668|5400b1fd1444,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|49086|ef093bf22f21,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|57364|933f4ea3f8dc,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|7979|c852785eb596,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|8451|773f82080b43,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|18063|955026a79e53,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|19381|84cfd00280c5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|19541|b79fb5f3e2a7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21379|01d066ae369f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|21533|a7cf35dbf89e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22345|f5ed6b861f51,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22495|af8b7f749a64,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724|IN|22661|39ca1b0f5ce3",
@@ -9662,7 +9707,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(17, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 23, 23 }, new[] { 0d, 0d, 0d }, new[] { 2.379995d, 1.351506d, 1.490648d }, new[] { 3.079509d, 9.392452d, 6.040546d, 3.071994d, 2.87009d, 9.081456d, 5.899852d, 5.994528d, 3.073473d, 2.915237d, 5.962254d, 3.569857d }, 0, true, null, true)
-                    }),
+                    },
+                    new[] { 0, 0, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "fe98442e926cac15-b06131d6100a4087",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7312|cb3faaa3a4ba,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8436|8968d3c33f6c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|6745|f0a29f8d66da; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7313|cabb2a25b9ee,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8437|770f4e20f522,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|6746|6ca9c51467a3; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7496|d96448d68abd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8547|895e60ce1c21,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|6833|6ce149fc3465",
