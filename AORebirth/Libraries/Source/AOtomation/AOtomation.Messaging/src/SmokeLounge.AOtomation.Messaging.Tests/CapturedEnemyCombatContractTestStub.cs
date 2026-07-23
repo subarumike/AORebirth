@@ -255,7 +255,6 @@ namespace AORebirth.Core.Playfields
             {
                 return this.MinDamage > 0
                        && this.MaxDamage >= this.MinDamage
-                       && this.Range > 0
                        && this.RechargeSeconds > 0;
             }
         }
@@ -785,8 +784,6 @@ namespace AORebirth.Core.Playfields
                            && this.RechargeSeconds > 0
                            && this.HasCapturedFixedAttackBehavior
                            && this.SendCapturedAttackInfo
-                           && (this.HasExplicitCapturedAttackRange()
-                               || this.HasCapturedWeaponAttackRangeSource())
                            && this.CapturedDamageObservations != null
                            && this.CapturedDamageObservations.Length > 0
                            && this.CapturedDamageObservations.All(value => value > 0)
@@ -839,8 +836,7 @@ namespace AORebirth.Core.Playfields
                            && this.RechargeSeconds > 0
                            && (this.UsesEquippedWeaponDamage
                                || (this.MinDamage > 0
-                                   && this.MaxDamage >= this.MinDamage
-                                   && this.HasExplicitCapturedAttackRange()))
+                                   && this.MaxDamage >= this.MinDamage))
                            && (this.WeaponDefinition.InitialEnergy == -1
                                    ? this.AttackInfoAmmoCount == -1
                                    : this.WeaponDefinition.InitialEnergy == 0
@@ -952,6 +948,8 @@ namespace AORebirth.Core.Playfields
 
         internal int SpecialAttackWeaponUnknown5 { get; set; }
 
+        internal int[] CapturedSpecialAttackWeaponUnknown5Observations { get; set; }
+
         internal CapturedEnemySpecialAttackSequenceDefinition SpecialAttackSequence { get; set; }
 
         internal CapturedEnemyParallelAttackSequenceDefinition ParallelAttackSequence { get; set; }
@@ -981,6 +979,20 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.EvidenceSourceIdentityHint = sourceIdentity;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithCapturedSpecialAttackWeaponUnknown5Observations(
+            int[] observations)
+        {
+            if (observations == null || observations.Length == 0)
+            {
+                return this;
+            }
+
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.CapturedSpecialAttackWeaponUnknown5Observations = observations.ToArray();
+            clone.SpecialAttackWeaponUnknown5 = observations[0];
             return clone;
         }
 

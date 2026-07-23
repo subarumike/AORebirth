@@ -262,7 +262,6 @@ namespace AORebirth.Core.Playfields
             {
                 return this.MinDamage > 0
                        && this.MaxDamage >= this.MinDamage
-                       && this.Range > 0
                        && this.RechargeSeconds > 0;
             }
         }
@@ -546,6 +545,8 @@ namespace AORebirth.Core.Playfields
 
         internal int SpecialAttackWeaponUnknown5 { get; private set; }
 
+        internal int[] CapturedSpecialAttackWeaponUnknown5Observations { get; private set; }
+
         internal double AttackStartDelaySeconds { get; private set; }
 
         internal double MovementTransitionDelaySeconds { get; private set; }
@@ -609,8 +610,7 @@ namespace AORebirth.Core.Playfields
                                && this.RechargeSeconds > 0
                                && (this.UsesEquippedWeaponDamage
                                    || (this.MinDamage > 0
-                                       && this.MaxDamage >= this.MinDamage
-                                       && this.HasExplicitCapturedAttackRange()))
+                                       && this.MaxDamage >= this.MinDamage))
                                && this.AttackInfoAmmoMatchesCapturedEnergy();
                     case CapturedEnemyAttackModel.Specialized:
                         return this.EvidenceSourceIdentity > 0
@@ -643,7 +643,56 @@ namespace AORebirth.Core.Playfields
 
                 if (this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
                 {
-                    return "fixed/generic AttackInfo lacks a complete capture-certified packet sequence";
+                    if (this.EvidenceSourceIdentity <= 0)
+                    {
+                        return "fixed packet source identity is missing";
+                    }
+
+                    if (!this.HasCapturedRequiredPacketFields)
+                    {
+                        return "fixed packet required fields are incomplete";
+                    }
+
+                    if (!this.HasCapturedSpecialAttackWeaponContext)
+                    {
+                        return "fixed packet SpecialAttackWeapon context is incomplete";
+                    }
+
+                    if (!this.HasCapturedAttackStartContext)
+                    {
+                        return "fixed packet Attack context is incomplete";
+                    }
+
+                    if (this.MinDamage <= 0 || this.MaxDamage < this.MinDamage)
+                    {
+                        return "fixed packet captured damage observations are invalid";
+                    }
+
+                    if (this.RechargeSeconds <= 0)
+                    {
+                        return "fixed packet captured landed interval is invalid";
+                    }
+
+                    if (!this.HasCompleteCapturedFixedRuntimeObservations())
+                    {
+                        return "fixed packet captured timing, damage, or attack-mode observations are incomplete";
+                    }
+
+                    if (!this.FixedAttackHasCompleteSource())
+                    {
+                        return "fixed packet attack source is incomplete";
+                    }
+
+                    if (this.WeaponDefinition != null
+                        && (!this.WeaponDefinition.IsValid
+                            || this.WeaponDefinition.EvidenceSourceIdentity
+                               != this.EvidenceSourceIdentity
+                            || !this.AttackInfoAmmoMatchesCapturedEnergy()))
+                    {
+                        return "fixed packet owner-linked weapon state is incomplete";
+                    }
+
+                    return "fixed packet contract is incomplete";
                 }
 
                 if (this.EvidenceSourceIdentity == 0)
@@ -677,6 +726,20 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.EvidenceSourceIdentityHint = sourceIdentity;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithCapturedSpecialAttackWeaponUnknown5Observations(
+            int[] observations)
+        {
+            if (observations == null || observations.Length == 0)
+            {
+                return this;
+            }
+
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.CapturedSpecialAttackWeaponUnknown5Observations = observations.ToArray();
+            clone.SpecialAttackWeaponUnknown5 = observations[0];
             return clone;
         }
 
@@ -845,8 +908,6 @@ namespace AORebirth.Core.Playfields
         {
             return this.HasCapturedFixedAttackBehavior
                    && this.SendCapturedAttackInfo
-                   && (this.HasExplicitCapturedAttackRange()
-                       || this.HasCapturedWeaponAttackRangeSource())
                    && this.CapturedDamageObservations != null
                    && this.CapturedDamageObservations.Length > 0
                    && this.CapturedDamageObservations.All(value => value > 0)
@@ -889,20 +950,6 @@ namespace AORebirth.Core.Playfields
                    && this.CapturedAttackRange.Value > 0.0d
                    && !double.IsNaN(this.CapturedAttackRange.Value)
                    && !double.IsInfinity(this.CapturedAttackRange.Value);
-        }
-
-        private bool HasCapturedWeaponAttackRangeSource()
-        {
-            return !this.CapturedAttackRange.HasValue
-                   && this.CapturedUsesEquippedWeapon
-                   && this.AttackInfoWeaponInstance == 0
-                   && this.WeaponDefinition != null
-                   && this.WeaponDefinition.IsValid
-                   && this.AttackInfoWeaponSlot == this.WeaponDefinition.InventorySlot
-                   && this.WeaponInventorySlot == this.WeaponDefinition.InventorySlot
-                   && this.WeaponLowId == this.WeaponDefinition.LowId
-                   && this.WeaponHighId == this.WeaponDefinition.HighId
-                   && this.WeaponQuality == this.WeaponDefinition.Quality;
         }
 
         private void ApplyCapturedWeaponIdentity(CapturedEnemyWeaponDefinition weaponDefinition)

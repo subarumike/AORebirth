@@ -102,20 +102,6 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        internal bool HasCaptureBackedAttackRange(CapturedEnemyWeaponDefinition weaponDefinition)
-        {
-            if (this.CapturedAttackRange.HasValue)
-            {
-                return IsValidInterval(this.CapturedAttackRange.Value);
-            }
-
-            return this.CapturedUsesEquippedWeapon == true
-                   && this.WeaponInstance == 0
-                   && weaponDefinition != null
-                   && weaponDefinition.IsValid
-                   && this.WeaponSlot == weaponDefinition.InventorySlot;
-        }
-
         internal bool Matches(
             CapturedEnemyCombatAttackDefinition attack,
             double attackStartDelaySeconds,
@@ -124,8 +110,7 @@ namespace AORebirth.Core.Playfields
             CapturedEnemyWeaponDefinition weaponDefinition)
         {
             if (attack == null
-                || !this.HasCompleteFixedRuntimeEvidence
-                || !this.HasCaptureBackedAttackRange(weaponDefinition))
+                || !this.HasCompleteFixedRuntimeEvidence)
             {
                 return false;
             }
@@ -153,9 +138,8 @@ namespace AORebirth.Core.Playfields
                    && attack.MinDamage == this.MinimumObservedDamage
                    && attack.MaxDamage == this.MaximumObservedDamage
                    && attack.DamageBonus == this.CapturedDamageBonus.Value
-                   && (this.CapturedAttackRange.HasValue
-                           ? NearlyEqual(attack.Range, this.CapturedAttackRange.Value)
-                           : attack.UsesEquippedWeapon)
+                   && (!this.CapturedAttackRange.HasValue
+                       || NearlyEqual(attack.Range, this.CapturedAttackRange.Value))
                    && attack.UsesEquippedWeapon == this.CapturedUsesEquippedWeapon.Value
                    && attack.SendAttackInfo == this.CapturedSendAttackInfo.Value
                    && attack.AttackInfoAmmoCount == this.InitialAmmoCount
@@ -206,7 +190,8 @@ namespace AORebirth.Core.Playfields
             int specialAttackWeaponUnknown5,
             byte attackN3Unknown,
             byte attackAction,
-            CapturedEnemyCombatProfileStreamDefinition[] streams)
+            CapturedEnemyCombatProfileStreamDefinition[] streams,
+            int[] specialAttackWeaponUnknown5Observations = null)
         {
             this.ProfileId = profileId ?? string.Empty;
             this.Evidence = evidence ?? string.Empty;
@@ -228,6 +213,10 @@ namespace AORebirth.Core.Playfields
             this.SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3;
             this.SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4;
             this.SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5;
+            this.SpecialAttackWeaponUnknown5Observations =
+                specialAttackWeaponUnknown5Observations == null
+                    ? new[] { specialAttackWeaponUnknown5 }
+                    : specialAttackWeaponUnknown5Observations.ToArray();
             this.AttackN3Unknown = attackN3Unknown;
             this.AttackAction = attackAction;
             this.Streams = streams ?? new CapturedEnemyCombatProfileStreamDefinition[0];
@@ -247,7 +236,8 @@ namespace AORebirth.Core.Playfields
             get
             {
                 return this.CaptureEvidenceSafe
-                       && this.DeterministicRuntimeInitializationProven;
+                       && (this.DeterministicRuntimeInitializationProven
+                           || this.HasCapturedOrderedSpecialAttackWeaponState);
             }
         }
         internal int[] SourceIdentities { get; private set; }
@@ -260,6 +250,16 @@ namespace AORebirth.Core.Playfields
         internal int SpecialAttackWeaponUnknown3 { get; private set; }
         internal int SpecialAttackWeaponUnknown4 { get; private set; }
         internal int SpecialAttackWeaponUnknown5 { get; private set; }
+        internal int[] SpecialAttackWeaponUnknown5Observations { get; private set; }
+        internal bool HasCapturedOrderedSpecialAttackWeaponState
+        {
+            get
+            {
+                return this.SpecialAttackWeaponUnknown5Observations.Length > 1
+                       && this.SpecialAttackWeaponUnknown5Observations[0]
+                          == this.SpecialAttackWeaponUnknown5;
+            }
+        }
         internal byte AttackN3Unknown { get; private set; }
         internal byte AttackAction { get; private set; }
         internal CapturedEnemyCombatProfileStreamDefinition[] Streams { get; private set; }
@@ -698,13 +698,6 @@ namespace AORebirth.Core.Playfields
                                                            evidenceSourceIdentity);
             if (current != null && current.AttackModel == CapturedEnemyAttackModel.Specialized)
             {
-                if (profile.Streams.Any(
-                        profileStream => !profileStream.HasCaptureBackedAttackRange(weapon)))
-                {
-                    failure = "specialized runtime enrichment lacks capture-backed maximum attack range";
-                    return false;
-                }
-
                 CapturedEnemyCombatContract enrichedSpecialized;
                 if (!profile.TryEnrichSpecialized(current, out enrichedSpecialized))
                 {
@@ -715,7 +708,9 @@ namespace AORebirth.Core.Playfields
                 resolved = enrichedSpecialized.WithCaptureCertification(
                     profile.Evidence,
                     evidenceSourceIdentity,
-                    weapon);
+                    weapon)
+                    .WithCapturedSpecialAttackWeaponUnknown5Observations(
+                        profile.SpecialAttackWeaponUnknown5Observations);
                 return resolved.IsCombatReady;
             }
 
@@ -729,10 +724,9 @@ namespace AORebirth.Core.Playfields
             double[] landedIntervalObservations =
                 profile.ResolveLandedIntervalObservations(stream);
             if (!stream.HasCompleteFixedRuntimeEvidence
-                || !stream.HasCaptureBackedAttackRange(weapon)
                 || landedIntervalObservations.Length == 0)
             {
-                failure = "captured profile lacks exact damage, SAW-to-Attack, first-hit, landed-interval, range, or attack-mode observations";
+                failure = "captured profile lacks exact damage, SAW-to-Attack, first-hit, landed-interval, or attack-mode observations";
                 return false;
             }
 
@@ -779,6 +773,8 @@ namespace AORebirth.Core.Playfields
                 resolved = resolved.WithCapturedWeapon(weapon);
             }
 
+            resolved = resolved.WithCapturedSpecialAttackWeaponUnknown5Observations(
+                profile.SpecialAttackWeaponUnknown5Observations);
             if (!resolved.IsCombatReady)
             {
                 failure = "selected raw profile failed shared contract readiness: "

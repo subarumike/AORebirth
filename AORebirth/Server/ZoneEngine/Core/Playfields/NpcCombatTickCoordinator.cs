@@ -58,6 +58,9 @@ namespace AORebirth.Core.Playfields
         private readonly CapturedIntObservationCursor capturedDamageObservationCursor =
             new CapturedIntObservationCursor();
 
+        private readonly CapturedIntObservationCursor capturedSpecialAttackWeaponStateCursor =
+            new CapturedIntObservationCursor();
+
         private readonly Dictionary<int, int> nextCapturedAttackStartDelayObservationIndexes =
             new Dictionary<int, int>();
 
@@ -100,6 +103,12 @@ namespace AORebirth.Core.Playfields
             }
 
             bool hasCapturedContract = hasRegisteredCapturedContract && capturedContract.IsCombatReady;
+            if (hasCapturedContract && this.GetCombatAttackSource(attacker) == null)
+            {
+                this.playfield.ClearNpcCombatTracking(attacker.Identity);
+                return;
+            }
+
             CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence =
                 hasCapturedContract ? capturedContract.SpecialAttackSequence : null;
             CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence =
@@ -251,6 +260,7 @@ namespace AORebirth.Core.Playfields
             this.nextLineOfSightRetryTicks.Clear();
             this.nextLineOfSightDiagnosticTicks.Clear();
             this.capturedDamageObservationCursor.ClearAll();
+            this.capturedSpecialAttackWeaponStateCursor.ClearAll();
             this.nextCapturedAttackStartDelayObservationIndexes.Clear();
             this.nextCapturedFirstHitDelayObservationIndexes.Clear();
             this.nextCapturedLandedIntervalObservationIndexes.Clear();
@@ -619,10 +629,6 @@ namespace AORebirth.Core.Playfields
                 0);
             if (rawRange <= 0)
             {
-                CapturedEnemyCombatRuntimeRegistry.QuarantineRuntime(
-                    attacker,
-                    "captured weapon template has no valid attackrange");
-                this.ClearTracking(attacker.Identity);
                 return false;
             }
 
@@ -1154,10 +1160,18 @@ namespace AORebirth.Core.Playfields
             {
                 this.lastNpcSpecialAttackWeaponTargets[attacker.Identity.Instance] =
                     attacker.FightingTarget.Instance;
+                int specialAttackWeaponUnknown5 =
+                    capturedContract.CapturedSpecialAttackWeaponUnknown5Observations == null
+                    || capturedContract.CapturedSpecialAttackWeaponUnknown5Observations.Length == 0
+                        ? capturedContract.SpecialAttackWeaponUnknown5
+                        : this.capturedSpecialAttackWeaponStateCursor.Select(
+                            attacker.Identity.Instance,
+                            capturedContract.CapturedSpecialAttackWeaponUnknown5Observations);
                 this.playfield.Announce(
                     CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
                         attacker.Identity,
-                        capturedContract));
+                        capturedContract,
+                        specialAttackWeaponUnknown5));
             }
         }
 
@@ -1432,6 +1446,11 @@ namespace AORebirth.Core.Playfields
                     return null;
                 }
 
+                if (!IsResolvedAttackRange(attackRange))
+                {
+                    return null;
+                }
+
                 return new CombatAttackSource
                        {
                            MinDamage = attack.MinDamage,
@@ -1565,6 +1584,33 @@ namespace AORebirth.Core.Playfields
                                                   && capturedContract.HasCapturedEquippedAttackInfo;
             bool usesCapturedDamageOverride = hasCapturedEquippedAttackInfo
                                                   && !capturedContract.UsesEquippedWeaponDamage;
+            double equippedAttackRange;
+            if (hasCapturedEquippedAttackInfo
+                && capturedContract.CapturedAttackRange.HasValue)
+            {
+                equippedAttackRange = capturedContract.CapturedAttackRange.Value;
+            }
+            else if (hasCapturedEquippedAttackInfo)
+            {
+                if (!this.TryResolveCapturedWeaponAttackRange(
+                        attacker,
+                        capturedContract,
+                        out equippedAttackRange))
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                equippedAttackRange = NormalizeCombatRange(
+                    weapon.GetAttribute((int)StatIds.attackrange));
+            }
+
+            if (!IsResolvedAttackRange(equippedAttackRange))
+            {
+                return null;
+            }
+
             int minDamage = usesCapturedDamageOverride
                                 ? capturedContract.MinDamage
                                 : NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.mindamage), 0);
@@ -1595,9 +1641,7 @@ namespace AORebirth.Core.Playfields
                        MinDamage = minDamage,
                        MaxDamage = maxDamage,
                        DamageBonus = damageBonus,
-                       Range = usesCapturedDamageOverride
-                                   ? capturedContract.CapturedAttackRange.Value
-                                   : NormalizeCombatRange(weapon.GetAttribute((int)StatIds.attackrange)),
+                       Range = equippedAttackRange,
                        RechargeSeconds = hasCapturedEquippedAttackInfo
                                              && capturedContract.RechargeSeconds > 0
                                              ? capturedContract.RechargeSeconds
@@ -1626,7 +1670,12 @@ namespace AORebirth.Core.Playfields
                        UsesCapturedWeaponEnergy = hasCapturedEquippedAttackInfo
                                                   && capturedContract.WeaponDefinition != null,
                        SendAttackInfo = true
-                    };
+                   };
+        }
+
+        private static bool IsResolvedAttackRange(double range)
+        {
+            return range > 0.0d && !double.IsNaN(range) && !double.IsInfinity(range);
         }
 
         private int GetAttackPetAttackInfoWeaponInstance(ICharacter attacker)

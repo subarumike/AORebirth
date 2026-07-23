@@ -272,6 +272,130 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AlreadyAuthorizedShadowUsesItsExactCapturedPacketSequenceWithoutARangeField()
+        {
+            const string profileId = "469eedefbd2e7efe-83d6c6ca8cd6c3d2";
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Shadow",
+                    30464,
+                    14,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "already-authorized shared packet-path test",
+                        true),
+                    out resolved,
+                    out failure),
+                failure);
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.IsFalse(resolved.CapturedAttackRange.HasValue);
+            Assert.IsFalse(resolved.CapturedUsesEquippedWeapon);
+
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.First(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.WeaponSlot == resolved.AttackInfoWeaponSlot
+                             && value.DamageTypeWire == resolved.AttackInfoUnknown
+                             && value.HitTypeWire == resolved.AttackInfoHitType
+                             && value.WeaponInstance == resolved.AttackInfoWeaponInstance
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown
+                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            AssertCapturedOrder(capturedSequence);
+            AssertHex(saw.BodyHex, capturedSequence[0]);
+            AssertHex(attack.BodyHex, capturedSequence[1]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[2]);
+        }
+
+        [TestMethod]
+        public void DiscardedPetSawStateTransitionsReplayInCapturedOrderPerActor()
+        {
+            const string profileId = "95d366ebb4f855e2-9bcb7a58208cf1e0";
+            int[] expectedStates = { 0, 0, 49, 49, 0, 46, 46, 46, 46, 40 };
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Discarded Pet",
+                    17720,
+                    10,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "captured mutable SAW replay test",
+                        true),
+                    out resolved,
+                    out failure),
+                failure);
+            CollectionAssert.AreEqual(
+                expectedStates,
+                resolved.CapturedSpecialAttackWeaponUnknown5Observations);
+            CollectionAssert.AreEqual(
+                expectedStates,
+                fixture.SpecialAttackWeaponPackets.Select(value => value.Unknown5).ToArray());
+
+            var cursor = new CapturedIntObservationCursor();
+            for (int index = 0; index < fixture.SpecialAttackWeaponPackets.Length; index++)
+            {
+                CapturedEnemySpecialAttackWeaponPacketFixture packet =
+                    fixture.SpecialAttackWeaponPackets[index];
+                int selected = cursor.Select(
+                    5001,
+                    resolved.CapturedSpecialAttackWeaponUnknown5Observations);
+                Assert.AreEqual(expectedStates[index], selected);
+                AssertHex(
+                    packet.BodyHex,
+                    CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                        IdentityOf(packet.SourceType, packet.SourceIdentity),
+                        resolved,
+                        selected));
+            }
+
+            Assert.AreEqual(
+                expectedStates[0],
+                cursor.Select(5001, resolved.CapturedSpecialAttackWeaponUnknown5Observations));
+            Assert.AreEqual(
+                expectedStates[0],
+                cursor.Select(5002, resolved.CapturedSpecialAttackWeaponUnknown5Observations));
+        }
+
+        [TestMethod]
         public void ReanimatedCorpseAnchorProfilesUseTheCapturedSharedPacketSequence()
         {
             var expectedProfiles = new[]

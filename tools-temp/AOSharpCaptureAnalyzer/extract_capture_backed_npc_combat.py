@@ -4402,6 +4402,29 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                     for packet_id in stream["attackInfoPacketIds"]
                 )
             )
+            runtime_missing_evidence = variant["runtimeMissingEvidence"]
+            mutable_saw_observations = [
+                row["unknown5"]
+                for row in variant["mutableSawStateObservations"]
+            ]
+            mutable_saw_replay_is_complete = (
+                not variant["deterministicRuntimeInitializationProven"]
+                and
+                len(mutable_saw_observations) > 1
+                and all(
+                    reason == "capture-backed non-equipped attack range"
+                    or reason.startswith(
+                        "deterministic runtime SpecialAttackWeapon Unknown5 state selection"
+                    )
+                    for reason in runtime_missing_evidence
+                )
+            )
+            mutable_saw_argument = (
+                ",\n                    "
+                + csharp_int_array(mutable_saw_observations)
+                if mutable_saw_replay_is_complete
+                else ""
+            )
             definition = (
                 "                new CapturedEnemyCombatProfileDefinition(\n"
                 f"                    {csharp_string(variant['semanticProfileId'])},\n"
@@ -4424,7 +4447,9 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                 "                    new[]\n"
                 "                    {\n"
                 + ",\n".join(stream_rows)
-                + "\n                    })"
+                + "\n                    }"
+                + mutable_saw_argument
+                + ")"
             )
             definitions.append((variant["semanticProfileId"], definition))
     definitions.sort(key=lambda row: row[0])

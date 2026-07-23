@@ -130,26 +130,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 var representative = ambiguousBinding.First();
                 CapturedEnemyCombatContract ambiguousResolved;
                 string ambiguousFailure;
-                Assert.IsFalse(
-                    CapturedEnemyCombatProfileCatalog.TryResolve(
-                        representative.Profile.ResourceId,
-                        representative.Profile.Name,
-                        representative.Profile.MonsterData,
-                        representative.Profile.Level,
-                        representative.SourceIdentity,
-                        CapturedEnemyCombatContract.Unresolved("ambiguous exact binding", true),
-                        out ambiguousResolved,
-                        out ambiguousFailure),
-                    "Capture-distinct variants sharing one source must fail closed.");
-                Assert.IsFalse(ambiguousResolved.IsCombatReady);
-                Assert.IsTrue(
-                    ambiguousFailure.IndexOf(
-                        "does not distinguish",
-                        StringComparison.Ordinal) >= 0
-                    || ambiguousFailure.IndexOf(
-                        "explicitly unsafe",
-                        StringComparison.Ordinal) >= 0,
-                    ambiguousFailure);
+                CapturedEnemyCombatProfileDefinition[] compatible =
+                    ambiguousBinding.Where(value => value.Profile.CaptureRuntimeEvidenceSafe)
+                        .Select(value => value.Profile)
+                        .ToArray();
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    representative.Profile.ResourceId,
+                    representative.Profile.Name,
+                    representative.Profile.MonsterData,
+                    representative.Profile.Level,
+                    representative.SourceIdentity,
+                    CapturedEnemyCombatContract.Unresolved("ambiguous exact binding", true),
+                    out ambiguousResolved,
+                    out ambiguousFailure);
+                if (compatible.Length == 1)
+                {
+                    Assert.IsTrue(success, ambiguousFailure);
+                    Assert.IsTrue(ambiguousResolved.IsCombatReady);
+                }
+                else
+                {
+                    Assert.IsFalse(
+                        success,
+                        "Capture-distinct compatible variants sharing one source must fail closed.");
+                    Assert.IsFalse(ambiguousResolved.IsCombatReady);
+                    Assert.IsTrue(
+                        ambiguousFailure.IndexOf(
+                            "does not distinguish",
+                            StringComparison.Ordinal) >= 0
+                        || ambiguousFailure.IndexOf(
+                            "explicitly unsafe",
+                            StringComparison.Ordinal) >= 0,
+                        ambiguousFailure);
+                }
             }
 
             Assert.IsFalse(
@@ -199,23 +212,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void RuntimeReadyStreamsRequireExactTimingDamageAndRangeSources()
+        public void PacketReadyStreamsRequireExactTimingAndDamageWithoutRangeCertification()
         {
             CapturedEnemyCombatProfileDefinition[] profiles =
                 CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
             CapturedEnemyCombatProfileStreamDefinition[] readyStreams = profiles.SelectMany(
                 profile => profile.Streams.Where(
-                    stream => stream.HasCompleteFixedRuntimeEvidence
-                              && stream.HasCaptureBackedAttackRange(
-                                  profile.WeaponDefinition))).ToArray();
+                    stream => stream.HasCompleteFixedRuntimeEvidence)).ToArray();
 
             Assert.IsTrue(readyStreams.Length > 0);
+            Assert.IsTrue(
+                readyStreams.Any(stream => !stream.CapturedAttackRange.HasValue),
+                "Packet certification must include complete streams whose behavior range is unresolved.");
             foreach (CapturedEnemyCombatProfileDefinition profile in profiles)
             {
                 foreach (CapturedEnemyCombatProfileStreamDefinition stream in profile.Streams)
                 {
-                    if (!stream.HasCompleteFixedRuntimeEvidence
-                        || !stream.HasCaptureBackedAttackRange(profile.WeaponDefinition))
+                    if (!stream.HasCompleteFixedRuntimeEvidence)
                     {
                         continue;
                     }
@@ -225,17 +238,163 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     Assert.AreEqual(
                         stream.CapturedAttackStartDelayObservationsSeconds.Length,
                         stream.CapturedFirstHitDelayObservationsSeconds.Length);
-                    if (!stream.CapturedAttackRange.HasValue)
-                    {
-                        Assert.IsTrue(stream.CapturedUsesEquippedWeapon == true);
-                        Assert.IsNotNull(profile.WeaponDefinition);
-                        Assert.IsTrue(profile.WeaponDefinition.IsValid);
-                        Assert.AreEqual(0, stream.WeaponInstance);
-                        Assert.AreEqual(
-                            profile.WeaponDefinition.InventorySlot,
-                            stream.WeaponSlot);
-                    }
                 }
+            }
+        }
+
+        [TestMethod]
+        public void ShadowPacketProfilesResolveWithoutInventingNaturalAttackRange()
+        {
+            var expectedProfiles = new[]
+            {
+                new { ProfileId = "25233d23b2122a1b-d8846baa20340c1c", Level = 13 },
+                new { ProfileId = "469eedefbd2e7efe-83d6c6ca8cd6c3d2", Level = 14 },
+                new { ProfileId = "4a974dee458fb68c-96eb7c29113e7cb3", Level = 15 }
+            };
+            CapturedEnemyCombatProfileDefinition[] profiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
+
+            foreach (var expected in expectedProfiles)
+            {
+                CapturedEnemyCombatProfileDefinition profile = profiles.Single(
+                    value => value.ProfileId == expected.ProfileId);
+                Assert.AreEqual(127, profile.ResourceId);
+                Assert.AreEqual("Shadow", profile.Name);
+                Assert.AreEqual(30464, profile.MonsterData);
+                Assert.AreEqual(expected.Level, profile.Level);
+                Assert.IsNull(profile.WeaponDefinition);
+                Assert.AreEqual(1, profile.Streams.Length);
+                Assert.IsFalse(profile.Streams[0].CapturedAttackRange.HasValue);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool resolvedSuccessfully =
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        "Shadow",
+                        30464,
+                        expected.Level,
+                        0,
+                        CapturedEnemyCombatContract.Unresolved(
+                            "range-independent packet certification test",
+                            true),
+                        out resolved,
+                        out failure);
+                Assert.IsTrue(
+                    resolvedSuccessfully,
+                    failure
+                    + "; evidenceSource=" + resolved.EvidenceSourceIdentity
+                    + "; min=" + resolved.MinDamage
+                    + "; max=" + resolved.MaxDamage
+                    + "; recharge=" + resolved.RechargeSeconds
+                    + "; saw=" + resolved.HasCapturedSpecialAttackWeaponContext
+                    + "; attack=" + resolved.HasCapturedAttackStartContext
+                    + "; packetFields=" + resolved.HasCapturedRequiredPacketFields
+                    + "; fixedBehavior=" + resolved.HasCapturedFixedAttackBehavior
+                    + "; sendAttackInfo=" + resolved.SendCapturedAttackInfo
+                    + "; specials=" + resolved.CapturedSpecialAttacks.Length
+                    + "; specialTag=" + resolved.CapturedSpecialAttacks[0].Tag
+                    + "; weaponSlot=" + resolved.AttackInfoWeaponSlot
+                    + "; weaponInstance=" + resolved.AttackInfoWeaponInstance
+                    + "; damageObs=" + resolved.CapturedDamageObservations.Length
+                    + "; startObs=" + resolved.CapturedAttackStartDelayObservationsSeconds.Length
+                    + "; firstObs=" + resolved.CapturedFirstHitDelayObservationsSeconds.Length
+                    + "; intervalObs=" + resolved.CapturedLandedIntervalObservationsSeconds.Length
+                    + "; start=" + resolved.AttackStartDelaySeconds
+                    + "; first=" + resolved.FirstHitDelaySeconds);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, resolved.AttackModel);
+                Assert.IsFalse(resolved.CapturedAttackRange.HasValue);
+                Assert.IsFalse(resolved.CapturedUsesEquippedWeapon);
+            }
+
+            CapturedEnemyCombatContract rejected;
+            string rejectedFailure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Shadow",
+                    30464,
+                    12,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved("cross-level rejection", true),
+                    out rejected,
+                    out rejectedFailure));
+            Assert.IsFalse(rejected.IsCombatReady);
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Architect Striker",
+                    30464,
+                    14,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved("cross-enemy rejection", true),
+                    out rejected,
+                    out rejectedFailure));
+            Assert.IsFalse(rejected.IsCombatReady);
+        }
+
+        [TestMethod]
+        public void DiscardedPetProfilesResolveTheirOrderedCapturedSawStateTransitions()
+        {
+            var expectedProfiles = new[]
+            {
+                new
+                {
+                    ProfileId = "abcad39356c40905-a60091518e8654c5",
+                    Level = 7,
+                    States = new[] { 43, 31, 0, 0, 0 }
+                },
+                new
+                {
+                    ProfileId = "947eb7806de2ef00-370328526bcb32c7",
+                    Level = 8,
+                    States = new[] { 0, 46 }
+                },
+                new
+                {
+                    ProfileId = "95d366ebb4f855e2-9bcb7a58208cf1e0",
+                    Level = 10,
+                    States = new[] { 0, 0, 49, 49, 0, 46, 46, 46, 46, 40 }
+                }
+            };
+            CapturedEnemyCombatProfileDefinition[] profiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
+
+            foreach (var expected in expectedProfiles)
+            {
+                CapturedEnemyCombatProfileDefinition profile = profiles.Single(
+                    value => value.ProfileId == expected.ProfileId);
+                Assert.AreEqual(127, profile.ResourceId);
+                Assert.AreEqual("Discarded Pet", profile.Name);
+                Assert.AreEqual(17720, profile.MonsterData);
+                Assert.AreEqual(expected.Level, profile.Level);
+                Assert.IsTrue(profile.CaptureEvidenceSafe);
+                Assert.IsFalse(profile.DeterministicRuntimeInitializationProven);
+                Assert.IsTrue(profile.HasCapturedOrderedSpecialAttackWeaponState);
+                CollectionAssert.AreEqual(
+                    expected.States,
+                    profile.SpecialAttackWeaponUnknown5Observations);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        "Discarded Pet",
+                        17720,
+                        expected.Level,
+                        0,
+                        CapturedEnemyCombatContract.Unresolved(
+                            "ordered mutable SAW state test",
+                            true),
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                CollectionAssert.AreEqual(
+                    expected.States,
+                    resolved.CapturedSpecialAttackWeaponUnknown5Observations);
             }
         }
 
@@ -363,10 +522,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     null));
 
             CapturedEnemyCombatContract enriched;
-            Assert.IsFalse(
+            Assert.IsTrue(
                 missingRangeProfile.TryEnrichSpecialized(contract, out enriched),
-                "A specialized baseline must not substitute its own unproven maximum attack range.");
-            Assert.IsNull(enriched);
+                "Packet matching must not reject an otherwise exact stream because range behavior is owned independently.");
+            Assert.IsNotNull(enriched);
+            Assert.AreEqual(
+                9.5d,
+                enriched.ParallelAttackSequence.Streams[0].Attack.Range,
+                "Packet enrichment must preserve the existing runtime range owner without claiming captured range evidence.");
 
             CapturedEnemyCombatProfileDefinition profile = CreateSpecializedTestProfile(
                 CreateSpecializedTestStream(
@@ -485,11 +648,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int sawAtFightStart = reset.IndexOf(
                 "AnnounceCapturedEnemySpecialAttackWeaponContext(",
                 StringComparison.Ordinal);
+            int attackAuthorization = reset.IndexOf(
+                "this.GetCombatAttackSource(attacker) == null",
+                StringComparison.Ordinal);
             int delayedAttackRegistration = reset.IndexOf(
                 "pendingCapturedAttackStarts[",
                 StringComparison.Ordinal);
+            Assert.IsTrue(attackAuthorization >= 0);
+            Assert.IsTrue(
+                sawAtFightStart > attackAuthorization,
+                "The combat coordinator must resolve an independent range owner before emitting the captured start packets.");
             Assert.IsTrue(sawAtFightStart >= 0);
             Assert.IsTrue(delayedAttackRegistration > sawAtFightStart);
+            StringAssert.Contains(
+                coordinator,
+                "return range > 0.0d && !double.IsNaN(range) && !double.IsInfinity(range);");
+            string clearTracking = Slice(
+                coordinator,
+                "internal void ClearTracking",
+                "internal void ClearRuntimeState");
+            Assert.IsFalse(
+                clearTracking.Contains("capturedSpecialAttackWeaponStateCursor.Clear("),
+                "Mutable SAW state is actor state and must survive ordinary fight tracking resets.");
+            string clearRuntimeState = Slice(
+                coordinator,
+                "internal void ClearRuntimeState",
+                "internal void ProcessCombatTick");
+            StringAssert.Contains(
+                clearRuntimeState,
+                "capturedSpecialAttackWeaponStateCursor.ClearAll()");
 
             string process = Slice(
                 coordinator,
@@ -674,7 +861,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void UniqueCultistProfileResolvesWithoutCapturedSourceIdentityMatch()
+        public void CultistWithoutAStableWeaponDiscriminatorFailsClosedWhenTwoVariantsAreCompatible()
         {
             const int runtimeSourceIdentity = unchecked((int)0x79834DCF);
             CapturedEnemyCombatProfileDefinition profile =
@@ -690,7 +877,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             CapturedEnemyCombatContract resolved;
             string failure;
-            Assert.IsTrue(
+            Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     1931,
                     "Cultist",
@@ -701,13 +888,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "active totw.cultist.26103 source 0x79834DCF",
                         true),
                     out resolved,
-                    out failure),
-                failure);
-            Assert.IsTrue(resolved.IsCombatReady);
-            Assert.AreEqual(profile.Evidence, resolved.Evidence);
-            Assert.AreEqual(
-                profile.RepresentativeEvidenceSourceIdentity,
-                resolved.EvidenceSourceIdentity);
+                    out failure));
+            Assert.IsFalse(resolved.IsCombatReady);
+            StringAssert.Contains(failure, "does not distinguish");
         }
 
         [TestMethod]
@@ -890,27 +1073,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void WorkmanStrikerWithoutAnExactRuntimeReadyWeaponProfileFailsClosed()
+        public void WorkmanStrikerQ12ResolvesItsOrderedCapturedSawVariant()
         {
             CapturedEnemyCombatContract resolved;
             string failure;
-            Assert.IsFalse(
+            Assert.IsTrue(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     127,
                     "Workman Striker",
                     203854,
                     16,
-                    unchecked((int)0x7953AFDD),
+                    unchecked((int)0x71111111),
                     CapturedEnemyCombatContract.EquippedWeapon(
-                        "active subway Workman Striker source 0x7953AFDD",
+                        "active subway Workman Striker Q12 stable weapon profile",
                         122905,
                         122906,
                         12,
                         6),
                     out resolved,
-                    out failure));
-            Assert.IsFalse(resolved.IsCombatReady);
-            StringAssert.Contains(failure, "does not distinguish");
+                    out failure),
+                failure);
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(122905, resolved.WeaponLowId);
+            Assert.AreEqual(122906, resolved.WeaponHighId);
+            Assert.AreEqual(12, resolved.WeaponQuality);
+            CollectionAssert.AreEqual(
+                new[] { 0, 26, 46, 46, 46 },
+                resolved.CapturedSpecialAttackWeaponUnknown5Observations);
         }
 
         [TestMethod]
