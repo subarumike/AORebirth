@@ -2,19 +2,14 @@
 
 ## Active
 
-### ICC Peacekeeper defend Rollerrat
+### Token Board — yellow chat token count
 
-- Assist was only evaluated at first aggro; fights that walk into PK range later got no help.
-- Tick-based assist: idle PK engages nearby hostile already fighting a player (~30m).
-- Also search allies around both player and hostile.
+Capture `20260723-123341`: FormatFeedback must use AO yellow prefix
+`~&!!!":!!!)<s` + length + `Side tokens collected: N.`
+Plain text shows as empty yellow lines.
 
 #### Smoke
-1. Restart ZoneEngine
-2. Pull a Rollerrat near a Peacekeeper (or kite into one)
-3. PK should stop patrol, attack, and kill the rat
 
-### Merged from origin (keep)
-
-Capture-backed NPC combat corpus / Temple population work from master was merged.
-See `docs/evidence/CAPTURE_BACKED_NPC_COMBAT_AUDIT_20260722.md` and `docs/project/PROJECT_STATE.md`.
-Arete Marcus-pad ambient fight + Arete cleaning-robot FixedAttack contracts kept local.
+1. Restart engines
+2. Use token board → yellow chat shows `Side tokens collected: N.`
+3. Stop engines when done

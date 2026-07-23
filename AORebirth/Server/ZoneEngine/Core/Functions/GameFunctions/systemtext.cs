@@ -39,6 +39,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
     using MsgPack;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     #endregion
@@ -81,16 +82,53 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity target,
             MessagePackObject[] arguments)
         {
+            ICharacter character = self as ICharacter;
+            if (character == null || arguments == null || arguments.Length < 1)
+            {
+                return false;
+            }
+
             string text = arguments[0].AsString();
+
+            // Token-board OnUse: "Side tokens collected: %d." / variants (capture 20260723-123341).
+            if (text != null && text.IndexOf("%d", System.StringComparison.Ordinal) >= 0)
+            {
+                text = text.Replace("%d", GetSideTokenCount(character).ToString());
+            }
+
+            // Capture 20260723-123341: yellow system chat needs AO format prefix or client
+            // shows an empty yellow line.
+            text = TokenBoardRuntime.ToYellowSystemFeedback(text);
+
             var message = new FormatFeedbackMessage()
                           {
-                              Identity = self.Identity,
+                              Identity = character.Identity,
+                              Unknown = 1,
                               FormattedMessage = text,
                               Unknown1 = 0,
                               Unknown2 = 0,
                           };
-            ((ICharacter)self).Send(message);
+            character.Send(message);
             return true;
+        }
+
+        /// <summary>
+        /// Clan = alignment (62), Omni = metatype (75). Neutral/other → 0.
+        /// </summary>
+        private static int GetSideTokenCount(ICharacter character)
+        {
+            int side = character.Stats[StatIds.side].Value;
+            if (side == (int)Side.Clan)
+            {
+                return character.Stats[StatIds.alignment].Value;
+            }
+
+            if (side == (int)Side.Omni)
+            {
+                return character.Stats[StatIds.metatype].Value;
+            }
+
+            return 0;
         }
 
         #endregion

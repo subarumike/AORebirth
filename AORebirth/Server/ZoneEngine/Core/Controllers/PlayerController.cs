@@ -339,18 +339,23 @@ namespace ZoneEngine.Core.Controllers
             // 6. Wait for nano recharge delay
             // 7. Unlock nano casting
 
+            // Crystal 300440 uploads program 300439; remap mistaken uploaded/cast ids.
+            nanoId = SummonedBucketheadTechnodealerRuntime.NormalizeNanoId(nanoId);
+
             if (!NanoLoader.NanoList.ContainsKey(nanoId))
             {
                 ChatTextMessageHandler.Default.Send(this.Character, "Unknown nano program.");
                 return false;
             }
 
-            if (!this.Character.UploadedNanos.Any(x => x.NanoId == nanoId))
+            if (!this.Character.UploadedNanos.Any(x => x.NanoId == nanoId)
+                && !SummonedBucketheadTechnodealerRuntime.HasUploadedSummonNano(this.Character, nanoId))
             {
                 PetShellItemService.Default.TryEnsureNanoUploaded(this.Character, nanoId);
             }
 
-            if (!this.Character.UploadedNanos.Any(x => x.NanoId == nanoId))
+            if (!this.Character.UploadedNanos.Any(x => x.NanoId == nanoId)
+                && !SummonedBucketheadTechnodealerRuntime.HasUploadedSummonNano(this.Character, nanoId))
             {
                 ChatTextMessageHandler.Default.Send(
                     this.Character,
@@ -477,6 +482,11 @@ namespace ZoneEngine.Core.Controllers
                     ChatTextMessageHandler.Default.Send(this.Character, hint);
                 }
             }
+            else if (SummonedBucketheadTechnodealerRuntime.IsSummonNano(nanoId))
+            {
+                // Dedicated path: do not depend on FunctionCollection SpawnMonster2 registration.
+                SummonedBucketheadTechnodealerRuntime.EnsureSpawnedAfterCast(this.Character, nanoId);
+            }
             else if (AmbientRestorationAuraRuntime.IsAmbientRestorationNano(nanoId))
             {
                 // Capture 20260722-keeper-exect-nano: 20s aura pulse
@@ -501,6 +511,9 @@ namespace ZoneEngine.Core.Controllers
                 {
                     MongoSlamRuntimeService.ApplyCaptureBackedSlamEffects(slamCaster, nanoId);
                 }
+
+                // Capture 20260723-053632 Sparrow Flight: SpellList after OnUse morph/flight.
+                AdventurerMorphFlightRuntime.OnMorphNanoApplied(this.Character, nanoId);
 
                 // Instant Hit drain nanos must not be treated as NCU buffs on the caster.
                 if (duration > 0 && !NanoEventRuntimeService.Default.HasOffensiveHitOnUse(nano))

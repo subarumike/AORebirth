@@ -234,6 +234,11 @@
     <Compile Include="Core\Functions\GameFunctions\mesh.cs" />
     <Compile Include="Core\Functions\GameFunctions\modify.cs" />
     <Compile Include="Core\Functions\GameFunctions\modifypercentage.cs" />
+    <Compile Include="Core\Functions\GameFunctions\scalingmodify.cs" />
+    <Compile Include="Core\Functions\GameFunctions\monstershape.cs" />
+    <Compile Include="Core\Functions\GameFunctions\canfly.cs" />
+    <Compile Include="Core\Functions\GameFunctions\restrictaction.cs" />
+    <Compile Include="Core\Functions\GameFunctions\changevariable.cs" />
     <Compile Include="Core\Functions\GameFunctions\openbank.cs" />
     <Compile Include="Core\Functions\GameFunctions\opensystemdialog.cs" />
     <Compile Include="Core\Functions\GameFunctions\savechar.cs" />
@@ -244,11 +249,20 @@
     </Compile>
     <Compile Include="Core\Functions\GameFunctions\set.cs" />
     <Compile Include="Core\Functions\GameFunctions\systemtext.cs" />
+    <Compile Include="Core\Functions\GameFunctions\destroyitem.cs" />
+    <Compile Include="Core\Functions\GameFunctions\spawnitem.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleport.cs" />
     <Compile Include="Core\Functions\GameFunctions\teleportproxy2.cs" />
     <Compile Include="Core\Functions\GameFunctions\uploadnano.cs" />
     <Compile Include="Core\Functions\GameFunctions\summonpet.cs" />
     <Compile Include="Core\Functions\GameFunctions\summonpets.cs" />
+    <Compile Include="Core\Functions\GameFunctions\spawnmonster2.cs" />
+    <Compile Include="Core\TokenBoardRuntime.cs" />
+    <Compile Include="Core\VehicleHudWearRuntime.cs" />
+    <Compile Include="Core\SummonedBucketheadTechnodealerRuntime.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedBucketheadTechnodealerInteractionHandler.cs" />
+    <Compile Include="Core\Playfields\CapturedBucketheadTechnodealerContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedBucketheadTechnodealerRuntimeRegistry.cs" />
     <Compile Include="Core\IntermalMessageEvents\PlayfieldMessageReceivedEvent.cs" />
     <Compile Include="Core\InternalMessages\IMExecuteFunction.cs" />
     <Compile Include="Core\InternalMessages\IMSendAOtomatinMessageToPlayfieldOthers.cs" />
@@ -263,6 +277,7 @@
     <Compile Include="Core\KnuBot\KnuBotDialogTree.cs" />
     <Compile Include="Core\CombatStartPacketDiagnostics.cs" />
     <Compile Include="Core\ActiveNanoRuntimeService.cs" />
+    <Compile Include="Core\AdventurerMorphFlightRuntime.cs" />
     <Compile Include="Core\NanoEventRuntimeService.cs" />
     <Compile Include="Core\MongoSlamRuntimeService.cs" />
     <Compile Include="Core\PetRuntimeService.cs" />

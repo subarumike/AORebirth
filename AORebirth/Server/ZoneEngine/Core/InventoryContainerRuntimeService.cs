@@ -974,6 +974,12 @@ namespace ZoneEngine.Core
             // Capture 20260721-nanoprogramsvendor: Use Marco nano crystal → complete tip 555BE9F4.
             StanGoodmanQuestRuntime.TryCompleteBuyNanoTipOnCrystalUse(character, item);
 
+            // Capture 20260723-123341: every token-board Use → FormatFeedback first, then upgrade funcs.
+            if (TokenBoardRuntime.TryHandleUse(character, itemPosition, item))
+            {
+                return true;
+            }
+
             TemplateActionMessageHandler.Default.Send(
                 character,
                 item,
@@ -1563,7 +1569,16 @@ namespace ZoneEngine.Core
                 case InventoryContainerInteractionRouteMode.InventoryItem:
                     if (this.UseInventoryItem(client.Controller.Character, target))
                     {
-                        GenericCmdMessageHandler.Default.Acknowledge(client.Controller.Character, message);
+                        ICharacter usedCharacter = client.Controller.Character;
+                        GenericCmdMessageHandler.Default.Acknowledge(usedCharacter, message);
+
+                        // Capture 20260723-123341: AppearanceUpdate after Use ACK when Shouldermesh ran.
+                        Character concrete = usedCharacter as Character;
+                        if (concrete != null && concrete.ChangedAppearance)
+                        {
+                            AppearanceUpdateMessageHandler.Default.Send(concrete);
+                            concrete.ChangedAppearance = false;
+                        }
                     }
                     else
                     {
@@ -1869,7 +1884,8 @@ namespace ZoneEngine.Core
                         toPlacement,
                         itemTo != null ? 1 : 0));
 
-                if (receivingPage.NeedsItemCheck && !this.CanEquipToPage(character, receivingPage, itemFrom))
+                if (receivingPage.NeedsItemCheck
+                    && !this.CanEquipToPage(character, receivingPage, itemFrom, toPlacement, itemTo))
                 {
                     LogUtil.Debug(
                         DebugInfoDetail.Error,
@@ -1887,13 +1903,22 @@ namespace ZoneEngine.Core
                     return true;
                 }
 
-                WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);
+                if (toPlacement == (int)WeaponSlots.Righthand
+                    || toPlacement == (int)WeaponSlots.LeftHand)
+                {
+                    WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);
+                }
 
                 if (itemTo != null)
                 {
                     if (affectsAppearance)
                     {
                         this.WaitForEquipVisualSync(itemFrom, itemTo, receivingPage is SocialArmorInventoryPage);
+                    }
+
+                    if (VehicleHudWearRuntime.IsVehicleItem(itemTo))
+                    {
+                        VehicleHudWearRuntime.NoteUnequipped(character, itemTo);
                     }
 
                     UnEquip.Send(client, receivingPage, toPlacement);
@@ -1919,6 +1944,12 @@ namespace ZoneEngine.Core
                     ackSourceContainer,
                     ackTargetPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
+                if (VehicleHudWearRuntime.IsVehicleItem(itemFrom))
+                {
+                    // Save prior MonsterScale/morph before OnWear ChangeVariable/MonsterShape.
+                    VehicleHudWearRuntime.NoteEquipped(character, itemFrom, toPlacement);
+                }
+
                 character.CalculateSkills();
                 this.EnsureWeaponVisualMeshes(character, true);
                 this.PersistClientMoveItemToInventory(character, "equip");
@@ -1953,6 +1984,11 @@ namespace ZoneEngine.Core
                     message.SourceContainer,
                     ackTargetPlacement);
                 character.CalculateSkills();
+                if (VehicleHudWearRuntime.IsVehicleItem(itemFrom))
+                {
+                    VehicleHudWearRuntime.NoteUnequipped(character, itemFrom);
+                }
+
                 this.EnsureWeaponVisualMeshes(character, true);
                 this.PersistClientMoveItemToInventory(character, "unequip");
                 return true;
@@ -2259,7 +2295,12 @@ namespace ZoneEngine.Core
             return receivingPage.FindFreeSlot();
         }
 
-        private bool CanEquipToPage(ICharacter character, IInventoryPage page, IItem item)
+        private bool CanEquipToPage(
+            ICharacter character,
+            IInventoryPage page,
+            IItem item,
+            int targetSlot,
+            IItem currentlyEquipped)
         {
             // Capture 20260721-Mason: after surgery clinic, gift leg 295706 equips to ImplantPage:002B.
             // Clinic nano Treatment can still be short if OnUse missed; allow the quest gift while
@@ -2278,6 +2319,20 @@ namespace ZoneEngine.Core
             else if (page is WeaponInventoryPage)
             {
                 action = item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield);
+                if (VehicleHudWearRuntime.IsVehicleItem(item)
+                    && !VehicleHudWearRuntime.AllowsWeaponSlot(item, targetSlot))
+                {
+                    return false;
+                }
+
+                if (VehicleHudWearRuntime.IsVehicleItem(item))
+                {
+                    return VehicleHudWearRuntime.EvaluateVehicleWieldRequirements(
+                        character,
+                        item,
+                        currentlyEquipped,
+                        () => action == null || action.CheckRequirements(character));
+                }
             }
 
             return action == null || action.CheckRequirements(character);

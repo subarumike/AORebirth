@@ -539,6 +539,16 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.ActivateNpc(character);
         }
 
+        public void RegisterDynel(IEntity entity)
+        {
+            this.runtimeSystems.RegisterDynel(entity);
+        }
+
+        public void UnregisterDynel(Identity identity)
+        {
+            this.runtimeSystems.UnregisterDynel(identity);
+        }
+
         public void AcquireNpcAggro(ICharacter attacker, ICharacter target)
         {
             this.runtimeSystems.AcquireNpcAggro(attacker, target);

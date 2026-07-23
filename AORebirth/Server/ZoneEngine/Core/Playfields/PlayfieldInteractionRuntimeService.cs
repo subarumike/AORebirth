@@ -96,6 +96,12 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            // Buckethead Technodealer: registry match only (never name-match other NPCs).
+            if (CapturedBucketheadTechnodealerInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             if (CapturedThrakGardenVendorInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;

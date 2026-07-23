@@ -1069,10 +1069,18 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
             }
 
+            uint value = client.Controller.Character.Stats[statId].BaseValue;
+
+            // Unset sentinel must not reach Info UI currencies (ICC / Freelancers show 1234567890).
+            if (value == 1234567890U)
+            {
+                value = 0;
+            }
+
             var tuple = new GameTuple<int, uint>
                         {
                             Value1 = statId,
-                            Value2 = client.Controller.Character.Stats[statId].BaseValue
+                            Value2 = value
                         };
 
             CombatXpRuntimeService.LogXpWireOutbound(

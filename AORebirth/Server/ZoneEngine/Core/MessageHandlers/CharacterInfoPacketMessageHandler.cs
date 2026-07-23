@@ -45,6 +45,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.PacketHandlers;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -167,16 +168,23 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 int cityPlayfieldId = GetOrganizationCityPlayfieldId(orgId);
 
-                if (tPlayer.Stats[StatIds.npcfamily].Value != 0)
+                // Buckethead Technodealer: capture SCFU NpcFamily=0, but Info must be Monster (0x50).
+                // Do not broaden this to all NPCController/Monster — that broke live vendors.
+                bool bucketheadInfo =
+                    CapturedBucketheadTechnodealerRuntimeRegistry.TryGet(
+                        tPlayer.Identity.Instance,
+                        out _);
+
+                if (bucketheadInfo || tPlayer.Stats[StatIds.npcfamily].Value != 0)
                 {
                     type = InfoPacketType.Monster;
                     x.Unknown = 1;
                     x.Info = new MonsterInfoPacket()
                              {
-                                 Unknown1=1,
-                                 Unknown2=0,
+                                 Unknown1 = 1,
+                                 Unknown2 = 0,
                                  CurrentHealth = tPlayer.Stats[StatIds.health].Value,
-                                 Level = ResolveInfoLevel(tPlayer),
+                                 Level = ResolveMonsterInfoLevel(tPlayer),
                                  MaxHealth = tPlayer.Stats[StatIds.life].Value,
                                  OrganizationId = 0,
                                  Profession = (byte)tPlayer.Stats[StatIds.profession].Value,
@@ -257,6 +265,22 @@ namespace ZoneEngine.Core.MessageHandlers
             if (raw == 0 || raw == 1234567890U || raw > 200)
             {
                 return 1;
+            }
+
+            return (byte)raw;
+        }
+
+        private static byte ResolveMonsterInfoLevel(ICharacter character)
+        {
+            uint raw = character.Stats[StatIds.level].BaseValue;
+            if (raw == 0 || raw == 1234567890U)
+            {
+                return 1;
+            }
+
+            if (raw > 255)
+            {
+                return 255;
             }
 
             return (byte)raw;

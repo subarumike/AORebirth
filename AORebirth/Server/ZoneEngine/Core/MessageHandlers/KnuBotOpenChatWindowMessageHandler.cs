@@ -53,6 +53,15 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            // Portable Buckethead Technodealer: left-click is KnuBotOpenChatWindow (no dialogue).
+            // Capture 20260723-114826 shop open is ShopUpdate+Trade; open that here.
+            if (CapturedBucketheadTechnodealerInteractionHandler.Default.TryHandleOpenChatWindow(
+                    player,
+                    npcIdentity))
+            {
+                return;
+            }
+
             // Content-driven NPCs (Rex / Windcaller / Tailor / Thrak) have no attached KnuBot; client still
             // opens them with KnubotOpenChatWindow (capture 20260718-185306 Veronica).
             if (ContentDrivenNpcDialogueRouter.TryStartDialogueForTarget(player, npcIdentity))

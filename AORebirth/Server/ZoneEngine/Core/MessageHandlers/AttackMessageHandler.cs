@@ -111,6 +111,15 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            // Sparrow Flight RestrictAction 2 — cannot fight while morphed.
+            if (AdventurerMorphFlightRuntime.IsFightingRestricted(character))
+            {
+                this.CancelPlayerAttack(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored: morph RestrictAction (no fighting).");
+                return;
+            }
+
             this.StartPlayerAttack(character, message.Target);
             this.EngageNpcTarget(character, target);
             this.SendCombatStartSpecialAttackWeapon(character);

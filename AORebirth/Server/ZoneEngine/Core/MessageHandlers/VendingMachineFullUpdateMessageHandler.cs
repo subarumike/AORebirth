@@ -52,6 +52,54 @@ namespace ZoneEngine.Core.MessageHandlers
             this.Send(character, this.Filler(vendor));
         }
 
+        /// <summary>
+        /// Capture 20260723-114826 portable Buckethead Technodealer VMFU:
+        /// TypeId=11, NpcIdentity set, Unk4=0xF424F, Unk5=0, Unk6=64,
+        /// 8 stats, empty name string, Unk8=2, Unk9=50, empty array, Unk11=3.
+        /// </summary>
+        public void SendBucketheadTechnodealer(ICharacter character, Vendor vendor)
+        {
+            this.Send(character, this.BucketheadFiller(vendor));
+        }
+
+        private MessageDataFiller BucketheadFiller(Vendor vendor)
+        {
+            return x =>
+            {
+                x.Identity = vendor.Identity;
+                x.Unknown = 0;
+                x.Coordinates = null;
+                x.Heading = null;
+                x.NpcIdentity = vendor.NpcIdentity;
+                x.TypeIdentifier = 0x0b;
+                x.PlayfieldId = vendor.Playfield.Identity.Instance;
+                x.Unknown4 = 0xf424f;
+                x.Unknown5 = 0;
+                x.Unknown6 = 64;
+                x.Stats = new[]
+                          {
+                              Tuple(CharacterStat.Flags, unchecked((uint)-2147338749)),
+                              Tuple(CharacterStat.StaticInstance, 99566),
+                              Tuple(CharacterStat.ACGItemLevel, 1),
+                              Tuple(CharacterStat.ACGItemTemplateID, 99566),
+                              Tuple(CharacterStat.ACGItemTemplateID2, 99566),
+                              Tuple(CharacterStat.MultipleCount, 1),
+                              Tuple((CharacterStat)501, 2),
+                              Tuple((CharacterStat)500, 0),
+                          };
+                x.Unknown7 = string.Empty;
+                x.Unknown8 = 2;
+                x.Unknown9 = 50;
+                x.Unknown10 = new Identity[0];
+                x.Unknown11 = 3;
+            };
+        }
+
+        private static GameTuple<CharacterStat, uint> Tuple(CharacterStat stat, uint value)
+        {
+            return new GameTuple<CharacterStat, uint> { Value1 = stat, Value2 = value };
+        }
+
         private MessageDataFiller Filler(Vendor vendor)
         {
             return x =>

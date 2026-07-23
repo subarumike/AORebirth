@@ -368,6 +368,13 @@ namespace ZoneEngine.Core.Packets
                 return slot == (int)WeaponSlots.Righthand || slot == (int)WeaponSlots.LeftHand;
             }
 
+            // Vehicles (yalm/water/ground) have ToWield but are HUD items, not guns.
+            int isVehicle = item.GetAttribute((int)StatIds.isvehicle);
+            if (isVehicle != MissingItemStatValue && isVehicle != 0)
+            {
+                return false;
+            }
+
             return item.ItemActions.Any(x => x.ActionType == ActionType.ToWield)
                    || HasWeaponStats(item);
         }

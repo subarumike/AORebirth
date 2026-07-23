@@ -115,6 +115,8 @@ namespace ZoneEngine.Core.PacketHandlers
             {
                 Item implantItem = match.ImplantOrTargetItem(sourceItem, targetItem);
 
+                NormalizeResultTemplateOrder(ts);
+
                 int resultMaxQl = 1;
                 int resultHighForQl = ts.ResultHighId;
                 if (!ItemLoader.ItemList.ContainsKey(resultHighForQl)
@@ -370,6 +372,13 @@ namespace ZoneEngine.Core.PacketHandlers
         {
             int absMinQL = ItemLoader.ItemList[ts.ResultLowId].Quality;
             int absMaxQL = ItemLoader.ItemList[ts.ResultHighId].Quality;
+            if (absMinQL > absMaxQL)
+            {
+                int swap = absMinQL;
+                absMinQL = absMaxQL;
+                absMaxQL = swap;
+            }
+
             if (absMaxQL == absMinQL)
             {
                 return ts.MaxXP;
@@ -410,6 +419,7 @@ namespace ZoneEngine.Core.PacketHandlers
                 if (match != null)
                 {
                     TradeSkillEntry ts = match.Entry;
+                    NormalizeResultTemplateOrder(ts);
                     Item clusterItem = match.ClusterItem(sourceItem, targetItem);
                     Item implantItem = match.ImplantOrTargetItem(sourceItem, targetItem);
 
@@ -473,6 +483,35 @@ namespace ZoneEngine.Core.PacketHandlers
                     TradeSkillPacket.SendNotTradeskill(client.Controller.Character);
                 }
             }
+        }
+
+        /// <summary>
+        /// items.dat Low/High AOIDs are not always ascending by AOID (e.g. Carbonrich Ore
+        /// 144770=QL1, 144768=QL255). Ensure ResultLowId is the lower-QL template.
+        /// </summary>
+        private static void NormalizeResultTemplateOrder(TradeSkillEntry ts)
+        {
+            if (ts == null)
+            {
+                return;
+            }
+
+            if (!ItemLoader.ItemList.ContainsKey(ts.ResultLowId)
+                || !ItemLoader.ItemList.ContainsKey(ts.ResultHighId))
+            {
+                return;
+            }
+
+            int lowQl = ItemLoader.ItemList[ts.ResultLowId].Quality;
+            int highQl = ItemLoader.ItemList[ts.ResultHighId].Quality;
+            if (lowQl <= highQl)
+            {
+                return;
+            }
+
+            int swapId = ts.ResultLowId;
+            ts.ResultLowId = ts.ResultHighId;
+            ts.ResultHighId = swapId;
         }
 
         /// <summary>
