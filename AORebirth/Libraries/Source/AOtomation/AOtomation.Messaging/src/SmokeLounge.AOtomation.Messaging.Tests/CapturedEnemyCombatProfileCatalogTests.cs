@@ -711,6 +711,112 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ReanimatedCorpseAnchorsResolveTheirExactCapturedWeaponProfiles()
+        {
+            var expectedProfiles = new[]
+            {
+                new
+                {
+                    SourceIdentity =
+                        CapturedTempleOfThreeWindsCombatCatalog
+                            .ReanimatedFirstAnchorCaptureSourceIdentity,
+                    ProfileId = "74af62ea08cc19d6-7757e8ce980f0cf3",
+                    Quality = 14
+                },
+                new
+                {
+                    SourceIdentity =
+                        CapturedTempleOfThreeWindsCombatCatalog
+                            .ReanimatedSecondAnchorCaptureSourceIdentity,
+                    ProfileId = "74af62ea08cc19d6-2c2762baa2d8ec8d",
+                    Quality = 20
+                }
+            };
+
+            foreach (var expected in expectedProfiles)
+            {
+                CapturedEnemyCombatProfileDefinition profile =
+                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                        value => value.ProfileId == expected.ProfileId);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        "Reanimated Corpse",
+                        41690,
+                        18,
+                        expected.SourceIdentity,
+                        CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(
+                            expected.SourceIdentity),
+                        out resolved,
+                        out failure),
+                    failure);
+
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.AreEqual(expected.SourceIdentity, resolved.EvidenceSourceIdentity);
+                Assert.AreEqual(profile.Evidence, resolved.Evidence);
+                Assert.AreEqual(150241, resolved.WeaponLowId);
+                Assert.AreEqual(150242, resolved.WeaponHighId);
+                Assert.AreEqual(expected.Quality, resolved.WeaponQuality);
+                Assert.AreEqual(6, resolved.WeaponInventorySlot);
+                Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, resolved.AttackInfoUnknown);
+                Assert.AreEqual(3, resolved.AttackInfoHitType);
+                Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+            }
+        }
+
+        [TestMethod]
+        public void EumenidesQ20WeaponSelectorResolvesTheExactGeneratedProfile()
+        {
+            const string profileId = "8b40ecdf74edf8a9-f3f54c2f107b40b4";
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract baseline = CapturedEnemyCombatContract.EquippedWeapon(
+                "Eumenides QL20 generated-profile selector",
+                NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate,
+                NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate,
+                NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,
+                6,
+                requiresDamageLineOfSight: true);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Eumenides",
+                    203726,
+                    20,
+                    0,
+                    baseline,
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(unchecked((int)0x79545042), resolved.EvidenceSourceIdentity);
+            Assert.AreEqual(123267, resolved.WeaponLowId);
+            Assert.AreEqual(123268, resolved.WeaponHighId);
+            Assert.AreEqual(20, resolved.WeaponQuality);
+            Assert.AreEqual(6, resolved.WeaponInventorySlot);
+            Assert.AreEqual(39, resolved.MinDamage);
+            Assert.AreEqual(45, resolved.MaxDamage);
+            Assert.AreEqual(19, resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(143, resolved.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(171, resolved.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(143, resolved.SpecialAttackWeaponUnknown3);
+            Assert.AreEqual(143, resolved.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(0, resolved.SpecialAttackWeaponUnknown5);
+            Assert.IsTrue(resolved.RequiresDamageLineOfSight);
+        }
+
+        [TestMethod]
         public void WorkmanStrikerResolvesTheExactCapturedStableWeaponProfile()
         {
             const int runtimeSourceIdentity = unchecked((int)0x79545219);

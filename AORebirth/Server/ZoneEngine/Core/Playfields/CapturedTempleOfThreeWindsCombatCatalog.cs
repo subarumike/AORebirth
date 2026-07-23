@@ -34,6 +34,10 @@ namespace AORebirth.Core.Playfields
         internal const double GartuaAttackRechargeSeconds = 5.3;
         internal const double MurialFirstHitDelaySeconds = 1.5397;
         internal const double MurialAttackRechargeSeconds = 3.7885;
+        internal const int ReanimatedFirstAnchorCaptureSourceIdentity =
+            unchecked((int)0x7984B500);
+        internal const int ReanimatedSecondAnchorCaptureSourceIdentity =
+            unchecked((int)0x7984B501);
 
         internal static CapturedEnemyCombatContract DefenderOfTheThree()
         {
@@ -299,6 +303,11 @@ namespace AORebirth.Core.Playfields
                 -1,
                 0,
                 0);
+        }
+
+        internal static CapturedEnemyCombatContract ReanimatedCorpse(int captureSourceIdentity)
+        {
+            return ReanimatedCorpse().WithEvidenceSourceHint(captureSourceIdentity);
         }
 
         internal static CapturedEnemyCombatContract EternalSentinel()
