@@ -526,6 +526,7 @@
     <Compile Include="Core\Playfields\PlayfieldLifecycleTrace.cs" />
     <Compile Include="Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldRuntimeSystems.cs" />
+    <Compile Include="Core\RuntimeOwnershipRegistry.cs" />
     <Compile Include="Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldStatUpdateRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldStaticDynelRuntimeService.cs" />

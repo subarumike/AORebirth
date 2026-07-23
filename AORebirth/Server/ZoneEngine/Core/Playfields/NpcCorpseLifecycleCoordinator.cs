@@ -44,6 +44,11 @@ namespace AORebirth.Core.Playfields
             return this.deadNpcDespawnTicks.TryGetValue(identity.Instance, out despawnTick);
         }
 
+        internal void ClearRuntimeState()
+        {
+            this.deadNpcDespawnTicks.Clear();
+        }
+
         internal void ScheduleDeadNpcDespawn(ICharacter target)
         {
             this.deadNpcDespawnTicks[target.Identity.Instance] =

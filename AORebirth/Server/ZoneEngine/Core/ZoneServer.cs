@@ -78,7 +78,7 @@ namespace ZoneEngine.Core
 
         /// <summary>
         /// </summary>
-        private readonly List<IPlayfield> playfields = new List<IPlayfield>();
+        private readonly RuntimeOwnershipRegistry<int, IPlayfield> playfields;
 
         private readonly DisposeContainer memBusDisposeContainer = new DisposeContainer();
 
@@ -98,6 +98,8 @@ namespace ZoneEngine.Core
         {
             // TODO: Get the Server id from chatengine or config file
             this.Id = 0x356;
+            this.playfields =
+                new RuntimeOwnershipRegistry<int, IPlayfield>(this.CreateOwnedPlayfield);
             this.ClientDisconnected += this.ZoneServerClientDisconnected;
 
             // New Bus initialization
@@ -187,7 +189,7 @@ namespace ZoneEngine.Core
         /// </summary>
         public void DisconnectAllClients()
         {
-            foreach (Playfield pf in this.playfields)
+            foreach (Playfield pf in this.playfields.Snapshot().OfType<Playfield>())
             {
                 pf.DisconnectAllClients();
             }
@@ -206,7 +208,7 @@ namespace ZoneEngine.Core
 
             if (!global)
             {
-                foreach (Playfield pf in this.playfields)
+                foreach (Playfield pf in this.playfields.Snapshot().OfType<Playfield>())
                 {
                     temp.Add(pf.Identity, names[pf.Identity.Instance]);
                 }
@@ -230,18 +232,7 @@ namespace ZoneEngine.Core
         /// </returns>
         public IPlayfield PlayfieldById(Identity id)
         {
-            lock (this.playfields)
-            {
-                foreach (IPlayfield pf in this.playfields)
-                {
-                    if (pf.Identity == id)
-                    {
-                        return pf;
-                    }
-                }
-
-                return this.CreatePlayfieldUnlocked(id);
-            }
+            return this.playfields.GetOrCreate(id.Instance);
         }
 
         #endregion
@@ -274,13 +265,10 @@ namespace ZoneEngine.Core
         {
             // Fill in the data
             requestPlayfieldList.ZoneEngineAddress = this.TcpEndPoint.Address.ToString();
-            lock (this.playfields)
+            requestPlayfieldList.PlayfieldIds.Clear();
+            foreach (Playfield pf in this.playfields.Snapshot().OfType<Playfield>())
             {
-                requestPlayfieldList.PlayfieldIds.Clear();
-                foreach (Playfield pf in this.playfields)
-                {
-                    requestPlayfieldList.PlayfieldIds.Add(pf.Identity);
-                }
+                requestPlayfieldList.PlayfieldIds.Add(pf.Identity);
             }
 
             // Now send it back to ChatEngine
@@ -318,25 +306,23 @@ namespace ZoneEngine.Core
         /// </returns>
         protected IPlayfield CreatePlayfield(Identity playfieldIdentity)
         {
-            lock (this.playfields)
-            {
-                foreach (IPlayfield pf in this.playfields)
-                {
-                    if (pf.Identity == playfieldIdentity)
-                    {
-                        return pf;
-                    }
-                }
-
-                return this.CreatePlayfieldUnlocked(playfieldIdentity);
-            }
+            return this.playfields.GetOrCreate(playfieldIdentity.Instance);
         }
 
-        private IPlayfield CreatePlayfieldUnlocked(Identity playfieldIdentity)
+        internal IPlayfield ReplacePlayfieldRuntime(Identity playfieldIdentity)
         {
-            var temp = new Playfield(this, playfieldIdentity);
-            this.playfields.Add(temp);
-            return temp;
+            return this.playfields.Replace(playfieldIdentity.Instance);
+        }
+
+        private IPlayfield CreateOwnedPlayfield(int playfieldInstance)
+        {
+            return new Playfield(
+                this,
+                new Identity
+                {
+                    Type = IdentityType.Playfield,
+                    Instance = playfieldInstance
+                });
         }
 
         /// <summary>
@@ -437,13 +423,7 @@ namespace ZoneEngine.Core
 
         public override void Stop()
         {
-            lock (this.playfields)
-            {
-                foreach (Playfield pf in this.playfields)
-                {
-                    pf.Dispose();
-                }
-            }
+            this.playfields.Dispose();
 
             base.Stop();
         }

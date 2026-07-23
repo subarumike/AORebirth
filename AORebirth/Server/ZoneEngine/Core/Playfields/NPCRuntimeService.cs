@@ -137,11 +137,19 @@ namespace AORebirth.Core.Playfields
             {
                 if (character.Controller is NPCController)
                 {
+                    character.DoNotDoTimers = true;
+                    character.SetTarget(Identity.None);
+                    character.SetFightingTarget(Identity.None);
+                    NPCController controller = (NPCController)character.Controller;
+                    controller.State = CharacterState.Idle;
+                    controller.StopFollow();
                     this.combatTick.ClearTracking(character.Identity);
                     CapturedEnemyCombatRuntimeRegistry.Remove(character.Identity.Instance);
                 }
             }
 
+            this.combatTick.ClearRuntimeState();
+            this.corpseLifecycle.ClearRuntimeState();
             this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance);
             this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
             this.chaseNavigation.ClearAll(NpcChaseInvalidationReason.EncounterReset);

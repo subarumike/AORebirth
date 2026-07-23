@@ -237,6 +237,25 @@ namespace AORebirth.Core.Playfields
             this.nextCapturedLandedIntervalObservationIndexes.Remove(identity.Instance);
         }
 
+        internal void ClearRuntimeState()
+        {
+            this.nextCombatTicks.Clear();
+            this.lastNpcCombatWeaponSlots.Clear();
+            this.lastNpcUnarmedAttackInfoSlots.Clear();
+            this.lastNpcSpecialAttackWeaponTargets.Clear();
+            this.completedCapturedOpeningAttacks.Clear();
+            this.pendingCapturedAttackStarts.Clear();
+            this.pendingCapturedMovementTransitions.Clear();
+            this.nextCapturedParallelAttackTicks.Clear();
+            this.startedCapturedParallelAttackClocks.Clear();
+            this.nextLineOfSightRetryTicks.Clear();
+            this.nextLineOfSightDiagnosticTicks.Clear();
+            this.capturedDamageObservationCursor.ClearAll();
+            this.nextCapturedAttackStartDelayObservationIndexes.Clear();
+            this.nextCapturedFirstHitDelayObservationIndexes.Clear();
+            this.nextCapturedLandedIntervalObservationIndexes.Clear();
+        }
+
         internal void ProcessCombatTick(ICharacter attacker)
         {
             if (attacker == null || this.playfield == null)
