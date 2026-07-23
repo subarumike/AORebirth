@@ -1202,7 +1202,8 @@ namespace AORebirth.Core.Playfields
             int lowId,
             int highId,
             int quality,
-            int inventorySlot)
+            int inventorySlot,
+            bool requiresDamageLineOfSight = false)
         {
             return new CapturedEnemyCombatContract
             {
@@ -1213,7 +1214,8 @@ namespace AORebirth.Core.Playfields
                 WeaponLowId = lowId,
                 WeaponHighId = highId,
                 WeaponQuality = quality,
-                WeaponInventorySlot = inventorySlot
+                WeaponInventorySlot = inventorySlot,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
             };
         }
 
@@ -1929,31 +1931,12 @@ namespace AORebirth.Core.Playfields
             switch (monsterData)
             {
                 case 203726:
-                    return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
-                        "20260709-222339 plus 20260717-214612/214751/215250: Eumenides owner-linked 123267/123268 weapons are observed at QL20 and QL17; runtime retains QL20 because the respawn selection rule is unresolved; initial empty-special context is 143/143/143/143/0, with two captured misses; immediate attack start, 0.233124-second movement transition, 5.199992-second first hit, 21 observed normal local-player hits 25..45, and 4.311321-second median interval across 17 intervals; weapon owns runtime damage and recharge",
+                    return CapturedEnemyCombatContract.EquippedWeapon(
+                        "Eumenides QL20 captured weapon profile selector; exact packet sequence is resolved from the generated capture catalog",
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate,
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate,
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,
                         (int)WeaponSlots.Righthand,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponDamageMinimumOverride,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesWeaponDamageMaximumOverride,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesAttackStartDelaySeconds,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesMovementTransitionDelaySeconds,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesFirstHitDelaySeconds,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds,
-                        false,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesInitialAttackInfoAmmoCount,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesAttackInfoUnknown,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown1,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown2,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown3,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown4,
-                        NpcCombatAttackRules.CapturedSubwayEumenidesSpecialAttackWeaponUnknown5,
-                        3,
-                        0,
-                        0,
-                        0,
-                        0,
                         requiresDamageLineOfSight: true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(

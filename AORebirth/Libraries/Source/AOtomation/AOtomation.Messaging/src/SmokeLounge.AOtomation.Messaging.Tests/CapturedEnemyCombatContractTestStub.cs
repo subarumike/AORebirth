@@ -602,6 +602,8 @@ namespace AORebirth.Core.Playfields
                 AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
                 IsCombatReady = false,
                 Evidence = evidence,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 MinDamage = minDamage,
                 MaxDamage = maxDamage,
                 RechargeSeconds = rechargeSeconds,
@@ -619,7 +621,8 @@ namespace AORebirth.Core.Playfields
             int lowId,
             int highId,
             int quality,
-            int inventorySlot)
+            int inventorySlot,
+            bool requiresDamageLineOfSight = false)
         {
             return new CapturedEnemyCombatContract
             {
@@ -631,7 +634,8 @@ namespace AORebirth.Core.Playfields
                 WeaponLowId = lowId,
                 WeaponHighId = highId,
                 WeaponQuality = quality,
-                WeaponInventorySlot = inventorySlot
+                WeaponInventorySlot = inventorySlot,
+                RequiresDamageLineOfSight = requiresDamageLineOfSight
             };
         }
 

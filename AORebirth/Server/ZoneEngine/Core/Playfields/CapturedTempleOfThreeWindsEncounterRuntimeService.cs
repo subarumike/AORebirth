@@ -222,8 +222,20 @@ namespace AORebirth.Core.Playfields
             };
             this.reanimatedSlots = new[]
             {
-                new ReanimatedSlotState(0, 65.80717f, 16.01125f, 292.15747f),
-                new ReanimatedSlotState(1, 65.74661f, 15.53284f, 288.377f)
+                new ReanimatedSlotState(
+                    0,
+                    CapturedTempleOfThreeWindsCombatCatalog
+                        .ReanimatedFirstAnchorCaptureSourceIdentity,
+                    65.80717f,
+                    16.01125f,
+                    292.15747f),
+                new ReanimatedSlotState(
+                    1,
+                    CapturedTempleOfThreeWindsCombatCatalog
+                        .ReanimatedSecondAnchorCaptureSourceIdentity,
+                    65.74661f,
+                    15.53284f,
+                    288.377f)
             };
         }
 
@@ -1101,7 +1113,8 @@ namespace AORebirth.Core.Playfields
                 CreateReanimatedDefinition(slot);
             return this.SpawnCharacter(
                 definition,
-                CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(),
+                CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(
+                    slot.CaptureSourceIdentity),
                 bossIdentity);
         }
 
@@ -1458,9 +1471,15 @@ namespace AORebirth.Core.Playfields
 
         private sealed class ReanimatedSlotState
         {
-            internal ReanimatedSlotState(int index, float x, float y, float z)
+            internal ReanimatedSlotState(
+                int index,
+                int captureSourceIdentity,
+                float x,
+                float y,
+                float z)
             {
                 this.Index = index;
+                this.CaptureSourceIdentity = captureSourceIdentity;
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
@@ -1468,6 +1487,7 @@ namespace AORebirth.Core.Playfields
             }
 
             internal int Index { get; private set; }
+            internal int CaptureSourceIdentity { get; private set; }
             internal float X { get; private set; }
             internal float Y { get; private set; }
             internal float Z { get; private set; }
