@@ -112,6 +112,10 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private readonly Timer heartBeat;
 
+        private readonly object heartBeatSync = new object();
+
+        private readonly object lifetimeSync = new object();
+
         private readonly PlayfieldRuntimeSystems runtimeSystems;
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
@@ -220,7 +224,7 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private float x;
 
-        private bool disposed = false;
+        private volatile bool disposed;
 
         #endregion
 
@@ -593,17 +597,14 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         public void DisconnectAllClients()
         {
-            IEnumerable<Character> templist = Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).ToList();
-            for (int i = templist.Count() - 1; i >= 0; i--)
+            IList<Character> characters = this.runtimeSystems.CharacterEntities();
+            for (int i = characters.Count - 1; i >= 0; i--)
             {
-                IEntity entity = templist.ElementAt(i);
-                if ((entity as Character) != null)
+                Character character = characters[i];
+                if (character.Controller != null && character.Controller.Client != null)
                 {
-                    if ((entity as Character).Controller.Client != null)
-                    {
-                        this.server.DisconnectClient((entity as Character).Controller.Client);
-                    }
-                    (entity as Character).Dispose();
+                    this.server.DisconnectClient(character.Controller.Client);
+                    character.Dispose();
                 }
             }
         }
@@ -857,17 +858,7 @@ namespace AORebirth.Core.Playfields
 
         private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)
         {
-            IPlayfield newPlayfield = this.server.PlayfieldById(playfield);
-            Pool.Instance.GetObject<Playfield>(
-                Identity.None,
-                new Identity() { Type = playfield.Type, Instance = playfield.Instance });
-
-            if (newPlayfield == null)
-            {
-                newPlayfield = new Playfield(this.server, playfield);
-            }
-
-            return newPlayfield;
+            return this.server.PlayfieldById(playfield);
         }
 
         private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)
@@ -1054,8 +1045,7 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            List<StaticDynel> list =
-                new List<StaticDynel>(Pool.Instance.GetAll<StaticDynel>(this.Identity));
+            IList<StaticDynel> list = this.runtimeSystems.StaticDynels();
             LogUtil.Debug(
                 DebugInfoDetail.Database,
                 "SendStaticDynelsToClient pf=" + this.Identity.Instance + " count=" + list.Count);
@@ -1233,33 +1223,44 @@ namespace AORebirth.Core.Playfields
         /// </param>
         private void HeartBeatTimer(object sender)
         {
-            try
+            lock (this.heartBeatSync)
             {
-                this.runtimeSystems.ProcessHeartbeatTimedLifecycle(
-                    this.Identity,
-                    this.ProcessPendingCorpseSpawns,
-                    this.ProcessCorpseDespawns,
-                    this.ProcessPendingCorpseCreditAwards,
-                    dynel => this.runtimeSystems.ProcessCharacterRegeneration(dynel, SendChangedStats),
-                    this.DoCombatTick,
-                    this.runtimeSystems.ProcessCharacterFollow,
-                    dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
-                        dynel,
-                        this.CheckWallCollision,
-                        this.CheckStatelCollision));
-            }
-            catch (Exception e)
-            {
-                LogUtil.ErrorException(e, false, "Playfield heartbeat failed for {0}", this.Identity);
-            }
-            finally
-            {
+                if (this.disposed)
+                {
+                    return;
+                }
+
                 try
                 {
-                    this.heartBeat.Change(10, 0);
+                    this.runtimeSystems.ProcessHeartbeatTimedLifecycle(
+                        this.Identity,
+                        this.ProcessPendingCorpseSpawns,
+                        this.ProcessCorpseDespawns,
+                        this.ProcessPendingCorpseCreditAwards,
+                        dynel => this.runtimeSystems.ProcessCharacterRegeneration(dynel, SendChangedStats),
+                        this.DoCombatTick,
+                        this.runtimeSystems.ProcessCharacterFollow,
+                        dynel => this.runtimeSystems.ProcessPlayerCollisionChecks(
+                            dynel,
+                            this.CheckWallCollision,
+                            this.CheckStatelCollision));
                 }
-                catch (ObjectDisposedException)
+                catch (Exception e)
                 {
+                    LogUtil.ErrorException(e, false, "Playfield heartbeat failed for {0}", this.Identity);
+                }
+                finally
+                {
+                    if (!this.disposed)
+                    {
+                        try
+                        {
+                            this.heartBeat.Change(10, 0);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
+                    }
                 }
             }
         }
@@ -3945,27 +3946,60 @@ namespace AORebirth.Core.Playfields
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposing)
             {
-                if (!this.disposed)
+                base.Dispose(false);
+                return;
+            }
+
+            lock (this.lifetimeSync)
+            {
+                if (this.disposed)
                 {
-                    // We wont save any NPCs to character table/character's stats table
+                    return;
+                }
+
+                this.disposed = true;
+                this.heartBeat.Dispose();
+            }
+
+            lock (this.heartBeatSync)
+            {
+            }
+
+            this.nextCombatTicks.Clear();
+            this.lastCombatWeaponSlots.Clear();
+
+            try
+            {
+                this.DisconnectAllClients();
+            }
+            finally
+            {
+                try
+                {
+                    // We wont save any NPCs to character table/character's stats table.
                     this.runtimeSystems.ClearNpcRuntimeState();
-                    this.corpseInventoryService.ClearPlayfield(this.Identity.Instance);
-                    this.DisconnectAllClients();
-                    if (this.memBusDisposeContainer != null)
+                }
+                finally
+                {
+                    try
                     {
-                        this.memBusDisposeContainer.Dispose();
+                        this.corpseInventoryService.ClearPlayfield(this.Identity.Instance);
                     }
-                    if (this.heartBeat != null)
+                    finally
                     {
-                        this.heartBeat.Dispose();
+                        try
+                        {
+                            this.memBusDisposeContainer.Dispose();
+                        }
+                        finally
+                        {
+                            base.Dispose(true);
+                        }
                     }
                 }
             }
-            this.disposed = true;
-
-            base.Dispose(disposing);
         }
 
         private class CombatAttackSource

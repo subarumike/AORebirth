@@ -7985,37 +7985,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string[] intentionalGlobalOrCrossPlayfieldExceptions =
                 {
-                    "DisconnectAllClients: global CanbeAffected character scan for server shutdown/dispose.",
                     "NumberOfDynels: global CanbeAffected count, not playfield-local registry count.",
-                    "NumberOfPlayers: global CanbeAffected Character count, not playfield-local registry count.",
-                    "Playfield transfer destination helper: cross-playfield Pool.GetObject<Playfield> handoff path."
+                    "NumberOfPlayers: global CanbeAffected Character count, not playfield-local registry count."
                 };
             Assert.AreEqual(
-                4,
+                2,
                 intentionalGlobalOrCrossPlayfieldExceptions.Length,
                 "Every direct Playfield Pool exception must be named with ownership scope.");
 
             Assert.IsTrue(
-                disconnectAllClients.Contains(
-                    "Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).ToList()"),
-                intentionalGlobalOrCrossPlayfieldExceptions[0]);
+                disconnectAllClients.Contains("this.runtimeSystems.CharacterEntities()")
+                && !disconnectAllClients.Contains("Pool.Instance")
+                && disconnectAllClients.Contains("character.Controller.Client != null"),
+                "Playfield disposal must disconnect only player characters registered to that playfield runtime.");
             Assert.IsTrue(
                 numberOfDynels.Contains("Pool.Instance.GetAll((int)IdentityType.CanbeAffected).Count()"),
-                intentionalGlobalOrCrossPlayfieldExceptions[1]);
+                intentionalGlobalOrCrossPlayfieldExceptions[0]);
             Assert.IsTrue(
                 numberOfPlayers.Contains(
                     "Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).Count()"),
-                intentionalGlobalOrCrossPlayfieldExceptions[2]);
+                intentionalGlobalOrCrossPlayfieldExceptions[1]);
             Assert.IsTrue(
-                transferDestination.Contains("Pool.Instance.GetObject<Playfield>("),
-                intentionalGlobalOrCrossPlayfieldExceptions[3]);
+                transferDestination.Contains("return this.server.PlayfieldById(playfield);")
+                && !transferDestination.Contains("Pool.Instance")
+                && !transferDestination.Contains("new Playfield("),
+                "Cross-playfield handoff must resolve through the server-owned persistent runtime registry.");
 
             Assert.AreEqual(
-                3,
+                2,
                 CountOccurrences(playfieldText, "Pool.Instance.GetAll"),
                 "Future direct Playfield Pool scans are blocked unless added to this explicit exception list.");
             Assert.AreEqual(
-                1,
+                0,
                 CountOccurrences(playfieldText, "Pool.Instance.GetObject"),
                 "Future direct Playfield Pool identity lookups are blocked unless added to this explicit exception list.");
         }

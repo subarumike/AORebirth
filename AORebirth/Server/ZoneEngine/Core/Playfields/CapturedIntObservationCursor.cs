@@ -39,5 +39,10 @@ namespace AORebirth.Core.Playfields
         {
             this.nextIndexesByActor.Remove(actorInstance);
         }
+
+        internal void ClearAll()
+        {
+            this.nextIndexesByActor.Clear();
+        }
     }
 }

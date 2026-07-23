@@ -110,6 +110,10 @@
     <Compile Include="NpcChaseNavigationTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
+    <Compile Include="PlayfieldRuntimeOwnershipTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\RuntimeOwnershipRegistry.cs">
+      <Link>RuntimeOwnershipRegistry.cs</Link>
+    </Compile>
     <Compile Include="PlayfieldCollisionGeometryTests.cs" />
     <Compile Include="Pf127GeometryOnlySafeModeTests.cs" />
     <Compile Include="AbmouthEncounterRuntimeServiceTests.cs" />

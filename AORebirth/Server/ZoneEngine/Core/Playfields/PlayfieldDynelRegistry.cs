@@ -91,6 +91,18 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
+        internal void Clear()
+        {
+            lock (this.sync)
+            {
+                this.ClearPooledViews();
+                this.statels.Clear();
+                this.terminals.Clear();
+                this.doors.Clear();
+                this.corpseIdentities.Clear();
+            }
+        }
+
         internal void RegisterStatels(IEnumerable<StatelData> playfieldStatels)
         {
             lock (this.sync)

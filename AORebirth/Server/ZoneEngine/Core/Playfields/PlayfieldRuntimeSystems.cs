@@ -257,6 +257,7 @@ namespace ZoneEngine.Core.Playfields
             this.npcRuntime.ClearRuntimeState();
             this.npcChaseNavigation.Dispose();
             this.visibilityInterest.Clear();
+            this.dynelRegistry.Clear();
         }
 
         internal List<StatelData> ResolveStatels(Identity playfieldIdentity)
