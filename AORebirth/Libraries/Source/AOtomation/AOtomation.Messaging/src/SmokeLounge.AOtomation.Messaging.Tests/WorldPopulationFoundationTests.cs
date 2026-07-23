@@ -754,17 +754,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { 0x79545213, 1 }, { 0x79545219, 1 }, { 0x79545224, 1 },
                 { 0x79803673, 1 }
             };
-            var coherentAttackSources = new HashSet<int>
-            {
-                0x7953AA16,
-                0x7953AA77,
-                0x7953AABE,
-                0x7953AB03,
-                0x7953AFB8,
-                0x7953AFBC,
-                0x7953AFDD,
-                0x79545000
-            };
             CollectionAssert.AreEquivalent(
                 expectedVariantCounts
                     .Select(value => value.Key.ToString("X8") + ":" + value.Value)
@@ -844,35 +833,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     Assert.IsFalse(contract.IsCombatReady);
                     Assert.IsTrue(contract.IsQuarantined);
                     Assert.IsFalse(string.IsNullOrWhiteSpace(contract.QuarantineReason));
-                    if (coherentAttackSources.Contains(spawn.SourceIdentity))
-                    {
-                        Assert.AreEqual(
-                            CapturedEnemyAttackModel.EquippedWeapon,
-                            contract.AttackModel);
-                        Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
-                        Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
-                        Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
-                        Assert.AreEqual(6, contract.WeaponInventorySlot);
-                        Assert.AreEqual(0, contract.MinDamage);
-                        Assert.AreEqual(0, contract.MaxDamage);
-                        Assert.AreEqual(0.0, contract.RechargeSeconds);
-                        Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
-                        Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
-                        Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
-                        Assert.AreEqual(0, contract.AttackInfoUnknown);
-                        Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
-                        Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
-                        Assert.IsFalse(contract.HasCapturedAttackStartContext);
-                        Assert.IsTrue(
-                            contract.Evidence.Contains(
-                                "item owns runtime damage and recharge"));
-                    }
-                    else
-                    {
-                        Assert.AreEqual(
-                            CapturedEnemyAttackModel.Unresolved,
-                            contract.AttackModel);
-                    }
+                    Assert.AreEqual(
+                        CapturedEnemyAttackModel.EquippedWeapon,
+                        contract.AttackModel);
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
+                    Assert.AreEqual(6, contract.WeaponInventorySlot);
+                    Assert.AreEqual(0, contract.MinDamage);
+                    Assert.AreEqual(0, contract.MaxDamage);
+                    Assert.AreEqual(0.0, contract.RechargeSeconds);
+                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                    Assert.AreEqual(-1, contract.AttackInfoAmmoCount);
+                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                    Assert.AreEqual(0, contract.AttackInfoUnknown);
+                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+                    Assert.IsFalse(contract.HasEmptySpecialAttackWeaponContext);
+                    Assert.IsFalse(contract.HasCapturedAttackStartContext);
+                    Assert.IsTrue(
+                        contract.Evidence.Contains(
+                            "item owns runtime damage and recharge"));
                 }
             }
             Assert.AreEqual(31, atomicVariantCount);
@@ -1106,10 +1086,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemyCombatContract contract = looter.Combat.ResolveContract(
                     spawn.SourceIdentity,
                     spawn.Level);
-                Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, contract.AttackModel);
+                int[] weapon = expected[spawn.SourceIdentity];
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
                 Assert.IsFalse(contract.IsCombatReady);
                 Assert.IsTrue(contract.IsQuarantined);
                 Assert.IsFalse(string.IsNullOrWhiteSpace(contract.QuarantineReason));
+                Assert.AreEqual(weapon[0], contract.WeaponLowId);
+                Assert.AreEqual(weapon[1], contract.WeaponHighId);
+                Assert.AreEqual(weapon[2], contract.WeaponQuality);
+                Assert.AreEqual(6, contract.WeaponInventorySlot);
             }
 
             CapturedEnemyCombatContract unknown = looter.Combat.ResolveContract(
@@ -1873,10 +1858,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         redundantScan.Combat.ResolveContract(
                             spawn.SourceIdentity,
                             variant);
-                    Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, contract.AttackModel);
+                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
                     Assert.IsFalse(contract.IsCombatReady);
                     Assert.IsTrue(contract.IsQuarantined);
                     Assert.IsFalse(string.IsNullOrWhiteSpace(contract.QuarantineReason));
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, contract.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, contract.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, contract.WeaponQuality);
+                    Assert.AreEqual(6, contract.WeaponInventorySlot);
+                    Assert.IsTrue(contract.HasCapturedEquippedAttackInfo);
+                    Assert.AreEqual(17, contract.AttackInfoAmmoCount);
+                    Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+                    Assert.AreEqual(0, contract.AttackInfoUnknown);
+                    Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
                 }
             }
 

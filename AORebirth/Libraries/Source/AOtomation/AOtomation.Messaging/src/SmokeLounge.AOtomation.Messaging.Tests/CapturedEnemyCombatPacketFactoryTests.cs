@@ -181,6 +181,449 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void WorkmanStrikerStableProfileUsesTheCapturedSharedPacketSequence()
+        {
+            const string profileId = "0ab4af8e83e1830c-4fb632d821975655";
+            const int runtimeSourceIdentity = unchecked((int)0x79545219);
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    16,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Workman Striker source 0x79545219",
+                        122905,
+                        122906,
+                        19,
+                        6),
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
+                value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
+                         && value.Energy == resolved.WeaponDefinition.InitialEnergy
+                         && value.MultipleCount
+                            == resolved.WeaponDefinition.SignedStatValue(
+                                CharacterStat.MultipleCount));
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.WeaponSlot == resolved.AttackInfoWeaponSlot
+                             && value.DamageTypeWire == resolved.AttackInfoUnknown
+                             && value.HitTypeWire == resolved.AttackInfoHitType
+                             && value.WeaponInstance == resolved.AttackInfoWeaponInstance
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown
+                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, capturedSequence.Length);
+            Assert.IsInstanceOfType(capturedSequence[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
+            AssertHex(weapon.BodyHex, capturedSequence[0]);
+            AssertHex(saw.BodyHex, capturedSequence[1]);
+            AssertHex(attack.BodyHex, capturedSequence[2]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[3]);
+        }
+
+        [TestMethod]
+        public void LooterStableProfileUsesTheCapturedSharedPacketSequence()
+        {
+            const string profileId = "1f9bcd8f10a573fe-3a02a8bc94c80061";
+            const int runtimeSourceIdentity = unchecked((int)0x7954501B);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Looter",
+                    203745,
+                    9,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Looter source 0x7954501B",
+                        123038,
+                        123039,
+                        8,
+                        6),
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
+                value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
+                         && value.Energy == resolved.WeaponDefinition.InitialEnergy
+                         && value.MultipleCount
+                            == resolved.WeaponDefinition.SignedStatValue(
+                                CharacterStat.MultipleCount));
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.WeaponSlot == resolved.AttackInfoWeaponSlot
+                             && value.DamageTypeWire == resolved.AttackInfoUnknown
+                             && value.HitTypeWire == resolved.AttackInfoHitType
+                             && value.WeaponInstance == resolved.AttackInfoWeaponInstance
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown
+                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, capturedSequence.Length);
+            Assert.IsInstanceOfType(capturedSequence[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
+            AssertHex(weapon.BodyHex, capturedSequence[0]);
+            AssertHex(saw.BodyHex, capturedSequence[1]);
+            AssertHex(attack.BodyHex, capturedSequence[2]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[3]);
+        }
+
+        [TestMethod]
+        public void IncompleteRebuildStableProfileUsesTheCapturedSharedPacketSequence()
+        {
+            const string profileId = "f4b7f149cee5b2ad-b4c320f0187034b8";
+            const int runtimeSourceIdentity = unchecked((int)0x79545172);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Incomplete Rebuild",
+                    203728,
+                    18,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Incomplete Rebuild source 0x79545172",
+                        122653,
+                        122654,
+                        15,
+                        6),
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
+                value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
+                         && value.Energy == resolved.WeaponDefinition.InitialEnergy
+                         && value.MultipleCount
+                            == resolved.WeaponDefinition.SignedStatValue(
+                                CharacterStat.MultipleCount));
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.WeaponSlot == resolved.AttackInfoWeaponSlot
+                             && value.DamageTypeWire == resolved.AttackInfoUnknown
+                             && value.HitTypeWire == resolved.AttackInfoHitType
+                             && value.WeaponInstance == resolved.AttackInfoWeaponInstance
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown
+                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, capturedSequence.Length);
+            Assert.IsInstanceOfType(capturedSequence[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
+            AssertHex(weapon.BodyHex, capturedSequence[0]);
+            AssertHex(saw.BodyHex, capturedSequence[1]);
+            AssertHex(attack.BodyHex, capturedSequence[2]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[3]);
+        }
+
+        [TestMethod]
+        public void FragmentedSoulStableProfileUsesTheCapturedSharedPacketSequence()
+        {
+            const string profileId = "41ec8ecff96a0c8c-fedb453533892b94";
+            const int runtimeSourceIdentity = unchecked((int)0x79545248);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Fragmented Soul",
+                    203729,
+                    18,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Fragmented Soul source 0x79545248",
+                        123685,
+                        123686,
+                        18,
+                        6),
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
+                value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
+                         && value.Energy == resolved.WeaponDefinition.InitialEnergy
+                         && value.MultipleCount
+                            == resolved.WeaponDefinition.SignedStatValue(
+                                CharacterStat.MultipleCount));
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.WeaponSlot == resolved.AttackInfoWeaponSlot
+                             && value.DamageTypeWire == resolved.AttackInfoUnknown
+                             && value.HitTypeWire == resolved.AttackInfoHitType
+                             && value.WeaponInstance == resolved.AttackInfoWeaponInstance
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown
+                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, capturedSequence.Length);
+            Assert.IsInstanceOfType(capturedSequence[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
+            AssertHex(weapon.BodyHex, capturedSequence[0]);
+            AssertHex(saw.BodyHex, capturedSequence[1]);
+            AssertHex(attack.BodyHex, capturedSequence[2]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[3]);
+        }
+
+        [TestMethod]
+        public void RedundantScanStableProfileUsesTheCapturedSharedPacketSequence()
+        {
+            const string profileId = "92a71de337c6ddab-64fa18a98612853b";
+            const int runtimeSourceIdentity = unchecked((int)0x795451BF);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Redundant Scan",
+                    204178,
+                    19,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Redundant Scan source 0x795451BF",
+                        122026,
+                        122027,
+                        14,
+                        6),
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
+                value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
+                         && value.Energy == resolved.WeaponDefinition.InitialEnergy
+                         && value.MultipleCount
+                            == resolved.WeaponDefinition.SignedStatValue(
+                                CharacterStat.MultipleCount));
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.First(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.WeaponSlot == resolved.AttackInfoWeaponSlot
+                             && value.DamageTypeWire == resolved.AttackInfoUnknown
+                             && value.HitTypeWire == resolved.AttackInfoHitType
+                             && value.WeaponInstance == resolved.AttackInfoWeaponInstance
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown
+                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, capturedSequence.Length);
+            Assert.IsInstanceOfType(capturedSequence[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
+            AssertHex(weapon.BodyHex, capturedSequence[0]);
+            AssertHex(saw.BodyHex, capturedSequence[1]);
+            AssertHex(attack.BodyHex, capturedSequence[2]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[3]);
+        }
+
+        [TestMethod]
         public void CultistResolutionRejectsMissingNearestAndCrossEnemyEvidence()
         {
             Assert.IsFalse(CapturedTempleOfThreeWindsCombatCatalog.Cultist(26147, 20).IsCombatReady);
@@ -595,6 +1038,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static Identity Weapon(int instance)
         {
             return new Identity { Type = (IdentityType)0xC74A, Instance = instance };
+        }
+
+        private static Identity IdentityOf(int type, int instance)
+        {
+            return new Identity { Type = (IdentityType)type, Instance = instance };
         }
 
         private static void AssertCapturedOrder(MessageBody[] messages)

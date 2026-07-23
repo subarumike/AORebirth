@@ -711,6 +711,394 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void WorkmanStrikerResolvesTheExactCapturedStableWeaponProfile()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x79545219);
+            const string profileId = "0ab4af8e83e1830c-4fb632d821975655";
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            Assert.AreEqual(127, profile.ResourceId);
+            Assert.AreEqual("Workman Striker", profile.Name);
+            Assert.AreEqual(203854, profile.MonsterData);
+            Assert.AreEqual(16, profile.Level);
+            Assert.IsFalse(profile.ContainsSource(runtimeSourceIdentity));
+            Assert.AreEqual(122905, profile.WeaponDefinition.LowId);
+            Assert.AreEqual(122906, profile.WeaponDefinition.HighId);
+            Assert.AreEqual(19, profile.WeaponDefinition.Quality);
+            Assert.AreEqual(6, profile.WeaponDefinition.InventorySlot);
+            Assert.AreEqual(-1, profile.WeaponDefinition.InitialEnergy);
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Workman Striker"
+                         && value.MonsterData == 203854);
+            OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            OrdinaryEnemySpawnVariant runtimeVariant =
+                runtimeSpawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 16
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 122905
+                             && value.WeaponLoadout.HighId == 122906
+                             && value.WeaponLoadout.Quality == 19);
+            CapturedEnemyCombatContract runtimeContract =
+                runtimeProfile.Combat.ResolveContract(runtimeSourceIdentity, runtimeVariant);
+            Assert.AreEqual(122905, runtimeContract.WeaponLowId);
+            Assert.AreEqual(122906, runtimeContract.WeaponHighId);
+            Assert.AreEqual(19, runtimeContract.WeaponQuality);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    16,
+                    runtimeSourceIdentity,
+                    runtimeContract,
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(
+                profile.RepresentativeEvidenceSourceIdentity,
+                resolved.EvidenceSourceIdentity);
+            Assert.AreEqual(122905, resolved.WeaponLowId);
+            Assert.AreEqual(122906, resolved.WeaponHighId);
+            Assert.AreEqual(19, resolved.WeaponQuality);
+            Assert.AreEqual(6, resolved.WeaponInventorySlot);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+            Assert.AreEqual(-1, resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(profile.SpecialAttackWeaponUnknown5, resolved.SpecialAttackWeaponUnknown5);
+        }
+
+        [TestMethod]
+        public void WorkmanStrikerWithoutAnExactRuntimeReadyWeaponProfileFailsClosed()
+        {
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    16,
+                    unchecked((int)0x7953AFDD),
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Workman Striker source 0x7953AFDD",
+                        122905,
+                        122906,
+                        12,
+                        6),
+                    out resolved,
+                    out failure));
+            Assert.IsFalse(resolved.IsCombatReady);
+            StringAssert.Contains(failure, "does not distinguish");
+        }
+
+        [TestMethod]
+        public void LooterResolvesTheExactCapturedStableWeaponProfile()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x7954501B);
+            const string profileId = "1f9bcd8f10a573fe-3a02a8bc94c80061";
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            Assert.AreEqual(127, profile.ResourceId);
+            Assert.AreEqual("Looter", profile.Name);
+            Assert.AreEqual(203745, profile.MonsterData);
+            Assert.AreEqual(9, profile.Level);
+            Assert.IsFalse(profile.ContainsSource(runtimeSourceIdentity));
+            Assert.AreEqual(123038, profile.WeaponDefinition.LowId);
+            Assert.AreEqual(123039, profile.WeaponDefinition.HighId);
+            Assert.AreEqual(8, profile.WeaponDefinition.Quality);
+            Assert.AreEqual(6, profile.WeaponDefinition.InventorySlot);
+            Assert.AreEqual(25, profile.WeaponDefinition.InitialEnergy);
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Looter"
+                         && value.MonsterData == 203745);
+            OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            CapturedEnemyCombatContract runtimeContract =
+                runtimeProfile.Combat.ResolveContract(
+                    runtimeSourceIdentity,
+                    runtimeSpawn.Level);
+            Assert.AreEqual(123038, runtimeContract.WeaponLowId);
+            Assert.AreEqual(123039, runtimeContract.WeaponHighId);
+            Assert.AreEqual(8, runtimeContract.WeaponQuality);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Looter",
+                    203745,
+                    9,
+                    runtimeSourceIdentity,
+                    runtimeContract,
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(
+                profile.RepresentativeEvidenceSourceIdentity,
+                resolved.EvidenceSourceIdentity);
+            Assert.AreEqual(24, resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+        }
+
+        [TestMethod]
+        public void IncompleteRebuildResolvesTheExactCapturedStableWeaponProfile()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x79545172);
+            const string profileId = "f4b7f149cee5b2ad-b4c320f0187034b8";
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            Assert.AreEqual(127, profile.ResourceId);
+            Assert.AreEqual("Incomplete Rebuild", profile.Name);
+            Assert.AreEqual(203728, profile.MonsterData);
+            Assert.AreEqual(18, profile.Level);
+            Assert.IsFalse(profile.ContainsSource(runtimeSourceIdentity));
+            Assert.AreEqual(122653, profile.WeaponDefinition.LowId);
+            Assert.AreEqual(122654, profile.WeaponDefinition.HighId);
+            Assert.AreEqual(15, profile.WeaponDefinition.Quality);
+            Assert.AreEqual(6, profile.WeaponDefinition.InventorySlot);
+            Assert.AreEqual(10, profile.WeaponDefinition.InitialEnergy);
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Incomplete Rebuild"
+                         && value.MonsterData == 203728);
+            OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            OrdinaryEnemySpawnVariant runtimeVariant =
+                runtimeSpawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 18
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 122653
+                             && value.WeaponLoadout.HighId == 122654
+                             && value.WeaponLoadout.Quality == 15);
+            CapturedEnemyCombatContract runtimeContract =
+                runtimeProfile.Combat.ResolveContract(runtimeSourceIdentity, runtimeVariant);
+            Assert.AreEqual(122653, runtimeContract.WeaponLowId);
+            Assert.AreEqual(122654, runtimeContract.WeaponHighId);
+            Assert.AreEqual(15, runtimeContract.WeaponQuality);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Incomplete Rebuild",
+                    203728,
+                    18,
+                    runtimeSourceIdentity,
+                    runtimeContract,
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(
+                profile.RepresentativeEvidenceSourceIdentity,
+                resolved.EvidenceSourceIdentity);
+            Assert.AreEqual(9, resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+        }
+
+        [TestMethod]
+        public void FragmentedSoulResolvesTheExactCapturedStableWeaponProfile()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x79545248);
+            const string profileId = "41ec8ecff96a0c8c-fedb453533892b94";
+            CapturedEnemyCombatProfileDefinition profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            Assert.AreEqual(127, profile.ResourceId);
+            Assert.AreEqual("Fragmented Soul", profile.Name);
+            Assert.AreEqual(203729, profile.MonsterData);
+            Assert.AreEqual(18, profile.Level);
+            Assert.IsTrue(profile.ContainsSource(runtimeSourceIdentity));
+            Assert.AreEqual(123685, profile.WeaponDefinition.LowId);
+            Assert.AreEqual(123686, profile.WeaponDefinition.HighId);
+            Assert.AreEqual(18, profile.WeaponDefinition.Quality);
+            Assert.AreEqual(6, profile.WeaponDefinition.InventorySlot);
+            Assert.AreEqual(25, profile.WeaponDefinition.InitialEnergy);
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Fragmented Soul"
+                         && value.MonsterData == 203729);
+            OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            OrdinaryEnemySpawnVariant runtimeVariant =
+                runtimeSpawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 18
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 123685
+                             && value.WeaponLoadout.HighId == 123686
+                             && value.WeaponLoadout.Quality == 18);
+            CapturedEnemyCombatContract runtimeContract =
+                runtimeProfile.Combat.ResolveContract(runtimeSourceIdentity, runtimeVariant);
+            Assert.AreEqual(123685, runtimeContract.WeaponLowId);
+            Assert.AreEqual(123686, runtimeContract.WeaponHighId);
+            Assert.AreEqual(18, runtimeContract.WeaponQuality);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Fragmented Soul",
+                    203729,
+                    18,
+                    runtimeSourceIdentity,
+                    runtimeContract,
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(
+                profile.RepresentativeEvidenceSourceIdentity,
+                resolved.EvidenceSourceIdentity);
+            Assert.AreEqual(24, resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+        }
+
+        [TestMethod]
+        public void RedundantScanResolvesItsExactCapturedActiveWeaponProfiles()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Redundant Scan"
+                         && value.MonsterData == 204178);
+
+            const int level19SourceIdentity = unchecked((int)0x795451BF);
+            const string level19ProfileId = "92a71de337c6ddab-64fa18a98612853b";
+            CapturedEnemyCombatProfileDefinition level19Profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == level19ProfileId);
+            OrdinaryEnemySpawnDefinition level19Spawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == level19SourceIdentity);
+            OrdinaryEnemySpawnVariant level19Variant =
+                level19Spawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 19
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 122026
+                             && value.WeaponLoadout.HighId == 122027
+                             && value.WeaponLoadout.Quality == 14);
+            CapturedEnemyCombatContract level19RuntimeContract =
+                runtimeProfile.Combat.ResolveContract(level19SourceIdentity, level19Variant);
+            CapturedEnemyCombatContract level19Resolved;
+            string level19Failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Redundant Scan",
+                    204178,
+                    19,
+                    level19SourceIdentity,
+                    level19RuntimeContract,
+                    out level19Resolved,
+                    out level19Failure),
+                level19Failure);
+            Assert.AreEqual(level19Profile.Evidence, level19Resolved.Evidence);
+            Assert.AreEqual(122026, level19Resolved.WeaponLowId);
+            Assert.AreEqual(122027, level19Resolved.WeaponHighId);
+            Assert.AreEqual(14, level19Resolved.WeaponQuality);
+            Assert.AreEqual(19, level19Resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, level19Resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, level19Resolved.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, level19Resolved.AttackInfoHitType);
+            Assert.AreEqual(0, level19Resolved.AttackInfoUnknown);
+
+            const int level21SourceIdentity = unchecked((int)0x795451C4);
+            const string level21ProfileId = "f72d48558515b89e-4bb05787332a3666";
+            CapturedEnemyCombatProfileDefinition level21Profile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == level21ProfileId);
+            OrdinaryEnemySpawnDefinition level21Spawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == level21SourceIdentity);
+            OrdinaryEnemySpawnVariant level21Variant =
+                level21Spawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 21
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 122028
+                             && value.WeaponLoadout.HighId == 122029
+                             && value.WeaponLoadout.Quality == 25);
+            CapturedEnemyCombatContract level21RuntimeContract =
+                runtimeProfile.Combat.ResolveContract(level21SourceIdentity, level21Variant);
+            CapturedEnemyCombatContract level21Resolved;
+            string level21Failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Redundant Scan",
+                    204178,
+                    21,
+                    level21SourceIdentity,
+                    level21RuntimeContract,
+                    out level21Resolved,
+                    out level21Failure),
+                level21Failure);
+            Assert.AreEqual(level21Profile.Evidence, level21Resolved.Evidence);
+            Assert.AreEqual(122028, level21Resolved.WeaponLowId);
+            Assert.AreEqual(122029, level21Resolved.WeaponHighId);
+            Assert.AreEqual(25, level21Resolved.WeaponQuality);
+            Assert.AreEqual(19, level21Resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, level21Resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, level21Resolved.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, level21Resolved.AttackInfoHitType);
+            Assert.AreEqual(0, level21Resolved.AttackInfoUnknown);
+        }
+
+        [TestMethod]
         public void ActiveSubwayAndTempleSpawnsAreEitherExactSourceCertifiedOrFailClosed()
         {
             string root = FindRepositoryRoot();
@@ -792,9 +1180,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     }
                     else
                     {
-                        Assert.AreEqual(1, compatibleKeyMatches.Length);
+                        CapturedEnemyCombatProfileDefinition[] stableWeaponMatches =
+                            compatibleKeyMatches.Where(
+                                value => value.MatchesStableWeaponProfile(baseline)).ToArray();
+                        CapturedEnemyCombatProfileDefinition selectedProfile =
+                            stableWeaponMatches.Length == 1
+                                ? stableWeaponMatches[0]
+                                : compatibleKeyMatches.Single();
                         Assert.AreEqual(
-                            evidenceMatches[0].RepresentativeEvidenceSourceIdentity,
+                            selectedProfile.RepresentativeEvidenceSourceIdentity,
                             resolved.EvidenceSourceIdentity);
                     }
                 }
