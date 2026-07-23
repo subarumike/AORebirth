@@ -277,6 +277,20 @@ namespace AORebirth.Core.Playfields
             return Array.IndexOf(this.SourceIdentities, sourceIdentity) >= 0;
         }
 
+        internal bool MatchesStableWeaponProfile(CapturedEnemyCombatContract contract)
+        {
+            return contract != null
+                   && this.WeaponDefinition != null
+                   && contract.WeaponLowId > 0
+                   && contract.WeaponHighId > 0
+                   && contract.WeaponQuality > 0
+                   && contract.WeaponInventorySlot > 0
+                   && this.WeaponDefinition.LowId == contract.WeaponLowId
+                   && this.WeaponDefinition.HighId == contract.WeaponHighId
+                   && this.WeaponDefinition.Quality == contract.WeaponQuality
+                   && this.WeaponDefinition.InventorySlot == contract.WeaponInventorySlot;
+        }
+
         internal bool MatchesSpecialized(CapturedEnemyCombatContract contract)
         {
             int[][] ignoredObservations;
@@ -623,35 +637,49 @@ namespace AORebirth.Core.Playfields
                 exactSourceSelected = sourceIdentityHint != 0
                                       && selected[0].ContainsSource(sourceIdentityHint);
             }
-            else if (sourceIdentityHint != 0)
+            else
             {
-                selected = compatibleMatches.Where(
-                    value => value.ContainsSource(sourceIdentityHint)).ToArray();
-                if (selected.Length != 1)
+                CapturedEnemyCombatProfileDefinition[] stableWeaponMatches =
+                    compatibleMatches.Where(
+                        value => value.MatchesStableWeaponProfile(current)).ToArray();
+                CapturedEnemyCombatProfileDefinition[] compatibleSelection =
+                    stableWeaponMatches.Length == 0
+                        ? compatibleMatches
+                        : stableWeaponMatches;
+                if (compatibleSelection.Length == 1)
+                {
+                    selected = compatibleSelection;
+                }
+                else if (sourceIdentityHint != 0)
+                {
+                    selected = compatibleSelection.Where(
+                        value => value.ContainsSource(sourceIdentityHint)).ToArray();
+                    if (selected.Length != 1)
+                    {
+                        failure = string.Format(
+                            "captured source {0:X8} does not distinguish {1} compatible exact contracts for resource={2} name={3} MonsterData={4} level={5}",
+                            sourceIdentityHint,
+                            compatibleSelection.Length,
+                            resourceId,
+                            name,
+                            monsterData,
+                            level);
+                        return false;
+                    }
+
+                    exactSourceSelected = true;
+                }
+                else
                 {
                     failure = string.Format(
-                        "captured source {0:X8} does not distinguish {1} compatible exact contracts for resource={2} name={3} MonsterData={4} level={5}",
-                        sourceIdentityHint,
-                        compatibleMatches.Length,
+                        "exact generated combat profile is ambiguous: {0} compatible contracts for resource={1} name={2} MonsterData={3} level={4}; captured source identity is required",
+                        compatibleSelection.Length,
                         resourceId,
                         name,
                         monsterData,
                         level);
                     return false;
                 }
-
-                exactSourceSelected = true;
-            }
-            else
-            {
-                failure = string.Format(
-                    "exact generated combat profile is ambiguous: {0} compatible contracts for resource={1} name={2} MonsterData={3} level={4}; captured source identity is required",
-                    compatibleMatches.Length,
-                    resourceId,
-                    name,
-                    monsterData,
-                    level);
-                return false;
             }
 
             CapturedEnemyCombatProfileDefinition profile = selected[0];

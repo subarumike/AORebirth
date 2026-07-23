@@ -614,6 +614,27 @@ namespace AORebirth.Core.Playfields
             };
         }
 
+        internal static CapturedEnemyCombatContract EquippedWeapon(
+            string evidence,
+            int lowId,
+            int highId,
+            int quality,
+            int inventorySlot)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
+                IsCombatReady = false,
+                Evidence = evidence,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
+                WeaponLowId = lowId,
+                WeaponHighId = highId,
+                WeaponQuality = quality,
+                WeaponInventorySlot = inventorySlot
+            };
+        }
+
         internal static CapturedEnemyCombatContract EquippedWeaponWithCapturedPacketSequence(
             string evidence,
             int evidenceSourceIdentity,
@@ -1689,6 +1710,8 @@ namespace AORebirth.Core.Playfields
             {
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = true,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 Evidence = weapon.Evidence
                            + ": Fragmented Soul selected one captured atomic level/stat/weapon generation; "
                            + "two normal local-player hits span 18..23; item owns runtime damage and recharge; "
@@ -1748,6 +1771,8 @@ namespace AORebirth.Core.Playfields
             {
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = true,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 Evidence = weapon.Evidence
                            + ": Workman Striker selected one captured atomic level/stat/weapon generation; "
                            + "59 normal local-player hits span 9..23; item owns runtime damage and recharge; "
@@ -1865,6 +1890,8 @@ namespace AORebirth.Core.Playfields
                 {
                     AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                     IsCombatReady = true,
+                    Retaliates = true,
+                    AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                     Evidence = string.Format(
                         "{0}: Incomplete Rebuild source 0x{1:X8} owner-linked QL{2} weapon {3}/{4}; two normal local-player hits span 17..35 and one captured miss shares ammo 9, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; no empty SIW or captured attack-start/stop context",
                         incompleteMatched.EvidenceCaptures,
@@ -1978,6 +2005,8 @@ namespace AORebirth.Core.Playfields
             {
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = true,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 Evidence = string.Format(
                     "{0}: {1} source 0x{2:X8} QL{3} weapon {4}/{5}; item owns normal damage and recharge",
                     matched.EvidenceCaptures,
@@ -2035,7 +2064,7 @@ namespace AORebirth.Core.Playfields
                 ? null
                 : variant.WeaponLoadout;
             string atomicFailure = string.Empty;
-            if (!baseline.IsCombatReady
+            if (baseline.AttackModel != CapturedEnemyAttackModel.EquippedWeapon
                 || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
                     monsterData,
                     sourceInstance,
@@ -2056,6 +2085,8 @@ namespace AORebirth.Core.Playfields
             {
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = true,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 Evidence = weapon.Evidence
                            + ": " + displayName
                            + " selected one captured atomic level/stat/weapon generation; "

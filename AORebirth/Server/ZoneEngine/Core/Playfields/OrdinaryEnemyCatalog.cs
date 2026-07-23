@@ -423,7 +423,9 @@ namespace AORebirth.Core.Playfields
                        == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
-                                CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
+                                archetype.MonsterData == DerangedShopperMonsterData
+                                || archetype.MonsterData == LooterMonsterData
+                                || CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
                                     ? CapturedSubwayCombatCatalog.ForOrdinary(
                                         archetype,
                                         sourceIdentity)
@@ -442,20 +444,13 @@ namespace AORebirth.Core.Playfields
                         || archetype.MonsterData == FragmentedSoulMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
                                 (sourceIdentity, variant) =>
-                                    CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
-                                        ? CapturedSubwayCombatCatalog.ForOrdinary(
-                                            archetype,
-                                            sourceIdentity,
-                                            variant,
-                                            content.GetGenerationVariants(
-                                                archetype.MonsterData,
-                                                sourceIdentity))
-                                        : CapturedEnemyCombatContract.Unresolved(
-                                            string.Format(
-                                                CultureInfo.InvariantCulture,
-                                                "No coherent same-capture Subway attack chain for source 0x{0:X8}",
-                                                sourceIdentity),
-                                            archetype.Combat != null && archetype.Combat.Observed))
+                                    CapturedSubwayCombatCatalog.ForOrdinary(
+                                        archetype,
+                                        sourceIdentity,
+                                        variant,
+                                        content.GetGenerationVariants(
+                                            archetype.MonsterData,
+                                            sourceIdentity)))
                             : null;
                 CapturedSubwayStrictLootProfileDefinition strictLootProfile =
                     content.GetStrictLootProfile(archetype.MonsterData);
