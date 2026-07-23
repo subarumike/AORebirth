@@ -1445,7 +1445,26 @@ namespace AORebirth.Core.Playfields
                 Retaliates = true,
                 AiProfile = NpcAiProfile.Passive,
                 AttackModel = CapturedEnemyAttackModel.Specialized,
-                SpecialAttackSequence = specialAttackSequence
+                SpecialAttackSequence = specialAttackSequence,
+                HasEmptySpecialAttackWeaponContext =
+                    specialAttackSequence.SpecialAttacks.Length == 0,
+                HasCapturedSpecialAttackWeaponContext = true,
+                CapturedSpecialAttacks = specialAttackSequence.SpecialAttacks,
+                HasCapturedAttackStartContext = true,
+                SpecialAttackWeaponN3Unknown =
+                    specialAttackSequence.SpecialAttackWeaponN3Unknown,
+                SpecialAttackWeaponUnknown1 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown1,
+                SpecialAttackWeaponUnknown2 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown2,
+                SpecialAttackWeaponUnknown3 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown3,
+                SpecialAttackWeaponUnknown4 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown4,
+                SpecialAttackWeaponUnknown5 =
+                    specialAttackSequence.SpecialAttackWeaponUnknown5,
+                AttackN3Unknown = specialAttackSequence.AttackN3Unknown,
+                AttackAction = specialAttackSequence.AttackAction
             };
         }
 
@@ -1461,7 +1480,26 @@ namespace AORebirth.Core.Playfields
                 AiProfile = NpcAiProfile.Passive,
                 AttackModel = CapturedEnemyAttackModel.Specialized,
                 ParallelAttackSequence = parallelAttackSequence,
-                RequiresDamageLineOfSight = requiresDamageLineOfSight
+                RequiresDamageLineOfSight = requiresDamageLineOfSight,
+                HasEmptySpecialAttackWeaponContext =
+                    parallelAttackSequence.SpecialAttacks.Length == 0,
+                HasCapturedSpecialAttackWeaponContext = true,
+                CapturedSpecialAttacks = parallelAttackSequence.SpecialAttacks,
+                HasCapturedAttackStartContext = true,
+                SpecialAttackWeaponN3Unknown =
+                    parallelAttackSequence.SpecialAttackWeaponN3Unknown,
+                SpecialAttackWeaponUnknown1 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown1,
+                SpecialAttackWeaponUnknown2 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown2,
+                SpecialAttackWeaponUnknown3 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown3,
+                SpecialAttackWeaponUnknown4 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown4,
+                SpecialAttackWeaponUnknown5 =
+                    parallelAttackSequence.SpecialAttackWeaponUnknown5,
+                AttackN3Unknown = parallelAttackSequence.AttackN3Unknown,
+                AttackAction = parallelAttackSequence.AttackAction
             };
         }
 
@@ -1648,6 +1686,7 @@ namespace AORebirth.Core.Playfields
 
             if (contract.Retaliates)
             {
+                bool hasDirectCaptureCertification = contract.IsCombatReady;
                 CapturedEnemyCombatContract resolved;
                 string resolutionFailure;
                 if (CapturedEnemyCombatProfileCatalog.TryResolve(
@@ -1658,7 +1697,11 @@ namespace AORebirth.Core.Playfields
                 {
                     contract = resolved;
                 }
-                else
+                else if (!hasDirectCaptureCertification
+                         || string.IsNullOrWhiteSpace(resolutionFailure)
+                         || !resolutionFailure.StartsWith(
+                             "no canonical raw combat profile for ",
+                             StringComparison.Ordinal))
                 {
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="

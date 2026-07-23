@@ -37,13 +37,26 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   boundary, while PF647 remains gateway-only. Private-client population
   visibility after the rebuilt engine restart remains the final live check.
 
+- Finalized PF1931 captures `20260722-042930`, `20260722-043108`,
+  `20260722-044315`, `20260722-045114`, `20260722-045309`,
+  `20260722-045421`, `20260722-045552`, and `20260722-045835` extend the
+  front-door population with fourteen exact Deathless Legionnaire anchors and
+  complete the main-room Uklesh -> Khalum -> Aztur succession. Deathless L49/L50
+  variants resolve their existing generated capture-backed combat profiles;
+  four L48 actors remain passive because the generated catalog contains no
+  compatible exact profile. Uklesh, Khalum, and Aztur use captured parallel
+  attack streams, exact mutable `SpecialAttackWeapon` state, exact atomic loot,
+  and captured `0.6822027` / `0.211` second successor delays. No independent
+  main-chain respawn or chain reset is invented. PF1931 now has ten ordinary
+  profiles / `167` ordinary anchors and twelve initially active named actors.
+
 - Murial the Faithful is active in the PF1931 Temple ordinary provider from
   identity-linked captures `20260721-232051` and `20260721-234614`. His exact
   L34/1,535-health SCFU, appearance, 26-point melee stream, CATMesh `5927`, and
   ordered 20-destination patrol are promoted. Two complete official-live loops
   took `104.2935936` and `107.0382618` seconds; the generic private waypoint
   runtime now needs in-client timing verification. PF1931 ordinary content is
-  now nine profiles / `153` anchors. Murial loot, nano `70294`, and exact
+  now ten profiles / `167` anchors. Murial loot, nano `70294`, and exact
   Murial-specific respawn remain unresolved; runtime uses the shared 300-second
   ordinary policy. Evidence:
   `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_MURIAL_PATROL.md`.
@@ -57,8 +70,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   downstream stat effect. Room evidence supplies 27 exact Cultist anchors. Capture
   `20260721-232051` adds five hallway anchors, Gartua's exact three-point path,
   and three more approximately 310-second death-to-replacement chains that
-  corroborate the 300-second post-NPC-despawn ordinary respawn policy.
-  Uklesh and the other remaining named main-room actors remain evidence-only. Evidence:
+  corroborate the 300-second post-NPC-despawn ordinary respawn policy. Evidence:
   `docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_GUARDIAN_GARTUA_MAIN_ROOM.md`.
 
 - The Curator and Nematet the Custodian of Time are active as the next PF1931

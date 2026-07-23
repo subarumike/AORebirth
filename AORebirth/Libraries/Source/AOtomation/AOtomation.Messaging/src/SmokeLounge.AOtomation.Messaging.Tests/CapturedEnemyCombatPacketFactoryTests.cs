@@ -181,6 +181,138 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AzturRoomBossesUseTheSharedFactoryWithCaptureExactBytes()
+        {
+            Identity localPlayer = SimpleChar(LocalPlayerIdentity);
+            CapturedEnemyCombatContract uklesh =
+                CapturedTempleOfThreeWindsCombatCatalog.UkleshTheFrozen();
+            CapturedEnemyCombatContract khalum;
+            CapturedEnemyCombatContract aztur;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    "Khalum",
+                    95352,
+                    73,
+                    unchecked((int)0x7988C14Du),
+                    CapturedTempleOfThreeWindsCombatCatalog.Khalum(),
+                    out khalum,
+                    out failure),
+                failure);
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    "Aztur the Immortal",
+                    159966,
+                    74,
+                    unchecked((int)0x7988C153u),
+                    CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal(),
+                    out aztur,
+                    out failure),
+                failure);
+
+            Identity ukleshIdentity = SimpleChar(unchecked((int)0x7987F730u));
+            MessageBody[] ukleshAttack =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    ukleshIdentity,
+                    uklesh,
+                    0),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    ukleshIdentity,
+                    localPlayer,
+                    uklesh),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    ukleshIdentity,
+                    localPlayer,
+                    127,
+                    -1,
+                    0,
+                    0,
+                    3,
+                    1280662101,
+                    0)
+            };
+            AssertCapturedOrder(ukleshAttack);
+            AssertHex(
+                "1D3C0F1C0000C3507987F7300000000BD300032E2600032E27504B4457504B4457000320D4000320D54C555A554C555A550000022700000227000002270000002A00000000",
+                ukleshAttack[0]);
+            AssertHex(
+                "284940700000C3507987F730000000C35070CBBEF300",
+                ukleshAttack[1]);
+            AssertHex(
+                "46002F160000C3507987F730000000007FFFFFFFFF000000000000C35070CBBEF300000000000000034C555A55",
+                ukleshAttack[2]);
+
+            Identity khalumIdentity = SimpleChar(unchecked((int)0x7988C14Du));
+            MessageBody[] khalumAttack =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    khalumIdentity,
+                    khalum,
+                    0),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    khalumIdentity,
+                    localPlayer,
+                    khalum),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    khalumIdentity,
+                    localPlayer,
+                    58,
+                    -1,
+                    1,
+                    0,
+                    3,
+                    1297107795,
+                    0)
+            };
+            AssertCapturedOrder(khalumAttack);
+            AssertHex(
+                "1D3C0F1C0000C3507988C14D0000000BD300032DAA00032DAB4D504B534D504B5300032DAE00032DA85346544E5346544E0000022700000227000002270000002A00000000",
+                khalumAttack[0]);
+            AssertHex(
+                "284940700000C3507988C14D000000C35070CBBEF300",
+                khalumAttack[1]);
+            AssertHex(
+                "46002F160000C3507988C14D000000003AFFFFFFFF000000010000C35070CBBEF300000000000000034D504B53",
+                khalumAttack[2]);
+
+            Identity azturIdentity = SimpleChar(unchecked((int)0x7988C153u));
+            MessageBody[] azturAttack =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    azturIdentity,
+                    aztur,
+                    0),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    azturIdentity,
+                    localPlayer,
+                    aztur),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    azturIdentity,
+                    localPlayer,
+                    359,
+                    -1,
+                    3,
+                    0,
+                    3,
+                    1179993922,
+                    0)
+            };
+            AssertCapturedOrder(azturAttack);
+            AssertHex(
+                "1D3C0F1C0000C3507988C1530000000FC4000329DF000329E04655474246554742000329DC000329DD5948555559485555000329D9000329DA4B4842434B4842430000034800000348000003480000034800000000",
+                azturAttack[0]);
+            AssertHex(
+                "284940700000C3507988C153000000C35070CBBEF300",
+                azturAttack[1]);
+            AssertHex(
+                "46002F160000C3507988C1530000000167FFFFFFFF000000030000C35070CBBEF3000000000000000346554742",
+                azturAttack[2]);
+        }
+
+        [TestMethod]
         public void WorkmanStrikerStableProfileUsesTheCapturedSharedPacketSequence()
         {
             const string profileId = "0ab4af8e83e1830c-4fb632d821975655";
@@ -1105,9 +1237,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
             }
 
-            Assert.AreEqual(153, spawns.Length);
+            Assert.AreEqual(167, spawns.Length);
             Assert.AreEqual(14, ready.Count);
-            Assert.AreEqual(139, quarantined.Count);
+            Assert.AreEqual(153, quarantined.Count);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
@@ -1157,9 +1289,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         (spawn, contract) => new { Spawn = spawn, Contract = contract })
                     .Where(value => value.Contract.IsCombatReady)
                     .All(value => value.Spawn.SourceIdentity == 0x7953AEA5));
-            Assert.AreEqual(153, templeSpawns.Length);
+            Assert.AreEqual(167, templeSpawns.Length);
             Assert.AreEqual(14, templeContracts.Count(value => value.IsCombatReady));
-            Assert.AreEqual(139, templeContracts.Count(value => value.IsQuarantined));
+            Assert.AreEqual(153, templeContracts.Count(value => value.IsQuarantined));
 
             CapturedEnemyCombatContract[] sourceUnboundSubwayEncounters =
             {
@@ -1266,9 +1398,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(templeCatalog.Contains("new AttackInfoMessage"));
             Assert.IsFalse(templeCatalog.Contains("new AttackMessage"));
             Assert.IsFalse(templeCatalog.Contains("new SpecialAttackWeaponMessage"));
-            Assert.IsTrue(marcus.Contains("CapturedEnemyCombatContract.Unresolved("));
-            Assert.IsFalse(marcus.Contains("new AttackInfoMessage"));
-            Assert.IsFalse(marcus.Contains("new AttackMessage"));
+            Assert.IsTrue(marcus.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence("));
             Assert.IsTrue(contractRuntime.Contains("case CapturedEnemyAttackModel.FixedAttackInfo:"));
             Assert.IsTrue(contractRuntime.Contains("controller.AiProfile = NpcAiProfile.Passive;"));
             Assert.IsTrue(contractRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Register(character.Identity.Instance, contract);"));

@@ -406,7 +406,9 @@ namespace AORebirth.Core.Playfields
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }
-            foreach (ICharacter summon in this.capturedTempleEncounters.NotifyDeath(target))
+            foreach (ICharacter summon in this.capturedTempleEncounters.NotifyDeath(
+                target,
+                diedAtUtc))
             {
                 this.playfield.DespawnNpcImmediately(summon);
             }
