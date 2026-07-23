@@ -424,7 +424,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 coordinatorText.Contains("pendingCapturedAttackStarts")
                 && coordinatorText.Contains("pendingCapturedMovementTransitions")
                 && coordinatorText.Contains(
-                    "capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds")
+                    "attackStartDelaySeconds + firstHitDelaySeconds")
                 && coordinatorText.Contains("+ capturedContract.MovementTransitionDelaySeconds")
                 && coordinatorText.Contains("capturedContract.HasCapturedAttackStartContext")
                 && coordinatorText.Contains("capturedContract.HasCapturedEquippedAttackInfo")
