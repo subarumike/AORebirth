@@ -495,6 +495,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesProductionWeaponQuality { get; private set; }
 
+        internal bool UsesProductionSpecializedValues { get; private set; }
+
         internal bool UsesCaptureProvenArchetype { get; private set; }
 
         internal string CaptureProvenArchetypeId { get; private set; }
@@ -772,6 +774,13 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionWeaponQuality = true;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionSpecializedValues()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionSpecializedValues = true;
             return clone;
         }
 
@@ -2261,7 +2270,8 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
                             0,
                             0,
-                            0));
+                            0))
+                        .WithProductionSpecializedValues();
                 case 17720:
                     return CapturedEnemyCombatContract.FixedAttack(
                         "20260708-143600 and 20260709-210452: 37 normal local-player Discarded Pet SIW1 hits span 9..18; four 30..33 criticals remain report-only; 30 same-source landed-hit intervals span 4.609299..5.950416 seconds with conventional median 5.089763; AttackInfo uses ammo -1, slot 0, unknown 0, and instance SIW1; raw SpecialAttackWeapon first four fields are exact by level while the varying fifth field remains unresolved and is not synthesized",

@@ -1333,6 +1333,101 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void FilthFleaUsesProductionDamageWithExactCapturedNaturalPacketSemantics()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Filth Flea"
+                         && value.MonsterData
+                            == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData);
+            OrdinaryEnemySpawnDefinition activeSpawn = runtimeCatalog.GetSpawns().First(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && value.Level == 10);
+            CapturedEnemyCombatContract baseline = runtimeProfile.Combat.ResolveContract(
+                activeSpawn.SourceIdentity,
+                activeSpawn.Level);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyCombatAttackDefinition attackDefinition =
+                resolved.SpecialAttackSequence.OpeningAttack;
+            Identity attacker = SimpleChar(activeSpawn.SourceIdentity);
+            Identity target = SimpleChar(LocalPlayerIdentity);
+            SpecialAttackWeaponMessage specialAttackWeapon =
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    attacker,
+                    resolved);
+            AttackMessage attack = CapturedEnemyCombatPacketFactory.CreateAttack(
+                attacker,
+                target,
+                resolved);
+            AttackInfoMessage attackInfo =
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    attacker,
+                    target,
+                    attackDefinition.MinDamage,
+                    attackDefinition.AttackInfoAmmoCount,
+                    attackDefinition.AttackInfoWeaponSlot,
+                    attackDefinition.AttackInfoUnknown,
+                    attackDefinition.AttackInfoHitType,
+                    attackDefinition.AttackInfoWeaponInstance,
+                    attackDefinition.AttackInfoN3Unknown);
+
+            AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
+            Assert.AreEqual(2, specialAttackWeapon.Specials.Length);
+            Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                specialAttackWeapon.Unknown1);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                specialAttackWeapon.Unknown2);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                specialAttackWeapon.Unknown3);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                specialAttackWeapon.Unknown4);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
+                specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, attack.Unknown);
+            Assert.AreEqual((byte)0, attack.Action);
+            Assert.AreEqual(target, attack.Target);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage,
+                attackInfo.Unknown1);
+            Assert.AreEqual(
+                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                attackInfo.Unknown2);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot,
+                attackInfo.Unknown3);
+            Assert.AreEqual(0, attackInfo.Unknown4);
+            Assert.AreEqual(
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                attackInfo.Unknown5);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                attackInfo.Unknown6);
+        }
+
+        [TestMethod]
         public void TempleOrdinaryCoverageHasFourteenExactContractsAndQuarantinesTheRest()
         {
             var provider = new CapturedTempleOfThreeWindsContentProvider();

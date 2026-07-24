@@ -793,6 +793,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesProductionWeaponQuality { get; set; }
 
+        internal bool UsesProductionSpecializedValues { get; set; }
+
         internal bool UsesCaptureProvenArchetype { get; set; }
 
         internal string CaptureProvenArchetypeId { get; set; }
@@ -1067,6 +1069,13 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionWeaponQuality = true;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionSpecializedValues()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionSpecializedValues = true;
             return clone;
         }
 
@@ -1379,6 +1388,64 @@ namespace AORebirth.Core.Playfields
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
+            if (monsterData == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData)
+            {
+                return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "20260708-004038 and 20260709-193914: Filth Flea normal slot rolls with criticals excluded",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaInitialAttackSeconds,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                                0,
+                                true),
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMinimumDamage,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                                0,
+                                true),
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadName),
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsLowTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsHighTemplate,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsName)
+                            },
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
+                            0,
+                            0,
+                            0))
+                    .WithProductionSpecializedValues();
+            }
+
             if (monsterData == BloodcreeperMonsterData)
             {
                 return new CapturedEnemyCombatContract
