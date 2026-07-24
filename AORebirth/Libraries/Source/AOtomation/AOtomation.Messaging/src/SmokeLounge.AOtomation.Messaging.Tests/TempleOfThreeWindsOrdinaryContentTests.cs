@@ -82,11 +82,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 profile.Loot.LevelCreditRules.Single(value => value.EnemyLevel == 50)
                     .MinimumCredits);
 
-            foreach (OrdinaryEnemySpawnDefinition spawn in spawns.Where(
-                value => value.Level >= 49))
+            Assert.AreEqual(
+                OrdinaryEnemyDamageSource.WeaponRoll,
+                profile.Combat.DamageSource);
+            CapturedEnemyCombatProfileDefinition[] capturedProfiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => value.MatchesArchetypeKey(
+                        1931,
+                        profile.DisplayName,
+                        profile.MonsterData)).ToArray();
+            Assert.AreEqual(2, capturedProfiles.Length);
+            Assert.IsTrue(
+                capturedProfiles.All(
+                    value => value.SupportsCaptureProvenEquippedWeaponArchetype));
+            Assert.IsTrue(
+                capturedProfiles[0].MatchesCaptureProvenEquippedWeaponArchetype(
+                    capturedProfiles[1]));
+            string deathlessArchetypeId = null;
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
             {
                 CapturedEnemyCombatContract current =
                     profile.Combat.ResolveContract(spawn.SourceIdentity, spawn.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, current.AttackModel);
                 CapturedEnemyCombatContract resolved;
                 string failure;
                 Assert.IsTrue(
@@ -101,9 +118,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         out failure),
                     failure);
                 Assert.IsTrue(resolved.IsCombatReady);
-                Assert.AreEqual(CapturedEnemyAttackModel.FixedAttackInfo, resolved.AttackModel);
-                Assert.AreEqual(spawn.Level == 49 ? 41 : 42, resolved.MinDamage);
-                Assert.AreEqual(resolved.MinDamage, resolved.MaxDamage);
+                Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, resolved.AttackModel);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                Assert.IsTrue(resolved.UsesEquippedWeaponDamage);
+                Assert.IsTrue(resolved.UsesEquippedWeaponTiming);
+                Assert.AreEqual(0, resolved.MinDamage);
+                Assert.AreEqual(0, resolved.MaxDamage);
                 Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
                 Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
                 Assert.AreEqual(0, resolved.AttackInfoUnknown);
@@ -112,29 +132,40 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(11, resolved.WeaponDefinition.Unknown1);
                 Assert.AreEqual(6, resolved.WeaponDefinition.InventorySlot);
                 Assert.AreEqual(1000015, resolved.WeaponDefinition.StateMachineType);
+                Assert.AreEqual(204747, resolved.WeaponDefinition.LowId);
+                Assert.AreEqual(204747, resolved.WeaponDefinition.HighId);
+                Assert.AreEqual(1, resolved.WeaponDefinition.Quality);
+                if (deathlessArchetypeId == null)
+                {
+                    deathlessArchetypeId = resolved.CaptureProvenArchetypeId;
+                }
+
                 Assert.AreEqual(
-                    spawn.Level == 49 ? 789 : 806,
-                    resolved.SpecialAttackWeaponUnknown1);
-                Assert.AreEqual(
-                    spawn.Level == 49 ? 28 : 29,
-                    resolved.SpecialAttackWeaponUnknown4);
+                    deathlessArchetypeId,
+                    resolved.CaptureProvenArchetypeId);
             }
 
-            OrdinaryEnemySpawnDefinition level48 = spawns.First(
-                value => value.Level == 48);
-            CapturedEnemyCombatContract rejected;
-            string rejectedFailure;
-            Assert.IsFalse(
-                CapturedEnemyCombatProfileCatalog.TryResolve(
-                    1931,
-                    profile.DisplayName,
-                    profile.MonsterData,
-                    level48.Level,
-                    level48.SourceIdentity,
-                    profile.Combat.ResolveContract(level48.SourceIdentity, level48.Level),
-                    out rejected,
-                    out rejectedFailure));
-            StringAssert.Contains(rejectedFailure, "no canonical raw combat profile");
+            Assert.AreEqual(
+                4,
+                spawns.Count(
+                    spawn =>
+                    {
+                        CapturedEnemyCombatContract resolved;
+                        string failure;
+                        return spawn.Level == 48
+                               && CapturedEnemyCombatProfileCatalog.TryResolve(
+                                   1931,
+                                   profile.DisplayName,
+                                   profile.MonsterData,
+                                   spawn.Level,
+                                   spawn.SourceIdentity,
+                                   profile.Combat.ResolveContract(
+                                       spawn.SourceIdentity,
+                                       spawn.Level),
+                                   out resolved,
+                                   out failure)
+                               && resolved.IsCombatReady;
+                    }));
         }
 
         [TestMethod]

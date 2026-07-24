@@ -1194,6 +1194,69 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void Level48DeathlessUsesCalculatedDamageWithExactArchetypePacketSemantics()
+        {
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    "Deathless Legionnaire",
+                    42981,
+                    48,
+                    unchecked((int)0x7987F61A),
+                    CapturedEnemyCombatContract.Unresolved(
+                        "level 48 Deathless packet semantics",
+                        true),
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+            Assert.IsTrue(resolved.UsesEquippedWeaponDamage);
+            Assert.IsTrue(resolved.UsesEquippedWeaponTiming);
+            Identity attacker = SimpleChar(unchecked((int)0x7987F61A));
+            Identity target = SimpleChar(LocalPlayerIdentity);
+            SpecialAttackWeaponMessage specialAttackWeapon =
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    attacker,
+                    resolved);
+            AttackMessage attack = CapturedEnemyCombatPacketFactory.CreateAttack(
+                attacker,
+                target,
+                resolved);
+            const int productionCalculatedDamage = 35;
+            AttackInfoMessage attackInfo =
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    attacker,
+                    target,
+                    productionCalculatedDamage,
+                    resolved.AttackInfoAmmoCount,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown);
+
+            AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
+            Assert.AreEqual(0, specialAttackWeapon.Specials.Length);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual(0, attack.Unknown);
+            Assert.AreEqual((byte)0, attack.Action);
+            Assert.AreEqual(target, attack.Target);
+            Assert.AreEqual(productionCalculatedDamage, attackInfo.Unknown1);
+            Assert.AreNotEqual(41, attackInfo.Unknown1);
+            Assert.AreNotEqual(42, attackInfo.Unknown1);
+            Assert.AreEqual(-1, attackInfo.Unknown2);
+            Assert.AreEqual(6, attackInfo.Unknown3);
+            Assert.AreEqual(0, attackInfo.Unknown4);
+            Assert.AreEqual(3, attackInfo.Unknown5);
+            Assert.AreEqual(0, attackInfo.Unknown6);
+        }
+
+        [TestMethod]
         public void TempleOrdinaryCoverageHasFourteenExactContractsAndQuarantinesTheRest()
         {
             var provider = new CapturedTempleOfThreeWindsContentProvider();

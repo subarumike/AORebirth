@@ -42,9 +42,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   `20260722-045421`, `20260722-045552`, and `20260722-045835` extend the
   front-door population with fourteen exact Deathless Legionnaire anchors and
   complete the main-room Uklesh -> Khalum -> Aztur succession. Deathless L49/L50
-  variants resolve their existing generated capture-backed combat profiles;
-  four L48 actors remain passive because the generated catalog contains no
-  compatible exact profile. Uklesh, Khalum, and Aztur use captured parallel
+  variants prove one shared Energy Scythe packet/weapon archetype. The four L48
+  actors now resolve that exact archetype while production item stats and
+  `CombatDamageRules` own damage/range/cadence instead of copying the observed
+  L49/L50 hit values. Active PF127/PF1931 certification is now `223` ready and
+  `266` quarantined, up from `219` / `270`; no other active level-only family
+  passed the same exact multi-level weapon/stream proof. Uklesh, Khalum, and
+  Aztur use captured parallel
   attack streams, exact mutable `SpecialAttackWeapon` state, exact atomic loot,
   and captured `0.6822027` / `0.211` second successor delays. No independent
   main-chain respawn or chain reset is invented. PF1931 now has ten ordinary

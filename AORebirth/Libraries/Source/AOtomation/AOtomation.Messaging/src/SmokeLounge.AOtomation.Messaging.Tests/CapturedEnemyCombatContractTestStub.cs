@@ -687,7 +687,7 @@ namespace AORebirth.Core.Playfields
             int minDamage,
             int maxDamage,
             int damageBonus,
-            double attackRange,
+            double? attackRange,
             double attackStartDelaySeconds,
             double movementTransitionDelaySeconds,
             double firstHitDelaySeconds,
@@ -706,7 +706,9 @@ namespace AORebirth.Core.Playfields
             byte specialAttackWeaponN3Unknown,
             byte attackN3Unknown,
             byte attackAction,
-            bool requiresDamageLineOfSight = false)
+            bool requiresDamageLineOfSight = false,
+            bool usesEquippedWeaponTiming = false,
+            ZoneEngine.Core.NpcAiProfile aiProfile = ZoneEngine.Core.NpcAiProfile.Passive)
         {
             return new CapturedEnemyCombatContract
             {
@@ -716,6 +718,8 @@ namespace AORebirth.Core.Playfields
                 EvidenceSourceIdentity = evidenceSourceIdentity,
                 HasCapturedRequiredPacketFields = true,
                 UsesEquippedWeaponDamage = usesEquippedWeaponDamage,
+                UsesEquippedWeaponTiming = usesEquippedWeaponTiming,
+                AiProfile = aiProfile,
                 MinDamage = minDamage,
                 MaxDamage = maxDamage,
                 CapturedDamageBonus = damageBonus,
@@ -764,6 +768,12 @@ namespace AORebirth.Core.Playfields
         internal bool HasCapturedRequiredPacketFields { get; set; }
 
         internal bool UsesEquippedWeaponDamage { get; set; }
+
+        internal bool UsesEquippedWeaponTiming { get; set; }
+
+        internal bool UsesCaptureProvenArchetype { get; set; }
+
+        internal string CaptureProvenArchetypeId { get; set; }
 
         internal int CapturedDamageBonus { get; set; }
 
@@ -870,8 +880,10 @@ namespace AORebirth.Core.Playfields
                            && this.WeaponDefinition.InventorySlot == this.WeaponInventorySlot
                            && this.AttackInfoWeaponSlot == this.WeaponInventorySlot
                            && this.AttackInfoWeaponInstance == 0
-                           && this.FirstHitDelaySeconds > 0
-                           && this.RechargeSeconds > 0
+                           && (this.UsesEquippedWeaponTiming
+                               || this.FirstHitDelaySeconds > 0)
+                           && (this.UsesEquippedWeaponTiming
+                               || this.RechargeSeconds > 0)
                            && (this.UsesEquippedWeaponDamage
                                || (this.MinDamage > 0
                                    && this.MaxDamage >= this.MinDamage))
@@ -1017,6 +1029,15 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.EvidenceSourceIdentityHint = sourceIdentity;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithCaptureProvenArchetype(
+            string archetypeId)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesCaptureProvenArchetype = true;
+            clone.CaptureProvenArchetypeId = archetypeId ?? string.Empty;
             return clone;
         }
 
@@ -1182,8 +1203,10 @@ namespace AORebirth.Core.Playfields
                                      && this.WeaponDefinition.InventorySlot == this.WeaponInventorySlot
                                      && this.AttackInfoWeaponSlot == this.WeaponInventorySlot
                                      && this.AttackInfoWeaponInstance == 0
-                                     && this.FirstHitDelaySeconds > 0
-                                     && this.RechargeSeconds > 0
+                                     && (this.UsesEquippedWeaponTiming
+                                         || this.FirstHitDelaySeconds > 0)
+                                     && (this.UsesEquippedWeaponTiming
+                                         || this.RechargeSeconds > 0)
                                      && (this.UsesEquippedWeaponDamage
                                          || (this.MinDamage > 0
                                              && this.MaxDamage >= this.MinDamage

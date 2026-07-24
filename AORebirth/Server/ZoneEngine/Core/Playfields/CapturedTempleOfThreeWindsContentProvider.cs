@@ -44,8 +44,8 @@ namespace AORebirth.Core.Playfields
 
         private static readonly CapturedEnemyCombatContract DeathlessLegionnaireCombat =
             CapturedEnemyCombatContract.Unresolved(
-                "20260722-044315: exact generated Deathless Legionnaire profiles resolve by "
-                + "PF1931/name/MonsterData/level; level 48 remains fail-closed",
+                "20260722-044315: level 49/50 captures prove one shared equipped-weapon "
+                + "archetype; item and runtime owners supply calculated combat values",
                 true);
 
         private static readonly RespawnPolicyDefinition CultistRespawn =
@@ -526,7 +526,7 @@ namespace AORebirth.Core.Playfields
                 CultistAggression,
                 new OrdinaryEnemyCombatProfile(
                     OrdinaryEnemyCombatMode.EquippedMelee,
-                    OrdinaryEnemyDamageSource.CapturedFixed,
+                    OrdinaryEnemyDamageSource.WeaponRoll,
                     true,
                     DeathlessLegionnaireCombat,
                     OrdinaryEnemyEvidenceState.Observed),
