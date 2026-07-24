@@ -2,14 +2,9 @@
 
 ## Active
 
-### Token Board — yellow chat token count
+### Capture-backed active enemy combat restoration
 
-Capture `20260723-123341`: FormatFeedback must use AO yellow prefix
-`~&!!!":!!!)<s` + length + `Side tokens collected: N.`
-Plain text shows as empty yellow lines.
-
-#### Smoke
-
-1. Restart engines
-2. Use token board → yellow chat shows `Side tokens collected: N.`
-3. Stop engines when done
+Continue binding active PF127/PF1931 atomic spawn variants to existing exact
+captured level/weapon packet semantics. Production generation owners retain QL,
+damage, range, cadence, and mutable weapon state. Unsupported levels, weapon
+families, packet streams, specials, and nanos remain fail-closed.

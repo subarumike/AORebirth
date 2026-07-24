@@ -284,6 +284,7 @@ namespace AORebirth.Core.Playfields
             get
             {
                 return this.SemanticFallbackCaptureProven
+                       && this.CaptureRuntimeEvidenceSafe
                        && this.SupportsCaptureProvenEquippedWeaponPacketSemantics;
             }
         }
@@ -292,7 +293,7 @@ namespace AORebirth.Core.Playfields
         {
             get
             {
-                return this.CaptureRuntimeEvidenceSafe
+                return this.CaptureEvidenceSafe
                        && this.WeaponDefinition != null
                        && this.WeaponDefinition.IsValid
                        && this.SpecialAttacks.Length == 0

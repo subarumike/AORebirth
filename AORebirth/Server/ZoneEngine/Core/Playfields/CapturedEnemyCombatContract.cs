@@ -2642,7 +2642,8 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0)
+                .WithProductionWeaponQuality();
         }
 
         private static CapturedEnemyCombatContract ForIncompleteRebuild(
@@ -2701,7 +2702,8 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0)
+                .WithProductionWeaponQuality();
         }
 
         private static CapturedEnemyCombatContract ForDerangedShopper(
@@ -2800,7 +2802,8 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0)
+                .WithProductionWeaponQuality();
         }
 
         private static CapturedEnemyCombatContract ForFragmentedSoul(
@@ -2857,7 +2860,8 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0)
+                .WithProductionWeaponQuality();
         }
 
         private static CapturedEnemyCombatContract ForRedundantScan(
@@ -2916,7 +2920,8 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0)
+                .WithProductionWeaponQuality();
         }
 
         private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype(

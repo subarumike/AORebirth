@@ -49,9 +49,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and all `31` source-local atomic generations to the exact captured
   level/weapon-family packet archetype while its existing generation selector
   owns QL and the item/combat owners retain damage, range, and cadence. Active
-  PF127/PF1931 certification is now `245` ready and `244` quarantined, up from
-  `223` / `266`. Exact generated selection also fails closed before source
-  selection when the stable weapon tuple differs. Uklesh, Khalum, and
+  PF127/PF1931 certification is now `254` ready and `235` quarantined, up from
+  `223` / `266`. Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
+  bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact
+  captured level/weapon packet semantics while their generation selectors own
+  QL. Nine actors have every possible atomic generation certified (`3`, `5`,
+  and `1`); incompatible level/weapon generations remain fail-closed. Exact
+  generated selection also fails closed before source selection when the
+  stable weapon tuple differs. Uklesh, Khalum, and
   Aztur use captured parallel
   attack streams, exact mutable `SpecialAttackWeapon` state, exact atomic loot,
   and captured `0.6822027` / `0.211` second successor delays. No independent
