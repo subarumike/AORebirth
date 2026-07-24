@@ -170,6 +170,26 @@ namespace AORebirth.Core.Playfields
                 this.Stats,
                 this.Unknown3);
         }
+
+        internal CapturedEnemyWeaponDefinition WithProductionWeaponQuality(int quality)
+        {
+            return new CapturedEnemyWeaponDefinition(
+                this.Evidence,
+                this.EvidenceSourceIdentity,
+                this.N3Unknown,
+                this.Unknown1,
+                this.InventorySlot,
+                this.StateMachineType,
+                this.StateMachineInstance,
+                this.Unknown2,
+                this.Stats.Select(
+                    value => value.Stat == CharacterStat.ACGItemLevel
+                                 ? new CapturedEnemyWeaponStatDefinition(
+                                     value.Stat,
+                                     unchecked((uint)quality))
+                                 : value).ToArray(),
+                this.Unknown3);
+        }
     }
 
     internal sealed class CapturedEnemyCombatAttackDefinition
@@ -473,6 +493,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesEquippedWeaponTiming { get; private set; }
 
+        internal bool UsesProductionWeaponQuality { get; private set; }
+
         internal bool UsesCaptureProvenArchetype { get; private set; }
 
         internal string CaptureProvenArchetypeId { get; private set; }
@@ -743,6 +765,13 @@ namespace AORebirth.Core.Playfields
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesCaptureProvenArchetype = true;
             clone.CaptureProvenArchetypeId = archetypeId ?? string.Empty;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionWeaponQuality()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionWeaponQuality = true;
             return clone;
         }
 
@@ -2535,7 +2564,8 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0,
-                0);
+                0)
+                .WithProductionWeaponQuality();
         }
 
         private static CapturedEnemyCombatContract ForLooter(
