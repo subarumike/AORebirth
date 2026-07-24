@@ -103,7 +103,9 @@ namespace AORebirth.Core.Playfields
             }
 
             bool hasCapturedContract = hasRegisteredCapturedContract && capturedContract.IsCombatReady;
-            if (hasCapturedContract && this.GetCombatAttackSource(attacker) == null)
+            CombatAttackSource capturedAttackSource =
+                hasCapturedContract ? this.GetCombatAttackSource(attacker) : null;
+            if (hasCapturedContract && capturedAttackSource == null)
             {
                 this.playfield.ClearNpcCombatTracking(attacker.Identity);
                 return;
@@ -144,6 +146,11 @@ namespace AORebirth.Core.Playfields
                                               : capturedContract.FirstHitDelaySeconds;
             if (hasCapturedAttackStart)
             {
+                if (capturedContract.UsesEquippedWeaponTiming)
+                {
+                    firstHitDelaySeconds = capturedAttackSource.RechargeSeconds;
+                }
+
                 if (capturedContract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
                 {
                     attackStartDelaySeconds = SelectCapturedDoubleObservation(
@@ -1643,7 +1650,14 @@ namespace AORebirth.Core.Playfields
                        DamageBonus = damageBonus,
                        Range = equippedAttackRange,
                        RechargeSeconds = hasCapturedEquippedAttackInfo
-                                             && capturedContract.RechargeSeconds > 0
+                                             && capturedContract.UsesEquippedWeaponTiming
+                                                 ? NormalizeCombatDelaySeconds(
+                                                     weapon.GetAttribute(
+                                                         (int)StatIds.itemdelay),
+                                                     weapon.GetAttribute(
+                                                         (int)StatIds.rechargedelay))
+                                             : hasCapturedEquippedAttackInfo
+                                               && capturedContract.RechargeSeconds > 0
                                              ? capturedContract.RechargeSeconds
                                              : NormalizeCombatDelaySeconds(
                                                  weapon.GetAttribute((int)StatIds.itemdelay),

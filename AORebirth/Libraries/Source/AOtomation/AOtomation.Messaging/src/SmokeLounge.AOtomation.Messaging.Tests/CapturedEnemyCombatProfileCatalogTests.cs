@@ -649,7 +649,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "AnnounceCapturedEnemySpecialAttackWeaponContext(",
                 StringComparison.Ordinal);
             int attackAuthorization = reset.IndexOf(
-                "this.GetCombatAttackSource(attacker) == null",
+                "capturedAttackSource == null",
                 StringComparison.Ordinal);
             int delayedAttackRegistration = reset.IndexOf(
                 "pendingCapturedAttackStarts[",
@@ -1394,6 +1394,90 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DeathlessArchetypeResolutionIsIndependentOfNearestCapturedLevel()
+        {
+            string archetypeId = null;
+            foreach (int level in new[] { 48, 49, 50 })
+            {
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        "Deathless Legionnaire",
+                        42981,
+                        level,
+                        0,
+                        CapturedEnemyCombatContract.Unresolved(
+                            "Deathless archetype level " + level,
+                            true),
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                Assert.AreEqual(204747, resolved.WeaponLowId);
+                Assert.AreEqual(204747, resolved.WeaponHighId);
+                Assert.AreEqual(1, resolved.WeaponQuality);
+                if (archetypeId == null)
+                {
+                    archetypeId = resolved.CaptureProvenArchetypeId;
+                }
+
+                Assert.AreEqual(archetypeId, resolved.CaptureProvenArchetypeId);
+            }
+
+            string source = File.ReadAllText(
+                Path.Combine(
+                    FindRepositoryRoot(),
+                    "AORebirth",
+                    "Server",
+                    "ZoneEngine",
+                    "Core",
+                    "Playfields",
+                    "CapturedEnemyCombatProfileCatalog.cs"));
+            Assert.IsFalse(source.Contains("Math.Abs(value.Level - level)"));
+            Assert.IsFalse(source.Contains("OrderBy(value => value.Level)"));
+        }
+
+        [TestMethod]
+        public void RealRedundantScanWeaponVariantsDoNotShareAnArchetype()
+        {
+            CapturedEnemyCombatProfileDefinition[] family =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => value.MatchesArchetypeKey(
+                        127,
+                        "Redundant Scan",
+                        204178)).ToArray();
+            Assert.IsTrue(family.Select(value => value.Level).Distinct().Count() >= 2);
+            Assert.IsTrue(
+                family.Where(value => value.WeaponDefinition != null)
+                    .Select(
+                        value => string.Format(
+                            "{0}/{1}/{2}",
+                            value.WeaponDefinition.LowId,
+                            value.WeaponDefinition.HighId,
+                            value.WeaponDefinition.Quality))
+                    .Distinct()
+                    .Count() >= 2);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Redundant Scan",
+                    204178,
+                    18,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "Redundant Scan variant guard",
+                        true),
+                    out resolved,
+                    out failure));
+            StringAssert.Contains(failure, "no canonical raw combat profile");
+        }
+
+        [TestMethod]
         public void ActiveSubwayAndTempleSpawnsAreEitherExactSourceCertifiedOrFailClosed()
         {
             string root = FindRepositoryRoot();
@@ -1456,35 +1540,65 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     if (spawn.PlayfieldInstance == 127) subwayCertified++;
                     else templeCertified++;
                     Assert.IsTrue(resolved.IsCombatReady);
-                    CapturedEnemyCombatProfileDefinition[] keyMatches = generatedProfiles.Where(
-                        value => value.MatchesKey(
-                            spawn.PlayfieldInstance,
-                            profile.DisplayName,
-                            profile.MonsterData,
-                            spawn.Level)).ToArray();
-                    CapturedEnemyCombatProfileDefinition[] evidenceMatches = keyMatches.Where(
-                        value => value.ContainsSource(
-                            resolved.EvidenceSourceIdentity)).ToArray();
-                    CapturedEnemyCombatProfileDefinition[] compatibleKeyMatches =
-                        keyMatches.Where(value => value.CaptureRuntimeEvidenceSafe).ToArray();
-                    Assert.AreEqual(1, evidenceMatches.Length);
-                    if (compatibleKeyMatches.Any(
-                            value => value.ContainsSource(spawn.SourceIdentity)))
+                    if (resolved.UsesCaptureProvenArchetype)
                     {
-                        Assert.AreEqual(spawn.SourceIdentity, resolved.EvidenceSourceIdentity);
+                        CapturedEnemyCombatProfileDefinition[] familyMatches =
+                            generatedProfiles.Where(
+                                value => value.MatchesArchetypeKey(
+                                    spawn.PlayfieldInstance,
+                                    profile.DisplayName,
+                                    profile.MonsterData)).ToArray();
+                        Assert.IsTrue(familyMatches.Length >= 2);
+                        Assert.IsTrue(
+                            familyMatches.Select(value => value.Level).Distinct().Count() >= 2);
+                        Assert.IsTrue(
+                            familyMatches.All(
+                                value =>
+                                    value.SupportsCaptureProvenEquippedWeaponArchetype));
+                        Assert.IsTrue(
+                            familyMatches.All(
+                                value =>
+                                    familyMatches[0]
+                                        .MatchesCaptureProvenEquippedWeaponArchetype(
+                                            value)));
+                        Assert.IsTrue(
+                            familyMatches.Any(
+                                value => value.ContainsSource(
+                                    resolved.EvidenceSourceIdentity)));
                     }
                     else
                     {
-                        CapturedEnemyCombatProfileDefinition[] stableWeaponMatches =
-                            compatibleKeyMatches.Where(
-                                value => value.MatchesStableWeaponProfile(baseline)).ToArray();
-                        CapturedEnemyCombatProfileDefinition selectedProfile =
-                            stableWeaponMatches.Length == 1
-                                ? stableWeaponMatches[0]
-                                : compatibleKeyMatches.Single();
-                        Assert.AreEqual(
-                            selectedProfile.RepresentativeEvidenceSourceIdentity,
-                            resolved.EvidenceSourceIdentity);
+                        CapturedEnemyCombatProfileDefinition[] keyMatches =
+                            generatedProfiles.Where(
+                                value => value.MatchesKey(
+                                    spawn.PlayfieldInstance,
+                                    profile.DisplayName,
+                                    profile.MonsterData,
+                                    spawn.Level)).ToArray();
+                        CapturedEnemyCombatProfileDefinition[] evidenceMatches = keyMatches.Where(
+                            value => value.ContainsSource(
+                                resolved.EvidenceSourceIdentity)).ToArray();
+                        CapturedEnemyCombatProfileDefinition[] compatibleKeyMatches =
+                            keyMatches.Where(value => value.CaptureRuntimeEvidenceSafe).ToArray();
+                        Assert.AreEqual(1, evidenceMatches.Length);
+                        if (compatibleKeyMatches.Any(
+                                value => value.ContainsSource(spawn.SourceIdentity)))
+                        {
+                            Assert.AreEqual(spawn.SourceIdentity, resolved.EvidenceSourceIdentity);
+                        }
+                        else
+                        {
+                            CapturedEnemyCombatProfileDefinition[] stableWeaponMatches =
+                                compatibleKeyMatches.Where(
+                                    value => value.MatchesStableWeaponProfile(baseline)).ToArray();
+                            CapturedEnemyCombatProfileDefinition selectedProfile =
+                                stableWeaponMatches.Length == 1
+                                    ? stableWeaponMatches[0]
+                                    : compatibleKeyMatches.Single();
+                            Assert.AreEqual(
+                                selectedProfile.RepresentativeEvidenceSourceIdentity,
+                                resolved.EvidenceSourceIdentity);
+                        }
                     }
                 }
                 else

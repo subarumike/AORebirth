@@ -810,6 +810,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             return draft;
         }
 
+        [TestMethod]
+        public void Level48NpcDamageComesFromProductionWeaponInputsNotCapturedDeathlessHits()
+        {
+            DamageCalculationResult result = CombatDamageRules.CalculateDetailed(
+                30,
+                40,
+                0,
+                48,
+                false,
+                new QueuedDamageRandomSource(35));
+
+            Assert.AreEqual(35, result.FinalTargetDamage);
+            Assert.AreNotEqual(41, result.FinalTargetDamage);
+            Assert.AreNotEqual(42, result.FinalTargetDamage);
+        }
+
         private static void AssertStage(
             DamageCalculationResult result,
             string stage,
