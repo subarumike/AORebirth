@@ -878,7 +878,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void IncompleteRebuildStableProfileUsesTheCapturedSharedPacketSequence()
+        public void IncompleteRebuildProductionQlChangesOnlyTheCapturedWifuQlField()
         {
             const string profileId = "f4b7f149cee5b2ad-b4c320f0187034b8";
             const int runtimeSourceIdentity = unchecked((int)0x79545172);
@@ -895,14 +895,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     18,
                     runtimeSourceIdentity,
                     CapturedEnemyCombatContract.EquippedWeapon(
-                        "active subway Incomplete Rebuild source 0x79545172",
+                        "active subway Incomplete Rebuild QL14 atomic generation",
                         122653,
                         122654,
-                        15,
-                        6),
+                        14,
+                        6)
+                        .WithProductionWeaponQuality(),
                     out resolved,
                     out failure),
                 failure);
+            Assert.AreEqual(14, resolved.WeaponQuality);
+            Assert.AreEqual(14, resolved.WeaponDefinition.Quality);
 
             CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
                 value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
@@ -919,12 +922,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyAttackInfoPacketFixture attackInfo =
                 fixture.AttackInfoPackets.First(
                     value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Ammo == resolved.AttackInfoAmmoCount
                              && value.WeaponSlot == resolved.AttackInfoWeaponSlot
                              && value.DamageTypeWire == resolved.AttackInfoUnknown
                              && value.HitTypeWire == resolved.AttackInfoHitType
                              && value.WeaponInstance == resolved.AttackInfoWeaponInstance
-                             && value.N3Unknown == resolved.AttackInfoN3Unknown
-                             && resolved.CapturedDamageObservations.Contains(value.Amount));
+                             && value.N3Unknown == resolved.AttackInfoN3Unknown);
 
             MessageBody[] capturedSequence =
             {
@@ -959,7 +962,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
             Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
             Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
-            AssertHex(weapon.BodyHex, capturedSequence[0]);
+            AssertHex(
+                "3B1D22680000C74A2574ECF6000000000B0000C350796079AF00153008000F424F0000000001060000276A0000000000000403000000170001DF1D000002BD0000000E000002BE0001DF1D000002BF0001DF1E0000019C000000010000001A0000000A00000126000000EB000000D2000000EB00000000",
+                capturedSequence[0]);
             AssertHex(saw.BodyHex, capturedSequence[1]);
             AssertHex(attack.BodyHex, capturedSequence[2]);
             AssertHex(attackInfo.BodyHex, capturedSequence[3]);

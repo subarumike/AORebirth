@@ -1303,6 +1303,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ProductionQlFamiliesResolveOnlyExactCapturedLevelWeaponPacketSemantics()
+        {
+            AssertProductionQlFamily(
+                "Incomplete Rebuild",
+                203728,
+                10,
+                23,
+                16,
+                10,
+                3);
+            AssertProductionQlFamily(
+                "Fragmented Soul",
+                203729,
+                10,
+                19,
+                11,
+                9,
+                5);
+            AssertProductionQlFamily(
+                "Redundant Scan",
+                204178,
+                4,
+                10,
+                7,
+                4,
+                1);
+        }
+
+        [TestMethod]
         public void LooterResolvesTheExactCapturedStableWeaponProfile()
         {
             const int runtimeSourceIdentity = unchecked((int)0x7954501B);
@@ -1400,12 +1429,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                              && value.WeaponLoadout != null
                              && value.WeaponLoadout.LowId == 122653
                              && value.WeaponLoadout.HighId == 122654
-                             && value.WeaponLoadout.Quality == 15);
+                             && value.WeaponLoadout.Quality == 14);
             CapturedEnemyCombatContract runtimeContract =
                 runtimeProfile.Combat.ResolveContract(runtimeSourceIdentity, runtimeVariant);
             Assert.AreEqual(122653, runtimeContract.WeaponLowId);
             Assert.AreEqual(122654, runtimeContract.WeaponHighId);
-            Assert.AreEqual(15, runtimeContract.WeaponQuality);
+            Assert.AreEqual(14, runtimeContract.WeaponQuality);
+            Assert.IsTrue(runtimeContract.UsesProductionWeaponQuality);
 
             CapturedEnemyCombatContract resolved;
             string failure;
@@ -1423,6 +1453,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(resolved.IsCombatReady);
             Assert.AreEqual(profile.Evidence, resolved.Evidence);
+            Assert.AreEqual(14, resolved.WeaponQuality);
+            Assert.AreEqual(14, resolved.WeaponDefinition.Quality);
             Assert.AreEqual(
                 profile.RepresentativeEvidenceSourceIdentity,
                 resolved.EvidenceSourceIdentity);
@@ -1765,19 +1797,40 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                     spawn.PlayfieldInstance,
                                     profile.DisplayName,
                                     profile.MonsterData)).ToArray();
-                        Assert.IsTrue(familyMatches.Length >= 2);
-                        Assert.IsTrue(
-                            familyMatches.Select(value => value.Level).Distinct().Count() >= 2);
-                        Assert.IsTrue(
-                            familyMatches.All(
-                                value =>
-                                    value.SupportsCaptureProvenEquippedWeaponArchetype));
-                        Assert.IsTrue(
-                            familyMatches.All(
-                                value =>
-                                    familyMatches[0]
-                                        .MatchesCaptureProvenEquippedWeaponArchetype(
+                        if (baseline.UsesProductionWeaponQuality)
+                        {
+                            CapturedEnemyCombatProfileDefinition[] packetMatches =
+                                familyMatches.Where(
+                                    value => value.Level == spawn.Level
+                                             && value
+                                                 .SupportsCaptureProvenEquippedWeaponPacketSemantics
+                                             && value.MatchesStableWeaponFamily(
+                                                 baseline)).ToArray();
+                            Assert.IsTrue(packetMatches.Length > 0);
+                            Assert.IsTrue(
+                                packetMatches.All(
+                                    value => packetMatches[0]
+                                        .MatchesCaptureProvenEquippedWeaponPacketSemantics(
                                             value)));
+                        }
+                        else
+                        {
+                            Assert.IsTrue(familyMatches.Length >= 2);
+                            Assert.IsTrue(
+                                familyMatches.Select(value => value.Level)
+                                    .Distinct().Count() >= 2);
+                            Assert.IsTrue(
+                                familyMatches.All(
+                                    value =>
+                                        value.SupportsCaptureProvenEquippedWeaponArchetype));
+                            Assert.IsTrue(
+                                familyMatches.All(
+                                    value =>
+                                        familyMatches[0]
+                                            .MatchesCaptureProvenEquippedWeaponArchetype(
+                                                value)));
+                        }
+
                         Assert.IsTrue(
                             familyMatches.Any(
                                 value => value.ContainsSource(
@@ -1869,6 +1922,123 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 templeQuarantined,
                 certified,
                 quarantined);
+        }
+
+        private static void AssertProductionQlFamily(
+            string name,
+            int monsterData,
+            int expectedActors,
+            int expectedVariants,
+            int expectedResolvedVariants,
+            int expectedActorsWithResolvedVariants,
+            int expectedFullyResolvedActors)
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == name
+                         && value.MonsterData == monsterData);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            CapturedEnemyCombatProfileDefinition[] generatedProfiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
+            int variants = 0;
+            int resolvedVariants = 0;
+            int actorsWithResolvedVariants = 0;
+            int fullyResolvedActors = 0;
+
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                OrdinaryEnemySpawnVariant[] atomicVariants =
+                    activeSpawn.LevelDefinition.GetExplicitVariants();
+                int resolvedForActor = 0;
+                foreach (OrdinaryEnemySpawnVariant variant in atomicVariants)
+                {
+                    CapturedEnemyCombatContract baseline =
+                        runtimeProfile.Combat.ResolveContract(
+                            activeSpawn.SourceIdentity,
+                            variant);
+                    Assert.IsTrue(
+                        baseline.UsesProductionWeaponQuality,
+                        string.Format(
+                            "{0} source=0x{1:X8} L{2} did not retain production QL ownership",
+                            name,
+                            activeSpawn.SourceIdentity,
+                            variant.Level));
+                    bool hasExactPacketSemantics = generatedProfiles.Any(
+                        value => value.MatchesArchetypeKey(127, name, monsterData)
+                                 && value.Level == variant.Level
+                                 && value.SupportsCaptureProvenEquippedWeaponPacketSemantics
+                                 && value.MatchesStableWeaponFamily(baseline));
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        name,
+                        monsterData,
+                        variant.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure);
+                    Assert.AreEqual(
+                        hasExactPacketSemantics,
+                        success,
+                        string.Format(
+                            "{0} source=0x{1:X8} L{2} weapon={3}/{4} QL={5}: {6}",
+                            name,
+                            activeSpawn.SourceIdentity,
+                            variant.Level,
+                            variant.WeaponLoadout.LowId,
+                            variant.WeaponLoadout.HighId,
+                            variant.WeaponLoadout.Quality,
+                            failure));
+                    if (success)
+                    {
+                        Assert.IsTrue(resolved.IsCombatReady);
+                        Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                        Assert.AreEqual(variant.WeaponLoadout.LowId, resolved.WeaponLowId);
+                        Assert.AreEqual(variant.WeaponLoadout.HighId, resolved.WeaponHighId);
+                        Assert.AreEqual(variant.WeaponLoadout.Quality, resolved.WeaponQuality);
+                        resolvedForActor++;
+                        resolvedVariants++;
+                    }
+                    else
+                    {
+                        Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+                    }
+
+                    variants++;
+                }
+
+                if (resolvedForActor > 0)
+                {
+                    actorsWithResolvedVariants++;
+                }
+
+                if (resolvedForActor == atomicVariants.Length)
+                {
+                    fullyResolvedActors++;
+                }
+            }
+
+            Assert.AreEqual(expectedActors, activeSpawns.Length, name + " actors");
+            Assert.AreEqual(expectedVariants, variants, name + " atomic variants");
+            Assert.AreEqual(
+                expectedResolvedVariants,
+                resolvedVariants,
+                name + " compatible atomic variants");
+            Assert.AreEqual(
+                expectedActorsWithResolvedVariants,
+                actorsWithResolvedVariants,
+                name + " actors with compatible variants");
+            Assert.AreEqual(
+                expectedFullyResolvedActors,
+                fullyResolvedActors,
+                name + " fully compatible actors");
         }
 
         private static CapturedEnemyCombatAttackDefinition CreateSpecializedTestAttack(
