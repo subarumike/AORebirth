@@ -49,8 +49,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and all `31` source-local atomic generations to the exact captured
   level/weapon-family packet archetype while its existing generation selector
   owns QL and the item/combat owners retain damage, range, and cadence. Active
-  PF127/PF1931 certification is now `254` ready and `235` quarantined, up from
-  `223` / `266`. Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
+  PF127/PF1931 certification is now `284` ready and `205` quarantined, up from
+  `223` / `266`. Filth Flea now binds `30` active PF127 actors at captured
+  levels 4, 6, 10-13, and 19-21 to their exact two-stream natural attack
+  semantics while production retains damage, range, cadence, ammunition, and
+  mutable `SpecialAttackWeapon` values. Its twelve level-5 actors retain their
+  distinct three-stream capture and unsupported levels remain fail-closed.
+  Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
   bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact
   captured level/weapon packet semantics while their generation selectors own
   QL. Nine actors have every possible atomic generation certified (`3`, `5`,

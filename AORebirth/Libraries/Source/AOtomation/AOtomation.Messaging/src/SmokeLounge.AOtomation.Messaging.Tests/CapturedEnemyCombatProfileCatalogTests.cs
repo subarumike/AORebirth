@@ -1303,6 +1303,137 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void FilthFleaProductionOwnedValuesResolveEveryCompatibleExactStream()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Filth Flea"
+                         && value.MonsterData
+                            == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(51, activeSpawns.Length);
+
+            CapturedEnemyCombatProfileDefinition[] generatedProfiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
+            CapturedEnemyCombatProfileDefinition levelFour = generatedProfiles.Single(
+                value => value.ProfileId == "deda2240caee7272-f66c89ab2748e17c");
+            Assert.IsTrue(levelFour.CaptureEvidenceSafe);
+            Assert.IsFalse(levelFour.CaptureRuntimeEvidenceSafe);
+            CapturedEnemyCombatProfileDefinition levelTen = generatedProfiles.Single(
+                value => value.ProfileId == "12e4e4cadd5f9059-c3b0e4a3ccaa520e");
+            Assert.AreEqual(59, levelTen.SpecialAttackWeaponUnknown1);
+            CapturedEnemyCombatProfileDefinition levelFive = generatedProfiles.Single(
+                value => value.ProfileId == "218eb3509f2be66b-12f99a4c2f732061");
+            Assert.AreEqual(3, levelFive.Streams.Length);
+
+            int restoredActors = 0;
+            int restoredVariants = 0;
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                OrdinaryEnemySpawnVariant[] variants =
+                    activeSpawn.LevelDefinition.GetExplicitVariants();
+                restoredVariants += variants.Length;
+                Assert.AreEqual(0, variants.Length);
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+
+                bool shouldResolve =
+                    activeSpawn.Level == 4
+                    || activeSpawn.Level == 6
+                    || activeSpawn.Level == 10
+                    || activeSpawn.Level == 11
+                    || activeSpawn.Level == 12
+                    || activeSpawn.Level == 13
+                    || activeSpawn.Level == 19
+                    || activeSpawn.Level == 20
+                    || activeSpawn.Level == 21;
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure);
+                Assert.AreEqual(
+                    shouldResolve,
+                    success,
+                    string.Format(
+                        "source=0x{0:X8} level={1}: {2}",
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level,
+                        failure));
+                if (!success)
+                {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+                    continue;
+                }
+
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+                Assert.IsNotNull(resolved.SpecialAttackSequence);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage,
+                    resolved.SpecialAttackSequence.OpeningAttack.MinDamage);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMaximumDamage,
+                    resolved.SpecialAttackSequence.OpeningAttack.MaxDamage);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonRechargeSeconds,
+                    resolved.SpecialAttackSequence.OpeningAttack.RechargeSeconds);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonWeaponSlot,
+                    resolved.SpecialAttackSequence.OpeningAttack.AttackInfoWeaponSlot);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaStickToHeadTag,
+                    resolved.SpecialAttackSequence.OpeningAttack.AttackInfoWeaponInstance);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMinimumDamage,
+                    resolved.SpecialAttackSequence.RepeatingAttack.MinDamage);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeMaximumDamage,
+                    resolved.SpecialAttackSequence.RepeatingAttack.MaxDamage);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds,
+                    resolved.SpecialAttackSequence.RepeatingAttack.RechargeSeconds);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeWeaponSlot,
+                    resolved.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponSlot);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                    resolved.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance);
+                Assert.IsTrue(
+                    resolved.SpecialAttackSequence.OpeningAttack
+                        .CapturedDamageObservations.Length > 0);
+                Assert.IsTrue(
+                    resolved.SpecialAttackSequence.RepeatingAttack
+                        .CapturedDamageObservations.Length > 0);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                    resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
+                    resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown5);
+                Assert.AreEqual(2, resolved.SpecialAttackSequence.SpecialAttacks.Length);
+                restoredActors++;
+            }
+
+            Assert.AreEqual(30, restoredActors);
+            Assert.AreEqual(0, restoredVariants);
+        }
+
+        [TestMethod]
         public void ProductionQlFamiliesResolveOnlyExactCapturedLevelWeaponPacketSemantics()
         {
             AssertProductionQlFamily(
@@ -1789,7 +1920,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     if (spawn.PlayfieldInstance == 127) subwayCertified++;
                     else templeCertified++;
                     Assert.IsTrue(resolved.IsCombatReady);
-                    if (resolved.UsesCaptureProvenArchetype)
+                    if (baseline.UsesProductionSpecializedValues)
+                    {
+                        CapturedEnemyCombatProfileDefinition[] keyMatches =
+                            generatedProfiles.Where(
+                                value => value.MatchesKey(
+                                    spawn.PlayfieldInstance,
+                                    profile.DisplayName,
+                                    profile.MonsterData,
+                                    spawn.Level)
+                                         && value.CaptureEvidenceSafe).ToArray();
+                        Assert.IsTrue(keyMatches.Length > 0);
+                        Assert.IsTrue(
+                            keyMatches.Any(
+                                value => value.ContainsSource(
+                                    resolved.EvidenceSourceIdentity)));
+                    }
+                    else if (resolved.UsesCaptureProvenArchetype)
                     {
                         CapturedEnemyCombatProfileDefinition[] familyMatches =
                             generatedProfiles.Where(

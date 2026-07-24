@@ -150,6 +150,20 @@ namespace AORebirth.Core.Playfields
                    && attack.AttackInfoN3Unknown == this.N3Unknown;
         }
 
+        internal bool MatchesProductionOwnedValues(
+            CapturedEnemyCombatAttackDefinition attack)
+        {
+            return attack != null
+                   && this.HasCompleteFixedRuntimeEvidence
+                   && attack.UsesEquippedWeapon == this.CapturedUsesEquippedWeapon.Value
+                   && attack.SendAttackInfo == this.CapturedSendAttackInfo.Value
+                   && attack.AttackInfoWeaponSlot == this.WeaponSlot
+                   && attack.AttackInfoUnknown == this.DamageTypeWire
+                   && attack.AttackInfoHitType == this.HitTypeWire
+                   && attack.AttackInfoWeaponInstance == this.WeaponInstance
+                   && attack.AttackInfoN3Unknown == this.N3Unknown;
+        }
+
         private static bool IsValidDelay(double value)
         {
             return !double.IsNaN(value) && !double.IsInfinity(value) && value >= 0.0d;
@@ -431,9 +445,16 @@ namespace AORebirth.Core.Playfields
             out int[][] capturedDamageObservationsByAttack)
         {
             capturedDamageObservationsByAttack = null;
-            if (!this.CaptureRuntimeEvidenceSafe
-                || contract == null
+            if (contract == null
                 || contract.AttackModel != CapturedEnemyAttackModel.Specialized)
+            {
+                return false;
+            }
+
+            bool productionOwnsVariableValues =
+                contract.UsesProductionSpecializedValues;
+            if (!this.CaptureRuntimeEvidenceSafe
+                && (!productionOwnsVariableValues || !this.CaptureEvidenceSafe))
             {
                 return false;
             }
@@ -501,11 +522,12 @@ namespace AORebirth.Core.Playfields
             }
 
             if (sawUnknown != this.SpecialAttackWeaponN3Unknown
-                || saw1 != this.SpecialAttackWeaponUnknown1
-                || saw2 != this.SpecialAttackWeaponUnknown2
-                || saw3 != this.SpecialAttackWeaponUnknown3
-                || saw4 != this.SpecialAttackWeaponUnknown4
-                || saw5 != this.SpecialAttackWeaponUnknown5
+                || (!productionOwnsVariableValues
+                    && (saw1 != this.SpecialAttackWeaponUnknown1
+                        || saw2 != this.SpecialAttackWeaponUnknown2
+                        || saw3 != this.SpecialAttackWeaponUnknown3
+                        || saw4 != this.SpecialAttackWeaponUnknown4
+                        || saw5 != this.SpecialAttackWeaponUnknown5))
                 || attackUnknown != this.AttackN3Unknown
                 || attackAction != this.AttackAction
                 || !SpecialsMatch(currentSpecials, this.SpecialAttacks)
@@ -521,12 +543,15 @@ namespace AORebirth.Core.Playfields
                 for (int streamIndex = 0; streamIndex < this.Streams.Length; streamIndex++)
                 {
                     CapturedEnemyCombatProfileStreamDefinition stream = this.Streams[streamIndex];
-                    matches[phaseIndex, streamIndex] = stream.Matches(
-                        attacks[phaseIndex],
-                        0.0d,
-                        firstHitDelays[phaseIndex],
-                        this.ResolveLandedIntervalObservations(stream),
-                        this.WeaponDefinition);
+                    matches[phaseIndex, streamIndex] =
+                        productionOwnsVariableValues
+                            ? stream.MatchesProductionOwnedValues(attacks[phaseIndex])
+                            : stream.Matches(
+                                attacks[phaseIndex],
+                                0.0d,
+                                firstHitDelays[phaseIndex],
+                                this.ResolveLandedIntervalObservations(stream),
+                                this.WeaponDefinition);
                 }
             }
 
@@ -823,7 +848,10 @@ namespace AORebirth.Core.Playfields
             }
 
             CapturedEnemyCombatProfileDefinition[] compatibleMatches = keyMatches.Where(
-                value => value.CaptureRuntimeEvidenceSafe).ToArray();
+                value => value.CaptureRuntimeEvidenceSafe
+                         || (current.AttackModel == CapturedEnemyAttackModel.Specialized
+                             && current.UsesProductionSpecializedValues
+                             && value.MatchesSpecialized(current))).ToArray();
             if (compatibleMatches.Length == 0)
             {
                 failure = "exact generated profiles are explicitly unsafe for runtime replay";
@@ -911,7 +939,10 @@ namespace AORebirth.Core.Playfields
             }
 
             CapturedEnemyCombatProfileDefinition profile = selected[0];
-            if (!profile.CaptureRuntimeEvidenceSafe)
+            if (!profile.CaptureRuntimeEvidenceSafe
+                && !(current.AttackModel == CapturedEnemyAttackModel.Specialized
+                     && current.UsesProductionSpecializedValues
+                     && profile.MatchesSpecialized(current)))
             {
                 failure = "selected raw profile has capture evidence that is explicitly unsafe for runtime replay";
                 return false;
