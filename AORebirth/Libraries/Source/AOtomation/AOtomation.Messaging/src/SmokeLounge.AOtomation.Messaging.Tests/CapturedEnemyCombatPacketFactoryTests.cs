@@ -404,6 +404,77 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void WorkmanStrikerProductionQlChangesOnlyTheCapturedWifuQlField()
+        {
+            const string profileId = "5db002948ad46e4a-0278a5de1cc46a00";
+            const int runtimeSourceIdentity = unchecked((int)0x79545000);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    14,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active Workman Striker QL11 atomic generation",
+                        122905,
+                        122906,
+                        11,
+                        6)
+                        .WithProductionWeaponQuality(),
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets[0];
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets[0];
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets[0];
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets[0];
+            MessageBody[] sequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, sequence.Length);
+            AssertHex(
+                "3B1D22680000C74A2571391A000000000B0000C3507953AA1600122002000F424F0000000001060000276A0000000000000403000000170001E019000002BD0000000B000002BE0001E019000002BF0001E01A0000019C000000010000001AFFFFFFFF00000126000000EB000000D2000000EB00000000",
+                sequence[0]);
+            AssertHex(saw.BodyHex, sequence[1]);
+            AssertHex(attack.BodyHex, sequence[2]);
+            AssertHex(attackInfo.BodyHex, sequence[3]);
+        }
+
+        [TestMethod]
         public void AlreadyAuthorizedShadowUsesItsExactCapturedPacketSequenceWithoutARangeField()
         {
             const string profileId = "469eedefbd2e7efe-83d6c6ca8cd6c3d2";

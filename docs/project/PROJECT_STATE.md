@@ -45,9 +45,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   variants prove one shared Energy Scythe packet/weapon archetype. The four L48
   actors now resolve that exact archetype while production item stats and
   `CombatDamageRules` own damage/range/cadence instead of copying the observed
-  L49/L50 hit values. Active PF127/PF1931 certification is now `223` ready and
-  `266` quarantined, up from `219` / `270`; no other active level-only family
-  passed the same exact multi-level weapon/stream proof. Uklesh, Khalum, and
+  L49/L50 hit values. Workman Striker now binds all `22` active PF127 sources
+  and all `31` source-local atomic generations to the exact captured
+  level/weapon-family packet archetype while its existing generation selector
+  owns QL and the item/combat owners retain damage, range, and cadence. Active
+  PF127/PF1931 certification is now `245` ready and `244` quarantined, up from
+  `223` / `266`. Exact generated selection also fails closed before source
+  selection when the stable weapon tuple differs. Uklesh, Khalum, and
   Aztur use captured parallel
   attack streams, exact mutable `SpecialAttackWeapon` state, exact atomic loot,
   and captured `0.6822027` / `0.211` second successor delays. No independent

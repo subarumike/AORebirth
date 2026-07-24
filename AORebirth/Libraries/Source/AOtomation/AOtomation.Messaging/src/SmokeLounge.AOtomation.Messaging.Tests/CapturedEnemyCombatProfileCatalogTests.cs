@@ -1103,6 +1103,206 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void WorkmanStrikerUsesTheSelectedProductionQlWithoutNearestLevelSubstitution()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x79545000);
+            const string capturedArchetypeProfileId =
+                "5db002948ad46e4a-0278a5de1cc46a00";
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Workman Striker"
+                         && value.MonsterData == 203854);
+            OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            OrdinaryEnemySpawnVariant runtimeVariant =
+                runtimeSpawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 14
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 122905
+                             && value.WeaponLoadout.HighId == 122906
+                             && value.WeaponLoadout.Quality == 11);
+            CapturedEnemyCombatContract runtimeContract =
+                runtimeProfile.Combat.ResolveContract(runtimeSourceIdentity, runtimeVariant);
+            Assert.IsTrue(runtimeContract.UsesProductionWeaponQuality);
+
+            CapturedEnemyCombatProfileDefinition capturedArchetype =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == capturedArchetypeProfileId);
+            Assert.AreEqual(14, capturedArchetype.Level);
+            Assert.AreEqual(15, capturedArchetype.WeaponDefinition.Quality);
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    runtimeVariant.Level,
+                    runtimeSourceIdentity,
+                    runtimeContract,
+                    out resolved,
+                    out failure),
+                failure);
+
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+            Assert.AreEqual(capturedArchetype.Evidence, resolved.Evidence);
+            Assert.AreEqual(122905, resolved.WeaponLowId);
+            Assert.AreEqual(122906, resolved.WeaponHighId);
+            Assert.AreEqual(11, resolved.WeaponQuality);
+            Assert.AreEqual(11, resolved.WeaponDefinition.Quality);
+            Assert.IsTrue(resolved.UsesEquippedWeaponDamage);
+            Assert.IsTrue(resolved.UsesEquippedWeaponTiming);
+            Assert.AreEqual(0, resolved.MinDamage);
+            Assert.AreEqual(0, resolved.MaxDamage);
+            Assert.AreEqual(77, resolved.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(77, resolved.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(77, resolved.SpecialAttackWeaponUnknown3);
+            Assert.AreEqual(77, resolved.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(43, resolved.SpecialAttackWeaponUnknown5);
+            Assert.AreEqual(0, resolved.SpecialAttackWeaponN3Unknown);
+            Assert.AreEqual(0, resolved.AttackN3Unknown);
+            Assert.AreEqual(0, resolved.AttackAction);
+            Assert.AreEqual(-1, resolved.AttackInfoAmmoCount);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+
+            CapturedEnemyCombatContract wrongWeaponFamily =
+                CapturedEnemyCombatContract.EquippedWeapon(
+                    "different Workman Striker weapon family",
+                    122907,
+                    122908,
+                    11,
+                    6)
+                    .WithProductionWeaponQuality();
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    14,
+                    runtimeSourceIdentity,
+                    wrongWeaponFamily,
+                    out resolved,
+                    out failure));
+
+            OrdinaryEnemySpawnDefinition levelSeventeenSpawn =
+                runtimeCatalog.GetSpawns().Single(
+                    value => value.PlayfieldInstance == 127
+                             && value.SourceIdentity == unchecked((int)0x7953A84F));
+            OrdinaryEnemySpawnVariant levelSeventeenVariant =
+                levelSeventeenSpawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 17
+                             && value.WeaponLoadout != null
+                             && value.WeaponLoadout.LowId == 122905
+                             && value.WeaponLoadout.HighId == 122906
+                             && value.WeaponLoadout.Quality == 19);
+            CapturedEnemyCombatContract levelSeventeenContract =
+                runtimeProfile.Combat.ResolveContract(
+                    levelSeventeenSpawn.SourceIdentity,
+                    levelSeventeenVariant);
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    17,
+                    levelSeventeenSpawn.SourceIdentity,
+                    levelSeventeenContract,
+                    out resolved,
+                    out failure),
+                failure);
+            Assert.AreEqual(17, levelSeventeenVariant.Level);
+            Assert.AreEqual(94, resolved.SpecialAttackWeaponUnknown1);
+
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Workman Striker",
+                    203854,
+                    18,
+                    levelSeventeenSpawn.SourceIdentity,
+                    levelSeventeenContract,
+                    out resolved,
+                    out failure));
+            StringAssert.Contains(
+                failure,
+                "no canonical raw combat profile");
+        }
+
+        [TestMethod]
+        public void WorkmanStrikerEveryActiveAtomicGenerationResolvesItsCapturedWeaponArchetype()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Workman Striker"
+                         && value.MonsterData == 203854);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(22, activeSpawns.Length);
+
+            int resolvedVariants = 0;
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                OrdinaryEnemySpawnVariant[] variants =
+                    activeSpawn.LevelDefinition.GetExplicitVariants();
+                Assert.IsTrue(variants.Length > 0);
+                foreach (OrdinaryEnemySpawnVariant variant in variants)
+                {
+                    CapturedEnemyCombatContract baseline =
+                        runtimeProfile.Combat.ResolveContract(
+                            activeSpawn.SourceIdentity,
+                            variant);
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    Assert.IsTrue(
+                        CapturedEnemyCombatProfileCatalog.TryResolve(
+                            127,
+                            runtimeProfile.DisplayName,
+                            runtimeProfile.MonsterData,
+                            variant.Level,
+                            activeSpawn.SourceIdentity,
+                            baseline,
+                            out resolved,
+                            out failure),
+                        string.Format(
+                            "source=0x{0:X8} level={1} weapon={2}/{3} QL={4}: {5}",
+                            activeSpawn.SourceIdentity,
+                            variant.Level,
+                            variant.WeaponLoadout == null
+                                ? 0
+                                : variant.WeaponLoadout.LowId,
+                            variant.WeaponLoadout == null
+                                ? 0
+                                : variant.WeaponLoadout.HighId,
+                            variant.WeaponLoadout == null
+                                ? 0
+                                : variant.WeaponLoadout.Quality,
+                            failure));
+                    Assert.IsTrue(resolved.IsCombatReady);
+                    Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                    Assert.AreEqual(variant.WeaponLoadout.LowId, resolved.WeaponLowId);
+                    Assert.AreEqual(variant.WeaponLoadout.HighId, resolved.WeaponHighId);
+                    Assert.AreEqual(variant.WeaponLoadout.Quality, resolved.WeaponQuality);
+                    resolvedVariants++;
+                }
+            }
+
+            Assert.AreEqual(31, resolvedVariants);
+        }
+
+        [TestMethod]
         public void LooterResolvesTheExactCapturedStableWeaponProfile()
         {
             const int runtimeSourceIdentity = unchecked((int)0x7954501B);
@@ -1475,6 +1675,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     out resolved,
                     out failure));
             StringAssert.Contains(failure, "no canonical raw combat profile");
+
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Redundant Scan",
+                    204178,
+                    20,
+                    unchecked((int)0x7953AF85),
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "Redundant Scan exact weapon-family guard",
+                        122027,
+                        122027,
+                        20,
+                        6),
+                    out resolved,
+                    out failure));
+            StringAssert.Contains(failure, "no exact stable weapon profile");
         }
 
         [TestMethod]
