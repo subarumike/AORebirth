@@ -4,6 +4,8 @@ namespace ZoneEngine.Core.Missions
 
     using System.Collections.Generic;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     #endregion
 
     /// <summary>
@@ -12,10 +14,8 @@ namespace ZoneEngine.Core.Missions
     /// matching key. Kept in memory only: a mission key is short lived and only meaningful for the session
     /// that granted it.
     ///
-    /// Limitation: the accepted-mission window currently replays a single fixed captured QuestId, so all
-    /// accepts share one mission identity. We therefore track keys as a per-character stack and remove the
-    /// most recently granted key on delete. This is sufficient for the current single-mission testing flow;
-    /// a full implementation should key by the real (unique) accepted mission identity.
+    /// Keys are stored by accepted mission identity when available; TryTakeLatest remains as a fallback for
+    /// older accepts that only recorded a per-character stack.
     /// </summary>
     internal static class MissionKeyStore
     {
@@ -23,11 +23,33 @@ namespace ZoneEngine.Core.Missions
 
         private static readonly Dictionary<int, List<int>> KeysByCharacter = new Dictionary<int, List<int>>();
 
+        private static readonly Dictionary<long, int> KeyByMission = new Dictionary<long, int>();
+
+        private static readonly Dictionary<long, int> KitByMission = new Dictionary<long, int>();
+
+        private static long MissionKey(int characterInstance, Identity mission)
+        {
+            return ((long)characterInstance << 32) ^ (((long)(int)mission.Type << 32) | (uint)mission.Instance);
+        }
+
         /// <summary>
-        /// Records a mission-key item instance just granted to a character.
+        /// Records a mission-key item instance just granted to a character (stack fallback).
         /// </summary>
         public static void Register(int characterInstance, int keyInstance)
         {
+            Register(characterInstance, Identity.None, keyInstance);
+        }
+
+        /// <summary>
+        /// Records a mission-key item for a specific accepted mission identity.
+        /// </summary>
+        public static void Register(int characterInstance, Identity mission, int keyInstance)
+        {
+            if (keyInstance == 0)
+            {
+                return;
+            }
+
             lock (Sync)
             {
                 List<int> keys;
@@ -38,7 +60,79 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 keys.Add(keyInstance);
+
+                if (mission != null && (int)mission.Type != 0 && mission.Instance != 0)
+                {
+                    KeyByMission[MissionKey(characterInstance, mission)] = keyInstance;
+                }
             }
+        }
+
+        /// <summary>
+        /// Records the Terminal repair-kit instance granted with a RepairMachine accept.
+        /// </summary>
+        public static void RegisterRepairKit(int characterInstance, Identity mission, int kitInstance)
+        {
+            if (kitInstance == 0 || mission == null || (int)mission.Type == 0 || mission.Instance == 0)
+            {
+                return;
+            }
+
+            lock (Sync)
+            {
+                KitByMission[MissionKey(characterInstance, mission)] = kitInstance;
+            }
+        }
+
+        /// <summary>
+        /// Removes and returns the repair-kit instance for a deleted mission, if recorded.
+        /// </summary>
+        public static bool TryTakeRepairKit(int characterInstance, Identity mission, out int kitInstance)
+        {
+            kitInstance = 0;
+            if (mission == null || (int)mission.Type == 0 || mission.Instance == 0)
+            {
+                return false;
+            }
+
+            lock (Sync)
+            {
+                long mk = MissionKey(characterInstance, mission);
+                int mapped;
+                if (!KitByMission.TryGetValue(mk, out mapped) || mapped == 0)
+                {
+                    return false;
+                }
+
+                KitByMission.Remove(mk);
+                kitInstance = mapped;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Removes the key for a specific mission identity when known; otherwise pops the latest key.
+        /// </summary>
+        public static bool TryTake(int characterInstance, Identity mission, out int keyInstance)
+        {
+            keyInstance = 0;
+            lock (Sync)
+            {
+                if (mission != null && (int)mission.Type != 0 && mission.Instance != 0)
+                {
+                    long mk = MissionKey(characterInstance, mission);
+                    int mapped;
+                    if (KeyByMission.TryGetValue(mk, out mapped) && mapped != 0)
+                    {
+                        KeyByMission.Remove(mk);
+                        keyInstance = mapped;
+                        RemoveFromStack_NoLock(characterInstance, mapped);
+                        return true;
+                    }
+                }
+            }
+
+            return TryTakeLatest(characterInstance, out keyInstance);
         }
 
         /// <summary>
@@ -60,6 +154,24 @@ namespace ZoneEngine.Core.Missions
                 keyInstance = keys[lastIndex];
                 keys.RemoveAt(lastIndex);
                 return true;
+            }
+        }
+
+        private static void RemoveFromStack_NoLock(int characterInstance, int keyInstance)
+        {
+            List<int> keys;
+            if (!KeysByCharacter.TryGetValue(characterInstance, out keys) || keys == null)
+            {
+                return;
+            }
+
+            for (int i = keys.Count - 1; i >= 0; i--)
+            {
+                if (keys[i] == keyInstance)
+                {
+                    keys.RemoveAt(i);
+                    return;
+                }
             }
         }
     }

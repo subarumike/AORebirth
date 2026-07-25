@@ -140,6 +140,11 @@ namespace ZoneEngine.Core.MessageHandlers
                     {
                         // Is it a Character object? (player and npcs)
                         CharacterInfoPacketMessageHandler.Default.Send(client.Controller.Character, tChar);
+
+                        // Capture 20260724-mission-find-person: InfoRequest on Find Person target completes.
+                        ZoneEngine.Core.Missions.MissionFindPersonService.TryHandleInfoRequest(
+                            client,
+                            message.Target);
                     }
                     else
                     {

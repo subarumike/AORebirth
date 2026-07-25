@@ -1771,6 +1771,8 @@ namespace AORebirth.Core.Playfields
                              "no canonical raw combat profile for ",
                              StringComparison.Ordinal))
                 {
+                    // Keep a complete source-local CapturedFixedPacketSequence (e.g. Nascence
+                    // Barking Chimera from 20260723-225021) when the Subway corpus has no match.
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="
                         + (string.IsNullOrWhiteSpace(resolutionFailure)

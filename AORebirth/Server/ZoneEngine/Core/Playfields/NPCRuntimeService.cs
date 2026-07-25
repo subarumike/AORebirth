@@ -166,6 +166,7 @@ namespace AORebirth.Core.Playfields
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             LoreleiOasisMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            NascenceLifeSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteFinishCaptureMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             SurveillanceDroidRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AreteLandingPopulationEnsure.ClearPlayfield(this.playfield.Identity.Instance);
@@ -360,6 +361,10 @@ namespace AORebirth.Core.Playfields
             this.worldPopulation.ProcessDue(utcNow);
             this.capturedSubwayEncounters.ProcessDue(utcNow, this.AcquireAggro);
             this.nascenceCoreHecklers.ProcessDue(utcNow);
+            NascenceLifeSpawn.TickBarkingChimeraRespawn(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc);
             AndromedaIccHqIdleGestureRuntime.ProcessDue(utcNow);
             this.capturedTempleEncounters.ProcessDue(utcNow, this.AcquireAggro);
         }

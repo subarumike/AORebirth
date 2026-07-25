@@ -34,6 +34,13 @@ namespace AORebirth.Core.Playfields
             "AOSharpLiveCapture 20260722-cap-mob-drop-cred corpse-loot-observations; Docker credits=4; Waste credits=11; Flea credits=5|11; Cleaning Robot credits=5";
         private const string CleaningRobotLootEvidence =
             "AOSharpLiveCapture 20260722-cap-mob-drop-cred; Cleaning Robot credits=5; Robot Junk 42620 / empty / misc";
+        // Capture 20260723-221330 Nascence Life corpses.
+        private const string NascenceChimeraProfileKey = "captured.nascence.barking-chimera";
+        private const string NascenceYuttosProfileKey = "captured.nascence.yuttos";
+        private const string NascenceDreamingSilvertailProfileKey = "captured.nascence.dreaming-silvertail";
+        private const string NascenceSwiftProfileKey = "captured.nascence.swift-silvertail";
+        private const string NascenceLifeLootEvidence =
+            "AOSharpLiveCapture 20260723-225021 Barking Chimera 15 corpses credits=0 (8 empty + 7 with items); 20260723-221330 Swift Silvertail 798C1F89 items 232839:232840 ql6 + 42640:42641 ql7; Dreaming/Yuttos empty openable corpse";
         private const int CapturedAbmouthCredits = 587;
         private const int CapturedInfectorCredits = 150;
         private const int CapturedEumenidesCredits = 186;
@@ -228,6 +235,42 @@ namespace AORebirth.Core.Playfields
                 {
                     this.EnsureCleaningRobot();
                     context.EnemyProfileKey = CleaningRobotProfileKey;
+                    return;
+                }
+
+                if (string.Equals(target.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureNascenceBarkingChimera();
+                    context.EnemyProfileKey = NascenceChimeraProfileKey;
+                    return;
+                }
+
+                if (string.Equals(target.Name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureNascenceEmptyAnimalLoot(
+                        "captured.nascence.yuttos",
+                        NascenceYuttosProfileKey,
+                        "Yuttos captured empty corpse",
+                        "capture.20260723-221330.yuttos.empty");
+                    context.EnemyProfileKey = NascenceYuttosProfileKey;
+                    return;
+                }
+
+                if (string.Equals(target.Name, "Dreaming Silvertail", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureNascenceEmptyAnimalLoot(
+                        "captured.nascence.dreaming-silvertail",
+                        NascenceDreamingSilvertailProfileKey,
+                        "Dreaming Silvertail captured empty corpse",
+                        "capture.20260723-221330.dreaming.empty");
+                    context.EnemyProfileKey = NascenceDreamingSilvertailProfileKey;
+                    return;
+                }
+
+                if (string.Equals(target.Name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureNascenceSwiftSilvertail();
+                    context.EnemyProfileKey = NascenceSwiftProfileKey;
                     return;
                 }
 
@@ -746,6 +789,221 @@ namespace AORebirth.Core.Playfields
                     Confidence = LootEvidenceConfidence.ProvenCapture,
                     Enabled = true,
                     Conditions = new string[0]
+                });
+        }
+
+        private void EnsureNascenceBarkingChimera()
+        {
+            const string tableKey = "captured.nascence.barking-chimera";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            // Capture 20260723-225021: 15 Barking Chimera corpse opens, credits=0.
+            // 8 empty; 7 with items (214789 x4, 259951 x2, 225975:225976 ql9, 232726:232727 ql6,
+            // 232834:232835 ql6, 214788). Snapshot roulette matches observed opens.
+            const string e = NascenceLifeLootEvidence;
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798C1F4F",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798C1F4F", 225975, 225976, 9, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798C1F96",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798C1F96", 214789, 214789, 1, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798E0A0A.empty", 0),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798E0A09.empty", 0),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798C1F94.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798E0A06",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E0A06", 214789, 214789, 1, 1)),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798E09BD",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E09BD", 232726, 232727, 6, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E09BD", 232834, 232835, 6, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E09BD", 214789, 214789, 1, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798E09BE.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798E09BF",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E09BF", 259951, 259951, 1, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798C1F93.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798E0A33",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E0A33", 259951, 259951, 1, 1),
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E0A33", 214789, 214789, 1, 1)),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798E0A32.empty", 0),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798E0A31.empty", 0),
+                    ObservedCorpseSnapshot(e, "capture.20260723-225021.chimera.798E0A36.empty", 0),
+                    ObservedCorpseSnapshot(
+                        e,
+                        "capture.20260723-225021.chimera.798E0A08",
+                        0,
+                        ObservedCorpseSnapshotEntry(e, "capture.20260723-225021.chimera.798E0A08", 214788, 214788, 1, 1)),
+                };
+
+            // ObservedCorpseSnapshots require ItemPoolUnresolved + Unresolved credits policy
+            // (same contract as Alex-pad / Vergil tables); Fixed ProvenCapture credits rejects registration.
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = "Barking Chimera captured corpse",
+                    TableType = LootTableType.EnemyType,
+                    RollGroups = new LootGroupDefinition[0],
+                    ObservedCorpseSnapshots = snapshots,
+                    CreditsPolicy = new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.Unresolved
+                    },
+                    QualityPolicy = "captured-observed-corpse-snapshots",
+                    Evidence = NascenceLifeLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    ItemPoolUnresolved = true,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = NascenceChimeraProfileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Conditions = new string[0],
+                    Evidence = NascenceLifeLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true
+                });
+        }
+
+        private void EnsureNascenceEmptyAnimalLoot(
+            string tableKey,
+            string profileKey,
+            string displayName,
+            string snapshotKey)
+        {
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            // Capture 20260723-221330: openable empty corpse (credits=0) for Nascence animals without observed loot.
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = displayName,
+                    TableType = LootTableType.EnemyType,
+                    RollGroups = new LootGroupDefinition[0],
+                    ObservedCorpseSnapshots =
+                        new[]
+                        {
+                            ObservedCorpseSnapshot(
+                                NascenceLifeLootEvidence,
+                                snapshotKey,
+                                0)
+                        },
+                    CreditsPolicy = new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.Unresolved
+                    },
+                    QualityPolicy = "captured-observed-corpse-snapshots",
+                    Evidence = NascenceLifeLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    ItemPoolUnresolved = true,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = profileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Conditions = new string[0],
+                    Evidence = NascenceLifeLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true
+                });
+        }
+
+        private void EnsureNascenceSwiftSilvertail()
+        {
+            const string tableKey = "captured.nascence.swift-silvertail";
+            if (this.registry.ContainsTable(tableKey))
+            {
+                return;
+            }
+
+            // Capture 20260723-221330: Swift Silvertail corpse items 232839:232840 ql6 + 42640:42641 ql7, credits=0.
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = "Swift Silvertail captured corpse",
+                    TableType = LootTableType.EnemyType,
+                    RollGroups = new LootGroupDefinition[0],
+                    ObservedCorpseSnapshots =
+                        new[]
+                        {
+                            ObservedCorpseSnapshot(
+                                NascenceLifeLootEvidence,
+                                "capture.20260723-221330.swift.798C1F89",
+                                0,
+                                ObservedCorpseSnapshotEntry(
+                                    NascenceLifeLootEvidence,
+                                    "capture.20260723-221330.swift.798C1F89",
+                                    232839,
+                                    232840,
+                                    6,
+                                    1),
+                                ObservedCorpseSnapshotEntry(
+                                    NascenceLifeLootEvidence,
+                                    "capture.20260723-221330.swift.798C1F89",
+                                    42640,
+                                    42641,
+                                    7,
+                                    1))
+                        },
+                    CreditsPolicy = new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.Unresolved
+                    },
+                    QualityPolicy = "captured-observed-corpse-snapshots",
+                    Evidence = NascenceLifeLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    ItemPoolUnresolved = true,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = NascenceSwiftProfileKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Conditions = new string[0],
+                    Evidence = NascenceLifeLootEvidence,
+                    Confidence = LootEvidenceConfidence.ProvenCapture,
+                    Enabled = true
                 });
         }
 

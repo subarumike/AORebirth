@@ -34,6 +34,18 @@ namespace ZoneEngine.Core.Missions
 
             public string ShortInfo;
 
+            /// <summary>Kill/Find person name shown in journal and used for interior spawn.</summary>
+            public string TargetName;
+
+            /// <summary>Map-dot side for the objective person (Clan/Omni/Neutral/Monster).</summary>
+            public int TargetSide;
+
+            /// <summary>Cash from mission description (money/XP slider) — paid on finish.</summary>
+            public int CashReward;
+
+            /// <summary>XP from mission description — paid on finish (may be 0 when slider is cash-heavy).</summary>
+            public int ExperienceReward;
+
             public DateTime ExpiryUtc;
 
             public QuestInfo Offer;
@@ -55,7 +67,12 @@ namespace ZoneEngine.Core.Missions
         /// <summary>
         /// Adds or replaces one accepted mission (matched by quest identity). Does not wipe other missions.
         /// </summary>
-        public static void Register(int characterInstance, QuestInfo offer, DateTime expiryUtc)
+        public static void Register(
+            int characterInstance,
+            QuestInfo offer,
+            DateTime expiryUtc,
+            string targetName = null,
+            int targetSide = 0)
         {
             if (characterInstance == 0 || offer == null)
             {
@@ -87,6 +104,10 @@ namespace ZoneEngine.Core.Missions
                                                 : MissionTypeCatalog.KillPersonIcon,
                             Quality = offer.Quality,
                             ShortInfo = offer.ShortInfo ?? string.Empty,
+                            TargetName = targetName ?? string.Empty,
+                            TargetSide = targetSide,
+                            CashReward = offer.CashReward,
+                            ExperienceReward = offer.ExperienceReward,
                             ExpiryUtc = expiryUtc,
                             Offer = offer,
                             MarkerPlayfield = markerPf,
@@ -163,6 +184,28 @@ namespace ZoneEngine.Core.Missions
         }
 
         /// <summary>
+        /// Resolves the stored mission for a journal Delete (exact type+instance, else instance-only).
+        /// </summary>
+        public static bool TryResolve(int characterInstance, Identity questIdentity, out AcceptedMission entry)
+        {
+            entry = null;
+            if (questIdentity == null || questIdentity.Instance == 0)
+            {
+                return false;
+            }
+
+            List<AcceptedMission> all = GetAll(characterInstance);
+            int index = FindIndex_NoLock(all, questIdentity);
+            if (index < 0 || index >= all.Count)
+            {
+                return false;
+            }
+
+            entry = all[index];
+            return entry != null;
+        }
+
+        /// <summary>
         /// Removes one mission by quest identity (journal delete). Returns true if something was removed.
         /// </summary>
         public static bool Remove(int characterInstance, Identity questIdentity)
@@ -236,10 +279,32 @@ namespace ZoneEngine.Core.Missions
 
         private static int FindIndex_NoLock(List<AcceptedMission> list, Identity questIdentity)
         {
+            if (list == null || questIdentity == null || questIdentity.Instance == 0)
+            {
+                return -1;
+            }
+
             for (int i = 0; i < list.Count; i++)
             {
                 AcceptedMission m = list[i];
-                if (m != null && m.QuestIdentity.Type == questIdentity.Type
+                if (m == null || m.QuestIdentity == null)
+                {
+                    continue;
+                }
+
+                if (m.QuestIdentity.Type == questIdentity.Type
+                    && m.QuestIdentity.Instance == questIdentity.Instance)
+                {
+                    return i;
+                }
+            }
+
+            // Client journal Delete sometimes sends Mission.Type=0 (or a mismatched type) with the
+            // same instance — still remove so LOGIN-RESYNC cannot resurrect the mission.
+            for (int i = 0; i < list.Count; i++)
+            {
+                AcceptedMission m = list[i];
+                if (m != null && m.QuestIdentity != null
                     && m.QuestIdentity.Instance == questIdentity.Instance)
                 {
                     return i;
@@ -277,7 +342,7 @@ namespace ZoneEngine.Core.Missions
 
                     sb.AppendFormat(
                         CultureInfo.InvariantCulture,
-                        "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}",
+                        "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|{13}|{14}|{15}|{16}",
                         characterInstance,
                         (int)entry.QuestIdentity.Type,
                         entry.QuestIdentity.Instance,
@@ -290,7 +355,11 @@ namespace ZoneEngine.Core.Missions
                         entry.MarkerX,
                         entry.MarkerY,
                         entry.MarkerZ,
-                        (entry.ShortInfo ?? string.Empty).Replace('|', '/').Replace('\r', ' ').Replace('\n', ' '));
+                        (entry.ShortInfo ?? string.Empty).Replace('|', '/').Replace('\r', ' ').Replace('\n', ' '),
+                        (entry.TargetName ?? string.Empty).Replace('|', '/').Replace('\r', ' ').Replace('\n', ' '),
+                        entry.TargetSide,
+                        entry.CashReward,
+                        entry.ExperienceReward);
                     sb.AppendLine();
                 }
 
@@ -355,6 +424,10 @@ namespace ZoneEngine.Core.Missions
                     float my = 0;
                     float mz = 0;
                     string shortInfo;
+                    string targetName = string.Empty;
+                    int targetSide = 0;
+                    int cashReward = 0;
+                    int experienceReward = 0;
                     if (parts.Length >= 13)
                     {
                         int.TryParse(parts[6], NumberStyles.Integer, CultureInfo.InvariantCulture, out markerPf);
@@ -364,6 +437,17 @@ namespace ZoneEngine.Core.Missions
                         float.TryParse(parts[10], NumberStyles.Float, CultureInfo.InvariantCulture, out my);
                         float.TryParse(parts[11], NumberStyles.Float, CultureInfo.InvariantCulture, out mz);
                         shortInfo = parts[12];
+                        if (parts.Length >= 15)
+                        {
+                            targetName = parts[13] ?? string.Empty;
+                            int.TryParse(parts[14], NumberStyles.Integer, CultureInfo.InvariantCulture, out targetSide);
+                        }
+
+                        if (parts.Length >= 17)
+                        {
+                            int.TryParse(parts[15], NumberStyles.Integer, CultureInfo.InvariantCulture, out cashReward);
+                            int.TryParse(parts[16], NumberStyles.Integer, CultureInfo.InvariantCulture, out experienceReward);
+                        }
                     }
                     else
                     {
@@ -379,6 +463,10 @@ namespace ZoneEngine.Core.Missions
                             Quality = quality,
                             ExpiryUtc = expiry,
                             ShortInfo = shortInfo,
+                            TargetName = targetName,
+                            TargetSide = targetSide,
+                            CashReward = cashReward,
+                            ExperienceReward = experienceReward,
                             Offer = null,
                             MarkerPlayfield = markerPf,
                             EntranceLow = entranceLow,

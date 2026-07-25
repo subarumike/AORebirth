@@ -10,7 +10,8 @@ namespace ZoneEngine.Core.Playfields.Content
 
     /// <summary>
     /// Nascence Life — outdoor Shadowlands starter zones (capture-backed mob/NPC population).
-    /// Playfields: 4310 Frontier, 4311 Wilds, 4312 Core/Swamp, 4313.
+    /// Playfields: 4310 Frontier, 4311 Wilds, 4312 Core/Swamp, 4313,
+    /// 4001 Jobe Research (Drake), 4531 Goldman/Arete Harbor.
     /// Heckler population on 4312 remains in NascenceCoreHecklerSpawnOrchestrator.
     /// </summary>
     public sealed class NascenceLifeContentModule : IPlayfieldContentModule
@@ -23,13 +24,21 @@ namespace ZoneEngine.Core.Playfields.Content
 
         internal const int Nascence4313PlayfieldId = 4313;
 
+        // Capture 20260723-221330 SCFU Scientist Drake Rodriguez on PF 4001 (Jobe Research).
+        internal const int JobeResearchPlayfieldId = 4001;
+
+        // Capture 20260723-221330 Goldman Harbor / Arete (capturePlayfieldObjectId 11B3).
+        internal const int GoldmanAretePlayfieldId = 4531;
+
         public bool Supports(Identity playfieldIdentity)
         {
             int pf = playfieldIdentity.Instance;
             return pf == FrontierPlayfieldId
                    || pf == WildsPlayfieldId
                    || pf == CorePlayfieldId
-                   || pf == Nascence4313PlayfieldId;
+                   || pf == Nascence4313PlayfieldId
+                   || pf == JobeResearchPlayfieldId
+                   || pf == GoldmanAretePlayfieldId;
         }
 
         public void Register(PlayfieldContentRegistration registration)

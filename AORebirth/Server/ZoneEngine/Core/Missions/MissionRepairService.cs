@@ -8,7 +8,10 @@ namespace ZoneEngine.Core.Missions
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Playfields;
     using AORebirth.ObjectManager;
+
+    using ZoneEngine.Core.Playfields;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -147,6 +150,12 @@ namespace ZoneEngine.Core.Missions
 
             MissionKeyGrantService.TryConsumeRepairTool(client, character, repairItem);
             MissionMachineTracker.Unregister(machineIdentity);
+
+            Playfield playfield = character.Playfield as Playfield;
+            if (playfield != null)
+            {
+                playfield.Despawn(machineIdentity);
+            }
 
             bool completed = MissionCompleteService.TryComplete(client, character, entry, reason);
             MissionDiagnostics.Log(

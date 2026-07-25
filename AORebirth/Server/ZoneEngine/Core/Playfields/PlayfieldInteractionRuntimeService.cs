@@ -25,6 +25,23 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            // FindPerson: Use/tag the fictional contact inside the instance.
+            if (MissionFindPersonService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (MissionLootPropService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            // FindItem / FindItemReturn: Use Mission Cube → real item.
+            if (MissionFindItemService.TryHandleCubeUse(client, message, target))
+            {
+                return true;
+            }
+
             // Capture 20260721-finish: Use Exit Arete Landing Terminal:574187C3 → ICC HQ PF 655.
             // Must run before Insurance — template 297303 must not be stolen as SaveChar.
             if (VaughnHammondQuestRuntime.TryHandleExitAreteLandingUse(client, message, target))

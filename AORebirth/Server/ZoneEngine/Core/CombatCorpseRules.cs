@@ -490,7 +490,26 @@ namespace ZoneEngine.Core
                 // Capture 20260722-cap-mob-drop-cred: Garbage Flea corpse CATMesh.
                 { 17657, 15231 },
                 { 30379, 26978 },
-                { 203748, 5921 }
+                { 203748, 5921 },
+                // Capture 20260723-221330: Barking Chimera / Yuttos corpse CATMesh.
+                { 209173, 208966 },
+                // Capture 20260723-221330: Swift/Dreaming Silvertail corpse CATMesh.
+                { 208922, 208937 },
+                // L7 gold 20260725-002423 / Find Person 20260725-185432 mission trash corpses.
+                { 26159, 17909 },
+                { 26139, 5914 },
+                { 26155, 23370 },
+                { 26137, 5934 },
+                { 26076, 17530 },
+                { 26101, 23366 },
+                { 26088, 17534 },
+                { 26103, 23366 },
+                { 26135, 5934 },
+                { 26074, 23366 },
+                { 26090, 5934 },
+                { 26092, 17530 },
+                { 26097, 23366 },
+                { 26123, 17530 }
             };
 
             foreach (KeyValuePair<int, int> mapping in CombatTestMobArchetype.CorpseVisualMappings())

@@ -587,6 +587,11 @@ namespace ZoneEngine.Core.Packets
                         scfu.Unknown1 = oasisUnknown1;
                     }
                 }
+                else if (NascenceLifeSpawn.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
+                {
+                    // Capture 20260723-221330 Barking Chimera / Yuttos Nascence Geosurvey Dog ExtTex.
+                    scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                }
                 else if (petMasterInstance != 0
                     && ZoneEngine.Core.PetBureaucratGuardianAppearance.IsGuardianPet(character))
                 {

@@ -18,6 +18,8 @@ namespace ZoneEngine.Core.Missions
 
     using Utility;
 
+    using ZoneEngine.Core.MessageHandlers;
+
     #endregion
 
     /// <summary>
@@ -31,6 +33,10 @@ namespace ZoneEngine.Core.Missions
         // Item identity type observed for mission keys on the wire (capture 20260717-pull-mish-doit).
         private const int MissionKeyIdentityType = 0x0000C76D;
 
+        // Repair kit identity type from capture 20260724-repaair-machine-mish (SimpleItemFullUpdate /
+        // FullCharacter inventory row): IdentityType.Terminal = 0xC73D, NOT MissionKey.
+        private const int RepairKitIdentityType = 0x0000C73D;
+
         // Mission-key item template (ACGItemTemplateID / StaticInstance) from the same capture.
         private const int MissionKeyTemplateId = 28577;
 
@@ -41,13 +47,17 @@ namespace ZoneEngine.Core.Missions
 
         private const byte MissionKeyOverflowSlot = 0x6F;
 
-        // Accept-grant repair kit for RepairMachine missions. Capture 20260717-211849 finishes with
-        // UseItemOnItem on Terminal:57958339, but the accept-granted template id was not on the wire
-        // (container loot 101277/101581 were implants/clusters, not the tool). Use a real items.dat
-        // tool template and label it on the wire as the mission repair kit.
-        private const int RepairItemLowId = 87810; // Hacker Tool (ItemDb_Rest)
+        // Accept-grant repair kits (capture 20260724-134055): StaticInstance varies per accept among
+        // 100292 / 100299 / 100344 / 100349 / 100361, ACGItemLevel=1, Flags=0x80000003.
+        // Fall back to Hacker Tool / Bomb tools when none of those templates exist in items.dat.
+        private static readonly int[] RepairItemCaptureIds =
+            {
+                100292, 100299, 100344, 100349, 100361
+            };
 
-        private const int RepairItemHighId = 87810;
+        private const int RepairItemHackerLowId = 87810;
+
+        private const int RepairItemHackerHighId = 87814;
 
         private const int RepairItemFallbackLowId = 95576; // Bomb Disarmament Tools
 
@@ -55,18 +65,25 @@ namespace ZoneEngine.Core.Missions
 
         private const int RepairItemQuality = 1;
 
-        private const byte RepairItemOverflowSlot = 0x70;
-
         private const string RepairItemDisplayName = "Mission Repair Kit";
 
         private const uint MissionKeyFlags = 0x80000205;
 
-        // CharacterAction the official server sends to drop a mission key on delete (capture 20260717-185345,
-        // printed as decimal Action=47). Not a named CharacterActionType, so it is applied by raw value.
+        // Capture Flags for the accept-granted repair kit (signed -2147483645 on the wire).
+        private const uint RepairItemFlags = 0x80000003;
+
+        // Finish capture 20260725-185432: Action=47 (0x2F), Parameter1=1, Despawn Unknown=0.
+        // (Older journal-delete capture used Parameter1=0x71; finish is authoritative for mish complete.)
         private const int MissionKeyDeleteAction = 0x2F;
+
+        private const int MissionKeyDeleteParameter1 = 1;
 
         private static int missionKeyInstanceSeed =
             Math.Max(0x00F6706A, unchecked((int)(DateTime.UtcNow.Ticks & 0x3fffffff)));
+
+        private static readonly object RepairPickSync = new object();
+
+        private static readonly Random RepairPickRng = new Random();
 
         /// <summary>
         /// Creates the mission key, adds it to the standard inventory page, persists, and notifies the client.
@@ -88,12 +105,18 @@ namespace ZoneEngine.Core.Missions
                 1,
                 keyName,
                 MissionKeyOverflowSlot,
+                MissionKeyFlags,
+                MissionKeyIdentityType,
+                false,
                 out keyInstance,
                 out inventoryError);
         }
 
         /// <summary>
         /// Grants the repair kit alongside the mission key for RepairMachine accepts.
+        /// Always QL 1 (capture); mission QL must not be applied to the kit template.
+        /// Wire matches capture 20260724-134055: Terminal identity, Unknown2/3=0x71/0x6F,
+        /// ContainerAdd Overflow→Overflow Slot=111 — same path as the mission key (kit first).
         /// </summary>
         public static bool TryGrantRepairItem(
             IZoneClient client,
@@ -102,7 +125,6 @@ namespace ZoneEngine.Core.Missions
             out int itemInstance,
             out InventoryError inventoryError)
         {
-            int resolvedQuality = quality > 0 ? quality : RepairItemQuality;
             int lowId;
             int highId;
             if (!TryResolveRepairTemplateIds(out lowId, out highId))
@@ -115,14 +137,48 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            // Capture kit is always QL 1; ignore mission QL so high-QL accepts do not reject the template.
             return TryGrantItem(
                 client,
                 character,
                 lowId,
                 highId,
-                resolvedQuality,
+                RepairItemQuality,
                 RepairItemDisplayName,
-                RepairItemOverflowSlot,
+                MissionKeyOverflowSlot,
+                RepairItemFlags,
+                RepairKitIdentityType,
+                false,
+                out itemInstance,
+                out inventoryError);
+        }
+
+        /// <summary>
+        /// Grants an arbitrary named item (FindItem cube pickup / finish reward) into inventory.
+        /// Finish reward uses gold 20260725-185432 wire: TemplateAction → ContainerAddItem,
+        /// TargetPlacement=0x6F — CreateItem + second TemplateAction defer bag UI until zone.
+        /// </summary>
+        public static bool TryGrantNamedItem(
+            IZoneClient client,
+            ICharacter character,
+            int lowId,
+            int highId,
+            int quality,
+            string itemName,
+            out int itemInstance,
+            out InventoryError inventoryError)
+        {
+            return TryGrantItem(
+                client,
+                character,
+                lowId,
+                highId,
+                quality > 0 ? quality : 1,
+                string.IsNullOrEmpty(itemName) ? "Mission Item" : itemName,
+                MissionKeyOverflowSlot,
+                MissionKeyFlags,
+                MissionKeyIdentityType,
+                true,
                 out itemInstance,
                 out inventoryError);
         }
@@ -134,8 +190,23 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            return (item.LowID == RepairItemLowId && item.HighID == RepairItemHighId)
-                   || (item.LowID == RepairItemFallbackLowId && item.HighID == RepairItemFallbackHighId);
+            for (int i = 0; i < RepairItemCaptureIds.Length; i++)
+            {
+                int captureId = RepairItemCaptureIds[i];
+                if (item.LowID == captureId && item.HighID == captureId)
+                {
+                    return true;
+                }
+            }
+
+            // Accept Hacker Tool pair / same-id endpoints (older grants).
+            if (item.LowID == RepairItemHackerLowId
+                && (item.HighID == RepairItemHackerHighId || item.HighID == RepairItemHackerLowId))
+            {
+                return true;
+            }
+
+            return item.LowID == RepairItemFallbackLowId && item.HighID == RepairItemFallbackHighId;
         }
 
         public static bool HasRepairTool(ICharacter character)
@@ -192,11 +263,42 @@ namespace ZoneEngine.Core.Missions
 
         private static bool TryResolveRepairTemplateIds(out int lowId, out int highId)
         {
-            if (ItemLoader.ItemList.ContainsKey(RepairItemLowId)
-                && ItemLoader.ItemList.ContainsKey(RepairItemHighId))
+            // Prefer a random capture kit AOID present in items.dat (official varies per accept).
+            var available = new List<int>();
+            for (int i = 0; i < RepairItemCaptureIds.Length; i++)
             {
-                lowId = RepairItemLowId;
-                highId = RepairItemHighId;
+                int captureId = RepairItemCaptureIds[i];
+                if (ItemLoader.ItemList.ContainsKey(captureId))
+                {
+                    available.Add(captureId);
+                }
+            }
+
+            if (available.Count > 0)
+            {
+                int pick;
+                lock (RepairPickSync)
+                {
+                    pick = available[RepairPickRng.Next(available.Count)];
+                }
+
+                lowId = pick;
+                highId = pick;
+                return true;
+            }
+
+            if (ItemLoader.ItemList.ContainsKey(RepairItemHackerLowId)
+                && ItemLoader.ItemList.ContainsKey(RepairItemHackerHighId))
+            {
+                lowId = RepairItemHackerLowId;
+                highId = RepairItemHackerHighId;
+                return true;
+            }
+
+            if (ItemLoader.ItemList.ContainsKey(RepairItemHackerLowId))
+            {
+                lowId = RepairItemHackerLowId;
+                highId = RepairItemHackerLowId;
                 return true;
             }
 
@@ -245,6 +347,9 @@ namespace ZoneEngine.Core.Missions
             int quality,
             string itemName,
             byte overflowSlot,
+            uint itemFlags,
+            int itemIdentityType,
+            bool finishRewardWire,
             out int itemInstance,
             out InventoryError inventoryError)
         {
@@ -285,7 +390,7 @@ namespace ZoneEngine.Core.Missions
             Item grantedItem;
             try
             {
-                grantedItem = CreateItem(lowId, highId, quality);
+                grantedItem = CreateItem(lowId, highId, quality, itemFlags, itemIdentityType);
             }
             catch (Exception ex)
             {
@@ -318,17 +423,98 @@ namespace ZoneEngine.Core.Missions
 
             itemInstance = grantedItem.Identity.Instance;
 
-            client.SendCompressed(
-                CreateItemMessage(character, grantedItem.Identity, itemName, overflowSlot, lowId, highId, quality));
+            // Capture accept (20260724-134055): CreateItem → ContainerAdd → TemplateActions.
+            // Finish gold 20260725-185432: TemplateAction → ContainerAddItem only (no CreateItem).
+            MissionDiagnostics.Log(
+                "GRANT-ITEM name={0} low={1} high={2} ql={3} idType=0x{4:X} instance={5} invSlot={6} overflow={7} finishWire={8}",
+                itemName,
+                lowId,
+                highId,
+                quality,
+                itemIdentityType,
+                itemInstance,
+                inventorySlot,
+                overflowSlot,
+                finishRewardWire);
+
+            if (!finishRewardWire)
+            {
+                client.SendCompressed(
+                    CreateItemMessage(
+                        character,
+                        grantedItem.Identity,
+                        itemName,
+                        MissionKeyUnknown2,
+                        overflowSlot,
+                        lowId,
+                        highId,
+                        quality,
+                        itemFlags));
+            }
+
+            if (finishRewardWire)
+            {
+                client.SendCompressed(
+                    new TemplateActionMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        ItemLowId = lowId,
+                        ItemHighId = highId,
+                        Quality = quality,
+                        Unknown1 = 1,
+                        Unknown2 = 87,
+                        Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
+                        Unknown3 = 0,
+                        Unknown4 = 0
+                    });
+            }
+
             client.SendCompressed(
                 new ContainerAddItemMessage
                 {
                     Identity = character.Identity,
                     Unknown = 0,
                     SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Target = new Identity { Type = IdentityType.OverflowWindow, Instance = character.Identity.Instance },
+                    Target = new Identity
+                             {
+                                 Type = IdentityType.OverflowWindow,
+                                 Instance = character.Identity.Instance
+                             },
                     TargetPlacement = overflowSlot
                 });
+
+            if (!finishRewardWire)
+            {
+                client.SendCompressed(
+                    new TemplateActionMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        ItemLowId = lowId,
+                        ItemHighId = highId,
+                        Quality = quality,
+                        Unknown1 = 1,
+                        Unknown2 = 87,
+                        Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
+                        Unknown3 = 0,
+                        Unknown4 = 0
+                    });
+                client.SendCompressed(
+                    new TemplateActionMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        ItemLowId = lowId,
+                        ItemHighId = highId,
+                        Quality = quality,
+                        Unknown1 = 1,
+                        Unknown2 = 3,
+                        Placement = new Identity { Type = IdentityType.Inventory, Instance = inventorySlot },
+                        Unknown3 = 50000,
+                        Unknown4 = character.Identity.Instance
+                    });
+            }
 
             return true;
         }
@@ -376,21 +562,42 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            var keyIdentity = new Identity { Type = (IdentityType)MissionKeyIdentityType, Instance = keyInstance };
+            Identity keyIdentity = new Identity
+                                   {
+                                       Type = (IdentityType)MissionKeyIdentityType,
+                                       Instance = keyInstance
+                                   };
 
             bool removedFromInventory = false;
+            int inventoryPageType = 0;
+            int inventorySlot = -1;
             foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
             {
                 foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List().ToList())
                 {
                     IItem item = itemEntry.Value;
+                    // Match template + instance only. After DB reload the wire IdentityType is often
+                    // not MissionKey (0xC76D), which left orphan keys in the bag on journal delete.
                     if (item == null || item.Identity == null || item.LowID != MissionKeyTemplateId
                         || item.HighID != MissionKeyTemplateId
-                        || item.Identity.Type != (IdentityType)MissionKeyIdentityType
                         || item.Identity.Instance != keyInstance)
                     {
                         continue;
                     }
+
+                    // Keep constructed MissionKey type (0xC76D). Bag IdentityType can drift
+                    // after reload and then CA 0x2F/Despawn is ignored until next zone FullCharacter.
+                    if (item.Identity.Instance != 0)
+                    {
+                        keyIdentity = new Identity
+                                      {
+                                          Type = (IdentityType)MissionKeyIdentityType,
+                                          Instance = item.Identity.Instance
+                                      };
+                    }
+
+                    inventoryPageType = pageEntry.Key;
+                    inventorySlot = itemEntry.Key;
 
                     try
                     {
@@ -411,6 +618,146 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
+            if (!removedFromInventory)
+            {
+                // Still notify client with the stored instance so a ghost icon can clear.
+                NotifyMissionItemDeleted(client, character, keyIdentity);
+                return false;
+            }
+
+            // Capture finish: CA 0x2F + Despawn. Also SendDeleteItem for the bag slot —
+            // without it the key icon stays until the next zone FullCharacter rebuild.
+            if (inventorySlot >= 0)
+            {
+                CharacterActionMessageHandler.Default.SendDeleteItem(
+                    character,
+                    inventoryPageType,
+                    inventorySlot);
+            }
+
+            MissionDiagnostics.Log(
+                "KEY-DELETE char={0} type=0x{1:X} instance={2} page={3} slot={4}",
+                character.Identity.Instance,
+                (int)keyIdentity.Type,
+                keyIdentity.Instance,
+                inventoryPageType,
+                inventorySlot);
+            NotifyMissionItemDeleted(client, character, keyIdentity);
+            return true;
+        }
+
+        /// <summary>
+        /// Removes every mission-key template found in inventory (journal delete / orphan cleanup).
+        /// </summary>
+        public static bool TryRemoveAnyMissionKey(IZoneClient client, ICharacter character)
+        {
+            if (client == null || character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            bool any = false;
+            var instances = new List<int>();
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List().ToList())
+                {
+                    IItem item = itemEntry.Value;
+                    if (item == null || item.Identity == null || item.LowID != MissionKeyTemplateId
+                        || item.HighID != MissionKeyTemplateId)
+                    {
+                        continue;
+                    }
+
+                    instances.Add(item.Identity.Instance);
+                }
+            }
+
+            for (int i = 0; i < instances.Count; i++)
+            {
+                if (TryRemoveMissionKey(client, character, instances[i]))
+                {
+                    any = true;
+                }
+            }
+
+            return any;
+        }
+
+        /// <summary>
+        /// Destroys a previously granted repair kit on journal delete (capture 20260724-134055):
+        /// CharacterAction(0x2F) targeting the Terminal kit identity with Parameter1=0x71, then Despawn.
+        /// </summary>
+        public static bool TryRemoveRepairItem(IZoneClient client, ICharacter character, int kitInstance)
+        {
+            if (client == null || character == null || character.BaseInventory == null || kitInstance == 0)
+            {
+                return false;
+            }
+
+            var kitIdentity = new Identity { Type = (IdentityType)RepairKitIdentityType, Instance = kitInstance };
+
+            bool removedFromInventory = false;
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List().ToList())
+                {
+                    IItem item = itemEntry.Value;
+                    if (item == null || item.Identity == null || !IsRepairTool(item)
+                        || item.Identity.Instance != kitInstance)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        pageEntry.Value.Remove(itemEntry.Key);
+                        character.BaseInventory.Write();
+                        removedFromInventory = true;
+                    }
+                    catch
+                    {
+                    }
+
+                    // Prefer the live identity type from the bag when present.
+                    kitIdentity = item.Identity;
+                    break;
+                }
+
+                if (removedFromInventory)
+                {
+                    break;
+                }
+            }
+
+            NotifyMissionItemDeleted(client, character, kitIdentity);
+            return removedFromInventory;
+        }
+
+        /// <summary>
+        /// Removes one repair kit from inventory when the per-mission kit instance is unknown.
+        /// </summary>
+        public static bool TryRemoveAnyRepairItem(IZoneClient client, ICharacter character)
+        {
+            IItem kit;
+            if (!TryFindRepairTool(character, out kit) || kit == null || kit.Identity == null)
+            {
+                return false;
+            }
+
+            return TryRemoveRepairItem(client, character, kit.Identity.Instance);
+        }
+
+        private static void NotifyMissionItemDeleted(
+            IZoneClient client,
+            ICharacter character,
+            Identity itemIdentity)
+        {
+            if (client == null || character == null || itemIdentity == null)
+            {
+                return;
+            }
+
             client.SendCompressed(
                 new CharacterActionMessage
                 {
@@ -418,31 +765,29 @@ namespace ZoneEngine.Core.Missions
                     Unknown = 0,
                     Action = (CharacterActionType)MissionKeyDeleteAction,
                     Unknown1 = 0,
-                    Target = keyIdentity,
-                    Parameter1 = 1,
+                    Target = itemIdentity,
+                    Parameter1 = MissionKeyDeleteParameter1,
                     Parameter2 = 0,
                     Unknown2 = 0
                 });
             client.SendCompressed(
-                new DespawnMessage { Identity = keyIdentity, Unknown = 1 });
-
-            return removedFromInventory;
+                new DespawnMessage { Identity = itemIdentity, Unknown = 0 });
         }
 
-        private static Item CreateItem(int lowId, int highId, int quality)
+        private static Item CreateItem(int lowId, int highId, int quality, uint itemFlags, int itemIdentityType)
         {
             var item = new Item(quality, lowId, highId)
                        {
                            Identity =
                                new Identity
                                {
-                                   Type = (IdentityType)MissionKeyIdentityType,
+                                   Type = (IdentityType)itemIdentityType,
                                    Instance = CreateMissionKeyInstance()
                                },
                            Flags = 1
                        };
 
-            foreach (GameTuple<CharacterStat, uint> stat in CreateItemStats(lowId, highId, quality))
+            foreach (GameTuple<CharacterStat, uint> stat in CreateItemStats(lowId, highId, quality, itemFlags))
             {
                 item.SetAttribute((int)stat.Value1, unchecked((int)stat.Value2));
             }
@@ -461,10 +806,12 @@ namespace ZoneEngine.Core.Missions
             ICharacter character,
             Identity itemIdentity,
             string itemName,
-            byte overflowSlot,
+            byte unknown2,
+            byte unknown3,
             int lowId,
             int highId,
-            int quality)
+            int quality,
+            uint itemFlags)
         {
             return new SimpleItemFullUpdateMessage
                    {
@@ -475,9 +822,9 @@ namespace ZoneEngine.Core.Missions
                        Instance = character.Identity.Instance,
                        Playfield = character.Playfield.Identity.Instance,
                        Unknown1 = new Identity { Type = (IdentityType)MissionKeyStateMachineType, Instance = 0 },
-                       Unknown2 = MissionKeyUnknown2,
-                       Unknown3 = overflowSlot,
-                       Stats = CreateItemStats(lowId, highId, quality),
+                       Unknown2 = unknown2,
+                       Unknown3 = unknown3,
+                       Stats = CreateItemStats(lowId, highId, quality, itemFlags),
                        Name = TerminatedName(itemName)
                    };
         }
@@ -498,11 +845,15 @@ namespace ZoneEngine.Core.Missions
             return keyName + '\0';
         }
 
-        private static GameTuple<CharacterStat, uint>[] CreateItemStats(int lowId, int highId, int quality)
+        private static GameTuple<CharacterStat, uint>[] CreateItemStats(
+            int lowId,
+            int highId,
+            int quality,
+            uint itemFlags)
         {
             return new[]
                    {
-                       MissionKeyStat(CharacterStat.Flags, MissionKeyFlags),
+                       MissionKeyStat(CharacterStat.Flags, itemFlags),
                        MissionKeyStat(CharacterStat.StaticInstance, lowId),
                        MissionKeyStat(CharacterStat.ACGItemLevel, quality),
                        MissionKeyStat(CharacterStat.ACGItemTemplateID, lowId),

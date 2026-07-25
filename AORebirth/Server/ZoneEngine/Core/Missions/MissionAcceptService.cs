@@ -4,6 +4,7 @@ namespace ZoneEngine.Core.Missions
 
     using System;
     using System.Collections.Generic;
+    using System.Text;
 
     using AORebirth.Core.Entities;
 
@@ -81,6 +82,24 @@ namespace ZoneEngine.Core.Missions
             int sent = 0;
             foreach (MissionAcceptedStore.AcceptedMission entry in all)
             {
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                // Sidecar-only Repair (Offer null) was crashing clients: Kill-template QFU + Repair icon.
+                // Drop those until a Repair capture template exists.
+                MissionRollType type = MissionTypeCatalog.TypeFromIcon(entry.MissionIconId);
+                if (entry.Offer == null && type == MissionRollType.RepairMachine)
+                {
+                    MissionAcceptedStore.Remove(character.Identity.Instance, entry.QuestIdentity);
+                    MissionDiagnostics.Log(
+                        "LOGIN-RESYNC drop-sidecar-repair char={0} quest={1:X8}",
+                        character.Identity.Instance,
+                        entry.QuestIdentity.Instance);
+                    continue;
+                }
+
                 if (SendOneMissionWindow(character, entry.Offer, entry, register: false))
                 {
                     sent++;
@@ -287,12 +306,99 @@ namespace ZoneEngine.Core.Missions
                 WriteInt32BigEndian(packet, MissionIconIdOffset, iconId);
                 ApplyMarkerLocation(packet, offer, stored);
 
+                string targetName = stored != null ? stored.TargetName : null;
+                int targetSide = stored != null ? stored.TargetSide : 0;
+                MissionRollType missionType = MissionTypeCatalog.TypeFromIcon(iconId);
+
+                // Find Person: journal must keep Find text from the roll offer (not Kill "stronghold").
+                // Same Kill QFU shell lengths — fit offer ShortInfo/Info over the capture ASCII blobs.
+                if (missionType == MissionRollType.FindPerson
+                    && offer != null
+                    && !string.IsNullOrEmpty(offer.Info))
+                {
+                    if (string.IsNullOrEmpty(targetName))
+                    {
+                        ResolveFindPersonNameAndSide(character, offer, out targetName, out targetSide);
+                    }
+                    else if (targetSide != (int)Side.Omni && targetSide != (int)Side.Clan)
+                    {
+                        targetSide = MissionInstanceService.ResolveFindPersonSideForCharacter(character);
+                    }
+
+                    string shortInfo = string.IsNullOrEmpty(offer.ShortInfo)
+                                           ? MissionAcceptCaptureTemplate.TemplateKillShortInfo
+                                           : offer.ShortInfo;
+                    string info = InjectDisplayNameIntoFindInfo(offer.Info, targetName);
+                    PatchAsciiBlob(
+                        packet,
+                        MissionAcceptCaptureTemplate.TemplateKillShortInfo,
+                        FitAsciiName(shortInfo, MissionAcceptCaptureTemplate.TemplateKillShortInfo.Length));
+                    PatchAsciiBlob(
+                        packet,
+                        MissionAcceptCaptureTemplate.TemplateKillInfo,
+                        FitAsciiName(info, MissionAcceptCaptureTemplate.TemplateKillInfo.Length));
+                }
+                else if (missionType == MissionRollType.FindPerson
+                         && stored != null
+                         && stored.Offer != null
+                         && !string.IsNullOrEmpty(stored.Offer.Info))
+                {
+                    // Login resync: offer may be null on the call but stored.Offer still has Find text.
+                    if (string.IsNullOrEmpty(targetName))
+                    {
+                        ResolveFindPersonNameAndSide(character, stored.Offer, out targetName, out targetSide);
+                    }
+                    else if (targetSide != (int)Side.Omni && targetSide != (int)Side.Clan)
+                    {
+                        targetSide = MissionInstanceService.ResolveFindPersonSideForCharacter(character);
+                    }
+
+                    string shortInfo = string.IsNullOrEmpty(stored.Offer.ShortInfo)
+                                           ? MissionAcceptCaptureTemplate.TemplateKillShortInfo
+                                           : stored.Offer.ShortInfo;
+                    string info = InjectDisplayNameIntoFindInfo(stored.Offer.Info, targetName);
+                    PatchAsciiBlob(
+                        packet,
+                        MissionAcceptCaptureTemplate.TemplateKillShortInfo,
+                        FitAsciiName(shortInfo, MissionAcceptCaptureTemplate.TemplateKillShortInfo.Length));
+                    PatchAsciiBlob(
+                        packet,
+                        MissionAcceptCaptureTemplate.TemplateKillInfo,
+                        FitAsciiName(info, MissionAcceptCaptureTemplate.TemplateKillInfo.Length));
+                }
+                else
+                {
+                    bool patchKillName = missionType == MissionRollType.KillPerson;
+                    if (string.IsNullOrEmpty(targetName))
+                    {
+                        if (patchKillName)
+                        {
+                            ResolveAndPatchObjectiveName(packet, missionType, offer, out targetName, out targetSide);
+                        }
+                    }
+                    else if (patchKillName)
+                    {
+                        PatchTemplateKillName(packet, targetName);
+                    }
+                }
+
+                if (stored != null)
+                {
+                    stored.TargetName = targetName ?? string.Empty;
+                    stored.TargetSide = targetSide;
+                }
+
                 DateTime expiryUtc = stored != null
                                          ? stored.ExpiryUtc
                                          : DateTime.UtcNow.AddSeconds(MissionDurationSeconds);
                 if (register && offer != null)
                 {
-                    MissionAcceptedStore.Register(character.Identity.Instance, offer, expiryUtc);
+                    MissionAcceptedStore.Register(
+                        character.Identity.Instance,
+                        offer,
+                        expiryUtc,
+                        targetName,
+                        targetSide);
                 }
 
                 // Live accept does not Delete before the first FullUpdate. Only delete when explicitly
@@ -448,6 +554,253 @@ namespace ZoneEngine.Core.Missions
                 buffer[offset + 2] = bits[2];
                 buffer[offset + 3] = bits[3];
             }
+        }
+
+        private static void ResolveFindPersonNameAndSide(
+            ICharacter character,
+            QuestInfo offer,
+            out string targetName,
+            out int targetSide)
+        {
+            targetSide = MissionInstanceService.ResolveFindPersonSideForCharacter(character);
+            if (offer != null && !string.IsNullOrEmpty(offer.Info))
+            {
+                if (offer.Info.IndexOf("omni side", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    targetSide = (int)Side.Omni;
+                }
+                else if (offer.Info.IndexOf("clan side", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    targetSide = (int)Side.Clan;
+                }
+            }
+
+            var rng = new Random(unchecked(Environment.TickCount * 911)
+                                 ^ (offer != null ? offer.QuestIdentity.Instance : 0));
+            if (!TryExtractFindPersonName(offer != null ? offer.Info : null, out targetName)
+                || string.IsNullOrEmpty(targetName))
+            {
+                targetName = MissionTargetNameCatalog.PickFindName(rng);
+            }
+        }
+
+        private static bool TryExtractFindPersonName(string info, out string name)
+        {
+            name = null;
+            if (string.IsNullOrEmpty(info))
+            {
+                return false;
+            }
+
+            // Capture Find texts: "quickly find Jeanne Messamore," / "find an enemy agent"
+            int idx = info.IndexOf("find ", StringComparison.OrdinalIgnoreCase);
+            if (idx < 0)
+            {
+                return false;
+            }
+
+            int start = idx + 5;
+            while (start < info.Length && info[start] == ' ')
+            {
+                start++;
+            }
+
+            if (start >= info.Length || !char.IsUpper(info[start]))
+            {
+                return false;
+            }
+
+            int end = start;
+            while (end < info.Length
+                   && (char.IsLetter(info[end]) || info[end] == ' ' || info[end] == '-' || info[end] == '\''))
+            {
+                end++;
+            }
+
+            string candidate = info.Substring(start, end - start).Trim();
+            if (candidate.Length < 5 || candidate.IndexOf(' ') < 0)
+            {
+                return false;
+            }
+
+            // Reject "him / her" style.
+            if (candidate.IndexOf("him", StringComparison.OrdinalIgnoreCase) >= 0
+                || candidate.IndexOf("her", StringComparison.OrdinalIgnoreCase) >= 0
+                || candidate.IndexOf("enemy", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return false;
+            }
+
+            name = candidate;
+            return true;
+        }
+
+        private static string InjectDisplayNameIntoFindInfo(string info, string displayName)
+        {
+            if (string.IsNullOrEmpty(info) || string.IsNullOrEmpty(displayName))
+            {
+                return info ?? string.Empty;
+            }
+
+            string existing;
+            if (!TryExtractFindPersonName(info, out existing) || string.IsNullOrEmpty(existing))
+            {
+                return info;
+            }
+
+            string fitted = FitAsciiName(displayName, existing.Length);
+            int idx = info.IndexOf(existing, StringComparison.Ordinal);
+            if (idx < 0)
+            {
+                return info;
+            }
+
+            return info.Substring(0, idx) + fitted + info.Substring(idx + existing.Length);
+        }
+
+        private static void PatchAsciiBlob(byte[] packet, string fromText, string toText)
+        {
+            if (packet == null || string.IsNullOrEmpty(fromText) || string.IsNullOrEmpty(toText))
+            {
+                return;
+            }
+
+            if (fromText.Length != toText.Length)
+            {
+                return;
+            }
+
+            byte[] from = Encoding.ASCII.GetBytes(fromText);
+            byte[] to = Encoding.ASCII.GetBytes(toText);
+            for (int i = 0; i + from.Length <= packet.Length; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < from.Length; j++)
+                {
+                    if (packet[i + j] != from[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (!match)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < to.Length; j++)
+                {
+                    packet[i + j] = to[j];
+                }
+
+                return;
+            }
+        }
+
+        private static void ResolveAndPatchObjectiveName(
+            byte[] packet,
+            MissionRollType type,
+            QuestInfo offer,
+            out string targetName,
+            out int targetSide)
+        {
+            targetName = MissionAcceptCaptureTemplate.TemplateKillTargetName;
+            targetSide = (int)Side.Clan;
+
+            if (offer != null && !string.IsNullOrEmpty(offer.Info))
+            {
+                if (offer.Info.IndexOf("omni side", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    targetSide = (int)Side.Omni;
+                }
+                else if (offer.Info.IndexOf("clan side", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    targetSide = (int)Side.Clan;
+                }
+                else
+                {
+                    targetSide = (int)Side.Neutral;
+                }
+            }
+
+            var rng = new Random(unchecked(Environment.TickCount * 911)
+                                 ^ (offer != null ? offer.QuestIdentity.Instance : 0));
+            if (type == MissionRollType.FindPerson)
+            {
+                targetName = MissionTargetNameCatalog.PickFindName(rng);
+            }
+            else if (type == MissionRollType.KillPerson)
+            {
+                targetName = MissionTargetNameCatalog.PickKillName(rng);
+            }
+            else
+            {
+                // Non-person objectives keep template text; no spawn rename.
+                targetName = MissionAcceptCaptureTemplate.TemplateKillTargetName;
+                return;
+            }
+
+            PatchTemplateKillName(packet, targetName);
+        }
+
+        /// <summary>
+        /// Replace the fixed capture name in the accept QFU Info (same ASCII length — wire-safe).
+        /// </summary>
+        private static void PatchTemplateKillName(byte[] packet, string displayName)
+        {
+            if (packet == null || string.IsNullOrEmpty(displayName))
+            {
+                return;
+            }
+
+            string template = MissionAcceptCaptureTemplate.TemplateKillTargetName;
+            byte[] from = Encoding.ASCII.GetBytes(template);
+            string fitted = FitAsciiName(displayName, template.Length);
+            byte[] to = Encoding.ASCII.GetBytes(fitted);
+            if (from.Length != to.Length)
+            {
+                return;
+            }
+
+            for (int i = 0; i + from.Length <= packet.Length; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < from.Length; j++)
+                {
+                    if (packet[i + j] != from[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
+                {
+                    for (int j = 0; j < to.Length; j++)
+                    {
+                        packet[i + j] = to[j];
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        private static string FitAsciiName(string name, int length)
+        {
+            string trimmed = (name ?? string.Empty).Trim();
+            if (trimmed.Length == length)
+            {
+                return trimmed;
+            }
+
+            if (trimmed.Length > length)
+            {
+                return trimmed.Substring(0, length);
+            }
+
+            return trimmed.PadRight(length, ' ');
         }
 
         private static byte[] HexToBytes(string hex)

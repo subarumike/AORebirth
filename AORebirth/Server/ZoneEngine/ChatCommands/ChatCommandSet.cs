@@ -37,11 +37,13 @@ namespace ZoneEngine.ChatCommands
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Enums;
     using AORebirth.ObjectManager;
     using AORebirth.Stats;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
@@ -163,12 +165,42 @@ namespace ZoneEngine.ChatCommands
                     name = ((INamedEntity)tempch).Name + " ";
                 }
 
+                int levelBefore = (int)tempch.Stats[(int)StatIds.level].BaseValue;
+                bool leveled = false;
+                if (statId == (int)StatIds.level)
+                {
+                    // /set level alone left NextXP=0 with no SK wire → Experience 0/0 at 200+.
+                    CombatXpRuntimeService.ReconcileAfterManualLevelSet(tempch);
+                }
+                else if (statId == (int)StatIds.sk)
+                {
+                    // /set sk only wrote the stat; apply shadowlevel thresholds from the new SK.
+                    leveled = CombatXpRuntimeService.ReconcileAfterManualSkSet(tempch);
+                }
+                else if (statId == (int)StatIds.xp)
+                {
+                    leveled = CombatXpRuntimeService.ReconcileAfterManualXpSet(tempch);
+                }
+
                 tempch.Controller.SendChangedStats();
 
                 string response = "Dynel " + name + "(" + target.Type + ":" + target.Instance + "): Stat "
                                   + StatNamesDefaults.GetStatName(statId) + " (" + statId + ") =";
                 response += " Old: " + statOldValue;
                 response += " New: " + statNewValue;
+                if (statId == (int)StatIds.level)
+                {
+                    int nextSk = tempch.Stats[(int)StatIds.nextsk].Value;
+                    response += " — bar resynced (NextSK=" + nextSk + ")";
+                }
+                else if (statId == (int)StatIds.sk || statId == (int)StatIds.xp)
+                {
+                    int levelAfter = (int)tempch.Stats[(int)StatIds.level].BaseValue;
+                    response += leveled
+                                    ? " — leveled " + levelBefore + " → " + levelAfter
+                                    : " — no level change (need level 200+ for SK; check /get level)";
+                }
+
                 character.Playfield.Publish(ChatTextMessageHandler.Default.CreateIM(character, response));
             }
         }

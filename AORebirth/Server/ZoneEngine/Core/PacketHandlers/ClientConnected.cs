@@ -123,7 +123,17 @@ namespace ZoneEngine.Core.PacketHandlers
 
             /* send playfield info to client */
             PlayfieldAnarchyFMessageHandler.Default.Send(client.Controller.Character);
-            MissionInstanceDoorReplay.SendForCharacter(client, client.Controller.Character);
+            // Live 20260725-184103: DoorFullUpdate flood starts immediately after PAF
+            // (before SCFU/FullCharacter). Delayed-only replay left the map grey/wrong.
+            if (client.Controller.Character.Playfield != null
+                && MissionInstanceService.IsMissionInstancePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                MissionInstanceDoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+                MissionInstanceService.TryRestampOutdoorReturnFromAccepted(client.Controller.Character);
+            }
 
             // Sparrow Flight CanFly requires expansionplayfield==0 (RK). Set from playfield id.
             if (client.Controller.Character.Playfield != null)
@@ -229,6 +239,16 @@ client.Controller.Character.Playfield.Identity,
                 client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,
                 () =>
                 {
+                    // Same reason as perks: this client often never sends CharInPlay after zone/relog,
+                    // so the mission journal must be restored here or it stays empty.
+                    ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
+
+                    // Gold 080425: Door/Chest FullUpdates land with SCFU before FullCharacter.
+                    // Send here (not post-PAF) so the client accepts door meshes + map icons.
+                    ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
+                        client,
+                        client.Controller.Character);
+
                     CombatXpRuntimeService.LogXpWireSnapshot(
                         client.Controller.Character,
                         "ClientConnected",
@@ -256,10 +276,6 @@ client.Controller.Character.Playfield.Identity,
                     {
                         PerkRuntimeService.Default.ResendPerkActions(loginCharacter);
                     }
-
-                    // Same reason as perks: this client often never sends CharInPlay after zone/relog,
-                    // so the mission journal must be restored here or it stays empty.
-                    ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
 
                     // Thrak garden-key journal entries are capture QFUs — re-emit Active missions after zone/relog.
                     ZoneEngine.Core.Thrak.Quests.ThrakGardenKeyQuestRuntime.TryResendActiveMissionsForLogin(
@@ -290,10 +306,11 @@ client.Controller.Character.Playfield.Identity,
 
             var specials = new[]
                            {
+                               // Capture 20260724-001643 SAW: MAAT 211357/211358, DIIT 42033/42032, BRAW 211401/211402.
                                new SpecialAttack
                                {
-                                   Unknown1 = 0x0000AAC0,
-                                   Unknown2 = 0x00023569,
+                                   Unknown1 = 0x0003399D,
+                                   Unknown2 = 0x0003399E,
                                    Unknown3 = 0x00000064,
                                    Unknown4 = "MAAT"
                                },
@@ -306,8 +323,8 @@ client.Controller.Character.Playfield.Identity,
                                },
                                new SpecialAttack
                                {
-                                   Unknown1 = 0x00011294,
-                                   Unknown2 = 0x00011295,
+                                   Unknown1 = 0x000339C9,
+                                   Unknown2 = 0x000339CA,
                                    Unknown3 = 0x0000008E,
                                    Unknown4 = "BRAW"
                                }

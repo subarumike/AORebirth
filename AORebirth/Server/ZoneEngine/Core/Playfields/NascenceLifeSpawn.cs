@@ -3,31 +3,37 @@ namespace AORebirth.Core.Playfields
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Textures;
     using AORebirth.Enums;
     using AORebirth.Interfaces;
+    using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.Playfields.Content;
 
     using Coordinate = AORebirth.Core.Vector.Coordinate;
     using Quaternion = AORebirth.Core.Vector.Quaternion;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     #endregion
 
     /// <summary>
-    /// Capture-backed Nascence Life outdoor mob/NPC population (PF 4310–4313).
+    /// Capture-backed Nascence Life outdoor mob/NPC population (PF 4310–4313, 4001, 4531).
     /// Captures: 20260718-170408 (4310 Frontier), 20260718-173204 (4311 Crippler cave),
     /// 20260718-174130 (4311 Two Mountains), 20260718-180726 (4312 East / Core; Hecklers excluded),
-    /// 20260718-230406 (4310 Drake + missing frontier roamers; NPCInfo only).
-    /// Total 830 NPCs (4310=246, 4311=387, 4312=197).
+    /// 20260718-230406 (4310 Drake + missing frontier roamers; NPCInfo only),
+    /// 20260723-221330 (PF 4001 Drake, PF 4531 Goldman Harbor, Chimera patrol),
+    /// 20260723-225021 (Barking Chimera fight packets + 15 corpse loot snapshots).
+    /// Total 830 NPCs (4310=246, 4311=387, 4312=197) plus Harbor/Jobe Research.
     /// PF 4312 Hecklers remain in NascenceCoreHecklerSpawnOrchestrator.
     /// </summary>
     internal static class NascenceLifeSpawn
@@ -43,6 +49,7 @@ namespace AORebirth.Core.Playfields
             public int MonsterData;
             public int Scale;
             public int VisualFlags;
+            public int CharacterFlags;
             public int HeadMesh;
             public float X;
             public float Y;
@@ -54,6 +61,173 @@ namespace AORebirth.Core.Playfields
             public int[][] Textures;
             public int[][] Meshes;
             public string CaptureFolder;
+            // Optional patrol path; leave null unless a spawn sets identity-local points.
+            public float[][] Waypoints = null;
+        }
+
+        // Capture 20260723-221330 SCFU ExtTex for Barking Chimera 798E09BC / Yuttos 798C1F0D (identical wire).
+        private static readonly byte[] BarkingChimeraExtendedTextureOverrideData =
+            {
+                0x00, 0x00, 0x07, 0xE2, 0x6C, 0x6F, 0x77, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x30, 0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+            };
+
+        // Capture CharacterFlags: Dreaming Silvertail 277352961; animal mobs 268964353.
+        private const int DreamingSilvertailCharacterFlags = 277352961;
+        private const int DefaultAnimalCharacterFlags = 268964353;
+
+        // Barking Chimera patrol intentionally disabled: shared absolute FollowTarget waypoints
+        // stacked many Chimeras on the same path points and yanked them away on attack/patrol.
+        // Re-enable only with per-spawn (identity-local or spawn-relative) paths, never shared world paths.
+
+        internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
+        {
+            if (string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase))
+            {
+                data = (byte[])BarkingChimeraExtendedTextureOverrideData.Clone();
+                return true;
+            }
+
+            data = null;
+            return false;
+        }
+
+        // Capture 20260723-225021 / 20260723-221330: credits=0 empty corpses were still opened on live.
+        // Subway EmptyCorpseLifetime=0 must not apply here or corpses despawn before click.
+        internal static bool UsesCaptureOpenableEmptyCorpse(string name)
+        {
+            return string.Equals(name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Yuttos Nascence Geosurvey Dog", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Dreaming Silvertail", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Swift Silvertail", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Mike: empty loot closes too fast — keep opened empty corpse ~2s before cleanup.
+        internal static readonly TimeSpan OpenableEmptyCorpseCleanupAfterOpenedDelay = TimeSpan.FromSeconds(2);
+
+        // Mike: Barking Chimera soft-respawn 30s after death (spawn-local, not shared patrol).
+        private const double BarkingChimeraRespawnSeconds = 30.0;
+        private const float BarkingChimeraAliveProximityMetersSq = 6.25f; // 2.5m, same as Alex-pad
+        private static readonly object ChimeraRespawnSync = new object();
+        private static readonly Dictionary<int, DateTime[]> ChimeraNextRespawnUtcByPlayfield =
+            new Dictionary<int, DateTime[]>();
+        private static int[] chimeraSpawnIndices;
+
+        private static int[] ChimeraSpawnIndices
+        {
+            get
+            {
+                if (chimeraSpawnIndices != null)
+                {
+                    return chimeraSpawnIndices;
+                }
+
+                var list = new List<int>();
+                for (int i = 0; i < Npcs.Length; i++)
+                {
+                    if (string.Equals(Npcs[i].Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
+                    {
+                        list.Add(i);
+                    }
+                }
+
+                chimeraSpawnIndices = list.ToArray();
+                return chimeraSpawnIndices;
+            }
+        }
+
+        public static void ClearPlayfield(int playfieldInstance)
+        {
+            lock (ChimeraRespawnSync)
+            {
+                ChimeraNextRespawnUtcByPlayfield.Remove(playfieldInstance);
+            }
+        }
+
+        public static void TickBarkingChimeraRespawn(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            Action<ICharacter> activateNpc)
+        {
+            if (playfield == null || activateNpc == null)
+            {
+                return;
+            }
+
+            int pf = playfieldIdentity.Instance;
+            if (pf != NascenceLifeContentModule.FrontierPlayfieldId
+                && pf != NascenceLifeContentModule.WildsPlayfieldId
+                && pf != NascenceLifeContentModule.CorePlayfieldId
+                && pf != NascenceLifeContentModule.Nascence4313PlayfieldId)
+            {
+                return;
+            }
+
+            int[] indices = ChimeraSpawnIndices;
+            DateTime[] timers;
+            lock (ChimeraRespawnSync)
+            {
+                if (!ChimeraNextRespawnUtcByPlayfield.TryGetValue(pf, out timers)
+                    || timers == null
+                    || timers.Length != indices.Length)
+                {
+                    timers = new DateTime[indices.Length];
+                    for (int i = 0; i < timers.Length; i++)
+                    {
+                        timers[i] = DateTime.MaxValue;
+                    }
+
+                    ChimeraNextRespawnUtcByPlayfield[pf] = timers;
+                }
+            }
+
+            for (int slot = 0; slot < indices.Length; slot++)
+            {
+                LifeNpc def = Npcs[indices[slot]];
+                if (def.PlayfieldId != pf)
+                {
+                    continue;
+                }
+
+                if (HasLivingBarkingChimeraNear(playfield, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+                else if (timers[slot] == DateTime.MaxValue)
+                {
+                    timers[slot] = DateTime.UtcNow.AddSeconds(BarkingChimeraRespawnSeconds);
+                }
+                else if (!(timers[slot] > DateTime.UtcNow)
+                         && SpawnOne(playfield, playfieldIdentity, activateNpc, def))
+                {
+                    timers[slot] = DateTime.MaxValue;
+                }
+            }
+        }
+
+        private static bool HasLivingBarkingChimeraNear(Playfield playfield, LifeNpc def)
+        {
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>(playfield.Identity))
+            {
+                if (candidate == null
+                    || candidate.Controller is PlayerController
+                    || !string.Equals(candidate.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
+                    || candidate.Stats[StatIds.health].Value <= 0)
+                {
+                    continue;
+                }
+
+                float dx = candidate.Coordinates().x - def.X;
+                float dz = candidate.Coordinates().z - def.Z;
+                if ((dx * dx) + (dz * dz) <= BarkingChimeraAliveProximityMetersSq)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static readonly LifeNpc[] Npcs =
@@ -1118,7 +1292,8 @@ namespace AORebirth.Core.Playfields
             {
                 PlayfieldId = 4310,
                 Name = "Emissary of Jobe",
-                Level = 200, Health = 164773, MonsterData = 215047, Scale = 100, VisualFlags = 31, HeadMesh = 40656,
+                Level = 200, Health = 164773, MonsterData = 215047, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 277352961, HeadMesh = 40656,
                 X = 854.6917f, Y = 30.015f, Z = 1062.84363f,
                 Hx = 0f, Hy = -0.749773562f, Hz = 0f, Hw = 0.661691844f,
                 Textures = new[] { new[] { 0, 215295 }, new[] { 1, 213751 }, new[] { 2, 213807 }, new[] { 3, 215296 }, new[] { 4, 215294 } },
@@ -1701,7 +1876,8 @@ namespace AORebirth.Core.Playfields
             {
                 PlayfieldId = 4310,
                 Name = "Joshua Falker",
-                Level = 100, Health = 6829, MonsterData = 259896, Scale = 112, VisualFlags = 31, HeadMesh = 223820,
+                Level = 100, Health = 6829, MonsterData = 259896, Scale = 112, VisualFlags = 31,
+                CharacterFlags = 277352961, HeadMesh = 223820,
                 X = 847.667847f, Y = 29.7936077f, Z = 1100.85828f,
                 Hx = 0f, Hy = -0.7140167f, Hz = 0f, Hw = -0.7001274f,
                 Textures = new[] { new[] { 0, 248006 }, new[] { 1, 247963 }, new[] { 2, 247978 }, new[] { 3, 247917 }, new[] { 4, 248056 } },
@@ -2150,14 +2326,23 @@ namespace AORebirth.Core.Playfields
             },
             new LifeNpc
             {
-                PlayfieldId = 4310,
+                // Capture 20260723-221330 scfu-appearance SimpleChar:7963A853 on PF 4001 (Jobe Research).
+                PlayfieldId = NascenceLifeContentModule.JobeResearchPlayfieldId,
                 Name = "Scientist Drake Rodriguez",
-                Level = 200, Health = 164773, MonsterData = 26092, Scale = 100, VisualFlags = 31, HeadMesh = 0,
+                Level = 200, Health = 164773, MonsterData = 26092, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 277352961, HeadMesh = 40694,
                 X = 854.5125f, Y = 34.405f, Z = 958.5875f,
                 Hx = 0f, Hy = -0.9730012f, Hz = 0f, Hw = 0.23080005f,
-                Textures = null,
-                Meshes = null,
-                CaptureFolder = "20260718-230406",
+                Textures = new[]
+                {
+                    new[] { 0, 213851 }, new[] { 1, 213751 }, new[] { 2, 213807 },
+                    new[] { 3, 213708 }, new[] { 4, 213925 }
+                },
+                Meshes = new[]
+                {
+                    new[] { 0, 20108, 215300, 2 }, new[] { 0, 40694, 0, 4 }, new[] { 5, 214715, 0, 0 }
+                },
+                CaptureFolder = "20260723-221330",
             },
             new LifeNpc
             {
@@ -9188,6 +9373,110 @@ namespace AORebirth.Core.Playfields
                 Meshes = null,
                 CaptureFolder = "20260718-180726",
             },
+            // Capture 20260723-221330 Goldman Harbor PF 4531 (0x11B3) SCFU + enemy-dossier.
+            new LifeNpc
+            {
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Sharon Goldman",
+                Level = 50, Health = 45320, MonsterData = 215029, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 40664,
+                X = 177.375259f, Y = 282.006378f, Z = 359.798065f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[]
+                {
+                    new[] { 0, 0 }, new[] { 1, 46219 }, new[] { 2, 45792 }, new[] { 3, 46220 }, new[] { 4, 46221 }
+                },
+                Meshes = new[] { new[] { 0, 40664, 0, 4 } },
+                CaptureFolder = "20260723-221330",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Doctor James Monaghan",
+                Level = 40, Health = 32984, MonsterData = 215027, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 40132,
+                X = 199.06012f, Y = 280.005f, Z = 343.575562f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[]
+                {
+                    new[] { 0, 117653 }, new[] { 1, 55995 }, new[] { 2, 40903 }, new[] { 3, 55994 }, new[] { 4, 56001 }
+                },
+                Meshes = new[] { new[] { 0, 20007, 55996, 2 }, new[] { 0, 40132, 0, 4 } },
+                CaptureFolder = "20260723-221330",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Winnie Glowtail",
+                Level = 5, Health = 2296, MonsterData = 215023, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 40665,
+                X = 198.689789f, Y = 280.005f, Z = 355.650116f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[]
+                {
+                    new[] { 0, 40972 }, new[] { 1, 40942 }, new[] { 2, 40962 }, new[] { 3, 40921 }, new[] { 4, 40982 }
+                },
+                Meshes = new[] { new[] { 0, 40665, 0, 4 } },
+                CaptureFolder = "20260723-221330",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Pedro Gavrillo",
+                Level = 20, Health = 11167, MonsterData = 215028, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 40715,
+                X = 174.95314f, Y = 282.0062f, Z = 354.525635f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[]
+                {
+                    new[] { 0, 0 }, new[] { 1, 81912 }, new[] { 2, 81914 }, new[] { 3, 81909 }, new[] { 4, 81917 }
+                },
+                Meshes = new[] { new[] { 0, 40715, 0, 4 } },
+                CaptureFolder = "20260723-221330",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Trond McDougal",
+                Level = 45, Health = 39152, MonsterData = 215025, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 40283,
+                X = 182.3278f, Y = 280.006226f, Z = 353.1129f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[]
+                {
+                    new[] { 0, 0 }, new[] { 1, 42249 }, new[] { 2, 42260 }, new[] { 3, 42247 }, new[] { 4, 42248 }
+                },
+                Meshes = new[] { new[] { 0, 40283, 0, 4 } },
+                CaptureFolder = "20260723-221330",
+            },
+            new LifeNpc
+            {
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Luna Erke",
+                Level = 31, Health = 1095, MonsterData = 26143, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 40137,
+                X = 196.280258f, Y = 280.005f, Z = 355.0273f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = new[]
+                {
+                    new[] { 0, 0 }, new[] { 1, 40900 }, new[] { 2, 42235 }, new[] { 3, 40894 }, new[] { 4, 40909 }
+                },
+                Meshes = new[] { new[] { 0, 40137, 0, 4 } },
+                CaptureFolder = "20260723-221330",
+            },
+            new LifeNpc
+            {
+                // Capture 20260723-221330 dossier only (no SCFU headMesh); keep HeadMesh=0.
+                PlayfieldId = NascenceLifeContentModule.GoldmanAretePlayfieldId,
+                Name = "Prince Creehan",
+                Level = 19, Health = 526, MonsterData = 26103, Scale = 100, VisualFlags = 31,
+                CharacterFlags = 268964353, HeadMesh = 0,
+                X = 179.270325f, Y = 285.005f, Z = 311.859344f,
+                Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                Textures = null,
+                Meshes = null,
+                CaptureFolder = "20260723-221330",
+            },
         };
 
         public static void SpawnForPlayfield(
@@ -9204,7 +9493,9 @@ namespace AORebirth.Core.Playfields
             if (pf != NascenceLifeContentModule.FrontierPlayfieldId
                 && pf != NascenceLifeContentModule.WildsPlayfieldId
                 && pf != NascenceLifeContentModule.CorePlayfieldId
-                && pf != NascenceLifeContentModule.Nascence4313PlayfieldId)
+                && pf != NascenceLifeContentModule.Nascence4313PlayfieldId
+                && pf != NascenceLifeContentModule.JobeResearchPlayfieldId
+                && pf != NascenceLifeContentModule.GoldmanAretePlayfieldId)
             {
                 return;
             }
@@ -9259,14 +9550,26 @@ namespace AORebirth.Core.Playfields
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, (uint)def.Health);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.level, (uint)def.Level);
             mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.visualflags, (uint)def.VisualFlags);
+            // Capture 20260723-221330 CharacterFlags: Dreaming=277352961; animals=268964353;
+            // Drake/Falker SCFU CharacterFlags=277352961 when set on LifeNpc.
+            int characterFlags;
+            if (string.Equals(def.Name, "Dreaming Silvertail", StringComparison.Ordinal))
+            {
+                characterFlags = DreamingSilvertailCharacterFlags;
+            }
+            else if (def.CharacterFlags != 0)
+            {
+                characterFlags = def.CharacterFlags;
+            }
+            else
+            {
+                characterFlags = DefaultAnimalCharacterFlags;
+            }
+
+            mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.flags, (uint)characterFlags);
             if (def.Scale > 0)
             {
                 mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.monsterscale, (uint)def.Scale);
-            }
-
-            if (def.HeadMesh > 0)
-            {
-                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.headmesh, (uint)def.HeadMesh);
             }
 
             if (def.Textures != null && def.Textures.Length > 0)
@@ -9299,18 +9602,143 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
+            // HeadMesh is OverridingModifierStat: BaseValue-only leaves template modifier and SCFU emits wrong/0 head.
+            // Match OrdinaryEnemyRuntimeService.SetHeadMesh (Value+BaseValue + layer-4 mesh).
+            ApplyCaptureHeadMesh(mob, def.HeadMesh);
+
             string combatFailure;
+            CapturedEnemyCombatContract combatContract =
+                string.Equals(def.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase)
+                    ? BuildBarkingChimeraCombatContract()
+                    : CapturedEnemyCombatContract.Unresolved(
+                        "NascenceLifeSpawn capture-backed actor has no source-local WIFU/attack-start/AttackInfo contract mapped; source NPC="
+                        + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
+                        true);
+            if (string.Equals(def.Name, "Barking Chimera", StringComparison.OrdinalIgnoreCase))
+            {
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.mindamage, 16u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxdamage, 38u);
+            }
+
             CapturedEnemyCombatRuntime.Prepare(
                 mob,
                 npcController,
-                CapturedEnemyCombatContract.Unresolved(
-                    "NascenceLifeSpawn capture-backed actor has no source-local WIFU/attack-start/AttackInfo contract mapped; source NPC="
-                    + def.Name + " monsterData=" + def.MonsterData + " level=" + def.Level,
-                    true),
+                combatContract,
                 out combatFailure);
 
+            // Do not auto-apply shared Chimera patrols. Explicit per-def Waypoints only.
+            ApplyWaypoints(mob, npcController, def.Waypoints);
             activateNpc(mob);
             return true;
+        }
+
+        /// <summary>
+        /// Capture 20260723-225021 Barking Chimera fight 798C1F4F: SAW (5 specials BGVX/YAPK/LWEK/MXLP/TKRQ)
+        /// + Attack + AttackInfo ammo=-1 hitType=3 damage 16-38; SAW unknowns 56/56/56/56/0; recharge from first landed interval.
+        /// </summary>
+        private static CapturedEnemyCombatContract BuildBarkingChimeraCombatContract()
+        {
+            var specials = new[]
+            {
+                new CapturedEnemySpecialAttackDefinition(232045, 232046, 0x42475658, "BGVX"),
+                new CapturedEnemySpecialAttackDefinition(232042, 232043, 0x5941504B, "YAPK"),
+                new CapturedEnemySpecialAttackDefinition(232039, 232040, 0x4C57454B, "LWEK"),
+                new CapturedEnemySpecialAttackDefinition(232036, 232037, 0x4D584C50, "MXLP"),
+                new CapturedEnemySpecialAttackDefinition(232033, 232034, 0x544B5251, "TKRQ"),
+            };
+
+            int[] damageObservations =
+                {
+                    25, 26, 29, 34, 27, 30, 22, 27, 28, 20, 30, 21, 35, 26, 31, 35, 36, 16, 37, 22, 19, 36,
+                    27, 32, 30, 32, 37, 25, 31, 22, 29, 36, 27, 32, 24, 21, 32, 26, 27, 33, 24, 37, 19, 26,
+                    31, 21, 34, 25, 29, 30, 28, 38, 30
+                };
+            double[] attackStartDelays =
+                {
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+                };
+            double[] firstHitDelays =
+                {
+                    5.084861, 9.095807, 9.545543, 9.830757, 3.351970, 7.903126, 3.997122, 6.451340,
+                    4.096567, 9.008532, 9.790527, 5.014908, 3.003818, 4.133419, 6.609437
+                };
+            double[] landedIntervals =
+                {
+                    3.032315, 8.230959, 9.852612, 4.731078, 2.879224, 4.532096, 3.008146, 3.520829,
+                    4.231391, 4.735585, 7.172459, 7.932109, 2.943068, 4.389520, 15.237053, 4.439573,
+                    8.087505, 5.430544, 4.703398, 4.653643, 4.321511, 3.880607, 5.828328, 8.601800,
+                    4.402286, 7.942136, 6.145209, 3.736697, 5.017904, 7.120029, 5.722469, 4.579176,
+                    2.618384, 13.082830, 5.783704, 4.897980, 4.389295, 3.705713
+                };
+
+            return CapturedEnemyCombatContract.CapturedFixedPacketSequence(
+                "20260723-225021: Barking Chimera fight+loot 798C1F4F SAW/Attack/AttackInfo",
+                unchecked((int)0x798C1F4F),
+                NpcAiProfile.Passive,
+                16,
+                38,
+                landedIntervals[0],
+                specials,
+                0,
+                56,
+                56,
+                56,
+                56,
+                0,
+                0,
+                0,
+                -1,
+                4,
+                0,
+                3,
+                0x42475658,
+                0,
+                false,
+                damageObservations,
+                attackStartDelays,
+                firstHitDelays,
+                landedIntervals,
+                0,
+                false,
+                null,
+                true);
+        }
+
+        private static void ApplyCaptureHeadMesh(Character mob, int headMesh)
+        {
+            if (mob == null || headMesh <= 0)
+            {
+                return;
+            }
+
+            int existingHeadMesh = mob.Stats[StatIds.headmesh].Value;
+            if (existingHeadMesh != 0 && existingHeadMesh != headMesh)
+            {
+                mob.MeshLayer.RemoveMesh(0, existingHeadMesh, 0, 4);
+                mob.SocialMeshLayer.RemoveMesh(0, existingHeadMesh, 0, 4);
+            }
+
+            // BaseValue first so OverridingModifierStat.Set leaves modifier=0 when Value is assigned.
+            mob.Stats[StatIds.headmesh].BaseValue = (uint)headMesh;
+            mob.Stats[StatIds.headmesh].Value = headMesh;
+            mob.MeshLayer.AddMesh(0, headMesh, 0, 4);
+            mob.SocialMeshLayer.AddMesh(0, headMesh, 0, 4);
+        }
+
+        private static void ApplyWaypoints(Character mob, NPCController controller, float[][] waypoints)
+        {
+            if (waypoints == null || waypoints.Length < 2)
+            {
+                return;
+            }
+
+            mob.Waypoints.Clear();
+            foreach (float[] wp in waypoints)
+            {
+                mob.AddWaypoint(new Vector3(wp[0], wp[1], wp[2]), false);
+            }
+
+            controller.State = CharacterState.Patrolling;
         }
     }
 }

@@ -47,6 +47,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.Packets;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -88,6 +89,10 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Target,
                 message.TargetPlacement))
             {
+                MissionFindItemService.TryHandleAfterLoot(
+                    client,
+                    client.Controller.Character,
+                    null);
                 return;
             }
 

@@ -49,6 +49,43 @@ namespace ZoneEngine.Core.MessageHandlers
 
             try
             {
+                bool repairGranted = false;
+                int repairInstance = 0;
+                InventoryError repairError = InventoryError.Invalid;
+                bool isRepair = MissionRepairService.IsRepairOffer(offer)
+                                || (matched && offer != null
+                                    && MissionTypeCatalog.TypeFromIcon(offer.MissionIconId)
+                                    == MissionRollType.RepairMachine);
+                if (isRepair)
+                {
+                    // Grant kit before the key so a nearly-full bag still receives the repair item.
+                    repairGranted = MissionKeyGrantService.TryGrantRepairItem(
+                        client,
+                        character,
+                        1,
+                        out repairInstance,
+                        out repairError);
+                    if (!repairGranted)
+                    {
+                        client.Server.Info(client, "CreateQuest repair kit grant failed: {0}", repairError);
+                        MissionDiagnostics.Log(
+                            "ACCEPT-REPAIR-FAIL quest={0} err={1}",
+                            acceptedQuestId,
+                            repairError);
+                    }
+                    else
+                    {
+                        MissionKeyStore.RegisterRepairKit(
+                            character.Identity.Instance,
+                            acceptedQuestId,
+                            repairInstance);
+                        MissionDiagnostics.Log(
+                            "ACCEPT-REPAIR-OK quest={0} itemInstance={1}",
+                            acceptedQuestId,
+                            repairInstance);
+                    }
+                }
+
                 int keyInstance;
                 InventoryError inventoryError;
                 bool granted = MissionKeyGrantService.TryGrantMissionKey(
@@ -60,40 +97,23 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 if (granted)
                 {
-                    MissionKeyStore.Register(character.Identity.Instance, keyInstance);
+                    MissionKeyStore.Register(character.Identity.Instance, acceptedQuestId, keyInstance);
                 }
                 else
                 {
                     client.Server.Info(client, "CreateQuest mission key grant failed: {0}", inventoryError);
                 }
 
-                bool repairGranted = false;
-                int repairInstance = 0;
-                InventoryError repairError = InventoryError.Invalid;
-                if (MissionRepairService.IsRepairOffer(offer))
-                {
-                    int repairQl = offer != null && offer.Quality > 0 ? offer.Quality : 1;
-                    repairGranted = MissionKeyGrantService.TryGrantRepairItem(
-                        client,
-                        character,
-                        repairQl,
-                        out repairInstance,
-                        out repairError);
-                    if (!repairGranted)
-                    {
-                        client.Server.Info(client, "CreateQuest repair kit grant failed: {0}", repairError);
-                    }
-                }
-
                 bool windowSent = MissionAcceptService.SendAcceptedMission(character, offer);
 
                 MissionDiagnostics.Log(
-                    "ACCEPT quest={0} matchedOffer={1} keyGranted={2} keyInstance={3} keyError={4} repairGranted={5} repairInstance={6} windowSent={7}",
+                    "ACCEPT quest={0} matchedOffer={1} keyGranted={2} keyInstance={3} keyError={4} isRepair={5} repairGranted={6} repairInstance={7} windowSent={8}",
                     acceptedQuestId,
                     matched,
                     granted,
                     keyInstance,
                     inventoryError,
+                    isRepair,
                     repairGranted,
                     repairInstance,
                     windowSent);

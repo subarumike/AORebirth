@@ -16,15 +16,17 @@ namespace ZoneEngine.Core.Missions
 
     using Utility;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
 
     #endregion
 
     /// <summary>
-    /// Completes one accepted RK mission. Capture <c>20260718-062936</c> finish order:
-    /// FormatFeedback (XP/credits) → TemplateAction side-token (Clan/Omni; skip Neutral) →
-    /// CharacterAction(59) on Mission → Quest Delete → CharacterAction(0x2F)+Despawn MissionKey.
+    /// Completes one accepted RK mission. Capture <c>20260724-141302</c> Kill-Person finish order
+    /// (after combat XP / loot lines): TemplateAction token → Feedback(token awarded) →
+    /// FormatFeedback "Received reward…" → XP grant → TemplateAction item → Feedback(Mission accomplished)
+    /// → CharacterAction(59) → Quest Delete → CharacterAction(0x2F) MissionKey.
     /// </summary>
     internal static class MissionCompleteService
     {
@@ -39,6 +41,15 @@ namespace ZoneEngine.Core.Missions
         private const int TemplateActionUnknown1 = 1;
 
         private const int TemplateActionUnknown2 = 87;
+
+        // Feedback category used by mission finish lines (capture 20260724-141302).
+        private const int MissionFeedbackCategoryId = 110;
+
+        // "You are awarded a token for your heroic effort."
+        private const int TokenAwardedFeedbackMessageId = 175335076;
+
+        // "Mission accomplished." (also used by Arete/Subway finish paths).
+        private const int MissionAccomplishedFeedbackMessageId = 108871108;
 
         // Clan token pair from finish TemplateAction (capture 20260718-062936).
         private const int ClanTokenLowId = 103910;
@@ -73,6 +84,44 @@ namespace ZoneEngine.Core.Missions
 
             MissionAcceptedStore.AcceptedMission entry = all[all.Count - 1];
             return TryComplete(client, character, entry, reason);
+        }
+
+        /// <summary>
+        /// FindPerson finish must delete the FindPerson journal row, not whatever is "latest"
+        /// if the player holds multiple missions.
+        /// </summary>
+        public static bool TryCompleteFindPerson(IZoneClient client, ICharacter character, string reason)
+        {
+            if (character == null)
+            {
+                return false;
+            }
+
+            List<MissionAcceptedStore.AcceptedMission> all =
+                MissionAcceptedStore.GetAll(character.Identity.Instance);
+            if (all == null || all.Count == 0)
+            {
+                return false;
+            }
+
+            MissionAcceptedStore.AcceptedMission findEntry = null;
+            for (int i = all.Count - 1; i >= 0; i--)
+            {
+                MissionAcceptedStore.AcceptedMission candidate = all[i];
+                if (candidate != null
+                    && MissionTypeCatalog.TypeFromIcon(candidate.MissionIconId) == MissionRollType.FindPerson)
+                {
+                    findEntry = candidate;
+                    break;
+                }
+            }
+
+            if (findEntry == null)
+            {
+                return TryCompleteLatest(client, character, reason);
+            }
+
+            return TryComplete(client, character, findEntry, reason);
         }
 
         /// <summary>
@@ -125,6 +174,27 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionTargetTracker.Unregister(victim.Identity);
+
+            // Find Person completes via InfoRequest — never via KillTarget (stale Kill tracker on reused PF).
+            MissionRollType stamped;
+            if (MissionInstanceService.TryGetStampedObjective(victim.Playfield.Identity.Instance, out stamped)
+                && stamped != MissionRollType.KillPerson)
+            {
+                return false;
+            }
+
+            List<MissionAcceptedStore.AcceptedMission> accepted =
+                MissionAcceptedStore.GetAll(player.Identity.Instance);
+            if (accepted != null && accepted.Count > 0)
+            {
+                MissionAcceptedStore.AcceptedMission latest = accepted[accepted.Count - 1];
+                if (latest != null
+                    && MissionTypeCatalog.TypeFromIcon(latest.MissionIconId) != MissionRollType.KillPerson)
+                {
+                    return false;
+                }
+            }
+
             return TryCompleteLatest(client, player, reason ?? "KillTarget");
         }
 
@@ -153,35 +223,85 @@ namespace ZoneEngine.Core.Missions
             {
                 int cashReward = ResolveCashReward(entry);
                 int xpReward = ResolveXpReward(entry);
+
+                // Capture 20260724-141302: token grant + "awarded a token" before Received reward.
+                bool tokenEligible = MissionTokenProgressTracker.HasFullTokenChance(character.Identity.Instance);
+                bool tokenGranted = false;
+                if (tokenEligible)
+                {
+                    int tokenQl = entry.Quality > 0 ? entry.Quality : 1;
+                    tokenGranted = TryGrantSideToken(character, tokenQl);
+                    if (tokenGranted)
+                    {
+                        FeedbackMessageHandler.Default.Send(
+                            character,
+                            MissionFeedbackCategoryId,
+                            TokenAwardedFeedbackMessageId);
+                    }
+                }
+                else
+                {
+                    MissionDiagnostics.Log(
+                        "TOKEN-SKIP-PCT char={0} mission={1:X8}",
+                        character.Identity.Instance,
+                        entry.QuestIdentity.Instance);
+                }
+
                 GrantCredits(character, cashReward);
                 SendRewardFeedback(character, xpReward, cashReward);
+                if (xpReward > 0)
+                {
+                    CombatXpRuntimeService.AwardDirectXp(
+                        character,
+                        xpReward,
+                        "mission-complete-" + entry.QuestIdentity.Instance.ToString("X8"));
+                }
 
-                int tokenQl = entry.Quality > 0 ? entry.Quality : 1;
-                TryGrantSideToken(character, tokenQl);
+                // Rolled mission ItemRewards always paid on objective complete (independent of token %).
+                bool itemGranted = TryGrantOfferItemReward(client, character, entry);
+                if (itemGranted)
+                {
+                    SendYellowFeedback(character, "You've received an item as mission reward!");
+                }
+
+                SendMissionAccomplishedFeedback(character);
 
                 SendMissionCompleteAction(character, entry.QuestIdentity);
                 SendQuestDelete(character, entry.QuestIdentity);
 
                 int keyInstance;
                 bool keyRemoved = false;
-                if (MissionKeyStore.TryTakeLatest(character.Identity.Instance, out keyInstance))
+                // Prefer mission-keyed take; fall back to latest, then any template in bag.
+                if (MissionKeyStore.TryTake(character.Identity.Instance, entry.QuestIdentity, out keyInstance)
+                    || MissionKeyStore.TryTakeLatest(character.Identity.Instance, out keyInstance))
                 {
                     keyRemoved = MissionKeyGrantService.TryRemoveMissionKey(client, character, keyInstance);
+                }
+
+                if (!keyRemoved)
+                {
+                    keyRemoved = MissionKeyGrantService.TryRemoveAnyMissionKey(client, character);
                 }
 
                 bool storeRemoved = MissionAcceptedStore.Remove(
                     character.Identity.Instance,
                     entry.QuestIdentity);
 
+                MissionTokenProgressTracker.ClearCharacter(character.Identity.Instance);
+                MissionFindItemService.ClearCharacter(character.Identity.Instance);
+
                 MissionDiagnostics.Log(
-                    "COMPLETE char={0} mission={1:X8} reason={2} cash={3} xp={4} keyRemoved={5} storeRemoved={6}",
+                    "COMPLETE char={0} mission={1:X8} reason={2} cash={3} xp={4} item={5} token={6} keyRemoved={7} storeRemoved={8} pf={9}",
                     character.Identity.Instance,
                     entry.QuestIdentity.Instance,
                     reason ?? string.Empty,
                     cashReward,
                     xpReward,
+                    itemGranted,
+                    tokenGranted,
                     keyRemoved,
-                    storeRemoved);
+                    storeRemoved,
+                    character.Playfield != null ? character.Playfield.Identity.Instance : 0);
 
                 return true;
             }
@@ -204,24 +324,127 @@ namespace ZoneEngine.Core.Missions
 
         private static int ResolveCashReward(MissionAcceptedStore.AcceptedMission entry)
         {
-            if (entry.Offer != null && entry.Offer.CashReward > 0)
+            if (entry == null)
             {
-                return entry.Offer.CashReward;
+                return 0;
             }
 
-            // Fallback when offer shell had no cash field — capture finish paid 3748 at QL~42.
             int ql = entry.Quality > 0 ? entry.Quality : 1;
-            return Math.Max(100, ql * 90);
+            // Hard ceiling: capture-shell leftovers were ~106k on QL18; never pay that again.
+            const int AbsoluteMaxCash = 150000;
+            int cash = 0;
+
+            if (entry.CashReward > 0)
+            {
+                cash = entry.CashReward;
+            }
+            else if (entry.Offer != null && entry.Offer.CashReward > 0)
+            {
+                cash = entry.Offer.CashReward;
+            }
+            else
+            {
+                cash = MissionRollService.BaseCashForMissionQl(ql);
+            }
+
+            int maxCash = MissionRollService.BaseCashForMissionQl(ql) * 2;
+            if (maxCash > AbsoluteMaxCash)
+            {
+                maxCash = AbsoluteMaxCash;
+            }
+
+            if (cash > maxCash || cash > AbsoluteMaxCash)
+            {
+                cash = MissionRollService.BaseCashForMissionQl(ql);
+            }
+
+            return cash;
         }
 
         private static int ResolveXpReward(MissionAcceptedStore.AcceptedMission entry)
         {
-            if (entry.Offer != null && entry.Offer.ExperienceReward > 0)
+            if (entry == null)
             {
-                return entry.Offer.ExperienceReward;
+                return 0;
             }
 
-            return 0;
+            int ql = entry.Quality > 0 ? entry.Quality : 1;
+            // Hard ceiling: capture-shell leftovers were ~20M XP and leveled 25→45 in one mish.
+            const int AbsoluteMaxXp = 2500000;
+            int xp;
+
+            if (entry.ExperienceReward > 0 || entry.CashReward > 0)
+            {
+                xp = entry.ExperienceReward;
+            }
+            else if (entry.Offer != null)
+            {
+                xp = entry.Offer.ExperienceReward;
+            }
+            else
+            {
+                return 0;
+            }
+
+            int maxXp = MissionRollService.BaseXpForMissionQl(ql) * 2;
+            if (maxXp > AbsoluteMaxXp)
+            {
+                maxXp = AbsoluteMaxXp;
+            }
+
+            if (xp > maxXp || xp > AbsoluteMaxXp)
+            {
+                // Recompute balanced mid-slider XP for stamped QL (ignore shell).
+                xp = MissionRollService.BaseXpForMissionQl(ql);
+            }
+
+            return xp;
+        }
+
+        /// <summary>
+        /// Always grants the rolled offer ItemRewards on complete (0 kills still pays).
+        /// Independent of token % progress.
+        /// </summary>
+        private static bool TryGrantOfferItemReward(
+            IZoneClient client,
+            ICharacter character,
+            MissionAcceptedStore.AcceptedMission entry)
+        {
+            if (entry == null || entry.Offer == null || entry.Offer.ItemRewards == null
+                || entry.Offer.ItemRewards.Length == 0)
+            {
+                return false;
+            }
+
+            QuestItemShort reward = entry.Offer.ItemRewards[0];
+            if (reward == null || reward.LowId <= 0)
+            {
+                return false;
+            }
+
+            int highId = reward.HighId > 0 ? reward.HighId : reward.LowId;
+            int ql = reward.Quality > 0 ? reward.Quality : (entry.Quality > 0 ? entry.Quality : 1);
+            string name = "Mission Reward";
+            int itemInstance;
+            InventoryError error;
+            bool ok = MissionKeyGrantService.TryGrantNamedItem(
+                client,
+                character,
+                reward.LowId,
+                highId,
+                ql,
+                name,
+                out itemInstance,
+                out error);
+            MissionDiagnostics.Log(
+                "COMPLETE-ITEM char={0} ok={1} low={2} high={3} ql={4} err={5}",
+                character.Identity.Instance,
+                ok,
+                reward.LowId,
+                highId,
+                ql,
+                error);
+            return ok;
         }
 
         private static void GrantCredits(ICharacter character, int cashReward)
@@ -244,39 +467,108 @@ namespace ZoneEngine.Core.Missions
             }
 
             character.Stats[StatIds.cash].Set((uint)after);
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.cash, (uint)after);
+            // Gold finish: cash/XP/feedback land immediately inside the instance — not on zone.
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(
+                    new StatMessage
+                    {
+                        Identity = character.Identity,
+                        Stats = new[]
+                                {
+                                    new GameTuple<CharacterStat, uint>
+                                    {
+                                        Value1 = (CharacterStat)StatIds.cash,
+                                        Value2 = (uint)after
+                                    }
+                                }
+                    });
+            }
+            else
+            {
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.cash, (uint)after);
+            }
         }
 
         private static void SendRewardFeedback(ICharacter character, int xp, int cash)
         {
-            character.Send(
-                new FormatFeedbackMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 1,
-                    Unknown1 = 0,
-                    Unknown2 = 0,
-                    FormattedMessage = string.Format(
-                        "Received reward: {0} XP, {1} credits.",
-                        xp,
-                        cash)
-                });
+            SendYellowFeedback(
+                character,
+                string.Format("Received reward: {0} XP, {1} credits.", xp, cash));
         }
 
-        private static void TryGrantSideToken(ICharacter character, int quality)
+        private static void SendMissionAccomplishedFeedback(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            var message = new FeedbackMessage
+                          {
+                              Identity = character.Identity,
+                              Unknown = 1,
+                              Unknown1 = 0,
+                              CategoryId = MissionFeedbackCategoryId,
+                              MessageId = MissionAccomplishedFeedbackMessageId
+                          };
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(message);
+            }
+            else
+            {
+                FeedbackMessageHandler.Default.Send(
+                    character,
+                    MissionFeedbackCategoryId,
+                    MissionAccomplishedFeedbackMessageId);
+            }
+        }
+
+        private static void SendYellowFeedback(ICharacter character, string plainText)
+        {
+            if (character == null || string.IsNullOrEmpty(plainText))
+            {
+                return;
+            }
+
+            // Must SendCompressed on the zone client — character.Send can sit buffered until zone.
+            // Gold finish shows FormatFeedback immediately on InfoRequest inside the instance.
+            var message = new FormatFeedbackMessage
+                          {
+                              Identity = character.Identity,
+                              Unknown = 1,
+                              Unknown1 = 0,
+                              Unknown2 = 0,
+                              FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(plainText)
+                          };
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(message);
+            }
+            else
+            {
+                character.Send(message);
+            }
+        }
+
+        private static bool TryGrantSideToken(ICharacter character, int quality)
         {
             Side side = (Side)character.Stats[StatIds.side].Value;
             int lowId;
             int highId;
+            string tokenName;
             if (side == Side.Clan)
             {
                 lowId = ClanTokenLowId;
                 highId = ClanTokenHighId;
+                tokenName = "Clan Token";
             }
             else if (side == Side.Omni)
             {
                 lowId = OmniTokenLowId;
                 highId = OmniTokenHighId;
+                tokenName = "Omni Token";
             }
             else
             {
@@ -284,7 +576,7 @@ namespace ZoneEngine.Core.Missions
                     "TOKEN-SKIP char={0} side={1} (neutral/other → no token)",
                     character.Identity.Instance,
                     side);
-                return;
+                return false;
             }
 
             int count = MissionLevelTable.GetTokenReward(character.Stats[StatIds.level].Value);
@@ -293,76 +585,67 @@ namespace ZoneEngine.Core.Missions
                 count = 1;
             }
 
-            bool inventoryOk = false;
-            try
+            // Same finish-wire grant that already delivers mission reward items in-instance.
+            IZoneClient client = character.Controller != null
+                                     ? character.Controller.Client as IZoneClient
+                                     : null;
+            if (client == null)
             {
-                if (ItemLoader.ItemList.ContainsKey(lowId) && ItemLoader.ItemList.ContainsKey(highId)
-                    && character.BaseInventory != null)
+                MissionDiagnostics.Log(
+                    "TOKEN-INV-FAIL char={0} side={1} err=no-client",
+                    character.Identity.Instance,
+                    side);
+                return false;
+            }
+
+            int tokenQl = 1;
+            int itemInstance;
+            InventoryError error;
+            bool ok = MissionKeyGrantService.TryGrantNamedItem(
+                client,
+                character,
+                lowId,
+                highId,
+                tokenQl,
+                tokenName,
+                out itemInstance,
+                out error);
+            if (ok && count > 1)
+            {
+                // Stack extras on the granted slot when level table awards >1.
+                try
                 {
-                    IInventoryPage page;
-                    if (character.BaseInventory.Pages.TryGetValue(
-                        character.BaseInventory.StandardPage,
-                        out page))
+                    foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
                     {
-                        int slot = page.FindFreeSlot();
-                        if (slot >= 0)
+                        foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List())
                         {
-                            var item = new Item(quality, lowId, highId) { MultipleCount = count, Flags = 1 };
-                            if (page.Add(slot, item) == InventoryError.OK)
+                            IItem item = itemEntry.Value;
+                            if (item != null && item.Identity != null
+                                && item.Identity.Instance == itemInstance)
                             {
+                                item.MultipleCount = count;
                                 character.BaseInventory.Write();
-                                inventoryOk = true;
+                                break;
                             }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MissionDiagnostics.Log(
-                    "TOKEN-INV-FAIL char={0} side={1} err={2}",
-                    character.Identity.Instance,
-                    side,
-                    ex.Message);
-            }
-
-            character.Send(
-                new TemplateActionMessage
+                catch
                 {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    ItemLowId = lowId,
-                    ItemHighId = highId,
-                    Quality = quality,
-                    Unknown1 = TemplateActionUnknown1,
-                    Unknown2 = TemplateActionUnknown2,
-                    Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Unknown3 = 0,
-                    Unknown4 = 0
-                });
-            character.Send(
-                new ContainerAddItemMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                    Target = new Identity
-                             {
-                                 Type = IdentityType.OverflowWindow,
-                                 Instance = character.Identity.Instance
-                             },
-                    TargetPlacement = OverflowNextFreeSlot
-                });
+                }
+            }
 
             MissionDiagnostics.Log(
-                "TOKEN-GRANT char={0} side={1} low={2} high={3} ql={4} count={5} invOk={6}",
+                "TOKEN-GRANT char={0} side={1} low={2} high={3} ql={4} count={5} invOk={6} err={7}",
                 character.Identity.Instance,
                 side,
                 lowId,
                 highId,
-                quality,
+                tokenQl,
                 count,
-                inventoryOk);
+                ok,
+                error);
+            return ok;
         }
 
         private static void SendMissionCompleteAction(ICharacter character, Identity mission)
@@ -375,39 +658,53 @@ namespace ZoneEngine.Core.Missions
                                 Instance = mission.Instance
                             };
 
-            character.Send(
-                new CharacterActionMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    Action = (CharacterActionType)MissionCompleteAction,
-                    Unknown1 = 0,
-                    Target = missionId,
-                    Parameter1 = MissionIdentityType,
-                    Parameter2 = unchecked((int)missionId.Instance),
-                    Unknown2 = 0
-                });
+            var message = new CharacterActionMessage
+                          {
+                              Identity = character.Identity,
+                              Unknown = 0,
+                              Action = (CharacterActionType)MissionCompleteAction,
+                              Unknown1 = 0,
+                              Target = missionId,
+                              Parameter1 = MissionIdentityType,
+                              Parameter2 = unchecked((int)missionId.Instance),
+                              Unknown2 = 0
+                          };
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(message);
+            }
+            else
+            {
+                character.Send(message);
+            }
         }
 
         private static void SendQuestDelete(ICharacter character, Identity mission)
         {
-            character.Send(
-                new QuestMessage
-                {
-                    Identity = character.Identity,
-                    Unknown = 0,
-                    Action = QuestAction.Delete,
-                    Unknown1 = 0,
-                    Mission = new Identity
-                              {
-                                  Type = mission.Type != 0
-                                             ? mission.Type
-                                             : (IdentityType)MissionIdentityType,
-                                  Instance = mission.Instance
-                              },
-                    Unknown2 = 0,
-                    Unknown3 = 0
-                });
+            var message = new QuestMessage
+                          {
+                              Identity = character.Identity,
+                              Unknown = 0,
+                              Action = QuestAction.Delete,
+                              Unknown1 = 0,
+                              Mission = new Identity
+                                        {
+                                            Type = mission.Type != 0
+                                                       ? mission.Type
+                                                       : (IdentityType)MissionIdentityType,
+                                            Instance = mission.Instance
+                                        },
+                              Unknown2 = 0,
+                              Unknown3 = 0
+                          };
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(message);
+            }
+            else
+            {
+                character.Send(message);
+            }
         }
     }
 }
