@@ -795,6 +795,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesProductionSpecializedValues { get; set; }
 
+        internal bool UsesProductionEquippedWeaponValues { get; set; }
+
         internal bool UsesCaptureProvenArchetype { get; set; }
 
         internal string CaptureProvenArchetypeId { get; set; }
@@ -1076,6 +1078,13 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionSpecializedValues = true;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionEquippedWeaponValues()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionEquippedWeaponValues = true;
             return clone;
         }
 
@@ -1820,12 +1829,14 @@ namespace AORebirth.Core.Playfields
                             && archetype.Combat != null
                             && archetype.Combat.Observed;
             bool runtimeReady = observed && archetype.Combat.RuntimeReady;
-            return new CapturedEnemyCombatContract
+            CapturedEnemyCombatContract contract = new CapturedEnemyCombatContract
             {
                 AttackModel = runtimeReady
                     ? CapturedEnemyAttackModel.FixedAttackInfo
                     : CapturedEnemyAttackModel.Unresolved,
                 IsCombatReady = runtimeReady,
+                Retaliates = observed,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
                 Evidence = archetype == null
                     ? string.Empty
                     : runtimeReady
@@ -1838,6 +1849,9 @@ namespace AORebirth.Core.Playfields
                 AttackInfoUnknown = runtimeReady ? archetype.Combat.AttackInfoUnknown : 0,
                 AttackInfoWeaponInstance = runtimeReady ? archetype.Combat.WeaponInstance : 0
             };
+            return archetype != null && archetype.MonsterData == 203746
+                       ? contract.WithProductionEquippedWeaponValues()
+                       : contract;
         }
 
         private static CapturedEnemyCombatContract ForFragmentedSoul(

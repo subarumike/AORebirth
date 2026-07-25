@@ -1065,6 +1065,95 @@ namespace AORebirth.Core.Playfields
                     resourceId,
                     name,
                     monsterData)).ToArray();
+            if (current.UsesProductionEquippedWeaponValues)
+            {
+                CapturedEnemyCombatProfileDefinition[] exactProductionFamily = family.Where(
+                    value => value.Level == level
+                             && value
+                                 .SupportsCaptureProvenEquippedWeaponPacketSemantics).ToArray();
+                if (exactProductionFamily.Length == 0)
+                {
+                    return false;
+                }
+
+                CapturedEnemyCombatProfileDefinition productionProfile;
+                if (exactProductionFamily.Length == 1)
+                {
+                    productionProfile = exactProductionFamily[0];
+                }
+                else
+                {
+                    CapturedEnemyCombatProfileDefinition[] sourceMatches =
+                        exactProductionFamily.Where(
+                            value => value.ContainsSource(sourceIdentityHint)).ToArray();
+                    if (sourceMatches.Length != 1)
+                    {
+                        return false;
+                    }
+
+                    productionProfile = sourceMatches[0];
+                }
+
+                int productionEvidenceSourceIdentity =
+                    productionProfile.ContainsSource(sourceIdentityHint)
+                        ? sourceIdentityHint
+                        : productionProfile.RepresentativeEvidenceSourceIdentity;
+                CapturedEnemyWeaponDefinition productionWeapon =
+                    productionProfile.WeaponDefinition.WithEvidenceSourceIdentity(
+                        productionEvidenceSourceIdentity);
+                CapturedEnemyCombatProfileStreamDefinition productionStream =
+                    productionProfile.Streams[0];
+                string productionArchetypeId = string.Format(
+                    "resource={0}|name={1}|MonsterData={2}|level={3}|weapon={4}/{5}|profile={6}",
+                    resourceId,
+                    name,
+                    monsterData,
+                    level,
+                    productionWeapon.LowId,
+                    productionWeapon.HighId,
+                    productionProfile.ProfileId);
+
+                resolved = CapturedEnemyCombatContract
+                    .EquippedWeaponWithCapturedPacketSequence(
+                        productionProfile.Evidence,
+                        productionEvidenceSourceIdentity,
+                        productionWeapon.LowId,
+                        productionWeapon.HighId,
+                        productionWeapon.Quality,
+                        productionWeapon.InventorySlot,
+                        true,
+                        0,
+                        0,
+                        0,
+                        productionStream.CapturedAttackRange,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        false,
+                        false,
+                        productionStream.InitialAmmoCount,
+                        productionStream.DamageTypeWire,
+                        productionProfile.SpecialAttackWeaponUnknown1,
+                        productionProfile.SpecialAttackWeaponUnknown2,
+                        productionProfile.SpecialAttackWeaponUnknown3,
+                        productionProfile.SpecialAttackWeaponUnknown4,
+                        productionProfile.SpecialAttackWeaponUnknown5,
+                        productionStream.HitTypeWire,
+                        productionStream.N3Unknown,
+                        productionProfile.SpecialAttackWeaponN3Unknown,
+                        productionProfile.AttackN3Unknown,
+                        productionProfile.AttackAction,
+                        current.RequiresDamageLineOfSight,
+                        true,
+                        current.AiProfile)
+                    .WithCapturedWeapon(productionWeapon)
+                    .WithCapturedSpecialAttackWeaponUnknown5Observations(
+                        productionProfile.SpecialAttackWeaponUnknown5Observations)
+                    .WithCaptureProvenArchetype(productionArchetypeId);
+                return resolved.IsCombatReady;
+            }
+
             if (current.UsesProductionWeaponQuality)
             {
                 CapturedEnemyCombatProfileDefinition[] compatibleLevelFamily = family.Where(
