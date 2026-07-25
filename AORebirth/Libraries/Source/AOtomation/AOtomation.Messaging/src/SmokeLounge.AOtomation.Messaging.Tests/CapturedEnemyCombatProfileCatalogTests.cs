@@ -1574,6 +1574,222 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PrematurePatternUsesExactNaturalStreamsWithProductionValues()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Premature Pattern"
+                         && value.MonsterData == 203727);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(7, activeSpawns.Length);
+
+            CapturedEnemyCombatProfileDefinition levelSeventeen =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "16398bc466394441-4396dd013773b1a8");
+            CapturedEnemyCombatProfileDefinition levelEighteen =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "623438ff48197091-8248575e9d33a84a");
+            Assert.IsTrue(levelSeventeen.CaptureEvidenceSafe);
+            Assert.IsFalse(levelSeventeen.CaptureRuntimeEvidenceSafe);
+            Assert.IsTrue(levelEighteen.CaptureEvidenceSafe);
+            Assert.AreEqual(1, levelSeventeen.Streams.Length);
+            Assert.AreEqual(1, levelEighteen.Streams.Length);
+            Assert.AreEqual(101, levelSeventeen.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(107, levelEighteen.SpecialAttackWeaponUnknown1);
+
+            int restoredActors = 0;
+            int restoredVariants = 0;
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                OrdinaryEnemySpawnVariant[] variants =
+                    activeSpawn.LevelDefinition.GetExplicitVariants();
+                if (variants.Length == 0)
+                {
+                    CapturedEnemyCombatContract baseline =
+                        runtimeProfile.Combat.ResolveContract(
+                            activeSpawn.SourceIdentity,
+                            activeSpawn.Level);
+                    Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure);
+                    bool shouldResolve =
+                        activeSpawn.Level == 17 || activeSpawn.Level == 18;
+                    Assert.AreEqual(
+                        shouldResolve,
+                        success,
+                        string.Format(
+                            "source=0x{0:X8} level={1}: {2}",
+                            activeSpawn.SourceIdentity,
+                            activeSpawn.Level,
+                            failure));
+                    if (!success)
+                    {
+                        Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+                        continue;
+                    }
+
+                    AssertPrematurePatternProductionContract(
+                        resolved,
+                        activeSpawn.Level == 17
+                            ? levelSeventeen.ProfileId
+                            : levelEighteen.ProfileId);
+                    restoredActors++;
+                    continue;
+                }
+
+                bool everyVariantResolved = true;
+                foreach (OrdinaryEnemySpawnVariant variant in variants)
+                {
+                    CapturedEnemyCombatContract baseline =
+                        runtimeProfile.Combat.ResolveContract(
+                            activeSpawn.SourceIdentity,
+                            variant);
+                    Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        variant.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure);
+                    Assert.IsTrue(
+                        success,
+                        string.Format(
+                            "source=0x{0:X8} variant level={1}: {2}",
+                            activeSpawn.SourceIdentity,
+                            variant.Level,
+                            failure));
+                    if (!success)
+                    {
+                        everyVariantResolved = false;
+                        continue;
+                    }
+
+                    AssertPrematurePatternProductionContract(
+                        resolved,
+                        variant.Level == 17
+                            ? levelSeventeen.ProfileId
+                            : levelEighteen.ProfileId);
+                    restoredVariants++;
+                }
+
+                if (everyVariantResolved)
+                {
+                    restoredActors++;
+                }
+            }
+
+            Assert.AreEqual(4, restoredActors);
+            Assert.AreEqual(2, restoredVariants);
+        }
+
+        [TestMethod]
+        public void InfectedAttendantUsesExactNaturalStreamWithProductionValues()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Infected Attendant"
+                         && value.MonsterData == 96056);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(5, activeSpawns.Length);
+
+            CapturedEnemyCombatProfileDefinition generatedProfile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "e7b6e43fd381d4aa-63cd3e499be4e58b");
+            Assert.IsTrue(generatedProfile.CaptureEvidenceSafe);
+            Assert.AreEqual(1, generatedProfile.Streams.Length);
+            Assert.AreEqual(59, generatedProfile.SpecialAttackWeaponUnknown1);
+
+            int restoredActors = 0;
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                Assert.AreEqual(
+                    0,
+                    activeSpawn.LevelDefinition.GetExplicitVariants().Length);
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure);
+                Assert.AreEqual(
+                    activeSpawn.Level == 11,
+                    success,
+                    string.Format(
+                        "source=0x{0:X8} level={1}: {2}",
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level,
+                        failure));
+                if (!success)
+                {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+                    continue;
+                }
+
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+                StringAssert.Contains(
+                    resolved.CaptureProvenArchetypeId,
+                    generatedProfile.ProfileId);
+                Assert.IsNotNull(resolved.SpecialAttackSequence);
+                Assert.IsNull(resolved.SpecialAttackSequence.OpeningAttack);
+                CapturedEnemyCombatAttackDefinition attack =
+                    resolved.SpecialAttackSequence.RepeatingAttack;
+                Assert.AreEqual(11, attack.MinDamage);
+                Assert.AreEqual(15, attack.MaxDamage);
+                Assert.AreEqual(5.0d, attack.RechargeSeconds);
+                Assert.AreEqual(0, attack.CapturedDamageObservations.Length);
+                Assert.AreEqual(-1, attack.AttackInfoAmmoCount);
+                Assert.AreEqual(0, attack.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, attack.AttackInfoUnknown);
+                Assert.AreEqual(3, attack.AttackInfoHitType);
+                Assert.AreEqual(1397315377, attack.AttackInfoWeaponInstance);
+                Assert.AreEqual(1, resolved.SpecialAttackSequence.SpecialAttacks.Length);
+                Assert.AreEqual(0, resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+                restoredActors++;
+            }
+
+            Assert.AreEqual(2, restoredActors);
+        }
+
+        [TestMethod]
         public void ProductionQlFamiliesResolveOnlyExactCapturedLevelWeaponPacketSemantics()
         {
             AssertProductionQlFamily(
@@ -2807,6 +3023,49 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                        StringComparison.Ordinal) >= 0
                 ? ReadSummaryValue(inventoryHeader, "runtimeGeneratedSemanticDefinitions")
                 : ReadSummaryValue(inventoryHeader, "captureCertifiedSemanticDefinitions");
+        }
+
+        private static void AssertPrematurePatternProductionContract(
+            CapturedEnemyCombatContract resolved,
+            string expectedProfileId)
+        {
+            Assert.IsTrue(resolved.IsCombatReady);
+            Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+            Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+            StringAssert.Contains(
+                resolved.CaptureProvenArchetypeId,
+                expectedProfileId);
+            Assert.IsNotNull(resolved.SpecialAttackSequence);
+            Assert.IsNull(resolved.SpecialAttackSequence.OpeningAttack);
+            CapturedEnemyCombatAttackDefinition attack =
+                resolved.SpecialAttackSequence.RepeatingAttack;
+            Assert.IsNotNull(attack);
+            Assert.AreEqual(17, attack.MinDamage);
+            Assert.AreEqual(22, attack.MaxDamage);
+            Assert.AreEqual(5.0d, attack.RechargeSeconds);
+            Assert.AreEqual(0, attack.CapturedDamageObservations.Length);
+            Assert.IsFalse(attack.UsesEquippedWeapon);
+            Assert.AreEqual(-1, attack.AttackInfoAmmoCount);
+            Assert.AreEqual(0, attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, attack.AttackInfoUnknown);
+            Assert.AreEqual(3, attack.AttackInfoHitType);
+            Assert.AreEqual(1397315377, attack.AttackInfoWeaponInstance);
+            Assert.AreEqual((byte)0, attack.AttackInfoN3Unknown);
+            Assert.IsTrue(attack.SendAttackInfo);
+            Assert.AreEqual(1, resolved.SpecialAttackSequence.SpecialAttacks.Length);
+            Assert.AreEqual(
+                144742,
+                resolved.SpecialAttackSequence.SpecialAttacks[0].LowTemplate);
+            Assert.AreEqual(
+                144743,
+                resolved.SpecialAttackSequence.SpecialAttacks[0].HighTemplate);
+            Assert.AreEqual(
+                1397315377,
+                resolved.SpecialAttackSequence.SpecialAttacks[0].Tag);
+            Assert.AreEqual(0, resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(0, resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown5);
+            Assert.AreEqual((byte)0, resolved.SpecialAttackSequence.AttackN3Unknown);
+            Assert.AreEqual((byte)0, resolved.SpecialAttackSequence.AttackAction);
         }
 
         private static string FindRepositoryRoot()

@@ -820,6 +820,20 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            CapturedEnemyCombatContract naturalAttackContract;
+            if (TryResolveProductionOwnedNaturalAttackProfile(
+                    resourceId,
+                    name,
+                    monsterData,
+                    level,
+                    sourceIdentityHint,
+                    current,
+                    out naturalAttackContract))
+            {
+                resolved = naturalAttackContract;
+                return true;
+            }
+
             CapturedEnemyCombatContract archetypeContract;
             if (TryResolveCaptureProvenEquippedWeaponArchetype(
                     resourceId,
@@ -1042,6 +1056,107 @@ namespace AORebirth.Core.Playfields
             }
 
             return true;
+        }
+
+        private static bool TryResolveProductionOwnedNaturalAttackProfile(
+            int resourceId,
+            string name,
+            int monsterData,
+            int level,
+            int sourceIdentityHint,
+            CapturedEnemyCombatContract current,
+            out CapturedEnemyCombatContract resolved)
+        {
+            resolved = null;
+            if (current == null
+                || !current.UsesProductionSpecializedValues
+                || current.AttackModel == CapturedEnemyAttackModel.Specialized
+                || current.MinDamage <= 0
+                || current.MaxDamage < current.MinDamage
+                || current.RechargeSeconds <= 0.0d)
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition[] compatibleProfiles = Profiles.Where(
+                value => value.MatchesKey(resourceId, name, monsterData, level)
+                         && value.CaptureEvidenceSafe
+                         && value.WeaponDefinition == null
+                         && value.Streams.Length == 1
+                         && value.Streams[0].CapturedUsesEquippedWeapon == false
+                         && value.Streams[0].CapturedSendAttackInfo == true).ToArray();
+            if (compatibleProfiles.Length == 0)
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition profile;
+            if (compatibleProfiles.Length == 1)
+            {
+                profile = compatibleProfiles[0];
+            }
+            else
+            {
+                CapturedEnemyCombatProfileDefinition[] sourceMatches =
+                    compatibleProfiles.Where(
+                        value => value.ContainsSource(sourceIdentityHint)).ToArray();
+                if (sourceMatches.Length != 1)
+                {
+                    return false;
+                }
+
+                profile = sourceMatches[0];
+            }
+
+            int evidenceSourceIdentity = profile.ContainsSource(sourceIdentityHint)
+                                             ? sourceIdentityHint
+                                             : profile.RepresentativeEvidenceSourceIdentity;
+            CapturedEnemyCombatProfileStreamDefinition stream = profile.Streams[0];
+            string archetypeId = string.Format(
+                "resource={0}|name={1}|MonsterData={2}|level={3}|profile={4}",
+                resourceId,
+                name,
+                monsterData,
+                level,
+                profile.ProfileId);
+            resolved = CapturedEnemyCombatContract
+                .CapturedSpecialSequence(
+                    profile.Evidence,
+                    new CapturedEnemySpecialAttackSequenceDefinition(
+                        0.0d,
+                        null,
+                        new CapturedEnemyCombatAttackDefinition(
+                            current.MinDamage,
+                            current.MaxDamage,
+                            current.CapturedDamageBonus,
+                            current.CapturedAttackRange
+                            ?? ZoneEngine.Core.Playfields.NpcCombatAttackRules
+                                .MaxMeleeCombatDistance,
+                            current.RechargeSeconds,
+                            false,
+                            stream.InitialAmmoCount,
+                            stream.WeaponSlot,
+                            stream.DamageTypeWire,
+                            stream.HitTypeWire,
+                            stream.WeaponInstance,
+                            stream.N3Unknown,
+                            true),
+                        profile.SpecialAttacks,
+                        current.SpecialAttackWeaponUnknown1,
+                        current.SpecialAttackWeaponUnknown2,
+                        current.SpecialAttackWeaponUnknown3,
+                        current.SpecialAttackWeaponUnknown4,
+                        current.SpecialAttackWeaponUnknown5,
+                        profile.SpecialAttackWeaponN3Unknown,
+                        profile.AttackN3Unknown,
+                        profile.AttackAction))
+                .WithProductionSpecializedValues()
+                .WithCaptureCertification(
+                    profile.Evidence,
+                    evidenceSourceIdentity,
+                    null)
+                .WithCaptureProvenArchetype(archetypeId);
+            return resolved.IsCombatReady;
         }
 
         private static bool TryResolveCaptureProvenEquippedWeaponArchetype(
