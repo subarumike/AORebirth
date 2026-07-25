@@ -1526,6 +1526,164 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void PrematurePatternUsesProductionValuesWithExactNaturalPacketPath()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x79545356);
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Premature Pattern"
+                         && value.MonsterData == 203727);
+            OrdinaryEnemySpawnDefinition activeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            OrdinaryEnemySpawnVariant levelSeventeen =
+                activeSpawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == 17);
+            CapturedEnemyCombatContract baseline = runtimeProfile.Combat.ResolveContract(
+                activeSpawn.SourceIdentity,
+                levelSeventeen);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    levelSeventeen.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure),
+                failure);
+            StringAssert.Contains(
+                resolved.CaptureProvenArchetypeId,
+                "16398bc466394441-4396dd013773b1a8");
+
+            CapturedEnemyCombatAttackDefinition attackDefinition =
+                resolved.SpecialAttackSequence.RepeatingAttack;
+            Identity attacker = SimpleChar(activeSpawn.SourceIdentity);
+            Identity target = SimpleChar(LocalPlayerIdentity);
+            SpecialAttackWeaponMessage specialAttackWeapon =
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    attacker,
+                    resolved);
+            AttackMessage attack = CapturedEnemyCombatPacketFactory.CreateAttack(
+                attacker,
+                target,
+                resolved);
+            AttackInfoMessage attackInfo =
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    attacker,
+                    target,
+                    attackDefinition.MinDamage,
+                    attackDefinition.AttackInfoAmmoCount,
+                    attackDefinition.AttackInfoWeaponSlot,
+                    attackDefinition.AttackInfoUnknown,
+                    attackDefinition.AttackInfoHitType,
+                    attackDefinition.AttackInfoWeaponInstance,
+                    attackDefinition.AttackInfoN3Unknown);
+
+            AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
+            Assert.AreEqual(1, specialAttackWeapon.Specials.Length);
+            Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown2);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown3);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown4);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual((byte)0, attack.Unknown);
+            Assert.AreEqual((byte)0, attack.Action);
+            Assert.AreEqual(target, attack.Target);
+            Assert.AreEqual(17, attackInfo.Unknown1);
+            Assert.AreEqual(-1, attackInfo.Unknown2);
+            Assert.AreEqual(0, attackInfo.Unknown3);
+            Assert.AreEqual(0, attackInfo.Unknown4);
+            Assert.AreEqual(3, attackInfo.Unknown5);
+            Assert.AreEqual(1397315377, attackInfo.Unknown6);
+            Assert.AreEqual((byte)0, attackInfo.Unknown);
+        }
+
+        [TestMethod]
+        public void InfectedAttendantUsesProductionValuesWithExactNaturalPacketPath()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x7953AA1A);
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Infected Attendant"
+                         && value.MonsterData == 96056);
+            OrdinaryEnemySpawnDefinition activeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            CapturedEnemyCombatContract baseline = runtimeProfile.Combat.ResolveContract(
+                activeSpawn.SourceIdentity,
+                activeSpawn.Level);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure),
+                failure);
+            StringAssert.Contains(
+                resolved.CaptureProvenArchetypeId,
+                "e7b6e43fd381d4aa-63cd3e499be4e58b");
+
+            CapturedEnemyCombatAttackDefinition attackDefinition =
+                resolved.SpecialAttackSequence.RepeatingAttack;
+            Identity attacker = SimpleChar(activeSpawn.SourceIdentity);
+            Identity target = SimpleChar(LocalPlayerIdentity);
+            SpecialAttackWeaponMessage specialAttackWeapon =
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    attacker,
+                    resolved);
+            AttackMessage attack = CapturedEnemyCombatPacketFactory.CreateAttack(
+                attacker,
+                target,
+                resolved);
+            AttackInfoMessage attackInfo =
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    attacker,
+                    target,
+                    attackDefinition.MinDamage,
+                    attackDefinition.AttackInfoAmmoCount,
+                    attackDefinition.AttackInfoWeaponSlot,
+                    attackDefinition.AttackInfoUnknown,
+                    attackDefinition.AttackInfoHitType,
+                    attackDefinition.AttackInfoWeaponInstance,
+                    attackDefinition.AttackInfoN3Unknown);
+
+            AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
+            Assert.AreEqual(1, specialAttackWeapon.Specials.Length);
+            Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown1);
+            Assert.AreEqual(0, specialAttackWeapon.Unknown5);
+            Assert.AreEqual((byte)0, attack.Unknown);
+            Assert.AreEqual((byte)0, attack.Action);
+            Assert.AreEqual(target, attack.Target);
+            Assert.AreEqual(11, attackInfo.Unknown1);
+            Assert.AreEqual(-1, attackInfo.Unknown2);
+            Assert.AreEqual(0, attackInfo.Unknown3);
+            Assert.AreEqual(0, attackInfo.Unknown4);
+            Assert.AreEqual(3, attackInfo.Unknown5);
+            Assert.AreEqual(1397315377, attackInfo.Unknown6);
+            Assert.AreEqual((byte)0, attackInfo.Unknown);
+        }
+
+        [TestMethod]
         public void TempleOrdinaryCoverageHasFourteenExactContractsAndQuarantinesTheRest()
         {
             var provider = new CapturedTempleOfThreeWindsContentProvider();

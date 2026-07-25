@@ -1849,6 +1849,13 @@ namespace AORebirth.Core.Playfields
                 AttackInfoUnknown = runtimeReady ? archetype.Combat.AttackInfoUnknown : 0,
                 AttackInfoWeaponInstance = runtimeReady ? archetype.Combat.WeaponInstance : 0
             };
+            if (archetype != null
+                && (archetype.MonsterData == 203727
+                    || archetype.MonsterData == 96056))
+            {
+                return contract.WithProductionSpecializedValues();
+            }
+
             return archetype != null && archetype.MonsterData == 203746
                        ? contract.WithProductionEquippedWeaponValues()
                        : contract;

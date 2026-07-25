@@ -3306,6 +3306,12 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0);
+            if (archetype.MonsterData == 203727
+                || archetype.MonsterData == 96056)
+            {
+                return contract.WithProductionSpecializedValues();
+            }
+
             return archetype.MonsterData == 203746
                        ? contract.WithProductionEquippedWeaponValues()
                        : contract;
