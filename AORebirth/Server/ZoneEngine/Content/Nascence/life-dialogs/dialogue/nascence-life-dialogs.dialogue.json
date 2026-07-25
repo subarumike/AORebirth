@@ -1,0 +1,311 @@
+{
+  "Identity": {
+    "Id": "nascence-life-dialogs-20260723-221330",
+    "Version": "capture-backed-options-1",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260723-221330"
+  },
+  "SourceCaptures": [
+    "20260723-221330"
+  ],
+  "Npcs": [
+    {
+      "Id": "scientist-drake-rodriguez",
+      "NpcIdentity": "SimpleChar:7963A853",
+      "Name": "Scientist Drake Rodriguez",
+      "RootNodeId": "drake_001",
+      "Aliases": [
+        "(SimpleChar:7963A853)"
+      ],
+      "Nodes": [
+        {
+          "Id": "drake_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only",
+          "Options": [
+            {
+              "Id": "drake_001_option_0",
+              "Index": 0,
+              "Text": "What is the purpose of this bracer?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:22.3715430Z Target=7963A853",
+              "NextNodeId": "drake_002",
+              "Actions": []
+            },
+            {
+              "Id": "drake_001_option_1",
+              "Index": 1,
+              "Text": "What are you doing here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:22.3715430Z Target=7963A853; branch body not captured",
+              "NextNodeId": "drake_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "drake_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:22.3715430Z Target=7963A853",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "drake_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "drake_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only after bracer question",
+          "Options": [
+            {
+              "Id": "drake_002_option_0",
+              "Index": 0,
+              "Text": "So this is Nascence?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:28.3441931Z Target=7963A853 after Answer=0",
+              "NextNodeId": "drake_003",
+              "Actions": []
+            },
+            {
+              "Id": "drake_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:28.3441931Z Target=7963A853",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "drake_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "drake_003",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only after So this is Nascence",
+          "Options": [
+            {
+              "Id": "drake_003_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:14:30.5518325Z Target=7963A853",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "drake_003_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "drake_uncaptured",
+          "PromptText": "",
+          "PromptTextConfidence": "option-text-only; AppendText not captured for What are you doing here",
+          "Options": [
+            {
+              "Id": "drake_uncaptured_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close until branch body is captured",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "drake_uncaptured_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "end",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "drake_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "joshua-falker",
+      "NpcIdentity": "SimpleChar:787B5401",
+      "Name": "Joshua Falker",
+      "RootNodeId": "falker_001",
+      "Aliases": [
+        "(SimpleChar:787B5401)"
+      ],
+      "Nodes": [
+        {
+          "Id": "falker_001",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only",
+          "Options": [
+            {
+              "Id": "falker_001_option_0",
+              "Index": 0,
+              "Text": "Yes!",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:21.4380053Z Target=787B5401",
+              "NextNodeId": "falker_002",
+              "Actions": []
+            },
+            {
+              "Id": "falker_001_option_1",
+              "Index": 1,
+              "Text": "No!",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:21.4380053Z Target=787B5401; branch body not captured",
+              "NextNodeId": "falker_uncaptured",
+              "Actions": []
+            },
+            {
+              "Id": "falker_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:21.4380053Z Target=787B5401",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "falker_001_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "falker_002",
+          "PromptText": "",
+          "PromptTextConfidence": "no-knubot-append-text-in-20260723-221330; options-only after Yes!",
+          "Options": [
+            {
+              "Id": "falker_002_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-23T20:15:26.5804938Z Target=787B5401 after Answer=0",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "falker_002_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "falker_uncaptured",
+          "PromptText": "",
+          "PromptTextConfidence": "option-text-only; AppendText not captured for No!",
+          "Options": [
+            {
+              "Id": "falker_uncaptured_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "safe close until branch body is captured",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "falker_uncaptured_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "end",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "falker_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "prince-creehan",
+      "NpcIdentity": "SimpleChar:78CCD541",
+      "Name": "Prince Creehan",
+      "RootNodeId": "creehan_001",
+      "Aliases": [
+        "(SimpleChar:78CCD541)"
+      ],
+      "Nodes": [
+        {
+          "Id": "creehan_001",
+          "PromptText": "Prince Creehan: Say what?",
+          "PromptTextConfidence": "SystemMessage/NpcMessage 2026-07-23T20:13:37.5115864Z; only captured body line",
+          "Options": [
+            {
+              "Id": "creehan_001_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "no AnswerList options captured; safe close after Say what?",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "creehan_001_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "close",
+          "PromptText": "",
+          "PromptTextConfidence": "end",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "creehan_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -247,6 +247,203 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
+        /// After a GM <c>/set sk</c> (or similar) writes cumulative SK, apply any earned
+        /// shadowlevels and refresh the SK bar wire. Plain stat set does not level by itself.
+        /// </summary>
+        /// <returns>True when level increased.</returns>
+        internal static bool ReconcileAfterManualSkSet(ICharacter character)
+        {
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return false;
+            }
+
+            IZoneClient client = character.Controller.Client;
+            int levelBefore = GetCurrentLevel(character);
+            if (levelBefore < ShadowLevelFloor)
+            {
+                LogXpTrace(
+                    character,
+                    "gm-sk-set-skip",
+                    "reason=below-shadow-floor level=" + levelBefore.ToString(CultureInfo.InvariantCulture));
+                if (client != null)
+                {
+                    SendSkProgressPackets(client, character);
+                }
+
+                ClearStatChangedFlag(character, StatIds.sk);
+                ClearStatChangedFlag(character, StatIds.nextsk);
+                WriteXpStatsToDb(character, "gm-sk-set-below-floor");
+                return false;
+            }
+
+            if (levelBefore >= MaxLevel)
+            {
+                if (client != null)
+                {
+                    StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextsk, 0);
+                }
+
+                ClearStatChangedFlag(character, StatIds.sk);
+                ClearStatChangedFlag(character, StatIds.nextsk);
+                WriteXpStatsToDb(character, "gm-sk-set-max");
+                return false;
+            }
+
+            bool leveledUp = ApplyPendingSkLevelUps(character, levelBefore);
+            if (leveledUp && client != null)
+            {
+                SendLevelUpPreFeedbackPackets(client, character, levelBefore);
+                PersistLevelStat(character);
+            }
+
+            if (client != null)
+            {
+                SendSkProgressPackets(client, character);
+            }
+
+            ClearManualXpWireStatChangedFlags(character, leveledUp);
+            ClearStatChangedFlag(character, StatIds.sk);
+            ClearStatChangedFlag(character, StatIds.nextsk);
+            WriteXpStatsToDb(character, leveledUp ? "gm-sk-set-levelup" : "gm-sk-set");
+            LogXpTrace(
+                character,
+                leveledUp ? "gm-sk-set-levelup" : "gm-sk-set",
+                "levelBefore=" + levelBefore.ToString(CultureInfo.InvariantCulture)
+                + " levelAfter=" + GetCurrentLevel(character).ToString(CultureInfo.InvariantCulture)
+                + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue)
+                    .ToString(CultureInfo.InvariantCulture));
+            return leveledUp;
+        }
+
+        /// <summary>
+        /// After a GM <c>/set xp</c>, apply any earned Rubi-Ka levels and refresh the XP bar.
+        /// </summary>
+        internal static bool ReconcileAfterManualXpSet(ICharacter character)
+        {
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return false;
+            }
+
+            IZoneClient client = character.Controller.Client;
+            int levelBefore = GetCurrentLevel(character);
+            if (levelBefore >= ShadowLevelFloor)
+            {
+                // At 200+ progression is SK; XP set does not advance shadowlevels.
+                return ReconcileAfterManualSkSet(character);
+            }
+
+            bool leveledUp = ApplyPendingLevelUps(character, levelBefore);
+            if (leveledUp && client != null)
+            {
+                SendLevelUpPreFeedbackPackets(client, character, levelBefore);
+                PersistLevelStat(character);
+            }
+
+            ClearManualXpWireStatChangedFlags(character, leveledUp);
+            WriteXpStatsToDb(character, leveledUp ? "gm-xp-set-levelup" : "gm-xp-set");
+            if (client != null)
+            {
+                SyncXpBarStatsOnLogin(character);
+            }
+
+            return leveledUp;
+        }
+
+        /// <summary>
+        /// After a GM <c>/set level</c>. Jumping to 200+ leaves NextXP=0 and never syncs
+        /// SK/NextSK — client shows Experience 0/0. Clamp level, set SK/XP floors, resync bar.
+        /// </summary>
+        internal static void ReconcileAfterManualLevelSet(ICharacter character)
+        {
+            if (character == null || !(character.Controller is Controllers.PlayerController))
+            {
+                return;
+            }
+
+            int level = GetCurrentLevel(character);
+            if (level < 1)
+            {
+                level = 1;
+                SetXpStat(character, StatIds.level, 1, "gm-level-set-clamp-min");
+            }
+            else if (level > MaxLevel)
+            {
+                level = MaxLevel;
+                SetXpStat(character, StatIds.level, (uint)MaxLevel, "gm-level-set-clamp-max");
+            }
+
+            // Force NextXP/NextSK Value cache to match the new level.
+            character.Stats[StatIds.nextxp].ReCalculate = true;
+            character.Stats[StatIds.nextsk].ReCalculate = true;
+            int _nx = character.Stats[StatIds.nextxp].Value;
+            int _ns = character.Stats[StatIds.nextsk].Value;
+
+            if (level >= ShadowLevelFloor)
+            {
+                SetXpStat(character, StatIds.nextxp, 0, "gm-level-set-clear-nextxp");
+                uint skFloor = GetCumulativeSkForLevelStart(level);
+                uint sk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
+                if (sk < skFloor)
+                {
+                    SetXpStat(character, StatIds.sk, skFloor, "gm-level-set-sk-floor");
+                }
+
+                // RK XP bar is unused at 200+; keep cumulative XP at the level-200 ceiling.
+                uint xpCap = GetCumulativeXpForLevelStart(MaxRubikaLevel);
+                SetXpStat(character, StatIds.xp, xpCap, "gm-level-set-xp-cap");
+                SetXpStat(character, StatIds.unsavedxp, 0, "gm-level-set-clear-unsaved");
+            }
+            else
+            {
+                uint floorXp = GetCumulativeXpForLevelStart(level);
+                uint xp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
+                if (xp < floorXp)
+                {
+                    SetXpStat(character, StatIds.xp, floorXp, "gm-level-set-xp-floor");
+                    SetXpStat(character, StatIds.unsavedxp, 0, "gm-level-set-unsaved-floor");
+                }
+
+                EnsureLevelXpThresholds(character, "gm-level-set-thresholds");
+            }
+
+            character.CalculateSkills();
+            int maxLife = Math.Max(1, character.Stats[StatIds.life].Value);
+            int maxNano = Math.Max(0, character.Stats[StatIds.maxnanoenergy].Value);
+            character.Stats[StatIds.health].Set((uint)maxLife);
+            character.Stats[StatIds.currentnano].Set((uint)maxNano);
+
+            PersistLevelStat(character);
+            WriteXpStatsToDb(character, "gm-level-set");
+
+            IZoneClient client = character.Controller.Client;
+            if (client != null)
+            {
+                // Same post-FullCharacter bar wire used on login (SK path at 200-219).
+                SyncXpBarStatsOnLogin(character);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.level, (uint)level);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.life, (uint)maxLife);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.health, (uint)maxLife);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.maxnanoenergy, (uint)maxNano);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.currentnano, (uint)maxNano);
+            }
+
+            ClearManualXpWireStatChangedFlags(character, true);
+            ClearStatChangedFlag(character, StatIds.sk);
+            ClearStatChangedFlag(character, StatIds.nextsk);
+            ClearStatChangedFlag(character, StatIds.nextxp);
+            LogXpTrace(
+                character,
+                "gm-level-set",
+                "level=" + level.ToString(CultureInfo.InvariantCulture)
+                + " nextXp=" + _nx.ToString(CultureInfo.InvariantCulture)
+                + " nextSk=" + _ns.ToString(CultureInfo.InvariantCulture)
+                + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue)
+                    .ToString(CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
         /// Non-combat XP grant using the same cumulative/level-up wire as kills.
         /// </summary>
         internal static bool AwardDirectXp(ICharacter character, int xpReward, string source)
@@ -589,6 +786,40 @@ namespace ZoneEngine.Core
 
             IZoneClient client = character.Controller.Client;
             int level = GetCurrentLevel(character);
+
+            // Level 200-219: client XP tooltip becomes "Experience 0/0" unless SK + NextSK
+            // are wired. Skip the RK XP NewLevel replay and sync Shadowknowledge instead.
+            if (IsShadowLevelProgression(level))
+            {
+                EnsureSkFloorOnLogin(character);
+                // Experience bar reads NextXP; keep it 0 so the client uses SK/NextSK instead.
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextxp, 0);
+                SendSkProgressPackets(client, character);
+                // Prevent a later SendChangedStats from re-pushing NextSK BaseValue 0 (0/0 bar).
+                ClearStatChangedFlag(character, StatIds.nextxp);
+                ClearStatChangedFlag(character, StatIds.sk);
+                ClearStatChangedFlag(character, StatIds.nextsk);
+                ClearStatChangedFlag(character, StatIds.lastsk);
+                LogXpTrace(
+                    character,
+                    "login-bar-sync-sk",
+                    "level=" + level.ToString(CultureInfo.InvariantCulture)
+                    + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue)
+                        .ToString(CultureInfo.InvariantCulture)
+                    + " nextSk=" + GetNextSkRequiredForLevel(level).ToString(CultureInfo.InvariantCulture));
+                return;
+            }
+
+            if (level >= MaxLevel)
+            {
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextxp, 0);
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextsk, 0);
+                ClearStatChangedFlag(character, StatIds.nextxp);
+                ClearStatChangedFlag(character, StatIds.nextsk);
+                LogXpTrace(character, "login-bar-sync-max", "level=220 nextXp=0 nextSk=0");
+                return;
+            }
+
             uint floorXp = GetCumulativeXpForLevelStart(level);
             uint progress = GetBarProgress(character);
             uint cumulative = floorXp + progress;
@@ -650,6 +881,26 @@ namespace ZoneEngine.Core
                 + " next=" + nextXp.ToString(CultureInfo.InvariantCulture)
                 + " level=" + level.ToString(CultureInfo.InvariantCulture)
                 + " newLevelReplay=true feedback=none");
+        }
+
+        /// <summary>
+        /// Level 200 SK floor is 0; higher shadowlevels must not sit below their table floor
+        /// or the client bar shows garbage until the first SK award.
+        /// </summary>
+        private static void EnsureSkFloorOnLogin(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            int level = GetCurrentLevel(character);
+            uint floor = GetCumulativeSkForLevelStart(level);
+            uint sk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
+            if (sk < floor)
+            {
+                SetXpStat(character, StatIds.sk, floor, "login-sk-floor");
+            }
         }
 
         internal static void SyncXpBarStatsOnLogin(ICharacter character)
@@ -992,17 +1243,56 @@ namespace ZoneEngine.Core
                 cumulativeXp,
                 "StatMessage",
                 "unknown=0");
-            StatMessageHandler.Default.SendSingle(character, (int)StatIds.xp, cumulativeXp);
+            // Zone client SendCompressed — StatMessageHandler.Default.Send can buffer until zone-out
+            // (mission finish reward stayed invisible until leave).
+            if (client != null)
+            {
+                client.SendCompressed(
+                    new StatMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 0,
+                        Stats =
+                            new[]
+                            {
+                                new GameTuple<CharacterStat, uint>
+                                {
+                                    Value1 = (CharacterStat)StatIds.xp,
+                                    Value2 = cumulativeXp
+                                }
+                            }
+                    });
+            }
+            else
+            {
+                StatMessageHandler.Default.SendSingle(character, (int)StatIds.xp, cumulativeXp);
+            }
+
             LogXpWireFeedbackOutbound(
                 "CombatXpRuntimeService",
                 "kill-xp-feedback",
                 character,
                 LevelUpFeedbackCategoryId,
                 XpFeedbackMessageId);
-            FeedbackMessageHandler.Default.Send(
-                character,
-                LevelUpFeedbackCategoryId,
-                XpFeedbackMessageId);
+            if (client != null)
+            {
+                client.SendCompressed(
+                    new FeedbackMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 1,
+                        Unknown1 = 0,
+                        CategoryId = LevelUpFeedbackCategoryId,
+                        MessageId = XpFeedbackMessageId
+                    });
+            }
+            else
+            {
+                FeedbackMessageHandler.Default.Send(
+                    character,
+                    LevelUpFeedbackCategoryId,
+                    XpFeedbackMessageId);
+            }
         }
 
         private static void SendSocialStatusReset(IZoneClient client, ICharacter character)
@@ -1283,10 +1573,21 @@ namespace ZoneEngine.Core
                 return;
             }
 
+            int level = GetCurrentLevel(character);
             uint sk = NormalizeStatValue(character.Stats[StatIds.sk].BaseValue);
-            uint nextSk = (uint)GetNextSkRequiredForLevel(GetCurrentLevel(character));
+            uint nextSk = (uint)GetNextSkRequiredForLevel(level);
+            // Force computed NextSK into the Value cache so any later changed-stat flush
+            // (sendBaseValue=false) still emits the table amount, not a stale 0.
+            character.Stats[StatIds.nextsk].ReCalculate = true;
+            int _ = character.Stats[StatIds.nextsk].Value;
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.sk, sk);
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.nextsk, nextSk);
+            LogXpTrace(
+                character,
+                "sk-progress-wire",
+                "level=" + level.ToString(CultureInfo.InvariantCulture)
+                + " sk=" + sk.ToString(CultureInfo.InvariantCulture)
+                + " nextSk=" + nextSk.ToString(CultureInfo.InvariantCulture));
         }
 
         private static void SendLevelUpPreFeedbackPackets(

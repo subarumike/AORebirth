@@ -1299,8 +1299,10 @@ namespace AORebirth.Core.Playfields
         }
 
         /// <summary>
-        /// Applies a capture-backed secondary special (FlingShot / Burst): rolls weapon damage,
-        /// subtracts HP, handles kill. Caller sends SpecialAttackInfo / SpecialUsed packets.
+        /// Applies a capture-backed secondary special (FlingShot / Burst / Brawl / Dimach):
+        /// rolls weapon/unarmed damage, subtracts HP, handles kill.
+        /// Caller sends SpecialAttackInfo / SpecialUsed packets.
+        /// Capture 20260724-001643: Brawl/Dimach use EquipSlot=0 AmmoCount=-1 when unarmed.
         /// </summary>
         public bool TryApplyPlayerSpecialAttack(
             ICharacter attacker,
@@ -1325,19 +1327,19 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            equipSlot = attackSource.AttackInfoWeaponSlot > 0
-                            ? attackSource.AttackInfoWeaponSlot
-                            : (int)WeaponSlots.Righthand;
-            ammoCount = Math.Max(0, attackSource.AttackInfoAmmoCount);
+            // Capture Brawl/Dimach: EquipSlot=0 AmmoCount=-1 (unarmed). Do not coerce slot 0 → Righthand.
+            equipSlot = attackSource.AttackInfoWeaponSlot;
+            ammoCount = attackSource.AttackInfoAmmoCount;
 
             int hitCount = PlayerSpecialAttackRules.ResolveHitCount(specialStatId);
+            int damageScale = PlayerSpecialAttackRules.ResolveDamageScale(specialStatId);
             int totalDamage = 0;
             for (int i = 0; i < hitCount; i++)
             {
                 totalDamage += this.CalculateCombatDamage(attacker, attackSource);
             }
 
-            damage = Math.Max(1, totalDamage);
+            damage = Math.Max(1, totalDamage * Math.Max(1, damageScale));
             int currentHealth = target.Stats[StatIds.health].Value;
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
@@ -2358,6 +2360,7 @@ namespace AORebirth.Core.Playfields
                 attacker,
                 target,
                 (character, text) => this.SendRewardFeedback(character, text));
+            MissionTokenProgressTracker.NotifyTrashKilled(attacker, target);
             MissionCompleteService.TryCompleteIfMissionTargetKilled(attacker, target, "KillTarget");
         }
 
@@ -2968,12 +2971,13 @@ namespace AORebirth.Core.Playfields
 
         private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()
         {
+            // Capture 20260724-001643 SAW: MAAT 211357/211358, DIIT 42033/42032, BRAW 211401/211402.
             return new[]
                    {
                        new SpecialAttack
                        {
-                           Unknown1 = 0x0000AAC0,
-                           Unknown2 = 0x00023569,
+                           Unknown1 = 0x0003399D,
+                           Unknown2 = 0x0003399E,
                            Unknown3 = 0x00000064,
                            Unknown4 = "MAAT"
                        },
@@ -2986,8 +2990,8 @@ namespace AORebirth.Core.Playfields
                        },
                        new SpecialAttack
                        {
-                           Unknown1 = 0x00011294,
-                           Unknown2 = 0x00011295,
+                           Unknown1 = 0x000339C9,
+                           Unknown2 = 0x000339CA,
                            Unknown3 = 0x0000008E,
                            Unknown4 = "BRAW"
                        }
@@ -3245,6 +3249,15 @@ namespace AORebirth.Core.Playfields
                     : TimeSpan.FromSeconds(definition.Profile.Corpse.UnlootedLifetimeSeconds);
             }
 
+            // Nascence capture-backed empty corpses (Chimera credits=0) must stay clickable.
+            // Subway EmptyCorpseLifetime=Zero remains the default for other born-empty corpses.
+            if (lootClass == CombatCorpseLootClass.Empty
+                && target != null
+                && NascenceLifeSpawn.UsesCaptureOpenableEmptyCorpse(target.Name))
+            {
+                return CombatCorpseRules.RegularLootCorpseLifetime;
+            }
+
             return CombatCorpseRules.LifetimeFor(lootClass);
         }
 
@@ -3308,6 +3321,30 @@ namespace AORebirth.Core.Playfields
                     (int)NpcCorpseLifecycleRules.CorpseSpawnDelay.TotalMilliseconds));
         }
 
+        private static Item TryCreateMissionLootItem(int quality, int lowId, int highId)
+        {
+            if (lowId <= 0)
+            {
+                return null;
+            }
+
+            int high = highId > 0 ? highId : lowId;
+            try
+            {
+                if (!ItemLoader.ItemList.ContainsKey(lowId) || !ItemLoader.ItemList.ContainsKey(high))
+                {
+                    return null;
+                }
+
+                int ql = quality > 0 ? quality : 1;
+                return new Item(ql, lowId, high) { MultipleCount = 1 };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
         {
             LootGenerationResult generatedLoot = GlobalLootRuntimeService.Generate(target, this.Identity.Instance);
@@ -3350,23 +3387,129 @@ namespace AORebirth.Core.Playfields
                         lootItems[i].Slot = i;
                     }
                 }
-                else if (lootItems.Count == 0)
+                else
                 {
-                    MissionInstanceLootCatalog.LootDrop drop;
+                    // Capture 20260725-185432: most trash corpses are credits-only;
+                    // ~1/10 had an item (124444/5 on Fresh Lookout). Seed sparsely.
+                    lootItems.Clear();
                     int monsterData = target.Stats[StatIds.monsterdata].Value;
-                    if (MissionInstanceLootCatalog.TryGetDrop(monsterData, out drop) && drop != null)
+                    int missionQl = 1;
+                    int stampedQl;
+                    if (ZoneEngine.Core.Missions.MissionInstanceService.TryGetStampedMissionQuality(
+                        this.Identity.Instance,
+                        out stampedQl)
+                        && stampedQl > 0)
                     {
+                        missionQl = stampedQl;
+                    }
+
+                    int salt = unchecked(target.Identity.Instance * 397) ^ monsterData;
+                    if ((Math.Abs(salt) % 10) == 0)
+                    {
+                        MissionInstanceLootCatalog.LootDrop drop;
+                        if (MissionInstanceLootCatalog.TryGetMissionTrashDrop(
+                                monsterData,
+                                missionQl,
+                                salt,
+                                out drop)
+                            && drop != null)
+                        {
+                            Item lootItem = TryCreateMissionLootItem(drop.Quality, drop.LowId, drop.HighId);
+                            if (lootItem == null)
+                            {
+                                int salt2 = unchecked(target.Identity.Instance * 911);
+                                for (int attempt = 0; attempt < 8 && lootItem == null; attempt++)
+                                {
+                                    MissionInstanceLootCatalog.LootDrop alt;
+                                    if (!MissionInstanceLootCatalog.TryGetMissionTrashDrop(
+                                            monsterData,
+                                            missionQl,
+                                            salt2 + (attempt * 17),
+                                            out alt)
+                                        || alt == null)
+                                    {
+                                        continue;
+                                    }
+
+                                    lootItem = TryCreateMissionLootItem(alt.Quality, alt.LowId, alt.HighId);
+                                }
+                            }
+
+                            if (lootItem == null)
+                            {
+                                lootItem = TryCreateMissionLootItem(missionQl, 124444, 124445)
+                                           ?? TryCreateMissionLootItem(1, 100010, 100010);
+                            }
+
+                            if (lootItem != null)
+                            {
+                                lootItems.Add(
+                                    new CorpseLootItem
+                                    {
+                                        Slot = 0,
+                                        Item = lootItem,
+                                        LootIdentity = this.AllocateCorpseLootItemIdentity()
+                                    });
+                                ZoneEngine.Core.Missions.MissionDiagnostics.Log(
+                                    "LOOT-SEED corpseNpc={0} low={1} high={2} ql={3} count={4}",
+                                    target.Identity.Instance,
+                                    lootItem.LowID,
+                                    lootItem.HighID,
+                                    lootItem.Quality,
+                                    lootItems.Count);
+                            }
+                        }
+                    }
+                }
+
+                // Ultra-rare chest/mob loot (~1%) — never terminal roll rewards.
+                if (!ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsFindItemHost(target.Identity)
+                    && !ZoneEngine.Core.Missions.MissionFindPersonService.IsFindPersonTarget(target.Identity)
+                    && !ZoneEngine.Core.Missions.MissionTargetTracker.IsMissionTarget(target.Identity))
+                {
+                    int missionQl = 1;
+                    int stampedQl;
+                    if (ZoneEngine.Core.Missions.MissionInstanceService.TryGetStampedMissionQuality(
+                        this.Identity.Instance,
+                        out stampedQl)
+                        && stampedQl > 0)
+                    {
+                        missionQl = stampedQl;
+                    }
+
+                    ZoneEngine.Core.Missions.MissionRareLootCatalog.RareDrop rare;
+                    var rareRng = new Random(
+                        unchecked(Environment.TickCount * 397)
+                        ^ target.Identity.Instance
+                        ^ this.Identity.Instance);
+                    if (ZoneEngine.Core.Missions.MissionRareLootCatalog.TryRoll(missionQl, rareRng, out rare)
+                        && rare != null)
+                    {
+                        int slot = lootItems.Count;
                         lootItems.Add(
                             new CorpseLootItem
                             {
-                                Slot = 0,
-                                Item = new Item(drop.Quality, drop.LowId, drop.HighId) { MultipleCount = 1 },
+                                Slot = slot,
+                                Item = new Item(rare.Quality, rare.LowId, rare.HighId) { MultipleCount = 1 },
                                 LootIdentity = this.AllocateCorpseLootItemIdentity()
                             });
+                        Utility.LogUtil.Debug(
+                            Utility.DebugInfoDetail.Engine,
+                            "MissionRareLoot drop=" + rare.Name + " ql=" + rare.Quality
+                            + " corpse=" + target.Identity);
                     }
                 }
             }
             int credits = generatedLoot.Credits;
+            // Capture 20260725-185432 mission trash corpses: credits 21–87 even when Items empty.
+            if (credits <= 0
+                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                    this.Identity.Instance)
+                && target != null)
+            {
+                int salt = unchecked(target.Identity.Instance * 131) ^ this.Identity.Instance;
+                credits = 20 + (Math.Abs(salt) % 68);
+            }
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);
             TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);
             TimeSpan itemLootLifetime = CombatCorpseRules.RegularLootCorpseLifetime;
@@ -3391,6 +3534,14 @@ namespace AORebirth.Core.Playfields
                     emptyCleanupDelay = TimeSpan.FromSeconds(
                         ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds);
                 }
+            }
+
+            // Mike: empty Chimera loot window must stay open ~2s before corpse cleanup (not instant).
+            if (lootClass == CombatCorpseLootClass.Empty
+                && target != null
+                && NascenceLifeSpawn.UsesCaptureOpenableEmptyCorpse(target.Name))
+            {
+                emptyCleanupDelay = NascenceLifeSpawn.OpenableEmptyCorpseCleanupAfterOpenedDelay;
             }
 
             DateTime expiresAtUtc = DateTime.UtcNow + lifetime;
@@ -3561,7 +3712,11 @@ namespace AORebirth.Core.Playfields
                    || IsCapturedCleaningRobot(target)
                    || UsesCapturedThiefCorpseProfile(target)
                    || CombatCorpseVisuals.IsUsableVisualId(target.Stats[StatIds.catmesh].Value)
-                   || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value);
+                   || MonsterDataToCorpseCatMesh.ContainsKey(target.Stats[StatIds.monsterdata].Value)
+                   // Mission trash: always allow corpse (loot). Gold 002423 humanoid CATMesh map
+                   // covers common MDs; unknown MD still gets a corpse with fallback mesh.
+                   || (target != null
+                       && ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsAggressive(target.Identity));
         }
 
         private static int CorpseCatMeshFor(ICharacter target)
@@ -3595,10 +3750,18 @@ namespace AORebirth.Core.Playfields
                 return CapturedSubwayThiefCorpseCatMesh;
             }
 
-            return CombatCorpseVisuals.CorpseCatMeshFor(
+            int mesh = CombatCorpseVisuals.CorpseCatMeshFor(
                 target.Stats[StatIds.catmesh].Value,
                 target.Stats[StatIds.monsterdata].Value,
                 MonsterDataToCorpseCatMesh);
+            // L7 gold fallback when MonsterData not in map (remix appearance).
+            if (!CombatCorpseVisuals.IsUsableVisualId(mesh)
+                && ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsAggressive(target.Identity))
+            {
+                return 5934;
+            }
+
+            return mesh;
         }
 
         private static bool UsesCapturedThiefCorpseProfile(ICharacter target)
@@ -3615,6 +3778,17 @@ namespace AORebirth.Core.Playfields
             if (IsCapturedCleaningRobot(target))
             {
                 return NpcCorpseLifecycleRules.CapturedCleaningRobotDeathActionParameter2;
+            }
+
+            // L7 gold 20260725-002423: mission trash Death Parameter2=501 (not default 0x1F7).
+            if (target != null
+                && ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsAggressive(target.Identity))
+            {
+                int keyed = CombatCorpseVisuals.DeathAnimationKeyFor(
+                    target.Stats[StatIds.corpseanimkey].Value,
+                    target.Stats[StatIds.itemanim].Value,
+                    501);
+                return keyed;
             }
 
             return CombatCorpseVisuals.DeathAnimationKeyFor(

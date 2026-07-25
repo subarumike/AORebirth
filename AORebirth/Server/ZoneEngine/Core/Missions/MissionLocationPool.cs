@@ -1,5 +1,7 @@
 namespace ZoneEngine.Core.Missions
 {
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     /// <summary>
     /// City / marker affiliation for RK mission rolls.
     /// Omni city terminals must not point at Clan markers (Athens / Tir side) and vice versa.
@@ -29,9 +31,26 @@ namespace ZoneEngine.Core.Missions
 
         /// <summary>
         /// Side of the mission terminal / city the player rolled from (Omni Trade, Rome, Tir, Athens…).
-        /// Wilderness / unknown playfields stay Neutral (full pool).
+        /// Explicit Neutral cities (Borealis / Newland / Neutral Training) return Neutral.
+        /// Wilderness / unknown playfields also return Neutral — use <see cref="TryGetCityAffiliation"/>
+        /// to tell city terminals apart from wilderness.
         /// </summary>
         internal static MissionLocationSide ResolveTerminalSide(int playfieldId)
+        {
+            MissionLocationSide side;
+            if (TryGetCityAffiliation(playfieldId, out side))
+            {
+                return side;
+            }
+
+            return MissionLocationSide.Neutral;
+        }
+
+        /// <summary>
+        /// True when <paramref name="playfieldId"/> is a known RK city / training terminal zone
+        /// with a fixed side affiliation (Clan / Omni / Neutral).
+        /// </summary>
+        internal static bool TryGetCityAffiliation(int playfieldId, out MissionLocationSide side)
         {
             switch (playfieldId)
             {
@@ -44,7 +63,8 @@ namespace ZoneEngine.Core.Missions
                 case 647: // Greater Tir County
                 case 952: // Clan Training
                 case 953: // Clan Backyard
-                    return MissionLocationSide.Clan;
+                    side = MissionLocationSide.Clan;
+                    return true;
 
                 // Omni cities / Rome / training
                 case 700: // Omni1-HEADQUARTER
@@ -57,11 +77,80 @@ namespace ZoneEngine.Core.Missions
                 case 735: // Rome Blue
                 case 740: // Rome Green
                 case 950: // Omni Training
-                    return MissionLocationSide.Omni;
+                    side = MissionLocationSide.Omni;
+                    return true;
+
+                // Neutral cities / training
+                case 566: // Newland City
+                case 800: // Borealis
+                case 954: // Neutral Training
+                    side = MissionLocationSide.Neutral;
+                    return true;
 
                 default:
-                    return MissionLocationSide.Neutral;
+                    side = MissionLocationSide.Neutral;
+                    return false;
             }
+        }
+
+        /// <summary>
+        /// Omni terminals: Omni only. Clan terminals: Clan only.
+        /// Neutral city terminals: Omni and Clan (and Neutral chars) can roll.
+        /// Wilderness terminals stay open.
+        /// </summary>
+        internal static bool CanCharacterRollAtTerminal(MissionLocationSide characterSide, int terminalPlayfieldId)
+        {
+            MissionLocationSide citySide;
+            if (!TryGetCityAffiliation(terminalPlayfieldId, out citySide))
+            {
+                return true;
+            }
+
+            if (citySide == MissionLocationSide.Neutral)
+            {
+                return true;
+            }
+
+            return characterSide == citySide;
+        }
+
+        /// <summary>
+        /// Yellow chat when a wrong-side character tries an Omni/Clan city terminal.
+        /// </summary>
+        internal static string FormatSideRestrictedRollFeedback(int terminalPlayfieldId)
+        {
+            MissionLocationSide citySide;
+            if (!TryGetCityAffiliation(terminalPlayfieldId, out citySide))
+            {
+                return "This mission terminal is not available for your side.";
+            }
+
+            if (citySide == MissionLocationSide.Omni)
+            {
+                return "Only Omni side can roll missions!";
+            }
+
+            if (citySide == MissionLocationSide.Clan)
+            {
+                return "Only Clan side can roll missions!";
+            }
+
+            return "This mission terminal is not available for your side.";
+        }
+
+        internal static MissionLocationSide ResolveCharacterSide(int sideStatValue)
+        {
+            if (sideStatValue == (int)Side.Clan)
+            {
+                return MissionLocationSide.Clan;
+            }
+
+            if (sideStatValue == (int)Side.Omni)
+            {
+                return MissionLocationSide.Omni;
+            }
+
+            return MissionLocationSide.Neutral;
         }
 
         /// <summary>
@@ -80,7 +169,7 @@ namespace ZoneEngine.Core.Missions
                 case 600: // Varmint Woods (Tir)
                     return MissionLocationSide.Clan;
 
-                // Omni / southern RK side
+                // Omni / southern RK side (includes Omni Trade city markers from capture 20260724-140307)
                 case 635: // Stret East Bank
                 case 650: // Upper Stret East Bank
                 case 655: // Andromeda
@@ -89,6 +178,7 @@ namespace ZoneEngine.Core.Missions
                 case 685: // Galway County
                 case 695: // Lush Fields
                 case 696: // Mutant Domain
+                case 710: // Omni-1 Trade
                 case 760: // 4 Holes
                 case 790: // Stret West Bank
                 case 791: // Holes in the Wall
@@ -101,22 +191,253 @@ namespace ZoneEngine.Core.Missions
         }
 
         /// <summary>
-        /// Omni terminals may use Omni + Neutral markers; Clan terminals Clan + Neutral.
-        /// Neutral terminals (or unknown) keep the full pool.
+        /// Approximate outdoor travel meters between a terminal city playfield and a marker playfield.
+        /// Same-playfield markers use real XYZ; cross-playfield uses city→zone travel tiers.
+        /// </summary>
+        internal static double ApproxTravelMeters(int terminalPlayfieldId, int markerPlayfieldId)
+        {
+            if (terminalPlayfieldId == 0 || markerPlayfieldId == 0)
+            {
+                return 3500.0;
+            }
+
+            if (terminalPlayfieldId == markerPlayfieldId)
+            {
+                return 0.0;
+            }
+
+            // City / training terminals: prefer explicit near-zone outdoor markers over coarse tier gaps.
+            int nearRank = NearClusterRank(terminalPlayfieldId, markerPlayfieldId);
+            if (nearRank == 1)
+            {
+                return 800.0;
+            }
+
+            if (nearRank == 2)
+            {
+                return 1600.0;
+            }
+
+            int fromTier = TravelTier(terminalPlayfieldId);
+            int toTier = TravelTier(markerPlayfieldId);
+            int delta = fromTier > toTier ? fromTier - toTier : toTier - fromTier;
+            switch (delta)
+            {
+                case 0:
+                    return 1100.0;
+                case 1:
+                    return 2400.0;
+                case 2:
+                    return 4200.0;
+                case 3:
+                    return 6500.0;
+                default:
+                    return 9000.0;
+            }
+        }
+
+        /// <summary>
+        /// 0 = same playfield, 1 = immediate near-zone for that city, 2 = next outdoor ring, else -1.
+        /// Low-level rolls should stay in rank 0 (or 1 when the city has no marker spots).
+        /// </summary>
+        internal static int NearClusterRank(int terminalPlayfieldId, int markerPlayfieldId)
+        {
+            if (terminalPlayfieldId == 0 || markerPlayfieldId == 0)
+            {
+                return -1;
+            }
+
+            if (terminalPlayfieldId == markerPlayfieldId)
+            {
+                return 0;
+            }
+
+            switch (terminalPlayfieldId)
+            {
+                // West / Old Athens — markers live in West Athens + Athen Shire
+                case 540:
+                case 545:
+                    if (markerPlayfieldId == 545 || markerPlayfieldId == 550)
+                    {
+                        return 1;
+                    }
+
+                    if (markerPlayfieldId == 551 || markerPlayfieldId == 585)
+                    {
+                        return 2;
+                    }
+
+                    return -1;
+
+                // Tir city / county
+                case 640:
+                case 641:
+                case 646:
+                case 647:
+                case 952:
+                case 953:
+                    if (markerPlayfieldId == 646 || markerPlayfieldId == 647 || markerPlayfieldId == 600)
+                    {
+                        return 1;
+                    }
+
+                    if (markerPlayfieldId == 585 || markerPlayfieldId == 586)
+                    {
+                        return 2;
+                    }
+
+                    return -1;
+
+                // Omni HQ / Entertainment / Trade / Training — Trade has in-city markers (capture
+                // 20260724-140307); other Omni cities still use nearby Omni outdoors when needed.
+                case 700:
+                case 705:
+                case 706:
+                case 710:
+                case 950:
+                    if (markerPlayfieldId == 716 || markerPlayfieldId == 717 || markerPlayfieldId == 655
+                        || markerPlayfieldId == 635)
+                    {
+                        return 1;
+                    }
+
+                    if (markerPlayfieldId == 695 || markerPlayfieldId == 650 || markerPlayfieldId == 685)
+                    {
+                        return 2;
+                    }
+
+                    return -1;
+
+                // Rome
+                case 730:
+                case 735:
+                case 740:
+                    if (markerPlayfieldId == 685 || markerPlayfieldId == 695)
+                    {
+                        return 1;
+                    }
+
+                    if (markerPlayfieldId == 760 || markerPlayfieldId == 635)
+                    {
+                        return 2;
+                    }
+
+                    return -1;
+
+                default:
+                    // Already outdoors: same PF is rank 0; adjacent county by travel tier delta 0–1
+                    int fromTier = TravelTier(terminalPlayfieldId);
+                    int toTier = TravelTier(markerPlayfieldId);
+                    int delta = fromTier > toTier ? fromTier - toTier : toTier - fromTier;
+                    if (delta == 0)
+                    {
+                        return 1;
+                    }
+
+                    if (delta == 1)
+                    {
+                        return 2;
+                    }
+
+                    return -1;
+            }
+        }
+
+        /// <summary>
+        /// 0 = city / training, 1 = near county, 2 = mid wilderness, 3 = far, 4 = remote.
+        /// </summary>
+        private static int TravelTier(int playfieldId)
+        {
+            switch (playfieldId)
+            {
+                case 540:
+                case 545:
+                case 640:
+                case 641:
+                case 700:
+                case 705:
+                case 706:
+                case 710:
+                case 730:
+                case 735:
+                case 740:
+                case 950:
+                case 952:
+                case 953:
+                    return 0;
+                case 550:
+                case 646:
+                case 647:
+                case 716:
+                case 717:
+                    return 1;
+                case 551:
+                case 585:
+                case 586:
+                case 600:
+                case 635:
+                case 650:
+                case 655:
+                case 685:
+                case 695:
+                    return 2;
+                case 505:
+                case 565:
+                case 570:
+                case 595:
+                case 625:
+                case 630:
+                case 665:
+                case 670:
+                case 696:
+                case 760:
+                    return 3;
+                case 790:
+                case 791:
+                case 795:
+                    return 4;
+                default:
+                    return 2;
+            }
+        }
+
+        /// <summary>
+        /// Omni terminals → Omni + Neutral markers; Clan → Clan + Neutral; Neutral city → Neutral only.
         /// </summary>
         internal static bool IsSpotAllowedForTerminal(int markerPlayfieldId, MissionLocationSide terminalSide)
         {
+            MissionLocationSide markerSide = ResolveMarkerSide(markerPlayfieldId);
             if (terminalSide == MissionLocationSide.Neutral)
             {
-                return true;
+                return markerSide == MissionLocationSide.Neutral;
             }
 
-            MissionLocationSide markerSide = ResolveMarkerSide(markerPlayfieldId);
             return markerSide == MissionLocationSide.Neutral || markerSide == terminalSide;
         }
 
         internal static readonly Spot[] Spots =
         {
+            // Omni-1 Trade city markers (capture 20260724-140307 low-level Omni rolls — all offers in PF 710)
+            new Spot { Playfield = 710, X = 229.605F, Y = 6.504F, Z = 452.042F, EntranceLow = 43308, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 235.629F, Y = 6.341F, Z = 255.948F, EntranceLow = 43307, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 235.654F, Y = 6.686F, Z = 402.990F, EntranceLow = 43307, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 262.047F, Y = 11.323F, Z = 350.765F, EntranceLow = 43307, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 266.672F, Y = 8.000F, Z = 238.107F, EntranceLow = 43307, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 300.328F, Y = 11.000F, Z = 286.893F, EntranceLow = 43308, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 326.852F, Y = 9.341F, Z = 236.729F, EntranceLow = 43307, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 351.567F, Y = 17.307F, Z = 411.014F, EntranceLow = 43307, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 375.765F, Y = 11.323F, Z = 528.953F, EntranceLow = 43308, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 384.235F, Y = 11.323F, Z = 237.047F, EntranceLow = 43307, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 390.948F, Y = 12.341F, Z = 496.171F, EntranceLow = 43308, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 427.014F, Y = 17.307F, Z = 440.433F, EntranceLow = 43308, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 466.752F, Y = 6.341F, Z = 204.629F, EntranceLow = 43307, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 469.765F, Y = 11.323F, Z = 528.953F, EntranceLow = 43308, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 482.877F, Y = 15.142F, Z = 297.595F, EntranceLow = 43307, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 510.010F, Y = 6.686F, Z = 200.654F, EntranceLow = 43308, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 540.328F, Y = 8.000F, Z = 526.893F, EntranceLow = 43308, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 545.958F, Y = 6.504F, Z = 197.605F, EntranceLow = 43307, EntranceHigh = 27595 },
+            new Spot { Playfield = 710, X = 570.328F, Y = 5.000F, Z = 337.893F, EntranceLow = 43308, EntranceHigh = 27594 },
+            new Spot { Playfield = 710, X = 577.395F, Y = 6.504F, Z = 490.958F, EntranceLow = 43307, EntranceHigh = 27594 },
             new Spot { Playfield = 791, X = 251.943F, Y = 6.817F, Z = 1647.62F, EntranceLow = 38080, EntranceHigh = 37660 },
             new Spot { Playfield = 795, X = 2008.322F, Y = 17.356F, Z = 675.536F, EntranceLow = 33859, EntranceHigh = 39226 },
             new Spot { Playfield = 790, X = 1172.884F, Y = 1.748F, Z = 2883.817F, EntranceLow = 38061, EntranceHigh = 36351 },

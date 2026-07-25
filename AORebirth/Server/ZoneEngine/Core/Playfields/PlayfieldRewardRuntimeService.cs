@@ -7,6 +7,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Core.Entities;
 
     using ZoneEngine.Core.Arete.Quests;
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Thrak.Quests;
 
     #endregion
@@ -26,6 +27,10 @@ namespace AORebirth.Core.Playfields
             if (awardCombatXp != null)
             {
                 awardCombatXp(attacker, target);
+            }
+            else
+            {
+                MissionTokenProgressTracker.NotifyTrashKilled(attacker, target);
             }
 
             RexB18CObjectiveProgressTracker.TryObserveNpcDeath(attacker, target);

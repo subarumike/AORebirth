@@ -36,7 +36,9 @@ namespace ZoneEngine.Core.Playfields
                 PositionOf,
                 CanShareVisibility,
                 IsConnectedRecipient,
-                IsPinnedVisibility);
+                IsPinnedVisibility,
+                this.ResolveEnterRadius,
+                this.ResolveLeaveRadius);
         }
 
         internal PlayfieldVisibilityInterestPolicy Policy
@@ -158,6 +160,39 @@ namespace ZoneEngine.Core.Playfields
                    && source != null
                    && source.Stats[StatIds.petmaster].Value > 0
                    && source.Stats[StatIds.petmaster].Value == recipient.Identity.Instance;
+        }
+
+        // Gold 20260725-151009: zone-in SCFU wave is start-room only; far NPCs stream later.
+        // Default 80m enter lights almost the whole L7 mish → PF Map fully explored (mobs as
+        // "seen" positions). Keep mobs, but only stream nearby ones like live.
+        private const float MissionInstanceEnterRadius = 32.0f;
+
+        private const float MissionInstanceLeaveRadius = 48.0f;
+
+        private float ResolveEnterRadius(ICharacter recipient)
+        {
+            if (recipient != null
+                && recipient.Playfield != null
+                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                    recipient.Playfield.Identity.Instance))
+            {
+                return MissionInstanceEnterRadius;
+            }
+
+            return this.policy.EnterRadius;
+        }
+
+        private float ResolveLeaveRadius(ICharacter recipient)
+        {
+            if (recipient != null
+                && recipient.Playfield != null
+                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                    recipient.Playfield.Identity.Instance))
+            {
+                return MissionInstanceLeaveRadius;
+            }
+
+            return this.policy.LeaveRadius;
         }
     }
 }

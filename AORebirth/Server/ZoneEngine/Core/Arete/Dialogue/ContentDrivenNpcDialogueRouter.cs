@@ -411,6 +411,64 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "THRAK_GARDEN_KEY"
             };
 
+        // Capture 20260723-221330 Nascence Life dialogs (options-only / Say what?).
+        private const int NascenceFrontierPlayfieldId = 4310;
+        private const int GoldmanAretePlayfieldId = 4531;
+        private const int ScientistDrakeRodriguezInstance = unchecked((int)0x7963A853);
+        private const int JoshuaFalkerInstance = unchecked((int)0x787B5401);
+        private const int PrinceCreehanInstance = unchecked((int)0x78CCD541);
+
+        private static readonly ContentDrivenNpcDialogueRegistration ScientistDrakeRodriguezRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Scientist Drake Rodriguez",
+                ExpectedNpcName = "Scientist Drake Rodriguez",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = ScientistDrakeRodriguezInstance
+                    },
+                NpcIdentityText = "SimpleChar:7963A853",
+                PlayfieldId = NascenceFrontierPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LIFE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration JoshuaFalkerRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Joshua Falker",
+                ExpectedNpcName = "Joshua Falker",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = JoshuaFalkerInstance
+                    },
+                NpcIdentityText = "SimpleChar:787B5401",
+                PlayfieldId = NascenceFrontierPlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LIFE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration PrinceCreehanRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Prince Creehan",
+                ExpectedNpcName = "Prince Creehan",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = PrinceCreehanInstance
+                    },
+                NpcIdentityText = "SimpleChar:78CCD541",
+                PlayfieldId = GoldmanAretePlayfieldId,
+                GateEnvironmentVariableName = null,
+                LogPrefix = "NASCENCE_LIFE"
+            };
+
         private static readonly ContentDrivenNpcDialogueRegistration CraigOrFuriousFistsRegistration =
             CreateThrakGardenVendorRegistration(
                 ThrakGardenVendorInteractionRules.FuriousFistsName,
@@ -471,6 +529,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ProphetYuttRegistration,
             HypnagogicUrgaLumRegistration,
             DreamingSilvertailRegistration,
+            ScientistDrakeRodriguezRegistration,
+            JoshuaFalkerRegistration,
+            PrinceCreehanRegistration,
             CraigOrFuriousFistsRegistration,
             CraigOrPreservationRegistration,
             CraigOrFlamingBarrelsRegistration,

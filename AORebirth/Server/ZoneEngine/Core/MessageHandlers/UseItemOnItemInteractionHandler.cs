@@ -28,6 +28,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
+            // FindItemReturn: L-click mission item + R-click mission terminal.
+            if (MissionFindItemService.TryHandleReturnToTerminal(client, message))
+            {
+                return true;
+            }
+
             if (MarcusB194GasFireProgressTracker.TryHandleUseItemOnItem(client, message))
             {
                 return true;

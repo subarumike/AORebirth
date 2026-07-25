@@ -251,13 +251,36 @@ namespace ZoneEngine.Core.MessageHandlers
                                 W = (float)heading.w
                             };
                 x.Unknown1 = 0x61;
+                // Match Teleport/PAF: stamped shape building (never a foreign fog-only building).
                 if (IsMissionInstanceDestination(playfield))
                 {
-                    // Capture 20260718-062936: ACGBuildingGeneratorData + GameServerId=0 + Playfield2(100002:1) + empty payload.
+                    // Match PlayfieldAnarchyF: stamped shape ACG building for this enter.
+                    int buildingInstance =
+                        ZoneEngine.Core.Missions.MissionInstanceService.GetLiveBuildingInstance(
+                            playfield.Instance);
+                    if (buildingInstance == 0)
+                    {
+                        buildingInstance = CapturedMissionBuildingInstance;
+                    }
+
+                    // Gold 20260725-184103: N3Teleport Destination is ACG entry
+                    // (545.43, 8.51, 350.52). Interior spawn / PAF coords are (~1.8, 5, 95).
+                    // Outdoor marker XYZ (capture 20260725-202953) made ACG load wrong → grey map.
+                    float destX = 545.43f;
+                    float destY = 8.51f;
+                    float destZ = 350.52f;
+
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3()
+                                    {
+                                        X = destX,
+                                        Y = destY,
+                                        Z = destZ
+                                    };
+
                     x.Playfield = new Identity
                                   {
                                       Type = LiveMissionBuildingType,
-                                      Instance = CapturedMissionBuildingInstance
+                                      Instance = buildingInstance
                                   };
                     x.GameServerId = 0;
                     x.SgId = 0;

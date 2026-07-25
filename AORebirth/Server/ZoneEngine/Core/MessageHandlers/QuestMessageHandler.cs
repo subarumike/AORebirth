@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
 
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
@@ -41,7 +42,24 @@ namespace ZoneEngine.Core.MessageHandlers
 
             try
             {
-                // Echo the delete back so the client removes the entry from the mission window.
+                // Prefer the stored DAC3 identity — client Delete sometimes sends Type=0 / wrong type,
+                // and echoing that leaves the journal entry stuck (LOGIN-RESYNC resurrects it).
+                Identity deleteMission = message.Mission;
+                MissionAcceptedStore.AcceptedMission stored;
+                if (MissionAcceptedStore.TryResolve(character.Identity.Instance, message.Mission, out stored)
+                    && stored != null && stored.QuestIdentity != null)
+                {
+                    deleteMission = stored.QuestIdentity;
+                }
+
+                if (deleteMission == null || deleteMission.Instance == 0)
+                {
+                    MissionDiagnostics.Log(
+                        "JOURNAL-DELETE-FAIL char={0} reason=no-mission-id",
+                        character.Identity.Instance);
+                    return;
+                }
+
                 client.SendCompressed(
                     new QuestMessage
                     {
@@ -49,32 +67,88 @@ namespace ZoneEngine.Core.MessageHandlers
                         Unknown = 0,
                         Action = QuestAction.Delete,
                         Unknown1 = 0,
-                        Mission = message.Mission,
+                        Mission = deleteMission,
                         Unknown2 = 0,
                         Unknown3 = 0
                     });
 
+                int kitInstance;
+                bool kitRemoved = false;
+                if (MissionKeyStore.TryTakeRepairKit(character.Identity.Instance, deleteMission, out kitInstance))
+                {
+                    kitRemoved = MissionKeyGrantService.TryRemoveRepairItem(client, character, kitInstance);
+                }
+                else if (IsDeletedRepairMission(character.Identity.Instance, deleteMission))
+                {
+                    kitRemoved = MissionKeyGrantService.TryRemoveAnyRepairItem(client, character);
+                }
+
                 int keyInstance;
                 bool keyRemoved = false;
-                if (MissionKeyStore.TryTakeLatest(character.Identity.Instance, out keyInstance))
+                if (MissionKeyStore.TryTake(character.Identity.Instance, deleteMission, out keyInstance))
                 {
                     keyRemoved = MissionKeyGrantService.TryRemoveMissionKey(client, character, keyInstance);
                 }
 
-                // Remove only the deleted mission — keep every other accepted mission.
-                bool storeRemoved = MissionAcceptedStore.Remove(character.Identity.Instance, message.Mission);
+                if (!keyRemoved)
+                {
+                    keyRemoved = MissionKeyGrantService.TryRemoveAnyMissionKey(client, character);
+                }
+
+                bool storeRemoved = MissionAcceptedStore.Remove(character.Identity.Instance, deleteMission);
+                MissionTokenProgressTracker.ClearCharacter(character.Identity.Instance);
+                MissionFindItemService.ClearCharacter(character.Identity.Instance);
+
+                MissionDiagnostics.Log(
+                    "JOURNAL-DELETE char={0} mission={1:X8} type={2:X} kitRemoved={3} keyRemoved={4} storeRemoved={5}",
+                    character.Identity.Instance,
+                    deleteMission.Instance,
+                    (int)deleteMission.Type,
+                    kitRemoved,
+                    keyRemoved,
+                    storeRemoved);
 
                 client.Server.Info(
                     client,
-                    "Quest delete mission={0} keyRemoved={1} storeRemoved={2}",
-                    message.Mission,
+                    "Quest delete mission={0} kitRemoved={1} keyRemoved={2} storeRemoved={3}",
+                    deleteMission,
+                    kitRemoved,
                     keyRemoved,
                     storeRemoved);
             }
             catch (Exception ex)
             {
+                MissionDiagnostics.Log(
+                    "JOURNAL-DELETE-FAIL char={0} err={1}",
+                    character.Identity.Instance,
+                    ex.Message);
                 client.Server.Info(client, "Quest delete failed: {0}", ex);
             }
+        }
+
+        private static bool IsDeletedRepairMission(int characterInstance, Identity mission)
+        {
+            if (mission == null)
+            {
+                return false;
+            }
+
+            List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(characterInstance);
+            for (int i = 0; i < all.Count; i++)
+            {
+                MissionAcceptedStore.AcceptedMission entry = all[i];
+                if (entry == null || entry.QuestIdentity == null)
+                {
+                    continue;
+                }
+
+                if (entry.QuestIdentity.Instance == mission.Instance)
+                {
+                    return MissionRepairService.IsRepairMission(entry);
+                }
+            }
+
+            return false;
         }
     }
 }

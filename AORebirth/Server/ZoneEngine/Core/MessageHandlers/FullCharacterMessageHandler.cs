@@ -714,6 +714,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 /* SK */
                 AddStat3232(client, statGroup2, 573);
 
+                /* LastSK */
+                AddStat3232(client, statGroup2, 574);
+
+                /* NextSK — computed from level; required for level 200+ SK tooltip. */
+                AddStat3232(client, statGroup2, 575);
+
                 /* Expansions */
                 AddStat3232(client, statGroup2, 389);
 
@@ -1069,7 +1075,19 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
             }
 
-            uint value = client.Controller.Character.Stats[statId].BaseValue;
+            uint value;
+            // NextXP / NextSK are computed (StatNextXP / StatNextSK). Always force recalculate
+            // so a stale Value cache cannot send 0 after level was loaded from DB.
+            if (statId == (int)StatIds.nextxp || statId == (int)StatIds.nextsk)
+            {
+                client.Controller.Character.Stats[statId].ReCalculate = true;
+                int computed = client.Controller.Character.Stats[statId].Value;
+                value = computed > 0 ? (uint)computed : 0U;
+            }
+            else
+            {
+                value = client.Controller.Character.Stats[statId].BaseValue;
+            }
 
             // Unset sentinel must not reach Info UI currencies (ICC / Freelancers show 1234567890).
             if (value == 1234567890U)

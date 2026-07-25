@@ -7,6 +7,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
+    using AORebirth.Core.Vector;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -51,16 +52,62 @@ namespace ZoneEngine.Core.MessageHandlers
             try
             {
                 int characterLevel = character.Stats[StatIds.level].Value;
-                int missionQuality = MissionLevelTable.GetMissionQuality(characterLevel, message.LevelSlider);
                 int terminalPlayfieldId = character.Playfield != null
                                              ? character.Playfield.Identity.Instance
                                              : 0;
+                MissionLocationSide characterSide = MissionLocationPool.ResolveCharacterSide(
+                    character.Stats[StatIds.side].Value);
+                if (!MissionLocationPool.CanCharacterRollAtTerminal(characterSide, terminalPlayfieldId))
+                {
+                    client.Server.Info(
+                        client,
+                        "QuestAlternative roll blocked — charSide={0} terminalPf={1}",
+                        characterSide,
+                        terminalPlayfieldId);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                MissionLocationPool.FormatSideRestrictedRollFeedback(terminalPlayfieldId))
+                        });
+                    return;
+                }
+
+                int fee;
+                if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
+                {
+                    client.Server.Info(
+                        client,
+                        "QuestAlternative roll blocked — need {0} credits",
+                        fee);
+                    return;
+                }
+
+                int missionQuality = MissionLevelTable.GetMissionQuality(characterLevel, message.LevelSlider);
+                float terminalX = 0f;
+                float terminalZ = 0f;
+                try
+                {
+                    Coordinate coords = character.Coordinates();
+                    terminalX = coords.x;
+                    terminalZ = coords.z;
+                }
+                catch
+                {
+                }
 
                 QuestAlternativeMessage response = MissionRollService.BuildRollResponse(
                     message,
                     character.Identity,
                     characterLevel,
-                    terminalPlayfieldId);
+                    terminalPlayfieldId,
+                    terminalX,
+                    terminalZ,
+                    characterSide);
                 client.SendCompressed(response);
 
                 // Remember what we offered so a following accept (CreateQuest) can look the mission up.
@@ -68,11 +115,12 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 client.Server.Info(
                     client,
-                    "QuestAlternative roll response sent offers={0} charLvl={1} slider={2} ql={3} terminal={4}",
+                    "QuestAlternative roll response sent offers={0} charLvl={1} slider={2} ql={3} fee={4} terminal={5}",
                     response.QuestInfos == null ? 0 : response.QuestInfos.Length,
                     characterLevel,
                     message.LevelSlider,
                     missionQuality,
+                    fee,
                     response.MissionTerminalIdentity);
             }
             catch (Exception ex)

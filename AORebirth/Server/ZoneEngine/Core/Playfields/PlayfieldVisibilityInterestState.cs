@@ -18,6 +18,8 @@ namespace ZoneEngine.Core.Playfields
         private readonly Func<TValue, TValue, bool> canShareVisibility;
         private readonly Func<TValue, bool> isActiveRecipient;
         private readonly Func<TValue, TValue, bool> isPinnedVisibility;
+        private readonly Func<TValue, float> resolveEnterRadius;
+        private readonly Func<TValue, float> resolveLeaveRadius;
         private readonly Dictionary<ulong, TValue> valuesByIdentity =
             new Dictionary<ulong, TValue>();
         private readonly Dictionary<ulong, HashSet<ulong>> visibleSourcesByRecipient =
@@ -33,7 +35,9 @@ namespace ZoneEngine.Core.Playfields
             Func<TValue, VisibilityPosition> positionOf,
             Func<TValue, TValue, bool> canShareVisibility,
             Func<TValue, bool> isActiveRecipient,
-            Func<TValue, TValue, bool> isPinnedVisibility)
+            Func<TValue, TValue, bool> isPinnedVisibility,
+            Func<TValue, float> resolveEnterRadius = null,
+            Func<TValue, float> resolveLeaveRadius = null)
         {
             this.policy = Require(policy, "policy");
             this.spatialIndex = Require(spatialIndex, "spatialIndex");
@@ -42,6 +46,22 @@ namespace ZoneEngine.Core.Playfields
             this.canShareVisibility = Require(canShareVisibility, "canShareVisibility");
             this.isActiveRecipient = Require(isActiveRecipient, "isActiveRecipient");
             this.isPinnedVisibility = Require(isPinnedVisibility, "isPinnedVisibility");
+            this.resolveEnterRadius = resolveEnterRadius;
+            this.resolveLeaveRadius = resolveLeaveRadius;
+        }
+
+        private float EnterRadiusFor(TValue recipient)
+        {
+            return this.resolveEnterRadius != null
+                       ? this.resolveEnterRadius(recipient)
+                       : this.policy.EnterRadius;
+        }
+
+        private float LeaveRadiusFor(TValue recipient)
+        {
+            return this.resolveLeaveRadius != null
+                       ? this.resolveLeaveRadius(recipient)
+                       : this.policy.LeaveRadius;
         }
 
         internal int LastCandidateInspectionCount
@@ -123,7 +143,8 @@ namespace ZoneEngine.Core.Playfields
             this.Register(recipient);
             Identity recipientIdentity = this.identityOf(recipient);
             VisibilityPosition recipientPosition = this.positionOf(recipient);
-            return this.spatialIndex.Query(recipientPosition, this.policy.EnterRadius)
+            float enterRadius = this.EnterRadiusFor(recipient);
+            return this.spatialIndex.Query(recipientPosition, enterRadius)
                 .Where(
                     source => source != null
                               && this.identityOf(source) != recipientIdentity
@@ -301,8 +322,10 @@ namespace ZoneEngine.Core.Playfields
             Action<TValue, Identity> leaveVisibility)
         {
             VisibilityPosition recipientPosition = this.positionOf(recipient);
+            float leaveRadius = this.LeaveRadiusFor(recipient);
+            float enterRadius = this.EnterRadiusFor(recipient);
             List<TValue> leaveRadiusCandidates = this.spatialIndex
-                .Query(recipientPosition, this.policy.LeaveRadius)
+                .Query(recipientPosition, leaveRadius)
                 .Where(source => this.CanShare(recipient, source))
                 .ToList();
             var candidatesByIdentity = leaveRadiusCandidates.ToDictionary(
@@ -323,7 +346,7 @@ namespace ZoneEngine.Core.Playfields
             List<TValue> entering = leaveRadiusCandidates
                 .Where(
                     source => !currentlyVisible.Contains(this.identityOf(source).Long())
-                              && Distance(recipient, source) <= this.policy.EnterRadius)
+                              && Distance(recipient, source) <= enterRadius)
                 .OrderBy(source => DistanceSquared(recipientPosition, this.positionOf(source)))
                 .ThenBy(source => (int)this.identityOf(source).Type)
                 .ThenBy(source => this.identityOf(source).Instance)
@@ -335,7 +358,7 @@ namespace ZoneEngine.Core.Playfields
                     source => source != null
                               && !this.isPinnedVisibility(recipient, source)
                               && (!candidatesByIdentity.ContainsKey(this.identityOf(source).Long())
-                                  || Distance(recipient, source) > this.policy.LeaveRadius))
+                                  || Distance(recipient, source) > leaveRadius))
                 .OrderBy(source => (int)this.identityOf(source).Type)
                 .ThenBy(source => this.identityOf(source).Instance)
                 .ToList();
@@ -387,13 +410,13 @@ namespace ZoneEngine.Core.Playfields
                 bool pinned = this.isPinnedVisibility(recipient, source);
                 if (currentlyVisible
                     && (!this.CanShare(recipient, source)
-                        || (distance > this.policy.LeaveRadius && !pinned)))
+                        || (distance > this.LeaveRadiusFor(recipient) && !pinned)))
                 {
                     leaveVisibility(recipient, this.identityOf(source));
                     this.RemoveVisibleEntry(this.identityOf(recipient), this.identityOf(source));
                 }
                 else if (!currentlyVisible
-                         && (distance <= this.policy.EnterRadius || pinned)
+                         && (distance <= this.EnterRadiusFor(recipient) || pinned)
                          && this.CanShare(recipient, source)
                          && this.MarkVisibleEntry(recipient, source))
                 {

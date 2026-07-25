@@ -118,11 +118,16 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
                 {
-                    // Live zone-in: PlayfieldId1 = ACGBuildingGeneratorData + generator layout payload.
-                    // Capture 20260719-5-different-shape-fo-mish supplies per-shape payloads.
+                    // Remapped live PFs are not in Playfields.xml → GetPlayfieldX/Z returns 100000
+                    // (unknown-size fallback). That makes the client treat the interior as a huge
+                    // static PF and paint the full grey floorplan. Gold 080425 PAF uses 0 sizes.
+                    x.PlayfieldX = 0;
+                    x.PlayfieldZ = 0;
+
+                    // Live zone-in: PlayfieldId1 = ACGBuildingGeneratorData + stamped shape payload.
+                    // Payload MUST match ShapeSourceByPlayfield (doors + NPC XYZ). Foreign ACG piles mobs.
                     int pf = character.Playfield.Identity.Instance;
-                    byte[] payload =
-                        AORebirth.Core.Playfields.MissionInstanceShapeCatalog.GetGeneratorPayload(pf);
+                    byte[] payload = MissionInstanceService.GetLiveGeneratorPayload(pf);
                     int buildingInstance =
                         AORebirth.Core.Playfields.MissionInstanceShapeCatalog.GetBuildingInstance(payload);
                     if (payload == null || payload.Length == 0)

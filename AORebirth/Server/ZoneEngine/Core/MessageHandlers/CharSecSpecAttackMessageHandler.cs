@@ -22,7 +22,8 @@ namespace ZoneEngine.Core.MessageHandlers
     #endregion
 
     /// <summary>
-    /// Handles CharSecSpecAttack (FlingShot / Burst). Capture 20260719-fling-burst sequence:
+    /// Handles CharSecSpecAttack (FlingShot / Burst / Brawl / Dimach).
+    /// Capture 20260719-fling-burst + 20260724-001643 sequence:
     /// echo CharSecSpecAttack → CharacterAction SpecialUsed → SpecialAttackInfo (damage) → later SpecialAvailable.
     /// </summary>
     [MessageHandler(MessageHandlerDirection.InboundOnly)]

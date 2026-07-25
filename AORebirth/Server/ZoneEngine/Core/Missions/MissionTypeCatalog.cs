@@ -2,7 +2,8 @@ namespace ZoneEngine.Core.Missions
 {
     /// <summary>
     /// RK mission types and the client journal icons captured from live rolls
-    /// (capture 20260717-Mission terminal2 / pull-mish-doit).
+    /// (capture 20260717-Mission terminal2 / pull-mish-doit / 20260719-Rolling different mishes).
+    /// Five gameplay types: KillPerson, FindPerson, FindItem, FindItemReturn, RepairMachine.
     /// </summary>
     internal enum MissionRollType
     {
@@ -12,7 +13,9 @@ namespace ZoneEngine.Core.Missions
 
         FindItem = 2,
 
-        RepairMachine = 3
+        RepairMachine = 3,
+
+        FindItemReturn = 4
     }
 
     internal static class MissionTypeCatalog
@@ -22,9 +25,9 @@ namespace ZoneEngine.Core.Missions
 
         internal const int FindPersonIcon = 11335; // 0x2C47
 
-        internal const int FindItemIconA = 11329; // 0x2C41
+        internal const int FindItemIconA = 11329; // 0x2C41 — Find item (keep)
 
-        internal const int FindItemIconB = 11337; // 0x2C49
+        internal const int FindItemIconB = 11337; // 0x2C49 — Find item and return to terminal
 
         internal const int RepairMachineIcon = 11342; // 0x2C4E
 
@@ -41,6 +44,7 @@ namespace ZoneEngine.Core.Missions
                 case MissionRollType.FindPerson:
                     return 1;
                 case MissionRollType.FindItem:
+                case MissionRollType.FindItemReturn:
                     return 2;
                 case MissionRollType.RepairMachine:
                     return 3;
@@ -58,7 +62,9 @@ namespace ZoneEngine.Core.Missions
                 case MissionRollType.FindPerson:
                     return FindPersonIcon;
                 case MissionRollType.FindItem:
-                    return (salt & 1) == 0 ? FindItemIconA : FindItemIconB;
+                    return FindItemIconA;
+                case MissionRollType.FindItemReturn:
+                    return FindItemIconB;
                 case MissionRollType.RepairMachine:
                     return RepairMachineIcon;
                 default:
@@ -68,6 +74,7 @@ namespace ZoneEngine.Core.Missions
 
         /// <summary>
         /// Maps a captured MissionIconId back to the roll type (capture 20260719-Rolling different mishes).
+        /// FindItemA = keep; FindItemB = return to terminal.
         /// </summary>
         internal static MissionRollType TypeFromIcon(int missionIconId)
         {
@@ -81,9 +88,14 @@ namespace ZoneEngine.Core.Missions
                 return MissionRollType.FindPerson;
             }
 
-            if (missionIconId == FindItemIconA || missionIconId == FindItemIconB)
+            if (missionIconId == FindItemIconA)
             {
                 return MissionRollType.FindItem;
+            }
+
+            if (missionIconId == FindItemIconB)
+            {
+                return MissionRollType.FindItemReturn;
             }
 
             if (missionIconId == RepairMachineIcon)
@@ -107,6 +119,8 @@ namespace ZoneEngine.Core.Missions
                     return "Find person mission";
                 case MissionRollType.FindItem:
                     return "Find item mission";
+                case MissionRollType.FindItemReturn:
+                    return "Find+return item mission";
                 case MissionRollType.RepairMachine:
                     return "Repair machine mission";
                 default:
@@ -124,11 +138,18 @@ namespace ZoneEngine.Core.Missions
                     return "FindPerson";
                 case MissionRollType.FindItem:
                     return "FindItem";
+                case MissionRollType.FindItemReturn:
+                    return "FindItemReturn";
                 case MissionRollType.RepairMachine:
                     return "RepairMachine";
                 default:
                     return "Unknown";
             }
+        }
+
+        internal static bool IsFindItemFamily(MissionRollType type)
+        {
+            return type == MissionRollType.FindItem || type == MissionRollType.FindItemReturn;
         }
 
         /// <summary>
@@ -144,7 +165,7 @@ namespace ZoneEngine.Core.Missions
                           MissionRollType.FindPerson,
                           MissionRollType.FindPerson,
                           MissionRollType.FindItem,
-                          MissionRollType.FindItem,
+                          MissionRollType.FindItemReturn,
                           MissionRollType.RepairMachine,
                           MissionRollType.RepairMachine
                       };
@@ -168,8 +189,8 @@ namespace ZoneEngine.Core.Missions
                 mix[0] = MissionRollType.KillPerson;
                 mix[1] = MissionRollType.FindPerson;
                 mix[2] = MissionRollType.FindItem;
-                mix[3] = MissionRollType.RepairMachine;
-                mix[4] = MissionRollType.FindPerson;
+                mix[3] = MissionRollType.FindItemReturn;
+                mix[4] = MissionRollType.RepairMachine;
             }
 
             // Final shuffle of the five slots so order varies too.

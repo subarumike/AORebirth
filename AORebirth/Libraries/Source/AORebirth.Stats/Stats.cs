@@ -3272,8 +3272,10 @@ namespace AORebirth.Stats
             this.newbieNP = new Stat(this, 603, 1234567890, false, false, false);
             this.nextDoorInBuilding = new Stat(this, 190, 1234567890, false, false, false);
             this.nextFormula = new Stat(this, 411, 1234567890, false, false, false);
-            this.nextSK = new StatNextSK(this, 575, 0, true, false, false);
-            this.nextXP = new StatNextXP(this, 350, 1450, true, false, false);
+            // sendBaseValue must be false: NextSK/NextXP are computed (GetValue). If true,
+            // GetChangedStats pushes BaseValue 0 and the client XP/SK bar becomes 0/0 at 200+.
+            this.nextSK = new StatNextSK(this, 575, 0, false, false, false);
+            this.nextXP = new StatNextXP(this, 350, 1450, false, false, false);
             this.npCostModifier = new Stat(this, 318, 0, false, false, false);
             this.npLevelUp = new Stat(this, 604, 1234567890, false, false, false);
             this.npPerSkill = new Stat(this, 605, 1234567890, false, false, false);

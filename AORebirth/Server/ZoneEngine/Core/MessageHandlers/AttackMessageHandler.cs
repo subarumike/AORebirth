@@ -68,18 +68,19 @@ namespace ZoneEngine.Core.MessageHandlers
         private const int RangedCombatStartSpecialAttackUnknown4 = 2439;
         private const int RangedCombatStartSpecialAttackUnknown5 = -100;
 
-        private const int CombatStartSpecialAttackUnknown1 = 13;
-        private const int CombatStartSpecialAttackUnknown2 = 25;
-        private const int CombatStartSpecialAttackUnknown3 = 13;
-        private const int CombatStartSpecialAttackUnknown4 = 33;
-        private const int CombatStartSpecialAttackUnknown5 = 100;
+        // Capture 20260724-001643 melee MA combat-start SpecialAttackWeapon trailer.
+        private const int CombatStartSpecialAttackUnknown1 = 61;
+        private const int CombatStartSpecialAttackUnknown2 = -166;
+        private const int CombatStartSpecialAttackUnknown3 = 658;
+        private const int CombatStartSpecialAttackUnknown4 = 969;
+        private const int CombatStartSpecialAttackUnknown5 = -100;
 
         protected override void Read(AttackMessage message, IZoneClient client)
         {
             ICharacter character = client.Controller.Character;
             ICharacter target = Pool.Instance.GetObject<ICharacter>(character.Playfield.Identity, message.Target);
 
-            client.Server.Info(
+            client.Server.Debug(
                 client,
                 "Attack action={0} target={1} targetFound={2} targetHealth={3}",
                 message.Action,
@@ -264,12 +265,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private static SpecialAttack[] CreateDefaultPlayerSpecialAttacks()
         {
+            // Capture 20260724-001643 SAW: MAAT 211357/211358, DIIT 42033/42032, BRAW 211401/211402.
             return new[]
                    {
                        new SpecialAttack
                        {
-                           Unknown1 = 0x0000AAC0,
-                           Unknown2 = 0x00023569,
+                           Unknown1 = 0x0003399D,
+                           Unknown2 = 0x0003399E,
                            Unknown3 = 0x00000064,
                            Unknown4 = "MAAT"
                        },
@@ -282,8 +284,8 @@ namespace ZoneEngine.Core.MessageHandlers
                        },
                        new SpecialAttack
                        {
-                           Unknown1 = 0x00011294,
-                           Unknown2 = 0x00011295,
+                           Unknown1 = 0x000339C9,
+                           Unknown2 = 0x000339CA,
                            Unknown3 = 0x0000008E,
                            Unknown4 = "BRAW"
                        }

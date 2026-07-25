@@ -28,6 +28,8 @@ namespace ZoneEngine.Core.Missions
 
         private static List<RewardItem> otherItems;
 
+        private static HashSet<string> missionRewardNanoKeys;
+
         private static bool loadAttempted;
 
         private static string lastLoadError;
@@ -186,6 +188,8 @@ namespace ZoneEngine.Core.Missions
                     return;
                 }
 
+                missionRewardNanoKeys = LoadMissionRewardNanoKeys(dir);
+
                 string[] files =
                     {
                         "ItemDb_Clusters.json",
@@ -197,6 +201,7 @@ namespace ZoneEngine.Core.Missions
 
                 var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
                 int loadedFiles = 0;
+                int nanosSkipped = 0;
                 foreach (string fileName in files)
                 {
                     string path = Path.Combine(dir, fileName);
@@ -222,6 +227,18 @@ namespace ZoneEngine.Core.Missions
                                 continue;
                             }
 
+                            bool isNano = fileIsNano || HasNanoTag(row.Key.Tags);
+                            if (IsExcludedFromRollRewards(row.Key.LowId, row.Key.Name))
+                            {
+                                continue;
+                            }
+
+                            if (isNano && !IsMissionRewardNano(row.Key.Name))
+                            {
+                                nanosSkipped++;
+                                continue;
+                            }
+
                             var item = new RewardItem
                                        {
                                            LowId = row.Key.LowId,
@@ -229,7 +246,7 @@ namespace ZoneEngine.Core.Missions
                                            LowQl = row.Key.LowQl,
                                            HighQl = row.Key.HighQl > 0 ? row.Key.HighQl : row.Key.LowQl,
                                            Name = row.Key.Name ?? string.Empty,
-                                           IsNano = fileIsNano || HasNanoTag(row.Key.Tags)
+                                           IsNano = isNano
                                        };
                             items.Add(item);
                             if (item.IsNano)
@@ -258,14 +275,131 @@ namespace ZoneEngine.Core.Missions
                 {
                     lastLoadError = null;
                     MissionDiagnostics.Log(
-                        "REWARD-CATALOG loaded files={0} items={1} nanos={2} other={3} dir={4}",
+                        "REWARD-CATALOG loaded files={0} items={1} nanos={2} other={3} nanosSkipped={4} allowlist={5} dir={6}",
                         loadedFiles,
                         items.Count,
                         nanoItems.Count,
                         otherItems.Count,
+                        nanosSkipped,
+                        missionRewardNanoKeys == null ? 0 : missionRewardNanoKeys.Count,
                         dir);
                 }
             }
+        }
+
+        /// <summary>
+        /// Ultra-rare Instruction Disc / similar items are mob/chest loot only (~1%), never terminal rolls.
+        /// </summary>
+        private static bool IsExcludedFromRollRewards(int lowId, string name)
+        {
+            if (MissionRareLootCatalog.IsRareLootTemplate(lowId))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            return name.IndexOf("Instruction Disc (Summon Grid Armor", StringComparison.OrdinalIgnoreCase) >= 0
+                   || name.IndexOf("Instruction Disk (Summon Grid Armor", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        /// <summary>
+        /// AO Galaxy "Mission Reward" nano names (crystal formula titles). Empty allowlist = keep all Mali nanos.
+        /// </summary>
+        private static bool IsMissionRewardNano(string itemName)
+        {
+            if (missionRewardNanoKeys == null || missionRewardNanoKeys.Count == 0)
+            {
+                return true;
+            }
+
+            string key = NormalizeNanoName(itemName);
+            if (string.IsNullOrEmpty(key))
+            {
+                return false;
+            }
+
+            if (missionRewardNanoKeys.Contains(key))
+            {
+                return true;
+            }
+
+            // Allow partial containment either direction (display suffixes / crystal wrappers).
+            foreach (string allowed in missionRewardNanoKeys)
+            {
+                if (key.IndexOf(allowed, StringComparison.Ordinal) >= 0
+                    || allowed.IndexOf(key, StringComparison.Ordinal) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static HashSet<string> LoadMissionRewardNanoKeys(string rewardsDir)
+        {
+            var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (string.IsNullOrEmpty(rewardsDir))
+            {
+                return keys;
+            }
+
+            string path = Path.Combine(rewardsDir, "MissionRewardNanoNames.txt");
+            if (!File.Exists(path))
+            {
+                return keys;
+            }
+
+            try
+            {
+                foreach (string line in File.ReadAllLines(path))
+                {
+                    string key = NormalizeNanoName(line);
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        keys.Add(key);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MissionDiagnostics.Log("REWARD-NANO-ALLOWLIST-FAIL {0}", ex.Message);
+            }
+
+            return keys;
+        }
+
+        private static string NormalizeNanoName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return string.Empty;
+            }
+
+            string s = name.Trim();
+            const string prefix = "Nano Crystal (";
+            if (s.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && s.EndsWith(")", StringComparison.Ordinal))
+            {
+                s = s.Substring(prefix.Length, s.Length - prefix.Length - 1).Trim();
+            }
+
+            // AO Galaxy display suffixes.
+            int spec = s.LastIndexOf(" Spec:", StringComparison.OrdinalIgnoreCase);
+            if (spec > 0)
+            {
+                s = s.Substring(0, spec).Trim();
+            }
+
+            if (s.EndsWith(" FP", StringComparison.OrdinalIgnoreCase))
+            {
+                s = s.Substring(0, s.Length - 3).Trim();
+            }
+
+            return s.ToLowerInvariant();
         }
 
         private static bool HasNanoTag(string[] tags)

@@ -69,6 +69,16 @@ namespace ZoneEngine.Core.Packets
         private const int CapturedAreteWasteOriginalSuffixOffset =
             NameOffset + CapturedAreteWasteOriginalEncodedNameLength;
 
+        // Capture 20260723-225021 corpse-full-updates Remains of Barking Chimera (PacketLength=462).
+        // Generic Rhinoman template ends without the ExtTex/material tail; CatMesh 208966 then skins
+        // as default lava orange/red. Live corpse packet carries the same "low2" ExtTex as living SCFU.
+        private const int CapturedBarkingChimeraMonsterData = 209173;
+        private const int CapturedBarkingChimeraOriginalEncodedNameLength = 27;
+        private const int CapturedBarkingChimeraMonsterDataOffset = 330;
+        private const int CapturedBarkingChimeraTailDeadNpcInstanceOffset = 342;
+        private const int CapturedBarkingChimeraOriginalSuffixOffset =
+            NameOffset + CapturedBarkingChimeraOriginalEncodedNameLength;
+
         private static readonly byte[] Template = HexToBytes(
             "0000000a0001019e000000003cac6f144f474e050000c76a00f0f00100000000080000000b00000000000000004504a4df41c5ea1244cb530d000000003e8fb30a000000003f75b5e0000002350000000000000000006f000046f200000000001818050000001700000000000002bd00000000000002be00000000000002bf000000000000019c000000010000016800000062000000df000000000000003b00000003000000040000000700000059000000010000019f0000c350000001a0776b95780000002a0000797e0000003d000000000000000800004650000000220000003c0000001b52656d61696e73206f66205268696e6f6d616e204d6f74686572000000000200000032000003f100000003000007e20000cf2738f46cbe0000000400000000000000010000000000000000000000000000000000000000000001f700000001000000040000798a000000000000c350776b9578000017a600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000");
 
@@ -122,6 +132,19 @@ namespace ZoneEngine.Core.Packets
             + "000000010000000000000000000000000000000000000000000001F4000000010000000400031BE4000000000000C35079607AE5000017A600000000"
             + "0001CB9500000000000000010000258900000000000000020000258F0000000000000003000025870000000000000004000025960000000000000000");
 
+        // L7 gold 20260725-002423 Remains of Tilda Konecny (CATMesh 5934, MD 26137, 420 bytes).
+        // Same field offsets as Vergil; Thief body mismatched mission trash and corpses vanished.
+        private static readonly byte[] CapturedMissionTrashCorpseTemplate = HexToBytes(
+            "03E8000A000101A400000DB4797E30D74F474E050000C76A00F7482700000000080000000B0000000000000000437FA2D540"
+            + "A051EC436AFD7100000000BF484630000000003F1F74C5001608000000000000000000006F00004AE3000000000018180500"
+            + "00001700000000000002BD00000000000002BE00000000000002BF000000000000019C00000001000001680000005D000000"
+            + "DF000000010000003B00000003000000040000000200000059000000010000019F0000C350000001A0799361EA0000002A00"
+            + "00172E0000003D0000001D0000000800004650000000220000003C0000004000009D110000001952656D61696E73206F6620"
+            + "54696C6461204B6F6E65636E79000000000200000032000003F100000003000007E20000CF273995AE700000000400000000"
+            + "000000010000000000000000000000000000000000000000000001F5000000010000000400006619000000000000C3507993"
+            + "61EA000017A6000000000000000000000000000000010000000000000000000000020000000000000000000000030001558E"
+            + "0000000000000004000058630000000000000000");
+
         // Official live Subway capture 20260716-222007, CorpseFullUpdate packet #198.
         // Preserve Eumenides' exact 416-byte body, CATMesh 17905, MonsterData,
         // scale, breed/sex/race fields, and visual tail while patching runtime state.
@@ -145,6 +168,18 @@ namespace ZoneEngine.Core.Packets
             + "000000010000000000000000000000000000000000000000000001F6000000010000000400004532000000000000C350798A239E000017A60000000000"
             + "00000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000000010000"
             + "07E24D6174657269616C2023323200000000000000000000000000000000000000000001768D0000000000000001");
+
+        // Capture 20260723-225021 corpse-full-updates row 798C1F4F. Leading 0000 pads AOSharp
+        // seq-stripped 000A… frame. Tail ExtTex "low2" + 0x33049 matches living Barking Chimera SCFU.
+        private static readonly byte[] CapturedBarkingChimeraTemplate = HexToBytes(
+            "0000000A000101CE00000DB0797E30D74F474E050000C76A00F4980300000000080000000B0000000000000000444910B441F123074493DD47000000"
+            + "003EFFC87A000000003F5DC3DC000010D60000000000000000006F000046F200000000001818050000001700000000000002BD00000000000002BE00"
+            + "000000000002BF000000000000019C00000001000001680000005E000000DF000000000000003B000000000000000400000006000000590000000100"
+            + "00019F0000C350000001A0798C1F4F0000002A000330460000003D000000000000000800004650000000220000003C0000001B52656D61696E73206F"
+            + "66204261726B696E67204368696D657261000000000200000032000003F100000003000007E20000CF273993159D0000000400000000000000010000"
+            + "000000000000000000000000000000000000000001F5000000010000000400033115000000000000C350798C1F4F000017A600000000000000000000"
+            + "000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000001000007E26C6F"
+            + "773200000000000000000000000000000000000000000000000000000000000330490000000000000001");
 
         public static byte[] Build(
             ICharacter deadNpc,
@@ -247,6 +282,32 @@ namespace ZoneEngine.Core.Packets
                     corpseCredits);
             }
 
+            if (deadNpc != null && corpseMonsterData == CapturedBarkingChimeraMonsterData)
+            {
+                return BuildCapturedBarkingChimera(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
+            // L7 gold 20260725-002423 Tilda Konecny corpse body (not Thief — corpses vanished).
+            if (deadNpc != null
+                && ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsAggressive(deadNpc.Identity))
+            {
+                return BuildCapturedMissionTrashCorpse(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
             string corpseName = "Remains of " + deadNpc.Name;
             byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
             int encodedNameLength = nameBytes.Length + 1;
@@ -320,6 +381,70 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(
                 buffer,
                 CapturedSubwayVergilTailDeadNpcInstanceOffset,
+                deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        private static byte[] BuildCapturedMissionTrashCorpse(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            // Tilda / Vergil-family templates are 420 bytes: name at 239, length at 235.
+            // Shared NameOffset/NameLengthOffset (231/227) are for the 414-byte generic Template
+            // and destroy 8 real bytes when reused here — client drops the corpse dynel.
+            const int missionTrashNameOffset = 239;
+            const int missionTrashNameLengthOffset = 235;
+            const int missionTrashOriginalEncodedNameLength = 25;
+            int missionTrashOriginalSuffixOffset =
+                missionTrashNameOffset + missionTrashOriginalEncodedNameLength;
+
+            string corpseName = "Remains of " + (deadNpc.Name ?? "Unknown");
+            byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
+            int encodedNameLength = nameBytes.Length + 1;
+            int newSuffixOffset = missionTrashNameOffset + encodedNameLength;
+            int afterNameDelta = newSuffixOffset - missionTrashOriginalSuffixOffset;
+            byte[] template = CapturedMissionTrashCorpseTemplate;
+            byte[] buffer = new byte[template.Length + afterNameDelta];
+
+            Buffer.BlockCopy(template, 0, buffer, 0, missionTrashNameOffset);
+            Buffer.BlockCopy(nameBytes, 0, buffer, missionTrashNameOffset, nameBytes.Length);
+            buffer[missionTrashNameOffset + nameBytes.Length] = 0;
+            Buffer.BlockCopy(
+                template,
+                missionTrashOriginalSuffixOffset,
+                buffer,
+                newSuffixOffset,
+                template.Length - missionTrashOriginalSuffixOffset);
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);
+            WriteInt32(buffer, SexOffset, deadNpc.Stats[StatIds.sex].Value);
+            WriteInt32(buffer, BreedOffset, deadNpc.Stats[StatIds.breed].Value);
+            WriteInt32(buffer, RaceOffset, deadNpc.Stats[StatIds.race].Value);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh > 0 ? corpseCatMesh : 5934);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, missionTrashNameLengthOffset, encodedNameLength);
+            WriteInt32(
+                buffer,
+                CapturedSubwayVergilMonsterDataOffset + afterNameDelta,
+                corpseMonsterData > 0 ? corpseMonsterData : 26137);
+            WriteInt32(
+                buffer,
+                CapturedSubwayVergilTailDeadNpcInstanceOffset + afterNameDelta,
                 deadNpc.Identity.Instance);
 
             return buffer;
@@ -514,6 +639,60 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(
                 buffer,
                 CapturedAreteWasteTailDeadNpcInstanceOffset + afterNameDelta,
+                deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        private static byte[] BuildCapturedBarkingChimera(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            // Same MonsterData/ExtTex path as Yuttos Nascence Geosurvey Dog; rewrite name, keep low2 tail.
+            string corpseName = "Remains of " + deadNpc.Name;
+            byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
+            int encodedNameLength = nameBytes.Length + 1;
+            int newSuffixOffset = NameOffset + encodedNameLength;
+            int afterNameDelta = newSuffixOffset - CapturedBarkingChimeraOriginalSuffixOffset;
+            byte[] buffer = new byte[CapturedBarkingChimeraTemplate.Length + afterNameDelta];
+
+            Buffer.BlockCopy(CapturedBarkingChimeraTemplate, 0, buffer, 0, NameOffset);
+            Buffer.BlockCopy(nameBytes, 0, buffer, NameOffset, nameBytes.Length);
+            Buffer.BlockCopy(
+                CapturedBarkingChimeraTemplate,
+                CapturedBarkingChimeraOriginalSuffixOffset,
+                buffer,
+                newSuffixOffset,
+                CapturedBarkingChimeraTemplate.Length - CapturedBarkingChimeraOriginalSuffixOffset);
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);
+            WriteInt32(buffer, SexOffset, deadNpc.Stats[StatIds.sex].Value);
+            WriteInt32(buffer, BreedOffset, deadNpc.Stats[StatIds.breed].Value);
+            WriteInt32(buffer, RaceOffset, deadNpc.Stats[StatIds.race].Value);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, NameLengthOffset, encodedNameLength);
+            WriteInt32(
+                buffer,
+                CapturedBarkingChimeraMonsterDataOffset + afterNameDelta,
+                corpseMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedBarkingChimeraTailDeadNpcInstanceOffset + afterNameDelta,
                 deadNpc.Identity.Instance);
 
             return buffer;

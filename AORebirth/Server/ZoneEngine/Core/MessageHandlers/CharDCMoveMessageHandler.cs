@@ -87,7 +87,8 @@ namespace ZoneEngine.Core.MessageHandlers
             float auxA = message.AuxA;
             float auxB = message.AuxB;
 
-            client.Server.Info(
+            // High-frequency move packets — do not Info-spam the ZoneEngine console.
+            client.Server.Debug(
                 client,
                 "CharDCMove moveTypeRaw={0} moveTypeNormalized={1} coords={2} tick={3} auxA={4} auxB={5}",
                 rawMoveType,
@@ -141,6 +142,10 @@ namespace ZoneEngine.Core.MessageHandlers
 
             client.Controller.Move(moveType, coordinates, heading);
             AreteRoboticGuardDogRuntime.NoteMoveType(client.Controller.Character, rawMoveType);
+
+            ZoneEngine.Core.Missions.MissionInstanceDoorReplay.TrySendNearbyOnMove(
+                client,
+                client.Controller.Character);
 
             // Garden save: only when standing on the save pad (once per visit).
             ZoneEngine.Core.ShadowlandsGardenSaveRuntimeService.TryApplyWhenOnSavePad(

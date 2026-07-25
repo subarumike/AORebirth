@@ -318,6 +318,7 @@
     <Compile Include="Core\Missions\MissionRollCaptureTemplate.cs" />
     <Compile Include="Core\Missions\MissionRollCaptureLibrary.cs" />
     <Compile Include="Core\Missions\MissionRollService.cs" />
+    <Compile Include="Core\Missions\MissionRollFeeService.cs" />
     <Compile Include="Core\Missions\MissionOfferStore.cs" />
     <Compile Include="Core\Missions\MissionLevelTable.cs" />
     <Compile Include="Core\Missions\MissionKeyStore.cs" />
@@ -332,6 +333,13 @@
     <Compile Include="Core\Missions\MissionTargetTracker.cs" />
     <Compile Include="Core\Missions\MissionMachineTracker.cs" />
     <Compile Include="Core\Missions\MissionRepairService.cs" />
+    <Compile Include="Core\Missions\MissionFindPersonService.cs" />
+    <Compile Include="Core\Missions\MissionFindItemService.cs" />
+    <Compile Include="Core\Missions\MissionTokenProgressTracker.cs" />
+    <Compile Include="Core\Missions\MissionLootContainerCatalog.cs" />
+    <Compile Include="Core\Missions\MissionLootPropService.cs" />
+    <Compile Include="Core\Missions\MissionTargetNameCatalog.cs" />
+    <Compile Include="Core\Missions\MissionRareLootCatalog.cs" />
     <Compile Include="Core\Missions\MissionInstanceDoorCapture.cs" />
     <Compile Include="Core\Missions\MissionInstanceDynelCapture.cs" />
     <Compile Include="Core\Missions\MissionInstanceDoorReplay.cs" />
@@ -770,6 +778,12 @@
     <Content Include="Content\Thrak\garden-key\quests\thrak-garden-key.quests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Nascence\life-dialogs\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Nascence\life-dialogs\dialogue\nascence-life-dialogs.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\dummy.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -852,6 +866,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Refined.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML Data\MissionRewards\MissionRewardNanoNames.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Rest.json">

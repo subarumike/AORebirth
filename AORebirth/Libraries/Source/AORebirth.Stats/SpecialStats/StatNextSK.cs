@@ -81,7 +81,8 @@ namespace AORebirth.Stats.SpecialStats
             get
             {
                 int level = this.Stats[StatIds.level].Value;
-                if (level < 200 || level > 220)
+                // Levels 200-219: NextSK from TableShadowLandsSK col 2. Level 220 = max (0).
+                if (level < 200 || level >= 220)
                 {
                     return 0;
                 }

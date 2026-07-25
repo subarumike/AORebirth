@@ -51,17 +51,25 @@ namespace ZoneEngine.Core.Missions
         /// Playfield of the rolling character (Omni Trade / Rome / Tir / Athens…). Used to keep
         /// Omni city rolls off Clan markers and Clan city rolls off Omni markers.
         /// </param>
+        /// <param name="terminalX">Character X at the terminal (proxy for terminal world position).</param>
+        /// <param name="terminalZ">Character Z at the terminal (proxy for terminal world position).</param>
         public static QuestAlternativeMessage BuildRollResponse(
             QuestAlternativeMessage request,
             Identity character,
             int characterLevel,
-            int terminalPlayfieldId = 0)
+            int terminalPlayfieldId = 0,
+            float terminalX = 0f,
+            float terminalZ = 0f,
+            MissionLocationSide characterSide = MissionLocationSide.Neutral)
         {
             EnsureInitialized();
 
             int missionQuality = MissionLevelTable.GetMissionQuality(characterLevel, request.LevelSlider);
             var rng = new Random(unchecked(Environment.TickCount * 397) ^ character.Instance ^ missionQuality);
-            MissionLocationSide terminalSide = MissionLocationPool.ResolveTerminalSide(terminalPlayfieldId);
+            MissionLocationSide citySide;
+            MissionLocationSide poolSide = MissionLocationPool.TryGetCityAffiliation(terminalPlayfieldId, out citySide)
+                                              ? citySide
+                                              : characterSide;
 
             // Whole captured roll — keeps Kill / Find / Repair / Broken-Machine texts matched to icons.
             QuestAlternativeMessage response = DecodeRollBody(PickLibraryBody(rng));
@@ -99,11 +107,27 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionDiagnostics.Log(
-                "ROLL-SIDE terminalPf={0} side={1}",
+                "ROLL-SIDE terminalPf={0} poolSide={1} charSide={2} charLvl={3} termXZ=({4:F0},{5:F0})",
                 terminalPlayfieldId,
-                terminalSide);
+                poolSide,
+                characterSide,
+                characterLevel,
+                terminalX,
+                terminalZ);
 
-            int[] allowedSpotIndexes = BuildAllowedSpotIndexes(terminalSide);
+            // Whole captured roll — icons stay paired with ShortInfo/Info (do NOT retype icons).
+            // ApplyMissionType used to overwrite MissionIconId onto foreign text and made
+            // Find Person show Kill/Find-Item descriptions ("clean out his stronghold").
+            int[] allowedSpotIndexes = BuildAllowedSpotIndexes(
+                poolSide,
+                characterLevel,
+                terminalPlayfieldId,
+                terminalX,
+                terminalZ);
+
+            // Prefer distinct playfields at higher levels; low-level same-zone rolls allow multiple
+            // XYZ markers inside one PF so all five offers stay near the terminal.
+            bool preferDistinctPlayfields = characterLevel > 40;
 
             for (int i = 0; i < offers.Length; i++)
             {
@@ -115,8 +139,8 @@ namespace ZoneEngine.Core.Missions
 
                 MissionRollType type = MissionTypeCatalog.TypeFromIcon(offer.MissionIconId);
 
-                // Assign a distinct Rubi-Ka marker from the live roll capture pool (different playfields).
-                ApplyPoolLocation(offer, rng, usedSpotIndexes, i, allowedSpotIndexes);
+                // Assign a Rubi-Ka marker from the live roll capture pool.
+                ApplyPoolLocation(offer, rng, usedSpotIndexes, i, allowedSpotIndexes, preferDistinctPlayfields);
 
                 offer.QuestIdentity = new Identity
                                       {
@@ -128,7 +152,6 @@ namespace ZoneEngine.Core.Missions
                 offer.Unknown23 = RetargetTerminal(offer.Unknown23, templateTerminal, terminal);
                 offer.Quality = missionQuality;
 
-                // Keep captured MissionIconId — do NOT rewrite ShortInfo/Info or swap icons onto wrong shells.
                 ApplyMoneyExperienceSlider(offer, request.MoneyExperienceSlider, missionQuality);
                 ApplyMaliReward(offer, missionQuality, rng, type);
 
@@ -251,7 +274,8 @@ namespace ZoneEngine.Core.Missions
             Random rng,
             int[] usedSpotIndexes,
             int slot,
-            int[] allowedSpotIndexes)
+            int[] allowedSpotIndexes,
+            bool preferDistinctPlayfields)
         {
             if (offer == null || offer.QuestActions == null || offer.QuestActions.Length == 0
                 || MissionLocationPool.Spots == null || MissionLocationPool.Spots.Length == 0)
@@ -265,7 +289,12 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
-            int spotIndex = PickDistinctSpotIndex(rng, usedSpotIndexes, slot, allowedSpotIndexes);
+            int spotIndex = PickDistinctSpotIndex(
+                rng,
+                usedSpotIndexes,
+                slot,
+                allowedSpotIndexes,
+                preferDistinctPlayfields);
             usedSpotIndexes[slot] = spotIndex;
             MissionLocationPool.Spot spot = MissionLocationPool.Spots[spotIndex];
 
@@ -281,7 +310,8 @@ namespace ZoneEngine.Core.Missions
             Random rng,
             int[] usedSpotIndexes,
             int slot,
-            int[] allowedSpotIndexes)
+            int[] allowedSpotIndexes,
+            bool preferDistinctPlayfields)
         {
             int count = MissionLocationPool.Spots.Length;
             int[] allowed = allowedSpotIndexes;
@@ -294,7 +324,7 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
-            for (int attempt = 0; attempt < 32; attempt++)
+            for (int attempt = 0; attempt < 48; attempt++)
             {
                 int candidate = allowed[rng.Next(allowed.Length)];
                 bool taken = false;
@@ -306,9 +336,15 @@ namespace ZoneEngine.Core.Missions
                         continue;
                     }
 
-                    // Prefer different playfields across the five offers in one roll.
-                    if (usedSpotIndexes[i] == candidate
-                        || MissionLocationPool.Spots[usedSpotIndexes[i]].Playfield == candidatePf)
+                    if (usedSpotIndexes[i] == candidate)
+                    {
+                        taken = true;
+                        break;
+                    }
+
+                    // High-level rolls: spread across playfields. Low-level: same zone OK, different XYZ.
+                    if (preferDistinctPlayfields
+                        && MissionLocationPool.Spots[usedSpotIndexes[i]].Playfield == candidatePf)
                     {
                         taken = true;
                         break;
@@ -324,56 +360,188 @@ namespace ZoneEngine.Core.Missions
             return allowed[rng.Next(allowed.Length)];
         }
 
-        private static int[] BuildAllowedSpotIndexes(MissionLocationSide terminalSide)
+        private static int[] BuildAllowedSpotIndexes(
+            MissionLocationSide poolSide,
+            int characterLevel,
+            int terminalPlayfieldId,
+            float terminalX,
+            float terminalZ)
         {
             int count = MissionLocationPool.Spots.Length;
-            if (terminalSide == MissionLocationSide.Neutral)
-            {
-                var all = new int[count];
-                for (int i = 0; i < count; i++)
-                {
-                    all[i] = i;
-                }
+            var sideMatched = new System.Collections.Generic.List<int>(count);
+            var sameZone = new System.Collections.Generic.List<int>(count);
+            var nearCluster = new System.Collections.Generic.List<int>(count);
+            var nearRing = new System.Collections.Generic.List<int>(count);
+            var distanceMatched = new System.Collections.Generic.List<int>(count);
 
-                return all;
-            }
+            double minDist = MinMissionDistanceMeters(characterLevel);
+            double maxDist = MaxMissionDistanceMeters(characterLevel);
 
-            int matched = 0;
             for (int i = 0; i < count; i++)
             {
-                if (MissionLocationPool.IsSpotAllowedForTerminal(
-                    MissionLocationPool.Spots[i].Playfield,
-                    terminalSide))
+                MissionLocationPool.Spot spot = MissionLocationPool.Spots[i];
+                if (!MissionLocationPool.IsSpotAllowedForTerminal(spot.Playfield, poolSide))
                 {
-                    matched++;
+                    continue;
+                }
+
+                sideMatched.Add(i);
+
+                int nearRank = MissionLocationPool.NearClusterRank(terminalPlayfieldId, spot.Playfield);
+                if (nearRank == 0)
+                {
+                    sameZone.Add(i);
+                }
+                else if (nearRank == 1)
+                {
+                    nearCluster.Add(i);
+                }
+                else if (nearRank == 2)
+                {
+                    nearRing.Add(i);
+                }
+
+                double dist = EstimateSpotDistance(spot, terminalPlayfieldId, terminalX, terminalZ);
+                if (dist >= minDist && dist <= maxDist)
+                {
+                    distanceMatched.Add(i);
                 }
             }
 
-            if (matched == 0)
+            // Low-level: stay in the terminal's zone (same PF), else city→near outdoor cluster.
+            if (characterLevel <= 40)
             {
-                // Fail open to full pool rather than empty offers.
-                var all = new int[count];
-                for (int i = 0; i < count; i++)
+                if (sameZone.Count > 0)
                 {
-                    all[i] = i;
+                    MissionDiagnostics.Log(
+                        "ROLL-DIST lvl={0} mode=sameZone hits={1} termPf={2}",
+                        characterLevel,
+                        sameZone.Count,
+                        terminalPlayfieldId);
+                    return sameZone.ToArray();
                 }
 
-                return all;
+                if (nearCluster.Count > 0)
+                {
+                    MissionDiagnostics.Log(
+                        "ROLL-DIST lvl={0} mode=nearCluster hits={1} termPf={2}",
+                        characterLevel,
+                        nearCluster.Count,
+                        terminalPlayfieldId);
+                    return nearCluster.ToArray();
+                }
+
+                if (nearRing.Count > 0)
+                {
+                    MissionDiagnostics.Log(
+                        "ROLL-DIST lvl={0} mode=nearRing hits={1} termPf={2}",
+                        characterLevel,
+                        nearRing.Count,
+                        terminalPlayfieldId);
+                    return nearRing.ToArray();
+                }
+            }
+            else if (characterLevel <= 80)
+            {
+                var mid = new System.Collections.Generic.List<int>(sameZone.Count + nearCluster.Count + nearRing.Count);
+                mid.AddRange(sameZone);
+                mid.AddRange(nearCluster);
+                mid.AddRange(nearRing);
+                if (mid.Count > 0)
+                {
+                    MissionDiagnostics.Log(
+                        "ROLL-DIST lvl={0} mode=midNear hits={1} termPf={2}",
+                        characterLevel,
+                        mid.Count,
+                        terminalPlayfieldId);
+                    return mid.ToArray();
+                }
             }
 
-            var allowed = new int[matched];
-            int write = 0;
+            if (distanceMatched.Count > 0)
+            {
+                MissionDiagnostics.Log(
+                    "ROLL-DIST lvl={0} min={1:F0} max={2:F0} sideHits={3} distHits={4}",
+                    characterLevel,
+                    minDist,
+                    maxDist,
+                    sideMatched.Count,
+                    distanceMatched.Count);
+                return distanceMatched.ToArray();
+            }
+
+            if (sideMatched.Count > 0)
+            {
+                MissionDiagnostics.Log(
+                    "ROLL-DIST-FALLBACK lvl={0} min={1:F0} max={2:F0} usingSideHits={3}",
+                    characterLevel,
+                    minDist,
+                    maxDist,
+                    sideMatched.Count);
+                return sideMatched.ToArray();
+            }
+
+            var all = new int[count];
             for (int i = 0; i < count; i++)
             {
-                if (MissionLocationPool.IsSpotAllowedForTerminal(
-                    MissionLocationPool.Spots[i].Playfield,
-                    terminalSide))
-                {
-                    allowed[write++] = i;
-                }
+                all[i] = i;
             }
 
-            return allowed;
+            return all;
+        }
+
+        /// <summary>
+        /// Low-level characters stay near the terminal; higher levels push markers farther out.
+        /// </summary>
+        private static double MaxMissionDistanceMeters(int characterLevel)
+        {
+            int level = characterLevel < 1 ? 1 : characterLevel;
+            return 900.0 + (level * 35.0);
+        }
+
+        private static double MinMissionDistanceMeters(int characterLevel)
+        {
+            // Low levels: no minimum — stay as close as possible.
+            if (characterLevel <= 40)
+            {
+                return 0.0;
+            }
+
+            int level = characterLevel < 1 ? 1 : characterLevel;
+            double min = (level * 12.0) - 200.0;
+            return min < 400 ? 400 : min;
+        }
+
+        private static double EstimateSpotDistance(
+            MissionLocationPool.Spot spot,
+            int terminalPlayfieldId,
+            float terminalX,
+            float terminalZ)
+        {
+            if (spot == null)
+            {
+                return 99999.0;
+            }
+
+            if (terminalPlayfieldId != 0 && spot.Playfield == terminalPlayfieldId)
+            {
+                double dx = spot.X - terminalX;
+                double dz = spot.Z - terminalZ;
+                return Math.Sqrt((dx * dx) + (dz * dz));
+            }
+
+            return MissionLocationPool.ApproxTravelMeters(terminalPlayfieldId, spot.Playfield);
+        }
+
+        /// <summary>
+        /// Retypes a captured offer shell by MissionIconId only.
+        /// Do not rewrite ShortInfo / CharInfos / Info — those lengths are capture-aligned and mutating
+        /// them has broken client roll parsing ("rolling mission not work at all").
+        /// Invented kill/find names are applied at instance spawn instead.
+        /// </summary>
+        private static void ApplyMissionType(QuestInfo offer, MissionRollType type, Random rng)
+        {
+            offer.MissionIconId = MissionTypeCatalog.IconId(type, 0);
         }
 
         private static void ApplyMaliReward(QuestInfo offer, int missionQuality, Random rng, MissionRollType type)
@@ -437,11 +605,42 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
-            int baseCash = offer.CashReward > 0 ? offer.CashReward : Math.Max(100, missionQuality * 50);
-            int baseXp = offer.ExperienceReward > 0 ? offer.ExperienceReward : Math.Max(100, missionQuality * 200);
+            int ql = missionQuality > 0 ? missionQuality : 1;
+            int baseCash = BaseCashForMissionQl(ql);
+            int baseXp = BaseXpForMissionQl(ql);
 
-            offer.CashReward = Math.Max(1, baseCash * (150 - slider) / 100);
-            offer.ExperienceReward = Math.Max(1, baseXp * (50 + slider) / 100);
+            offer.CashReward = Math.Max(0, baseCash * (150 - slider) / 100);
+            // Live capture 20260724-144103: cash-heavy slider can yield 0 XP on the description/finish line.
+            offer.ExperienceReward = Math.Max(0, baseXp * (50 + slider) / 100);
+            if (offer.CashReward <= 0 && offer.ExperienceReward <= 0)
+            {
+                offer.CashReward = Math.Max(1, baseCash / 2);
+            }
+
+            // Absolute safety vs any future template regression.
+            if (offer.CashReward > 150000)
+            {
+                offer.CashReward = baseCash;
+            }
+
+            if (offer.ExperienceReward > 2500000)
+            {
+                offer.ExperienceReward = baseXp;
+            }
+        }
+
+        /// <summary>Balanced (slider mid) cash for a mission QL.</summary>
+        internal static int BaseCashForMissionQl(int missionQuality)
+        {
+            int ql = missionQuality > 0 ? missionQuality : 1;
+            return Math.Max(25, ql * ql * 2);
+        }
+
+        /// <summary>Balanced (slider mid) XP for a mission QL.</summary>
+        internal static int BaseXpForMissionQl(int missionQuality)
+        {
+            int ql = missionQuality > 0 ? missionQuality : 1;
+            return Math.Max(50, ql * ql * 50);
         }
 
         private static int NextQuestInstance()
