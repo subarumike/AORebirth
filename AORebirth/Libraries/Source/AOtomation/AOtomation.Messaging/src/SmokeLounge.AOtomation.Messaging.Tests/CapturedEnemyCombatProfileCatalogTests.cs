@@ -1434,6 +1434,146 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void MolestedMoleculesUsesItsUniqueExactWeaponStreamWithProductionValues()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Molested Molecules"
+                         && value.MonsterData == 203746);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(9, activeSpawns.Length);
+
+            CapturedEnemyCombatProfileDefinition exactProfile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "4ba26b078c2496d9-2e2fc4992159adf3");
+            Assert.AreEqual(20, exactProfile.Level);
+            Assert.IsTrue(exactProfile.CaptureEvidenceSafe);
+            Assert.IsFalse(exactProfile.CaptureRuntimeEvidenceSafe);
+            Assert.IsTrue(
+                exactProfile.SupportsCaptureProvenEquippedWeaponPacketSemantics);
+            Assert.AreEqual(122217, exactProfile.WeaponDefinition.LowId);
+            Assert.AreEqual(122217, exactProfile.WeaponDefinition.HighId);
+            Assert.AreEqual(20, exactProfile.WeaponDefinition.Quality);
+            Assert.AreEqual(6, exactProfile.WeaponDefinition.InventorySlot);
+
+            int restoredActors = 0;
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                Assert.AreEqual(
+                    0,
+                    activeSpawn.LevelDefinition.GetExplicitVariants().Length);
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionEquippedWeaponValues);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure);
+                string expectedProfileId = null;
+                switch (activeSpawn.Level)
+                {
+                    case 17:
+                        expectedProfileId = "46500f6c2cd2882a-2422c91610d14b94";
+                        break;
+                    case 18:
+                        expectedProfileId = "b7a9f2fa5901b542-1a1c4a09ea74f89c";
+                        break;
+                    case 19:
+                        expectedProfileId = "91251aa18cd96ec5-6d07601f79a79e03";
+                        break;
+                    case 20:
+                        expectedProfileId = "4ba26b078c2496d9-2e2fc4992159adf3";
+                        break;
+                    case 21:
+                        expectedProfileId = "76842c25578f7757-40413a3d0b4d835d";
+                        break;
+                }
+
+                Assert.AreEqual(
+                    expectedProfileId != null,
+                    success,
+                    string.Format(
+                        "source=0x{0:X8} level={1}: {2}",
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level,
+                        failure));
+                if (!success)
+                {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+                    continue;
+                }
+
+                CapturedEnemyCombatProfileDefinition expectedProfile =
+                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                        value => value.ProfileId == expectedProfileId);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                Assert.IsTrue(resolved.UsesEquippedWeaponDamage);
+                Assert.IsTrue(resolved.UsesEquippedWeaponTiming);
+                Assert.IsTrue(
+                    resolved.CaptureProvenArchetypeId.Contains(expectedProfileId));
+                Assert.AreEqual(
+                    expectedProfile.ContainsSource(activeSpawn.SourceIdentity)
+                        ? activeSpawn.SourceIdentity
+                        : expectedProfile.RepresentativeEvidenceSourceIdentity,
+                    resolved.EvidenceSourceIdentity);
+                Assert.IsNotNull(resolved.WeaponDefinition);
+                Assert.AreEqual(
+                    expectedProfile.WeaponDefinition.LowId,
+                    resolved.WeaponLowId);
+                Assert.AreEqual(
+                    expectedProfile.WeaponDefinition.HighId,
+                    resolved.WeaponHighId);
+                Assert.AreEqual(
+                    expectedProfile.WeaponDefinition.Quality,
+                    resolved.WeaponQuality);
+                Assert.AreEqual(
+                    expectedProfile.WeaponDefinition.InventorySlot,
+                    resolved.WeaponInventorySlot);
+                Assert.AreEqual(
+                    expectedProfile.WeaponDefinition.InitialEnergy,
+                    resolved.WeaponDefinition.InitialEnergy);
+                Assert.AreEqual(
+                    expectedProfile.Streams[0].WeaponSlot,
+                    resolved.AttackInfoWeaponSlot);
+                Assert.AreEqual(
+                    expectedProfile.Streams[0].DamageTypeWire,
+                    resolved.AttackInfoUnknown);
+                Assert.AreEqual(
+                    expectedProfile.Streams[0].HitTypeWire,
+                    resolved.AttackInfoHitType);
+                Assert.AreEqual(
+                    expectedProfile.Streams[0].WeaponInstance,
+                    resolved.AttackInfoWeaponInstance);
+                Assert.AreEqual(
+                    expectedProfile.SpecialAttackWeaponUnknown1,
+                    resolved.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    expectedProfile.SpecialAttackWeaponUnknown5,
+                    resolved.SpecialAttackWeaponUnknown5);
+                restoredActors++;
+            }
+
+            Assert.AreEqual(6, restoredActors);
+        }
+
+        [TestMethod]
         public void ProductionQlFamiliesResolveOnlyExactCapturedLevelWeaponPacketSemantics()
         {
             AssertProductionQlFamily(
@@ -1944,7 +2084,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                     spawn.PlayfieldInstance,
                                     profile.DisplayName,
                                     profile.MonsterData)).ToArray();
-                        if (baseline.UsesProductionWeaponQuality)
+                        if (baseline.UsesProductionEquippedWeaponValues)
+                        {
+                            CapturedEnemyCombatProfileDefinition[] packetMatches =
+                                familyMatches.Where(
+                                    value => value.Level == spawn.Level
+                                             && value
+                                                 .SupportsCaptureProvenEquippedWeaponPacketSemantics)
+                                    .ToArray();
+                            Assert.IsTrue(packetMatches.Length > 0);
+                            Assert.AreEqual(
+                                1,
+                                packetMatches.Count(
+                                    value => value.ContainsSource(
+                                        resolved.EvidenceSourceIdentity)));
+                        }
+                        else if (baseline.UsesProductionWeaponQuality)
                         {
                             CapturedEnemyCombatProfileDefinition[] packetMatches =
                                 familyMatches.Where(

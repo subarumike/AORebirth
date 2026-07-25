@@ -497,6 +497,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesProductionSpecializedValues { get; private set; }
 
+        internal bool UsesProductionEquippedWeaponValues { get; private set; }
+
         internal bool UsesCaptureProvenArchetype { get; private set; }
 
         internal string CaptureProvenArchetypeId { get; private set; }
@@ -781,6 +783,13 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionSpecializedValues = true;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionEquippedWeaponValues()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionEquippedWeaponValues = true;
             return clone;
         }
 
@@ -3286,7 +3295,7 @@ namespace AORebirth.Core.Playfields
                     true);
             }
 
-            return CapturedEnemyCombatContract.FixedAttack(
+            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttack(
                 string.Join(",", archetype.EvidenceCaptures),
                 combat.MinDamage,
                 combat.MaxDamage,
@@ -3297,6 +3306,9 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0);
+            return archetype.MonsterData == 203746
+                       ? contract.WithProductionEquippedWeaponValues()
+                       : contract;
         }
 
         internal static CapturedEnemyCombatContract ForOrdinary(
