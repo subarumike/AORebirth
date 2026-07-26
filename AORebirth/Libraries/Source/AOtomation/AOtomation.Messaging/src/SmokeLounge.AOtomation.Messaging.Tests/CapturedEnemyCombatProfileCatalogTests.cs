@@ -1558,6 +1558,88 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LevelThirtyTwoCultistsUseTheirUniqueExactWeaponStreamWithProductionValues()
+        {
+            const string profileId = "b07cc6a46f13664f-8e90c740f8e6bbe0";
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Cultist"
+                         && value.MonsterData == 26149);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 1931
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && value.Level == 32).ToArray();
+            Assert.AreEqual(3, activeSpawns.Length);
+
+            CapturedEnemyCombatProfileDefinition exactProfile =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId == profileId);
+            Assert.AreEqual(1931, exactProfile.ResourceId);
+            Assert.AreEqual("Cultist", exactProfile.Name);
+            Assert.AreEqual(26149, exactProfile.MonsterData);
+            Assert.AreEqual(32, exactProfile.Level);
+            Assert.IsTrue(exactProfile.CaptureEvidenceSafe);
+            Assert.IsFalse(exactProfile.CaptureRuntimeEvidenceSafe);
+            Assert.IsTrue(
+                exactProfile.SupportsCaptureProvenEquippedWeaponPacketSemantics);
+
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionEquippedWeaponValues);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure),
+                    string.Format(
+                        "source=0x{0:X8}: {1}",
+                        activeSpawn.SourceIdentity,
+                        failure));
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                Assert.IsTrue(resolved.UsesEquippedWeaponDamage);
+                Assert.IsTrue(resolved.UsesEquippedWeaponTiming);
+                Assert.IsTrue(resolved.CaptureProvenArchetypeId.Contains(profileId));
+                Assert.AreEqual(
+                    exactProfile.RepresentativeEvidenceSourceIdentity,
+                    resolved.EvidenceSourceIdentity);
+                Assert.AreEqual(
+                    exactProfile.WeaponDefinition.LowId,
+                    resolved.WeaponLowId);
+                Assert.AreEqual(
+                    exactProfile.WeaponDefinition.HighId,
+                    resolved.WeaponHighId);
+                Assert.AreEqual(
+                    exactProfile.WeaponDefinition.Quality,
+                    resolved.WeaponQuality);
+                Assert.AreEqual(
+                    exactProfile.Streams[0].WeaponSlot,
+                    resolved.AttackInfoWeaponSlot);
+                Assert.AreEqual(
+                    exactProfile.Streams[0].DamageTypeWire,
+                    resolved.AttackInfoUnknown);
+                Assert.AreEqual(
+                    exactProfile.Streams[0].HitTypeWire,
+                    resolved.AttackInfoHitType);
+            }
+        }
+
+        [TestMethod]
         public void ReanimatedCorpseAnchorsResolveTheirExactCapturedWeaponProfiles()
         {
             var expectedProfiles = new[]
