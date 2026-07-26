@@ -2321,11 +2321,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
             }
 
-            Assert.AreEqual(313, certifiedKeys.Count);
-            Assert.AreEqual(176, rejected.Count);
+            Assert.AreEqual(325, certifiedKeys.Count);
+            Assert.AreEqual(164, rejected.Count);
             Assert.AreEqual(spawns.Length, certifiedKeys.Count + rejected.Count);
-            Assert.AreEqual(226, certifiedKeys.Count(value => value.StartsWith("127|")));
-            Assert.AreEqual(96, rejected.Keys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(238, certifiedKeys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(84, rejected.Keys.Count(value => value.StartsWith("127|")));
             Assert.AreEqual(87, certifiedKeys.Count(value => value.StartsWith("1931|")));
             Assert.AreEqual(80, rejected.Keys.Count(value => value.StartsWith("1931|")));
 
@@ -2801,6 +2801,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatProfileDefinition levelFive = generatedProfiles.Single(
                 value => value.ProfileId == "218eb3509f2be66b-12f99a4c2f732061");
             Assert.AreEqual(3, levelFive.Streams.Length);
+            CapturedEnemyCombatProfileStreamDefinition terminalLevelFiveStream =
+                levelFive.Streams.Single(value => value.CapturedTerminalHitOnly);
+            Assert.AreEqual(0, terminalLevelFiveStream.WeaponSlot);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
+                terminalLevelFiveStream.WeaponInstance);
+            Assert.AreEqual(4, terminalLevelFiveStream.DamageTypeWire);
+            Assert.AreEqual(3, terminalLevelFiveStream.HitTypeWire);
+            Assert.IsTrue(levelFive.Evidence.Contains("20260708-004038"));
+            Assert.IsTrue(levelFive.Evidence.Contains("20260708-143600"));
+            Assert.IsTrue(levelFive.Evidence.Contains("20260709-193914"));
 
             int restoredActors = 0;
             int restoredVariants = 0;
@@ -2818,6 +2829,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
                 bool shouldResolve =
                     activeSpawn.Level == 4
+                    || activeSpawn.Level == 5
                     || activeSpawn.Level == 6
                     || activeSpawn.Level == 10
                     || activeSpawn.Level == 11
@@ -2884,6 +2896,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(
                     NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
                     resolved.SpecialAttackSequence.RepeatingAttack.AttackInfoWeaponInstance);
+                Assert.IsFalse(
+                    resolved.SpecialAttackSequence.OpeningAttack
+                        .LethalAttackInfoUnknown.HasValue);
+                Assert.AreEqual(
+                    activeSpawn.Level == 5 ? (int?)4 : null,
+                    resolved.SpecialAttackSequence.RepeatingAttack
+                        .LethalAttackInfoUnknown);
+                Assert.AreEqual(
+                    0,
+                    resolved.SpecialAttackSequence.RepeatingAttack
+                        .AttackInfoUnknown);
                 Assert.IsTrue(
                     resolved.SpecialAttackSequence.OpeningAttack
                         .CapturedDamageObservations.Length > 0);
@@ -2900,7 +2923,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 restoredActors++;
             }
 
-            Assert.AreEqual(30, restoredActors);
+            Assert.AreEqual(42, restoredActors);
             Assert.AreEqual(0, restoredVariants);
         }
 

@@ -508,6 +508,11 @@ namespace AORebirth.Core.Playfields
             int damage = this.CalculateCombatDamage(attacker, attackSource);
             int newHealth = Math.Max(0, currentHealth - damage);
             bool killingHit = newHealth == 0;
+            if (killingHit && attackSource.LethalAttackInfoUnknown.HasValue)
+            {
+                attackSource.AttackInfoUnk1 =
+                    attackSource.LethalAttackInfoUnknown.Value;
+            }
 
             this.AnnounceNpcSpecialAttackWeaponContextIfNeeded(attacker, target, attackSource);
             this.AnnounceCombatDamage(
@@ -1101,6 +1106,7 @@ namespace AORebirth.Core.Playfields
                 AttackInfoHitType = attack.AttackInfoHitType,
                 AttackInfoWeaponInstance = attack.AttackInfoWeaponInstance,
                 AttackInfoN3Unknown = attack.AttackInfoN3Unknown,
+                LethalAttackInfoUnknown = attack.LethalAttackInfoUnknown,
                 UsesCapturedWeaponEnergy = contract.WeaponDefinition != null
                                            && attack.AttackInfoWeaponSlot
                                               == contract.WeaponDefinition.InventorySlot
@@ -1117,6 +1123,11 @@ namespace AORebirth.Core.Playfields
             int currentHealth = target.Stats[StatIds.health].Value;
             int damage = this.CalculateCombatDamage(attacker, attackSource);
             int newHealth = Math.Max(0, currentHealth - damage);
+            if (newHealth == 0 && attackSource.LethalAttackInfoUnknown.HasValue)
+            {
+                attackSource.AttackInfoUnk1 =
+                    attackSource.LethalAttackInfoUnknown.Value;
+            }
             this.AnnounceCombatDamage(
                 attacker,
                 target,
@@ -1473,6 +1484,7 @@ namespace AORebirth.Core.Playfields
                            AttackInfoHitType = attack.AttackInfoHitType,
                            AttackInfoWeaponInstance = attack.AttackInfoWeaponInstance,
                            AttackInfoN3Unknown = attack.AttackInfoN3Unknown,
+                           LethalAttackInfoUnknown = attack.LethalAttackInfoUnknown,
                            UsesCapturedWeaponEnergy = capturedContract.WeaponDefinition != null
                                                       && attack.AttackInfoWeaponSlot
                                                          == capturedContract.WeaponDefinition.InventorySlot
@@ -1870,6 +1882,8 @@ namespace AORebirth.Core.Playfields
             public int AttackInfoWeaponInstance { get; set; }
 
             public byte AttackInfoN3Unknown { get; set; }
+
+            public int? LethalAttackInfoUnknown { get; set; }
 
             public bool UsesCapturedWeaponEnergy { get; set; }
 

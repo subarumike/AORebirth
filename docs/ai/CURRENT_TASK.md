@@ -4,20 +4,18 @@
 
 ### Capture-backed active enemy combat restoration
 
-The three active level-32 `MonsterData 26149` Temple Cultists remain certified
-through generated profile `b07cc6a46f13664f-8e90c740f8e6bbe0` from capture
-`20260721-052115`. The focused `MonsterData 26137` production-source gate
-rejected restoration: canonical item template `204747/204747` is one fixed QL1
-record, ordinary spawn construction supplies no SAW values, equipped weapon
-state supplies only WIFU/item state, and the shared packet factory copies
-`Unknown1..4` from the selected capture contract. No existing authoritative
-source reproduces the six captured initializations at levels 21, 23, 26, 28,
-29, and 30, so all ten uncaptured-level actors remain quarantined.
+The full Filth Flea corpus proves that the level-5 profile contains two
+scheduled weapon phases plus one terminal result variant, not three independent
+cadences. Generated profile `218eb3509f2be66b-12f99a4c2f732061` now marks the
+single slot-0 `damageTypeWire=4` observation as terminal-only because its raw
+`AttackInfo` is followed at the identical timestamp by target
+`CharacterAction action=99`. The shared health/combat path emits that exact
+field only for a lethal AZUS hit; ordinary AZUS hits remain wire value `0`.
+This restores all 12 active level-5 actors without adding a timer or fallback.
 
-Actor-based reconciliation now supersedes the stale incremental checkpoint.
-The authoritative PF127/PF1931 denominator is `489` unique actors: `313`
-certified and `176` quarantined. PF1931 contains `149` unique Cultists:
-`73` certified and `76` quarantined, with exactly one rejection row per
-quarantined actor. The prior `70` Cultist and `376/113` totals were stale
-documentation, not duplicate runtime actors or inflated rejection rows. See
-`docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md`.
+The authoritative PF127/PF1931 denominator remains `489` unique actors: `325`
+are certified and `164` are quarantined. PF127 is `238/84`; PF1931 remains
+`87/80`. Filth Flea is `42` certified and `9` quarantined. The remaining level
+7, 8, 14, and 15 actors have no complete same-generation combat chain and stay
+fail-closed. See
+`docs/evidence/SUBWAY_FILTH_FLEA_COMBAT_RESTORATION_20260726.md`.

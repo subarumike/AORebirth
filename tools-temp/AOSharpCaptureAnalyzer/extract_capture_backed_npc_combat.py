@@ -612,6 +612,26 @@ def decode_despawn(body: bytes) -> dict[str, Any]:
     )
 
 
+def decode_character_action(body: bytes) -> dict[str, Any]:
+    reader = BodyReader(body)
+    result = finish(
+        reader,
+        {
+            "messageId": reader.u32("messageId"),
+            "source": reader.identity("source"),
+            "n3Unknown": reader.u8("n3Unknown"),
+            "action": reader.i32("action"),
+            "unknown1": reader.i32("unknown1"),
+            "target": reader.identity("target"),
+            "parameter1": reader.i32("parameter1"),
+            "parameter2": reader.i32("parameter2"),
+            "unknown2": reader.i16("unknown2"),
+        },
+    )
+    result["unsupported"] = True
+    return result
+
+
 DECODERS = {
     "WeaponItemFullUpdate": decode_weapon_item_full_update,
     "SpecialAttackWeapon": decode_special_attack_weapon,
@@ -622,6 +642,7 @@ DECODERS = {
     "CastNanoSpell": decode_cast_nano_spell,
     "StopFight": decode_stop_fight,
     "Despawn": decode_despawn,
+    "CharacterAction": decode_character_action,
 }
 
 
@@ -1751,6 +1772,19 @@ def correlate(
     incomplete: list[dict[str, Any]] = []
     unsupported: list[dict[str, Any]] = []
 
+    def is_terminal_hit(attack_info: PacketRecord) -> bool:
+        if attack_info.target is None or attack_info.time is None:
+            return False
+        return any(
+            row.capture == attack_info.capture
+            and row.sequence > attack_info.sequence
+            and row.time == attack_info.time
+            and row.message_type == "CharacterAction"
+            and row.source == attack_info.target
+            and row.decoded.get("action") == 99
+            for row in records
+        )
+
     for record in records:
         if record.message_type in {
             "MissedAttackInfo",
@@ -1863,6 +1897,7 @@ def correlate(
             "classification": "normal-landed" if attack_info.decoded["hitTypeWire"] == 3 else "non-normal-landed",
             "hitTypeWire": attack_info.decoded["hitTypeWire"],
             "damageTypeWire": attack_info.decoded["damageTypeWire"],
+            "terminalHit": is_terminal_hit(attack_info),
             "missingEvidence": missing,
             "conflicts": conflicts,
             "evidenceFound": {
@@ -2367,6 +2402,9 @@ def build_profiles(
                             if len(distinct_intervals) == 1
                             else None
                         ),
+                        "capturedTerminalHitOnly": all(
+                            row["terminalHit"] for row in stream_rows
+                        ),
                         "chainCount": len(stream_rows),
                         "attackInfoPacketIds": [row["attackInfoPacketId"] for row in stream_rows],
                     }
@@ -2442,6 +2480,7 @@ def build_profiles(
                     ],
                     "attackPacketId": row["attackPacketId"],
                     "attackInfoPacketId": row["attackInfoPacketId"],
+                    "terminalHit": row["terminalHit"],
                 }
                 for row in ordered_rows
             ]
@@ -4367,7 +4406,9 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                     + f"{csharp_double_array(stream['landedIntervalObservationsSeconds'])}, "
                     + "0, "
                     + ("true" if weapon_context_kind == "equipped" else "false")
-                    + ", null, true)"
+                    + ", null, true, "
+                    + ("true" if stream["capturedTerminalHitOnly"] else "false")
+                    + ")"
                 )
             sources = ", ".join(
                 csharp_int(int(value, 16)) for value in variant["sourceIdentities"]
@@ -4403,9 +4444,40 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                 )
             )
             runtime_missing_evidence = variant["runtimeMissingEvidence"]
+            mutable_saw_state_observations = []
+            seen_mutable_saw_packet_ids = set()
+            for sibling in profile["variants"]:
+                if (
+                    sibling["sourceIdentities"] != variant["sourceIdentities"]
+                    or sibling["invariantContractSignature"][
+                        "specialAttackWeapon"
+                    ]
+                    != variant["invariantContractSignature"][
+                        "specialAttackWeapon"
+                    ]
+                    or sibling["invariantContractSignature"]["attack"]
+                    != variant["invariantContractSignature"]["attack"]
+                ):
+                    continue
+                for observation in sibling["mutableSawStateObservations"]:
+                    if observation["packetId"] in seen_mutable_saw_packet_ids:
+                        continue
+                    seen_mutable_saw_packet_ids.add(observation["packetId"])
+                    mutable_saw_state_observations.append(observation)
+            mutable_saw_state_observations.sort(
+                key=lambda observation: (
+                    packet_by_id[observation["packetId"]]["capture"],
+                    (
+                        packet_by_id[observation["packetId"]]["globalOrdinal"]
+                        if packet_by_id[observation["packetId"]]["globalOrdinal"]
+                        is not None
+                        else packet_by_id[observation["packetId"]]["sequence"]
+                    ),
+                )
+            )
             mutable_saw_observations = [
                 row["unknown5"]
-                for row in variant["mutableSawStateObservations"]
+                for row in mutable_saw_state_observations
             ]
             mutable_saw_replay_is_complete = (
                 not variant["deterministicRuntimeInitializationProven"]
@@ -4413,6 +4485,11 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                 len(mutable_saw_observations) > 1
                 and all(
                     reason == "capture-backed non-equipped attack range"
+                    or (
+                        weapon_context_kind in {"natural", "natural-or-special"}
+                        and reason
+                        == "exact specialized runtime sequence for multiple captured AttackInfo streams"
+                    )
                     or reason.startswith(
                         "deterministic runtime SpecialAttackWeapon Unknown5 state selection"
                     )
@@ -5494,6 +5571,17 @@ def self_test() -> None:
     assert attack_info["weaponSlot"] == 6
     assert attack_info["damageTypeWire"] == 0
     assert attack_info["hitTypeWire"] == 3
+
+    flea_target_death = decode_character_action(
+        bytes.fromhex(
+            "5E4777700000C350794ADBC800000000630000000000000000"
+            "0000000000000000000001F40000"
+        )
+    )
+    assert flea_target_death["source"]["instanceHex"] == "794ADBC8"
+    assert flea_target_death["action"] == 99
+    assert flea_target_death["parameter2"] == 500
+    assert flea_target_death["unsupported"]
 
     ground_item_prefix = bytes.fromhex(
         "3B1D22680000C74A256F9561000000000B0000000000000000"

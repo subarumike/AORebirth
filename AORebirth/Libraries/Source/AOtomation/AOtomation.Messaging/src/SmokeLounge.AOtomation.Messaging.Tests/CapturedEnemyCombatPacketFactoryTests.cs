@@ -1510,6 +1510,89 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LevelFiveFilthFleaKeepsNormalArmHitsAndUsesTheCapturedLethalOutcome()
+        {
+            const string profileId = "218eb3509f2be66b-12f99a4c2f732061";
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Filth Flea"
+                         && value.MonsterData
+                            == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData);
+            OrdinaryEnemySpawnDefinition activeSpawn = runtimeCatalog.GetSpawns().First(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && value.Level == 5);
+            CapturedEnemyCombatContract baseline = runtimeProfile.Combat.ResolveContract(
+                activeSpawn.SourceIdentity,
+                activeSpawn.Level);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure),
+                failure);
+
+            CapturedEnemyCombatAttackDefinition repeating =
+                resolved.SpecialAttackSequence.RepeatingAttack;
+            Assert.AreEqual(0, repeating.AttackInfoUnknown);
+            Assert.AreEqual((int?)4, repeating.LethalAttackInfoUnknown);
+
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyAttackInfoPacketFixture normalFixture =
+                fixture.AttackInfoPackets.First(
+                    value => value.WeaponSlot == repeating.AttackInfoWeaponSlot
+                             && value.WeaponInstance
+                                == repeating.AttackInfoWeaponInstance
+                             && value.DamageTypeWire
+                                == repeating.AttackInfoUnknown);
+            CapturedEnemyAttackInfoPacketFixture lethalFixture =
+                fixture.AttackInfoPackets.Single(
+                    value => value.WeaponSlot == repeating.AttackInfoWeaponSlot
+                             && value.WeaponInstance
+                                == repeating.AttackInfoWeaponInstance
+                             && value.DamageTypeWire
+                                == repeating.LethalAttackInfoUnknown.Value);
+
+            AttackInfoMessage normal = CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                IdentityOf(normalFixture.SourceType, normalFixture.SourceIdentity),
+                IdentityOf(normalFixture.TargetType, normalFixture.TargetIdentity),
+                normalFixture.Amount,
+                normalFixture.Ammo,
+                repeating.AttackInfoWeaponSlot,
+                repeating.AttackInfoUnknown,
+                repeating.AttackInfoHitType,
+                repeating.AttackInfoWeaponInstance,
+                repeating.AttackInfoN3Unknown);
+            AttackInfoMessage lethal = CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                IdentityOf(lethalFixture.SourceType, lethalFixture.SourceIdentity),
+                IdentityOf(lethalFixture.TargetType, lethalFixture.TargetIdentity),
+                lethalFixture.Amount,
+                lethalFixture.Ammo,
+                repeating.AttackInfoWeaponSlot,
+                repeating.LethalAttackInfoUnknown.Value,
+                repeating.AttackInfoHitType,
+                repeating.AttackInfoWeaponInstance,
+                repeating.AttackInfoN3Unknown);
+
+            Assert.AreEqual(0, normal.Unknown4);
+            Assert.AreEqual(4, lethal.Unknown4);
+            AssertHex(normalFixture.BodyHex, normal);
+            AssertHex(lethalFixture.BodyHex, lethal);
+        }
+
+        [TestMethod]
         public void MolestedMoleculesUsesProductionWeaponValuesWithExactCapturedPacketSequence()
         {
             const string profileId = "4ba26b078c2496d9-2e2fc4992159adf3";
@@ -2726,6 +2809,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon("));
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttack("));
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo("));
+            Assert.IsTrue(
+                coordinator.Contains(
+                    "if (killingHit && attackSource.LethalAttackInfoUnknown.HasValue)"));
+            Assert.IsTrue(
+                coordinator.Contains(
+                    "if (newHealth == 0 && attackSource.LethalAttackInfoUnknown.HasValue)"));
+            Assert.IsTrue(
+                coordinator.Contains(
+                    "attackSource.AttackInfoUnk1 ="));
+            Assert.IsTrue(
+                coordinator.Contains(
+                    "attackSource.LethalAttackInfoUnknown.Value;"));
             Assert.IsTrue(coordinator.Contains("CreateCapturedCleaningRobotSpecialAttacks(),"));
             Assert.IsTrue(visibility.Contains("CapturedEnemyCombatPacketFactory.CreateWeaponDefinition("));
             Assert.IsTrue(visibility.Contains("item.MultipleCount"));

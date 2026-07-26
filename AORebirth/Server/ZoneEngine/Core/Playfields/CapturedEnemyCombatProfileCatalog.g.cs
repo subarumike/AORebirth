@@ -50,7 +50,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(30, 30, 15, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 30 }, new[] { 0d }, new[] { 2.312246d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(30, 30, 15, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 30 }, new[] { 0d }, new[] { 2.312246d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "028210688643a4d8-6ff86979de5c6526",
@@ -76,9 +76,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(8, 10, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 10, 8 }, new[] { 0d, 0d }, new[] { 10.9681d, 4.644714d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(8, 11, -1, 1, 0, 3, 1279612722, (byte)0, 5.944275d, new[] { 8, 11, 10 }, new[] { 0d, 0d }, new[] { 8.703051d, 2.575041d }, new[] { 5.944275d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 0, 4, 3, 1279612721, (byte)0, 0d, new[] { 9 }, new[] { 0d }, new[] { 10.493337d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(8, 10, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 10, 8 }, new[] { 0d, 0d }, new[] { 10.9681d, 4.644714d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(8, 11, -1, 1, 0, 3, 1279612722, (byte)0, 5.944275d, new[] { 8, 11, 10 }, new[] { 0d, 0d }, new[] { 8.703051d, 2.575041d }, new[] { 5.944275d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 0, 4, 3, 1279612721, (byte)0, 0d, new[] { 9 }, new[] { 0d }, new[] { 10.493337d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "036d695117f3e198-3bd634dd92364727",
@@ -121,7 +121,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(3, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 9, 9, 3, 9, 9 }, new[] { 0d, 0d, 0d }, new[] { 0.599459d, 4.509288d, 10.299181d }, new[] { 5.862109d, 5.848035d, 5.671753d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(3, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 9, 9, 3, 9, 9 }, new[] { 0d, 0d, 0d }, new[] { 0.599459d, 4.509288d, 10.299181d }, new[] { 5.862109d, 5.848035d, 5.671753d }, 0, true, null, true, false)
                     },
                     new[] { 19, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -165,7 +165,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24 }, new[] { 0d }, new[] { 8.792627d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24 }, new[] { 0d }, new[] { 8.792627d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0442e5cb9bb937c9-f9031b9d5776b541",
@@ -191,8 +191,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6, 6, 6, 6, 6 }, new[] { 0d }, new[] { 5.807408d }, new[] { 4.066181d, 1.932494d, 6.416474d, 2.034765d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(40, 40, -1, 1, 0, 3, 1162887496, (byte)0, 12.915939d, new[] { 40, 40, 40 }, new[] { 0d, 0d }, new[] { 4.391296d, 3.12408d }, new[] { 12.915939d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6, 6, 6, 6, 6 }, new[] { 0d }, new[] { 5.807408d }, new[] { 4.066181d, 1.932494d, 6.416474d, 2.034765d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(40, 40, -1, 1, 0, 3, 1162887496, (byte)0, 12.915939d, new[] { 40, 40, 40 }, new[] { 0d, 0d }, new[] { 4.391296d, 3.12408d }, new[] { 12.915939d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0ab4af8e83e1830c-24bcb9b070d812c6",
@@ -235,7 +235,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 21, 25, 18, 16, 19, 16 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 2.616253d, 1.73302d, 0.165996d, 1.048506d, 0.407d }, new[] { 4.747813d, 4.756757d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 21, 25, 18, 16, 19, 16 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 2.616253d, 1.73302d, 0.165996d, 1.048506d, 0.407d }, new[] { 4.747813d, 4.756757d }, 0, true, null, true, false)
                     },
                     new[] { 0, 26, 46, 46, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -279,7 +279,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.115807d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.115807d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0ab4af8e83e1830c-4fb632d821975655",
@@ -322,7 +322,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(13, 20, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 20, 19, 20, 17, 18, 13 }, new[] { 0d, 0d }, new[] { 3.015762d, 2.816273d }, new[] { 4.966555d, 10.898524d, 5.043616d, 5.159404d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(13, 20, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 20, 19, 20, 17, 18, 13 }, new[] { 0d, 0d }, new[] { 3.015762d, 2.816273d }, new[] { 4.966555d, 10.898524d, 5.043616d, 5.159404d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0ab4af8e83e1830c-b23a1888106cee51",
@@ -365,7 +365,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 17, 18, 22, 21, 23, 19, 23, 17, 20 }, new[] { 0d, 0d, 0d }, new[] { 2.782583d, 2.147533d, 4.727441d }, new[] { 5.516767d, 5.40271d, 5.729758d, 9.935585d, 5.011241d, 5.017353d, 5.333642d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 17, 18, 22, 21, 23, 19, 23, 17, 20 }, new[] { 0d, 0d, 0d }, new[] { 2.782583d, 2.147533d, 4.727441d }, new[] { 5.516767d, 5.40271d, 5.729758d, 9.935585d, 5.011241d, 5.017353d, 5.333642d }, 0, true, null, true, false)
                     },
                     new[] { 0, 40, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -409,7 +409,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26, 26 }, new[] { 0d }, new[] { 2.426482d }, new[] { 3.848158d, 3.858619d, 7.927704d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26, 26 }, new[] { 0d }, new[] { 2.426482d }, new[] { 3.848158d, 3.858619d, 7.927704d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0ce07cf876c21bb4-9240cd83babb2980",
@@ -452,7 +452,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 23, 23, 23, 23, 23 }, new[] { 0d }, new[] { 2.515083d }, new[] { 4.241464d, 4.325492d, 3.300159d, 3.410912d, 6.94623d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 23, 23, 23, 23, 23 }, new[] { 0d }, new[] { 2.515083d }, new[] { 4.241464d, 4.325492d, 3.300159d, 3.410912d, 6.94623d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0f23e947e073a1aa-89afb5ae2e3ad61b",
@@ -477,7 +477,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19, 19, 19 }, new[] { 0d, 0d }, new[] { 8.748323d, 2.905538d }, new[] { 5.265234d, 10.247963d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19, 19, 19 }, new[] { 0d, 0d }, new[] { 8.748323d, 2.905538d }, new[] { 5.265234d, 10.247963d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "0f9eadbf8920f64c-6e2469c7048722ee",
@@ -502,7 +502,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 5, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 5, 5, 5, 5, 5, 5, 5, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 0.199447d, 0.133081d, 1.81557d, 2.032495d, 1.466639d }, new[] { 3.849203d, 4.532257d, 4.167738d, 3.799364d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 5, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 5, 5, 5, 5, 5, 5, 5, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 0.199447d, 0.133081d, 1.81557d, 2.032495d, 1.466639d }, new[] { 3.849203d, 4.532257d, 4.167738d, 3.799364d }, 0, false, null, true, false)
                     },
                     new[] { 34, 34, 34, 0, 30 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -546,7 +546,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(29, 29, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 29 }, new[] { 0d }, new[] { 1.654574d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(29, 29, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 29 }, new[] { 0d }, new[] { 1.654574d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "12a2cf0418be7fb8-89afb5ae2e3ad61b",
@@ -571,7 +571,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19, 19, 19 }, new[] { 0d }, new[] { 7.931098d }, new[] { 5.427566d, 5.428348d, 5.799183d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19, 19, 19 }, new[] { 0d }, new[] { 7.931098d }, new[] { 5.427566d, 5.428348d, 5.799183d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "12a2cf0418be7fb8-f97a24ac7a189544",
@@ -596,7 +596,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 20, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19, 19, 20, 20 }, new[] { 0d }, new[] { 2.334417d }, new[] { 4.532071d, 4.577628d, 3.889287d, 3.599767d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 20, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19, 19, 20, 20 }, new[] { 0d }, new[] { 2.334417d }, new[] { 4.532071d, 4.577628d, 3.889287d, 3.599767d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "12e4e4cadd5f9059-c3b0e4a3ccaa520e",
@@ -622,8 +622,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4 }, new[] { 0d }, new[] { 4.750912d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 22 }, new[] { 0d }, new[] { 3.067828d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4 }, new[] { 0d }, new[] { 4.750912d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 22 }, new[] { 0d }, new[] { 3.067828d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1481e2f9f1b55bde-ec1c75204dea6fc7",
@@ -649,10 +649,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 12, -1, 1, 0, 3, 1279874866, (byte)0, 0d, new[] { 10, 9, 10, 8, 10, 8, 9, 11, 10, 10, 8, 11, 6, 11, 9, 10, 8, 10, 9, 9, 6, 9, 10, 7, 8, 8, 10, 6, 8, 8, 9, 7, 6, 8, 11, 9, 9, 10, 10, 6, 8, 12, 6, 9, 8, 10, 10 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.060517d, 2.185229d, 3.154983d, 10.862882d, 3.152216d, 2.850199d, 2.881031d, 2.890543d, 2.14956d, 2.013554d, 2.480446d, 10.950183d, 2.243054d, 3.002101d, 3.280585d, 2.520706d, 3.148708d, 3.03971d, 4.649879d, 5.5015d, 6.645123d, 10.389927d, 3.310157d, 11.369912d, 3.331449d, 10.560578d, 2.065009d, 2.100472d, 11.504108d, 2.650051d, 2.58937d, 2.719135d, 3.570541d, 2.571517d }, new[] { 8.240365d, 8.97144d, 8.386217d, 8.488731d, 8.821954d, 8.491091d, 8.161871d, 8.359587d, 17.567075d, 0.001d, 8.753474d, 9.021605d, 5.849612d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 9, -1, 0, 4, 3, 1279874865, (byte)0, 0d, new[] { 6, 7, 9 }, new[] { 0d, 0d, 0d }, new[] { 13.190427d, 22.63958d, 22.489142d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 1, 4, 3, 1279874866, (byte)0, 0d, new[] { 9 }, new[] { 0d }, new[] { 2.175104d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 12, -1, 0, 0, 3, 1279874865, (byte)0, 0d, new[] { 12, 8, 6, 6, 9, 9, 11, 9, 9, 7, 7, 10, 7, 9, 9, 6, 8, 8, 8, 7, 9, 7, 10, 7, 10, 6 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.490321d, 5.052033d, 6.284035d, 5.113454d, 4.791443d, 4.847881d, 5.660897d, 5.660897d, 5.540087d, 6.5212d, 6.031188d, 7.554631d, 8.558386d, 4.607487d, 5.499758d, 6.438824d, 13.468184d, 0.120257d }, new[] { 8.909969d, 8.679211d, 8.886225d, 8.108517d, 8.653257d, 8.723087d, 8.871542d, 8.824459d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 12, -1, 1, 0, 3, 1279874866, (byte)0, 0d, new[] { 10, 9, 10, 8, 10, 8, 9, 11, 10, 10, 8, 11, 6, 11, 9, 10, 8, 10, 9, 9, 6, 9, 10, 7, 8, 8, 10, 6, 8, 8, 9, 7, 6, 8, 11, 9, 9, 10, 10, 6, 8, 12, 6, 9, 8, 10, 10 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.060517d, 2.185229d, 3.154983d, 10.862882d, 3.152216d, 2.850199d, 2.881031d, 2.890543d, 2.14956d, 2.013554d, 2.480446d, 10.950183d, 2.243054d, 3.002101d, 3.280585d, 2.520706d, 3.148708d, 3.03971d, 4.649879d, 5.5015d, 6.645123d, 10.389927d, 3.310157d, 11.369912d, 3.331449d, 10.560578d, 2.065009d, 2.100472d, 11.504108d, 2.650051d, 2.58937d, 2.719135d, 3.570541d, 2.571517d }, new[] { 8.240365d, 8.97144d, 8.386217d, 8.488731d, 8.821954d, 8.491091d, 8.161871d, 8.359587d, 17.567075d, 0.001d, 8.753474d, 9.021605d, 5.849612d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 9, -1, 0, 4, 3, 1279874865, (byte)0, 0d, new[] { 6, 7, 9 }, new[] { 0d, 0d, 0d }, new[] { 13.190427d, 22.63958d, 22.489142d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 1, 4, 3, 1279874866, (byte)0, 0d, new[] { 9 }, new[] { 0d }, new[] { 2.175104d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 12, -1, 0, 0, 3, 1279874865, (byte)0, 0d, new[] { 12, 8, 6, 6, 9, 9, 11, 9, 9, 7, 7, 10, 7, 9, 9, 6, 8, 8, 8, 7, 9, 7, 10, 7, 10, 6 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.490321d, 5.052033d, 6.284035d, 5.113454d, 4.791443d, 4.847881d, 5.660897d, 5.660897d, 5.540087d, 6.5212d, 6.031188d, 7.554631d, 8.558386d, 4.607487d, 5.499758d, 6.438824d, 13.468184d, 0.120257d }, new[] { 8.909969d, 8.679211d, 8.886225d, 8.108517d, 8.653257d, 8.723087d, 8.871542d, 8.824459d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "16398bc466394441-4396dd013773b1a8",
@@ -677,7 +677,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 38, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 16, 38 }, new[] { 0d, 0d }, new[] { 8.026333d, 1.56117d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 38, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 16, 38 }, new[] { 0d, 0d }, new[] { 8.026333d, 1.56117d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "16f18d7ac5e3177e-20d1cbd10c47ac0b",
@@ -702,7 +702,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10, 9 }, new[] { 0d, 0d }, new[] { 1.716831d, 2.550576d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10, 9 }, new[] { 0d, 0d }, new[] { 1.716831d, 2.550576d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "184d93538683de86-5c400828447aa0a2",
@@ -727,7 +727,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 18 }, new[] { 0d }, new[] { 4.319826d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 18 }, new[] { 0d }, new[] { 4.319826d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1bf3d297e40955b7-40860fdf03f3fba3",
@@ -753,8 +753,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 13, -1, 0, 0, 3, 1279612721, (byte)0, 6.089333d, new[] { 13, 12 }, new[] { 0d }, new[] { 4.419834d }, new[] { 6.089333d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 13, -1, 1, 0, 3, 1279612722, (byte)0, 6.150099d, new[] { 6, 13 }, new[] { 0d }, new[] { 2.27935d }, new[] { 6.150099d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 13, -1, 0, 0, 3, 1279612721, (byte)0, 6.089333d, new[] { 13, 12 }, new[] { 0d }, new[] { 4.419834d }, new[] { 6.089333d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 13, -1, 1, 0, 3, 1279612722, (byte)0, 6.150099d, new[] { 6, 13 }, new[] { 0d }, new[] { 2.27935d }, new[] { 6.150099d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1c42797c1a980105-998f3f8fca4b8167",
@@ -780,8 +780,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 6, 4, 7 }, new[] { 0d }, new[] { 5.071594d }, new[] { 7.012971d, 6.952192d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 7, -1, 1, 0, 3, 1279612722, (byte)0, 6.954515d, new[] { 4, 7, 7 }, new[] { 0d, 0d }, new[] { 9.757726d, 2.039877d }, new[] { 6.954515d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 6, 4, 7 }, new[] { 0d }, new[] { 5.071594d }, new[] { 7.012971d, 6.952192d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 7, -1, 1, 0, 3, 1279612722, (byte)0, 6.954515d, new[] { 4, 7, 7 }, new[] { 0d, 0d }, new[] { 9.757726d, 2.039877d }, new[] { 6.954515d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1cbc7d143599a90e-1cdfc1076d2ed5e6",
@@ -807,8 +807,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(75, 75, -1, 0, 0, 3, 1397118030, (byte)0, 0d, new[] { 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75 }, new[] { 0d }, new[] { 3.837957d }, new[] { 4.260616d, 11.835792d, 4.211024d, 4.24272d, 4.270039d, 4.251301d, 4.230612d, 8.529836d, 4.295167d, 4.219466d, 8.500107d, 4.50053d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(36, 75, -1, 1, 0, 3, 1297107795, (byte)0, 0d, new[] { 36, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75 }, new[] { 0d }, new[] { 2.518967d }, new[] { 4.329386d, 3.859455d, 7.566318d, 4.260268d, 4.243173d, 4.25014d, 4.272365d, 4.229474d, 4.250249d, 4.290306d, 8.60441d, 8.41084d, 4.239656d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(75, 75, -1, 0, 0, 3, 1397118030, (byte)0, 0d, new[] { 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75 }, new[] { 0d }, new[] { 3.837957d }, new[] { 4.260616d, 11.835792d, 4.211024d, 4.24272d, 4.270039d, 4.251301d, 4.230612d, 8.529836d, 4.295167d, 4.219466d, 8.500107d, 4.50053d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(36, 75, -1, 1, 0, 3, 1297107795, (byte)0, 0d, new[] { 36, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75 }, new[] { 0d }, new[] { 2.518967d }, new[] { 4.329386d, 3.859455d, 7.566318d, 4.260268d, 4.243173d, 4.25014d, 4.272365d, 4.229474d, 4.250249d, 4.290306d, 8.60441d, 8.41084d, 4.239656d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1d0a5568131fc137-9733e047ccd9bc1d",
@@ -833,7 +833,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(13, 30, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 27, 18, 20, 30, 24, 20, 19, 13, 21, 26, 18, 16, 26, 15 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.349856d, 2.333317d, 2.169894d, 2.367499d, 1.06611d, 1.349442d, 2.39994d, 3.332467d }, new[] { 5.415843d, 5.016862d, 5.04936d, 5.033394d, 5.20036d, 10.932678d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(13, 30, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 27, 18, 20, 30, 24, 20, 19, 13, 21, 26, 18, 16, 26, 15 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.349856d, 2.333317d, 2.169894d, 2.367499d, 1.06611d, 1.349442d, 2.39994d, 3.332467d }, new[] { 5.415843d, 5.016862d, 5.04936d, 5.033394d, 5.20036d, 10.932678d }, 0, false, null, true, false)
                     },
                     new[] { 0, 40, 0, 25, 40, 45, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -877,7 +877,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(37, 37, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 37 }, new[] { 0d }, new[] { 8.230073d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(37, 37, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 37 }, new[] { 0d }, new[] { 8.230073d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1e9cacd0721ac81b-620ee46c9d239150",
@@ -920,7 +920,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22, 22, 22, 22, 22, 22 }, new[] { 0d, 0d }, new[] { 3.572753d, 2.820452d }, new[] { 10.931524d, 8.031616d, 2.580166d, 5.459417d, 5.414749d, 2.878734d, 2.586037d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22, 22, 22, 22, 22, 22 }, new[] { 0d, 0d }, new[] { 3.572753d, 2.820452d }, new[] { 10.931524d, 8.031616d, 2.580166d, 5.459417d, 5.414749d, 2.878734d, 2.586037d }, 0, true, null, true, false)
                     },
                     new[] { 0, 52 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -964,7 +964,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 11 }, new[] { 0d }, new[] { 1.466065d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 11 }, new[] { 0d }, new[] { 1.466065d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "1f9bcd8f10a573fe-3a02a8bc94c80061",
@@ -1007,7 +1007,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 15, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14, 15, 15 }, new[] { 0d }, new[] { 2.919949d }, new[] { 5.099881d, 5.019857d, 5.099901d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 15, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14, 15, 15 }, new[] { 0d }, new[] { 2.919949d }, new[] { 5.099881d, 5.019857d, 5.099901d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "205522dd82bba193-6af97cbf2da8ce46",
@@ -1050,7 +1050,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(27, 27, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 27 }, new[] { 0d }, new[] { 11.304015d }, new[] { 9.906134d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(27, 27, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 27 }, new[] { 0d }, new[] { 11.304015d }, new[] { 9.906134d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2106bd6d80e2998a-4adbbba91aa8df22",
@@ -1077,9 +1077,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 24, -1, 1, 0, 3, 1363559243, (byte)0, 11.611682d, new[] { 18, 24, 22, 21 }, new[] { 0d, 0d, 0d }, new[] { 17.221198d, 5.039317d, 2.738839d }, new[] { 11.611682d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(33, 38, -1, 0, 0, 3, 1112623439, (byte)0, 0d, new[] { 38, 33 }, new[] { 0d, 0d }, new[] { 9.579463d, 8.689276d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 21, -1, 2, 0, 3, 1229212761, (byte)0, 0d, new[] { 17, 20, 18, 21 }, new[] { 0d, 0d }, new[] { 2.100141d, 2.829988d }, new[] { 12.619895d, 11.120598d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 24, -1, 1, 0, 3, 1363559243, (byte)0, 11.611682d, new[] { 18, 24, 22, 21 }, new[] { 0d, 0d, 0d }, new[] { 17.221198d, 5.039317d, 2.738839d }, new[] { 11.611682d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(33, 38, -1, 0, 0, 3, 1112623439, (byte)0, 0d, new[] { 38, 33 }, new[] { 0d, 0d }, new[] { 9.579463d, 8.689276d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 21, -1, 2, 0, 3, 1229212761, (byte)0, 0d, new[] { 17, 20, 18, 21 }, new[] { 0d, 0d }, new[] { 2.100141d, 2.829988d }, new[] { 12.619895d, 11.120598d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "218eb3509f2be66b-12f99a4c2f732061",
@@ -1105,9 +1105,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, -1, 0, 4, 3, 1096439123, (byte)0, 0d, new[] { 11 }, new[] { 0d }, new[] { 12.560702d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(3, 10, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 5, 6, 5, 7, 9, 8, 5, 10, 7, 3, 3, 3, 3 }, new[] { 0d, 0d, 0d, 0d }, new[] { 5.419731d, 1.770053d, 3.920014d, 5.224046d }, new[] { 2.410574d, 2.090391d, 2.220324d, 2.39006d, 7.179422d, 2.430294d, 2.79928d, 2.890694d, 2.853283d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 23, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 16, 18, 23, 21, 15 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.870076d, 10.560202d, 11.729213d, 3.28034d, 3.647454d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, -1, 0, 4, 3, 1096439123, (byte)0, 0d, new[] { 11 }, new[] { 0d }, new[] { 12.560702d }, new double[0], 0, false, null, true, true),
+                        new CapturedEnemyCombatProfileStreamDefinition(3, 10, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 5, 6, 5, 7, 9, 8, 5, 10, 7, 3, 3, 3, 3 }, new[] { 0d, 0d, 0d, 0d }, new[] { 5.419731d, 1.770053d, 3.920014d, 5.224046d }, new[] { 2.410574d, 2.090391d, 2.220324d, 2.39006d, 7.179422d, 2.430294d, 2.79928d, 2.890694d, 2.853283d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 23, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 16, 18, 23, 21, 15 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.870076d, 10.560202d, 11.729213d, 3.28034d, 3.647454d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2242b5a062d3312e-d0c4832ddcd2ac17",
@@ -1150,7 +1150,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(31, 31, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 31, 31, 31, 31, 31, 31 }, new[] { 0d, 0d }, new[] { 11.096871d, 16.413591d }, new[] { 12.165587d, 6.944929d, 3.462844d, 3.470575d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(31, 31, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 31, 31, 31, 31, 31, 31 }, new[] { 0d, 0d }, new[] { 11.096871d, 16.413591d }, new[] { 12.165587d, 6.944929d, 3.462844d, 3.470575d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "240682821468c6d8-318aea11e3d539ff",
@@ -1193,7 +1193,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 14 }, new[] { 0d }, new[] { 8.175504d }, new[] { 5.160079d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 14 }, new[] { 0d }, new[] { 8.175504d }, new[] { 5.160079d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "240682821468c6d8-a3d7dc1309898f48",
@@ -1236,7 +1236,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 9 }, new[] { 0d }, new[] { 9.593204d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 9 }, new[] { 0d }, new[] { 9.593204d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "25233d23b2122a1b-d8846baa20340c1c",
@@ -1261,7 +1261,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 14, 20, 14, 16, 16, 20, 16, 12, 12, 15, 21, 17, 17, 21 }, new[] { 0d, 0d }, new[] { 23.960949d, 7.8144d }, new[] { 5.279938d, 5.616362d, 5.250252d, 5.299336d, 5.382686d, 5.410893d, 5.431579d, 4.949693d, 5.101742d, 4.858591d, 16.092922d, 15.483009d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 14, 20, 14, 16, 16, 20, 16, 12, 12, 15, 21, 17, 17, 21 }, new[] { 0d, 0d }, new[] { 23.960949d, 7.8144d }, new[] { 5.279938d, 5.616362d, 5.250252d, 5.299336d, 5.382686d, 5.410893d, 5.431579d, 4.949693d, 5.101742d, 4.858591d, 16.092922d, 15.483009d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "25cc91fe3350b2e8-7dcf5a6b2ea0750a",
@@ -1304,7 +1304,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 47, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 29, 27, 19, 19, 47, 19, 19 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 10.155714d, 2.08301d, 0.891258d, 0.749765d, 1.770601d }, new[] { 3.594553d, 3.724034d, 3.682869d, 6.87216d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 47, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 29, 27, 19, 19, 47, 19, 19 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 10.155714d, 2.08301d, 0.891258d, 0.749765d, 1.770601d }, new[] { 3.594553d, 3.724034d, 3.682869d, 6.87216d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "25cc91fe3350b2e8-b7ba39c8633f32c5",
@@ -1347,7 +1347,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18 }, new[] { 0d }, new[] { 13.993307d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18 }, new[] { 0d }, new[] { 13.993307d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "25cc91fe3350b2e8-f988a8d4de5849ac",
@@ -1390,7 +1390,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18 }, new[] { 0d }, new[] { 3.137551d }, new[] { 8.869825d, 5.483534d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18 }, new[] { 0d }, new[] { 3.137551d }, new[] { 8.869825d, 5.483534d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2626c546d4b91e88-f7231672241fa69f",
@@ -1433,7 +1433,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 16, 16 }, new[] { 0d }, new[] { 8.333101d }, new[] { 5.500574d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 16, 16 }, new[] { 0d }, new[] { 8.333101d }, new[] { 5.500574d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "277c54b4c6a1bcfd-53522a00642b7972",
@@ -1458,7 +1458,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 17, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 17, 16, 14, 17 }, new[] { 0d }, new[] { 8.480316d }, new[] { 5.350104d, 10.848152d, 5.335007d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 17, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 17, 16, 14, 17 }, new[] { 0d }, new[] { 8.480316d }, new[] { 5.350104d, 10.848152d, 5.335007d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "29ea7ad995035923-04f40b95697ea22a",
@@ -1483,7 +1483,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19 }, new[] { 0d, 0d }, new[] { 4.532078d, 8.149262d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19, 19 }, new[] { 0d, 0d }, new[] { 4.532078d, 8.149262d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a00185997e49d3a-0a5f6153239ce087",
@@ -1526,7 +1526,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(98, 98, 3, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 98 }, new[] { 0d }, new[] { 0.419473d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(98, 98, 3, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 98 }, new[] { 0d }, new[] { 0.419473d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a00185997e49d3a-433cb976f3a34dfa",
@@ -1569,8 +1569,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(45, 115, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 63, 71, 103, 74, 45, 115 }, new[] { 0d }, new[] { 13.585264d }, new[] { 3.002237d, 2.846057d, 2.881482d, 2.870537d, 3.065164d }, 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(97, 97, 24, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 97 }, new[] { 0d }, new[] { 30.996768d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(45, 115, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 63, 71, 103, 74, 45, 115 }, new[] { 0d }, new[] { 13.585264d }, new[] { 3.002237d, 2.846057d, 2.881482d, 2.870537d, 3.065164d }, 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(97, 97, 24, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 97 }, new[] { 0d }, new[] { 30.996768d }, new double[0], 0, true, null, true, true)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a00185997e49d3a-b3e999d1c1e5e37d",
@@ -1613,8 +1613,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(48, 96, 0, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 48, 51, 96, 62 }, new[] { 0d }, new[] { 1.508146d }, new[] { 2.930195d, 2.870381d, 2.899946d }, 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(72, 72, 0, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 72 }, new[] { 0d }, new[] { 1.284014d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(48, 96, 0, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 48, 51, 96, 62 }, new[] { 0d }, new[] { 1.508146d }, new[] { 2.930195d, 2.870381d, 2.899946d }, 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(72, 72, 0, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 72 }, new[] { 0d }, new[] { 1.284014d }, new double[0], 0, true, null, true, true)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a00185997e49d3a-cdf9356233b03d52",
@@ -1657,7 +1657,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(57, 57, 0, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 57 }, new[] { 0d }, new[] { 5.122313d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(57, 57, 0, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 57 }, new[] { 0d }, new[] { 5.122313d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a00185997e49d3a-f2a86aef3fd11fe1",
@@ -1700,8 +1700,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(54, 54, 15, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 54 }, new[] { 0d }, new[] { 6.630566d }, new double[0], 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(76, 76, 15, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 76 }, new[] { 0d }, new[] { 9.620861d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(54, 54, 15, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 54 }, new[] { 0d }, new[] { 6.630566d }, new double[0], 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(76, 76, 15, 6, 4, 3, 0, (byte)0, 4.7d, new[] { 76 }, new[] { 0d }, new[] { 9.620861d }, new double[0], 0, true, null, true, true)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a0fab561b65d495-eb4ec365beb65ffc",
@@ -1727,8 +1727,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(58, 58, -1, 0, 0, 3, 1397118030, (byte)0, 0d, new[] { 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58 }, new[] { 0d }, new[] { 3.899589d }, new[] { 4.275072d, 4.229604d, 4.560332d, 4.048846d, 4.098307d, 4.233148d, 4.271038d, 4.231102d, 4.242444d, 4.536665d, 3.968103d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(58, 58, -1, 1, 0, 3, 1297107795, (byte)0, 0d, new[] { 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58 }, new[] { 0d }, new[] { 2.220458d }, new[] { 4.651178d, 3.927095d, 4.207555d, 4.22585d, 4.357591d, 4.13227d, 4.299387d, 4.241112d, 4.534312d, 3.926792d, 4.253596d, 4.239349d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(58, 58, -1, 0, 0, 3, 1397118030, (byte)0, 0d, new[] { 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58 }, new[] { 0d }, new[] { 3.899589d }, new[] { 4.275072d, 4.229604d, 4.560332d, 4.048846d, 4.098307d, 4.233148d, 4.271038d, 4.231102d, 4.242444d, 4.536665d, 3.968103d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(58, 58, -1, 1, 0, 3, 1297107795, (byte)0, 0d, new[] { 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58 }, new[] { 0d }, new[] { 2.220458d }, new[] { 4.651178d, 3.927095d, 4.207555d, 4.22585d, 4.357591d, 4.13227d, 4.299387d, 4.241112d, 4.534312d, 3.926792d, 4.253596d, 4.239349d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2a1d4cb7813554fa-90a0c301751057c4",
@@ -1753,7 +1753,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 17, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12, 13, 14, 17, 14, 15, 13, 11, 12, 13, 14, 13, 13 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.059373d, 3.099959d, 2.590438d, 3.114899d }, new[] { 10.410008d, 5.020502d, 5.030024d, 5.069171d, 5.11089d, 10.739497d, 5.744676d, 5.703846d, 11.79473d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 17, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12, 13, 14, 17, 14, 15, 13, 11, 12, 13, 14, 13, 13 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.059373d, 3.099959d, 2.590438d, 3.114899d }, new[] { 10.410008d, 5.020502d, 5.030024d, 5.069171d, 5.11089d, 10.739497d, 5.744676d, 5.703846d, 11.79473d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2af15463358e0628-8175f8f1465a8b60",
@@ -1796,7 +1796,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 38, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 22, 22, 38, 38, 30, 30, 30 }, new[] { 0d, 0d }, new[] { 8.660023d, 8.490474d }, new[] { 4.492775d, 4.08993d, 7.341442d, 4.18034d, 5.026042d, 5.083213d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 38, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 22, 22, 38, 38, 30, 30, 30 }, new[] { 0d, 0d }, new[] { 8.660023d, 8.490474d }, new[] { 4.492775d, 4.08993d, 7.341442d, 4.18034d, 5.026042d, 5.083213d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2b56f1ff974bf909-8dbb2064bebe6dee",
@@ -1822,10 +1822,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 26 }, new[] { 0d }, new[] { 6.200703d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 26 }, new[] { 0d }, new[] { 21.329387d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 26, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 25, 21, 21, 26, 18, 15, 18, 15, 16, 24, 24 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.370612d, 9.846499d, 17.959609d, 24.843831d, 3.956738d, 2.6938d }, new[] { 8.793382d, 9.221488d, 9.138789d, 9.290492d, 0.001001d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 23, -1, 0, 0, 3, 1296389937, (byte)0, 9.146688d, new[] { 23, 23, 14, 16 }, new[] { 0d, 0d, 0d }, new[] { 21.933223d, 20.689642d, 6.110422d }, new[] { 9.146688d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 26 }, new[] { 0d }, new[] { 6.200703d }, new double[0], 0, false, null, true, true),
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 26 }, new[] { 0d }, new[] { 21.329387d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 26, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 25, 21, 21, 26, 18, 15, 18, 15, 16, 24, 24 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.370612d, 9.846499d, 17.959609d, 24.843831d, 3.956738d, 2.6938d }, new[] { 8.793382d, 9.221488d, 9.138789d, 9.290492d, 0.001001d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 23, -1, 0, 0, 3, 1296389937, (byte)0, 9.146688d, new[] { 23, 23, 14, 16 }, new[] { 0d, 0d, 0d }, new[] { 21.933223d, 20.689642d, 6.110422d }, new[] { 9.146688d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2b61d374fd8a1acc-e3f7f701a6d25057",
@@ -1868,7 +1868,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(30, 30, 27, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 30, 30 }, new[] { 0d }, new[] { 2.661758d }, new[] { 15.61848d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(30, 30, 27, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 30, 30 }, new[] { 0d }, new[] { 2.661758d }, new[] { 15.61848d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "2ee43d964a95a575-9ca73d7846c38f6c",
@@ -1911,7 +1911,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d, 0d }, new[] { 26.183548d, 1.440116d, 2.723211d }, new[] { 3.555659d, 6.985429d, 3.450754d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d, 0d }, new[] { 26.183548d, 1.440116d, 2.723211d }, new[] { 3.555659d, 6.985429d, 3.450754d }, 0, true, null, true, false)
                     },
                     new[] { 0, 20, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -1955,7 +1955,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 6.082032d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 6.082032d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "324619d6bd655102-77719f4634c58982",
@@ -1980,7 +1980,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(33, 33, -1, 0, 0, 3, 1330927940, (byte)0, 0d, new[] { 33, 33, 33, 33, 33 }, new[] { 0d }, new[] { 4.926902d }, new[] { 3.033948d, 3.026322d, 6.0248d, 3.0678d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(33, 33, -1, 0, 0, 3, 1330927940, (byte)0, 0d, new[] { 33, 33, 33, 33, 33 }, new[] { 0d }, new[] { 4.926902d }, new[] { 3.033948d, 3.026322d, 6.0248d, 3.0678d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3256b0ac4af9bb7e-108249f369bb55a9",
@@ -2005,7 +2005,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 41, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 23, 24, 22, 23, 23, 25, 23, 21, 21, 21, 38, 21, 41, 21, 21, 25, 21, 23, 21, 23, 23, 24, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 5.427047d, 5.794492d, 5.247174d, 5.800058d, 2.229378d, 2.180387d, 9.679584d, 2.000072d }, new[] { 3.784948d, 7.389249d, 3.69385d, 4.027449d, 4.052737d, 11.270925d, 3.729615d, 14.809475d, 7.370389d, 14.71071d, 3.669681d, 11.001153d, 3.699641d, 3.729968d, 3.650068d, 7.431079d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 41, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 23, 24, 22, 23, 23, 25, 23, 21, 21, 21, 38, 21, 41, 21, 21, 25, 21, 23, 21, 23, 23, 24, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 5.427047d, 5.794492d, 5.247174d, 5.800058d, 2.229378d, 2.180387d, 9.679584d, 2.000072d }, new[] { 3.784948d, 7.389249d, 3.69385d, 4.027449d, 4.052737d, 11.270925d, 3.729615d, 14.809475d, 7.370389d, 14.71071d, 3.669681d, 11.001153d, 3.699641d, 3.729968d, 3.650068d, 7.431079d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "32f013469367735b-52865bbb023d662b",
@@ -2031,9 +2031,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 23, -1, 1, 0, 3, 1380931378, (byte)0, 0d, new[] { 17, 21, 22, 23, 18, 15, 19 }, new[] { 0d, 0d, 0d, 0d }, new[] { 13.387758d, 3.598551d, 1.521507d, 8.338755d }, new[] { 9.569658d, 9.667966d, 9.609776d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 22, -1, 0, 0, 3, 1380931377, (byte)0, 0d, new[] { 22, 14, 18, 17, 22, 22, 20, 15 }, new[] { 0d, 0d, 0d, 0d }, new[] { 16.617297d, 0.710011d, 6.404268d, 1.3476d }, new[] { 9.870405d, 10.082115d, 9.600164d, 10.52118d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 23, -1, 1, 0, 3, 1380931378, (byte)0, 0d, new[] { 17, 21, 22, 23, 18, 15, 19 }, new[] { 0d, 0d, 0d, 0d }, new[] { 13.387758d, 3.598551d, 1.521507d, 8.338755d }, new[] { 9.569658d, 9.667966d, 9.609776d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 22, -1, 0, 0, 3, 1380931377, (byte)0, 0d, new[] { 22, 14, 18, 17, 22, 22, 20, 15 }, new[] { 0d, 0d, 0d, 0d }, new[] { 16.617297d, 0.710011d, 6.404268d, 1.3476d }, new[] { 9.870405d, 10.082115d, 9.600164d, 10.52118d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 63, 3, 3, 28 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3883a2fbbbc16a0f-89afb5ae2e3ad61b",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|10340|3a8e6af372b0; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|10341|969b6d803d65; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|10386|9364e5a7941f",
@@ -2057,7 +2058,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 2.276518d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 2.276518d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3a30f717db6d1c96-d6f63cb7b4383445",
@@ -2100,7 +2101,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(25, 25, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 25 }, new[] { 0d }, new[] { 6.369271d }, new[] { 7.834807d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(25, 25, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 25 }, new[] { 0d }, new[] { 6.369271d }, new[] { 7.834807d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3a7955d29042e98e-fd6c064d9658217a",
@@ -2125,7 +2126,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10 }, new[] { 0d }, new[] { 1.816108d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10 }, new[] { 0d }, new[] { 1.816108d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3ca1a49acf49817f-d9b19717daf4c178",
@@ -2152,9 +2153,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(83, 87, -1, 2, 0, 3, 1497912661, (byte)0, 0d, new[] { 87, 86, 86, 84, 84, 86, 86, 84, 84, 84, 84, 84, 84, 85, 84, 83, 85, 85, 85, 86, 86, 83, 83, 84, 84, 84, 84, 84 }, new[] { 0d, 0d, 0d }, new[] { 7.638537d, 6.317434d, 5.593651d }, new[] { 5.521231d, 9.075375d, 6.010702d, 9.044763d, 15.117639d, 9.368973d, 5.724059d, 9.123366d, 9.049015d, 6.054355d, 5.857051d, 9.077515d, 5.982089d, 9.084763d, 9.378888d, 14.800977d, 5.863043d, 9.102826d, 9.273153d, 21.095382d, 9.099396d, 9.097752d, 6.027765d, 9.041745d, 6.005316d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(350, 360, -1, 3, 0, 3, 1179993922, (byte)0, 0d, new[] { 359, 352, 353, 355, 356, 357, 355, 353, 360, 353, 357, 358, 356, 350, 357 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 5.433081d, 4.606505d, 4.23252d, 3.959126d, 2.058543d }, new[] { 13.349405d, 14.690009d, 24.410374d, 14.705569d, 34.155424d, 28.277715d, 9.729416d, 14.668332d, 13.083967d, 24.393827d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(157, 175, -1, 1, 0, 3, 1263026755, (byte)0, 0d, new[] { 173, 158, 168, 170, 162, 161, 167, 162, 173, 166, 162, 173, 164, 171, 173, 167, 165, 160, 175, 175, 166, 157, 171, 157, 163, 163, 168, 162, 164, 174, 173 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 9.163576d, 9.364974d, 8.766489d, 8.085124d, 13.399619d }, new[] { 5.933442d, 9.067398d, 6.029904d, 9.043341d, 9.082776d, 6.364994d, 14.751362d, 9.088148d, 9.095949d, 6.083527d, 9.397732d, 6.13901d, 6.022065d, 9.080028d, 6.015059d, 9.088499d, 9.026927d, 6.050646d, 9.06486d, 9.110843d, 9.27669d, 5.987095d, 9.35917d, 14.837751d, 15.126108d, 9.03269d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(83, 87, -1, 2, 0, 3, 1497912661, (byte)0, 0d, new[] { 87, 86, 86, 84, 84, 86, 86, 84, 84, 84, 84, 84, 84, 85, 84, 83, 85, 85, 85, 86, 86, 83, 83, 84, 84, 84, 84, 84 }, new[] { 0d, 0d, 0d }, new[] { 7.638537d, 6.317434d, 5.593651d }, new[] { 5.521231d, 9.075375d, 6.010702d, 9.044763d, 15.117639d, 9.368973d, 5.724059d, 9.123366d, 9.049015d, 6.054355d, 5.857051d, 9.077515d, 5.982089d, 9.084763d, 9.378888d, 14.800977d, 5.863043d, 9.102826d, 9.273153d, 21.095382d, 9.099396d, 9.097752d, 6.027765d, 9.041745d, 6.005316d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(350, 360, -1, 3, 0, 3, 1179993922, (byte)0, 0d, new[] { 359, 352, 353, 355, 356, 357, 355, 353, 360, 353, 357, 358, 356, 350, 357 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 5.433081d, 4.606505d, 4.23252d, 3.959126d, 2.058543d }, new[] { 13.349405d, 14.690009d, 24.410374d, 14.705569d, 34.155424d, 28.277715d, 9.729416d, 14.668332d, 13.083967d, 24.393827d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(157, 175, -1, 1, 0, 3, 1263026755, (byte)0, 0d, new[] { 173, 158, 168, 170, 162, 161, 167, 162, 173, 166, 162, 173, 164, 171, 173, 167, 165, 160, 175, 175, 166, 157, 171, 157, 163, 163, 168, 162, 164, 174, 173 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 9.163576d, 9.364974d, 8.766489d, 8.085124d, 13.399619d }, new[] { 5.933442d, 9.067398d, 6.029904d, 9.043341d, 9.082776d, 6.364994d, 14.751362d, 9.088148d, 9.095949d, 6.083527d, 9.397732d, 6.13901d, 6.022065d, 9.080028d, 6.015059d, 9.088499d, 9.026927d, 6.050646d, 9.06486d, 9.110843d, 9.27669d, 5.987095d, 9.35917d, 14.837751d, 15.126108d, 9.03269d }, 0, false, null, true, false)
                     },
                     new[] { 0, 62, 62, 62, 62, 62, 62 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -2203,7 +2204,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(71, 72, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 72, 72, 72, 72, 72, 72, 72, 72, 71, 72, 72, 71, 72, 72, 72, 72, 72, 71, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 11.565297d, 5.455176d, 1.272211d, 1.671575d, 10.234902d, 9.607733d, 3.959063d }, new[] { 8.737399d, 5.968302d, 9.079117d, 9.063101d, 6.022915d, 9.096392d, 15.091584d, 9.157161d, 5.991891d, 12.425963d, 5.889292d, 10.064874d, 9.3318d, 9.066454d, 5.996008d, 18.156333d, 6.306792d, 8.793594d, 6.327258d, 8.97837d, 6.373249d, 8.942356d, 9.018282d, 15.168308d, 9.067466d, 6.018171d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(71, 72, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 72, 72, 72, 72, 72, 72, 72, 72, 71, 72, 72, 71, 72, 72, 72, 72, 72, 71, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 11.565297d, 5.455176d, 1.272211d, 1.671575d, 10.234902d, 9.607733d, 3.959063d }, new[] { 8.737399d, 5.968302d, 9.079117d, 9.063101d, 6.022915d, 9.096392d, 15.091584d, 9.157161d, 5.991891d, 12.425963d, 5.889292d, 10.064874d, 9.3318d, 9.066454d, 5.996008d, 18.156333d, 6.306792d, 8.793594d, 6.327258d, 8.97837d, 6.373249d, 8.942356d, 9.018282d, 15.168308d, 9.067466d, 6.018171d }, 0, true, null, true, false)
                     },
                     new[] { 0, 62, 62, 62, 62, 62, 62 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -2230,9 +2231,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 8, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5, 8, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.486999d, 4.102707d, 4.56102d, 4.793073d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 10, -1, 1, 0, 3, 1279612722, (byte)0, 6.317314d, new[] { 9, 7, 10, 5, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.987031d, 1.701069d, 1.899228d, 2.700143d, 2.520949d }, new[] { 6.317314d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 0, 4, 3, 1279612721, (byte)0, 0d, new[] { 12 }, new[] { 0d }, new[] { 3.502023d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 8, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5, 8, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.486999d, 4.102707d, 4.56102d, 4.793073d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 10, -1, 1, 0, 3, 1279612722, (byte)0, 6.317314d, new[] { 9, 7, 10, 5, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.987031d, 1.701069d, 1.899228d, 2.700143d, 2.520949d }, new[] { 6.317314d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 0, 4, 3, 1279612721, (byte)0, 0d, new[] { 12 }, new[] { 0d }, new[] { 3.502023d }, new double[0], 0, false, null, true, true)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3d93ff842effe18b-c2f9cf4727f71a13",
@@ -2258,9 +2259,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5, 5, 5, 7, 7, 7, 5, 6, 8, 8, 9, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.333818d, 25.195174d, 2.139559d, 1.741318d, 4.93173d, 4.224044d, 4.014035d, 2.670328d, 0.350002d }, new[] { 7.385241d, 6.053819d, 6.789142d, 6.770739d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 11, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 5, 5, 5, 5, 9, 9, 8, 9, 6, 11, 7, 6, 6 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.707648d, 15.796905d, 22.811412d, 1.910301d, 5.681351d, 1.96253d, 2.439226d, 2.738325d, 2.201092d, 1.803591d, 0.439291d }, new[] { 7.033499d, 13.551634d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 1, 4, 3, 1279612722, (byte)0, 0d, new[] { 9 }, new[] { 0d }, new[] { 29.124871d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5, 5, 5, 7, 7, 7, 5, 6, 8, 8, 9, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.333818d, 25.195174d, 2.139559d, 1.741318d, 4.93173d, 4.224044d, 4.014035d, 2.670328d, 0.350002d }, new[] { 7.385241d, 6.053819d, 6.789142d, 6.770739d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 11, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 5, 5, 5, 5, 9, 9, 8, 9, 6, 11, 7, 6, 6 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.707648d, 15.796905d, 22.811412d, 1.910301d, 5.681351d, 1.96253d, 2.439226d, 2.738325d, 2.201092d, 1.803591d, 0.439291d }, new[] { 7.033499d, 13.551634d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 9, -1, 1, 4, 3, 1279612722, (byte)0, 0d, new[] { 9 }, new[] { 0d }, new[] { 29.124871d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3e759ced63dc4150-29a8e12faff87840",
@@ -2303,7 +2304,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(42, 42, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 42 }, new[] { 0.000999d }, new[] { 5.751105d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(42, 42, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 42 }, new[] { 0.000999d }, new[] { 5.751105d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3ec94c5698a809ab-d38e253d2479c92e",
@@ -2346,7 +2347,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26, 26 }, new[] { 0d }, new[] { 19.307975d }, new[] { 7.982435d, 4.283524d, 11.960122d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26, 26 }, new[] { 0d }, new[] { 19.307975d }, new[] { 7.982435d, 4.283524d, 11.960122d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3f70ab044f0e78d5-d2b65cf5c70d61d6",
@@ -2371,9 +2372,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 16, -1, 0, 0, 3, 1397315377, (byte)0, 5.214425d, new[] { 11, 16, 16, 13 }, new[] { 0d, 0d, 0d }, new[] { 8.255845d, 3.041422d, 0.885464d }, new[] { 5.214425d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 16, -1, 0, 0, 3, 1397315377, (byte)0, 5.214425d, new[] { 11, 16, 16, 13 }, new[] { 0d, 0d, 0d }, new[] { 8.255845d, 3.041422d, 0.885464d }, new[] { 5.214425d }, 0, false, null, true, false)
                     },
-                    new[] { 0, 0, 40 }),
+                    new[] { 0, 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3fb47a16c3e0d523-34d5dfe5ced96cb2",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|10891|c5a025976551,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7791|29fef74126c7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7793|8dca5ec652a4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7797|b344cb7193c6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8280|3732aab5e2cf,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2999|9a445b10229f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3001|3515bbd92cd9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3008|bb8bc28e28cf; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|10892|b928ce8e1d3f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7792|49f2ee54f612,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7794|fdb4ad955c20,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7798|daeb651231dc,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8281|64d72309d6b5,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3000|15bab4a1083b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3002|3c5830b25eeb,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3009|da0cfe20cd63; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7907|69e09f28f988,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7934|c6d6b552e328,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7947|a3c731a0f3f1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7963|821b2f047233,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7976|ebac171ce6d7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7996|db268e9b32c1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8027|5b8397e1b455,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8041|385fa30ecdfa,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8059|ae6dddea087d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8072|59a6b2d682d4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8128|c9b62615e35a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8293|b07205284b11,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8336|4abb6c33c776,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8407|c73e09ce84f8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8526|a6657b64b3ec,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|11194|ca60e8d1f5c1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|11337|08b595783d4f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3150|991015b86680,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3173|13f5fcc542d0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3209|b382654302bd,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3290|c01666449406,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7910|030eb0ac9c6d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8243|64bcb75ba77a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|8491|0e55e5558904,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|10946|e3bda546c4cb,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3122|be43994eb807,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3139|aef393272740,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|3146|5fe67faf1462",
@@ -2398,9 +2399,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.082478d, 6.065969d, 4.832903d, 6.349503d, 9.133943d, 5.116937d, 4.116808d, 10.03426d }, new[] { 2.216114d, 2.499573d, 2.167247d, 2.349164d, 2.350585d, 2.568367d, 2.098232d, 4.816593d, 9.348935d, 2.266569d, 7.08324d, 4.681847d, 2.350483d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 1, 0, 3, 1162887496, (byte)0, 15.349345d, new[] { 23, 23, 23, 23, 23, 23, 23 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.965753d, 11.248748d, 3.282828d, 4.116808d, 3.067828d, 3.88253d }, new[] { 15.349345d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.082478d, 6.065969d, 4.832903d, 6.349503d, 9.133943d, 5.116937d, 4.116808d, 10.03426d }, new[] { 2.216114d, 2.499573d, 2.167247d, 2.349164d, 2.350585d, 2.568367d, 2.098232d, 4.816593d, 9.348935d, 2.266569d, 7.08324d, 4.681847d, 2.350483d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 1, 0, 3, 1162887496, (byte)0, 15.349345d, new[] { 23, 23, 23, 23, 23, 23, 23 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.965753d, 11.248748d, 3.282828d, 4.116808d, 3.067828d, 3.88253d }, new[] { 15.349345d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 0, 0, 23, 0, 0, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "3fccf79cd852dc47-ce56d2fa636e4b3f",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|745|9cb5791d0b33; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6942|07bc01395867; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|6943|074715666093; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7247|4d71f7527f67,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7436|fc2745ad1128,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7543|caa86fb5150d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|7653|1c39b075b178",
@@ -2442,7 +2444,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22 }, new[] { 0d }, new[] { 7.469499d }, new[] { 5.525632d, 2.649578d, 2.636882d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22 }, new[] { 0d }, new[] { 7.469499d }, new[] { 5.525632d, 2.649578d, 2.636882d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "41ec2f5fb41b8e2f-5f0a16ad1c7c6589",
@@ -2485,7 +2487,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(25, 34, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 34, 27 }, new[] { 0d, 0d }, new[] { 2.984133d, 18.044752d }, new[] { 4.378445d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(25, 34, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 34, 27 }, new[] { 0d, 0d }, new[] { 2.984133d, 18.044752d }, new[] { 4.378445d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "41ec2f5fb41b8e2f-95101dc382060622",
@@ -2528,7 +2530,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22 }, new[] { 0d }, new[] { 6.355736d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22 }, new[] { 0d }, new[] { 6.355736d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "41ec8ecff96a0c8c-4f4ed102043d7370",
@@ -2571,7 +2573,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17, 17, 17, 17, 17, 17, 17 }, new[] { 0d }, new[] { 6.582027d }, new[] { 10.721892d, 5.358746d, 5.367398d, 5.36017d, 5.411192d, 4.796816d, 4.484915d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17, 17, 17, 17, 17, 17, 17 }, new[] { 0d }, new[] { 6.582027d }, new[] { 10.721892d, 5.358746d, 5.367398d, 5.36017d, 5.411192d, 4.796816d, 4.484915d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "41ec8ecff96a0c8c-fedb453533892b94",
@@ -2614,7 +2616,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 17, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 15, 17, 17 }, new[] { 0d, 0d }, new[] { 5.949944d, 7.852817d }, new[] { 5.63348d, 5.349492d, 5.675528d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 17, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 15, 17, 17 }, new[] { 0d, 0d }, new[] { 5.949944d, 7.852817d }, new[] { 5.63348d, 5.349492d, 5.675528d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "424fc8c70099e867-dfdfa57bbf6d8e9c",
@@ -2657,7 +2659,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(41, 41, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 41, 41 }, new[] { 0d }, new[] { 2.583518d }, new[] { 4.021536d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(41, 41, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 41, 41 }, new[] { 0d }, new[] { 2.583518d }, new[] { 4.021536d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "45c6e511d794c6bf-8c8a88032be6ca97",
@@ -2683,9 +2685,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 20, -1, 1, 0, 3, 1380276018, (byte)0, 0d, new[] { 10, 16, 12, 13, 13, 20 }, new[] { 0d, 0d, 0d }, new[] { 17.691537d, 12.281832d, 5.870233d }, new[] { 14.809299d, 0.001003d, 28.87066d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 14, -1, 0, 0, 3, 1380276017, (byte)0, 0d, new[] { 7, 14, 5, 6, 6, 8, 7, 6, 6, 12 }, new[] { 0d, 0d, 0d }, new[] { 5.581033d, 5.741706d, 9.32042d }, new[] { 5.770756d, 9.830203d, 5.790108d, 15.119714d, 15.159737d, 5.429523d, 10.220286d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 20, -1, 1, 0, 3, 1380276018, (byte)0, 0d, new[] { 10, 16, 12, 13, 13, 20 }, new[] { 0d, 0d, 0d }, new[] { 17.691537d, 12.281832d, 5.870233d }, new[] { 14.809299d, 0.001003d, 28.87066d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 14, -1, 0, 0, 3, 1380276017, (byte)0, 0d, new[] { 7, 14, 5, 6, 6, 8, 7, 6, 6, 12 }, new[] { 0d, 0d, 0d }, new[] { 5.581033d, 5.741706d, 9.32042d }, new[] { 5.770756d, 9.830203d, 5.790108d, 15.119714d, 15.159737d, 5.429523d, 10.220286d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 31, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "45d32715e93f85c6-bcd64434325f2403",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|12153|1bd140f66229; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|12154|f1df23b416b2; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|12211|3f2def39fba0",
@@ -2709,7 +2712,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 3.025037d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 3.025037d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "46500f6c2cd2882a-2422c91610d14b94",
@@ -2752,7 +2755,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 2.400656d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 2.400656d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "469eedefbd2e7efe-83d6c6ca8cd6c3d2",
@@ -2777,7 +2780,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 23, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 16, 15, 20, 20, 16, 15, 17, 17, 15, 23, 16, 23, 23, 14, 14 }, new[] { 0d, 0d, 0d }, new[] { 13.949046d, 3.198546d, 3.067722d }, new[] { 5.442963d, 5.307536d, 5.24839d, 5.186234d, 5.317136d, 5.206517d, 5.449462d, 5.115718d, 5.324323d, 4.732759d, 15.75176d, 21.096021d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 23, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 16, 15, 20, 20, 16, 15, 17, 17, 15, 23, 16, 23, 23, 14, 14 }, new[] { 0d, 0d, 0d }, new[] { 13.949046d, 3.198546d, 3.067722d }, new[] { 5.442963d, 5.307536d, 5.24839d, 5.186234d, 5.317136d, 5.206517d, 5.449462d, 5.115718d, 5.324323d, 4.732759d, 15.75176d, 21.096021d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "46a87c17eefbd77b-c850f3966b62b38e",
@@ -2803,8 +2806,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 5, -1, 0, 0, 3, 1279612721, (byte)0, 6.800882d, new[] { 4, 5 }, new[] { 0d }, new[] { 4.390156d }, new[] { 6.800882d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 4, 4 }, new[] { 0d, 0d }, new[] { 9.201413d, 2.346188d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 5, -1, 0, 0, 3, 1279612721, (byte)0, 6.800882d, new[] { 4, 5 }, new[] { 0d }, new[] { 4.390156d }, new[] { 6.800882d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 4, 4 }, new[] { 0d, 0d }, new[] { 9.201413d, 2.346188d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "470de902ce07b996-4b135515d29a9f3e",
@@ -2847,7 +2850,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 28, 28 }, new[] { 0d }, new[] { 6.512778d }, new[] { 19.376399d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 28, 28 }, new[] { 0d }, new[] { 6.512778d }, new[] { 19.376399d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "477ae7aca2274b51-474eed6223e4ee5c",
@@ -2890,7 +2893,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 28, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 25, 28 }, new[] { 0d, 0d }, new[] { 0.483201d, 5.433583d }, new[] { 4.533262d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 28, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 25, 28 }, new[] { 0d, 0d }, new[] { 0.483201d, 5.433583d }, new[] { 4.533262d }, 0, true, null, true, false)
                     },
                     new[] { 49, 58 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -2917,10 +2920,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(25, 27, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 25, 27 }, new[] { 0d, 0d }, new[] { 24.310137d, 3.050106d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 30, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 30, 23 }, new[] { 0d, 0d }, new[] { 19.160627d, 29.957581d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(20, 37, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 30, 20, 25, 20, 37, 30, 34, 33, 34, 37, 20 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.880809d, 1.480265d, 10.530051d, 3.63957d, 2.480764d, 3.390443d, 0d }, new[] { 8.789786d, 8.630558d, 9.402673d, 8.821823d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(20, 26, -1, 0, 0, 3, 1296389937, (byte)0, 9.143252d, new[] { 26, 20, 21, 25, 20 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.870221d, 4.169777d, 6.420952d, 5.740361d }, new[] { 9.143252d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(25, 27, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 25, 27 }, new[] { 0d, 0d }, new[] { 24.310137d, 3.050106d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 30, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 30, 23 }, new[] { 0d, 0d }, new[] { 19.160627d, 29.957581d }, new double[0], 0, false, null, true, true),
+                        new CapturedEnemyCombatProfileStreamDefinition(20, 37, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 30, 20, 25, 20, 37, 30, 34, 33, 34, 37, 20 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.880809d, 1.480265d, 10.530051d, 3.63957d, 2.480764d, 3.390443d, 0d }, new[] { 8.789786d, 8.630558d, 9.402673d, 8.821823d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(20, 26, -1, 0, 0, 3, 1296389937, (byte)0, 9.143252d, new[] { 26, 20, 21, 25, 20 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.870221d, 4.169777d, 6.420952d, 5.740361d }, new[] { 9.143252d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "485016ecdf4af63f-dfa9d79e1b1f4242",
@@ -2945,7 +2948,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 0, 0, 3, 1397315377, (byte)0, 4.899172d, new[] { 17, 17 }, new[] { 0d }, new[] { 6.849777d }, new[] { 4.899172d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 0, 0, 3, 1397315377, (byte)0, 4.899172d, new[] { 17, 17 }, new[] { 0d }, new[] { 6.849777d }, new[] { 4.899172d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "49446e0dee54c54a-c64aba3347b7e384",
@@ -2988,9 +2991,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 16, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 15, 11, 12, 12, 11, 12, 16, 11, 10, 10, 10, 10, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.580252d, 2.290035d, 3.282449d, 2.949127d, 2.233925d, 38.413531d, 14.780678d, 2.465018d, 3.865449d, 4.412292d }, new[] { 10.289926d, 4.949966d, 5.23978d, 5.070269d, 4.949051d, 5.25103d, 5.080262d, 5.782971d, 5.816469d, 5.900159d, 5.865325d, 5.936468d, 5.930901d, 5.926769d, 5.916142d, 6.242033d, 5.740198d, 5.739814d, 5.937508d, 6.112736d, 5.802653d, 5.962508d, 6.15224d, 5.926776d, 5.916132d, 35.574945d, 6.450082d, 5.847298d, 18.687501d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 16, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 15, 11, 12, 12, 11, 12, 16, 11, 10, 10, 10, 10, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.580252d, 2.290035d, 3.282449d, 2.949127d, 2.233925d, 38.413531d, 14.780678d, 2.465018d, 3.865449d, 4.412292d }, new[] { 10.289926d, 4.949966d, 5.23978d, 5.070269d, 4.949051d, 5.25103d, 5.080262d, 5.782971d, 5.816469d, 5.900159d, 5.865325d, 5.936468d, 5.930901d, 5.926769d, 5.916142d, 6.242033d, 5.740198d, 5.739814d, 5.937508d, 6.112736d, 5.802653d, 5.962508d, 6.15224d, 5.926776d, 5.916132d, 35.574945d, 6.450082d, 5.847298d, 18.687501d }, 0, true, null, true, false)
                     },
-                    new[] { 0, 0, 0, 0, 31, 0, 0, 25, 0, 0 }),
+                    new[] { 0, 0, 0, 0, 31, 0, 25, 0, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4959f101d04c692a-51b5785995ac28cc",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|1882|46480899b629,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|1006|4b22bc0104a3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11828|bc4bc1d4f993,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2260|6c4f7bdebdf1,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4862|3b83e6dfe499,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8182|249ae8daf0c2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|6150|6c4069545cc9,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|8736|26fac7f0f25e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17882|fc1ada6d2032; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|1884|b7b51ed0a10b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|1008|651061e1ae34,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|11830|3685e8c3e553,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2262|e92a63bdcfa7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|4864|9f14b0b14638,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8184|e6c96f6daf5a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|6152|fa9448d11020,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|8738|021d6afb1d6a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|17884|8f6e5580a91b; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|1933|8a85a8e7a11b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432|IN|2153|397c80220236,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|1363|fc2b1d16890d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|2733|0fe876d6886d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|5549|b20285b436a3,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8313|dc5a506cd38c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8549|f9827a0121ad,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|8887|56c009f10650,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|9245|6f26045a6aea,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12223|ea99d01cdca7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107|IN|12531|2e8bbbaa3549,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195725|IN|6293|b7dfa019a594,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-200850|IN|9259|99a2d6d51687,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-214819|IN|19293|8ce90fe41159",
@@ -3014,7 +3017,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(2, 8, -1, 0, 0, 3, 1363891017, (byte)0, 0d, new[] { 5, 6, 4, 4, 5, 8, 5, 6, 2, 8, 8, 4, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.14001d, 9.29727d, 11.076602d, 17.404324d, 2.91661d, 10.281737d, 3.085295d, 23.360728d, 29.124915d }, new[] { 7.020001d, 6.604071d, 6.528517d, 6.654186d, 6.918119d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(2, 8, -1, 0, 0, 3, 1363891017, (byte)0, 0d, new[] { 5, 6, 4, 4, 5, 8, 5, 6, 2, 8, 8, 4, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.14001d, 9.29727d, 11.076602d, 17.404324d, 2.91661d, 10.281737d, 3.085295d, 23.360728d, 29.124915d }, new[] { 7.020001d, 6.604071d, 6.528517d, 6.654186d, 6.918119d }, 0, false, null, true, false)
                     },
                     new[] { 40, 20, 60, 26, 26, 20, 26, 20, 26 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -3041,8 +3044,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 4, 3, 1380276017, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 3.360315d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 20, -1, 1, 0, 3, 1380276018, (byte)0, 0.000999d, new[] { 19, 20, 20 }, new[] { 0d, 0d }, new[] { 1.719702d, 5.309156d }, new[] { 0.000999d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 4, 3, 1380276017, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 3.360315d }, new double[0], 0, false, null, true, true),
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 20, -1, 1, 0, 3, 1380276018, (byte)0, 0.000999d, new[] { 19, 20, 20 }, new[] { 0d, 0d }, new[] { 1.719702d, 5.309156d }, new[] { 0.000999d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4a8d45cbccae49e5-599ff40211922fa8",
@@ -3085,7 +3088,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 28, 28 }, new[] { 0d }, new[] { 10.268453d }, new[] { 3.559952d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 28, 28 }, new[] { 0d }, new[] { 10.268453d }, new[] { 3.559952d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4a974dee458fb68c-96eb7c29113e7cb3",
@@ -3110,7 +3113,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 19, 19, 18, 21, 15 }, new[] { 0d, 0d }, new[] { 0.92304d, 0.922039d }, new[] { 9.545567d, 4.81693d, 4.889367d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 19, 19, 18, 21, 15 }, new[] { 0d, 0d }, new[] { 0.92304d, 0.922039d }, new[] { 9.545567d, 4.81693d, 4.889367d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4b6baa7ad81c6eb1-8aa88308817eb871",
@@ -3153,7 +3156,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.551894d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.551894d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4ba26b078c2496d9-2e2fc4992159adf3",
@@ -3196,7 +3199,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 40, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 31, 35, 29, 19, 19, 19, 40, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 5.216177d, 2.925826d, 0.750653d, 1.033631d, 13.22289d, 1.742324d }, new[] { 9.483859d, 3.932738d, 3.893351d, 3.898494d, 3.88423d, 3.772783d, 6.9384d, 3.497319d, 6.723487d, 3.272643d, 3.766854d, 3.233815d, 3.482377d, 6.939967d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 40, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 31, 35, 29, 19, 19, 19, 40, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 5.216177d, 2.925826d, 0.750653d, 1.033631d, 13.22289d, 1.742324d }, new[] { 9.483859d, 3.932738d, 3.893351d, 3.898494d, 3.88423d, 3.772783d, 6.9384d, 3.497319d, 6.723487d, 3.272643d, 3.766854d, 3.233815d, 3.482377d, 6.939967d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4c05b2ad557f829b-d2d9cb741e270fa8",
@@ -3222,8 +3225,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4, 4, 4 }, new[] { 0d }, new[] { 7.581643d }, new[] { 2.684806d, 2.771441d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(20, 20, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 20 }, new[] { 0d }, new[] { 3.59543d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4, 4, 4 }, new[] { 0d }, new[] { 7.581643d }, new[] { 2.684806d, 2.771441d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(20, 20, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 20 }, new[] { 0d }, new[] { 3.59543d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "4d0557d8b95e5bc8-447d5ea93ffdb368",
@@ -3266,7 +3269,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 18, 17, 21, 16, 12, 12, 17, 14, 17, 12, 12, 12, 12, 12, 12, 12, 12 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.888675d, 1.30051d, 0.239457d, 3.240101d, 3.9608d, 2.95068d, 4.183866d, 3.4003d, 3.070025d }, new[] { 5.13031d, 4.980591d, 5.049824d, 5.079922d, 11.190787d, 5.983913d, 5.182505d, 18.947554d, 15.203374d, 6.820043d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 18, 17, 21, 16, 12, 12, 17, 14, 17, 12, 12, 12, 12, 12, 12, 12, 12 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.888675d, 1.30051d, 0.239457d, 3.240101d, 3.9608d, 2.95068d, 4.183866d, 3.4003d, 3.070025d }, new[] { 5.13031d, 4.980591d, 5.049824d, 5.079922d, 11.190787d, 5.983913d, 5.182505d, 18.947554d, 15.203374d, 6.820043d }, 0, true, null, true, false)
                     },
                     new[] { 0, 49, 37, 37, 49, 0, 0, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -3292,7 +3295,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 33, -1, 0, 0, 3, 1397315377, (byte)0, 10.105348d, new[] { 33, 14, 16, 16, 16, 16, 16, 16 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.382415d, 3.632561d, 3.892266d, 2.871904d, 0.841145d, 3.006953d, 2.447736d }, new[] { 10.105348d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 33, -1, 0, 0, 3, 1397315377, (byte)0, 10.105348d, new[] { 33, 14, 16, 16, 16, 16, 16, 16 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.382415d, 3.632561d, 3.892266d, 2.871904d, 0.841145d, 3.006953d, 2.447736d }, new[] { 10.105348d }, 0, false, null, true, false)
                     },
                     new[] { 20, 40, 31, 61, 81, 71, 101 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -3336,7 +3339,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(27, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27 }, new[] { 0d }, new[] { 2.001295d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(27, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27 }, new[] { 0d }, new[] { 2.001295d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "507420968010ac73-01ed8f89e4ecb861",
@@ -3379,7 +3382,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(34, 34, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 34 }, new[] { 0d }, new[] { 4.092869d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(34, 34, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 34 }, new[] { 0d }, new[] { 4.092869d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "507420968010ac73-e34cd954337a7dcf",
@@ -3422,7 +3425,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(27, 33, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 33, 27 }, new[] { 0d }, new[] { 3.432471d }, new[] { 4.466488d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(27, 33, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 33, 27 }, new[] { 0d }, new[] { 3.432471d }, new[] { 4.466488d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "507420968010ac73-ef6d2cf09c6524ec",
@@ -3465,7 +3468,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 4.201018d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 4.201018d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "507420968010ac73-fc12498b7e77187d",
@@ -3508,7 +3511,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.221999d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.221999d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "52d3ba784e30554b-3fd891ae6c2d1596",
@@ -3551,8 +3554,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(2, 9, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 2, 8, 8, 3, 5, 9, 2, 7, 9, 7, 7, 8, 6, 2, 3, 3, 5, 8, 2, 7, 2, 6, 8, 2, 7, 2, 7, 7, 2, 8, 3, 8, 2, 7, 2, 3, 5, 4, 6, 8, 3, 8, 8, 5, 5, 5, 8, 6, 3, 4, 7, 4, 4, 6, 8, 7, 7, 3, 7, 2, 3, 4, 6, 5, 5, 3, 4, 2, 4, 2, 7, 5, 3 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.349668d, 3.230008d, 9.984812d, 3.339431d, 3.529513d, 2.790804d, 3.159922d, 10.913148d, 2.870086d, 2.620827d, 3.480999d, 4.123027d, 3.861133d, 4.08516d, 2.816618d, 4.041729d, 2.469756d }, new[] { 14.038184d, 7.129748d, 7.169941d, 6.966047d, 7.076387d, 14.400279d, 6.888689d, 7.440112d, 7.350095d, 14.682106d, 6.589725d, 7.262024d, 7.149468d, 14.499988d, 6.995005d, 7.149119d, 7.147956d, 7.189911d, 7.308151d, 7.301974d, 7.002177d, 7.280245d, 7.09629d, 7.136375d, 14.308035d, 14.251042d, 7.175629d, 7.154486d, 7.015851d, 7.116886d, 7.139868d, 7.180651d, 7.11333d, 7.006823d, 7.163608d, 7.163478d, 14.120359d, 7.128005d, 7.120397d, 7.182911d, 7.159959d, 7.152926d, 7.161388d, 7.165632d, 7.229074d, 7.033665d, 7.175673d, 7.148352d, 7.17417d, 7.335554d, 14.215969d, 7.24977d, 7.37916d, 6.954709d, 14.2799d, 7.14988d }, 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(3, 8, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 6, 3, 4, 8, 8, 8, 7, 8, 7, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 38.821237d, 38.922792d, 31.148226d, 46.346399d, 39.594219d, 31.968972d, 45.326254d, 32.233802d, 39.724233d, 40.005133d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(2, 9, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 2, 8, 8, 3, 5, 9, 2, 7, 9, 7, 7, 8, 6, 2, 3, 3, 5, 8, 2, 7, 2, 6, 8, 2, 7, 2, 7, 7, 2, 8, 3, 8, 2, 7, 2, 3, 5, 4, 6, 8, 3, 8, 8, 5, 5, 5, 8, 6, 3, 4, 7, 4, 4, 6, 8, 7, 7, 3, 7, 2, 3, 4, 6, 5, 5, 3, 4, 2, 4, 2, 7, 5, 3 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.349668d, 3.230008d, 9.984812d, 3.339431d, 3.529513d, 2.790804d, 3.159922d, 10.913148d, 2.870086d, 2.620827d, 3.480999d, 4.123027d, 3.861133d, 4.08516d, 2.816618d, 4.041729d, 2.469756d }, new[] { 14.038184d, 7.129748d, 7.169941d, 6.966047d, 7.076387d, 14.400279d, 6.888689d, 7.440112d, 7.350095d, 14.682106d, 6.589725d, 7.262024d, 7.149468d, 14.499988d, 6.995005d, 7.149119d, 7.147956d, 7.189911d, 7.308151d, 7.301974d, 7.002177d, 7.280245d, 7.09629d, 7.136375d, 14.308035d, 14.251042d, 7.175629d, 7.154486d, 7.015851d, 7.116886d, 7.139868d, 7.180651d, 7.11333d, 7.006823d, 7.163608d, 7.163478d, 14.120359d, 7.128005d, 7.120397d, 7.182911d, 7.159959d, 7.152926d, 7.161388d, 7.165632d, 7.229074d, 7.033665d, 7.175673d, 7.148352d, 7.17417d, 7.335554d, 14.215969d, 7.24977d, 7.37916d, 6.954709d, 14.2799d, 7.14988d }, 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(3, 8, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 6, 3, 4, 8, 8, 8, 7, 8, 7, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 38.821237d, 38.922792d, 31.148226d, 46.346399d, 39.594219d, 31.968972d, 45.326254d, 32.233802d, 39.724233d, 40.005133d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5339849977417b5a-9ca73d7846c38f6c",
@@ -3595,7 +3598,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 14, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d }, new[] { 3.722258d, 2.010594d }, new[] { 3.178841d, 3.060714d, 3.031985d, 9.321903d, 3.309006d, 9.075967d, 3.20905d, 3.439703d, 22.513615d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 14, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, new[] { 0d, 0d }, new[] { 3.722258d, 2.010594d }, new[] { 3.178841d, 3.060714d, 3.031985d, 9.321903d, 3.309006d, 9.075967d, 3.20905d, 3.439703d, 22.513615d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5343310a1d296756-075dfd2e9a2a4ba7",
@@ -3638,7 +3641,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 33, 19, 6, 0, 3, 0, (byte)0, 3.5d, new[] { 28, 29, 31, 30, 28, 31, 31, 30, 28, 27, 24, 25, 25, 33, 24, 32, 28, 23 }, new[] { 0d }, new[] { 21.809819d }, new[] { 12.402922d, 3.779995d, 2.880349d, 2.959944d, 4.329815d, 2.590126d, 2.809736d, 2.520864d, 2.229288d, 2.529968d, 2.540003d, 7.920467d, 2.210204d, 2.479242d, 2.85d, 2.209988d, 2.510362d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 33, 19, 6, 0, 3, 0, (byte)0, 3.5d, new[] { 28, 29, 31, 30, 28, 31, 31, 30, 28, 27, 24, 25, 25, 33, 24, 32, 28, 23 }, new[] { 0d }, new[] { 21.809819d }, new[] { 12.402922d, 3.779995d, 2.880349d, 2.959944d, 4.329815d, 2.590126d, 2.809736d, 2.520864d, 2.229288d, 2.529968d, 2.540003d, 7.920467d, 2.210204d, 2.479242d, 2.85d, 2.209988d, 2.510362d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "53f586efd7c2056e-0b7d314423180b40",
@@ -3681,7 +3684,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 27 }, new[] { 0d }, new[] { 2.476261d }, new[] { 3.816743d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 27 }, new[] { 0d }, new[] { 2.476261d }, new[] { 3.816743d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "54ce2d5c43b12146-158b0cfbdf05c87f",
@@ -3706,7 +3709,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 9, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 7, 6, 8, 7, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.916609d, 2.850022d, 1.717637d, 0.483794d, 1.800832d, 1.979921d, 0.134157d }, new[] { 4.549839d, 4.049853d, 6.99842d, 3.616379d, 3.249557d, 3.209219d, 2.612625d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 9, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 7, 6, 8, 7, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.916609d, 2.850022d, 1.717637d, 0.483794d, 1.800832d, 1.979921d, 0.134157d }, new[] { 4.549839d, 4.049853d, 6.99842d, 3.616379d, 3.249557d, 3.209219d, 2.612625d }, 0, false, null, true, false)
                     },
                     new[] { 0, 0, 0, 0, 14, 8, 53 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -3732,7 +3735,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 0.250998d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 0.250998d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "550de529541c8221-239b7c7cd80ed8c4",
@@ -3775,7 +3778,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21 }, new[] { 0d }, new[] { 10.785799d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21 }, new[] { 0d }, new[] { 10.785799d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "55e83348aaaa7019-66b0ad151ed38d80",
@@ -3800,7 +3803,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 3.26309d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 3.26309d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "563e08cd4ffdff38-b06131d6100a4087",
@@ -3825,7 +3828,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19 }, new[] { 0d }, new[] { 2.696738d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19 }, new[] { 0d }, new[] { 2.696738d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5643a4bd8a3aaf44-084c355903d1b399",
@@ -3868,7 +3871,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 22 }, new[] { 0d, 0d }, new[] { 11.975001d, 0.348506d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 22 }, new[] { 0d, 0d }, new[] { 11.975001d, 0.348506d }, new double[0], 0, true, null, true, false)
                     },
                     new[] { 8, 14 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -3912,7 +3915,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(13, 34, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 33, 34, 34 }, new[] { 0d, 0d }, new[] { 2.370845d, 4.248824d }, new[] { 3.77077d, 3.249341d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(13, 34, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 33, 34, 34 }, new[] { 0d, 0d }, new[] { 2.370845d, 4.248824d }, new[] { 3.77077d, 3.249341d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "580c7b67db56dc9d-1891a6ed4966ba79",
@@ -3955,8 +3958,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(3, 19, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 12, 4, 13, 4, 12, 11, 11, 9, 9, 9, 6, 3, 18, 3, 3, 3, 10, 17, 8, 10, 4, 7, 8, 6, 15, 4, 3, 16, 7, 11, 19, 8, 19, 16, 17, 13, 11, 16, 17, 4, 16, 9, 9, 16, 6, 5, 16, 5, 3, 6, 3, 12, 3, 6, 3, 8, 13, 14, 6, 5, 7, 14, 17, 18, 14, 10, 6, 9, 13, 19, 16, 17, 12, 5, 14, 6, 3, 6, 8, 3, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.439786d, 3.326522d, 8.690464d, 10.089598d, 3.849736d, 2.30956d, 2.450078d, 2.969539d, 2.123693d, 3.238908d, 10.010071d, 2.1748d, 3.576602d, 2.897136d, 2.948531d, 2.677136d, 3.355669d, 3.072878d, 3.455566d, 9.745173d, 2.710796d, 2.74981d, 2.900906d, 10.00255d, 9.161534d }, new[] { 6.296928d, 6.539911d, 6.440624d, 6.019621d, 6.480568d, 6.311266d, 6.330439d, 6.322928d, 6.079274d, 6.33199d, 6.350054d, 6.297123d, 6.330581d, 12.60413d, 6.360807d, 6.309667d, 6.352521d, 6.309593d, 6.499845d, 6.140907d, 6.30641d, 12.450289d, 6.34222d, 6.312109d, 6.322412d, 6.600431d, 6.401255d, 6.272557d, 6.348731d, 6.315172d, 6.301561d, 6.332612d, 12.590537d, 6.425946d, 12.634356d, 6.205264d, 6.367543d, 6.323823d, 6.286122d, 6.286964d, 6.577742d, 6.107177d, 6.457181d, 6.185417d, 6.314771d, 6.318452d, 6.346637d, 6.085445d, 6.29079d, 6.328082d, 6.3279d, 6.269121d, 12.987026d, 6.370324d, 6.280771d, 6.35013d }, 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 19, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 18, 18, 11, 13, 18, 19, 10, 18, 9, 15, 9, 13, 19, 18, 15, 10, 14 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 41.226875d, 33.975691d, 22.611147d, 41.576804d, 27.594618d, 40.398487d, 28.15268d, 21.122524d, 22.390834d, 22.821033d, 27.645598d, 21.915819d, 46.932731d, 28.709211d, 28.750177d, 27.698736d, 28.136964d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(3, 19, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 12, 4, 13, 4, 12, 11, 11, 9, 9, 9, 6, 3, 18, 3, 3, 3, 10, 17, 8, 10, 4, 7, 8, 6, 15, 4, 3, 16, 7, 11, 19, 8, 19, 16, 17, 13, 11, 16, 17, 4, 16, 9, 9, 16, 6, 5, 16, 5, 3, 6, 3, 12, 3, 6, 3, 8, 13, 14, 6, 5, 7, 14, 17, 18, 14, 10, 6, 9, 13, 19, 16, 17, 12, 5, 14, 6, 3, 6, 8, 3, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.439786d, 3.326522d, 8.690464d, 10.089598d, 3.849736d, 2.30956d, 2.450078d, 2.969539d, 2.123693d, 3.238908d, 10.010071d, 2.1748d, 3.576602d, 2.897136d, 2.948531d, 2.677136d, 3.355669d, 3.072878d, 3.455566d, 9.745173d, 2.710796d, 2.74981d, 2.900906d, 10.00255d, 9.161534d }, new[] { 6.296928d, 6.539911d, 6.440624d, 6.019621d, 6.480568d, 6.311266d, 6.330439d, 6.322928d, 6.079274d, 6.33199d, 6.350054d, 6.297123d, 6.330581d, 12.60413d, 6.360807d, 6.309667d, 6.352521d, 6.309593d, 6.499845d, 6.140907d, 6.30641d, 12.450289d, 6.34222d, 6.312109d, 6.322412d, 6.600431d, 6.401255d, 6.272557d, 6.348731d, 6.315172d, 6.301561d, 6.332612d, 12.590537d, 6.425946d, 12.634356d, 6.205264d, 6.367543d, 6.323823d, 6.286122d, 6.286964d, 6.577742d, 6.107177d, 6.457181d, 6.185417d, 6.314771d, 6.318452d, 6.346637d, 6.085445d, 6.29079d, 6.328082d, 6.3279d, 6.269121d, 12.987026d, 6.370324d, 6.280771d, 6.35013d }, 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 19, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 18, 18, 11, 13, 18, 19, 10, 18, 9, 15, 9, 13, 19, 18, 15, 10, 14 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 41.226875d, 33.975691d, 22.611147d, 41.576804d, 27.594618d, 40.398487d, 28.15268d, 21.122524d, 22.390834d, 22.821033d, 27.645598d, 21.915819d, 46.932731d, 28.709211d, 28.750177d, 27.698736d, 28.136964d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "581d73763fccec59-e94384f7f2ee2b46",
@@ -3982,8 +3985,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 10, -1, 0, 0, 3, 1279612721, (byte)0, 7.910029d, new[] { 8, 10, 10, 6 }, new[] { 0d, 0d, 0d }, new[] { 4.070121d, 0.949699d, 2.109274d }, new[] { 7.910029d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(8, 13, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 8, 13, 10 }, new[] { 0d, 0d, 0d }, new[] { 1.249285d, 7.110281d, 0.359452d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 10, -1, 0, 0, 3, 1279612721, (byte)0, 7.910029d, new[] { 8, 10, 10, 6 }, new[] { 0d, 0d, 0d }, new[] { 4.070121d, 0.949699d, 2.109274d }, new[] { 7.910029d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(8, 13, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 8, 13, 10 }, new[] { 0d, 0d, 0d }, new[] { 1.249285d, 7.110281d, 0.359452d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "58e682ec3ebb63c8-b677b63db5c16f15",
@@ -4026,7 +4029,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21 }, new[] { 0d }, new[] { 3.170487d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21 }, new[] { 0d }, new[] { 3.170487d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "591280b976682cf2-22a272367d05a581",
@@ -4052,8 +4055,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 22, -1, 0, 0, 3, 1279612721, (byte)0, 6.01237d, new[] { 19, 22 }, new[] { 0d }, new[] { 3.500739d }, new[] { 6.01237d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(8, 18, -1, 1, 0, 3, 1279612722, (byte)0, 4.831813d, new[] { 18, 8 }, new[] { 0d }, new[] { 2.380962d }, new[] { 4.831813d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 22, -1, 0, 0, 3, 1279612721, (byte)0, 6.01237d, new[] { 19, 22 }, new[] { 0d }, new[] { 3.500739d }, new[] { 6.01237d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(8, 18, -1, 1, 0, 3, 1279612722, (byte)0, 4.831813d, new[] { 18, 8 }, new[] { 0d }, new[] { 2.380962d }, new[] { 4.831813d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5aa2541e7645c589-9bcb7a58208cf1e0",
@@ -4078,7 +4081,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 25, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11, 15, 18, 19, 13, 19, 13, 12, 19, 16, 18, 17, 12, 13, 12, 18, 16, 13, 14, 18, 17, 16, 16, 12, 13, 10, 14, 11, 11, 11, 25, 11, 11, 17 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 7.818686d, 3.280454d, 2.080391d, 2.948748d, 2.46657d, 1.483583d, 2.698234d, 6.183733d, 1.583255d }, new[] { 5.009837d, 5.000774d, 5.34923d, 5.180712d, 4.890166d, 5.02951d, 5.090054d, 5.7001d, 5.56923d, 5.330241d, 5.679988d, 5.329901d, 5.380693d, 5.418725d, 5.450551d, 5.450085d, 5.419841d, 5.45073d, 5.389345d, 5.040686d, 5.03927d, 5.080804d, 5.684366d, 5.666535d, 5.716103d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 25, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11, 15, 18, 19, 13, 19, 13, 12, 19, 16, 18, 17, 12, 13, 12, 18, 16, 13, 14, 18, 17, 16, 16, 12, 13, 10, 14, 11, 11, 11, 25, 11, 11, 17 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 7.818686d, 3.280454d, 2.080391d, 2.948748d, 2.46657d, 1.483583d, 2.698234d, 6.183733d, 1.583255d }, new[] { 5.009837d, 5.000774d, 5.34923d, 5.180712d, 4.890166d, 5.02951d, 5.090054d, 5.7001d, 5.56923d, 5.330241d, 5.679988d, 5.329901d, 5.380693d, 5.418725d, 5.450551d, 5.450085d, 5.419841d, 5.45073d, 5.389345d, 5.040686d, 5.03927d, 5.080804d, 5.684366d, 5.666535d, 5.716103d }, 0, false, null, true, false)
                     },
                     new[] { 0, 0, 0, 0, 14, 31, 0, 0, 34 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -4122,7 +4125,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(72, 72, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 72, 72, 72, 72 }, new[] { 0d }, new[] { 3.665119d }, new[] { 10.247675d, 5.422971d, 12.373342d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(72, 72, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 72, 72, 72, 72 }, new[] { 0d }, new[] { 3.665119d }, new[] { 10.247675d, 5.422971d, 12.373342d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5c3488b85111d5ef-5e949f1dfaa2ce18",
@@ -4165,7 +4168,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(32, 36, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 32, 32, 36 }, new[] { 0d, 0d, 0d }, new[] { 4.882405d, 12.152273d, 13.276602d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(32, 36, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 32, 32, 36 }, new[] { 0d, 0d, 0d }, new[] { 4.882405d, 12.152273d, 13.276602d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5db002948ad46e4a-0278a5de1cc46a00",
@@ -4208,7 +4211,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 15, 15, 15, 17, 17, 14, 14, 30 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.417562d, 1.416562d, 1.849465d, 6.849457d, 1.407024d, 1.406023d, 0.984255d }, new[] { 5.000991d, 5.009169d, 5.009168d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 15, 15, 15, 17, 17, 14, 14, 30 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.417562d, 1.416562d, 1.849465d, 6.849457d, 1.407024d, 1.406023d, 0.984255d }, new[] { 5.000991d, 5.009169d, 5.009168d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5db002948ad46e4a-365bef87422ad1f8",
@@ -4251,7 +4254,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 18, 18, 19, 18 }, new[] { 0d, 0d }, new[] { 2.281966d, 1.273308d }, new[] { 5.092328d, 5.159818d, 5.139163d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 18, 18, 19, 18 }, new[] { 0d, 0d }, new[] { 2.281966d, 1.273308d }, new[] { 5.092328d, 5.159818d, 5.139163d }, 0, true, null, true, false)
                     },
                     new[] { 0, 43 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -4295,7 +4298,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 29, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 29, 29, 17, 18 }, new[] { 0d, 0d, 0d }, new[] { 0.756508d, 0.756507d, 3.632343d }, new[] { 5.056374d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 29, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 29, 29, 17, 18 }, new[] { 0d, 0d, 0d }, new[] { 0.756508d, 0.756507d, 3.632343d }, new[] { 5.056374d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5db002948ad46e4a-90b8491e9403213c",
@@ -4338,9 +4341,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 18, 18, 15, 15, 15, 15, 15, 14, 14, 17, 16, 17, 17, 17, 14, 17, 17, 21, 21, 26, 26, 15, 15, 15 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.994045d, 34.35908d, 2.729266d, 2.729266d, 4.229095d, 2.819475d, 2.819474d }, new[] { 5.379305d, 5.405085d, 5.382509d, 5.405527d, 5.393216d, 5.389392d, 5.733061d, 5.075868d, 5.363497d, 5.10965d, 5.000935d, 5.172508d, 4.900963d, 5.722057d, 20.549952d, 10.073472d, 4.977298d, 4.977297d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 18, 18, 15, 15, 15, 15, 15, 14, 14, 17, 16, 17, 17, 17, 14, 17, 17, 21, 21, 26, 26, 15, 15, 15 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.994045d, 34.35908d, 2.729266d, 2.729266d, 4.229095d, 2.819475d, 2.819474d }, new[] { 5.379305d, 5.405085d, 5.382509d, 5.405527d, 5.393216d, 5.389392d, 5.733061d, 5.075868d, 5.363497d, 5.10965d, 5.000935d, 5.172508d, 4.900963d, 5.722057d, 20.549952d, 10.073472d, 4.977298d, 4.977297d }, 0, true, null, true, false)
                     },
-                    new[] { 0, 0, 40, 40, 43, 43, 43 }),
+                    new[] { 0, 40, 43, 43, 0, 40, 43 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "5db002948ad46e4a-9ecd091aef937ca8",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|12922|88a2126fa085; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13364|7faac76561d4; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13365|c1442e691117; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13415|98d4fbd7dde2,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|13498|e161ecd5209c",
@@ -4382,7 +4385,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14 }, new[] { 0d }, new[] { 1.859672d }, new[] { 4.539154d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14 }, new[] { 0d }, new[] { 1.859672d }, new[] { 4.539154d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "60db5b6a7ece8f6c-0cf797e873267006",
@@ -4425,7 +4428,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 12, 16, 16, 16, 19, 15, 15, 19, 11, 12, 12, 12, 12, 12, 12, 12 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 5.430241d, 2.882778d, 8.93271d, 4.031902d, 6.845398d }, new[] { 16.299443d, 5.460506d, 5.409535d, 5.560084d, 5.309507d, 5.410451d, 5.149844d, 5.030455d, 5.266292d, 6.166936d, 6.050568d, 6.048691d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 13, 12, 16, 16, 16, 19, 15, 15, 19, 11, 12, 12, 12, 12, 12, 12, 12 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 5.430241d, 2.882778d, 8.93271d, 4.031902d, 6.845398d }, new[] { 16.299443d, 5.460506d, 5.409535d, 5.560084d, 5.309507d, 5.410451d, 5.149844d, 5.030455d, 5.266292d, 6.166936d, 6.050568d, 6.048691d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "61a8f43adca0ad1c-e64d843fc19e908e",
@@ -4451,8 +4454,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 35, -1, 0, 0, 3, 1397446449, (byte)0, 0d, new[] { 35, 22 }, new[] { 0d, 0d }, new[] { 33.713702d, 5.410331d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(20, 41, -1, 1, 0, 3, 1397446450, (byte)0, 0d, new[] { 36, 21, 41, 20 }, new[] { 0d, 0d }, new[] { 2.982365d, 2.97454d }, new[] { 6.49924d, 21.665389d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 35, -1, 0, 0, 3, 1397446449, (byte)0, 0d, new[] { 35, 22 }, new[] { 0d, 0d }, new[] { 33.713702d, 5.410331d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(20, 41, -1, 1, 0, 3, 1397446450, (byte)0, 0d, new[] { 36, 21, 41, 20 }, new[] { 0d, 0d }, new[] { 2.982365d, 2.97454d }, new[] { 6.49924d, 21.665389d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "623438ff48197091-8248575e9d33a84a",
@@ -4477,7 +4480,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 22 }, new[] { 0d }, new[] { 8.083043d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 22 }, new[] { 0d }, new[] { 8.083043d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "654ce3810a403892-7a547a1f84232faa",
@@ -4503,8 +4506,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6, 6, 6, 6 }, new[] { 0d }, new[] { 5.807408d }, new[] { 4.215855d, 1.916441d, 2.082359d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(37, 37, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 37 }, new[] { 0d }, new[] { 4.840462d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6, 6, 6, 6 }, new[] { 0d }, new[] { 5.807408d }, new[] { 4.215855d, 1.916441d, 2.082359d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(37, 37, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 37 }, new[] { 0d }, new[] { 4.840462d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "654ce3810a403892-d3072a2954c06011",
@@ -4530,7 +4533,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6 }, new[] { 0d }, new[] { 6.541873d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6 }, new[] { 0d }, new[] { 6.541873d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "67a276f9e41a99e6-d2b65cf5c70d61d6",
@@ -4555,9 +4558,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(13, 21, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 16, 13, 14, 16, 15, 14, 13, 13, 16, 16, 15, 15, 14, 20, 20, 21, 14, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 35.355025d, 2.408485d, 1.567625d, 1.566122d, 0.280511d, 3.226016d, 3.226016d, 1.516299d, 2.166543d, 4.62766d }, new[] { 5.497376d, 5.466013d, 5.488971d, 5.804573d, 5.193014d, 5.496595d, 5.466575d, 5.466576d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(13, 21, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 16, 13, 14, 16, 15, 14, 13, 13, 16, 16, 15, 15, 14, 20, 20, 21, 14, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 35.355025d, 2.408485d, 1.567625d, 1.566122d, 0.280511d, 3.226016d, 3.226016d, 1.516299d, 2.166543d, 4.62766d }, new[] { 5.497376d, 5.466013d, 5.488971d, 5.804573d, 5.193014d, 5.496595d, 5.466575d, 5.466576d }, 0, false, null, true, false)
                     },
-                    new[] { 0, 0, 40, 40, 40, 40, 40, 40, 40, 0 }),
+                    new[] { 0, 40, 40, 40, 40, 40, 0, 40, 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "67f518afac8fd529-88660aa55a7b2d5c",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7491|3ef7e2bc2bd4; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7903|dafa91521296; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7904|b910dadd3ed4; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7971|864813ac9c4a",
@@ -4599,7 +4602,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.369501d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.369501d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "68c66a0d93630de8-c53b2b69965dc3e8",
@@ -4642,7 +4645,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 9, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 9, 9, 9, 9, 9, 7 }, new[] { 0d, 0d, 0d }, new[] { 2.890198d, 11.409643d, 21.192413d }, new[] { 5.929498d, 5.949582d, 6.080141d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 9, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 9, 9, 9, 9, 9, 7 }, new[] { 0d, 0d, 0d }, new[] { 2.890198d, 11.409643d, 21.192413d }, new[] { 5.929498d, 5.949582d, 6.080141d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "68da92f240bea6f1-2a805263c516dbab",
@@ -4685,7 +4688,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 2.631484d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 2.631484d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "68da92f240bea6f1-62fcf8ff2edba652",
@@ -4728,7 +4731,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 2.107395d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 2.107395d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "69c2b09a081c979d-2263c5409515cf44",
@@ -4754,8 +4757,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 5, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 4, 5, 5 }, new[] { 0d, 0d, 0d }, new[] { 4.105087d, 5.397572d, 1.139319d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 8, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 7, 7, 8, 6, 4 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.929905d, 2.21179d, 2.200498d, 2.467034d, 2.193599d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 5, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 4, 5, 5 }, new[] { 0d, 0d, 0d }, new[] { 4.105087d, 5.397572d, 1.139319d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 8, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 7, 7, 8, 6, 4 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.929905d, 2.21179d, 2.200498d, 2.467034d, 2.193599d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "6a70c08c306cdce0-91809cf7b713a97a",
@@ -4798,7 +4801,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(39, 46, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 46, 39, 39 }, new[] { 0d, 0d }, new[] { 2.101575d, 1.410403d }, new[] { 2.677047d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(39, 46, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 46, 39, 39 }, new[] { 0d, 0d }, new[] { 2.101575d, 1.410403d }, new[] { 2.677047d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "6d3034aa09341df7-691976ef69c0d50a",
@@ -4823,7 +4826,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 36, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 17, 17, 17, 17, 17, 17, 28, 23, 33, 33, 36, 34, 36, 17 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.066887d, 12.43415d, 2.416235d, 0.614675d }, new[] { 4.916206d, 4.600114d, 4.366017d, 4.498798d, 5.023192d, 5.103398d, 9.946453d, 4.976588d, 4.531896d, 4.666914d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 36, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 17, 17, 17, 17, 17, 17, 28, 23, 33, 33, 36, 34, 36, 17 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.066887d, 12.43415d, 2.416235d, 0.614675d }, new[] { 4.916206d, 4.600114d, 4.366017d, 4.498798d, 5.023192d, 5.103398d, 9.946453d, 4.976588d, 4.531896d, 4.666914d }, 0, false, null, true, false)
                     },
                     new[] { 0, 0, 20, 60 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -4867,7 +4870,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 27, 27, 27, 27, 27 }, new[] { 0d }, new[] { 2.919639d }, new[] { 3.360814d, 3.708167d, 3.395527d, 7.022527d, 3.613112d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 27, 27, 27, 27, 27 }, new[] { 0d }, new[] { 2.919639d }, new[] { 3.360814d, 3.708167d, 3.395527d, 7.022527d, 3.613112d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "738864c2fe905661-76933f02bd713d01",
@@ -4910,7 +4913,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 24, 24, 25, 25, 24, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 7.487872d, 1.310481d, 4.123114d, 0.630019d, 1.598211d }, new[] { 8.247285d, 2.839547d, 3.320531d, 2.783645d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 24, 24, 25, 25, 24, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 7.487872d, 1.310481d, 4.123114d, 0.630019d, 1.598211d }, new[] { 8.247285d, 2.839547d, 3.320531d, 2.783645d }, 0, true, null, true, false)
                     },
                     new[] { 46, 46, 1, 46, 1 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -4954,7 +4957,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 3.349197d }, new[] { 5.728437d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 3.349197d }, new[] { 5.728437d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "74af62ea08cc19d6-55c69630d74d3ee4",
@@ -4997,7 +5000,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 10.121997d }, new[] { 5.942294d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 10.121997d }, new[] { 5.942294d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "74af62ea08cc19d6-7757e8ce980f0cf3",
@@ -5040,7 +5043,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17, 17 }, new[] { 0d }, new[] { 2.897037d }, new[] { 5.711476d, 5.718709d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17, 17 }, new[] { 0d }, new[] { 2.897037d }, new[] { 5.711476d, 5.718709d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "764da582418412f8-73876f078a285d61",
@@ -5065,7 +5068,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 26, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 18, 26, 24, 23, 23, 17, 17, 17 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.348724d, 0.48754d, 1.913988d, 1.093142d, 6.130228d }, new[] { 4.750109d, 3.152607d, 3.215117d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 26, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 18, 26, 24, 23, 23, 17, 17, 17 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.348724d, 0.48754d, 1.913988d, 1.093142d, 6.130228d }, new[] { 4.750109d, 3.152607d, 3.215117d }, 0, false, null, true, false)
                     },
                     new[] { 0, 105, 105, 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -5109,7 +5112,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 3.332527d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 3.332527d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "76842c25578f7757-40413a3d0b4d835d",
@@ -5152,7 +5155,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 42, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 37, 28, 23, 21, 22, 40, 24, 42 }, new[] { 0d, 0d, 0d, 0d }, new[] { 7.99409d, 0.834217d, 2.868432d, 2.564781d }, new[] { 4.730687d, 4.76446d, 4.458606d, 4.350832d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 42, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 37, 28, 23, 21, 22, 40, 24, 42 }, new[] { 0d, 0d, 0d, 0d }, new[] { 7.99409d, 0.834217d, 2.868432d, 2.564781d }, new[] { 4.730687d, 4.76446d, 4.458606d, 4.350832d }, 0, true, null, true, false)
                     },
                     new[] { 0, 66, 66, 77 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -5196,7 +5199,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19 }, new[] { 0d }, new[] { 20.185824d }, new[] { 5.2471d, 5.786161d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19 }, new[] { 0d }, new[] { 20.185824d }, new[] { 5.2471d, 5.786161d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "76e772d3e32e2f5c-71b81d8ddfcffc8a",
@@ -5239,7 +5242,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 16 }, new[] { 0d }, new[] { 5.889326d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 16 }, new[] { 0d }, new[] { 5.889326d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "76e772d3e32e2f5c-ef9cfa622cae4d22",
@@ -5282,7 +5285,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18 }, new[] { 0d }, new[] { 5.266429d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18 }, new[] { 0d }, new[] { 5.266429d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "77e68b16cffada7f-0b152ad5e6c41a98",
@@ -5307,7 +5310,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 13, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12, 13 }, new[] { 0d, 0d }, new[] { 3.366838d, 0.548512d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 13, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12, 13 }, new[] { 0d, 0d }, new[] { 3.366838d, 0.548512d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "7988c4d75b8900ec-b8d97aa27de91a3a",
@@ -5350,7 +5353,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 21, 21, 21, 21 }, new[] { 0d }, new[] { 19.933288d }, new[] { 11.043124d, 7.440307d, 2.809685d, 10.368005d, 7.638489d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 21, 21, 21, 21 }, new[] { 0d }, new[] { 19.933288d }, new[] { 11.043124d, 7.440307d, 2.809685d, 10.368005d, 7.638489d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "7ac165c69b541989-09cb059593079b44",
@@ -5393,7 +5396,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(45, 45, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 45, 45, 45, 45 }, new[] { 0d }, new[] { 4.050695d }, new[] { 3.790134d, 7.153076d, 3.820615d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(45, 45, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 45, 45, 45, 45 }, new[] { 0d }, new[] { 4.050695d }, new[] { 3.790134d, 7.153076d, 3.820615d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "7bdd067f27e700ad-decbf3d023100f95",
@@ -5419,8 +5422,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 7, 7, 7, 7, 7 }, new[] { 0d, 0d }, new[] { 11.382391d, 3.764574d }, new[] { 6.618774d, 6.733157d, 6.580314d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 1, 0, 3, 1279612722, (byte)0, 13.119044d, new[] { 7, 7 }, new[] { 0d }, new[] { 9.242085d }, new[] { 13.119044d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 7, 7, 7, 7, 7 }, new[] { 0d, 0d }, new[] { 11.382391d, 3.764574d }, new[] { 6.618774d, 6.733157d, 6.580314d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 1, 0, 3, 1279612722, (byte)0, 13.119044d, new[] { 7, 7 }, new[] { 0d }, new[] { 9.242085d }, new[] { 13.119044d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "7bf04ee82332d2fa-37ebb9ed51b57ea6",
@@ -5446,9 +5449,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 18, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 17, 18 }, new[] { 0d, 0d }, new[] { 2.831439d, 3.462428d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 19, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 19, 14 }, new[] { 0d, 0d }, new[] { 2.930666d, 0.720369d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 18 }, new[] { 0d }, new[] { 3.81259d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 18, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 17, 18 }, new[] { 0d, 0d }, new[] { 2.831439d, 3.462428d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 19, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 19, 14 }, new[] { 0d, 0d }, new[] { 2.930666d, 0.720369d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 18 }, new[] { 0d }, new[] { 3.81259d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "7f38449a6d737bd2-8f1ba2c3c9b39086",
@@ -5474,8 +5477,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 7 }, new[] { 0d }, new[] { 1.910254d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 13, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 13, 11 }, new[] { 0d, 0d }, new[] { 0.309551d, 2.119909d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 7 }, new[] { 0d }, new[] { 1.910254d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 13, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 13, 11 }, new[] { 0d, 0d }, new[] { 0.309551d, 2.119909d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "7fad1f11e0349abd-6511ee2030c533dd",
@@ -5518,8 +5521,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(2, 8, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 4, 5, 8, 7, 6, 2, 7, 2, 6, 4, 4, 6, 6, 8, 3, 7, 2, 5, 4, 2, 5, 2, 8, 4, 6, 7, 4, 4, 6, 3, 4, 5, 3, 4, 2, 3, 7 }, new[] { 0d, 0d, 0d, 0.001d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.533294d, 3.021037d, 2.541286d, 3.294363d, 2.739963d, 10.606132d, 2.553751d, 2.483353d, 17.096297d, 3.920506d }, new[] { 7.237182d, 7.282076d, 7.262731d, 7.249803d, 7.232647d, 7.401258d, 7.054484d, 7.312533d, 7.138795d, 7.228149d, 7.228834d, 7.414809d, 7.047611d, 7.244304d, 7.264613d, 7.257958d, 14.500486d, 7.224531d, 7.269871d, 7.235211d, 7.224809d, 7.473304d, 7.257192d, 7.382284d, 7.119387d, 7.240515d, 7.201189d }, 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 7, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 7, 5, 7 }, new[] { 0d, 0d, 0d }, new[] { 47.067646d, 45.952537d, 46.440838d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(2, 8, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 4, 5, 8, 7, 6, 2, 7, 2, 6, 4, 4, 6, 6, 8, 3, 7, 2, 5, 4, 2, 5, 2, 8, 4, 6, 7, 4, 4, 6, 3, 4, 5, 3, 4, 2, 3, 7 }, new[] { 0d, 0d, 0d, 0.001d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.533294d, 3.021037d, 2.541286d, 3.294363d, 2.739963d, 10.606132d, 2.553751d, 2.483353d, 17.096297d, 3.920506d }, new[] { 7.237182d, 7.282076d, 7.262731d, 7.249803d, 7.232647d, 7.401258d, 7.054484d, 7.312533d, 7.138795d, 7.228149d, 7.228834d, 7.414809d, 7.047611d, 7.244304d, 7.264613d, 7.257958d, 14.500486d, 7.224531d, 7.269871d, 7.235211d, 7.224809d, 7.473304d, 7.257192d, 7.382284d, 7.119387d, 7.240515d, 7.201189d }, 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 7, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 7, 5, 7 }, new[] { 0d, 0d, 0d }, new[] { 47.067646d, 45.952537d, 46.440838d }, new double[0], 0, true, null, true, true)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "82eccee02b323f4a-3408ca7897406958",
@@ -5562,7 +5565,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 4.090356d }, new[] { 4.316273d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 4.090356d }, new[] { 4.316273d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "82eccee02b323f4a-68e0e1e1c990a006",
@@ -5605,7 +5608,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.751664d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.751664d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "82eccee02b323f4a-dbff7d760eeb8d8a",
@@ -5648,7 +5651,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(43, 43, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 43 }, new[] { 0d }, new[] { 0.95059d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(43, 43, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 43 }, new[] { 0d }, new[] { 0.95059d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8463627013e24c54-998f3f8fca4b8167",
@@ -5674,7 +5677,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 4 }, new[] { 0d }, new[] { 1.958248d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 4 }, new[] { 0d }, new[] { 1.958248d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "87a2f60683a3943d-ea9679a34f531d59",
@@ -5717,7 +5720,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 48, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 35, 32, 48, 19 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.900881d, 0.449456d, 0.66644d, 2.750667d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 48, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 35, 32, 48, 19 }, new[] { 0d, 0d, 0d, 0d }, new[] { 3.900881d, 0.449456d, 0.66644d, 2.750667d }, new double[0], 0, true, null, true, false)
                     },
                     new[] { 0, 66, 66, 66 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -5761,7 +5764,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22 }, new[] { 0d, 0d }, new[] { 2.183514d, 9.099219d }, new[] { 9.485372d, 2.749857d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(22, 22, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 22, 22, 22, 22 }, new[] { 0d, 0d }, new[] { 2.183514d, 9.099219d }, new[] { 9.485372d, 2.749857d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8862442ad0440f58-29d7128dd3295e3e",
@@ -5804,7 +5807,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 26, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 17, 16, 13, 26, 12 }, new[] { 0d, 0d, 0d, 0d }, new[] { 4.490675d, 0.10995d, 4.440346d, 0.799402d }, new[] { 5.190565d, 5.152207d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 26, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 17, 16, 13, 26, 12 }, new[] { 0d, 0d, 0d, 0d }, new[] { 4.490675d, 0.10995d, 4.440346d, 0.799402d }, new[] { 5.190565d, 5.152207d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8862442ad0440f58-6e2dc55a960bb28c",
@@ -5847,7 +5850,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 19, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 15, 18, 12, 12, 17, 19, 11, 12, 19, 18, 11, 16, 16, 15, 11, 11, 11 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.499911d, 0.978791d, 3.979907d, 3.459528d, 0.269924d, 2.789821d, 3.150601d }, new[] { 5.039927d, 4.991008d, 4.989593d, 4.970468d, 4.96943d, 5.019033d, 10.000026d, 5.130884d, 4.859609d, 5.299677d, 5.482121d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 19, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 15, 18, 12, 12, 17, 19, 11, 12, 19, 18, 11, 16, 16, 15, 11, 11, 11 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.499911d, 0.978791d, 3.979907d, 3.459528d, 0.269924d, 2.789821d, 3.150601d }, new[] { 5.039927d, 4.991008d, 4.989593d, 4.970468d, 4.96943d, 5.019033d, 10.000026d, 5.130884d, 4.859609d, 5.299677d, 5.482121d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8862442ad0440f58-b2b0641a63fcbe7b",
@@ -5890,7 +5893,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 20, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 12, 17, 20, 16, 11, 11, 11, 11, 11, 11, 11, 11 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.849653d, 2.118968d, 4.900267d, 5.399598d, 5.232927d }, new[] { 5.160504d, 5.516548d, 5.165729d, 5.266037d, 5.433391d, 5.115796d, 5.267253d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 20, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 12, 17, 20, 16, 11, 11, 11, 11, 11, 11, 11, 11 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.849653d, 2.118968d, 4.900267d, 5.399598d, 5.232927d }, new[] { 5.160504d, 5.516548d, 5.165729d, 5.266037d, 5.433391d, 5.115796d, 5.267253d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8862442ad0440f58-de5fe0fa20d6a3d1",
@@ -5933,7 +5936,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 11, 11, 11 }, new[] { 0d, 0d, 0d }, new[] { 3.983442d, 2.80084d, 1.816868d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 11, 11, 11 }, new[] { 0d, 0d, 0d }, new[] { 3.983442d, 2.80084d, 1.816868d }, new double[0], 0, true, null, true, false)
                     },
                     new[] { 0, 34, 31 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -5977,7 +5980,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24, 24, 24 }, new[] { 0d }, new[] { 11.345876d }, new[] { 4.372112d, 3.811489d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24, 24, 24 }, new[] { 0d }, new[] { 11.345876d }, new[] { 4.372112d, 3.811489d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "892dfb68e6f7b990-d7204bfa4af8b4b0",
@@ -6020,7 +6023,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(56, 103, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 56, 61, 59, 63, 67, 103, 85, 92, 90 }, new[] { 0d }, new[] { 0.68d }, new[] { 3.751016d, 3.209529d, 3.530445d, 2.899875d, 3.599525d, 3.189412d, 2.860398d, 3.230276d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(56, 103, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 56, 61, 59, 63, 67, 103, 85, 92, 90 }, new[] { 0d }, new[] { 0.68d }, new[] { 3.751016d, 3.209529d, 3.530445d, 2.899875d, 3.599525d, 3.189412d, 2.860398d, 3.230276d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8ab20232a184fbd3-f13bdd0ea3a9ce5e",
@@ -6045,7 +6048,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10, 7, 7, 7, 7, 7, 7 }, new[] { 0d, 0d, 0d }, new[] { 10.783174d, 1.643506d, 1.98083d }, new[] { 4.314854d, 3.19006d, 3.056973d, 3.099916d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 10, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 10, 7, 7, 7, 7, 7, 7 }, new[] { 0d, 0d, 0d }, new[] { 10.783174d, 1.643506d, 1.98083d }, new[] { 4.314854d, 3.19006d, 3.056973d, 3.099916d }, 0, false, null, true, false)
                     },
                     new[] { 0, 11, 11 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6089,7 +6092,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(25, 25, 19, 6, 0, 3, 0, (byte)0, 3.5d, new[] { 25, 25, 25, 25 }, new[] { 0d }, new[] { 5.660601d }, new[] { 4.229971d, 4.220008d, 9.799682d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(25, 25, 19, 6, 0, 3, 0, (byte)0, 3.5d, new[] { 25, 25, 25, 25 }, new[] { 0d }, new[] { 5.660601d }, new[] { 4.229971d, 4.220008d, 9.799682d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8b40ecdf74edf8a9-f3f54c2f107b40b4",
@@ -6132,7 +6135,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(39, 45, 19, 6, 0, 3, 0, (byte)0, 3.5d, new[] { 39, 45 }, new[] { 0d }, new[] { 5.200992d }, new[] { 9.749082d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(39, 45, 19, 6, 0, 3, 0, (byte)0, 3.5d, new[] { 39, 45 }, new[] { 0d }, new[] { 5.200992d }, new[] { 9.749082d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8b54471b824c0c97-ec9d782c1f25f0f4",
@@ -6175,7 +6178,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 22, 22, 21, 22, 27, 22, 27, 27, 26 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.683513d, 16.239949d, 2.504744d, 2.071096d, 2.44958d, 1.128116d }, new[] { 2.621023d, 3.107952d, 2.713657d, 3.241507d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 27, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 22, 22, 21, 22, 27, 22, 27, 27, 26 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 1.683513d, 16.239949d, 2.504744d, 2.071096d, 2.44958d, 1.128116d }, new[] { 2.621023d, 3.107952d, 2.713657d, 3.241507d }, 0, true, null, true, false)
                     },
                     new[] { 52, 52, 7, 52, 52, 52 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6219,7 +6222,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 3.185308d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 3.185308d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8bd8ca936bf5aab4-900bd9d4e4558df5",
@@ -6262,7 +6265,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.961546d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15 }, new[] { 0d }, new[] { 3.961546d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "8dae5024f999475e-03dc0b29328f8462",
@@ -6305,7 +6308,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14, 14, 14 }, new[] { 0d, 0d }, new[] { 13.66264d, 0.790509d }, new[] { 4.45973d, 4.551471d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 14, 14, 14 }, new[] { 0d, 0d }, new[] { 13.66264d, 0.790509d }, new[] { 4.45973d, 4.551471d }, 0, true, null, true, false)
                     },
                     new[] { 0, 13 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6331,7 +6334,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 26, -1, 0, 0, 3, 1397315377, (byte)0, 5.070275d, new[] { 16, 16, 16, 11, 26 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.619144d, 3.600325d, 2.68383d, 1.916506d }, new[] { 5.070275d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 26, -1, 0, 0, 3, 1397315377, (byte)0, 5.070275d, new[] { 16, 16, 16, 11, 26 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.619144d, 3.600325d, 2.68383d, 1.916506d }, new[] { 5.070275d }, 0, false, null, true, false)
                     },
                     new[] { 0, 49, 0, 37 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6375,7 +6378,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 17 }, new[] { 0.001d }, new[] { 2.717539d }, new[] { 5.52917d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 14, 17 }, new[] { 0.001d }, new[] { 2.717539d }, new[] { 5.52917d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "92a71de337c6ddab-64fa18a98612853b",
@@ -6418,7 +6421,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.815979d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.815979d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "92bf3b156e202a51-15eb379115a2f2ef",
@@ -6461,7 +6464,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24, 24, 24 }, new[] { 0d, 0d }, new[] { 13.556696d, 1.957539d }, new[] { 21.047477d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24, 24, 24 }, new[] { 0d, 0d }, new[] { 13.556696d, 1.957539d }, new[] { 21.047477d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "92bf3b156e202a51-7b232d1f57445bdc",
@@ -6504,7 +6507,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(24, 49, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 27, 29, 43, 24, 40, 49, 44, 34, 31, 41 }, new[] { 0d }, new[] { 1.715035d }, new[] { 0.000832d, 4.136154d, 4.150172d, 9.630554d, 8.669765d, 4.169658d, 4.180482d, 4.139616d, 4.130052d, 4.149976d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(24, 49, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 27, 27, 29, 43, 24, 40, 49, 44, 34, 31, 41 }, new[] { 0d }, new[] { 1.715035d }, new[] { 0.000832d, 4.136154d, 4.150172d, 9.630554d, 8.669765d, 4.169658d, 4.180482d, 4.139616d, 4.130052d, 4.149976d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9385ca5dee3a806b-decbf3d023100f95",
@@ -6530,9 +6533,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 11, -1, 0, 0, 3, 1279612721, (byte)0, 6.575659d, new[] { 10, 7, 7, 11, 7, 8, 4, 4 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.178278d, 1.17308d, 2.284673d, 3.337481d, 2.348532d, 1.241519d, 4.345241d }, new[] { 6.575659d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 11, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 11, 10, 5, 11, 4, 4 }, new[] { 0d, 0d, 0d, 0d }, new[] { 2.457837d, 0.483211d, 1.707646d, 8.853548d }, new[] { 5.153195d, 6.498305d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 11, -1, 0, 0, 3, 1279612721, (byte)0, 6.575659d, new[] { 10, 7, 7, 11, 7, 8, 4, 4 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.178278d, 1.17308d, 2.284673d, 3.337481d, 2.348532d, 1.241519d, 4.345241d }, new[] { 6.575659d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 11, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 11, 10, 5, 11, 4, 4 }, new[] { 0d, 0d, 0d, 0d }, new[] { 2.457837d, 0.483211d, 1.707646d, 8.853548d }, new[] { 5.153195d, 6.498305d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 63, 63, 66, 63, 66, 66, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "947eb7806de2ef00-370328526bcb32c7",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|12878|5d1795a45a6f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|12977|fc85855acec3; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|12879|55022a46d224,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|12978|427202887aaa; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|12927|442c11237c0a,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|13021|882b9d1b98c4,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|13095|fa19cd0eb848",
@@ -6556,7 +6560,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 15, -1, 0, 0, 3, 1397315377, (byte)0, 4.78033d, new[] { 11, 11, 15 }, new[] { 0d, 0d }, new[] { 3.218993d, 2.769441d }, new[] { 4.78033d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 15, -1, 0, 0, 3, 1397315377, (byte)0, 4.78033d, new[] { 11, 11, 15 }, new[] { 0d, 0d }, new[] { 3.218993d, 2.769441d }, new[] { 4.78033d }, 0, false, null, true, false)
                     },
                     new[] { 0, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6600,7 +6604,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21 }, new[] { 0d }, new[] { 5.766625d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 21, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21 }, new[] { 0d }, new[] { 5.766625d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "95d366ebb4f855e2-9bcb7a58208cf1e0",
@@ -6625,7 +6629,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 24, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14, 13, 12, 17, 10, 12, 16, 18, 14, 14, 15, 18, 18, 24, 17, 13, 17 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.850385d, 3.419242d, 0.17078d, 1.071171d, 3.119991d, 0.54004d, 1.460018d, 5.159765d, 2.019877d, 2.819851d }, new[] { 5.271904d, 4.610298d, 4.950035d, 4.878814d, 5.299685d, 5.200288d, 4.940604d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 24, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14, 13, 12, 17, 10, 12, 16, 18, 14, 14, 15, 18, 18, 24, 17, 13, 17 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.850385d, 3.419242d, 0.17078d, 1.071171d, 3.119991d, 0.54004d, 1.460018d, 5.159765d, 2.019877d, 2.819851d }, new[] { 5.271904d, 4.610298d, 4.950035d, 4.878814d, 5.299685d, 5.200288d, 4.940604d }, 0, false, null, true, false)
                     },
                     new[] { 0, 0, 49, 49, 0, 46, 46, 46, 46, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6669,7 +6673,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26 }, new[] { 0d }, new[] { 5.350776d }, new[] { 7.655752d, 7.621288d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26 }, new[] { 0d }, new[] { 5.350776d }, new[] { 7.655752d, 7.621288d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "961e29c05a4b8326-19d6799a05d23514",
@@ -6695,8 +6699,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 5, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5 }, new[] { 0d }, new[] { 10.759692d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 10 }, new[] { 0d }, new[] { 8.479164d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 5, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5 }, new[] { 0d }, new[] { 10.759692d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 10 }, new[] { 0d }, new[] { 8.479164d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "963ecf2aa60f045c-de110ebeb7e358cd",
@@ -6721,8 +6725,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 0, 4, 3, 1397315377, (byte)0, 0d, new[] { 26 }, new[] { 0d }, new[] { 33.000651d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(13, 29, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 28, 23, 15, 27, 29, 16, 21, 16, 17, 29, 13, 14, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.229502d, 2.689793d, 3.899835d, 2.373371d, 1.710553d, 0.439822d, 2.16609d, 3.04982d, 8.123701d }, new[] { 4.699917d, 5.070521d, 4.899745d, 5.009931d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 0, 4, 3, 1397315377, (byte)0, 0d, new[] { 26 }, new[] { 0d }, new[] { 33.000651d }, new double[0], 0, false, null, true, true),
+                        new CapturedEnemyCombatProfileStreamDefinition(13, 29, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 28, 23, 15, 27, 29, 16, 21, 16, 17, 29, 13, 14, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.229502d, 2.689793d, 3.899835d, 2.373371d, 1.710553d, 0.439822d, 2.16609d, 3.04982d, 8.123701d }, new[] { 4.699917d, 5.070521d, 4.899745d, 5.009931d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "96caf73786039de8-7e31afc8bb1eceb3",
@@ -6747,7 +6751,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(39, 39, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 39 }, new[] { 0d }, new[] { 0.716066d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(39, 39, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 39 }, new[] { 0d }, new[] { 0.716066d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "974fe9276d707f6f-77e0b56404d6eb86",
@@ -6790,7 +6794,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.249903d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.249903d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9bad6a082b52dbbd-eb61ba4157ded52e",
@@ -6833,7 +6837,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 44, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 21, 37, 44, 36, 37, 37, 37, 37, 37, 37 }, new[] { 0d, 0d, 0d }, new[] { 3.290825d, 0.940504d, 2.708413d }, new[] { 3.172961d, 6.044739d, 2.964833d, 2.962448d, 2.999983d, 2.975759d, 3.031188d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 44, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 21, 37, 44, 36, 37, 37, 37, 37, 37, 37 }, new[] { 0d, 0d, 0d }, new[] { 3.290825d, 0.940504d, 2.708413d }, new[] { 3.172961d, 6.044739d, 2.964833d, 2.962448d, 2.999983d, 2.975759d, 3.031188d }, 0, true, null, true, false)
                     },
                     new[] { 0, 82, 37 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -6877,7 +6881,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 2.414326d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 2.414326d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9c09e27f8152019e-9733e047ccd9bc1d",
@@ -6902,9 +6906,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 22, -1, 0, 0, 3, 1145919558, (byte)0, 5.633024d, new[] { 15, 15, 12, 12, 12, 12, 22, 22 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.516121d, 8.516121d, 2.191522d, 2.19152d, 5.299939d, 5.300941d }, new[] { 5.633024d, 5.633024d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 22, -1, 0, 0, 3, 1145919558, (byte)0, 5.633024d, new[] { 15, 15, 12, 12, 12, 12, 22, 22 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.516121d, 8.516121d, 2.191522d, 2.19152d, 5.299939d, 5.300941d }, new[] { 5.633024d, 5.633024d }, 0, false, null, true, false)
                     },
-                    new[] { 0, 0, 34, 34, 34, 34 }),
+                    new[] { 0, 34, 34, 0, 34, 34 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9c5706fc671cbac5-57c871f8212c0bb1",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|621|2a0db5cff5ce; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3406|e3c72280cda2; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3407|d60c36b13968; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3460|b91c16ebcd91,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3659|aaffb596d51c,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|3855|029d0553e2a2",
@@ -6946,7 +6950,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 15 }, new[] { 0d }, new[] { 1.620258d }, new[] { 4.05934d, 3.750494d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 15, 15 }, new[] { 0d }, new[] { 1.620258d }, new[] { 4.05934d, 3.750494d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9d2198eaf47fd672-d1a43246b8c374fb",
@@ -6989,7 +6993,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 10 }, new[] { 0d }, new[] { 2.039925d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 10 }, new[] { 0d }, new[] { 2.039925d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "9e402946526c7a7d-9523e84139c96f2b",
@@ -7015,8 +7019,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4, 4, 4 }, new[] { 0d, 0d, 0d }, new[] { 5.766006d, 6.282638d, 5.866948d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 26, 26 }, new[] { 0d, 0d }, new[] { 4.115826d, 4.850259d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4, 4, 4 }, new[] { 0d, 0d, 0d }, new[] { 5.766006d, 6.282638d, 5.866948d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 26, 26 }, new[] { 0d, 0d }, new[] { 4.115826d, 4.850259d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a518fde81b921108-3a8039b259753d35",
@@ -7059,7 +7063,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(20, 20, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 20 }, new[] { 0d }, new[] { 3.020028d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(20, 20, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 20 }, new[] { 0d }, new[] { 3.020028d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a631010e67f24903-0bb5ffe744d13dff",
@@ -7085,8 +7089,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4 }, new[] { 0d }, new[] { 4.833773d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(37, 37, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 37 }, new[] { 0d }, new[] { 3.782794d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 4, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 4 }, new[] { 0d }, new[] { 4.833773d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(37, 37, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 37 }, new[] { 0d }, new[] { 3.782794d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a6354fe1615bcdfd-955888fcfdcdc71a",
@@ -7129,7 +7133,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 1.827062d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 1.827062d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a7299bdccc469543-064305180fc7f1ad",
@@ -7154,7 +7158,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14 }, new[] { 0d }, new[] { 1.110531d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 14, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14 }, new[] { 0d }, new[] { 1.110531d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a78f71dca01a79e9-2d3679422f861499",
@@ -7179,7 +7183,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 19, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 15, 19 }, new[] { 0d, 0d }, new[] { 2.993841d, 7.970192d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 19, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 15, 19 }, new[] { 0d, 0d }, new[] { 2.993841d, 7.970192d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a84eedad1a598b40-c4f21242a4a7ba96",
@@ -7222,7 +7226,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 23 }, new[] { 0d }, new[] { 6.757534d }, new[] { 4.265625d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 23 }, new[] { 0d }, new[] { 6.757534d }, new[] { 4.265625d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a867d5624faafcec-2125d88ca85e181c",
@@ -7265,7 +7269,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23 }, new[] { 0d }, new[] { 2.100003d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23 }, new[] { 0d }, new[] { 2.100003d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a867d5624faafcec-8fb16c7c66cd28fc",
@@ -7308,7 +7312,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 8.584313d }, new[] { 7.658567d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 8.584313d }, new[] { 7.658567d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a86b0e029ea2ec0a-f36e634698521306",
@@ -7333,9 +7337,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 13, 13, 11, 11, 12, 12, 12, 12, 11, 12, 12, 13, 14, 12, 12, 12, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 14.546393d, 8.145801d, 8.860334d, 8.143801d, 1.100508d, 1.099508d, 0.100001d, 1.616741d, 0.684506d, 0.683506d, 0.150999d, 1.600447d }, new[] { 11.600187d, 5.733082d, 5.867102d, 5.684055d, 5.798597d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 21, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 13, 13, 11, 11, 12, 12, 12, 12, 11, 12, 12, 13, 14, 12, 12, 12, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 14.546393d, 8.145801d, 8.860334d, 8.143801d, 1.100508d, 1.099508d, 0.100001d, 1.616741d, 0.684506d, 0.683506d, 0.150999d, 1.600447d }, new[] { 11.600187d, 5.733082d, 5.867102d, 5.684055d, 5.798597d }, 0, false, null, true, false)
                     },
-                    new[] { 0, 0, 0, 0, 28, 28, 28, 28, 28, 28, 28, 28 }),
+                    new[] { 0, 0, 28, 28, 28, 28, 28, 28, 0, 0, 28, 28 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a9d8950a9c1ecc18-7f2f30e11d41b30e",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12675|ecd59d345b2e; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12676|f3adf23eef06; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12692|047254f9ad48",
@@ -7359,7 +7363,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19 }, new[] { 0d }, new[] { 0.632429d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 19 }, new[] { 0d }, new[] { 0.632429d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "a9e27de26c24fc0b-5c8f4c3638fcd560",
@@ -7384,7 +7388,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 12.549213d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 12.549213d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "aaead18ed8cbeecd-be1311889f1967d1",
@@ -7427,7 +7431,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26 }, new[] { 0d }, new[] { 13.488262d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26 }, new[] { 0d }, new[] { 13.488262d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "ab85b62ee4bcbb3e-8fd724e1b4560300",
@@ -7470,7 +7474,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 12, 12 }, new[] { 0d }, new[] { 13.716312d }, new[] { 15.948635d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 12, 12 }, new[] { 0d }, new[] { 13.716312d }, new[] { 15.948635d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "abcad39356c40905-a60091518e8654c5",
@@ -7495,7 +7499,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(3, 13, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 13, 13, 10, 10, 13, 9, 9, 9, 3 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.409764d, 0.26124d, 2.250801d, 2.100407d, 2.948759d }, new[] { 5.950416d, 5.079568d, 5.730171d, 11.578849d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(3, 13, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 13, 13, 10, 10, 13, 9, 9, 9, 3 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 1.409764d, 0.26124d, 2.250801d, 2.100407d, 2.948759d }, new[] { 5.950416d, 5.079568d, 5.730171d, 11.578849d }, 0, false, null, true, false)
                     },
                     new[] { 43, 31, 0, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -7522,9 +7526,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 28 }, new[] { 0d }, new[] { 1.847332d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(2, 2, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 2, 2, 2 }, new[] { 0d }, new[] { 3.709824d }, new[] { 8.590879d, 9.001341d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(3, 3, -1, 0, 0, 3, 1296389937, (byte)0, 8.999781d, new[] { 3, 3 }, new[] { 0d }, new[] { 6.350161d }, new[] { 8.999781d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 28 }, new[] { 0d }, new[] { 1.847332d }, new double[0], 0, false, null, true, true),
+                        new CapturedEnemyCombatProfileStreamDefinition(2, 2, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 2, 2, 2 }, new[] { 0d }, new[] { 3.709824d }, new[] { 8.590879d, 9.001341d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(3, 3, -1, 0, 0, 3, 1296389937, (byte)0, 8.999781d, new[] { 3, 3 }, new[] { 0d }, new[] { 6.350161d }, new[] { 8.999781d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b07cc6a46f13664f-8e90c740f8e6bbe0",
@@ -7567,7 +7571,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(20, 25, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 24, 24, 25, 20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 13.812658d, 10.267652d, 2.017497d, 1.69059d, 2.928905d, 0.765507d, 1.581507d }, new[] { 2.94019d, 2.622002d, 2.840264d, 5.721154d, 2.841902d, 2.978649d, 2.660123d, 2.889621d, 2.81467d, 2.820554d, 2.83297d, 2.834741d, 3.027249d, 2.660511d, 16.56867d, 3.725174d, 7.453329d, 6.153623d, 2.928749d, 2.847167d, 2.877462d, 2.838891d, 3.37569d, 3.06975d, 2.648999d, 2.909555d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(20, 25, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 24, 24, 25, 20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 13.812658d, 10.267652d, 2.017497d, 1.69059d, 2.928905d, 0.765507d, 1.581507d }, new[] { 2.94019d, 2.622002d, 2.840264d, 5.721154d, 2.841902d, 2.978649d, 2.660123d, 2.889621d, 2.81467d, 2.820554d, 2.83297d, 2.834741d, 3.027249d, 2.660511d, 16.56867d, 3.725174d, 7.453329d, 6.153623d, 2.928749d, 2.847167d, 2.877462d, 2.838891d, 3.37569d, 3.06975d, 2.648999d, 2.909555d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b0c41cb2de4ee8e2-b5973540c7a7d356",
@@ -7592,7 +7596,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(47, 47, -1, 0, 0, 3, 1465538645, (byte)0, 0d, new[] { 47, 47, 47, 47 }, new[] { 0d }, new[] { 4.892075d }, new[] { 3.770001d, 12.832384d, 3.70171d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(47, 47, -1, 0, 0, 3, 1465538645, (byte)0, 0d, new[] { 47, 47, 47, 47 }, new[] { 0d }, new[] { 4.892075d }, new[] { 3.770001d, 12.832384d, 3.70171d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b36cc51994a5c80f-0a582196e3a4980f",
@@ -7618,10 +7622,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(216, 340, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 304, 241, 267, 313, 327, 249, 297, 315, 307, 216, 262, 267, 302, 276, 321, 294, 299, 238, 340, 250 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.000998d, 0d, 0d, 0d, 0.190999d, 0d, 0.220999d, 0d }, new[] { 6.499227d, 4.099999d, 0.309857d, 2.287983d, 2.864901d, 2.679046d, 2.732047d, 2.439969d, 3.112172d, 2.72053d, 1.414025d, 2.825527d, 2.40687d, 2.651658d, 3.132525d, 2.894651d, 1.207014d, 2.68554d, 2.495039d, 2.929803d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(207, 340, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 240, 296, 286, 286, 234, 246, 340, 285, 319, 215, 261, 226, 287, 207 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.216001d, 0d, 0d, 0.19d, 0d, 0d }, new[] { 39.241995d, 1.353011d, 1.129011d, 1.293361d, 2.307016d, 1.322878d, 1.552464d, 1.363699d, 1.891d, 1.321017d, 2.777891d, 2.459993d, 4.992106d, 1.542042d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(190, 338, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 211, 190, 279, 326, 279, 210, 221, 322, 237, 278, 322, 258, 220, 192, 309, 232, 258, 191, 206, 249, 257, 336, 312, 287, 253, 228, 226, 230, 302, 292, 300, 233, 293, 301, 338, 243, 272, 320, 210, 202, 331, 298, 325, 277, 211, 322, 211, 221, 328, 218 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.001001d, 0d, 0d, 0d, 0d, 0d, 0d, 0.000998d, 0d, 0d, 0d, 0d, 0d, 0d, 0.190999d, 0d, 0.220999d, 0d, 0d, 0d }, new[] { 2.070577d, 5.239337d, 0.700256d, 1.520293d, 2.939476d, 2.289544d, 1.490436d, 3.220264d, 1.084966d, 1.360672d, 1.326505d, 1.189505d, 1.243525d, 1.794009d, 1.233428d, 1.769666d, 1.340765d, 1.215014d, 1.205011d, 0.290508d, 1.565015d, 0.690071d, 1.440023d, 1.161507d, 1.047505d, 1.214614d, 1.413011d, 1.517021d, 1.537016d, 1.23176d, 1.054017d, 0d, 1.507447d, 0.943023d, 0.901d, 1.428792d, 1.566516d }, new[] { 3.258602d, 2.810305d, 3.769879d, 6.400295d, 3.2804d, 3.100255d, 3.280042d, 3.289846d, 3.24056d, 3.349221d, 6.600565d, 3.290736d, 3.388801d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(198, 328, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 278, 270, 288, 328, 299, 268, 207, 322, 198, 268, 200, 203, 312, 232, 295, 224, 263, 323, 221, 249, 287, 251, 235, 248, 241, 240, 281 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.381001d, 0d, 0.216001d, 0d, 0.19d, 0d, 0d }, new[] { 3.179876d, 2.609575d, 0.799531d, 6.529776d, 2.720599d, 0.890599d, 0.452512d, 0.273d, 1.120507d, 1.042982d, 0.471167d, 0.668d, 1.23101d, 1.311485d, 1.368016d, 2.655051d }, new[] { 3.539411d, 3.241007d, 3.510762d, 6.700171d, 3.24017d, 3.179372d, 3.280823d, 3.299391d, 3.310414d, 3.420376d, 9.87949d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(216, 340, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 304, 241, 267, 313, 327, 249, 297, 315, 307, 216, 262, 267, 302, 276, 321, 294, 299, 238, 340, 250 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.000998d, 0d, 0d, 0d, 0.190999d, 0d, 0.220999d, 0d }, new[] { 6.499227d, 4.099999d, 0.309857d, 2.287983d, 2.864901d, 2.679046d, 2.732047d, 2.439969d, 3.112172d, 2.72053d, 1.414025d, 2.825527d, 2.40687d, 2.651658d, 3.132525d, 2.894651d, 1.207014d, 2.68554d, 2.495039d, 2.929803d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(207, 340, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 240, 296, 286, 286, 234, 246, 340, 285, 319, 215, 261, 226, 287, 207 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.216001d, 0d, 0d, 0.19d, 0d, 0d }, new[] { 39.241995d, 1.353011d, 1.129011d, 1.293361d, 2.307016d, 1.322878d, 1.552464d, 1.363699d, 1.891d, 1.321017d, 2.777891d, 2.459993d, 4.992106d, 1.542042d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(190, 338, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 211, 190, 279, 326, 279, 210, 221, 322, 237, 278, 322, 258, 220, 192, 309, 232, 258, 191, 206, 249, 257, 336, 312, 287, 253, 228, 226, 230, 302, 292, 300, 233, 293, 301, 338, 243, 272, 320, 210, 202, 331, 298, 325, 277, 211, 322, 211, 221, 328, 218 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.001001d, 0d, 0d, 0d, 0d, 0d, 0d, 0.000998d, 0d, 0d, 0d, 0d, 0d, 0d, 0.190999d, 0d, 0.220999d, 0d, 0d, 0d }, new[] { 2.070577d, 5.239337d, 0.700256d, 1.520293d, 2.939476d, 2.289544d, 1.490436d, 3.220264d, 1.084966d, 1.360672d, 1.326505d, 1.189505d, 1.243525d, 1.794009d, 1.233428d, 1.769666d, 1.340765d, 1.215014d, 1.205011d, 0.290508d, 1.565015d, 0.690071d, 1.440023d, 1.161507d, 1.047505d, 1.214614d, 1.413011d, 1.517021d, 1.537016d, 1.23176d, 1.054017d, 0d, 1.507447d, 0.943023d, 0.901d, 1.428792d, 1.566516d }, new[] { 3.258602d, 2.810305d, 3.769879d, 6.400295d, 3.2804d, 3.100255d, 3.280042d, 3.289846d, 3.24056d, 3.349221d, 6.600565d, 3.290736d, 3.388801d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(198, 328, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 278, 270, 288, 328, 299, 268, 207, 322, 198, 268, 200, 203, 312, 232, 295, 224, 263, 323, 221, 249, 287, 251, 235, 248, 241, 240, 281 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.381001d, 0d, 0.216001d, 0d, 0.19d, 0d, 0d }, new[] { 3.179876d, 2.609575d, 0.799531d, 6.529776d, 2.720599d, 0.890599d, 0.452512d, 0.273d, 1.120507d, 1.042982d, 0.471167d, 0.668d, 1.23101d, 1.311485d, 1.368016d, 2.655051d }, new[] { 3.539411d, 3.241007d, 3.510762d, 6.700171d, 3.24017d, 3.179372d, 3.280823d, 3.299391d, 3.310414d, 3.420376d, 9.87949d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b43e8bf3355880a0-99773b9042d7deb2",
@@ -7646,7 +7650,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(2, 8, -1, 0, 0, 3, 1363891017, (byte)0, 0d, new[] { 7, 8, 8, 6, 3, 4, 3, 3, 7, 5, 2, 5, 4, 7, 4, 2, 3, 4, 3, 2, 7, 8, 6, 3, 2, 5, 2, 7, 2, 2, 8, 6, 6, 5, 3, 5, 7, 4, 7, 4, 4, 7, 7, 6, 8, 3, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.001d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.200809d, 3.78106d, 11.384463d, 18.382861d, 10.472564d, 11.265344d, 3.673672d, 4.619787d, 10.470444d, 10.449917d, 26.535578d, 2.760244d, 11.170903d, 12.171526d, 3.278835d, 3.86681d, 19.274863d, 3.974155d, 2.488895d, 10.280536d, 11.46395d, 19.562859d, 10.693385d, 34.484281d, 10.104407d, 18.837776d, 34.912568d, 11.197755d, 11.28154d, 3.928992d }, new[] { 0.001002d, 7.822179d, 15.413827d, 15.452156d, 7.755801d, 23.129682d, 15.439945d, 7.614724d, 7.689708d, 15.404405d, 23.152475d, 15.353198d, 15.560768d, 7.719414d, 15.415981d, 7.691574d, 7.725755d, 15.332021d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(2, 8, -1, 0, 0, 3, 1363891017, (byte)0, 0d, new[] { 7, 8, 8, 6, 3, 4, 3, 3, 7, 5, 2, 5, 4, 7, 4, 2, 3, 4, 3, 2, 7, 8, 6, 3, 2, 5, 2, 7, 2, 2, 8, 6, 6, 5, 3, 5, 7, 4, 7, 4, 4, 7, 7, 6, 8, 3, 6, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.001d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.200809d, 3.78106d, 11.384463d, 18.382861d, 10.472564d, 11.265344d, 3.673672d, 4.619787d, 10.470444d, 10.449917d, 26.535578d, 2.760244d, 11.170903d, 12.171526d, 3.278835d, 3.86681d, 19.274863d, 3.974155d, 2.488895d, 10.280536d, 11.46395d, 19.562859d, 10.693385d, 34.484281d, 10.104407d, 18.837776d, 34.912568d, 11.197755d, 11.28154d, 3.928992d }, new[] { 0.001002d, 7.822179d, 15.413827d, 15.452156d, 7.755801d, 23.129682d, 15.439945d, 7.614724d, 7.689708d, 15.404405d, 23.152475d, 15.353198d, 15.560768d, 7.719414d, 15.415981d, 7.691574d, 7.725755d, 15.332021d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b5c4f69be6c935c1-dff237f379f8f4dc",
@@ -7672,8 +7676,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(29, 29, -1, 0, 0, 3, 1397446449, (byte)0, 0d, new[] { 29 }, new[] { 0d }, new[] { 11.615783d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 1, 0, 3, 1397446450, (byte)0, 0d, new[] { 23 }, new[] { 0d }, new[] { 1.900586d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(29, 29, -1, 0, 0, 3, 1397446449, (byte)0, 0d, new[] { 29 }, new[] { 0d }, new[] { 11.615783d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 1, 0, 3, 1397446450, (byte)0, 0d, new[] { 23 }, new[] { 0d }, new[] { 1.900586d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b5f528b4207c2706-d5b032bb2f1a55b8",
@@ -7716,7 +7720,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(45, 45, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 45 }, new[] { 0d }, new[] { 7.636306d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(45, 45, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 45 }, new[] { 0d }, new[] { 7.636306d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b73196d6390cb04e-36542c39514bffc3",
@@ -7759,7 +7763,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, new[] { 0d }, new[] { 4.979359d }, new[] { 4.250615d, 3.12953d, 6.200538d, 3.10044d, 3.119873d, 3.379527d, 2.800022d, 3.109788d, 3.089771d, 8.010325d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 }, new[] { 0d }, new[] { 4.979359d }, new[] { 4.250615d, 3.12953d, 6.200538d, 3.10044d, 3.119873d, 3.379527d, 2.800022d, 3.109788d, 3.089771d, 8.010325d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b73196d6390cb04e-f75f789a125e1112",
@@ -7802,7 +7806,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 1.838722d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 1.838722d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b7a9f2fa5901b542-1a1c4a09ea74f89c",
@@ -7845,7 +7849,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 8.419103d }, new[] { 5.727474d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17 }, new[] { 0d }, new[] { 8.419103d }, new[] { 5.727474d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b805e5cfffcc408e-743b441ee7c72a09",
@@ -7888,9 +7892,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 30, 30, 15, 21, 16 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 2.34399d, 2.330989d, 1.166525d, 1.931003d, 4.484472d }, new[] { 4.816895d, 4.816895d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 21, 30, 30, 15, 21, 16 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 2.34399d, 2.330989d, 1.166525d, 1.931003d, 4.484472d }, new[] { 4.816895d, 4.816895d }, 0, true, null, true, false)
                     },
-                    new[] { 0, 0, 46, 46, 46 }),
+                    new[] { 0, 46, 46, 46, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b808b0f2aeddf6bd-c64492f613e72516",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54577|f9926171004f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55343|275870c9112e; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54649|9bf7583fa5a0,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55421|02f5d3cb571a; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54651|3509e4187784,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55423|d11304349ac6; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|54668|61731aaa4301,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55476|6a446963f70e,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55506|53bf406aaa52,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|55536|49e563ba0ef0",
@@ -7932,7 +7936,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 9, 17, 17, 12 }, new[] { 0d, 0d }, new[] { 3.229726d, 8.825491d }, new[] { 5.653554d, 5.61412d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 9, 17, 17, 12 }, new[] { 0d, 0d }, new[] { 3.229726d, 8.825491d }, new[] { 5.653554d, 5.61412d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "b87cb77ab0e1833d-729890c01f4adbfa",
@@ -7957,7 +7961,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 37, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 26, 30, 21, 26, 17, 35, 37, 26, 33, 22, 21, 27, 28, 29, 21, 26, 26, 17, 16, 25, 21, 28, 29, 20 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.066056d, 0.450198d, 1.565946d, 0.699288d, 0.684001d, 7.233228d, 3.499382d, 1.850209d, 2.666747d, 1.499178d, 0d }, new[] { 5.516322d, 5.566738d, 5.549458d, 5.350113d, 4.699938d, 5.13347d, 5.166038d, 5.166757d, 4.749752d, 4.81585d, 4.766319d, 4.700482d, 4.865792d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 37, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 26, 30, 21, 26, 17, 35, 37, 26, 33, 22, 21, 27, 28, 29, 21, 26, 26, 17, 16, 25, 21, 28, 29, 20 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 8.066056d, 0.450198d, 1.565946d, 0.699288d, 0.684001d, 7.233228d, 3.499382d, 1.850209d, 2.666747d, 1.499178d, 0d }, new[] { 5.516322d, 5.566738d, 5.549458d, 5.350113d, 4.699938d, 5.13347d, 5.166038d, 5.166757d, 4.749752d, 4.81585d, 4.766319d, 4.700482d, 4.865792d }, 0, false, null, true, false)
                     },
                     new[] { 0, 37, 66, 57, 42, 0, 42, 42, 42, 42, 42 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -8001,7 +8005,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 8.299893d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 8.299893d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "ba3b8c1950020e4e-54c89f30cf5c3f33",
@@ -8044,7 +8048,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 31, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 31, 31, 31, 30, 30 }, new[] { 0d, 0d }, new[] { 2.209412d, 29.779118d }, new[] { 9.961122d, 3.070028d, 7.934646d, 10.262604d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 31, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 31, 31, 31, 30, 30 }, new[] { 0d, 0d }, new[] { 2.209412d, 29.779118d }, new[] { 9.961122d, 3.070028d, 7.934646d, 10.262604d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "bdeca087687c6087-de72e99010e5a0ec",
@@ -8087,7 +8091,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(21, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 30 }, new[] { 0d }, new[] { 2.319516d }, new[] { 3.579418d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(21, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 21, 30 }, new[] { 0d }, new[] { 2.319516d }, new[] { 3.579418d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "c384b7027842ef47-6420b0f90fc9019f",
@@ -8130,7 +8134,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.014172d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 124, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 3.014172d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "c394997375b95022-29e8c0711094782c",
@@ -8173,7 +8177,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 23, 23, 23, 23, 23, 23 }, new[] { 0d }, new[] { 2.703081d }, new[] { 8.62659d, 8.082285d, 8.729494d, 3.995579d, 4.250281d, 4.296249d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(23, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 23, 23, 23, 23, 23, 23 }, new[] { 0d }, new[] { 2.703081d }, new[] { 8.62659d, 8.082285d, 8.729494d, 3.995579d, 4.250281d, 4.296249d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "c75b256b0b85f4f7-de110ebeb7e358cd",
@@ -8198,7 +8202,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12 }, new[] { 0d }, new[] { 1.83386d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12 }, new[] { 0d }, new[] { 1.83386d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "c75fb420ee0ef7a1-1cba8d59c59287f8",
@@ -8224,9 +8228,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(73, 123, -1, 1, 0, 3, 1481592922, (byte)0, 0d, new[] { 93, 97, 86, 89, 73, 81, 79, 75, 95, 74, 82, 93, 123, 77, 77, 96, 78 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 5.850101d, 3.581335d, 1.734601d, 0.944447d, 5.870361d, 3.650021d, 2.500003d, 5.209268d }, new[] { 6.587119d, 3.90575d, 1.987218d, 3.425454d, 4.309808d, 2.269434d, 5.200246d, 2.359889d, 5.139656d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(110, 138, -1, 0, 0, 3, 1145392727, (byte)0, 0d, new[] { 124, 118, 117, 115, 110, 125, 123, 138, 115, 125 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.800748d, 3.211129d, 4.181175d, 0.579804d, 3.208985d }, new[] { 11.439537d, 5.426571d, 4.065232d, 4.948738d, 7.860676d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(73, 123, -1, 1, 0, 3, 1481592922, (byte)0, 0d, new[] { 93, 97, 86, 89, 73, 81, 79, 75, 95, 74, 82, 93, 123, 77, 77, 96, 78 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 5.850101d, 3.581335d, 1.734601d, 0.944447d, 5.870361d, 3.650021d, 2.500003d, 5.209268d }, new[] { 6.587119d, 3.90575d, 1.987218d, 3.425454d, 4.309808d, 2.269434d, 5.200246d, 2.359889d, 5.139656d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(110, 138, -1, 0, 0, 3, 1145392727, (byte)0, 0d, new[] { 124, 118, 117, 115, 110, 125, 123, 138, 115, 125 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 3.800748d, 3.211129d, 4.181175d, 0.579804d, 3.208985d }, new[] { 11.439537d, 5.426571d, 4.065232d, 4.948738d, 7.860676d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 95, 144, 95, 0, 55, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "c98b015d7a3869d0-d3cc0d362e8c9eb8",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1046|63ab25d2dade,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1179|08b2a9ac184f,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1276|0483fc3f7c8b,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|863|785c2afddd41; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1047|495132403ff7,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1180|605c957027c8,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1277|b1abb8111da6,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|864|7ff0d86e1991; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|981|62e94dc52aab,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1056|901b7fe66f48,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1136|24ffb726666d,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1222|b702b73b7cac,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1306|fdebf443ec75",
@@ -8250,7 +8255,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1145196631, (byte)0, 3.783895d, new[] { 6, 7, 9, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 7.115817d, 0.466314d, 1.999918d, 1.484254d }, new[] { 3.783895d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1145196631, (byte)0, 3.783895d, new[] { 6, 7, 9, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 7.115817d, 0.466314d, 1.999918d, 1.484254d }, new[] { 3.783895d }, 0, false, null, true, false)
                     },
                     new[] { 5, 51, 27, 45 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -8277,10 +8282,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 15, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 10, 9, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 9, 14, 14, 15, 11, 9, 10, 14, 11, 12, 11 }, new[] { 0d, 0.001001d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 10.687427d, 4.153966d, 11.455206d, 3.875826d, 25.87682d, 10.527612d, 8.645087d, 5.099972d }, new[] { 19.667361d, 12.918198d, 6.878923d, 25.886355d, 6.849665d, 6.212903d, 6.349493d, 6.584167d, 5.901523d, 6.385451d, 5.535212d, 5.922368d, 6.411554d, 6.351916d, 5.955726d, 10.243825d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(9, 15, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 11, 9, 11, 10, 11, 10, 10, 10, 11, 10, 10, 10, 11, 10, 10, 9, 9, 9, 14, 15, 11, 9, 13, 11, 10, 13, 14, 9 }, new[] { 0d, 0.001001d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 14.781458d, 8.800717d, 15.741132d, 1.926731d, 9.344536d, 17.104762d, 8.49698d, 12.298364d, 2.873738d, 9.551676d }, new[] { 6.504487d, 6.513334d, 6.518601d, 0.000999d, 6.556305d, 19.609326d, 6.572521d, 6.839614d, 6.299688d, 6.47976d, 12.374587d, 7.088817d, 6.141047d, 6.397244d, 11.135638d, 6.220595d, 5.946666d, 5.283825d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, -1, 0, 4, 3, 1279612721, (byte)0, 0d, new[] { 16 }, new[] { 0d }, new[] { 4.814219d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 16, -1, 1, 4, 3, 1279612722, (byte)0, 0d, new[] { 10, 16 }, new[] { 0d, 0d }, new[] { 94.184306d, 0.429505d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 15, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 10, 9, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 9, 14, 14, 15, 11, 9, 10, 14, 11, 12, 11 }, new[] { 0d, 0.001001d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 10.687427d, 4.153966d, 11.455206d, 3.875826d, 25.87682d, 10.527612d, 8.645087d, 5.099972d }, new[] { 19.667361d, 12.918198d, 6.878923d, 25.886355d, 6.849665d, 6.212903d, 6.349493d, 6.584167d, 5.901523d, 6.385451d, 5.535212d, 5.922368d, 6.411554d, 6.351916d, 5.955726d, 10.243825d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(9, 15, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 11, 9, 11, 10, 11, 10, 10, 10, 11, 10, 10, 10, 11, 10, 10, 9, 9, 9, 14, 15, 11, 9, 13, 11, 10, 13, 14, 9 }, new[] { 0d, 0.001001d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 14.781458d, 8.800717d, 15.741132d, 1.926731d, 9.344536d, 17.104762d, 8.49698d, 12.298364d, 2.873738d, 9.551676d }, new[] { 6.504487d, 6.513334d, 6.518601d, 0.000999d, 6.556305d, 19.609326d, 6.572521d, 6.839614d, 6.299688d, 6.47976d, 12.374587d, 7.088817d, 6.141047d, 6.397244d, 11.135638d, 6.220595d, 5.946666d, 5.283825d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, -1, 0, 4, 3, 1279612721, (byte)0, 0d, new[] { 16 }, new[] { 0d }, new[] { 4.814219d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 16, -1, 1, 4, 3, 1279612722, (byte)0, 0d, new[] { 10, 16 }, new[] { 0d, 0d }, new[] { 94.184306d, 0.429505d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "cd33f0b6a298d696-03dc0b29328f8462",
@@ -8323,7 +8328,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(25, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 25 }, new[] { 0d }, new[] { 2.047524d }, new[] { 4.635296d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(25, 25, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 25 }, new[] { 0d }, new[] { 2.047524d }, new[] { 4.635296d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "cdb60f9e06a0b82f-ba54c4e1f8ffa2b1",
@@ -8348,7 +8353,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 0, 0, 3, 1397315377, (byte)0, 4.599295d, new[] { 17, 17, 17 }, new[] { 0d, 0d }, new[] { 3.049364d, 12.412219d }, new[] { 4.599295d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, -1, 0, 0, 3, 1397315377, (byte)0, 4.599295d, new[] { 17, 17, 17 }, new[] { 0d, 0d }, new[] { 3.049364d, 12.412219d }, new[] { 4.599295d }, 0, false, null, true, false)
                     },
                     new[] { 40, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -8375,8 +8380,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 4.100209d, new[] { 6, 6 }, new[] { 0d }, new[] { 4.099313d }, new[] { 4.100209d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(32, 32, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 32 }, new[] { 0d }, new[] { 3.133783d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 4.100209d, new[] { 6, 6 }, new[] { 0d }, new[] { 4.099313d }, new[] { 4.100209d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(32, 32, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 32 }, new[] { 0d }, new[] { 3.133783d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "d066cff0134deb5d-6cbbbf63bf40882d",
@@ -8419,7 +8424,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19 }, new[] { 0d }, new[] { 6.24282d }, new[] { 3.67415d, 3.699061d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19, 19, 19 }, new[] { 0d }, new[] { 6.24282d }, new[] { 3.67415d, 3.699061d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "d066cff0134deb5d-88401ddd47b9cf67",
@@ -8462,7 +8467,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 23, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 19 }, new[] { 0d, 0d }, new[] { 12.266804d, 2.793293d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 23, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 23, 19 }, new[] { 0d, 0d }, new[] { 12.266804d, 2.793293d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "d066cff0134deb5d-8c9873fc6b350927",
@@ -8505,7 +8510,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 6.826939d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 24, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 6.826939d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "d6c74939b2aef572-e4433e00aa80432a",
@@ -8530,7 +8535,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 7, 7 }, new[] { 0d, 0d }, new[] { 1.982943d, 1.95012d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 0, 0, 3, 1145196631, (byte)0, 0d, new[] { 7, 7 }, new[] { 0d, 0d }, new[] { 1.982943d, 1.95012d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "d80efa2762f9f8ef-217b44097826f3b4",
@@ -8573,7 +8578,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(30, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 30 }, new[] { 0d }, new[] { 0.611042d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(30, 30, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 30 }, new[] { 0d }, new[] { 0.611042d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "d8a85c2d36f5d2ca-84c6e8872a752d99",
@@ -8599,10 +8604,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(28, 57, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 34, 46, 28, 55, 49, 57 }, new[] { 0d, 0d, 0.234999d, 0d, 0d, 0d }, new[] { 5.71562d, 6.008491d, 9.545776d, 5.48349d, 7.31228d, 3.8051d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(39, 51, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 41, 39, 51 }, new[] { 0d, 0d, 0d }, new[] { 2.648388d, 0.425049d, 6.96591d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(25, 54, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 29, 34, 25, 39, 49, 42, 42, 49, 52, 52, 54 }, new[] { 0d, 0d, 0d, 0.234999d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.438281d, 2.896604d, 5.10657d, 6.2583d, 2.871227d, 2.575455d, 3.330712d, 3.444266d, 1.388642d, 3.55004d, 2.700227d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(35, 49, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 35, 41, 41, 48, 49, 40 }, new[] { 0d, 0.234999d, 0d, 0d, 0d, 0d }, new[] { 2.209703d, 0.401455d, 0.152999d, 3.381716d, 1.082278d, 2.332698d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(28, 57, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 34, 46, 28, 55, 49, 57 }, new[] { 0d, 0d, 0.234999d, 0d, 0d, 0d }, new[] { 5.71562d, 6.008491d, 9.545776d, 5.48349d, 7.31228d, 3.8051d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(39, 51, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 41, 39, 51 }, new[] { 0d, 0d, 0d }, new[] { 2.648388d, 0.425049d, 6.96591d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(25, 54, -1, 1, 0, 3, 1296389938, (byte)0, 0d, new[] { 29, 34, 25, 39, 49, 42, 42, 49, 52, 52, 54 }, new[] { 0d, 0d, 0d, 0.234999d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.438281d, 2.896604d, 5.10657d, 6.2583d, 2.871227d, 2.575455d, 3.330712d, 3.444266d, 1.388642d, 3.55004d, 2.700227d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(35, 49, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 35, 41, 41, 48, 49, 40 }, new[] { 0d, 0.234999d, 0d, 0d, 0d, 0d }, new[] { 2.209703d, 0.401455d, 0.152999d, 3.381716d, 1.082278d, 2.332698d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "da475bc1fdf048c7-843ef50701ad29bb",
@@ -8630,8 +8635,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(66, 66, -1, 2, 0, 3, 1497912661, (byte)0, 0d, new[] { 66 }, new[] { 0d }, new[] { 5.005926d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(302, 302, -1, 3, 0, 3, 1179993922, (byte)0, 0d, new[] { 302 }, new[] { 0d }, new[] { 3.486419d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(66, 66, -1, 2, 0, 3, 1497912661, (byte)0, 0d, new[] { 66 }, new[] { 0d }, new[] { 5.005926d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(302, 302, -1, 3, 0, 3, 1179993922, (byte)0, 0d, new[] { 302 }, new[] { 0d }, new[] { 3.486419d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "deab6196933d0fe2-d23c92c31b6befe1",
@@ -8674,7 +8679,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 28, 28, 28 }, new[] { 0d }, new[] { 2.27701d }, new[] { 3.788279d, 3.407799d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(28, 28, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 28, 28, 28 }, new[] { 0d }, new[] { 2.27701d }, new[] { 3.788279d, 3.407799d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "deda2240caee7272-f66c89ab2748e17c",
@@ -8700,8 +8705,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 7, 8, 5, 5, 8, 9 }, new[] { 0d, 0d }, new[] { 0.110111d, 0.189698d }, new[] { 2.439919d, 1.949729d, 2.089982d, 6.870503d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 23, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 23, 18 }, new[] { 0d, 0d }, new[] { 5.079693d, 9.289406d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 9, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 7, 8, 5, 5, 8, 9 }, new[] { 0d, 0d }, new[] { 0.110111d, 0.189698d }, new[] { 2.439919d, 1.949729d, 2.089982d, 6.870503d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 23, -1, 1, 0, 3, 1162887496, (byte)0, 0d, new[] { 23, 18 }, new[] { 0d, 0d }, new[] { 5.079693d, 9.289406d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "df4c49e856606ba7-c8d4d465d55392fb",
@@ -8744,7 +8749,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(47, 47, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 47, 47 }, new[] { 0d }, new[] { 11.949287d }, new[] { 3.589783d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(47, 47, -1, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 47, 47 }, new[] { 0d }, new[] { 11.949287d }, new[] { 3.589783d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "df82a069eff71a5e-21ace024b55dfd85",
@@ -8770,9 +8775,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 4.350671d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(13, 16, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 16, 13, 13, 13 }, new[] { 0d, 0.399998d, 0d, 0.41151d }, new[] { 2.109366d, 1.870082d, 3.153257d, 2.054532d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 10 }, new[] { 0d }, new[] { 2.868267d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 0, 4, 3, 1296389937, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 4.350671d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(13, 16, -1, 1, 4, 3, 1296389938, (byte)0, 0d, new[] { 16, 13, 13, 13 }, new[] { 0d, 0.399998d, 0d, 0.41151d }, new[] { 2.109366d, 1.870082d, 3.153257d, 2.054532d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 10, -1, 0, 0, 3, 1296389937, (byte)0, 0d, new[] { 10 }, new[] { 0d }, new[] { 2.868267d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e037cf6f4165eff5-71ebcc342951c27c",
@@ -8815,7 +8820,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18, 18, 18, 18, 18, 18, 18, 18 }, new[] { 0d, 0d, 0d }, new[] { 47.708953d, 5.566928d, 1.168017d }, new[] { 22.983961d, 22.457241d, 5.679403d, 5.694163d, 18.635806d, 5.596612d, 34.031458d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18, 18, 18, 18, 18, 18, 18, 18 }, new[] { 0d, 0d, 0d }, new[] { 47.708953d, 5.566928d, 1.168017d }, new[] { 22.983961d, 22.457241d, 5.679403d, 5.694163d, 18.635806d, 5.596612d, 34.031458d }, 0, true, null, true, false)
                     },
                     new[] { 0, 20, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -8859,7 +8864,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18 }, new[] { 0d }, new[] { 8.345665d }, new[] { 5.644905d, 11.716738d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 18, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 18, 18, 18 }, new[] { 0d }, new[] { 8.345665d }, new[] { 5.644905d, 11.716738d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e087828bbf80132b-c73a736abf2b4060",
@@ -8884,9 +8889,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 16, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 13, 16, 14, 14, 11, 11, 11, 13, 13, 12, 13, 12, 12, 15, 16, 12, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 13.06634d, 23.61475d, 3.31414d, 7.968703d, 2.300356d, 3.048613d, 3.265114d }, new[] { 5.1162d, 5.333747d, 5.199945d, 5.299287d, 5.382157d, 5.168252d, 5.667345d, 5.673376d, 5.666802d, 5.478578d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 16, -1, 0, 0, 3, 1145919558, (byte)0, 0d, new[] { 13, 16, 14, 14, 11, 11, 11, 13, 13, 12, 13, 12, 12, 15, 16, 12, 13 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 13.06634d, 23.61475d, 3.31414d, 7.968703d, 2.300356d, 3.048613d, 3.265114d }, new[] { 5.1162d, 5.333747d, 5.199945d, 5.299287d, 5.382157d, 5.168252d, 5.667345d, 5.673376d, 5.666802d, 5.478578d }, 0, false, null, true, false)
                     },
-                    new[] { 0, 0, 0, 0, 0, 0, 11 }),
+                    new[] { 0, 0, 0, 0, 11, 0, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e0af63ed4c2ef5d3-63cd3e499be4e58b",
                     "wifu=natural-none; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2840|1a57b5585e4a; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2841|4a81b88a6c59; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|2931|aa9a091a9d40",
@@ -8910,7 +8915,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11 }, new[] { 0d }, new[] { 2.35d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11 }, new[] { 0d }, new[] { 2.35d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e19faa6665cd6214-db283bd3164e1767",
@@ -8936,7 +8941,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(8, 8, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 8 }, new[] { 0.001d }, new[] { 5.609625d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(8, 8, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 8 }, new[] { 0.001d }, new[] { 5.609625d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e30508b3b9b8e352-a87351572a2f5f23",
@@ -8979,7 +8984,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24, 24, 24, 24, 24 }, new[] { 0d, 0d, 0d, 0d }, new[] { 2.059546d, 1.988964d, 1.727121d, 1.63652d }, new[] { 3.948249d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(24, 24, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 24, 24, 24, 24, 24 }, new[] { 0d, 0d, 0d, 0d }, new[] { 2.059546d, 1.988964d, 1.727121d, 1.63652d }, new[] { 3.948249d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e461df5879424a51-4adbbba91aa8df22",
@@ -9006,9 +9011,9 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, -1, 1, 0, 3, 1363559243, (byte)0, 0d, new[] { 16 }, new[] { 0d }, new[] { 4.361113d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(42, 42, -1, 0, 0, 3, 1112623439, (byte)0, 0d, new[] { 42 }, new[] { 0d }, new[] { 9.233047d }, new double[0], 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 2, 0, 3, 1229212761, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 2.481356d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(16, 16, -1, 1, 0, 3, 1363559243, (byte)0, 0d, new[] { 16 }, new[] { 0d }, new[] { 4.361113d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(42, 42, -1, 0, 0, 3, 1112623439, (byte)0, 0d, new[] { 42 }, new[] { 0d }, new[] { 9.233047d }, new double[0], 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 15, -1, 2, 0, 3, 1229212761, (byte)0, 0d, new[] { 15 }, new[] { 0d }, new[] { 2.481356d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e6ac36360bc6ec9c-d2b65cf5c70d61d6",
@@ -9033,7 +9038,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12, 12 }, new[] { 0d, 0d }, new[] { 0.200169d, 8.234534d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(12, 12, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 12, 12 }, new[] { 0d, 0d }, new[] { 0.200169d, 8.234534d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e7b6e43fd381d4aa-63cd3e499be4e58b",
@@ -9058,7 +9063,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11 }, new[] { 0d }, new[] { 2.799331d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(11, 11, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 11 }, new[] { 0d }, new[] { 2.799331d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "e7f9c22413486d03-592518922478c677",
@@ -9083,7 +9088,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 11, -1, 0, 0, 3, 1145196631, (byte)0, 6.655393d, new[] { 11, 10, 7, 7 }, new[] { 0d, 0d, 0d }, new[] { 10.582758d, 1.867606d, 6.947857d }, new[] { 6.655393d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 11, -1, 0, 0, 3, 1145196631, (byte)0, 6.655393d, new[] { 11, 10, 7, 7 }, new[] { 0d, 0d, 0d }, new[] { 10.582758d, 1.867606d, 6.947857d }, new[] { 6.655393d }, 0, false, null, true, false)
                     },
                     new[] { 0, 0, 20 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -9109,7 +9114,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(18, 42, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 18, 42, 25, 27, 27 }, new[] { 0d, 0d }, new[] { 2.866162d, 1.949295d }, new[] { 5.116551d, 5.167153d, 10.099345d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(18, 42, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 18, 42, 25, 27, 27 }, new[] { 0d, 0d }, new[] { 2.866162d, 1.949295d }, new[] { 5.116551d, 5.167153d, 10.099345d }, 0, false, null, true, false)
                     },
                     new[] { 0, 46 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -9153,8 +9158,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(2, 10, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 2, 5, 9, 7, 7, 5, 5, 6, 6, 10, 6, 9, 8, 5, 5, 5, 7, 8, 6, 2, 4 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.490214d, 2.594752d, 2.775959d, 2.247564d, 2.998591d, 2.983025d }, new[] { 6.932173d, 7.053973d, 7.114611d, 6.935675d, 7.082681d, 7.125824d, 6.988693d, 7.049421d, 7.041106d, 7.235675d, 6.944431d, 7.095325d, 7.050042d, 7.040225d, 7.08856d }, 0, true, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 10, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 10, 4, 9 }, new[] { 0d, 0d, 0d }, new[] { 23.661533d, 38.086839d, 37.833053d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(2, 10, 0, 6, 0, 3, 0, (byte)0, 6.4d, new[] { 2, 5, 9, 7, 7, 5, 5, 6, 6, 10, 6, 9, 8, 5, 5, 5, 7, 8, 6, 2, 4 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 3.490214d, 2.594752d, 2.775959d, 2.247564d, 2.998591d, 2.983025d }, new[] { 6.932173d, 7.053973d, 7.114611d, 6.935675d, 7.082681d, 7.125824d, 6.988693d, 7.049421d, 7.041106d, 7.235675d, 6.944431d, 7.095325d, 7.050042d, 7.040225d, 7.08856d }, 0, true, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 10, 0, 6, 4, 3, 0, (byte)0, 6.4d, new[] { 10, 4, 9 }, new[] { 0d, 0d, 0d }, new[] { 23.661533d, 38.086839d, 37.833053d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "ee439e0bd1ea74d1-04f40b95697ea22a",
@@ -9179,7 +9184,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15, 19, 19, 15, 19, 19 }, new[] { 0d, 0d }, new[] { 1.966808d, 2.461273d }, new[] { 5.100053d, 4.268079d, 5.509481d, 11.32564d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15, 19, 19, 15, 19, 19 }, new[] { 0d, 0d }, new[] { 1.966808d, 2.461273d }, new[] { 5.100053d, 4.268079d, 5.509481d, 11.32564d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "ef0725e51790c4e2-c609294305e43b14",
@@ -9204,7 +9209,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 17, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15, 15, 17, 17 }, new[] { 0d, 0d }, new[] { 6.699652d, 28.011037d }, new[] { 5.567448d, 10.205791d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 17, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15, 15, 17, 17 }, new[] { 0d, 0d }, new[] { 6.699652d, 28.011037d }, new[] { 5.567448d, 10.205791d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f05cd862c6056037-c2f9cf4727f71a13",
@@ -9230,9 +9235,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 8, -1, 0, 0, 3, 1279612721, (byte)0, 7.20138d, new[] { 7, 8, 5, 8, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 5.092768d, 4.559904d, 2.400036d, 4.539247d, 0.839863d }, new[] { 7.20138d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 8, -1, 1, 0, 3, 1279612722, (byte)0, 6.550794d, new[] { 8, 5, 8, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.240753d, 2.54985d, 2.481766d, 2.118232d }, new[] { 6.550794d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 8, -1, 0, 0, 3, 1279612721, (byte)0, 7.20138d, new[] { 7, 8, 5, 8, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d }, new[] { 5.092768d, 4.559904d, 2.400036d, 4.539247d, 0.839863d }, new[] { 7.20138d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 8, -1, 1, 0, 3, 1279612722, (byte)0, 6.550794d, new[] { 8, 5, 8, 5, 5 }, new[] { 0d, 0d, 0d, 0d }, new[] { 0.240753d, 2.54985d, 2.481766d, 2.118232d }, new[] { 6.550794d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 17, 0, 34, 0, 0, 25 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f1a2719671a2207d-ba6a655b52db14df",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|IN|67|21fb35f6cd7d; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|IN|547|14f21418a615; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|IN|548|eb3713d40719; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|IN|559|276745bd8876,tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|IN|637|f8b6c37e643b",
@@ -9274,7 +9280,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 18, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 18 }, new[] { 0d }, new[] { 2.130326d }, new[] { 10.812012d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 18, 14, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 15, 18 }, new[] { 0d }, new[] { 2.130326d }, new[] { 10.812012d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f1e2bc8f6809d72c-42554a1c70a69759",
@@ -9300,9 +9306,10 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 11, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5, 5, 5, 5, 10, 6, 7, 7, 7, 6, 9, 6, 6, 8, 10, 8, 7, 10, 11 }, new[] { 0d, 0d, 0.001006d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.362508d, 5.338714d, 10.951575d, 5.345984d, 11.160755d, 5.664061d, 10.932865d, 4.690025d, 12.019295d, 5.110721d, 4.439019d, 6.710385d }, new[] { 0.00228d, 6.930198d, 6.883039d, 6.199742d, 6.519064d, 0.001001d, 10.395828d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(5, 12, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 5, 5, 5, 9, 11, 11, 9, 10, 5, 6, 9, 10, 8, 6, 5, 6, 6, 9, 9, 6, 6, 9, 5, 7, 7, 8, 12, 10, 5 }, new[] { 0d, 0d, 0.001006d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.249849d, 10.310252d, 1.949447d, 9.260354d, 9.63044d, 9.307487d, 8.853315d, 0d, 1.836626d, 2.530516d, 2.539665d, 9.799587d, 3.551247d, 2.030666d, 2.350029d, 2.119023d, 2.581291d, 4.972877d, 2.160015d }, new[] { 6.486018d, 6.785566d, 6.566268d, 6.566476d, 6.229939d, 6.569402d, 13.460831d, 0.001001d, 6.630304d, 10.303256d }, 0, false, null, true)
-                    }),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 11, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 5, 5, 5, 5, 10, 6, 7, 7, 7, 6, 9, 6, 6, 8, 10, 8, 7, 10, 11 }, new[] { 0d, 0d, 0.001006d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.362508d, 5.338714d, 10.951575d, 5.345984d, 11.160755d, 5.664061d, 10.932865d, 4.690025d, 12.019295d, 5.110721d, 4.439019d, 6.710385d }, new[] { 0.00228d, 6.930198d, 6.883039d, 6.199742d, 6.519064d, 0.001001d, 10.395828d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(5, 12, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 5, 5, 5, 9, 11, 11, 9, 10, 5, 6, 9, 10, 8, 6, 5, 6, 6, 9, 9, 6, 6, 9, 5, 7, 7, 8, 12, 10, 5 }, new[] { 0d, 0d, 0.001006d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.249849d, 10.310252d, 1.949447d, 9.260354d, 9.63044d, 9.307487d, 8.853315d, 0d, 1.836626d, 2.530516d, 2.539665d, 9.799587d, 3.551247d, 2.030666d, 2.350029d, 2.119023d, 2.581291d, 4.972877d, 2.160015d }, new[] { 6.486018d, 6.785566d, 6.566268d, 6.566476d, 6.229939d, 6.569402d, 13.460831d, 0.001001d, 6.630304d, 10.303256d }, 0, false, null, true, false)
+                    },
+                    new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 23, 0, 0, 0, 23, 0, 40, 0, 0, 14, 0 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f2059f604ad30393-e92b5cbb00b5ff5f",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|26793|9f88e46f2b27; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|26819|729541778ca3; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|26821|5e70347609c1; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525|IN|26860|e971d12e4418",
@@ -9344,7 +9351,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 7 }, new[] { 0d }, new[] { 3.068081d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(7, 7, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 7 }, new[] { 0d }, new[] { 3.068081d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f3f164d036b28fa1-f3988da8dfac5f86",
@@ -9369,7 +9376,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(27, 27, -1, 0, 0, 3, 1112165199, (byte)0, 0d, new[] { 27, 27 }, new[] { 0d, 0d }, new[] { 1.929606d, 16.935511d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(27, 27, -1, 0, 0, 3, 1112165199, (byte)0, 0d, new[] { 27, 27 }, new[] { 0d, 0d }, new[] { 1.929606d, 16.935511d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f4b7f149cee5b2ad-b4c320f0187034b8",
@@ -9412,7 +9419,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17, 17 }, new[] { 0d }, new[] { 3.243154d }, new[] { 4.828531d, 4.63339d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 17, 17 }, new[] { 0d }, new[] { 3.243154d }, new[] { 4.828531d, 4.63339d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f4b7f149cee5b2ad-c24feb267ea895a9",
@@ -9455,7 +9462,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 9.659609d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 17, 9, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17 }, new[] { 0d }, new[] { 9.659609d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f71cf6db73bcfadd-9de45b855e6806de",
@@ -9481,8 +9488,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6, 6, 6, 6 }, new[] { 0d }, new[] { 7.990188d }, new[] { 2.033075d, 4.100022d, 6.46761d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(38, 38, -1, 1, 0, 3, 1162887496, (byte)0, 13.506566d, new[] { 38, 38 }, new[] { 0d }, new[] { 5.016167d }, new[] { 13.506566d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(6, 6, -1, 0, 0, 3, 1096439123, (byte)0, 0d, new[] { 6, 6, 6, 6 }, new[] { 0d }, new[] { 7.990188d }, new[] { 2.033075d, 4.100022d, 6.46761d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(38, 38, -1, 1, 0, 3, 1162887496, (byte)0, 13.506566d, new[] { 38, 38 }, new[] { 0d }, new[] { 5.016167d }, new[] { 13.506566d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "f72d48558515b89e-4bb05787332a3666",
@@ -9525,7 +9532,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 3.939674d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(19, 19, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 19 }, new[] { 0d }, new[] { 3.939674d }, new double[0], 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "fa44dbe3acb9f73c-ed455fde78218d7b",
@@ -9568,7 +9575,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(10, 11, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 10, 11, 11 }, new[] { 0d, 0d, 0d }, new[] { 2.515425d, 4.565539d, 1.333144d }, new double[0], 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(10, 11, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 10, 11, 11 }, new[] { 0d, 0d, 0d }, new[] { 2.515425d, 4.565539d, 1.333144d }, new double[0], 0, true, null, true, false)
                     },
                     new[] { 0, 28, 34 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -9595,8 +9602,8 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 6, 7, 4, 5, 4, 5, 7, 6, 6, 5, 6, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.278726d, 5.141927d, 4.270192d, 5.203101d, 5.034073d, 4.553922d, 4.599549d }, new[] { 6.847387d, 6.814464d, 7.03296d, 6.72233d, 6.697628d, 6.936003d }, 0, false, null, true),
-                        new CapturedEnemyCombatProfileStreamDefinition(4, 8, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 4, 8, 4, 4, 5, 8, 7, 4, 5, 5, 6, 4, 4, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.117301d, 2.304365d, 2.852173d, 10.062908d, 2.042485d, 2.299715d, 9.800831d, 9.564478d, 9.196396d, 8.982302d }, new[] { 6.807912d, 6.746461d, 7.350487d, 6.316088d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 7, -1, 0, 0, 3, 1279612721, (byte)0, 0d, new[] { 6, 7, 4, 5, 4, 5, 7, 6, 6, 5, 6, 5, 5 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 4.278726d, 5.141927d, 4.270192d, 5.203101d, 5.034073d, 4.553922d, 4.599549d }, new[] { 6.847387d, 6.814464d, 7.03296d, 6.72233d, 6.697628d, 6.936003d }, 0, false, null, true, false),
+                        new CapturedEnemyCombatProfileStreamDefinition(4, 8, -1, 1, 0, 3, 1279612722, (byte)0, 0d, new[] { 4, 8, 4, 4, 5, 8, 7, 4, 5, 5, 6, 4, 4, 7 }, new[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d }, new[] { 2.117301d, 2.304365d, 2.852173d, 10.062908d, 2.042485d, 2.299715d, 9.800831d, 9.564478d, 9.196396d, 8.982302d }, new[] { 6.807912d, 6.746461d, 7.350487d, 6.316088d }, 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "fdbb6fcce2bac5fd-4afe62819d15acfe",
@@ -9621,7 +9628,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(43, 43, -1, 0, 0, 3, 1465538645, (byte)0, 0d, new[] { 43, 43 }, new[] { 0d, 0d }, new[] { 23.031084d, 10.915985d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(43, 43, -1, 0, 0, 3, 1465538645, (byte)0, 0d, new[] { 43, 43 }, new[] { 0d, 0d }, new[] { 23.031084d, 10.915985d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "fe392350897b358a-24a802cb7db6c581",
@@ -9664,7 +9671,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26, 26, 26, 26 }, new[] { 0d }, new[] { 2.619538d }, new[] { 3.611431d, 3.410737d, 3.510757d, 3.500631d, 3.710042d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(26, 26, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 26, 26, 26, 26, 26, 26 }, new[] { 0d }, new[] { 2.619538d }, new[] { 3.611431d, 3.410737d, 3.510757d, 3.500631d, 3.710042d }, 0, true, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "fe392350897b358a-c4027eb3ce806767",
@@ -9707,7 +9714,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(17, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 23, 23 }, new[] { 0d, 0d, 0d }, new[] { 2.379995d, 1.351506d, 1.490648d }, new[] { 3.079509d, 9.392452d, 6.040546d, 3.071994d, 2.87009d, 9.081456d, 5.899852d, 5.994528d, 3.073473d, 2.915237d, 5.962254d, 3.569857d }, 0, true, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(17, 23, -1, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 17, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 23, 23 }, new[] { 0d, 0d, 0d }, new[] { 2.379995d, 1.351506d, 1.490648d }, new[] { 3.079509d, 9.392452d, 6.040546d, 3.071994d, 2.87009d, 9.081456d, 5.899852d, 5.994528d, 3.073473d, 2.915237d, 5.962254d, 3.569857d }, 0, true, null, true, false)
                     },
                     new[] { 0, 0, 40 }),
                 new CapturedEnemyCombatProfileDefinition(
@@ -9733,7 +9740,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(15, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15, 19, 18 }, new[] { 0d, 0d, 0d }, new[] { 3.400749d, 3.788818d, 5.185128d }, new double[0], 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(15, 19, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 15, 19, 18 }, new[] { 0d, 0d, 0d }, new[] { 3.400749d, 3.788818d, 5.185128d }, new double[0], 0, false, null, true, false)
                     }),
                 new CapturedEnemyCombatProfileDefinition(
                     "ff1685d6a9c45e2c-370328526bcb32c7",
@@ -9758,7 +9765,7 @@ namespace AORebirth.Core.Playfields
                     (byte)0,
                     new[]
                     {
-                        new CapturedEnemyCombatProfileStreamDefinition(14, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14, 15, 14 }, new[] { 0d }, new[] { 3.009238d }, new[] { 5.480594d, 4.930391d }, 0, false, null, true)
+                        new CapturedEnemyCombatProfileStreamDefinition(14, 15, -1, 0, 0, 3, 1397315377, (byte)0, 0d, new[] { 14, 15, 14 }, new[] { 0d }, new[] { 3.009238d }, new[] { 5.480594d, 4.930391d }, 0, false, null, true, false)
                     })
             };
         }

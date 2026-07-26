@@ -299,7 +299,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                      profile.Name,
                                      profile.MonsterData,
                                      profile.Level)
-                                 && value.CaptureRuntimeEvidenceSafe
+                                 && (value.CaptureRuntimeEvidenceSafe
+                                     || (resolved.AttackModel
+                                         == CapturedEnemyAttackModel.Specialized
+                                         && resolved.UsesProductionSpecializedValues
+                                         && value.MatchesSpecialized(resolved)))
                                  && value.Evidence == resolved.Evidence
                                  && value.ContainsSource(resolved.EvidenceSourceIdentity));
                 CapturedEnemyCombatPacketFixture fixture = fixtures[selectedProfile.ProfileId];
@@ -452,6 +456,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                 resolvedAttack.AttackInfoN3Unknown).Unknown2,
                             profile.ProfileId
                             + " resolved specialized mutable AttackInfo ammunition");
+                        if (resolvedAttack.LethalAttackInfoUnknown.HasValue)
+                        {
+                            CapturedEnemyAttackInfoPacketFixture lethalAttackInfo =
+                                fixture.AttackInfoPackets.Single(
+                                    value => value.SourceIdentity
+                                             == resolved.EvidenceSourceIdentity
+                                             && value.WeaponSlot
+                                                == resolvedAttack.AttackInfoWeaponSlot
+                                             && value.DamageTypeWire
+                                                == resolvedAttack.LethalAttackInfoUnknown.Value
+                                             && value.HitTypeWire
+                                                == resolvedAttack.AttackInfoHitType
+                                             && value.WeaponInstance
+                                                == resolvedAttack.AttackInfoWeaponInstance
+                                             && value.N3Unknown
+                                                == resolvedAttack.AttackInfoN3Unknown);
+                            AssertHex(
+                                lethalAttackInfo.BodyHex,
+                                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                                    IdentityOf(
+                                        lethalAttackInfo.SourceType,
+                                        lethalAttackInfo.SourceIdentity),
+                                    IdentityOf(
+                                        lethalAttackInfo.TargetType,
+                                        lethalAttackInfo.TargetIdentity),
+                                    lethalAttackInfo.Amount,
+                                    lethalAttackInfo.Ammo,
+                                    resolvedAttack.AttackInfoWeaponSlot,
+                                    resolvedAttack.LethalAttackInfoUnknown.Value,
+                                    resolvedAttack.AttackInfoHitType,
+                                    resolvedAttack.AttackInfoWeaponInstance,
+                                    resolvedAttack.AttackInfoN3Unknown),
+                                lethalAttackInfo.PacketId
+                                + " resolved specialized lethal AttackInfo");
+                        }
                     }
                 }
             }
