@@ -49,7 +49,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and all `31` source-local atomic generations to the exact captured
   level/weapon-family packet archetype while its existing generation selector
   owns QL and the item/combat owners retain damage, range, and cadence. Active
-  PF127/PF1931 certification is now `330` ready and `159` quarantined, up from
+  PF127/PF1931 certification is now `344` ready and `145` quarantined, up from
   `223` / `266`. Filth Flea now binds `30` active PF127 actors at captured
   levels 4, 6, 10-13, and 19-21 to their exact two-stream natural attack
   semantics while production retains damage, range, cadence, ammunition, and
@@ -66,9 +66,12 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   L13-L15/L17 actors. Slum Runner now binds all `24` active actors, restoring
   `18`, through the exact DBPW natural packet archetype. Shadow now binds all
   `31` active actors, restoring `8`, through the exact DMXF natural packet
-  archetype. Runtime level is not a captured contract discriminator for these
-  invariant natural streams; production retains damage, range, cadence,
-  health, loadout, ammunition, and mutable `SpecialAttackWeapon` state.
+  archetype. Uncontrollable Anger, Empty Shell, Infector, Neural Burnout, and
+  Lost Thought now likewise restore `5`, `4`, `2`, `2`, and `1` active actors
+  through their invariant exact SIW1 or DMXF natural packet archetypes. Runtime
+  level is not a captured contract discriminator for these invariant natural
+  streams; production retains damage, range, cadence, health, loadout,
+  ammunition, and mutable `SpecialAttackWeapon` state.
   Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
   bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact
   captured level/weapon packet semantics while their generation selectors own
