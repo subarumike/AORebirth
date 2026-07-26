@@ -416,6 +416,43 @@ namespace AORebirth.Core.Playfields
                    && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
         }
 
+        internal bool SupportsCaptureProvenNaturalAttackPacketSemantics
+        {
+            get
+            {
+                return this.CaptureEvidenceSafe
+                       && this.WeaponDefinition == null
+                       && this.Streams.Length == 1
+                       && this.Streams[0].CapturedUsesEquippedWeapon == false
+                       && this.Streams[0].CapturedSendAttackInfo == true;
+            }
+        }
+
+        internal bool MatchesCaptureProvenNaturalAttackPacketSemantics(
+            CapturedEnemyCombatProfileDefinition other)
+        {
+            if (!this.SupportsCaptureProvenNaturalAttackPacketSemantics
+                || other == null
+                || !other.SupportsCaptureProvenNaturalAttackPacketSemantics
+                || this.SpecialAttackWeaponN3Unknown != other.SpecialAttackWeaponN3Unknown
+                || this.AttackN3Unknown != other.AttackN3Unknown
+                || this.AttackAction != other.AttackAction
+                || !SpecialsMatch(this.SpecialAttacks, other.SpecialAttacks))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileStreamDefinition left = this.Streams[0];
+            CapturedEnemyCombatProfileStreamDefinition right = other.Streams[0];
+            return left.WeaponSlot == right.WeaponSlot
+                   && left.DamageTypeWire == right.DamageTypeWire
+                   && left.HitTypeWire == right.HitTypeWire
+                   && left.WeaponInstance == right.WeaponInstance
+                   && left.N3Unknown == right.N3Unknown
+                   && left.CapturedUsesEquippedWeapon == right.CapturedUsesEquippedWeapon
+                   && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
+        }
+
         internal bool MatchesSpecialized(CapturedEnemyCombatContract contract)
         {
             int[][] ignoredObservations;
@@ -825,8 +862,6 @@ namespace AORebirth.Core.Playfields
                     resourceId,
                     name,
                     monsterData,
-                    level,
-                    sourceIdentityHint,
                     current,
                     out naturalAttackContract))
             {
@@ -1062,8 +1097,6 @@ namespace AORebirth.Core.Playfields
             int resourceId,
             string name,
             int monsterData,
-            int level,
-            int sourceIdentityHint,
             CapturedEnemyCombatContract current,
             out CapturedEnemyCombatContract resolved)
         {
@@ -1078,50 +1111,41 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            CapturedEnemyCombatProfileDefinition[] compatibleProfiles = Profiles.Where(
-                value => value.MatchesKey(resourceId, name, monsterData, level)
-                         && value.CaptureEvidenceSafe
-                         && value.WeaponDefinition == null
-                         && value.Streams.Length == 1
-                         && value.Streams[0].CapturedUsesEquippedWeapon == false
-                         && value.Streams[0].CapturedSendAttackInfo == true).ToArray();
-            if (compatibleProfiles.Length == 0)
+            CapturedEnemyCombatProfileDefinition[] family = Profiles.Where(
+                value => value.MatchesArchetypeKey(resourceId, name, monsterData)
+                         && value
+                             .SupportsCaptureProvenNaturalAttackPacketSemantics)
+                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
+                .ToArray();
+            if (family.Length == 0)
             {
                 return false;
             }
 
-            CapturedEnemyCombatProfileDefinition profile;
-            if (compatibleProfiles.Length == 1)
+            CapturedEnemyCombatProfileDefinition profile = family[0];
+            if (family.Any(
+                value => !profile
+                    .MatchesCaptureProvenNaturalAttackPacketSemantics(value)))
             {
-                profile = compatibleProfiles[0];
-            }
-            else
-            {
-                CapturedEnemyCombatProfileDefinition[] sourceMatches =
-                    compatibleProfiles.Where(
-                        value => value.ContainsSource(sourceIdentityHint)).ToArray();
-                if (sourceMatches.Length != 1)
-                {
-                    return false;
-                }
-
-                profile = sourceMatches[0];
+                return false;
             }
 
-            int evidenceSourceIdentity = profile.ContainsSource(sourceIdentityHint)
-                                             ? sourceIdentityHint
-                                             : profile.RepresentativeEvidenceSourceIdentity;
+            int evidenceSourceIdentity = profile.RepresentativeEvidenceSourceIdentity;
             CapturedEnemyCombatProfileStreamDefinition stream = profile.Streams[0];
+            string evidence = string.Join(
+                "; ",
+                family.Select(value => value.Evidence).Distinct().ToArray());
             string archetypeId = string.Format(
-                "resource={0}|name={1}|MonsterData={2}|level={3}|profile={4}",
+                "resource={0}|name={1}|MonsterData={2}|profiles={3}",
                 resourceId,
                 name,
                 monsterData,
-                level,
-                profile.ProfileId);
+                string.Join(
+                    ",",
+                    family.Select(value => value.ProfileId).ToArray()));
             resolved = CapturedEnemyCombatContract
                 .CapturedSpecialSequence(
-                    profile.Evidence,
+                    evidence,
                     new CapturedEnemySpecialAttackSequenceDefinition(
                         0.0d,
                         null,
@@ -1134,7 +1158,7 @@ namespace AORebirth.Core.Playfields
                                 .MaxMeleeCombatDistance,
                             current.RechargeSeconds,
                             false,
-                            stream.InitialAmmoCount,
+                            current.AttackInfoAmmoCount,
                             stream.WeaponSlot,
                             stream.DamageTypeWire,
                             stream.HitTypeWire,
@@ -1152,7 +1176,7 @@ namespace AORebirth.Core.Playfields
                         profile.AttackAction))
                 .WithProductionSpecializedValues()
                 .WithCaptureCertification(
-                    profile.Evidence,
+                    evidence,
                     evidenceSourceIdentity,
                     null)
                 .WithCaptureProvenArchetype(archetypeId);
