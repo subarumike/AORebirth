@@ -208,7 +208,8 @@ namespace AORebirth.Core.Playfields
             int attackInfoWeaponInstance,
             byte attackInfoN3Unknown,
             bool sendAttackInfo,
-            int[] capturedDamageObservations = null)
+            int[] capturedDamageObservations = null,
+            int? lethalAttackInfoUnknown = null)
         {
             this.MinDamage = minDamage;
             this.MaxDamage = maxDamage;
@@ -226,6 +227,7 @@ namespace AORebirth.Core.Playfields
             this.CapturedDamageObservations = capturedDamageObservations == null
                                                   ? new int[0]
                                                   : capturedDamageObservations.ToArray();
+            this.LethalAttackInfoUnknown = lethalAttackInfoUnknown;
         }
 
         internal int MinDamage { get; private set; }
@@ -256,8 +258,11 @@ namespace AORebirth.Core.Playfields
 
         internal int[] CapturedDamageObservations { get; private set; }
 
+        internal int? LethalAttackInfoUnknown { get; private set; }
+
         internal CapturedEnemyCombatAttackDefinition WithCapturedDamageObservations(
-            int[] capturedDamageObservations)
+            int[] capturedDamageObservations,
+            int? lethalAttackInfoUnknown = null)
         {
             return new CapturedEnemyCombatAttackDefinition(
                 this.MinDamage,
@@ -273,7 +278,8 @@ namespace AORebirth.Core.Playfields
                 this.AttackInfoWeaponInstance,
                 this.AttackInfoN3Unknown,
                 this.SendAttackInfo,
-                capturedDamageObservations);
+                capturedDamageObservations,
+                lethalAttackInfoUnknown ?? this.LethalAttackInfoUnknown);
         }
 
         internal bool IsValid
@@ -808,10 +814,14 @@ namespace AORebirth.Core.Playfields
         }
 
         internal CapturedEnemyCombatContract WithCapturedSpecializedDamageObservations(
-            int[][] capturedDamageObservationsByAttack)
+            int[][] capturedDamageObservationsByAttack,
+            int?[] lethalAttackInfoUnknownByAttack)
         {
             if (this.AttackModel != CapturedEnemyAttackModel.Specialized
-                || capturedDamageObservationsByAttack == null)
+                || capturedDamageObservationsByAttack == null
+                || lethalAttackInfoUnknownByAttack == null
+                || lethalAttackInfoUnknownByAttack.Length
+                   != capturedDamageObservationsByAttack.Length)
             {
                 return null;
             }
@@ -830,10 +840,12 @@ namespace AORebirth.Core.Playfields
                 CapturedEnemyCombatAttackDefinition openingAttack = sequence.OpeningAttack == null
                                                                           ? null
                                                                           : sequence.OpeningAttack.WithCapturedDamageObservations(
-                                                                              capturedDamageObservationsByAttack[observationIndex++]);
+                                                                              capturedDamageObservationsByAttack[observationIndex],
+                                                                              lethalAttackInfoUnknownByAttack[observationIndex++]);
                 CapturedEnemyCombatAttackDefinition repeatingAttack =
                     sequence.RepeatingAttack.WithCapturedDamageObservations(
-                        capturedDamageObservationsByAttack[observationIndex]);
+                        capturedDamageObservationsByAttack[observationIndex],
+                        lethalAttackInfoUnknownByAttack[observationIndex]);
                 clone.SpecialAttackSequence = new CapturedEnemySpecialAttackSequenceDefinition(
                     sequence.InitialAttackDelaySeconds,
                     openingAttack,
@@ -867,7 +879,8 @@ namespace AORebirth.Core.Playfields
                 enrichedStreams[index] = new CapturedEnemyParallelAttackStreamDefinition(
                     stream.InitialDelaySeconds,
                     stream.Attack.WithCapturedDamageObservations(
-                        capturedDamageObservationsByAttack[index]));
+                        capturedDamageObservationsByAttack[index],
+                        lethalAttackInfoUnknownByAttack[index]));
             }
 
             clone.ParallelAttackSequence = new CapturedEnemyParallelAttackSequenceDefinition(

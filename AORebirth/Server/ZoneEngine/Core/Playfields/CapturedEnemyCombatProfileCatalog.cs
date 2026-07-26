@@ -31,7 +31,8 @@ namespace AORebirth.Core.Playfields
             int? capturedDamageBonus = null,
             bool? capturedUsesEquippedWeapon = null,
             double? capturedAttackRange = null,
-            bool? capturedSendAttackInfo = null)
+            bool? capturedSendAttackInfo = null,
+            bool capturedTerminalHitOnly = false)
         {
             this.MinimumObservedDamage = minimumObservedDamage;
             this.MaximumObservedDamage = maximumObservedDamage;
@@ -61,6 +62,7 @@ namespace AORebirth.Core.Playfields
             this.CapturedUsesEquippedWeapon = capturedUsesEquippedWeapon;
             this.CapturedAttackRange = capturedAttackRange;
             this.CapturedSendAttackInfo = capturedSendAttackInfo;
+            this.CapturedTerminalHitOnly = capturedTerminalHitOnly;
         }
 
         internal int MinimumObservedDamage { get; private set; }
@@ -80,6 +82,7 @@ namespace AORebirth.Core.Playfields
         internal bool? CapturedUsesEquippedWeapon { get; private set; }
         internal double? CapturedAttackRange { get; private set; }
         internal bool? CapturedSendAttackInfo { get; private set; }
+        internal bool CapturedTerminalHitOnly { get; private set; }
 
         internal bool HasCompleteFixedRuntimeEvidence
         {
@@ -159,6 +162,20 @@ namespace AORebirth.Core.Playfields
                    && attack.SendAttackInfo == this.CapturedSendAttackInfo.Value
                    && attack.AttackInfoWeaponSlot == this.WeaponSlot
                    && attack.AttackInfoUnknown == this.DamageTypeWire
+                   && attack.AttackInfoHitType == this.HitTypeWire
+                   && attack.AttackInfoWeaponInstance == this.WeaponInstance
+                   && attack.AttackInfoN3Unknown == this.N3Unknown;
+        }
+
+        internal bool MatchesCapturedTerminalOutcome(
+            CapturedEnemyCombatAttackDefinition attack)
+        {
+            return this.CapturedTerminalHitOnly
+                   && attack != null
+                   && this.HasCompleteFixedRuntimeEvidence
+                   && attack.UsesEquippedWeapon == this.CapturedUsesEquippedWeapon.Value
+                   && attack.SendAttackInfo == this.CapturedSendAttackInfo.Value
+                   && attack.AttackInfoWeaponSlot == this.WeaponSlot
                    && attack.AttackInfoHitType == this.HitTypeWire
                    && attack.AttackInfoWeaponInstance == this.WeaponInstance
                    && attack.AttackInfoN3Unknown == this.N3Unknown;
@@ -456,7 +473,11 @@ namespace AORebirth.Core.Playfields
         internal bool MatchesSpecialized(CapturedEnemyCombatContract contract)
         {
             int[][] ignoredObservations;
-            return this.TryMatchSpecialized(contract, out ignoredObservations);
+            int?[] ignoredTerminalUnknowns;
+            return this.TryMatchSpecialized(
+                contract,
+                out ignoredObservations,
+                out ignoredTerminalUnknowns);
         }
 
         internal bool TryEnrichSpecialized(
@@ -465,23 +486,28 @@ namespace AORebirth.Core.Playfields
         {
             enriched = null;
             int[][] capturedDamageObservationsByAttack;
+            int?[] lethalAttackInfoUnknownByAttack;
             if (!this.TryMatchSpecialized(
                     contract,
-                    out capturedDamageObservationsByAttack))
+                    out capturedDamageObservationsByAttack,
+                    out lethalAttackInfoUnknownByAttack))
             {
                 return false;
             }
 
             enriched = contract.WithCapturedSpecializedDamageObservations(
-                capturedDamageObservationsByAttack);
+                capturedDamageObservationsByAttack,
+                lethalAttackInfoUnknownByAttack);
             return enriched != null;
         }
 
         private bool TryMatchSpecialized(
             CapturedEnemyCombatContract contract,
-            out int[][] capturedDamageObservationsByAttack)
+            out int[][] capturedDamageObservationsByAttack,
+            out int?[] lethalAttackInfoUnknownByAttack)
         {
             capturedDamageObservationsByAttack = null;
+            lethalAttackInfoUnknownByAttack = null;
             if (contract == null
                 || contract.AttackModel != CapturedEnemyAttackModel.Specialized)
             {
@@ -568,18 +594,26 @@ namespace AORebirth.Core.Playfields
                 || attackUnknown != this.AttackN3Unknown
                 || attackAction != this.AttackAction
                 || !SpecialsMatch(currentSpecials, this.SpecialAttacks)
-                || attacks.Count == 0
-                || attacks.Count != this.Streams.Length)
+                || attacks.Count == 0)
             {
                 return false;
             }
 
-            var matches = new bool[attacks.Count, this.Streams.Length];
+            CapturedEnemyCombatProfileStreamDefinition[] cadenceStreams =
+                this.Streams.Where(stream => !stream.CapturedTerminalHitOnly).ToArray();
+            CapturedEnemyCombatProfileStreamDefinition[] terminalStreams =
+                this.Streams.Where(stream => stream.CapturedTerminalHitOnly).ToArray();
+            if (attacks.Count != cadenceStreams.Length)
+            {
+                return false;
+            }
+
+            var matches = new bool[attacks.Count, cadenceStreams.Length];
             for (int phaseIndex = 0; phaseIndex < attacks.Count; phaseIndex++)
             {
-                for (int streamIndex = 0; streamIndex < this.Streams.Length; streamIndex++)
+                for (int streamIndex = 0; streamIndex < cadenceStreams.Length; streamIndex++)
                 {
-                    CapturedEnemyCombatProfileStreamDefinition stream = this.Streams[streamIndex];
+                    CapturedEnemyCombatProfileStreamDefinition stream = cadenceStreams[streamIndex];
                     matches[phaseIndex, streamIndex] =
                         productionOwnsVariableValues
                             ? stream.MatchesProductionOwnedValues(attacks[phaseIndex])
@@ -599,7 +633,34 @@ namespace AORebirth.Core.Playfields
             }
 
             capturedDamageObservationsByAttack = streamForPhase.Select(
-                streamIndex => this.Streams[streamIndex].CapturedDamageObservations.ToArray()).ToArray();
+                streamIndex => cadenceStreams[streamIndex].CapturedDamageObservations.ToArray()).ToArray();
+            lethalAttackInfoUnknownByAttack = new int?[attacks.Count];
+            foreach (CapturedEnemyCombatProfileStreamDefinition terminalStream in terminalStreams)
+            {
+                int[] compatiblePhases = Enumerable.Range(0, attacks.Count).Where(
+                    phaseIndex => terminalStream.MatchesCapturedTerminalOutcome(
+                        attacks[phaseIndex])).ToArray();
+                if (compatiblePhases.Length != 1)
+                {
+                    capturedDamageObservationsByAttack = null;
+                    lethalAttackInfoUnknownByAttack = null;
+                    return false;
+                }
+
+                int phase = compatiblePhases[0];
+                if (lethalAttackInfoUnknownByAttack[phase].HasValue
+                    && lethalAttackInfoUnknownByAttack[phase].Value
+                       != terminalStream.DamageTypeWire)
+                {
+                    capturedDamageObservationsByAttack = null;
+                    lethalAttackInfoUnknownByAttack = null;
+                    return false;
+                }
+
+                lethalAttackInfoUnknownByAttack[phase] =
+                    terminalStream.DamageTypeWire;
+            }
+
             return true;
         }
 
