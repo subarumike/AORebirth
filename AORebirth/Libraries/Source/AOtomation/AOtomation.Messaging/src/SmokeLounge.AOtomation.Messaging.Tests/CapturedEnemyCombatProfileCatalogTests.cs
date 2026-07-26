@@ -11,6 +11,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.Core.Playfields;
 
     [TestClass]
@@ -1637,6 +1639,476 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     exactProfile.Streams[0].HitTypeWire,
                     resolved.AttackInfoHitType);
             }
+        }
+
+        [TestMethod]
+        public void RemainingCultistQuarantineAuditIsExplicit()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            Dictionary<string, OrdinaryEnemyProfile> runtimeProfiles =
+                runtimeCatalog.GetProfiles().Where(
+                    value => value.DisplayName == "Cultist")
+                    .ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
+            CapturedEnemyCombatProfileDefinition[] generatedProfiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
+            Func<CapturedEnemyCombatProfileDefinition, string> structuralKey = value =>
+                string.Format(
+                    "{0}/{1}/slot{2}/wifu{3}:{4}:{5}:{6}:{7}/stats[{8}]/"
+                    + "specials[{9}]/sawN3{10}/attackN3{11}/action{12}/streams[{13}]",
+                    value.WeaponDefinition == null ? 0 : value.WeaponDefinition.LowId,
+                    value.WeaponDefinition == null ? 0 : value.WeaponDefinition.HighId,
+                    value.WeaponDefinition == null
+                        ? 0
+                        : value.WeaponDefinition.InventorySlot,
+                    value.WeaponDefinition == null ? 0 : value.WeaponDefinition.N3Unknown,
+                    value.WeaponDefinition == null ? 0 : value.WeaponDefinition.Unknown1,
+                    value.WeaponDefinition == null
+                        ? 0
+                        : value.WeaponDefinition.StateMachineType,
+                    value.WeaponDefinition == null
+                        ? 0
+                        : value.WeaponDefinition.StateMachineInstance,
+                    value.WeaponDefinition == null ? 0 : value.WeaponDefinition.Unknown2,
+                    value.WeaponDefinition == null
+                        ? string.Empty
+                        : string.Join(
+                            ",",
+                            value.WeaponDefinition.Stats.Select(
+                                stat => stat.Stat == CharacterStat.ACGItemLevel
+                                        || stat.Stat == CharacterStat.Energy
+                                        || stat.Stat == CharacterStat.MultipleCount
+                                        || stat.Stat == CharacterStat.AttackDelay
+                                        || stat.Stat == CharacterStat.RechargeDelay
+                                    ? string.Format("{0}:production", (int)stat.Stat)
+                                    : string.Format(
+                                        "{0}:{1}",
+                                        (int)stat.Stat,
+                                        stat.Value))),
+                    string.Join(
+                        ",",
+                        value.SpecialAttacks.Select(
+                            special => string.Format(
+                                "{0}/{1}/{2}/{3}",
+                                special.LowTemplate,
+                                special.HighTemplate,
+                                special.Tag,
+                                special.Name))),
+                    value.SpecialAttackWeaponN3Unknown,
+                    value.AttackN3Unknown,
+                    value.AttackAction,
+                    string.Join(
+                        ",",
+                        value.Streams.Select(
+                            stream => string.Format(
+                                "slot{0}/damage{1}/hit{2}/instance{3}/n3{4}/equipped{5}/attackInfo{6}",
+                                stream.WeaponSlot,
+                                stream.DamageTypeWire,
+                                stream.HitTypeWire,
+                                stream.WeaponInstance,
+                                stream.N3Unknown,
+                                stream.CapturedUsesEquippedWeapon,
+                                stream.CapturedSendAttackInfo))));
+            var quarantined = new List<Tuple<
+                OrdinaryEnemySpawnDefinition,
+                OrdinaryEnemyProfile,
+                string>>();
+
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 1931
+                         && runtimeProfiles.ContainsKey(value.ProfileKey)))
+            {
+                OrdinaryEnemyProfile runtimeProfile =
+                    runtimeProfiles[activeSpawn.ProfileKey];
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                baseline.Retaliates = true;
+                baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                if (!CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure))
+                {
+                    quarantined.Add(
+                        Tuple.Create(
+                            activeSpawn,
+                            runtimeProfile,
+                            string.Format(
+                                "{0}; baselineReady={1}; baselineModel={2}",
+                                failure,
+                                baseline.IsCombatReady,
+                                baseline.AttackModel)));
+                }
+            }
+
+            Assert.AreEqual(76, quarantined.Count);
+            foreach (IGrouping<string, Tuple<
+                OrdinaryEnemySpawnDefinition,
+                OrdinaryEnemyProfile,
+                string>> group in quarantined.GroupBy(
+                    value => string.Format(
+                        "{0}|{1}|{2}",
+                        value.Item2.MonsterData,
+                        value.Item1.Level,
+                        value.Item3),
+                    StringComparer.Ordinal).OrderBy(value => value.Key, StringComparer.Ordinal))
+            {
+                Tuple<OrdinaryEnemySpawnDefinition, OrdinaryEnemyProfile, string> first =
+                    group.First();
+                CapturedEnemyCombatProfileDefinition[] candidates = generatedProfiles.Where(
+                    value => value.MatchesKey(
+                        1931,
+                        first.Item2.DisplayName,
+                        first.Item2.MonsterData,
+                        first.Item1.Level)).ToArray();
+                string candidateSummary = candidates.Length == 0
+                    ? "none"
+                    : string.Join(
+                        " || ",
+                        candidates.Select(
+                            value => string.Format(
+                                "{0};captureSafe={1};runtimeSafe={2};packetReady={3};"
+                                + "weapon={4}/{5}/QL{6}/slot{7}/energy{8};streams={9};"
+                                + "sessions={10}",
+                                value.ProfileId,
+                                value.CaptureEvidenceSafe,
+                                value.CaptureRuntimeEvidenceSafe,
+                                value.SupportsCaptureProvenEquippedWeaponPacketSemantics,
+                                value.WeaponDefinition == null
+                                    ? 0
+                                    : value.WeaponDefinition.LowId,
+                                value.WeaponDefinition == null
+                                    ? 0
+                                    : value.WeaponDefinition.HighId,
+                                value.WeaponDefinition == null
+                                    ? 0
+                                    : value.WeaponDefinition.Quality,
+                                value.WeaponDefinition == null
+                                    ? 0
+                                    : value.WeaponDefinition.InventorySlot,
+                                value.WeaponDefinition == null
+                                    ? 0
+                                    : value.WeaponDefinition.InitialEnergy,
+                                string.Join(
+                                    ",",
+                                    value.Streams.Select(
+                                        stream => string.Format(
+                                            "ammo{0}/slot{1}/damage{2}/hit{3}/instance{4}/equipped{5}/attackInfo{6}",
+                                            stream.InitialAmmoCount,
+                                            stream.WeaponSlot,
+                                            stream.DamageTypeWire,
+                                            stream.HitTypeWire,
+                                            stream.WeaponInstance,
+                                            stream.CapturedUsesEquippedWeapon,
+                                            stream.CapturedSendAttackInfo))),
+                                string.Join(
+                                    ",",
+                                    System.Text.RegularExpressions.Regex.Matches(
+                                        value.Evidence,
+                                        @"captures/(\d{8}-\d{6})")
+                                        .Cast<System.Text.RegularExpressions.Match>()
+                                        .Select(match => match.Groups[1].Value)
+                                        .Distinct()
+                                        .OrderBy(session => session, StringComparer.Ordinal)))));
+                this.TestContext.WriteLine(
+                    "AUDIT md={0} level={1} actors={2} sources={3} failure={4} candidates={5}",
+                    first.Item2.MonsterData,
+                    first.Item1.Level,
+                    group.Count(),
+                    string.Join(
+                        ",",
+                        group.Select(
+                            value => string.Format(
+                                "0x{0:X8}",
+                                value.Item1.SourceIdentity))),
+                    first.Item3,
+                    candidateSummary);
+            }
+
+            foreach (IGrouping<int, CapturedEnemyCombatProfileDefinition> family
+                in generatedProfiles.Where(
+                    value => value.ResourceId == 1931
+                             && value.Name == "Cultist")
+                    .GroupBy(value => value.MonsterData)
+                    .OrderBy(value => value.Key))
+            {
+                foreach (CapturedEnemyCombatProfileDefinition profile in family.OrderBy(
+                    value => value.Level).ThenBy(
+                    value => value.ProfileId,
+                    StringComparer.Ordinal))
+                {
+                    CapturedEnemyWeaponDefinition weapon = profile.WeaponDefinition;
+                    this.TestContext.WriteLine(
+                        "PROFILE md={0} level={1} id={2} "
+                        + "wifu={3}/{4}/ql{5}/slot{6}/n3{7}/u1{8}/sm{9}:{10}/u2{11}/u3{12}/"
+                        + "energy{13}/stats[{14}] saw={15}:{16}:{17}:{18}:{19}/n3{20} "
+                        + "streams[{21}] sessions={22}",
+                        profile.MonsterData,
+                        profile.Level,
+                        profile.ProfileId,
+                        weapon == null ? 0 : weapon.LowId,
+                        weapon == null ? 0 : weapon.HighId,
+                        weapon == null ? 0 : weapon.Quality,
+                        weapon == null ? 0 : weapon.InventorySlot,
+                        weapon == null ? 0 : weapon.N3Unknown,
+                        weapon == null ? 0 : weapon.Unknown1,
+                        weapon == null ? 0 : weapon.StateMachineType,
+                        weapon == null ? 0 : weapon.StateMachineInstance,
+                        weapon == null ? 0 : weapon.Unknown2,
+                        weapon == null ? 0 : weapon.Unknown3,
+                        weapon == null ? 0 : weapon.InitialEnergy,
+                        weapon == null
+                            ? string.Empty
+                            : string.Join(
+                                ",",
+                                weapon.Stats.Select(
+                                    stat => string.Format(
+                                        "{0}:{1}",
+                                        (int)stat.Stat,
+                                        unchecked((int)stat.Value)))),
+                        profile.SpecialAttackWeaponUnknown1,
+                        profile.SpecialAttackWeaponUnknown2,
+                        profile.SpecialAttackWeaponUnknown3,
+                        profile.SpecialAttackWeaponUnknown4,
+                        profile.SpecialAttackWeaponUnknown5,
+                        profile.SpecialAttackWeaponN3Unknown,
+                        string.Join(
+                            ",",
+                            profile.Streams.Select(
+                                stream => string.Format(
+                                    "ammo{0}/slot{1}/damage{2}/hit{3}/instance{4}/n3{5}/"
+                                    + "equipped{6}/attackInfo{7}",
+                                    stream.InitialAmmoCount,
+                                    stream.WeaponSlot,
+                                    stream.DamageTypeWire,
+                                    stream.HitTypeWire,
+                                    stream.WeaponInstance,
+                                    stream.N3Unknown,
+                                    stream.CapturedUsesEquippedWeapon,
+                                    stream.CapturedSendAttackInfo))),
+                        string.Join(
+                            ",",
+                            Regex.Matches(profile.Evidence, @"captures/(\d{8}-\d{6})")
+                                .Cast<Match>()
+                                .Select(match => match.Groups[1].Value)
+                                .Distinct()
+                                .OrderBy(value => value, StringComparer.Ordinal)));
+                }
+
+                var remainingProfiles = family.OrderBy(
+                    value => value.ProfileId,
+                    StringComparer.Ordinal).ToList();
+                while (remainingProfiles.Count > 0)
+                {
+                    CapturedEnemyCombatProfileDefinition representative =
+                        remainingProfiles[0];
+                    CapturedEnemyCombatProfileDefinition[] archetype =
+                        remainingProfiles.Where(
+                            value => representative
+                                .MatchesCaptureProvenEquippedWeaponArchetype(value))
+                            .ToArray();
+                    if (archetype.Length == 0)
+                    {
+                        archetype = new[] { representative };
+                    }
+
+                    this.TestContext.WriteLine(
+                        "ARCHETYPE md={0} compatible={1} profiles={2} levels={3} "
+                        + "weapon={4}/{5}/slot{6} packetReady={7} reusable={8} "
+                        + "streams={9} sessions={10}",
+                        family.Key,
+                        archetype.Length,
+                        string.Join(
+                            ",",
+                            archetype.Select(value => value.ProfileId)),
+                        string.Join(
+                            ",",
+                            archetype.Select(value => value.Level).Distinct().OrderBy(value => value)),
+                        representative.WeaponDefinition == null
+                            ? 0
+                            : representative.WeaponDefinition.LowId,
+                        representative.WeaponDefinition == null
+                            ? 0
+                            : representative.WeaponDefinition.HighId,
+                        representative.WeaponDefinition == null
+                            ? 0
+                            : representative.WeaponDefinition.InventorySlot,
+                        representative.SupportsCaptureProvenEquippedWeaponPacketSemantics,
+                        representative.SupportsCaptureProvenEquippedWeaponArchetype,
+                        string.Join(
+                            ",",
+                            representative.Streams.Select(
+                                stream => string.Format(
+                                    "ammo{0}/slot{1}/damage{2}/hit{3}/instance{4}",
+                                    stream.InitialAmmoCount,
+                                    stream.WeaponSlot,
+                                    stream.DamageTypeWire,
+                                    stream.HitTypeWire,
+                                    stream.WeaponInstance))),
+                        string.Join(
+                            ",",
+                            archetype.SelectMany(
+                                value => System.Text.RegularExpressions.Regex.Matches(
+                                    value.Evidence,
+                                    @"captures/(\d{8}-\d{6})")
+                                    .Cast<System.Text.RegularExpressions.Match>()
+                                    .Select(match => match.Groups[1].Value))
+                                .Distinct()
+                                .OrderBy(value => value, StringComparer.Ordinal)));
+                    foreach (CapturedEnemyCombatProfileDefinition profile in archetype)
+                    {
+                        remainingProfiles.Remove(profile);
+                    }
+                }
+
+                CapturedEnemyCombatProfileDefinition[] packetProfiles = family.Where(
+                    value => value.SupportsCaptureProvenEquippedWeaponPacketSemantics)
+                    .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
+                    .ToArray();
+                var packetGroups = new List<CapturedEnemyCombatProfileDefinition[]>();
+                foreach (CapturedEnemyCombatProfileDefinition profile in packetProfiles)
+                {
+                    if (packetGroups.Any(
+                        group => group[0]
+                            .MatchesCaptureProvenEquippedWeaponPacketSemantics(profile)))
+                    {
+                        continue;
+                    }
+
+                    packetGroups.Add(
+                        packetProfiles.Where(
+                            value => profile
+                                .MatchesCaptureProvenEquippedWeaponPacketSemantics(value))
+                            .ToArray());
+                }
+
+                foreach (CapturedEnemyCombatProfileDefinition[] packetGroup in packetGroups)
+                {
+                    CapturedEnemyCombatProfileDefinition representative = packetGroup[0];
+                    this.TestContext.WriteLine(
+                        "PACKET_ARCHETYPE md={0} compatible={1} profiles={2} levels={3} "
+                        + "weapon={4}/{5}/slot{6} streams={7}",
+                        family.Key,
+                        packetGroup.Length,
+                        string.Join(
+                            ",",
+                            packetGroup.Select(value => value.ProfileId)),
+                        string.Join(
+                            ",",
+                            packetGroup.Select(value => value.Level).Distinct().OrderBy(value => value)),
+                        representative.WeaponDefinition.LowId,
+                        representative.WeaponDefinition.HighId,
+                        representative.WeaponDefinition.InventorySlot,
+                        string.Join(
+                            ",",
+                            representative.Streams.Select(
+                                stream => string.Format(
+                                    "ammo{0}/slot{1}/damage{2}/hit{3}/instance{4}",
+                                    stream.InitialAmmoCount,
+                                    stream.WeaponSlot,
+                                    stream.DamageTypeWire,
+                                    stream.HitTypeWire,
+                                    stream.WeaponInstance))));
+                }
+
+                foreach (IGrouping<string, CapturedEnemyCombatProfileDefinition> structuralGroup
+                    in family.Where(
+                        value => value.CaptureEvidenceSafe
+                                 && value.WeaponDefinition != null
+                                 && value.WeaponDefinition.IsValid
+                                 && value.Streams.Length == 1)
+                        .GroupBy(structuralKey, StringComparer.Ordinal)
+                        .OrderByDescending(value => value.Count()))
+                {
+                    CapturedEnemyCombatProfileDefinition representative =
+                        structuralGroup.First();
+                    this.TestContext.WriteLine(
+                        "STRUCTURAL_ARCHETYPE md={0} compatible={1} profiles={2} levels={3} "
+                        + "weapon={4}/{5}/slot{6} sessions={7}",
+                        family.Key,
+                        structuralGroup.Count(),
+                        string.Join(
+                            ",",
+                            structuralGroup.Select(value => value.ProfileId)),
+                        string.Join(
+                            ",",
+                            structuralGroup.Select(value => value.Level)
+                                .Distinct()
+                                .OrderBy(value => value)),
+                        representative.WeaponDefinition.LowId,
+                        representative.WeaponDefinition.HighId,
+                        representative.WeaponDefinition.InventorySlot,
+                        string.Join(
+                            ",",
+                            structuralGroup.SelectMany(
+                                value => System.Text.RegularExpressions.Regex.Matches(
+                                    value.Evidence,
+                                    @"captures/(\d{8}-\d{6})")
+                                    .Cast<System.Text.RegularExpressions.Match>()
+                                    .Select(match => match.Groups[1].Value))
+                                .Distinct()
+                                .OrderBy(value => value, StringComparer.Ordinal)));
+                }
+            }
+
+            Assert.AreEqual(
+                72,
+                quarantined.Count(
+                    value => value.Item3.StartsWith(
+                        "no canonical raw combat profile for ",
+                        StringComparison.Ordinal)));
+            Assert.AreEqual(
+                4,
+                quarantined.Count(
+                    value => value.Item3.Contains(
+                        "does not distinguish 2 compatible exact contracts")));
+
+            Tuple<OrdinaryEnemySpawnDefinition, OrdinaryEnemyProfile, string>[]
+                largestStructurallySimilarBlockedCohort = quarantined.Where(
+                    value => value.Item2.MonsterData == 26137).ToArray();
+            Assert.AreEqual(10, largestStructurallySimilarBlockedCohort.Length);
+            Assert.IsTrue(
+                largestStructurallySimilarBlockedCohort.All(
+                    value => value.Item3.StartsWith(
+                        "no canonical raw combat profile for ",
+                        StringComparison.Ordinal)));
+
+            CapturedEnemyCombatProfileDefinition[] captured26137 =
+                generatedProfiles.Where(
+                    value => value.ResourceId == 1931
+                             && value.Name == "Cultist"
+                             && value.MonsterData == 26137).ToArray();
+            Assert.AreEqual(6, captured26137.Length);
+            Assert.AreEqual(
+                6,
+                captured26137.Select(
+                    value => string.Format(
+                        "{0}:{1}:{2}:{3}:{4}",
+                        value.SpecialAttackWeaponUnknown1,
+                        value.SpecialAttackWeaponUnknown2,
+                        value.SpecialAttackWeaponUnknown3,
+                        value.SpecialAttackWeaponUnknown4,
+                        value.SpecialAttackWeaponUnknown5))
+                    .Distinct(StringComparer.Ordinal)
+                    .Count(),
+                "Each captured level has a distinct SAW initialization; an uncaptured level "
+                + "cannot borrow another level's initialization.");
+            Assert.IsTrue(
+                captured26137.All(
+                    left => captured26137.Count(
+                        right => left
+                            .MatchesCaptureProvenEquippedWeaponPacketSemantics(right)) == 1));
         }
 
         [TestMethod]
