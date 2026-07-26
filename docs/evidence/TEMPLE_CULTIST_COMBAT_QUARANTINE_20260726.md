@@ -6,13 +6,20 @@ No remaining Cultist cohort can be restored from the generated profiles without
 inventing or borrowing an uncaptured `SpecialAttackWeapon` initialization.
 Production combat behavior is therefore unchanged.
 
-The accepted checkpoint is still `376/489` certified and `113` quarantined.
-The current resolver enumerates `76` quarantined Cultist spawn rows, not the
-checkpoint's stated `70`. This is a pre-existing six-row accounting discrepancy:
-the audit was run at accepted commit
-`47b7604633b960b46fb553eca2c46e9cba391707` before any production change.
-It does not represent six newly quarantined actors, and this evidence-only slice
-does not revise the accepted certification metric.
+The authoritative actor-based PF127/PF1931 denominator is `489` unique active
+spawns: `313` certified and `176` quarantined. PF1931 contains `149` unique
+Cultist actors: `73` certified and `76` quarantined. There are `76` Cultist
+rejection rows because the resolver is invoked exactly once for each unique
+Cultist spawn and every failed invocation contributes one row. The generated
+catalog contains `50` Cultist profile rows; those evidence profiles are not
+runtime actors and are not part of the `149`-actor denominator.
+
+The previous `376` certified / `113` quarantined checkpoint and its `70`
+remaining Cultists were stale incrementally maintained documentation. They do
+not reconcile to the current resolver over the current `489` unique actors.
+There are no duplicate Cultist spawn keys, duplicate playfield/source-identity
+pairs, or multiple rejection records for one actor. The six-row `76` versus
+`70` difference was therefore stale documentation, not rejection-row inflation.
 
 ## Shared exact packet structure
 
@@ -36,6 +43,53 @@ The packet factory emits those values exactly from the selected contract. The
 repository has no production owner that supplies missing Cultist
 `SpecialAttackWeapon Unknown1..4` values to the binder. Selecting another
 level's values would therefore be nearest-level or cross-level substitution.
+
+## MD26137 serialized SAW field map
+
+Byte ranges below are zero-based offsets in the serialized 37-byte
+`SpecialAttackWeapon` message body.
+
+| Bytes | Serializer field | L21 | L23 | L26 | L28 | L29 | L30 | Classification and current owner |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| `0..3` | message type | `1D3C0F1C` | same | same | same | same | same | Constant serializer-owned N3 message type. |
+| `4..7` | source identity type | `0000C350` | same | same | same | same | same | Constant `SimpleChar` identity type supplied by runtime actor identity. |
+| `8..11` | source identity instance | `0x7984B52E` | `0x7983FB9B` | `0x79834ECD` | `0x7984B374`, `0x7983FC37`, or `0x79834EC1` | `0x7987F038` | `0x7984B543` or `0x7987F630` | Generation-local runtime identity; not a reusable combat-profile value. |
+| `12` | N3 `Unknown` | `0` | `0` | `0` | `0` | `0` | `0` | Constant capture-bound field copied by the packet factory. |
+| `13..16` | empty X3F1 `Specials` array | `000003F1` | same | same | same | same | same | Constant capture-bound empty array. |
+| `17..20` | `Unknown1` | `320` | `351` | `400` | `434` | `450` | `468` | Level-dependent, capture-bound, no production owner. |
+| `21..24` | `Unknown2` | `320` | `351` | `400` | `434` | `450` | `468` | Level-dependent, capture-bound, no production owner. |
+| `25..28` | `Unknown3` | `320` | `351` | `400` | `434` | `450` | `468` | Level-dependent, capture-bound, no production owner. |
+| `29..32` | `Unknown4` | `12` | `13` | `16` | `17` | `17` | `18` | Level-dependent, capture-bound, no production owner. |
+| `33..36` | `Unknown5` | initial `0`; observed `0,13` | `0` | `0` | `0` | `0` | initial `0`; observed `0,20,0` | Initial value is capture-bound. Subsequent values are replayed only from the selected contract's ordered per-actor observation cursor. No generic missing-level source exists. |
+
+The exact initial SAW field tuples are therefore:
+
+| Level | Generated profile | Initial tuple `Unknown1:Unknown2:Unknown3:Unknown4:Unknown5` | Capture sessions |
+|---:|---|---|---|
+| 21 | `8dae5024f999475e-03dc0b29328f8462` | `320:320:320:12:0` | `20260721-052115` |
+| 23 | `58e682ec3ebb63c8-b677b63db5c16f15` | `351:351:351:13:0` | `20260721-032547` |
+| 26 | `a84eedad1a598b40-c4f21242a4a7ba96` | `400:400:400:16:0` | `20260721-052115` |
+| 28 | `e30508b3b9b8e352-a87351572a2f5f23` | `434:434:434:17:0` | `20260721-031913`, `20260721-052115` |
+| 29 | `3ec94c5698a809ab-d38e253d2479c92e` | `450:450:450:17:0` | `20260721-230426` |
+| 30 | `2ee43d964a95a575-9ca73d7846c38f6c` | `468:468:468:18:0` | `20260721-052115`, `20260722-042930` |
+
+## Production-source gate
+
+| Candidate authoritative source | What it actually owns | Six-level result |
+|---|---|---|
+| `AORebirth/Datafiles/items.dat` through `ItemLoader` and `Item` | Direct load of canonical template `204747` proves QL `1`, attack skill `105:100`, template RechargeDelay/stat `210=320`, AttackDelay/stat `294=280`, and no per-level record. Template low/high are both `204747`; with identical low/high templates, `Item.GetAttribute` returns the one low-template value rather than a level-dependent interpolation. The SAW serializer does not read item-template stats. | Rejected. Template stat `210=320` numerically matches `Unknown1..3` only at L21, but misses the other five levels and supplies no `Unknown4` mapping. It reproduces `0/6` complete tuples and no code maps that item stat to SAW. |
+| Active ordinary spawn construction | `CapturedTempleOfThreeWindsContentProvider` supplies level, health, scale, RunSpeed, appearance, and source identity. `OrdinaryEnemyRuntimeService.ApplyStats` installs those actor stats. | Rejected. No SAW field or independently validated SAW calculation exists in this path. |
+| Equipped-item instance and WIFU builder | `CapturedEnemyCombatContract.TryEquipCapturedWeapon` constructs QL1 item `204747/204747`. `ApplyCapturedWeaponStats` owns Flags, MultipleCount, Energy, AttackDelay, and RechargeDelay; for these captures it overwrites item delay/recharge to `235/235` at every level. | Rejected. These values reproduce captured WIFU, not SAW `Unknown1..4`; all six item instances have the same template, QL, and `235/235` runtime delay/recharge values. |
+| Player combat-start SAW generation | `AttackMessageHandler` selects one captured melee constant tuple or one captured ranged-special tuple based on equipped-item capability. | Rejected. It is player-only, not level-dependent, and neither constant tuple matches any MD26137 captured tuple. |
+| Shared captured-NPC packet factory | `CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon` copies `Unknown1..5` directly from its selected contract arguments. | Exact `6/6` only when the six captured contracts themselves are supplied. It derives `0/6` missing-level tuples and is not an authoritative production calculator. |
+| Per-actor captured runtime state | `NpcCombatTickCoordinator` advances only `Unknown5` through the selected contract's ordered observation array. Captured weapon Energy/ammunition are separately actor-owned. | Rejected for missing levels. It owns mutable replay state after exact contract selection, but supplies no `Unknown1..4` values and no missing-level `Unknown5` observation sequence. |
+
+The six-level proof therefore failed the implementation gate. Exact-byte tests
+confirm that all six existing contracts still reproduce their captured
+WIFU -> SAW -> Attack -> AttackInfo bodies, including the distinct SAW values,
+but no source other than those level-specific capture contracts supplies the
+varying fields. No formula was inferred from the six points, no adjacent level
+was copied, and no production combat code was changed.
 
 ## Generated combat families
 
@@ -119,3 +173,44 @@ candidate and preserves fail-closed selection.
 
 No actor was enabled by a nearest-level, nearest-QL, identity, or cross-weapon
 fallback.
+
+## Authoritative count reconciliation
+
+| Scope | Actor denominator | Certified actors | Quarantined actors | Rejection rows | Generated profile rows |
+|---|---:|---:|---:|---:|---:|
+| PF127 | `322` | `226` | `96` | `96` | not an actor denominator |
+| PF1931 | `167` | `87` | `80` | `80` | not an actor denominator |
+| PF127 + PF1931 | `489` | `313` | `176` | `176` | not an actor denominator |
+| PF1931 Cultists only | `149` | `73` | `76` | `76` | `50` |
+
+Permanent regression coverage asserts:
+
+- uniqueness of `playfield + SpawnKey` and `playfield + source identity`;
+- one resolver classification per active actor;
+- `certified + quarantined = actor denominator`;
+- one rejection row per quarantined actor;
+- `72 + 2 + 2 = 76` Cultist blockers;
+- `73 + 76 = 149` Cultist actors;
+- `313 + 176 = 489` active dungeon actors.
+
+## Validation
+
+- Focused MD26137 capture-bound source gate: `1/1` pass.
+- Focused Cultist actor-count reconciliation: `1/1` pass.
+- Focused MD26137 exact four-packet replay: `1/1` pass.
+- Full combat profile catalog: `42/42` pass.
+- Captured combat packet factory: `34/34` pass.
+- Generated exact-byte packet fixtures: `3/3` pass.
+- Temple ordinary content: `6/6` pass.
+- Focused Subway combat regressions: `5/5` pass.
+- World population foundation: `35/39` pass. The four failures are unrelated
+  existing expectations in source-aware fallback preservation, Mugger damage
+  shape, Incomplete Rebuild damage shape, and Deranged Shopper damage shape.
+- Complete messaging suite: `509/551` pass, `42` unrelated failures. The
+  failures remain in pre-existing damage-policy expectations, stale generated
+  coverage input hashes, inventory-route ownership assertions, missing deployed
+  content fixtures, world-population expectations, and visibility row/hook
+  expectations; none is in the changed MD26137 or count-reconciliation tests.
+- Debug build: pass.
+- `git diff --check`: pass.
+- Engine restart: pass; ports `6996`, `7012`, `7500`, and `7501` listening.

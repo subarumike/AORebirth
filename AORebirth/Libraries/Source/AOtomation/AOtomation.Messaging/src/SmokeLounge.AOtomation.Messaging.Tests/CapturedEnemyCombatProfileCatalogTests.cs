@@ -2112,6 +2112,259 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void Md26137SawInitializationRemainsCaptureBoundAndMissingLevelsFailClosed()
+        {
+            var expected = new[]
+            {
+                new
+                {
+                    Level = 21,
+                    ProfileId = "8dae5024f999475e-03dc0b29328f8462",
+                    Saw = 320,
+                    Saw4 = 12,
+                    Saw5 = new[] { 0, 13 }
+                },
+                new
+                {
+                    Level = 23,
+                    ProfileId = "58e682ec3ebb63c8-b677b63db5c16f15",
+                    Saw = 351,
+                    Saw4 = 13,
+                    Saw5 = new[] { 0 }
+                },
+                new
+                {
+                    Level = 26,
+                    ProfileId = "a84eedad1a598b40-c4f21242a4a7ba96",
+                    Saw = 400,
+                    Saw4 = 16,
+                    Saw5 = new[] { 0 }
+                },
+                new
+                {
+                    Level = 28,
+                    ProfileId = "e30508b3b9b8e352-a87351572a2f5f23",
+                    Saw = 434,
+                    Saw4 = 17,
+                    Saw5 = new[] { 0 }
+                },
+                new
+                {
+                    Level = 29,
+                    ProfileId = "3ec94c5698a809ab-d38e253d2479c92e",
+                    Saw = 450,
+                    Saw4 = 17,
+                    Saw5 = new[] { 0 }
+                },
+                new
+                {
+                    Level = 30,
+                    ProfileId = "2ee43d964a95a575-9ca73d7846c38f6c",
+                    Saw = 468,
+                    Saw4 = 18,
+                    Saw5 = new[] { 0, 20, 0 }
+                }
+            };
+            CapturedEnemyCombatProfileDefinition[] profiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => value.ResourceId == 1931
+                             && value.Name == "Cultist"
+                             && value.MonsterData == 26137).ToArray();
+            Assert.AreEqual(expected.Length, profiles.Length);
+
+            foreach (var value in expected)
+            {
+                CapturedEnemyCombatProfileDefinition profile = profiles.Single(
+                    candidate => candidate.ProfileId == value.ProfileId);
+                CapturedEnemyWeaponDefinition weapon = profile.WeaponDefinition;
+                CapturedEnemyCombatProfileStreamDefinition stream = profile.Streams.Single();
+
+                Assert.AreEqual(value.Level, profile.Level);
+                Assert.IsNotNull(weapon);
+                Assert.AreEqual(204747, weapon.LowId);
+                Assert.AreEqual(204747, weapon.HighId);
+                Assert.AreEqual(1, weapon.Quality);
+                Assert.AreEqual(6, weapon.InventorySlot);
+                Assert.AreEqual((byte)0, weapon.N3Unknown);
+                Assert.AreEqual(11, weapon.Unknown1);
+                Assert.AreEqual(1000015, weapon.StateMachineType);
+                Assert.AreEqual(0, weapon.StateMachineInstance);
+                Assert.AreEqual(262, weapon.Unknown2);
+                Assert.AreEqual(0, weapon.Unknown3);
+                Assert.AreEqual(-1, weapon.InitialEnergy);
+                Assert.AreEqual(0, profile.SpecialAttacks.Length);
+                Assert.AreEqual((byte)0, profile.SpecialAttackWeaponN3Unknown);
+                Assert.AreEqual(value.Saw, profile.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(value.Saw, profile.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(value.Saw, profile.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(value.Saw4, profile.SpecialAttackWeaponUnknown4);
+                Assert.AreEqual(0, profile.SpecialAttackWeaponUnknown5);
+                CollectionAssert.AreEqual(
+                    value.Saw5,
+                    profile.SpecialAttackWeaponUnknown5Observations);
+                Assert.AreEqual((byte)0, profile.AttackN3Unknown);
+                Assert.AreEqual((byte)0, profile.AttackAction);
+                Assert.AreEqual(-1, stream.InitialAmmoCount);
+                Assert.AreEqual(6, stream.WeaponSlot);
+                Assert.AreEqual(0, stream.DamageTypeWire);
+                Assert.AreEqual(3, stream.HitTypeWire);
+                Assert.AreEqual(0, stream.WeaponInstance);
+                Assert.AreEqual((byte)0, stream.N3Unknown);
+                Assert.IsTrue(stream.CapturedUsesEquippedWeapon == true);
+                Assert.IsTrue(stream.CapturedSendAttackInfo == true);
+            }
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Cultist"
+                         && value.MonsterData == 26137);
+            OrdinaryEnemySpawnDefinition[] blocked = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 1931
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && !profiles.Any(profile => profile.Level == value.Level)).ToArray();
+            Assert.AreEqual(10, blocked.Length);
+            CollectionAssert.AreEquivalent(
+                new[] { 22, 24, 25, 31, 31, 33, 33, 34, 34, 35 },
+                blocked.Select(value => value.Level).ToArray());
+            foreach (OrdinaryEnemySpawnDefinition spawn in blocked)
+            {
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        spawn.SourceIdentity,
+                        spawn.Level);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsFalse(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        spawn.Level,
+                        spawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure));
+                Assert.IsTrue(
+                    failure.StartsWith(
+                        "no canonical raw combat profile for ",
+                        StringComparison.Ordinal),
+                    failure);
+            }
+        }
+
+        [TestMethod]
+        public void ActiveActorAndCultistQuarantineCountsReconcileByUniqueSpawn()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            Dictionary<string, OrdinaryEnemyProfile> profiles =
+                runtimeCatalog.GetProfiles().ToDictionary(
+                    value => value.ProfileKey,
+                    StringComparer.Ordinal);
+            OrdinaryEnemySpawnDefinition[] spawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         || value.PlayfieldInstance == 1931).ToArray();
+            var certifiedKeys = new HashSet<string>(StringComparer.Ordinal);
+            var rejected = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            Assert.AreEqual(489, spawns.Length);
+            Assert.AreEqual(
+                spawns.Length,
+                spawns.Select(
+                    value => string.Format(
+                        "{0}|{1}",
+                        value.PlayfieldInstance,
+                        value.SpawnKey)).Distinct(StringComparer.Ordinal).Count());
+            Assert.AreEqual(
+                spawns.Length,
+                spawns.Select(
+                    value => string.Format(
+                        "{0}|{1:X8}",
+                        value.PlayfieldInstance,
+                        value.SourceIdentity)).Distinct(StringComparer.Ordinal).Count());
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                OrdinaryEnemyProfile profile = profiles[spawn.ProfileKey];
+                CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    spawn.Level);
+                baseline.Retaliates = true;
+                baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                string actorKey = string.Format(
+                    "{0}|{1}",
+                    spawn.PlayfieldInstance,
+                    spawn.SpawnKey);
+                if (CapturedEnemyCombatProfileCatalog.TryResolve(
+                        spawn.PlayfieldInstance,
+                        profile.DisplayName,
+                        profile.MonsterData,
+                        spawn.Level,
+                        spawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure))
+                {
+                    Assert.IsTrue(certifiedKeys.Add(actorKey));
+                }
+                else
+                {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+                    rejected.Add(actorKey, failure);
+                }
+            }
+
+            Assert.AreEqual(313, certifiedKeys.Count);
+            Assert.AreEqual(176, rejected.Count);
+            Assert.AreEqual(spawns.Length, certifiedKeys.Count + rejected.Count);
+            Assert.AreEqual(226, certifiedKeys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(96, rejected.Keys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(87, certifiedKeys.Count(value => value.StartsWith("1931|")));
+            Assert.AreEqual(80, rejected.Keys.Count(value => value.StartsWith("1931|")));
+
+            OrdinaryEnemySpawnDefinition[] cultists = spawns.Where(
+                value => value.PlayfieldInstance == 1931
+                         && profiles[value.ProfileKey].DisplayName == "Cultist").ToArray();
+            HashSet<string> cultistKeys = new HashSet<string>(
+                cultists.Select(value => "1931|" + value.SpawnKey),
+                StringComparer.Ordinal);
+            int certifiedCultists = cultistKeys.Count(certifiedKeys.Contains);
+            string[] rejectedCultistKeys = cultistKeys.Where(rejected.ContainsKey).ToArray();
+            Assert.AreEqual(149, cultistKeys.Count);
+            Assert.AreEqual(73, certifiedCultists);
+            Assert.AreEqual(76, rejectedCultistKeys.Length);
+            Assert.AreEqual(cultistKeys.Count, certifiedCultists + rejectedCultistKeys.Length);
+            Assert.AreEqual(
+                50,
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Count(
+                    value => value.ResourceId == 1931
+                             && value.Name == "Cultist"));
+            Assert.AreEqual(
+                72,
+                rejectedCultistKeys.Count(
+                    key => rejected[key].StartsWith(
+                        "no canonical raw combat profile for ",
+                        StringComparison.Ordinal)));
+            Assert.AreEqual(
+                4,
+                rejectedCultistKeys.Count(
+                    key => rejected[key].Contains(
+                        "does not distinguish 2 compatible exact contracts")));
+            Assert.AreEqual(
+                rejectedCultistKeys.Length,
+                rejectedCultistKeys.GroupBy(
+                    key => key,
+                    StringComparer.Ordinal).Sum(group => group.Count()));
+        }
+
+        [TestMethod]
         public void ReanimatedCorpseAnchorsResolveTheirExactCapturedWeaponProfiles()
         {
             var expectedProfiles = new[]

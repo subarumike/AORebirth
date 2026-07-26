@@ -49,8 +49,10 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and all `31` source-local atomic generations to the exact captured
   level/weapon-family packet archetype while its existing generation selector
   owns QL and the item/combat owners retain damage, range, and cadence. Active
-  PF127/PF1931 certification is now `376` ready and `113` quarantined, up from
-  `223` / `266`. Filth Flea now binds `30` active PF127 actors at captured
+  Actor-based PF127/PF1931 certification is `313` ready and `176` quarantined
+  across `489` unique active spawns, up from `223` / `266`. The previously
+  documented `376` / `113` checkpoint was a stale incremental total rather than
+  a current resolver classification. Filth Flea now binds `30` active PF127 actors at captured
   levels 4, 6, 10-13, and 19-21 to their exact two-stream natural attack
   semantics while production retains damage, range, cadence, ammunition, and
   mutable `SpecialAttackWeapon` values. Its twelve level-5 actors retain their
@@ -84,17 +86,19 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   cadence, Energy, ammunition, and mutable weapon state. Other Cultist
   weapon/stream variants remain distinct and ambiguous or unsupported
   variants still fail closed.
-  The 2026-07-26 remaining-Cultist audit found no additional safe cohort.
-  Seventy-two resolver-rejected actors have no complete generated profile at
-  their exact MonsterData/level, two have unresolved same-template QL
-  initialization ambiguity, and two have genuine cross-weapon ambiguity.
-  `MonsterData 26137` is the largest internally structure-similar blocked
-  cohort (10 actors), but its six captured levels have six distinct exact
-  `SpecialAttackWeapon` initializations; cross-level substitution remains
-  forbidden. The resolver enumerates 76 rejected Cultist rows, a pre-existing
-  six-row discrepancy with the accepted 70-Cultist checkpoint. No production
-  behavior or accepted `376` / `113` certification metric changed; full
-  evidence is recorded in
+  The 2026-07-26 remaining-Cultist source gate found no additional safe cohort.
+  Canonical QL1 item `204747/204747`, ordinary actor construction, equipped
+  item state, and existing player/NPC packet paths do not supply the varying
+  MD26137 SAW `Unknown1..4` fields. Only the six level-specific capture
+  contracts reproduce all six exact packets, so the ten missing-level actors
+  remain fail-closed without interpolation or adjacent-level reuse. Seventy-two
+  resolver-rejected Cultists have no exact generated profile, two have
+  unresolved same-template QL ambiguity, and two have genuine cross-weapon
+  ambiguity. Actor-based reconciliation proves `149` unique Cultists:
+  `73` certified and `76` quarantined, with one rejection row per quarantined
+  actor and `50` generated evidence-profile rows outside the actor denominator.
+  The earlier `70` Cultist checkpoint was stale documentation. Full evidence is
+  recorded in
   `docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md`.
   Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
   bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact

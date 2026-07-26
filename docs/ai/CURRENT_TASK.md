@@ -6,14 +6,18 @@
 
 The three active level-32 `MonsterData 26149` Temple Cultists remain certified
 through generated profile `b07cc6a46f13664f-8e90c740f8e6bbe0` from capture
-`20260721-052115`. A focused audit of every currently resolver-rejected Cultist
-found no additional safely reusable cohort: 72 active rows have no complete
-generated profile at their exact MonsterData/level, two have unresolved
-same-template QL initialization ambiguity, and two have genuine cross-weapon
-ambiguity. The largest structure-similar cohort (`MonsterData 26137`, 10 actors)
-has six captured levels with six different exact `SpecialAttackWeapon`
-initializations, so no adjacent level was substituted. The resolver enumerates
-76 rejected Cultist rows, exposing a pre-existing six-row discrepancy with the
-accepted 70-Cultist checkpoint; no production behavior or accepted
-`376`-ready/`113`-quarantined metric changed in this evidence-only slice. See
+`20260721-052115`. The focused `MonsterData 26137` production-source gate
+rejected restoration: canonical item template `204747/204747` is one fixed QL1
+record, ordinary spawn construction supplies no SAW values, equipped weapon
+state supplies only WIFU/item state, and the shared packet factory copies
+`Unknown1..4` from the selected capture contract. No existing authoritative
+source reproduces the six captured initializations at levels 21, 23, 26, 28,
+29, and 30, so all ten uncaptured-level actors remain quarantined.
+
+Actor-based reconciliation now supersedes the stale incremental checkpoint.
+The authoritative PF127/PF1931 denominator is `489` unique actors: `313`
+certified and `176` quarantined. PF1931 contains `149` unique Cultists:
+`73` certified and `76` quarantined, with exactly one rejection row per
+quarantined actor. The prior `70` Cultist and `376/113` totals were stale
+documentation, not duplicate runtime actors or inflated rejection rows. See
 `docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md`.
