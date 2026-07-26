@@ -963,6 +963,106 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DiscardedPetUsesReusableNaturalArchetypeAcrossAllActiveLevels()
+        {
+            string[] profileIds =
+            {
+                "2a1d4cb7813554fa-90a0c301751057c4",
+                "947eb7806de2ef00-370328526bcb32c7",
+                "95d366ebb4f855e2-9bcb7a58208cf1e0",
+                "abcad39356c40905-a60091518e8654c5"
+            };
+            CapturedEnemyCombatProfileDefinition[] generated =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => profileIds.Contains(value.ProfileId)).ToArray();
+            Assert.AreEqual(profileIds.Length, generated.Length);
+            Assert.IsTrue(
+                generated.All(
+                    value => generated[0]
+                        .MatchesCaptureProvenNaturalAttackPacketSemantics(
+                            value)));
+            Assert.IsFalse(
+                generated[0].MatchesCaptureProvenNaturalAttackPacketSemantics(
+                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                        value => value.ProfileId
+                                 == "25233d23b2122a1b-d8846baa20340c1c")));
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Discarded Pet"
+                         && value.MonsterData == 17720);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(29, activeSpawns.Length);
+
+            var resolvedArchetypeIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+                baseline.Retaliates = true;
+                baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsFalse(resolved.CaptureProvenArchetypeId.Contains("|level="));
+                Assert.IsTrue(
+                    profileIds.All(
+                        value => resolved.CaptureProvenArchetypeId.Contains(value)));
+                CapturedEnemyCombatAttackDefinition attack =
+                    resolved.SpecialAttackSequence.RepeatingAttack;
+                Assert.AreEqual(baseline.MinDamage, attack.MinDamage);
+                Assert.AreEqual(baseline.MaxDamage, attack.MaxDamage);
+                Assert.AreEqual(baseline.RechargeSeconds, attack.RechargeSeconds);
+                Assert.AreEqual(baseline.AttackInfoAmmoCount, attack.AttackInfoAmmoCount);
+                Assert.AreEqual(0, attack.CapturedDamageObservations.Length);
+                Assert.AreEqual(0, attack.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, attack.AttackInfoUnknown);
+                Assert.AreEqual(3, attack.AttackInfoHitType);
+                Assert.AreEqual(1397315377, attack.AttackInfoWeaponInstance);
+                Assert.IsFalse(attack.UsesEquippedWeapon);
+                Assert.AreEqual(
+                    144742,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].LowTemplate);
+                Assert.AreEqual(
+                    144743,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].HighTemplate);
+                Assert.AreEqual(
+                    baseline.SpecialAttackWeaponUnknown1,
+                    resolved.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    baseline.SpecialAttackWeaponUnknown5,
+                    resolved.SpecialAttackWeaponUnknown5);
+                Assert.IsNull(
+                    resolved.CapturedSpecialAttackWeaponUnknown5Observations);
+                resolvedArchetypeIds.Add(resolved.CaptureProvenArchetypeId);
+            }
+
+            Assert.AreEqual(
+                1,
+                resolvedArchetypeIds.Count,
+                "Discarded Pet levels must share one exact SIW1 packet archetype.");
+        }
+
+        [TestMethod]
         public void SpecializedMatchingRequiresDistinctStreamsAndRepeatingFirstHitEvidence()
         {
             CapturedEnemyCombatAttackDefinition duplicatePhase =

@@ -2294,7 +2294,8 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayDiscardedPetWeaponTag,
                         -1,
                         0,
-                        0);
+                        0)
+                        .WithProductionSpecializedValues();
                 case 17649:
                     return ForDisobedientBot(level);
                 case 30379:

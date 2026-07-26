@@ -4,12 +4,12 @@
 
 ### Capture-backed active enemy combat restoration
 
-Uncontrollable Anger, Empty Shell, Infector, Neural Burnout, and Lost Thought
-now reuse their exact SIW1 or DMXF natural packet archetypes across every
-compatible active level, restoring `5`, `4`, `2`, `2`, and `1` previously
-quarantined actors. Existing production owners retain level, health, damage,
-range, cadence, loadout, ammunition, and mutable combat state. Active
-PF127/PF1931 certification is now `344` ready and `145` quarantined. Continue
-with the next quarantined family whose only blocker is production-owned or
-mutable data being treated as identity; real weapon, stream, mode, special,
-nano, slot, hit-type, and damage-type differences remain fail-closed.
+Discarded Pet now reuses its exact SIW1 natural packet archetype across all
+`29` active PF127 actors. Existing production owners retain level, health,
+damage, range, cadence, ammunition, and mutable SAW state; the exact captured
+level-7, level-8, and level-10 ordered SAW fixtures still replay independently
+per actor. Active PF127/PF1931 certification is now `373` ready and `116`
+quarantined. Continue with the next quarantined family whose only blocker is
+production-owned or mutable data being treated as identity; real weapon,
+stream, mode, special, nano, slot, hit-type, and damage-type differences remain
+fail-closed.
