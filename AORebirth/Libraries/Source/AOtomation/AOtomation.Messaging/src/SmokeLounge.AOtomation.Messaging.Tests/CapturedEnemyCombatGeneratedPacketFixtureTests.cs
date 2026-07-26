@@ -11,6 +11,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using SmokeLounge.AOtomation.Messaging.Serialization;
 
     using ZoneEngine.Core;
@@ -125,6 +126,124 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             stream.N3Unknown),
                         attackInfo.PacketId);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void Md26137CapturedLevelsReproduceTheirExactFourPacketSequences()
+        {
+            string[] profileIds =
+            {
+                "8dae5024f999475e-03dc0b29328f8462",
+                "58e682ec3ebb63c8-b677b63db5c16f15",
+                "a84eedad1a598b40-c4f21242a4a7ba96",
+                "e30508b3b9b8e352-a87351572a2f5f23",
+                "3ec94c5698a809ab-d38e253d2479c92e",
+                "2ee43d964a95a575-9ca73d7846c38f6c"
+            };
+            Dictionary<string, CapturedEnemyCombatProfileDefinition> profiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().ToDictionary(
+                    value => value.ProfileId,
+                    StringComparer.Ordinal);
+            Dictionary<string, CapturedEnemyCombatPacketFixture> fixtures =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().ToDictionary(
+                    value => value.ProfileId,
+                    StringComparer.Ordinal);
+
+            foreach (string profileId in profileIds)
+            {
+                CapturedEnemyCombatProfileDefinition profile = profiles[profileId];
+                CapturedEnemyCombatPacketFixture fixture = fixtures[profileId];
+                CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets[0];
+                CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                    fixture.SpecialAttackWeaponPackets.First(
+                        value => value.SourceIdentity == weapon.OwnerIdentity
+                                 && value.Unknown5
+                                    == profile.SpecialAttackWeaponUnknown5);
+                CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.First(
+                    value => value.SourceIdentity == saw.SourceIdentity);
+                CapturedEnemyAttackInfoPacketFixture attackInfo =
+                    fixture.AttackInfoPackets.First(
+                        value => value.SourceIdentity == saw.SourceIdentity
+                                 && value.WeaponSlot == profile.Streams[0].WeaponSlot
+                                 && value.DamageTypeWire
+                                    == profile.Streams[0].DamageTypeWire
+                                 && value.HitTypeWire == profile.Streams[0].HitTypeWire
+                                 && value.WeaponInstance
+                                    == profile.Streams[0].WeaponInstance
+                                 && value.N3Unknown == profile.Streams[0].N3Unknown);
+                MessageBody[] sequence =
+                {
+                    CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                        IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                        weapon.PlayfieldId,
+                        IdentityOf(
+                            weapon.WeaponIdentityType,
+                            weapon.WeaponIdentityInstance),
+                        profile.WeaponDefinition,
+                        weapon.Energy,
+                        weapon.MultipleCount),
+                    CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                        IdentityOf(saw.SourceType, saw.SourceIdentity),
+                        profile.SpecialAttacks,
+                        profile.SpecialAttackWeaponN3Unknown,
+                        profile.SpecialAttackWeaponUnknown1,
+                        profile.SpecialAttackWeaponUnknown2,
+                        profile.SpecialAttackWeaponUnknown3,
+                        profile.SpecialAttackWeaponUnknown4,
+                        saw.Unknown5),
+                    CapturedEnemyCombatPacketFactory.CreateAttack(
+                        IdentityOf(attack.SourceType, attack.SourceIdentity),
+                        IdentityOf(attack.TargetType, attack.TargetIdentity),
+                        profile.AttackN3Unknown,
+                        profile.AttackAction),
+                    CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                        IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                        IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                        attackInfo.Amount,
+                        attackInfo.Ammo,
+                        profile.Streams[0].WeaponSlot,
+                        profile.Streams[0].DamageTypeWire,
+                        profile.Streams[0].HitTypeWire,
+                        profile.Streams[0].WeaponInstance,
+                        profile.Streams[0].N3Unknown)
+                };
+
+                Assert.AreEqual(4, sequence.Length, profileId);
+                Assert.IsInstanceOfType(
+                    sequence[0],
+                    typeof(WeaponItemFullUpdateMessage),
+                    profileId);
+                Assert.IsInstanceOfType(
+                    sequence[1],
+                    typeof(SpecialAttackWeaponMessage),
+                    profileId);
+                Assert.IsInstanceOfType(sequence[2], typeof(AttackMessage), profileId);
+                Assert.IsInstanceOfType(
+                    sequence[3],
+                    typeof(AttackInfoMessage),
+                    profileId);
+                AssertHex(weapon.BodyHex, sequence[0], weapon.PacketId);
+                AssertHex(saw.BodyHex, sequence[1], saw.PacketId);
+                AssertHex(attack.BodyHex, sequence[2], attack.PacketId);
+                AssertHex(attackInfo.BodyHex, sequence[3], attackInfo.PacketId);
+
+                SpecialAttackWeaponMessage mutableState =
+                    CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                        IdentityOf(saw.SourceType, saw.SourceIdentity),
+                        profile.SpecialAttacks,
+                        profile.SpecialAttackWeaponN3Unknown,
+                        profile.SpecialAttackWeaponUnknown1,
+                        profile.SpecialAttackWeaponUnknown2,
+                        profile.SpecialAttackWeaponUnknown3,
+                        profile.SpecialAttackWeaponUnknown4,
+                        99);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown1, mutableState.Unknown1);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown2, mutableState.Unknown2);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown3, mutableState.Unknown3);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown4, mutableState.Unknown4);
+                Assert.AreEqual(99, mutableState.Unknown5);
+                Assert.AreEqual(0, mutableState.Specials.Length);
             }
         }
 
