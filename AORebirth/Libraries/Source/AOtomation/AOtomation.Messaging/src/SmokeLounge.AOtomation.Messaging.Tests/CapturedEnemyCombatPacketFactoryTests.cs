@@ -599,6 +599,88 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DiscardedPetMissingLevelUsesExactNaturalPacketPath()
+        {
+            const int runtimeSourceIdentity = unchecked((int)0x794DF1E5);
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Discarded Pet"
+                         && value.MonsterData == 17720);
+            OrdinaryEnemySpawnDefinition activeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            Assert.AreEqual(5, activeSpawn.Level);
+
+            CapturedEnemyCombatContract baseline = runtimeProfile.Combat.ResolveContract(
+                activeSpawn.SourceIdentity,
+                activeSpawn.Level);
+            baseline.Retaliates = true;
+            baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    runtimeProfile.DisplayName,
+                    runtimeProfile.MonsterData,
+                    activeSpawn.Level,
+                    activeSpawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure),
+                failure);
+            CapturedEnemyCombatAttackDefinition attackDefinition =
+                resolved.SpecialAttackSequence.RepeatingAttack;
+            Identity attacker = SimpleChar(activeSpawn.SourceIdentity);
+            Identity target = SimpleChar(LocalPlayerIdentity);
+            SpecialAttackWeaponMessage specialAttackWeapon =
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    attacker,
+                    resolved);
+            AttackMessage attack = CapturedEnemyCombatPacketFactory.CreateAttack(
+                attacker,
+                target,
+                resolved);
+            AttackInfoMessage attackInfo =
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    attacker,
+                    target,
+                    attackDefinition.MinDamage,
+                    attackDefinition.AttackInfoAmmoCount,
+                    attackDefinition.AttackInfoWeaponSlot,
+                    attackDefinition.AttackInfoUnknown,
+                    attackDefinition.AttackInfoHitType,
+                    attackDefinition.AttackInfoWeaponInstance,
+                    attackDefinition.AttackInfoN3Unknown);
+
+            AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
+            Assert.IsFalse(resolved.CaptureProvenArchetypeId.Contains("|level="));
+            Assert.AreEqual(0, attackDefinition.CapturedDamageObservations.Length);
+            Assert.AreEqual(144742, specialAttackWeapon.Specials[0].Unknown1);
+            Assert.AreEqual(144743, specialAttackWeapon.Specials[0].Unknown2);
+            Assert.AreEqual(1397315377, specialAttackWeapon.Specials[0].Unknown3);
+            Assert.AreEqual("SIW1", specialAttackWeapon.Specials[0].Unknown4);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown1, specialAttackWeapon.Unknown1);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown2, specialAttackWeapon.Unknown2);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown3, specialAttackWeapon.Unknown3);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown4, specialAttackWeapon.Unknown4);
+            Assert.AreEqual(baseline.SpecialAttackWeaponUnknown5, specialAttackWeapon.Unknown5);
+            Assert.AreEqual((byte)0, attack.Unknown);
+            Assert.AreEqual((byte)0, attack.Action);
+            Assert.AreEqual(baseline.MinDamage, attackInfo.Unknown1);
+            Assert.AreEqual(baseline.AttackInfoAmmoCount, attackInfo.Unknown2);
+            Assert.AreEqual(0, attackInfo.Unknown3);
+            Assert.AreEqual(0, attackInfo.Unknown4);
+            Assert.AreEqual(3, attackInfo.Unknown5);
+            Assert.AreEqual(1397315377, attackInfo.Unknown6);
+            Assert.AreEqual((byte)0, attackInfo.Unknown);
+        }
+
+        [TestMethod]
         public void ReanimatedCorpseAnchorProfilesUseTheCapturedSharedPacketSequence()
         {
             var expectedProfiles = new[]

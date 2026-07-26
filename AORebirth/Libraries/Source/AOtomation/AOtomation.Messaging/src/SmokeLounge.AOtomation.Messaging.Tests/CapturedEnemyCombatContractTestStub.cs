@@ -1479,7 +1479,7 @@ namespace AORebirth.Core.Playfields
                     AttackInfoWeaponSlot = 0,
                     AttackInfoUnknown = 0,
                     AttackInfoWeaponInstance = 0x53495731
-                };
+                }.WithProductionSpecializedValues();
             }
 
             if (monsterData == 203733)
