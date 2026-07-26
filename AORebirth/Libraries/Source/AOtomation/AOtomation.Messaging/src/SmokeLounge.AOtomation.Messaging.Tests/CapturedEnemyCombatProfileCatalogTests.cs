@@ -335,6 +335,120 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ShadowUsesReusableNaturalArchetypeAcrossAllActiveLevels()
+        {
+            string[] profileIds =
+            {
+                "25233d23b2122a1b-d8846baa20340c1c",
+                "469eedefbd2e7efe-83d6c6ca8cd6c3d2",
+                "4a974dee458fb68c-96eb7c29113e7cb3",
+                "55e83348aaaa7019-66b0ad151ed38d80",
+                "96caf73786039de8-7e31afc8bb1eceb3",
+                "9c09e27f8152019e-9733e047ccd9bc1d",
+                "a78f71dca01a79e9-2d3679422f861499",
+                "a86b0e029ea2ec0a-f36e634698521306",
+                "e087828bbf80132b-c73a736abf2b4060"
+            };
+            CapturedEnemyCombatProfileDefinition[] generated =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => profileIds.Contains(value.ProfileId)).ToArray();
+            Assert.AreEqual(profileIds.Length, generated.Length);
+            foreach (CapturedEnemyCombatProfileDefinition profile in generated)
+            {
+                Assert.IsTrue(
+                    generated[0]
+                        .MatchesCaptureProvenNaturalAttackPacketSemantics(
+                            profile));
+            }
+
+            CapturedEnemyCombatProfileDefinition incompatible =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "0f9eadbf8920f64c-6e2469c7048722ee");
+            Assert.IsFalse(
+                generated[0]
+                    .MatchesCaptureProvenNaturalAttackPacketSemantics(
+                        incompatible));
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Shadow"
+                         && value.MonsterData == 30464);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(31, activeSpawns.Length);
+
+            var resolvedArchetypeIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+                Assert.IsFalse(resolved.CaptureProvenArchetypeId.Contains("|level="));
+                foreach (string profileId in profileIds)
+                {
+                    StringAssert.Contains(
+                        resolved.CaptureProvenArchetypeId,
+                        profileId);
+                }
+
+                CapturedEnemyCombatAttackDefinition attack =
+                    resolved.SpecialAttackSequence.RepeatingAttack;
+                Assert.AreEqual(baseline.MinDamage, attack.MinDamage);
+                Assert.AreEqual(baseline.MaxDamage, attack.MaxDamage);
+                Assert.AreEqual(baseline.RechargeSeconds, attack.RechargeSeconds);
+                Assert.AreEqual(baseline.AttackInfoAmmoCount, attack.AttackInfoAmmoCount);
+                Assert.AreEqual(0, attack.CapturedDamageObservations.Length);
+                Assert.AreEqual(0, attack.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, attack.AttackInfoUnknown);
+                Assert.AreEqual(3, attack.AttackInfoHitType);
+                Assert.AreEqual(1145919558, attack.AttackInfoWeaponInstance);
+                Assert.IsFalse(attack.UsesEquippedWeapon);
+                Assert.AreEqual(1, resolved.SpecialAttackSequence.SpecialAttacks.Length);
+                Assert.AreEqual(
+                    201062,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].LowTemplate);
+                Assert.AreEqual(
+                    201063,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].HighTemplate);
+                Assert.AreEqual(
+                    1145919558,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].Tag);
+                Assert.AreEqual(0, resolved.WeaponLowId);
+                Assert.AreEqual(0, resolved.WeaponHighId);
+                Assert.IsTrue(activeSpawn.Health > 0);
+                resolvedArchetypeIds.Add(resolved.CaptureProvenArchetypeId);
+            }
+
+            Assert.AreEqual(
+                1,
+                resolvedArchetypeIds.Count,
+                "Shadow levels must share one exact DMXF packet archetype.");
+        }
+
+        [TestMethod]
         public void DiscardedPetProfilesResolveTheirOrderedCapturedSawStateTransitions()
         {
             var expectedProfiles = new[]
@@ -1916,6 +2030,122 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 1,
                 resolvedArchetypeIds.Count,
                 "Architect Striker levels must share one exact packet archetype.");
+        }
+
+        [TestMethod]
+        public void SlumRunnerUsesReusableNaturalArchetypeAcrossAllActiveLevels()
+        {
+            string[] profileIds =
+            {
+                "0f9eadbf8920f64c-6e2469c7048722ee",
+                "16f18d7ac5e3177e-20d1cbd10c47ac0b",
+                "3a7955d29042e98e-fd6c064d9658217a",
+                "54ce2d5c43b12146-158b0cfbdf05c87f",
+                "8ab20232a184fbd3-f13bdd0ea3a9ce5e",
+                "c98b015d7a3869d0-d3cc0d362e8c9eb8",
+                "d6c74939b2aef572-e4433e00aa80432a",
+                "e7f9c22413486d03-592518922478c677"
+            };
+            CapturedEnemyCombatProfileDefinition[] generated =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => profileIds.Contains(value.ProfileId)).ToArray();
+            Assert.AreEqual(profileIds.Length, generated.Length);
+            foreach (CapturedEnemyCombatProfileDefinition profile in generated)
+            {
+                Assert.IsTrue(
+                    generated[0]
+                        .MatchesCaptureProvenNaturalAttackPacketSemantics(
+                            profile));
+            }
+
+            CapturedEnemyCombatProfileDefinition incompatible =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "16398bc466394441-4396dd013773b1a8");
+            Assert.IsFalse(
+                generated[0]
+                    .MatchesCaptureProvenNaturalAttackPacketSemantics(
+                        incompatible));
+
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Slum Runner"
+                         && value.MonsterData == 55648);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+            Assert.AreEqual(24, activeSpawns.Length);
+
+            var resolvedArchetypeIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                Assert.AreEqual(
+                    0,
+                    activeSpawn.LevelDefinition.GetExplicitVariants().Length);
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+                Assert.IsFalse(resolved.CaptureProvenArchetypeId.Contains("|level="));
+                foreach (string profileId in profileIds)
+                {
+                    StringAssert.Contains(
+                        resolved.CaptureProvenArchetypeId,
+                        profileId);
+                }
+
+                CapturedEnemyCombatAttackDefinition attack =
+                    resolved.SpecialAttackSequence.RepeatingAttack;
+                Assert.AreEqual(baseline.MinDamage, attack.MinDamage);
+                Assert.AreEqual(baseline.MaxDamage, attack.MaxDamage);
+                Assert.AreEqual(baseline.RechargeSeconds, attack.RechargeSeconds);
+                Assert.AreEqual(baseline.AttackInfoAmmoCount, attack.AttackInfoAmmoCount);
+                Assert.AreEqual(0, attack.CapturedDamageObservations.Length);
+                Assert.AreEqual(0, attack.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, attack.AttackInfoUnknown);
+                Assert.AreEqual(3, attack.AttackInfoHitType);
+                Assert.AreEqual(1145196631, attack.AttackInfoWeaponInstance);
+                Assert.IsFalse(attack.UsesEquippedWeapon);
+                Assert.AreEqual(1, resolved.SpecialAttackSequence.SpecialAttacks.Length);
+                Assert.AreEqual(
+                    201053,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].LowTemplate);
+                Assert.AreEqual(
+                    201054,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].HighTemplate);
+                Assert.AreEqual(
+                    1145196631,
+                    resolved.SpecialAttackSequence.SpecialAttacks[0].Tag);
+                Assert.AreEqual(0, resolved.WeaponLowId);
+                Assert.AreEqual(0, resolved.WeaponHighId);
+                Assert.IsTrue(activeSpawn.Health > 0);
+                resolvedArchetypeIds.Add(resolved.CaptureProvenArchetypeId);
+            }
+
+            Assert.AreEqual(
+                1,
+                resolvedArchetypeIds.Count,
+                "Slum Runner levels must share one exact DBPW packet archetype.");
         }
 
         [TestMethod]

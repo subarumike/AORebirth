@@ -4,9 +4,11 @@
 
 ### Capture-backed active enemy combat restoration
 
-Premature Pattern, Infected Attendant, and Architect Striker now reuse their
-exact natural packet archetypes across compatible active levels. Existing
-production owners retain level, health, damage, range, cadence, loadout,
-ammunition, and mutable combat state. Continue with the next quarantined family
-whose only blocker is exact integer level; real weapon, stream, mode, special,
+Slum Runner and Shadow now reuse their exact DBPW and DMXF natural packet
+archetypes across every compatible active level, restoring `18` and `8`
+previously quarantined actors. Existing production owners retain level, health,
+damage, range, cadence, loadout, ammunition, and mutable combat state. Active
+PF127/PF1931 certification is now `330` ready and `159` quarantined. Continue
+with the next quarantined family whose only blocker is production-owned or
+mutable data being treated as identity; real weapon, stream, mode, special,
 nano, slot, hit-type, and damage-type differences remain fail-closed.
