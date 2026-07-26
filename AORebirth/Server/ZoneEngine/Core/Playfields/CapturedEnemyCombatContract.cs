@@ -3312,7 +3312,12 @@ namespace AORebirth.Core.Playfields
                 || archetype.MonsterData == 96056
                 || archetype.MonsterData == 203743
                 || archetype.MonsterData == 55648
-                || archetype.MonsterData == 30464)
+                || archetype.MonsterData == 30464
+                || archetype.MonsterData == 96195
+                || archetype.MonsterData == 203731
+                || archetype.MonsterData == 31909
+                || archetype.MonsterData == 203730
+                || archetype.MonsterData == 96193)
             {
                 return contract.WithProductionSpecializedValues();
             }
