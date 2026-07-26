@@ -49,7 +49,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and all `31` source-local atomic generations to the exact captured
   level/weapon-family packet archetype while its existing generation selector
   owns QL and the item/combat owners retain damage, range, and cadence. Active
-  PF127/PF1931 certification is now `373` ready and `116` quarantined, up from
+  PF127/PF1931 certification is now `376` ready and `113` quarantined, up from
   `223` / `266`. Filth Flea now binds `30` active PF127 actors at captured
   levels 4, 6, 10-13, and 19-21 to their exact two-stream natural attack
   semantics while production retains damage, range, cadence, ammunition, and
@@ -76,6 +76,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   contract discriminator for these invariant natural streams; production
   retains damage, range, cadence, health, loadout, ammunition, and mutable
   `SpecialAttackWeapon` state.
+  Three active level-32 `MonsterData 26149` Temple Cultists now resolve
+  generated profile `b07cc6a46f13664f-8e90c740f8e6bbe0` from capture
+  `20260721-052115`. Their exact equipped-weapon templates, slot, hit/damage
+  types, and WIFU -> SpecialAttackWeapon -> Attack -> AttackInfo packet path
+  remain capture-bound; existing item and combat owners retain damage, range,
+  cadence, Energy, ammunition, and mutable weapon state. Other Cultist
+  weapon/stream variants remain distinct and ambiguous or unsupported
+  variants still fail closed.
   Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
   bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact
   captured level/weapon packet semantics while their generation selectors own

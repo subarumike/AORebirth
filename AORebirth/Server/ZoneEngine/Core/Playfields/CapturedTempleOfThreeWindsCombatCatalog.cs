@@ -523,9 +523,10 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract Cultist(int monsterData, int level)
         {
             return CapturedEnemyCombatContract.Unresolved(
-                "Temple Cultist combat requires exact source identity; monsterData="
+                "Temple Cultist combat requires an exact capture-backed weapon and packet profile; monsterData="
                 + monsterData + " level=" + level,
-                true);
+                true)
+                .WithProductionEquippedWeaponValues();
         }
 
         internal static CapturedEnemyCombatContract Cultist(
@@ -598,10 +599,11 @@ namespace AORebirth.Core.Playfields
                         468, 468, 468, 18, 0, 19, 3, 1.8387221);
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
-                        "No coherent same-capture Cultist attack chain for source 0x"
+                        "No source-specific Cultist contract for source 0x"
                         + sourceIdentity.ToString("X8") + "; monsterData=" + monsterData
                         + " level=" + level,
-                        true);
+                        true)
+                        .WithProductionEquippedWeaponValues();
             }
         }
 
@@ -806,7 +808,8 @@ namespace AORebirth.Core.Playfields
                         WeaponStat(CharacterStat.AttackDelay, 235),
                         WeaponStat(CharacterStat.RechargeDelay, 235)
                     },
-                    0));
+                    0))
+                .WithProductionEquippedWeaponValues();
         }
 
         private static CapturedEnemyWeaponStatDefinition WeaponStat(
