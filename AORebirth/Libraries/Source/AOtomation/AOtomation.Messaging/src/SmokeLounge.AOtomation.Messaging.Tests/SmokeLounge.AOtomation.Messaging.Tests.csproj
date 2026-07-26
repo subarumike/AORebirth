@@ -107,6 +107,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCatalog.cs">
       <Link>MissionRewardCatalog.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRareLootCatalog.cs">
+      <Link>MissionRareLootCatalog.cs</Link>
+    </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />

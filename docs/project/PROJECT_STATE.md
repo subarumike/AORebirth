@@ -49,7 +49,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and all `31` source-local atomic generations to the exact captured
   level/weapon-family packet archetype while its existing generation selector
   owns QL and the item/combat owners retain damage, range, and cadence. Active
-  PF127/PF1931 certification is now `296` ready and `193` quarantined, up from
+  PF127/PF1931 certification is now `304` ready and `185` quarantined, up from
   `223` / `266`. Filth Flea now binds `30` active PF127 actors at captured
   levels 4, 6, 10-13, and 19-21 to their exact two-stream natural attack
   semantics while production retains damage, range, cadence, ammunition, and
@@ -59,11 +59,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   exact equipped-weapon packet profiles while existing item/combat owners
   retain damage, range, and cadence. The L21 source identity distinguishes
   three otherwise exact level candidates; uncaptured L23/L24 actors remain
-  fail-closed. Premature Pattern now binds four active L17/L18 actors, including
-  both atomic variants of source `0x79545356`, and Infected Attendant binds two
-  active L11 actors to their exact natural packet streams. Production retains
-  damage, range, cadence, and mutable `SpecialAttackWeapon` state; unsupported
-  active levels remain fail-closed.
+  fail-closed. Premature Pattern now binds all seven active L16-L19/L22 actors,
+  including both atomic variants of source `0x79545356`, and Infected Attendant
+  binds all five active L11/L12/L15/L23 actors to their reusable exact natural
+  packet archetypes. Architect Striker now likewise binds all seven active
+  L13-L15/L17 actors. Runtime level is not a captured contract discriminator
+  for these invariant natural streams; production retains damage, range,
+  cadence, health, loadout, ammunition, and mutable `SpecialAttackWeapon`
+  state.
   Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
   bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact
   captured level/weapon packet semantics while their generation selectors own
