@@ -84,6 +84,18 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   cadence, Energy, ammunition, and mutable weapon state. Other Cultist
   weapon/stream variants remain distinct and ambiguous or unsupported
   variants still fail closed.
+  The 2026-07-26 remaining-Cultist audit found no additional safe cohort.
+  Seventy-two resolver-rejected actors have no complete generated profile at
+  their exact MonsterData/level, two have unresolved same-template QL
+  initialization ambiguity, and two have genuine cross-weapon ambiguity.
+  `MonsterData 26137` is the largest internally structure-similar blocked
+  cohort (10 actors), but its six captured levels have six distinct exact
+  `SpecialAttackWeapon` initializations; cross-level substitution remains
+  forbidden. The resolver enumerates 76 rejected Cultist rows, a pre-existing
+  six-row discrepancy with the accepted 70-Cultist checkpoint. No production
+  behavior or accepted `376` / `113` certification metric changed; full
+  evidence is recorded in
+  `docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md`.
   Incomplete Rebuild, Fragmented Soul, and Redundant Scan now
   bind `34` compatible atomic variants (`16`, `11`, and `7`) to their exact
   captured level/weapon packet semantics while their generation selectors own
