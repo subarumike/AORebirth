@@ -153,3 +153,34 @@ rewrite its checked-in artifact because current repository parsing does not
 resolve `NascenceLifeContentModule.JobeResearchPlayfieldId`; the checked-in
 active-coverage artifact therefore remains unchanged, and the focused runtime
 coverage tests are the authoritative result for this pass.
+
+## 2026-07-27 Next Ranked Slice
+
+Rank 1 Disobedient Bot remains blocked: the only complete reusable generated
+archetype is L8, while the twelve fixed-scope actors are L6/L7/L9/L10. Rank 2
+Looter is complete and excluded. Rank 3 Melded Patterns is therefore the next
+family evaluated.
+
+Only fixed-scope source `0x795451DD` is safely restorable. It is L25,
+MonsterData `203747`, and exactly matches generated profile
+`41ec2f5fb41b8e2f-5f0a16ad1c7c6589` with equipped templates
+`121817/121818`, slot `6`, instance `0`, hit wire `3`, damage wire `0`, and
+ordered mutable SAW field 5 values `0 -> 85`. Previously certified L25 source
+`0x795451D8` remains certified through the same archetype.
+
+The other fixed-scope Melded actors remain fail-closed:
+
+- L18 `0x79545190` has an independently captured `121818/121818` weapon tuple,
+  not the selected `121817/121818` family.
+- L20 `0x79545196` has an incompatible stable weapon tuple.
+- L21 `0x79545187` and `0x79545198` have no exact compatible selected-family
+  profile.
+- L22 `0x795451BA` and L23 `0x7954508E` have no canonical raw combat profile.
+
+The fixed 53-actor scope is now `8` certified and `45` quarantined. PF127 is
+`246/76`; PF1931 remains `87/80`; combined coverage is `333/156` of `489`.
+The active Melded Patterns family moved from `3/7` to `4/6`. The active-coverage
+generator now understands the current qualified Nascence constants and current
+dynamic/Arete runtime sources; its checked-in artifact regenerates
+deterministically at `1,512` audited actors. Full evidence is in
+`docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md`.

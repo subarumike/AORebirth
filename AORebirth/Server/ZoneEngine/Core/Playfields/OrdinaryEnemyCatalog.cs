@@ -423,9 +423,17 @@ namespace AORebirth.Core.Playfields
                        == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
-                                archetype.MonsterData == DerangedShopperMonsterData
-                                || archetype.MonsterData == LooterMonsterData
-                                || CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
+                                archetype.MonsterData
+                                == NpcCombatAttackRules
+                                    .CapturedSubwayMeldedPatternsMonsterData
+                                && level == 25
+                                    ? CapturedSubwayCombatCatalog.ForOrdinary(
+                                            archetype,
+                                            sourceIdentity)
+                                        .WithProductionWeaponQuality()
+                                    : archetype.MonsterData == DerangedShopperMonsterData
+                                      || archetype.MonsterData == LooterMonsterData
+                                      || CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
                                     ? CapturedSubwayCombatCatalog.ForOrdinary(
                                         archetype,
                                         sourceIdentity)

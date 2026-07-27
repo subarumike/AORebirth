@@ -4,15 +4,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- Seven previously quarantined PF127 Looter actors now reuse the exact existing
-  L9/L10 equipped-weapon packet archetypes. The source-specific contract marks
-  source-selected QL as production-owned; exact weapon templates `123038/123039`,
-  mode, slot, stream order, SAW shape, numeric hit/damage wires, and ambiguity
-  checks remain capture-bound and fail-closed. The complete active Looter
-  family is `8/8`. PF127/PF1931 are now `332` certified and `157` quarantined
-  of `489` unique actors (`245/77` in PF127 and unchanged `87/80` in PF1931).
-  The fixed remaining 53-actor PF127 scope is `7/46`; the other 46 retain exact
-  missing, incompatible, or ambiguous stream blockers. Evidence:
+- PF127 Melded Patterns source `0x795451DD` now uses exact generated profile
+  `41ec2f5fb41b8e2f-5f0a16ad1c7c6589`. The L25 `121817/121818`
+  equipped-weapon family, WIFU/SAW/Attack/AttackInfo order, slot/instance,
+  action, numeric hit/damage wires, and ordered SAW state remain capture-bound;
+  existing production QL20 and per-actor Energy/ammunition owners remain in
+  control. Previously certified source `0x795451D8` remains certified, while
+  incompatible Melded levels and weapon families stay fail-closed. PF127/PF1931
+  are now `333` certified and `156` quarantined of `489` unique actors
+  (`246/76` in PF127 and unchanged `87/80` in PF1931). The fixed 53-actor
+  PF127 scope is `8/45`; the active Melded family is `4/6`. Evidence:
+  `docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md` and
   `docs/evidence/SUBWAY_REMAINING_COMBAT_COHORT_RESTORATION_20260726.md`.
 
 - Capture-backed NPC combat is now source-local and fail-closed. One shared
