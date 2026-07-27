@@ -4,18 +4,16 @@
 
 ### Capture-backed active enemy combat restoration
 
-The full Violent Vagabond review found a generic miss-correlation defect:
-`MissedAttackInfo` carries the observer/defender in its N3 source and the actual
-attacker in a later embedded identity. The extractor now attributes and retains
-that exact attacker, defender, SAW, Attack, miss shape, and packet order.
-Regeneration recovers 41 raw observations, or 40 distinct misses after one
-declared overlapping logger capture is deduplicated.
+The remaining fixed 53-actor PF127 combat scope is now `7` certified and `46`
+quarantined. All seven previously quarantined Looter actors use their existing
+complete L9/L10 capture-backed archetypes. The source-specific contract now
+marks production-selected weapon QL as production-owned while keeping weapon
+templates, mode, slot, level semantics, stream shape/order, numeric hit/damage
+types, and ambiguity checks exact and fail-closed.
 
-The authoritative PF127/PF1931 denominator remains `489` unique actors: `325`
-are certified and `164` are quarantined. PF127 is `238/84`; PF1931 remains
-`87/80`. Violent Vagabond remains `0/22`: the complete corpus contains no
-Vagabond-owned landed, critical, or terminal `AttackInfo`, so miss evidence
-cannot prove hit type, damage type, landed weapon slot/instance, or lethal
-result semantics. All 22 actors remain fail-closed with zero compatible
-generated contracts. See
-`docs/evidence/SUBWAY_VIOLENT_VAGABOND_COMBAT_RESTORATION_20260726.md`.
+The authoritative PF127/PF1931 denominator remains `489` unique actors: `332`
+are certified and `157` are quarantined. PF127 is `245/77`; PF1931 remains
+`87/80`. The full active Looter family is now `8/8`. The other 46 actors in the
+fixed scope remain fail-closed for specific missing, incompatible, or ambiguous
+generated stream evidence. See
+`docs/evidence/SUBWAY_REMAINING_COMBAT_COHORT_RESTORATION_20260726.md`.

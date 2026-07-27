@@ -1,0 +1,155 @@
+# Subway Remaining Combat Cohort Restoration
+
+Date: 2026-07-26
+
+## Scope
+
+This pass fixed the remaining 53-actor PF127 combat scope identified after the
+accepted Violent Vagabond and Filth Flea work. The scope is fixed by runtime
+source identity in a regression test; no capture rescan, new contract, generic
+fallback, nearest-level selection, or cross-enemy mapping was used.
+
+Before this pass the combined PF127/PF1931 active population was `325`
+capture-certified and `164` quarantined. PF127 was `238/84`; PF1931 was
+`87/80`.
+
+## Exact 53-Actor Inventory
+
+| Family | MonsterData | Level | Runtime source identities | Actors |
+| --- | ---: | ---: | --- | ---: |
+| Bloodcreeper | 30379 | 24 | `795451C5` | 1 |
+| Disobedient Bot | 17649 | 6 | `7953AFA3` | 1 |
+| Disobedient Bot | 17649 | 7 | `7953AF98`, `79557C66` | 2 |
+| Disobedient Bot | 17649 | 9 | `7953AD4B`, `7953AD69`, `7953AF6F` | 3 |
+| Disobedient Bot | 17649 | 10 | `7953AA1E`, `7953AA81`, `7953AA8F`, `7953AB08`, `7953AD61`, `7957E40A` | 6 |
+| Fragmented Soul | 203729 | 17 | `7954516F` | 1 |
+| Fragmented Soul | 203729 | 18 | `7954518B`, `7954518E`, `79545367` | 3 |
+| Fragmented Soul | 203729 | 19 | `7954517A` | 1 |
+| Fragmented Soul | 203729 | 21 | `795451AE` | 1 |
+| Incomplete Rebuild | 203728 | 17 | `79545170`, `79545241` | 2 |
+| Incomplete Rebuild | 203728 | 18 | `79545172` | 1 |
+| Incomplete Rebuild | 203728 | 19 | `79545177`, `79545181`, `79545188` | 3 |
+| Looter | 203745 | 9 | `795313CB`, `79545029`, `7957E5CD` | 3 |
+| Looter | 203745 | 10 | `795312DC`, `79545034`, `7954503C`, `79557CB8` | 4 |
+| Melded Patterns | 203747 | 18 | `79545190` | 1 |
+| Melded Patterns | 203747 | 20 | `79545196` | 1 |
+| Melded Patterns | 203747 | 21 | `79545187`, `79545198` | 2 |
+| Melded Patterns | 203747 | 22 | `795451BA` | 1 |
+| Melded Patterns | 203747 | 23 | `7954508E` | 1 |
+| Melded Patterns | 203747 | 25 | `795451DD` | 1 |
+| Molested Molecules | 203746 | 23 | `79545139` | 1 |
+| Molested Molecules | 203746 | 24 | `795451D2`, `795451D7` | 2 |
+| Redundant Scan | 204178 | 20 | `7953AF85` | 1 |
+| Stim Fiend | 203739 | 9 | `7957E415` | 1 |
+| Stim Fiend | 203739 | 12 | `7953AD68`, `79545069`, `79545072`, `7957E128` | 4 |
+| Stim Fiend | 203739 | 14 | `7953ABBF` | 1 |
+| Stim Fiend | 203739 | 17 | `7953ABAD` | 1 |
+| Workman Striker | 203854 | 14 | `7953AFF9`, `7954501A` | 2 |
+| Workman Striker | 203854 | 16 | `79545219` | 1 |
+| **Total** |  |  |  | **53** |
+
+The fixed scope contains no Filth Flea or Violent Vagabond actor.
+
+## Ranked Cohorts
+
+| Rank | Family | Actors | Existing evidence result |
+| ---: | --- | ---: | --- |
+| 1 | Disobedient Bot | 12 | The only complete reusable generated archetype is L8. Active L6/L7/L9/L10 rows do not have an exact compatible generated stream; the historical midpoint policy is not capture proof. |
+| 2 | Looter | 7 | Complete L9/L10 equipped-weapon streams exist. Runtime source weapon QL was incorrectly treated as captured contract identity instead of a production-selected value. |
+| 3 | Melded Patterns | 7 | L22/L23 have no exact compatible generated profile; remaining captured-level rows include incompatible stable weapon QL observations. |
+| 4 | Stim Fiend | 7 | L9/L17 have no exact profile; L12 is runtime-unsafe and L14 lacks complete timing/evidence semantics. |
+| 5 | Fragmented Soul | 6 | Compatible-looking rows remain ambiguous between multiple exact generated streams; L19 has no exact profile. |
+| 6 | Incomplete Rebuild | 6 | L17 has no exact profile; L18/L19 still have unresolved multi-stream ambiguity. |
+| 7 | Workman Striker | 3 | Multiple generated profiles remain semantically ambiguous for these source variants. |
+| 8 | Molested Molecules | 3 | No exact L23/L24 generated profiles exist. |
+| 9 | Bloodcreeper | 1 | The generated specialized sequence does not reproduce every selected raw stream. |
+| 10 | Redundant Scan | 1 | Multiple generated profiles remain semantically ambiguous. |
+
+Looter was the largest cohort with complete compatible generated packet
+semantics and only a production-owned value blocking reuse.
+
+## Looter Capture-Backed Archetypes
+
+The seven selected actors use the existing Looter L9 and L10 profiles:
+
+| Level | Generated profile | Captured QL | Capture sessions |
+| ---: | --- | ---: | --- |
+| 9 | `1f9bcd8f10a573fe-18e6692741ae1557` | 10 | `20260709-210452` |
+| 9 | `1f9bcd8f10a573fe-3a02a8bc94c80061` | 8 | `20260708-143600` |
+| 10 | `8862442ad0440f58-29d7128dd3295e3e` | 12 | `20260708-143600` |
+| 10 | `8862442ad0440f58-6e2dc55a960bb28c` | 8 | `20260708-143600` |
+| 10 | `8862442ad0440f58-b2b0641a63fcbe7b` | 11 | `20260708-143600` |
+| 10 | `8862442ad0440f58-de5fe0fa20d6a3d1` | 9 | `20260709-210452` |
+
+Representative complete raw chains include:
+
+- L9 QL10: WIFU `20260709-210452|IN|4237|fb2f43b75519`,
+  `SpecialAttackWeapon` `|7489|8d494a183f7d`, `Attack`
+  `|7490|f8cb1585ddb8`, and `AttackInfo`
+  `|7500|67efb8191311`.
+- L9 QL8: WIFU `20260708-143600|IN|9602|c5ba8d799e28`,
+  `SpecialAttackWeapon` `|15121|c5420c465e85`, `Attack`
+  `|15122|601148430e21`, and `AttackInfo`
+  `|15154|5ae4750e765c`.
+- L10 QL12: WIFU `20260708-143600|IN|11430|eb2c07946571`,
+  `SpecialAttackWeapon` `|18074|3c9a7900bb17`, `Attack`
+  `|18075|91c9eff9b545`, and `AttackInfo`
+  `|18116|4dea52dc693a`.
+
+The exact reusable semantics remain:
+
+- equipped weapon templates `123038/123039`;
+- WIFU slot `6`, state-machine id `1000015`, instance `0`, unknown fields
+  `11/262`;
+- one ordered `WIFU -> SpecialAttackWeapon -> Attack -> AttackInfo` stream;
+- `Attack` action `0` and N3 unknown `0`;
+- `AttackInfo` slot `6`, damage-type wire `0`, hit-type wire `3`, weapon
+  instance `0`, and N3 unknown `0`;
+- L9 invariant SAW fields `49/49/45/49`;
+- L10 invariant SAW fields `54/54/49/54`;
+- finite per-actor energy/ammunition and ordered mutable SAW field 5.
+
+The runtime source rows already own the selected QLs: QL9 for
+`795313CB/79545029/7957E5CD`; QL12 for `795312DC/79545034`; QL11 for
+`7954503C`; and QL8 for `79557CB8`. The generated stream owns the packet
+semantics while the existing source-specific weapon tuple owns the runtime QL.
+
+## Production Repair
+
+`CapturedSubwayCombatCatalog.ForSourceSpecificWeaponArchetype` already required
+exactly one source-owned weapon tuple and failed closed for zero or multiple
+tuples. Its returned contract did not carry
+`UsesProductionWeaponQuality`, causing the catalog to compare the source-owned
+QL as immutable capture identity.
+
+The production contract now calls `WithProductionWeaponQuality()` after
+building the exact source-specific equipped weapon. This removes only QL from
+reusable contract identity. Weapon templates, mode, slot, packet order, level
+semantics, hit/damage wires, SAW shape, stream count, and ambiguity checks
+remain exact and fail-closed.
+
+The Looter packet regression changes production QL in the WIFU and proves the
+captured SAW, Attack, and AttackInfo bodies remain byte-exact. A cross-weapon
+case using `122905/122906` remains rejected.
+
+## Result
+
+All seven selected Looter actors now resolve their exact L9/L10 generated
+archetype through the shared capture-backed combat path. The pre-existing
+certified Looter `7954501B` remains certified, so the full active Looter family
+is now `8/8`.
+
+The fixed 53-actor scope is now `7` certified and `46` quarantined. Combined
+PF127/PF1931 coverage is `332` certified and `157` quarantined of `489`;
+PF127 is `245/77` and PF1931 remains `87/80`.
+
+The 46 remaining actors stay fail-closed for the explicit missing,
+incompatible, or ambiguous stream reasons in the ranked table. None was left
+quarantined because Looter binding failed.
+
+The approved Subway contract generator completed with `40` archetypes and
+produced no generated diff. The narrow active-coverage generator could not
+rewrite its checked-in artifact because current repository parsing does not
+resolve `NascenceLifeContentModule.JobeResearchPlayfieldId`; the checked-in
+active-coverage artifact therefore remains unchanged, and the focused runtime
+coverage tests are the authoritative result for this pass.
