@@ -918,6 +918,19 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            CapturedEnemyCombatContract generatedNaturalAttackContract;
+            if (TryResolveMathematicallyGeneratedNaturalAttackArchetype(
+                    resourceId,
+                    name,
+                    monsterData,
+                    level,
+                    current,
+                    out generatedNaturalAttackContract))
+            {
+                resolved = generatedNaturalAttackContract;
+                return true;
+            }
+
             CapturedEnemyCombatContract naturalAttackContract;
             if (TryResolveProductionOwnedNaturalAttackProfile(
                     resourceId,
@@ -1152,6 +1165,72 @@ namespace AORebirth.Core.Playfields
             }
 
             return true;
+        }
+
+        private static bool TryResolveMathematicallyGeneratedNaturalAttackArchetype(
+            int resourceId,
+            string name,
+            int monsterData,
+            int level,
+            CapturedEnemyCombatContract current,
+            out CapturedEnemyCombatContract resolved)
+        {
+            resolved = null;
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (!OrdinaryEnemyCombatSetupGenerator.MatchesGeneratedSetup(
+                    monsterData,
+                    level,
+                    current,
+                    out generated))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition[] family = Profiles.Where(
+                value => value.MatchesArchetypeKey(resourceId, name, monsterData)
+                         && value
+                             .SupportsCaptureProvenNaturalAttackPacketSemantics)
+                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
+                .ToArray();
+            if (family.Length == 0)
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition profile = family[0];
+            if (family.Any(
+                value => !profile
+                    .MatchesCaptureProvenNaturalAttackPacketSemantics(value)))
+            {
+                return false;
+            }
+
+            if (!profile.MatchesSpecialized(current))
+            {
+                return false;
+            }
+
+            int evidenceSourceIdentity =
+                profile.RepresentativeEvidenceSourceIdentity;
+            string evidence = string.Join(
+                "; ",
+                family.Select(value => value.Evidence).Distinct().ToArray());
+            string archetypeId = string.Format(
+                "formula={0}|resource={1}|name={2}|MonsterData={3}|profiles={4}",
+                generated.FormulaId,
+                resourceId,
+                name,
+                monsterData,
+                string.Join(
+                    ",",
+                    family.Select(value => value.ProfileId).ToArray()));
+            resolved = current
+                .WithCaptureCertification(
+                    evidence + "; generated numeric setup=" + generated.FormulaId,
+                    evidenceSourceIdentity,
+                    null)
+                .WithCaptureProvenArchetype(archetypeId);
+            return resolved.IsCombatReady;
         }
 
         private static bool TryResolveProductionOwnedNaturalAttackProfile(

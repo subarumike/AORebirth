@@ -54,7 +54,7 @@ The fixed scope contains no Filth Flea or Violent Vagabond actor.
 
 | Rank | Family | Actors | Existing evidence result |
 | ---: | --- | ---: | --- |
-| 1 | Disobedient Bot | 12 | The only complete reusable generated archetype is L8. Active L6/L7/L9/L10 rows do not have an exact compatible generated stream; the historical midpoint policy is not capture proof. |
+| 1 | Disobedient Bot | 12 | **Superseded 2026-07-27:** L8 supplies the exact categorical stream; five captured levels prove the bounded mathematical SAW setup now used by all 12 active actors. |
 | 2 | Looter | 7 | Complete L9/L10 equipped-weapon streams exist. Runtime source weapon QL was incorrectly treated as captured contract identity instead of a production-selected value. |
 | 3 | Melded Patterns | 7 | L22/L23 have no exact compatible generated profile; remaining captured-level rows include incompatible stable weapon QL observations. |
 | 4 | Stim Fiend | 7 | L9/L17 have no exact profile; L12 is runtime-unsafe and L14 lacks complete timing/evidence semantics. |
@@ -184,3 +184,30 @@ generator now understands the current qualified Nascence constants and current
 dynamic/Arete runtime sources; its checked-in artifact regenerates
 deterministically at `1,512` audited actors. Full evidence is in
 `docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md`.
+
+## 2026-07-27 Mathematical Disobedient Bot Restoration
+
+The former Disobedient Bot blocker is resolved without another capture.
+Programmatic exact-integer analysis of raw L5/L6/L8/L9/L10 SAW packets proves
+fields 1-4 are:
+
+`floor((19 * actorLevel + 28) / 4)`
+
+The bounded results are L5=`30`, L6=`35`, L7=`40`, L8=`45`, L9=`49`, and
+L10=`54`. All five leave-one-out evaluations predict the removed captured
+point exactly. The rule is restricted to MonsterData `17649`, levels `5..10`,
+and exact SIW1 templates `144742/144743`, tag/instance `0x53495731`, natural
+specialized mode, slot `0`, numeric hit type `3`, numeric damage type `0`, and
+the capture-backed SAW/Attack/AttackInfo stream. It fails closed outside that
+domain.
+
+All 12 fixed-scope L6/L7/L9/L10 actors now resolve through generated profile
+`ff1685d6a9c45e2c-370328526bcb32c7`. No other remaining family shares the
+proved family-specific domain, so the same generator restores zero additional
+actors. The fixed 53-actor scope is now `20` certified and `33` quarantined.
+PF127 is `258/64`; PF1931 remains `87/80`; combined coverage is `345/144` of
+`489`.
+
+Full evidence and the machine-readable PF127/PF1931 dataset are in
+`docs/evidence/ENEMY_COMBAT_SETUP_FORMULA_20260727.md` and
+`docs/generated/enemy_combat_setup_formula_dataset.json`.

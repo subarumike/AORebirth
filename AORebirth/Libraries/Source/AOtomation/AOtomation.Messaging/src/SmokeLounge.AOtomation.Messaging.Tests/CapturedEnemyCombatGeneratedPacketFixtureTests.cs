@@ -292,19 +292,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
 
                 resolvedCount++;
+                bool mathematicalArchetype =
+                    resolved.UsesCaptureProvenArchetype
+                    && resolved.CaptureProvenArchetypeId.StartsWith(
+                        "formula=",
+                        StringComparison.Ordinal);
                 CapturedEnemyCombatProfileDefinition selectedProfile =
                     CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
-                        value => value.MatchesKey(
-                                     profile.ResourceId,
-                                     profile.Name,
-                                     profile.MonsterData,
-                                     profile.Level)
+                        value => (mathematicalArchetype
+                                      ? value.MatchesArchetypeKey(
+                                          profile.ResourceId,
+                                          profile.Name,
+                                          profile.MonsterData)
+                                      : value.MatchesKey(
+                                          profile.ResourceId,
+                                          profile.Name,
+                                          profile.MonsterData,
+                                          profile.Level))
                                  && (value.CaptureRuntimeEvidenceSafe
                                      || (resolved.AttackModel
                                          == CapturedEnemyAttackModel.Specialized
                                          && resolved.UsesProductionSpecializedValues
                                          && value.MatchesSpecialized(resolved)))
-                                 && value.Evidence == resolved.Evidence
+                                 && (mathematicalArchetype
+                                     || value.Evidence == resolved.Evidence)
                                  && value.ContainsSource(resolved.EvidenceSourceIdentity));
                 CapturedEnemyCombatPacketFixture fixture = fixtures[selectedProfile.ProfileId];
                 CapturedEnemySpecialAttackWeaponPacketFixture saw =
@@ -423,8 +434,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                             == resolvedAttack.AttackInfoWeaponInstance
                                          && value.N3Unknown
                                             == resolvedAttack.AttackInfoN3Unknown
-                                         && resolvedAttack.CapturedDamageObservations.Contains(
-                                             value.Amount));
+                                         && (mathematicalArchetype
+                                                 ? value.Amount
+                                                   >= resolvedAttack.MinDamage
+                                                   && value.Amount
+                                                      <= resolvedAttack.MaxDamage
+                                                 : resolvedAttack
+                                                     .CapturedDamageObservations
+                                                     .Contains(value.Amount)));
                         Assert.IsNotNull(
                             attackInfo,
                             profile.ProfileId + " resolved specialized AttackInfo evidence");

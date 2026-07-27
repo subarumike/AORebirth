@@ -111,6 +111,7 @@
       <Link>MissionRareLootCatalog.cs</Link>
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
+    <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="PlayfieldRuntimeOwnershipTests.cs" />
@@ -266,6 +267,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs">
       <Link>NpcCombatAttackRules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs">
+      <Link>OrdinaryEnemyCombatSetupGenerator.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcDamageLineOfSightRuntimeService.cs">
       <Link>NpcDamageLineOfSightRuntimeService.cs</Link>

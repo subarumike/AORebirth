@@ -519,6 +519,7 @@
     <Compile Include="Core\Playfields\SubwayLootPoolRules.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
+    <Compile Include="Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcDamageLineOfSightRuntimeService.cs" />
     <Compile Include="Core\Playfields\NpcCorpseLifecycleCoordinator.cs" />

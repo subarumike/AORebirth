@@ -2552,6 +2552,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string attackRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
+            string combatSetupGeneratorText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs"));
             string movementCoordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string capturedPacketFactoryText = File.ReadAllText(
@@ -4199,30 +4201,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 combatContractText.Contains("case 17649:")
                 && providerText.Contains("CapturedSubwayCombatCatalog.For(name, monsterData, level)")
                 && combatContractText.Contains("15 Disobedient Bot SIW1 normal local-player hits span 6-15 damage")
-                && combatContractText.Contains("three other-player hits and two player-owned Killer-pet hits remain separate")
-                && combatContractText.Contains("SpecialAttackWeapon contexts are capture-backed for levels 5, 6, 8, 9, and 10")
-                && combatContractText.Contains("including the level-5 terminal value 22")
-                && combatContractText.Contains("level 7 explicitly using the bounded 35/45 midpoint policy")
-                && combatContractText.Contains("Disobedient Bot SIW1 attack context is unresolved for level")
+                && combatContractText.Contains("numeric SpecialAttackWeapon values at levels 5, 6, 8, 9, and 10")
+                && combatContractText.Contains("OrdinaryEnemyCombatSetupGenerator.TryGenerate")
+                && combatContractText.Contains("Disobedient Bot SIW1 mathematical combat setup is unsupported for level")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 6")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotMaximumDamage = 15")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotRechargeSeconds = 5.973723")
                 && attackRulesText.Contains("CapturedSubwayDisobedientBotWeaponTag = 0x53495731")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue = 30")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue = 35")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue = 40")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue = 45")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue = 49")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue = 54")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue = 22")
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue") == 1
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue") == 1
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue") == 1
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue") == 1
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue") == 1
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue") == 1
-                && CountOccurrences(combatContractText, "CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue") == 1
-                && catalogText.Contains("level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level)")
+                && !attackRulesText.Contains("CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue")
+                && !attackRulesText.Contains("CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue")
+                && combatSetupGeneratorText.Contains("((19 * input.ActorLevel) + 28) / 4")
+                && combatSetupGeneratorText.Contains("DisobedientBotMinimumLevel = 5")
+                && combatSetupGeneratorText.Contains("DisobedientBotMaximumLevel = 10")
+                && catalogText.Contains("CapturedSubwayCombatCatalog.For(")
+                && catalogText.Contains("archetype.MonsterData,")
+                && catalogText.Contains("level)")
                 && ordinaryProfileText.Contains("CapturedEnemyCombatContract ResolveContract(int level)")
                 && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
                 && ordinaryRuntimeText.Contains("combatContract.AttackModel")
