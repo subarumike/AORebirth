@@ -99,22 +99,7 @@ namespace ZoneEngine.Core.Playfields
 
         public const string CapturedSubwayDisobedientBotWeaponName = "SIW1";
 
-        public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue = 30;
-
-        public const int CapturedSubwayDisobedientBotLevel6SpecialAttackWeaponValue = 35;
-
-        // Private midpoint policy between captured level-6 value 35 and level-8 value 45.
-        public const int CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue = 40;
-
-        public const int CapturedSubwayDisobedientBotLevel8SpecialAttackWeaponValue = 45;
-
-        public const int CapturedSubwayDisobedientBotLevel9SpecialAttackWeaponValue = 49;
-
-        public const int CapturedSubwayDisobedientBotLevel10SpecialAttackWeaponValue = 54;
-
-        public const int CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponLastValue = 22;
-
-        public const int CapturedSubwayDisobedientBotSpecialAttackWeaponLastValue = 0;
+        public const int CapturedSubwayDisobedientBotInitialSpecialAttackWeaponUnknown5 = 0;
 
         // Official-live Vagabonds produced only misses, so their damage is a private
         // playability policy using the captured 9..12 normal range of the adjacent,

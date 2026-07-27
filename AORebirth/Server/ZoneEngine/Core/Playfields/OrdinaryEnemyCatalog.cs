@@ -287,7 +287,9 @@ namespace AORebirth.Core.Playfields
                 CapturedSubwaySourceWeaponEvidenceDefinition[] sourceWeaponEvidence =
                     ordinaryContent.GetSourceWeaponEvidence(first.MonsterData);
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
-                    sourceWeaponEvidence.Length > 0
+                    first.MonsterData
+                    != NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData
+                    && sourceWeaponEvidence.Length > 0
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
                                 CapturedSubwayCombatCatalog.ForSupportedSourceWeapon(

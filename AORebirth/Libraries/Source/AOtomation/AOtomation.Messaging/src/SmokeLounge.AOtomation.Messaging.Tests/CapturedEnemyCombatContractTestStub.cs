@@ -1702,6 +1702,75 @@ namespace AORebirth.Core.Playfields
 
         internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
         {
+            if (monsterData
+                == NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData)
+            {
+                OrdinaryEnemyCombatNumericSetup generated;
+                if (!level.HasValue
+                    || !OrdinaryEnemyCombatSetupGenerator.TryGenerate(
+                        new OrdinaryEnemyCombatSetupInput(
+                            monsterData,
+                            level.Value,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotLowTemplate,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotHighTemplate,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponTag,
+                            NpcCombatAttackRules.CapturedSubwayDisobedientBotWeaponName),
+                        out generated))
+                {
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Disobedient Bot mathematical combat setup is unsupported.",
+                        true);
+                }
+
+                return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        "Disobedient Bot capture-validated mathematical SIW1 setup.",
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            NpcCombatAttackRules
+                                .CapturedSubwayDisobedientBotInitialAttackSeconds,
+                            null,
+                            new CapturedEnemyCombatAttackDefinition(
+                                NpcCombatAttackRules
+                                    .CapturedSubwayDisobedientBotMinimumDamage,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayDisobedientBotMaximumDamage,
+                                0,
+                                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayDisobedientBotRechargeSeconds,
+                                false,
+                                NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayDisobedientBotWeaponSlot,
+                                0,
+                                NpcCombatAttackRules.NormalAttackInfoHitType,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayDisobedientBotWeaponTag,
+                                0,
+                                true),
+                            new[]
+                            {
+                                new CapturedEnemySpecialAttackDefinition(
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayDisobedientBotLowTemplate,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayDisobedientBotHighTemplate,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayDisobedientBotWeaponTag,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayDisobedientBotWeaponName)
+                            },
+                            generated.SpecialAttackWeaponUnknown1,
+                            generated.SpecialAttackWeaponUnknown2,
+                            generated.SpecialAttackWeaponUnknown3,
+                            generated.SpecialAttackWeaponUnknown4,
+                            NpcCombatAttackRules
+                                .CapturedSubwayDisobedientBotInitialSpecialAttackWeaponUnknown5,
+                            0,
+                            0,
+                            0))
+                    .WithProductionSpecializedValues();
+            }
+
             if (monsterData == 26092)
             {
                 if (level != 5)

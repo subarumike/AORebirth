@@ -432,8 +432,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     bindingKey + " must have exactly one level-coverage row for level=" + level);
                 Dictionary<string, object> levelRow = matchingLevelRows[0];
                 string resolutionMode = StringMember(levelRow, "resolutionMode");
-                CapturedEnemyCombatContract runtimeBaseline =
-                    CapturedEnemyCombatContract.Unresolved("active coverage guard", true);
+                CapturedEnemyCombatContract runtimeBaseline;
+                if (resolutionMode == "exact-mathematical-combat-setup")
+                {
+                    var runtimeCatalog = new OrdinaryEnemyCatalog(
+                        new CapturedSubwayContentProvider(),
+                        new CapturedSubwayOrdinaryContentProvider(),
+                        new CapturedTempleOfThreeWindsContentProvider());
+                    OrdinaryEnemyProfile runtimeProfile =
+                        runtimeCatalog.GetProfiles().Single(
+                            value => value.DisplayName == name
+                                     && value.MonsterData == monsterData);
+                    runtimeBaseline = runtimeProfile.Combat.ResolveContract(
+                        sourceIdentity,
+                        level);
+                }
+                else
+                {
+                    runtimeBaseline =
+                        CapturedEnemyCombatContract.Unresolved(
+                            "active coverage guard",
+                            true);
+                }
                 Assert.IsFalse(
                     resolutionMode.StartsWith(
                         "reviewed-specialized-baseline-",

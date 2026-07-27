@@ -4,26 +4,27 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- PF127 Melded Patterns source `0x795451DD` now uses exact generated profile
-  `41ec2f5fb41b8e2f-5f0a16ad1c7c6589`. The L25 `121817/121818`
-  equipped-weapon family, WIFU/SAW/Attack/AttackInfo order, slot/instance,
-  action, numeric hit/damage wires, and ordered SAW state remain capture-bound;
-  existing production QL20 and per-actor Energy/ammunition owners remain in
-  control. Previously certified source `0x795451D8` remains certified, while
-  incompatible Melded levels and weapon families stay fail-closed. PF127/PF1931
-  are now `333` certified and `156` quarantined of `489` unique actors
-  (`246/76` in PF127 and unchanged `87/80` in PF1931). The fixed 53-actor
-  PF127 scope is `8/45`; the active Melded family is `4/6`. Evidence:
-  `docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md` and
-  `docs/evidence/SUBWAY_REMAINING_COMBAT_COHORT_RESTORATION_20260726.md`.
+- Disobedient Bot MonsterData `17649` now uses the bounded mathematical setup
+  `floor((19 * actorLevel + 28) / 4)` for SAW numeric fields 1-4 across the
+  proven L5..L10 domain. Population/runtime owns actor level; the exact SIW1
+  templates `144742/144743`, natural-specialized mode, slot `0`, instance/tag
+  `0x53495731`, numeric hit/damage wires `3/0`, action, stream structure, and
+  packet order remain capture-bound. Five raw captured levels and five
+  leave-one-out evaluations are exact. All 12 active L6/L7/L9/L10 actors are
+  restored without identity, nearest-level, or per-level output mappings.
+  PF127/PF1931 are now `345` certified and `144` quarantined of `489` unique
+  actors (`258/64` in PF127 and unchanged `87/80` in PF1931). The fixed
+  53-actor PF127 scope is `20/33`. Evidence:
+  `docs/evidence/ENEMY_COMBAT_SETUP_FORMULA_20260727.md`.
 
-- Capture-backed NPC combat is now source-local and fail-closed. One shared
+- Historical foundation checkpoint (superseded totals): capture-backed NPC
+  combat became source-local and fail-closed. One shared
   runtime factory owns exact owner-linked WIFU, `SpecialAttackWeapon`, `Attack`,
   and `AttackInfo` construction; per-actor Energy state preserves finite ammo,
   raw N3 fields and numeric hit-wire values are not normalized, and synthetic
   incoming-hit chat has been removed. Per-actor, per-observation-array cursors
   keep parallel captured attack streams independent. The fixed initial-active
-  audit covers `1,496` hostile/retaliatory actors: `85` are runtime-certified
+  audit covered `1,496` hostile/retaliatory actors: `85` were runtime-certified
   and `1,411` remain passive/quarantined (`755` merged profiles: `85` certified,
   `670` unresolved). The deterministic corpus result covers `364` sessions,
   `348` canonical sessions, `2,647` complete chains, `243` capture-certified

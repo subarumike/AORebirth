@@ -1767,7 +1767,7 @@
     {
       "actorCount": 1,
       "bindingKey": "de1862277cc8584f7bfa",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA1E",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1780,7 +1780,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AA1E",
@@ -1789,7 +1789,7 @@
     {
       "actorCount": 1,
       "bindingKey": "f49773c62a7f48687f73",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA81",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1802,7 +1802,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AA81",
@@ -1811,7 +1811,7 @@
     {
       "actorCount": 1,
       "bindingKey": "55ea7d437db046b19fc1",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA8F",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1824,7 +1824,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AA8F",
@@ -1833,7 +1833,7 @@
     {
       "actorCount": 1,
       "bindingKey": "c73e0f1e2e6c2ad9ccf9",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AB08",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1846,7 +1846,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AB08",
@@ -1855,7 +1855,7 @@
     {
       "actorCount": 1,
       "bindingKey": "008ca36a0074dbd24a1f",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD4B",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1868,7 +1868,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AD4B",
@@ -1877,7 +1877,7 @@
     {
       "actorCount": 1,
       "bindingKey": "b91322d0902bd5d90981",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD61",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1890,7 +1890,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AD61",
@@ -1899,7 +1899,7 @@
     {
       "actorCount": 1,
       "bindingKey": "08e4b530165696f3e63a",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD69",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1912,7 +1912,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AD69",
@@ -1921,7 +1921,7 @@
     {
       "actorCount": 1,
       "bindingKey": "66132000fc1315d13c67",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AF6F",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1934,7 +1934,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AF6F",
@@ -1943,7 +1943,7 @@
     {
       "actorCount": 1,
       "bindingKey": "aebd3a426ad9040083e5",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AF98",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1956,7 +1956,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AF98",
@@ -1965,7 +1965,7 @@
     {
       "actorCount": 1,
       "bindingKey": "46039def645f5d7d52c4",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AFA3",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -1978,7 +1978,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AFA3",
@@ -1987,7 +1987,7 @@
     {
       "actorCount": 1,
       "bindingKey": "e73abf768e4810931cdc",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79557C66",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -2000,7 +2000,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x79557C66",
@@ -2009,7 +2009,7 @@
     {
       "actorCount": 1,
       "bindingKey": "da2032e80dd3e8587967",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E40A",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -2022,7 +2022,7 @@
       ],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7957E40A",
@@ -36656,17 +36656,18 @@
     "captureCertifiedVariantCountWithMutableSawState": 76,
     "captureCertifiedVariantCountWithMutableWeaponState": 3,
     "exactRawWireObservationCount": 2284,
-    "finalCaptureCertifiedActorCount": 85,
-    "finalQuarantinedActorCount": 1427,
-    "fixedCertifiedProfileRowCount": 85,
+    "finalCaptureCertifiedActorCount": 97,
+    "finalQuarantinedActorCount": 1415,
+    "fixedCertifiedProfileRowCount": 97,
     "fixedProfileRowCount": 766,
-    "fixedUnresolvedProfileRowCount": 681,
-    "newlyCaptureCertifiedActorCount": 70,
+    "fixedUnresolvedProfileRowCount": 669,
+    "newlyCaptureCertifiedActorCount": 82,
     "priorCaptureCertifiedActorCount": 15,
     "remainingConflictedSourceIdentityCount": 2,
     "restoredEnemyNames": [
       "Cultist",
       "Deranged Shopper",
+      "Disobedient Bot",
       "Fragmented Soul",
       "Incomplete Rebuild",
       "Melded Patterns",
@@ -60205,33 +60206,40 @@
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260711-170337",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AFA3",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "ff3161fa27b9798030c8",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 6,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 35,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 6,
       "levelCandidates": [
         6
@@ -60239,88 +60247,85 @@
       "levelCoverage": [
         {
           "captureSessions": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260711-170337",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=6|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 6,
-          "missingEvidence": [
-            "Attack missing inside the current fight boundary",
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 35,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 6,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 11,
-      "missingEvidence": [
-        "Attack missing inside the current fight boundary",
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AFA3",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-180248",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-181729",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-182237",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-205400",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-212455",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AF98",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "f4a42f8ba6ecdb416ee2",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 7,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 40,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 7,
       "levelCandidates": [
         7
@@ -60328,86 +60333,85 @@
       "levelCoverage": [
         {
           "captureSessions": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-180248",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-181729",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-182237",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-205400",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-212455",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-incomplete-sequence",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=7|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 7,
-          "missingEvidence": [
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 40,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 7,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AF98",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-180248",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-181729",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-182237",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-205400",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-212455",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79557C66",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "4a3f6401b4dec28453ed",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 7,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 40,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 7,
       "levelCandidates": [
         7
@@ -60415,90 +60419,85 @@
       "levelCoverage": [
         {
           "captureSessions": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-180248",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-181729",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-182237",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-205400",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-212455",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-incomplete-sequence",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=7|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 7,
-          "missingEvidence": [
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 40,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 7,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x79557C66",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD4B",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "d63e2691b56d0ef20108",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 9,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 49,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 9,
       "levelCandidates": [
         9
@@ -60507,190 +60506,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=9|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 9,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 49,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 9,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 17,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AD4B",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD69",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "ec854676cab8d251f984",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 9,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5793|ef4826764e26",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD69"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD69"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD69"
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 49,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 9,
       "levelCandidates": [
         9
@@ -60699,185 +60592,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=9|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5793|ef4826764e26",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD69"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD69"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD69"
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 49,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
             }
           ],
-          "evidencePacketIds": [],
-          "level": 9,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 9,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 17,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AD69",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AF6F",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "d9fbca6f955182710589",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 9,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 49,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 9,
       "levelCandidates": [
         9
@@ -60886,91 +60678,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-225850",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-155528",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012522",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=9|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 9,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 49,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 9,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 17,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AF6F",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA1E",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "71e3218b265683dc4fd9",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 10,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 10,
       "levelCandidates": [
         10
@@ -60979,182 +60764,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 10,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AA1E",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA81",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "06825b08f4c4b06b8e93",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 10,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7238|952b4f0cb953",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA81"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA81"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA81"
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 10,
       "levelCandidates": [
         10
@@ -61163,177 +60850,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7238|952b4f0cb953",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA81"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA81"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA81"
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
             }
           ],
-          "evidencePacketIds": [],
-          "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 10,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AA81",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA8F",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "48f87a4a444e23a7e00e",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 10,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 10,
       "levelCandidates": [
         10
@@ -61342,182 +60936,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 10,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AA8F",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AB08",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "1f63c61b2deebcdc8f4d",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 10,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|9711|fd0acbde9724",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AB08"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|9710|a4113a88e06c",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AB08"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AB08"
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 10,
       "levelCandidates": [
         10
@@ -61526,177 +61022,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|9711|fd0acbde9724",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AB08"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|9710|a4113a88e06c",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AB08"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AB08"
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
             }
           ],
-          "evidencePacketIds": [],
-          "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 10,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AB08",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD61",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "a93c09fad382be8e7e72",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 10,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 10,
       "levelCandidates": [
         10
@@ -61705,87 +61108,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 10,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7953AD61",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E40A",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs"
       ],
       "coverageKey": "5470ee7a766acb9945c5",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 10,
+          "observations": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+      ],
       "level": 10,
       "levelCandidates": [
         10
@@ -61794,55 +61194,47 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e"
+          ],
+          "formulaId": "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1",
+          "level": 10,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7"
         }
       ],
-      "matchingEvidenceSessionCount": 13,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 17649,
       "name": "Disobedient Bot",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.supported.17649",
       "runtimeSourceIdentityHint": "0x7957E40A",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
@@ -245364,9 +244756,9 @@
   "surfaces": [
     {
       "actorCount": 322,
-      "certified": 31,
+      "certified": 43,
       "surface": "subway-ordinary",
-      "unresolved": 291
+      "unresolved": 279
     },
     {
       "actorCount": 3,
@@ -245436,8 +244828,8 @@
     }
   ],
   "totals": {
-    "certified": 85,
+    "certified": 97,
     "initialActorCount": 1512,
-    "unresolved": 1427
+    "unresolved": 1415
   }
 }

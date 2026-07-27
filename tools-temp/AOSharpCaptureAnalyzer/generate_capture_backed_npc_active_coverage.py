@@ -1413,6 +1413,9 @@ def classify_level(
     level: int,
     profiles_by_identity: Mapping[Tuple[int, int, int, str], Mapping[str, Any]],
     metadata_by_identity: Mapping[Tuple[int, int, int, str], Sequence[Mapping[str, Any]]],
+    mathematical_bindings: Optional[
+        Mapping[Tuple[int, int, int, str], Mapping[str, Any]]
+    ] = None,
 ) -> Dict[str, Any]:
     identity = (actor.resource, actor.monster_data, level, actor.name)
     profile = profiles_by_identity.get(identity)
@@ -1433,6 +1436,47 @@ def classify_level(
         "runtimeMissingEvidence": [],
         "disabledGameplayCapability": "NPC auto-attack emission and damage application",
     }
+    mathematical_binding = (
+        mathematical_bindings.get(identity)
+        if mathematical_bindings is not None
+        else None
+    )
+    if mathematical_binding is not None:
+        result.update(
+            {
+                "classification": "certified",
+                "resolutionMode": "exact-mathematical-combat-setup",
+                "captureSessions": mathematical_binding.get(
+                    "captureSessions", []
+                ),
+                "evidencePacketIds": mathematical_binding.get(
+                    "evidencePacketIds", []
+                ),
+                "evidenceFound": [
+                    {
+                        "observationType": "capture-validated-mathematical-combat-setup",
+                        "formulaId": mathematical_binding.get("formulaId"),
+                        "semanticProfileId": mathematical_binding.get(
+                            "compatibleSemanticProfileId"
+                        ),
+                        "generatedSpecialAttackWeaponValue": (
+                            mathematical_binding.get(
+                                "generatedSpecialAttackWeaponValue"
+                            )
+                        ),
+                    }
+                ],
+                "missingEvidence": [],
+                "runtimeContractReady": True,
+                "runtimeMissingEvidence": [],
+                "disabledGameplayCapability": None,
+                "formulaId": mathematical_binding.get("formulaId"),
+                "semanticProfileId": mathematical_binding.get(
+                    "compatibleSemanticProfileId"
+                ),
+            }
+        )
+        return result
     if profile is None:
         metadata = list(metadata_by_identity.get(identity, []))
         result["captureSessions"] = sorted_unique(row.get("capture") for row in metadata)
@@ -1908,10 +1952,43 @@ def build_non_denominator_audit_records(
     return records, family_summaries
 
 
-def build_inventory(repo_root: Path, combat_inventory_path: Path) -> Dict[str, Any]:
+def build_inventory(
+    repo_root: Path,
+    combat_inventory_path: Path,
+    formula_dataset_path: Optional[Path] = None,
+) -> Dict[str, Any]:
     actors = parse_all_actors(repo_root)
     merged = merge_actors(actors)
     combat_inventory = json.loads(combat_inventory_path.read_text(encoding="utf-8"))
+    mathematical_bindings: Dict[
+        Tuple[int, int, int, str], Mapping[str, Any]
+    ] = {}
+    if formula_dataset_path is not None and formula_dataset_path.is_file():
+        formula_dataset = json.loads(
+            formula_dataset_path.read_text(encoding="utf-8")
+        )
+        formula = formula_dataset.get("acceptedFormula", {})
+        capture_sessions = sorted_unique(
+            row.get("captureSession")
+            for row in formula.get("rawPacketObservations", [])
+        )
+        evidence_packet_ids = sorted_unique(
+            row.get("packetId")
+            for row in formula.get("rawPacketObservations", [])
+        )
+        for binding in formula.get("activeBindings", []):
+            identity = (
+                int(binding["resource"]),
+                int(binding["monsterData"]),
+                int(binding["level"]),
+                str(binding["name"]),
+            )
+            if identity in mathematical_bindings:
+                continue
+            enriched_binding = dict(binding)
+            enriched_binding["captureSessions"] = capture_sessions
+            enriched_binding["evidencePacketIds"] = evidence_packet_ids
+            mathematical_bindings[identity] = enriched_binding
     searched_sessions = sorted_unique(
         session.get("capture") for session in combat_inventory.get("sessions", [])
     )
@@ -1976,7 +2053,13 @@ def build_inventory(repo_root: Path, combat_inventory_path: Path) -> Dict[str, A
         ),
     ):
         variants = [
-            classify_level(actor, level, profiles_by_identity, metadata_by_identity)
+            classify_level(
+                actor,
+                level,
+                profiles_by_identity,
+                metadata_by_identity,
+                mathematical_bindings,
+            )
             for level in actor.levels
         ]
         classification = (
@@ -2405,6 +2488,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--output",
         default="docs/generated/capture_backed_npc_combat_active_coverage.json",
     )
+    parser.add_argument(
+        "--formula-dataset",
+        default="docs/generated/enemy_combat_setup_formula_dataset.json",
+    )
     args = parser.parse_args(argv)
 
     repo_root = (
@@ -2413,8 +2500,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         else find_repo_root(Path(__file__).resolve().parent)
     )
     combat_inventory_path = repo_path(repo_root, args.combat_inventory)
+    formula_dataset_path = repo_path(repo_root, args.formula_dataset)
     output_path = repo_root / args.output
-    document = build_inventory(repo_root, combat_inventory_path)
+    document = build_inventory(
+        repo_root,
+        combat_inventory_path,
+        formula_dataset_path,
+    )
     rendered = canonical_json(document)
 
     if args.write:
