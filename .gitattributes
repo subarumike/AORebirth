@@ -12,6 +12,9 @@
 # Capture-backed PF127 geometry is byte-hash validated and must remain LF-only.
 AORebirth/Server/ZoneEngine/Content/Captured/Subway/pf127-geometry.json text eol=lf
 
+# The deterministic full-corpus combat inventory exceeds GitHub's normal blob limit.
+docs/generated/capture_backed_npc_combat_inventory.json filter=lfs diff=lfs merge=lfs -text
+
 # Unified patches require the standard prefix space on blank context lines.
 tools-temp/AOSharpLiveInjector/patches/*.patch whitespace=-blank-at-eol
 
