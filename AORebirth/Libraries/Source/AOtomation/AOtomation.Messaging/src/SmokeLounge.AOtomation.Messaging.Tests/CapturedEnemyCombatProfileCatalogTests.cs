@@ -2774,6 +2774,106 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void ViolentVagabondMissEvidenceIsAttributedToTheAttackerButRemainsFailClosedWithoutALandedResult()
+        {
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Violent Vagabond"
+                         && value.MonsterData == 203733);
+            OrdinaryEnemySpawnDefinition[] activeSpawns = runtimeCatalog.GetSpawns().Where(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == runtimeProfile.ProfileKey).ToArray();
+
+            Assert.AreEqual(22, activeSpawns.Length);
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "6=5",
+                    "7=10",
+                    "8=1",
+                    "10=6"
+                },
+                activeSpawns.GroupBy(value => value.Level)
+                    .Select(value => value.Key + "=" + value.Count())
+                    .ToArray());
+            Assert.AreEqual(
+                0,
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Count(
+                    value => value.MatchesArchetypeKey(
+                        127,
+                        "Violent Vagabond",
+                        203733)),
+                "Miss-only evidence must not create a reusable landed-combat contract.");
+
+            string inventoryPath = Path.Combine(
+                FindRepositoryRoot(),
+                "docs",
+                "generated",
+                "capture_backed_npc_combat_inventory.json");
+            Dictionary<string, string> inventoryProfiles = ReadInventoryProfiles(inventoryPath);
+            var mappedProfiles = new List<string>();
+            int attributedMissObservations = 0;
+            foreach (int level in new[] { 6, 7, 8, 9, 10 })
+            {
+                string profileJson;
+                Assert.IsTrue(
+                    inventoryProfiles.TryGetValue(
+                        string.Format(
+                            "resource=127|md=203733|level={0}|name=Violent Vagabond",
+                            level),
+                        out profileJson),
+                    "Missing generated Vagabond evidence profile for level " + level);
+                StringAssert.Contains(profileJson, "\"normalCompleteChainCount\":0");
+                mappedProfiles.Add(profileJson);
+                attributedMissObservations += Regex.Matches(
+                        profileJson,
+                        "\"messageType\":\"MissedAttackInfo\".*?"
+                        + "\"observationCount\":(?<count>[0-9]+)",
+                        RegexOptions.CultureInvariant)
+                    .Cast<Match>()
+                    .Sum(value => int.Parse(value.Groups["count"].Value));
+            }
+
+            string mappedEvidence = string.Join("\n", mappedProfiles.ToArray());
+            Assert.AreEqual(27, attributedMissObservations);
+            StringAssert.Contains(mappedEvidence, "\"attackerIdentity\":\"0x794DF068\"");
+            StringAssert.Contains(mappedEvidence, "\"n3SourceIdentity\":\"0x7944C065\"");
+            StringAssert.Contains(mappedEvidence, "\"MissedAttackInfo\":true");
+            StringAssert.Contains(
+                mappedEvidence,
+                "normal landed or critical AttackInfo semantics");
+
+            foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
+            {
+                CapturedEnemyCombatContract baseline =
+                    runtimeProfile.Combat.ResolveContract(
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsFalse(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        127,
+                        runtimeProfile.DisplayName,
+                        runtimeProfile.MonsterData,
+                        activeSpawn.Level,
+                        activeSpawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure),
+                    activeSpawn.SpawnKey);
+                Assert.IsFalse(resolved.IsCombatReady, activeSpawn.SpawnKey);
+                StringAssert.Contains(
+                    failure,
+                    "no canonical raw combat profile",
+                    activeSpawn.SpawnKey);
+            }
+        }
+
+        [TestMethod]
         public void FilthFleaProductionOwnedValuesResolveEveryCompatibleExactStream()
         {
             var runtimeCatalog = new OrdinaryEnemyCatalog(

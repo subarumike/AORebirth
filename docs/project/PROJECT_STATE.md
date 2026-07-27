@@ -4,16 +4,19 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- PF127 Filth Flea combat is `42/51` actor-certified. Full raw-corpus review
-  proved the level-5 apparent third stream is one lethal slot-0 AZUS
-  `AttackInfo` outcome, not an independent cadence. Generated profile
-  `218eb3509f2be66b-12f99a4c2f732061` now retains that terminal wire value, and
-  the shared NPC coordinator selects it only from the existing lethal-health
-  result. All 12 level-5 actors are restored without a new timer or fallback;
-  the 9 level-7/8/14/15 actors remain fail-closed for incomplete chains.
-  PF127/PF1931 now reconcile to `325` certified and `164` quarantined of `489`
-  unique actors (`238/84` in PF127 and unchanged `87/80` in PF1931). Evidence:
-  `docs/evidence/SUBWAY_FILTH_FLEA_COMBAT_RESTORATION_20260726.md`.
+- PF127 Violent Vagabond combat remains `0/22` actor-certified after a complete
+  raw-corpus review. A generic extractor defect used the observing/defending
+  N3 source as the source of `MissedAttackInfo`; the decoder and correlation
+  now retain the embedded attacker, defender, exact SAW/Attack context, miss
+  fields, and packet order. The corpus contains 41 raw observations, or 40
+  distinct misses after one declared overlapping logger capture is counted
+  once, but no Vagabond-owned normal, critical, or terminal `AttackInfo`.
+  Miss-only evidence cannot prove the required landed hit/damage types,
+  weapon slot/instance, or lethal semantics, so zero contracts were generated
+  and all 22 actors remain fail-closed. PF127/PF1931 remain `325` certified and
+  `164` quarantined of `489` unique actors (`238/84` in PF127 and unchanged
+  `87/80` in PF1931). Evidence:
+  `docs/evidence/SUBWAY_VIOLENT_VAGABOND_COMBAT_RESTORATION_20260726.md`.
 
 - Capture-backed NPC combat is now source-local and fail-closed. One shared
   runtime factory owns exact owner-linked WIFU, `SpecialAttackWeapon`, `Attack`,

@@ -546,8 +546,8 @@ def decode_missed_attack_info(body: bytes) -> dict[str, Any]:
             "n3Unknown": reader.u8("n3Unknown"),
             "unknown1": reader.i32("unknown1"),
             "unknown2": reader.i32("unknown2"),
-            "unknown3": reader.identity("unknown3"),
-            "target": reader.identity("target"),
+            "attacker": reader.identity("attacker"),
+            "defender": reader.identity("defender"),
             "unknown5": reader.i32("unknown5"),
         },
     )
@@ -716,13 +716,19 @@ class PacketRecord:
         fields = self.decoded
         if self.message_type == "WeaponItemFullUpdate":
             identity = fields.get("owner")
+        elif self.message_type == "MissedAttackInfo":
+            identity = fields.get("attacker")
         else:
             identity = fields.get("source") or fields.get("caster")
         return identity.get("instance") if identity else None
 
     @property
     def target(self) -> int | None:
-        identity = self.decoded.get("target")
+        identity = (
+            self.decoded.get("defender")
+            if self.message_type == "MissedAttackInfo"
+            else self.decoded.get("target")
+        )
         return identity.get("instance") if identity else None
 
     @property
@@ -1024,6 +1030,8 @@ def load_metadata_generations(
 def source_from_decoded(message_type: str, decoded: dict[str, Any]) -> int | None:
     if message_type == "WeaponItemFullUpdate":
         identity = decoded.get("owner")
+    elif message_type == "MissedAttackInfo":
+        identity = decoded.get("attacker")
     else:
         identity = decoded.get("source") or decoded.get("caster")
     return identity.get("instance") if identity else None
@@ -1799,18 +1807,123 @@ def correlate(
                 classification = "nano"
             else:
                 classification = "unsupported-message"
-            unsupported.append(
-                {
-                    "packetId": record.packet_id,
-                    "capture": record.capture,
-                    "messageType": record.message_type,
-                    "sourceIdentity": hex_identity(record.source) if record.source is not None else None,
-                    "metadata": record.metadata.public() if record.metadata else None,
-                    "metadataResolution": record.metadata_resolution,
-                    "classification": classification,
-                    "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-                }
-            )
+            observation = {
+                "packetId": record.packet_id,
+                "capture": record.capture,
+                "capturedUtc": record.captured_utc,
+                "messageType": record.message_type,
+                "sourceIdentity": (
+                    hex_identity(record.source)
+                    if record.source is not None
+                    else None
+                ),
+                "metadata": record.metadata.public() if record.metadata else None,
+                "metadataResolution": record.metadata_resolution,
+                "classification": classification,
+                "runtimeSupport": (
+                    "inventory-only; current shared NPC auto-attack runtime "
+                    "does not emit this sequence"
+                ),
+            }
+            if record.message_type == "MissedAttackInfo":
+                attack_candidates = [
+                    row
+                    for row in attacks
+                    if row.capture == record.capture
+                    and row.source == record.source
+                    and row.target == record.target
+                    and row.sequence < record.sequence
+                    and not has_boundary(records, row, record)
+                ]
+                attack_candidates.sort(key=lambda row: row.sequence, reverse=True)
+                attack = attack_candidates[0] if attack_candidates else None
+                saw_candidates = [
+                    row
+                    for row in saws
+                    if attack is not None
+                    and row.capture == attack.capture
+                    and row.source == attack.source
+                    and row.sequence < attack.sequence
+                    and not has_boundary(records, row, attack)
+                ]
+                saw_candidates.sort(key=lambda row: row.sequence, reverse=True)
+                saw = saw_candidates[0] if saw_candidates else None
+                wifu_candidates = [
+                    row
+                    for row in wifus
+                    if attack is not None
+                    and row.capture == attack.capture
+                    and row.source == attack.source
+                    and row.sequence < attack.sequence
+                    and not has_boundary(records, row, attack)
+                ]
+                wifu_candidates.sort(key=lambda row: row.sequence, reverse=True)
+                wifu = wifu_candidates[0] if wifu_candidates else None
+                missing_evidence = []
+                if record.metadata_resolution != "capture-local-generation":
+                    missing_evidence.append(
+                        "same-capture preceding SCFU generation metadata"
+                    )
+                if attack is None:
+                    missing_evidence.append(
+                        "originating Attack inside the current fight boundary"
+                    )
+                if saw is None:
+                    missing_evidence.append(
+                        "SpecialAttackWeapon before originating Attack"
+                    )
+                if wifu is None:
+                    missing_evidence.append(
+                        "owner-linked WIFU or independently proven natural attack mode"
+                    )
+                missing_evidence.append(
+                    "normal landed or critical AttackInfo semantics"
+                )
+                observation.update(
+                    {
+                        "attackerIdentity": (
+                            hex_identity(record.source)
+                            if record.source is not None
+                            else None
+                        ),
+                        "defenderIdentity": (
+                            hex_identity(record.target)
+                            if record.target is not None
+                            else None
+                        ),
+                        "n3SourceIdentity": hex_identity(
+                            record.decoded["source"]["instance"]
+                        ),
+                        "n3Unknown": record.decoded["n3Unknown"],
+                        "unknown1": record.decoded["unknown1"],
+                        "unknown2": record.decoded["unknown2"],
+                        "unknown5": record.decoded["unknown5"],
+                        "missingEvidence": missing_evidence,
+                        "evidenceFound": {
+                            "WeaponItemFullUpdate": (
+                                wifu.packet_id if wifu is not None else None
+                            ),
+                            "SpecialAttackWeapon": (
+                                saw.packet_id if saw is not None else None
+                            ),
+                            "Attack": (
+                                attack.packet_id if attack is not None else None
+                            ),
+                            "MissedAttackInfo": record.packet_id,
+                        },
+                        "packetOrderProven": bool(
+                            saw is not None
+                            and attack is not None
+                            and saw.sequence < attack.sequence < record.sequence
+                        ),
+                        "runtimeSupport": (
+                            "evidence-only miss; the packet contains no landed, "
+                            "critical, terminal, damage-type, hit-type, weapon-slot, "
+                            "or weapon-instance result semantics"
+                        ),
+                    }
+                )
+            unsupported.append(observation)
 
     for attack_info in attack_infos:
         metadata = attack_info.metadata
@@ -2702,6 +2815,14 @@ def aggregate_observations(
     for row in rows:
         signature = {
             "sourceIdentity": row.get("sourceIdentity"),
+            "attackerIdentity": row.get("attackerIdentity"),
+            "defenderIdentity": row.get("defenderIdentity"),
+            "n3SourceIdentity": row.get("n3SourceIdentity"),
+            "n3Unknown": row.get("n3Unknown"),
+            "unknown1": row.get("unknown1"),
+            "unknown2": row.get("unknown2"),
+            "unknown5": row.get("unknown5"),
+            "packetOrderProven": row.get("packetOrderProven"),
             "classification": row.get("classification"),
             "messageType": row.get("messageType"),
             "hitTypeWire": row.get("hitTypeWire"),
@@ -2726,6 +2847,7 @@ def aggregate_observations(
                     "SpecialAttackWeapon",
                     "Attack",
                     "AttackInfo",
+                    "MissedAttackInfo",
                 }
                 and isinstance(packet_id, str)
             }
@@ -2752,6 +2874,10 @@ def aggregate_observations(
                 "evidenceFound": {
                     "AttackInfo": any(
                         bool(row.get("evidenceFound", {}).get("AttackInfo"))
+                        for row in values
+                    ),
+                    "MissedAttackInfo": any(
+                        bool(row.get("evidenceFound", {}).get("MissedAttackInfo"))
                         for row in values
                     ),
                     "metadataResolution": sorted(
@@ -5571,6 +5697,27 @@ def self_test() -> None:
     assert attack_info["weaponSlot"] == 6
     assert attack_info["damageTypeWire"] == 0
     assert attack_info["hitTypeWire"] == 3
+
+    vagabond_miss_body = bytes.fromhex(
+        "5C654B280000C3507944C0650100000000000000060000C350797B885C"
+        "0000C3507944C06500000000"
+    )
+    missed_attack_info = decode_missed_attack_info(vagabond_miss_body)
+    assert missed_attack_info["source"]["instanceHex"] == "7944C065"
+    assert missed_attack_info["attacker"]["instanceHex"] == "797B885C"
+    assert missed_attack_info["defender"]["instanceHex"] == "7944C065"
+    assert missed_attack_info["n3Unknown"] == 1
+    assert missed_attack_info["unknown1"] == 0
+    assert missed_attack_info["unknown2"] == 6
+    assert missed_attack_info["unknown5"] == 0
+    miss_record = stub_record(
+        "vagabond-miss",
+        9,
+        missed_attack_info,
+        "MissedAttackInfo",
+    )
+    assert hex_identity(miss_record.source) == "0x797B885C"
+    assert hex_identity(miss_record.target) == "0x7944C065"
 
     flea_target_death = decode_character_action(
         bytes.fromhex(

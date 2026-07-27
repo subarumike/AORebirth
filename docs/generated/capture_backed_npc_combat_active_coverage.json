@@ -34923,7 +34923,7 @@
   "combatInventory": {
     "path": "docs/generated/capture_backed_npc_combat_inventory.json",
     "schemaVersion": 3,
-    "sha256": "ceacd8bfb89b9335ea424c5a436d4add88d1a9e2e8983441e1b7e8c2c6f31f0b"
+    "sha256": "6ea15f90ea0bdffc0cee37e24318da3828ef17682885deac2668c9960629330f"
   },
   "contentInputs": [
     {
