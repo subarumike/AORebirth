@@ -3001,7 +3001,8 @@ namespace AORebirth.Core.Playfields
                 matched.LowId,
                 matched.HighId,
                 matched.Quality,
-                (int)WeaponSlots.Righthand);
+                (int)WeaponSlots.Righthand)
+                .WithProductionWeaponQuality();
         }
 
         internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(

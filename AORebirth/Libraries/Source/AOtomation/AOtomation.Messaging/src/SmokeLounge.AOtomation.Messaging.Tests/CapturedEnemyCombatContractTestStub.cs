@@ -2237,7 +2237,8 @@ namespace AORebirth.Core.Playfields
                 WeaponLowId = matched.LowId,
                 WeaponHighId = matched.HighId,
                 WeaponQuality = matched.Quality,
-                WeaponInventorySlot = 6
+                WeaponInventorySlot = 6,
+                UsesProductionWeaponQuality = true
             };
         }
 

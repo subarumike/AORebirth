@@ -960,6 +960,89 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void LooterProductionQualityChangesOnlyTheCapturedWifuQlField()
+        {
+            const string profileId = "1f9bcd8f10a573fe-18e6692741ae1557";
+            const int runtimeSourceIdentity = unchecked((int)0x795313CB);
+            CapturedEnemyCombatPacketFixture fixture =
+                CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                    value => value.ProfileId == profileId);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Looter",
+                    203745,
+                    9,
+                    runtimeSourceIdentity,
+                    CapturedEnemyCombatContract.EquippedWeapon(
+                        "active subway Looter QL9 source 0x795313CB",
+                        123038,
+                        123039,
+                        9,
+                        6)
+                        .WithProductionWeaponQuality(),
+                    out resolved,
+                    out failure),
+                failure);
+            Assert.AreEqual(9, resolved.WeaponQuality);
+            Assert.AreEqual(9, resolved.WeaponDefinition.Quality);
+
+            CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
+                value => value.OwnerIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemySpecialAttackWeaponPacketFixture saw =
+                fixture.SpecialAttackWeaponPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity
+                             && value.Unknown5 == resolved.SpecialAttackWeaponUnknown5);
+            CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.Single(
+                value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+            CapturedEnemyAttackInfoPacketFixture attackInfo =
+                fixture.AttackInfoPackets.Single(
+                    value => value.SourceIdentity == resolved.EvidenceSourceIdentity);
+
+            MessageBody[] capturedSequence =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    IdentityOf(weapon.OwnerType, weapon.OwnerIdentity),
+                    weapon.PlayfieldId,
+                    IdentityOf(weapon.WeaponIdentityType, weapon.WeaponIdentityInstance),
+                    resolved.WeaponDefinition,
+                    weapon.Energy,
+                    weapon.MultipleCount),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    IdentityOf(saw.SourceType, saw.SourceIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    IdentityOf(attack.SourceType, attack.SourceIdentity),
+                    IdentityOf(attack.TargetType, attack.TargetIdentity),
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    IdentityOf(attackInfo.SourceType, attackInfo.SourceIdentity),
+                    IdentityOf(attackInfo.TargetType, attackInfo.TargetIdentity),
+                    attackInfo.Amount,
+                    attackInfo.Ammo,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+
+            Assert.AreEqual(4, capturedSequence.Length);
+            Assert.IsInstanceOfType(capturedSequence[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
+            AssertHex(
+                "3B1D22680000C74A25713973000000000B0000C3507953AD7C00122002000F424F0000000001060000276A0000000000000403000000170001E09E000002BD00000009000002BE0001E09E000002BF0001E09F0000019C000000010000001A0000001900000126000000EB000000D2000000EB00000000",
+                capturedSequence[0]);
+            AssertHex(saw.BodyHex, capturedSequence[1]);
+            AssertHex(attack.BodyHex, capturedSequence[2]);
+            AssertHex(attackInfo.BodyHex, capturedSequence[3]);
+        }
+
+        [TestMethod]
         public void IncompleteRebuildProductionQlChangesOnlyTheCapturedWifuQlField()
         {
             const string profileId = "f4b7f149cee5b2ad-b4c320f0187034b8";

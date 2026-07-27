@@ -4,19 +4,16 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- PF127 Violent Vagabond combat remains `0/22` actor-certified after a complete
-  raw-corpus review. A generic extractor defect used the observing/defending
-  N3 source as the source of `MissedAttackInfo`; the decoder and correlation
-  now retain the embedded attacker, defender, exact SAW/Attack context, miss
-  fields, and packet order. The corpus contains 41 raw observations, or 40
-  distinct misses after one declared overlapping logger capture is counted
-  once, but no Vagabond-owned normal, critical, or terminal `AttackInfo`.
-  Miss-only evidence cannot prove the required landed hit/damage types,
-  weapon slot/instance, or lethal semantics, so zero contracts were generated
-  and all 22 actors remain fail-closed. PF127/PF1931 remain `325` certified and
-  `164` quarantined of `489` unique actors (`238/84` in PF127 and unchanged
-  `87/80` in PF1931). Evidence:
-  `docs/evidence/SUBWAY_VIOLENT_VAGABOND_COMBAT_RESTORATION_20260726.md`.
+- Seven previously quarantined PF127 Looter actors now reuse the exact existing
+  L9/L10 equipped-weapon packet archetypes. The source-specific contract marks
+  source-selected QL as production-owned; exact weapon templates `123038/123039`,
+  mode, slot, stream order, SAW shape, numeric hit/damage wires, and ambiguity
+  checks remain capture-bound and fail-closed. The complete active Looter
+  family is `8/8`. PF127/PF1931 are now `332` certified and `157` quarantined
+  of `489` unique actors (`245/77` in PF127 and unchanged `87/80` in PF1931).
+  The fixed remaining 53-actor PF127 scope is `7/46`; the other 46 retain exact
+  missing, incompatible, or ambiguous stream blockers. Evidence:
+  `docs/evidence/SUBWAY_REMAINING_COMBAT_COHORT_RESTORATION_20260726.md`.
 
 - Capture-backed NPC combat is now source-local and fail-closed. One shared
   runtime factory owns exact owner-linked WIFU, `SpecialAttackWeapon`, `Attack`,
