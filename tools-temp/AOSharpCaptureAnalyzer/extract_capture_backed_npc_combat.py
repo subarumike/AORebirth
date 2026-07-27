@@ -4462,6 +4462,61 @@ def csharp_double_array(values: Iterable[float]) -> str:
     )
 
 
+def should_emit_mutable_saw_replay(variant: dict[str, Any]) -> bool:
+    weapon_context_kind = variant["baseSignature"]["weaponContextKind"]
+    runtime_missing_evidence = variant["runtimeMissingEvidence"]
+    legacy_reasons_only = all(
+        reason == "capture-backed non-equipped attack range"
+        or (
+            weapon_context_kind in {"natural", "natural-or-special"}
+            and reason
+            == "exact specialized runtime sequence for multiple captured AttackInfo streams"
+        )
+        or reason.startswith(
+            "deterministic runtime SpecialAttackWeapon Unknown5 state selection"
+        )
+        for reason in runtime_missing_evidence
+    )
+    has_production_ammo_state = any(
+        " AttackInfo index=" in reason
+        and " ammo=" in reason
+        and " expected=" in reason
+        for reason in runtime_missing_evidence
+    )
+    has_production_wifu_state = any(
+        reason.startswith(
+            "deterministic runtime WIFU Energy/MultipleCount state selection"
+        )
+        for reason in runtime_missing_evidence
+    )
+    two_state_production_extension = (
+        weapon_context_kind == "equipped"
+        and len(variant["mutableSawStateObservations"]) == 2
+        and has_production_ammo_state
+        and has_production_wifu_state
+        and all(
+            reason.startswith(
+                "deterministic runtime SpecialAttackWeapon Unknown5 state selection"
+            )
+            or reason.startswith(
+                "deterministic runtime WIFU Energy/MultipleCount state selection"
+            )
+            or (
+                " AttackInfo index=" in reason
+                and " ammo=" in reason
+                and " expected=" in reason
+            )
+            for reason in runtime_missing_evidence
+        )
+    )
+    return (
+        variant["captureEvidenceSafe"]
+        and not variant["deterministicRuntimeInitializationProven"]
+        and len(variant["mutableSawStateObservations"]) > 1
+        and (legacy_reasons_only or two_state_production_extension)
+    )
+
+
 def render_generated_catalog(inventory: dict[str, Any]) -> str:
     packet_by_id = {row["packetId"]: row for row in inventory["packets"]}
     definitions = []
@@ -4569,7 +4624,6 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                     for packet_id in stream["attackInfoPacketIds"]
                 )
             )
-            runtime_missing_evidence = variant["runtimeMissingEvidence"]
             mutable_saw_state_observations = []
             seen_mutable_saw_packet_ids = set()
             for sibling in profile["variants"]:
@@ -4605,22 +4659,8 @@ def render_generated_catalog(inventory: dict[str, Any]) -> str:
                 row["unknown5"]
                 for row in mutable_saw_state_observations
             ]
-            mutable_saw_replay_is_complete = (
-                not variant["deterministicRuntimeInitializationProven"]
-                and
-                len(mutable_saw_observations) > 1
-                and all(
-                    reason == "capture-backed non-equipped attack range"
-                    or (
-                        weapon_context_kind in {"natural", "natural-or-special"}
-                        and reason
-                        == "exact specialized runtime sequence for multiple captured AttackInfo streams"
-                    )
-                    or reason.startswith(
-                        "deterministic runtime SpecialAttackWeapon Unknown5 state selection"
-                    )
-                    for reason in runtime_missing_evidence
-                )
+            mutable_saw_replay_is_complete = should_emit_mutable_saw_replay(
+                variant
             )
             mutable_saw_argument = (
                 ",\n                    "
@@ -5686,6 +5726,33 @@ def self_test() -> None:
     assert saw_signature_from_decoded(
         saw, MUTABLE_SAW_FIELD_NAMES
     ) != saw_signature_from_decoded(stable_saw_change, MUTABLE_SAW_FIELD_NAMES)
+    mutable_saw_replay_variant = {
+        "captureEvidenceSafe": True,
+        "deterministicRuntimeInitializationProven": False,
+        "baseSignature": {"weaponContextKind": "equipped"},
+        "mutableSawStateObservations": [
+            {"packetId": "saw-initial", "unknown5": 0},
+            {"packetId": "saw-next", "unknown5": 85},
+        ],
+        "runtimeMissingEvidence": [
+            "capture source=0x00000001 WIFU packet AttackInfo index=0 ammo=0 expected=6",
+            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 85]",
+            "deterministic runtime WIFU Energy/MultipleCount state selection across captured values",
+        ],
+    }
+    assert should_emit_mutable_saw_replay(mutable_saw_replay_variant)
+    mutable_saw_replay_variant["mutableSawStateObservations"].append(
+        {"packetId": "saw-third", "unknown5": 90}
+    )
+    assert not should_emit_mutable_saw_replay(mutable_saw_replay_variant)
+    mutable_saw_replay_variant["mutableSawStateObservations"].pop()
+    mutable_saw_replay_variant["runtimeMissingEvidence"].append(
+        "unsupported semantic stream difference"
+    )
+    assert not should_emit_mutable_saw_replay(mutable_saw_replay_variant)
+    mutable_saw_replay_variant["runtimeMissingEvidence"].pop()
+    mutable_saw_replay_variant["captureEvidenceSafe"] = False
+    assert not should_emit_mutable_saw_replay(mutable_saw_replay_variant)
 
     cultist_ai = bytes.fromhex(
         "46002F160000C3507984B379000000000F0000000E000000060000C35070CBBEF3"

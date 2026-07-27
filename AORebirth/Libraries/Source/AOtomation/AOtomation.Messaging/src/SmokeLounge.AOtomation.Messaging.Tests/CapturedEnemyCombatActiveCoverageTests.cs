@@ -18,8 +18,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1496;
-        private const int ExpectedBindingRecordCount = 1482;
+        private const int ExpectedInitialActorCount = 1512;
+        private const int ExpectedBindingRecordCount = 1498;
         private static readonly Lazy<Dictionary<string, object>> CoverageDocument =
             new Lazy<Dictionary<string, object>>(LoadCoverageDocument);
 
@@ -209,15 +209,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 value => JsonObject(value, "non-denominator audit record"))
                 .GroupBy(value => StringMember(value, "auditFamily"), StringComparer.Ordinal)
                 .ToDictionary(value => value.Key, value => value.ToArray(), StringComparer.Ordinal);
-            Assert.AreEqual(62, recordsByFamily["dynamic-mission-mobs"].Length);
-            Assert.AreEqual(10, recordsByFamily["cleaning-robots"].Length);
+            Assert.AreEqual(155, recordsByFamily["dynamic-mission-mobs"].Length);
+            Assert.AreEqual(14, recordsByFamily["cleaning-robots"].Length);
             Assert.AreEqual(1, recordsByFamily["scripted-hostiles"].Length);
-            Assert.AreEqual(73, records.Length);
+            Assert.AreEqual(170, records.Length);
             Assert.AreEqual(
-                23,
+                27,
                 recordsByFamily["cleaning-robots"].Sum(
                     value => IntMember(value, "fixedDenominatorActorCount")),
-                "Cleaning-robot supplemental rows must reconcile to their 23 fixed Arete actors.");
+                "Cleaning-robot supplemental rows must reconcile to their 27 fixed Arete actors.");
 
             var auditKeys = new HashSet<string>(StringComparer.Ordinal);
             foreach (Dictionary<string, object> record in recordsByFamily.Values.SelectMany(value => value))
@@ -226,7 +226,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.IsTrue(auditKeys.Add(auditKey), "Duplicate supplemental audit " + auditKey);
                 Assert.AreEqual(0, IntMember(record, "denominatorContribution"), auditKey);
                 Assert.IsFalse(string.IsNullOrWhiteSpace(StringMember(record, "name")), auditKey);
-                Assert.IsTrue(IntMember(record, "monsterData") > 0, auditKey);
+                int monsterData = IntMember(record, "monsterData");
+                Assert.IsTrue(monsterData >= 0, auditKey);
+                if (monsterData == 0)
+                {
+                    Assert.AreEqual("unresolved", StringMember(record, "classification"), auditKey);
+                }
                 Assert.IsTrue(ArrayMember(record, "contentSources").Length > 0, auditKey);
 
                 if (StringMember(record, "auditFamily") == "cleaning-robots")
@@ -366,8 +371,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
             Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
             Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(16, discovered.Count);
-            Assert.AreEqual(18, discovered.Values.Sum());
+            Assert.AreEqual(18, discovered.Count);
+            Assert.AreEqual(20, discovered.Values.Sum());
             foreach (KeyValuePair<string, int> entryPoint in discovered)
             {
                 Dictionary<string, object> record = recorded[entryPoint.Key];
@@ -538,9 +543,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "temple-named-encounters", 9 },
                 { "temple-reanimated-corpse-adds", 2 },
                 { "nascence-core-hecklers", 40 },
-                { "nascence-life", 830 },
-                { "arete-family", 91 },
-                { "arete-additional-captured-actors", 8 },
+                { "nascence-life", 837 },
+                { "arete-family", 96 },
+                { "arete-additional-captured-actors", 12 },
                 { "subway-merchants", 6 },
                 { "rome-blue-city", 22 },
                 { "thrak-omni-garden", 10 }

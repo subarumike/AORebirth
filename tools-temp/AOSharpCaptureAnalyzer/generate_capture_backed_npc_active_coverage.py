@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
-EXPECTED_INITIAL_ACTORS = 1496
+EXPECTED_INITIAL_ACTORS = 1512
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -35,9 +35,9 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("temple-named-encounters", 9),
     ("temple-reanimated-corpse-adds", 2),
     ("nascence-core-hecklers", 40),
-    ("nascence-life", 830),
-    ("arete-family", 91),
-    ("arete-additional-captured-actors", 8),
+    ("nascence-life", 837),
+    ("arete-family", 96),
+    ("arete-additional-captured-actors", 12),
     ("subway-merchants", 6),
     ("rome-blue-city", 22),
     ("thrak-omni-garden", 10),
@@ -71,6 +71,16 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
         ("arete-family",),
     ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs": (
+        1,
+        "fixed-denominator-surfaces",
+        ("arete-additional-captured-actors",),
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs": (
+        1,
+        "fixed-denominator-surfaces",
+        ("arete-additional-captured-actors",),
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs": (
         1,
         "fixed-denominator-surfaces",
         ("arete-additional-captured-actors",),
@@ -890,6 +900,7 @@ def parse_structured_npc_array(
     surface: str,
     fixed_resource: Optional[int] = None,
     capture_field: Optional[str] = None,
+    constants: Mapping[str, Any] = {},
 ) -> List[ActorDefinition]:
     text = read_source(repo_root, relative_path)
     body = extract_array_initializer(text, declaration_marker)
@@ -906,17 +917,17 @@ def parse_structured_npc_array(
         if resource is None:
             if "PlayfieldId" not in row:
                 raise CoverageError(f"{relative_path} row lacks PlayfieldId")
-            resource = parse_csharp_int(row["PlayfieldId"])
+            resource = parse_csharp_int(row["PlayfieldId"], constants)
         evidence: Tuple[str, ...] = ()
         if capture_field and capture_field in row:
-            evidence = (parse_csharp_string(row[capture_field]),)
+            evidence = (parse_csharp_string(row[capture_field], constants),)
         actors.append(
             make_actor(
                 surface,
                 resource,
-                parse_csharp_string(row["Name"]),
-                parse_csharp_int(row["MonsterData"]),
-                parse_csharp_int(row["Level"]),
+                parse_csharp_string(row["Name"], constants),
+                parse_csharp_int(row["MonsterData"], constants),
+                parse_csharp_int(row["Level"], constants),
                 relative_path,
                 evidence_capture_ids=evidence,
             )
@@ -926,6 +937,18 @@ def parse_structured_npc_array(
 
 def parse_nascence_life(repo_root: Path) -> List[ActorDefinition]:
     path = "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs"
+    module_path = (
+        "AORebirth/Server/ZoneEngine/Core/Playfields/Content/"
+        "NascenceLifeContentModule.cs"
+    )
+    module_constants = extract_constants(read_source(repo_root, module_path))
+    constants = dict(module_constants)
+    constants.update(
+        {
+            "NascenceLifeContentModule." + name: value
+            for name, value in module_constants.items()
+        }
+    )
     actors = parse_structured_npc_array(
         repo_root,
         path,
@@ -933,12 +956,15 @@ def parse_nascence_life(repo_root: Path) -> List[ActorDefinition]:
         "LifeNpc",
         "nascence-life",
         capture_field="CaptureFolder",
+        constants=constants,
     )
+    for actor in actors:
+        actor.content_sources = (path, module_path)
     counts = defaultdict(int)
     for actor in actors:
         counts[actor.resource] += actor.actor_count
-    expected = {4310: 246, 4311: 387, 4312: 197}
-    if dict(counts) != expected or len(actors) != 830:
+    expected = {4001: 1, 4310: 245, 4311: 387, 4312: 197, 4531: 7}
+    if dict(counts) != expected or len(actors) != 837:
         raise CoverageError(
             f"Nascence Life parser found {len(actors)} actors with playfield counts {dict(counts)}"
         )
@@ -1063,10 +1089,10 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
             evidence_capture_ids=("20260720-064523",),
         )
     )
-    if sum(actor.actor_count for actor in actors) != 91:
+    if sum(actor.actor_count for actor in actors) != 96:
         raise CoverageError(
             "Arete family parser reconciled "
-            f"{sum(actor.actor_count for actor in actors)} actors instead of 91"
+            f"{sum(actor.actor_count for actor in actors)} actors instead of 96"
         )
     return actors
 
@@ -1096,7 +1122,7 @@ def parse_arete_additional(repo_root: Path) -> List[ActorDefinition]:
                 notes=("runtime spawner does not retain the official capture source identity as a resolver hint",),
             )
         )
-    if len(actors) != 7:
+    if len(actors) != 11:
         raise CoverageError(f"Arete captured robot parser found {len(actors)} spawns")
 
     automaton_path = "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs"
@@ -1300,7 +1326,12 @@ def parse_dynamic_mission_profiles(repo_root: Path) -> List[Dict[str, Any]]:
 
     spawn_text = read_source(repo_root, spawn_path)
     for fields in parse_object_initializers(spawn_text, "MissionNpc"):
-        if parse_csharp_string(fields.get("Name", '""')) == "Mission Cache":
+        name_expression = fields.get("Name", '""')
+        try:
+            parsed_name = parse_csharp_string(name_expression)
+        except CoverageError:
+            continue
+        if parsed_name == "Mission Cache":
             add_definition(fields, spawn_path)
 
     rows: List[Dict[str, Any]] = []
@@ -1309,9 +1340,9 @@ def parse_dynamic_mission_profiles(repo_root: Path) -> List[Dict[str, Any]]:
         row["roles"] = sorted(row["roles"])
         row["contentSources"] = sorted(row["contentSources"])
         rows.append(row)
-    if len(rows) != 62 or sum(row["configuredDefinitionCount"] for row in rows) != 75:
+    if len(rows) != 155 or sum(row["configuredDefinitionCount"] for row in rows) != 196:
         raise CoverageError(
-            "dynamic mission profile parser expected 62 profiles / 75 configured "
+            "dynamic mission profile parser expected 155 profiles / 196 configured "
             f"definitions, found {len(rows)} / "
             f"{sum(row['configuredDefinitionCount'] for row in rows)}"
         )
@@ -1868,7 +1899,7 @@ def build_non_denominator_audit_records(
                 ),
             }
         )
-    if family_summaries[0]["recordCount"] != 62:
+    if family_summaries[0]["recordCount"] != 155:
         raise CoverageError("dynamic mission non-denominator audit lost profile records")
     if family_summaries[1]["recordCount"] == 0:
         raise CoverageError("cleaning robot non-denominator audit found no profiles")

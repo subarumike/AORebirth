@@ -2488,7 +2488,8 @@ namespace AORebirth.Core.Playfields
                     new[]
                     {
                         new CapturedEnemyCombatProfileStreamDefinition(25, 34, 19, 6, 0, 3, 0, (byte)0, 4.7d, new[] { 25, 34, 27 }, new[] { 0d, 0d }, new[] { 2.984133d, 18.044752d }, new[] { 4.378445d }, 0, true, null, true, false)
-                    }),
+                    },
+                    new[] { 0, 85 }),
                 new CapturedEnemyCombatProfileDefinition(
                     "41ec2f5fb41b8e2f-95101dc382060622",
                     "wifu=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1039|18adfcb43302; saw=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3127|25e550543b11; attack=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3128|b9983c3a5d15; attackInfo=tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3242|100f511696d7",
