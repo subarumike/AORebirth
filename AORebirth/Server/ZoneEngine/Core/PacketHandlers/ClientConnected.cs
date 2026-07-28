@@ -127,13 +127,22 @@ namespace ZoneEngine.Core.PacketHandlers
             // (before SCFU/FullCharacter). Delayed-only replay left the map grey/wrong.
             if (client.Controller.Character.Playfield != null
                 && MissionInstanceService.IsMissionInstancePlayfield(
-                    client.Controller.Character.Playfield.Identity.Instance)
-                && !MissionAcgBindingRuntime.IsBoundLivePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))
             {
-                MissionInstanceDoorReplay.SendForCharacter(
-                    client,
-                    client.Controller.Character);
+                if (MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+                {
+                    MissionAcgRuntimeManager.SendForCharacter(
+                        client,
+                        client.Controller.Character);
+                }
+                else
+                {
+                    MissionInstanceDoorReplay.SendForCharacter(
+                        client,
+                        client.Controller.Character);
+                }
+
                 MissionInstanceService.TryRestampOutdoorReturnFromAccepted(client.Controller.Character);
             }
 
@@ -250,9 +259,16 @@ client.Controller.Character.Playfield.Identity,
 
                     // Gold 080425: Door/Chest FullUpdates land with SCFU before FullCharacter.
                     // Send here (not post-PAF) so the client accepts door meshes + map icons.
-                    if (client.Controller.Character.Playfield == null
-                        || !MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    if (client.Controller.Character.Playfield != null
+                        && MissionAcgBindingRuntime.IsBoundLivePlayfield(
                             client.Controller.Character.Playfield.Identity.Instance))
+                    {
+                        MissionAcgRuntimeManager.ClearSent(client.Controller.Character);
+                        MissionAcgRuntimeManager.SendForCharacter(
+                            client,
+                            client.Controller.Character);
+                    }
+                    else
                     {
                         ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
                             client,

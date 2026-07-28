@@ -501,9 +501,6 @@ namespace ZoneEngine.Core.Missions
             if (MissionAcgBindingRuntime.HasAnyBindingForOwner(
                 character.Identity.Instance))
             {
-                // Stage 2 establishes exact durable identity and an isolated PF2, but full safe
-                // interior materialization is Stage 3. Never fall back to the newest mission or
-                // shared PF while a durable binding exists.
                 MissionAcgBindingRecord exact;
                 bool resolved =
                     MissionAcgBindingRuntime.TryResolveByExteriorMarker(
@@ -527,17 +524,111 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
-                MissionDiagnostics.Log(
-                    "ENTRY-DEFERRED char={0} accepted={1}:{2} key={3} bundle={4} building={5}:{6} livePf2={7} reason=stage3-materialization-required",
+                MissionAcgEntryPlan plan;
+                if (!MissionAcgEntryResolver.TryCreatePlan(exact, out plan))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-REJECT char={0} accepted={1}:{2} reason=invalid-binding-plan",
+                        character.Identity.Instance,
+                        exact.Binding.AcceptedQuestIdentity.Type,
+                        exact.Binding.AcceptedQuestIdentity.Instance);
+                    return false;
+                }
+
+                MissionAcgMaterializedInstance materialized;
+                string materializeFailure;
+                if (!MissionAcgRuntimeManager.TryGetOrMaterialize(
+                    exact,
+                    out materialized,
+                    out materializeFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-REJECT char={0} accepted={1}:{2} reason=materialization-failed detail={3}",
+                        character.Identity.Instance,
+                        exact.Binding.AcceptedQuestIdentity.Type,
+                        exact.Binding.AcceptedQuestIdentity.Instance,
+                        materializeFailure);
+                    return false;
+                }
+
+                if (exact.State.LifecycleState == MissionAcgLifecycleState.Accepted)
+                {
+                    MissionAcgBindingRecord active;
+                    string transitionFailure;
+                    if (!MissionAcgBindingRuntime.TryTransition(
+                        exact,
+                        MissionAcgLifecycleState.Active,
+                        MissionAcgCleanupState.None,
+                        DateTime.UtcNow,
+                        out active,
+                        out transitionFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "ENTRY-REJECT char={0} accepted={1}:{2} reason=active-transition-failed detail={3}",
+                            character.Identity.Instance,
+                            exact.Binding.AcceptedQuestIdentity.Type,
+                            exact.Binding.AcceptedQuestIdentity.Instance,
+                            transitionFailure);
+                        return false;
+                    }
+
+                    exact = active;
+                }
+
+                int fromPlayfield = character.Playfield.Identity.Instance;
+                StampObjective(
+                    exact.Binding.AllocatedLivePlayfield2,
+                    exact.Binding.MissionType);
+                StampMissionQuality(
+                    exact.Binding.AllocatedLivePlayfield2,
+                    exact.Binding.MissionQuality);
+                StampShapeSource(
+                    exact.Binding.AllocatedLivePlayfield2,
+                    materialized.Bundle.SourcePlayfield2);
+                StampOutdoorReturn(
                     character.Identity.Instance,
-                    exact.Binding.AcceptedQuestIdentity.Type,
-                    exact.Binding.AcceptedQuestIdentity.Instance,
-                    exact.Binding.MissionKeyIdentity.Instance,
-                    exact.Binding.SelectedBundleId,
-                    exact.Binding.AcgBuildingIdentity.Type,
-                    exact.Binding.AcgBuildingIdentity.Instance,
-                    exact.Binding.AllocatedLivePlayfield2);
-                return false;
+                    exact.Binding.ExteriorEntranceIdentity.Instance,
+                    exact.Binding.ExteriorX,
+                    exact.Binding.ExteriorY,
+                    exact.Binding.ExteriorZ);
+                MissionTokenProgressTracker.BindCharacter(
+                    exact.Binding.AllocatedLivePlayfield2,
+                    character.Identity.Instance);
+                MissionAcgRuntimeManager.ClearSent(character);
+
+                var exactPlayfield =
+                    new Identity
+                    {
+                        Type = IdentityType.Playfield,
+                        Instance = exact.Binding.AllocatedLivePlayfield2
+                    };
+                character.DoNotDoTimers = false;
+                character.Teleport(
+                    new Coordinate
+                    {
+                        x = materialized.Spawn.X,
+                        y = materialized.Spawn.Y,
+                        z = materialized.Spawn.Z
+                    },
+                    character.Heading,
+                    exactPlayfield);
+                AORebirth.Core.Playfields.Playfield.ArmPostZoneCollisionGrace(character);
+
+                MissionDiagnostics.Log(
+                    "ENTRY-TELEPORT char={0} fromPf={1} accepted={2}:{3} key={4} bundle={5} building={6}:{7} livePf2={8} spawn=({9},{10},{11})",
+                    character.Identity.Instance,
+                    fromPlayfield,
+                    plan.AcceptedQuestIdentity.Type,
+                    plan.AcceptedQuestIdentity.Instance,
+                    plan.MissionKeyIdentity.Instance,
+                    plan.BundleId,
+                    plan.BuildingIdentity.Type,
+                    plan.BuildingIdentity.Instance,
+                    plan.AllocatedLivePlayfield2,
+                    materialized.Spawn.X,
+                    materialized.Spawn.Y,
+                    materialized.Spawn.Z);
+                return true;
             }
 
             if (!MissionKeyGrantService.HasMissionKey(character))
@@ -697,7 +788,31 @@ namespace ZoneEngine.Core.Missions
             float destX;
             float destY;
             float destZ;
-            ResolveOutdoorExitDestination(character, out destPf, out destX, out destY, out destZ);
+            MissionAcgBindingRecord exactBinding;
+            if (MissionAcgBindingRuntime.TryResolveByLivePlayfield(
+                character.Playfield.Identity.Instance,
+                out exactBinding))
+            {
+                if (exactBinding.Binding.OwnerIdentity.Instance
+                    != character.Identity.Instance)
+                {
+                    return false;
+                }
+
+                destPf = exactBinding.Binding.ExteriorEntranceIdentity.Instance;
+                destX = exactBinding.Binding.ExteriorX + OutdoorExitMarkerStandoff;
+                destY = exactBinding.Binding.ExteriorY;
+                destZ = exactBinding.Binding.ExteriorZ;
+            }
+            else
+            {
+                ResolveOutdoorExitDestination(
+                    character,
+                    out destPf,
+                    out destX,
+                    out destY,
+                    out destZ);
+            }
 
             var pfIdentity = new Identity { Type = IdentityType.Playfield, Instance = destPf };
             character.DoNotDoTimers = false;
@@ -739,6 +854,19 @@ namespace ZoneEngine.Core.Missions
             x = SpawnX;
             y = SpawnY;
             z = SpawnZ;
+            MissionAcgMaterializedInstance materialized;
+            if (MissionAcgRuntimeManager.TryResolveByPlayfield(
+                playfieldId,
+                out materialized)
+                && materialized.Exit != null
+                && materialized.Exit.Position != null)
+            {
+                x = materialized.Exit.Position.X;
+                y = materialized.Exit.Position.Y;
+                z = materialized.Exit.Position.Z;
+                return;
+            }
+
             AORebirth.Core.Playfields.MissionShape shape =
                 AORebirth.Core.Playfields.MissionInstanceShapeCatalog.PickShape(playfieldId, null);
             if (shape != null)

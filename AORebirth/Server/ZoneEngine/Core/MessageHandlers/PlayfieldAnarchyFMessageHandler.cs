@@ -33,6 +33,7 @@ namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
 
     using AORebirth.Core.Components;
@@ -127,11 +128,19 @@ namespace ZoneEngine.Core.MessageHandlers
                     // Live zone-in: PlayfieldId1 = ACGBuildingGeneratorData + stamped shape payload.
                     // Payload MUST match ShapeSourceByPlayfield (doors + NPC XYZ). Foreign ACG piles mobs.
                     int pf = character.Playfield.Identity.Instance;
+                    bool boundMission =
+                        MissionAcgBindingRuntime.IsBoundLivePlayfield(pf);
                     byte[] payload = MissionInstanceService.GetLiveGeneratorPayload(pf);
                     int buildingInstance =
                         MissionInstanceService.GetLiveBuildingInstance(pf);
                     if (payload == null || payload.Length == 0)
                     {
+                        if (boundMission)
+                        {
+                            throw new InvalidOperationException(
+                                "Bound ACG mission has no exact generator payload.");
+                        }
+
                         payload = CreateCapturedMissionGeneratorPayload();
                         buildingInstance = CapturedMissionBuildingInstance;
                     }

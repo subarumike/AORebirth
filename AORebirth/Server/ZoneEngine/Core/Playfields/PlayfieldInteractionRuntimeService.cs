@@ -19,6 +19,13 @@ namespace ZoneEngine.Core.Playfields
     {
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
+            // Persisted ACG missions route every interaction by owner + allocated PF2 + runtime
+            // identity before any legacy global tracker can claim the target.
+            if (MissionAcgRuntimeInteractionService.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             // Mission Repair Kit used on / Use of Broken Machine inside the instance.
             if (MissionRepairService.TryHandleUse(client, message, target))
             {

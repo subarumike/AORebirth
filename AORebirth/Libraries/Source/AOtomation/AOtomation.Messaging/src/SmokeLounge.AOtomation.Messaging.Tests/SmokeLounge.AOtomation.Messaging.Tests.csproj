@@ -84,6 +84,7 @@
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="MissionAcgLayoutCatalogTests.cs" />
     <Compile Include="MissionAcgBindingPersistenceTests.cs" />
+    <Compile Include="MissionAcgRuntimeMaterializationTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
@@ -110,6 +111,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingResolver.cs">
       <Link>MissionAcgBindingResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgRuntimeMaterialization.cs">
+      <Link>MissionAcgRuntimeMaterialization.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgRuntimeStateStore.cs">
+      <Link>MissionAcgRuntimeStateStore.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutCatalog.cs">
       <Link>MissionAcgLayoutCatalog.cs</Link>
