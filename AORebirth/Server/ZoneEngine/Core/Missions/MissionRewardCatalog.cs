@@ -54,7 +54,7 @@ namespace ZoneEngine.Core.Missions
 
         /// <summary>
         /// Picks one reward for <paramref name="missionQuality"/>. Returns false when no catalog entry
-        /// covers that QL (so the roll can keep the capture's original reward and log the miss).
+        /// covers that QL; generated rolls treat that as a fail-closed generation error.
         /// </summary>
         public static bool TryPickReward(int missionQuality, Random rng, out QuestItemShort reward, out string itemName, out bool isNano)
         {

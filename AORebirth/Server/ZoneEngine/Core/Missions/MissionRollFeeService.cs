@@ -35,7 +35,6 @@ namespace ZoneEngine.Core.Missions
             }
 
             int level = character.Stats[StatIds.level].Value;
-            fee = level < 1 ? 1 : level;
 
             // Prefer live Value (what the client shows). BaseValue alone is often 0 after login
             // and made every roll fail with an empty terminal.
@@ -46,7 +45,8 @@ namespace ZoneEngine.Core.Missions
             }
 
             int cashBefore = CashStatRules.Clamp(cashRaw);
-            if (cashBefore < fee)
+            int cashAfter;
+            if (!MissionRollFeeRules.TryCalculateCharge(level, cashBefore, out fee, out cashAfter))
             {
                 SendYellowFeedback(
                     character,
@@ -62,7 +62,6 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            int cashAfter = CashStatRules.Clamp((long)cashBefore - fee);
             character.Stats[StatIds.cash].Set((uint)cashAfter);
             StatMessageHandler.Default.SendSingle(character, (int)StatIds.cash, (uint)cashAfter);
 

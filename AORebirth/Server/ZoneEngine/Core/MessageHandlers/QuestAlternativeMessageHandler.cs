@@ -77,17 +77,33 @@ namespace ZoneEngine.Core.MessageHandlers
                     return;
                 }
 
-                int fee;
-                if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
+                int missionQuality;
+                MissionSliderProfile sliderProfile;
+                string sliderError = null;
+                if (!MissionLevelTable.TryGetMissionQuality(
+                        characterLevel,
+                        message.LevelSlider,
+                        out missionQuality)
+                    || !MissionSliderProfile.TryCreate(message, out sliderProfile, out sliderError))
                 {
                     client.Server.Info(
                         client,
-                        "QuestAlternative roll blocked — need {0} credits",
-                        fee);
+                        "QuestAlternative roll blocked — unsupported slider encoding lvl={0} err={1}",
+                        message.LevelSlider,
+                        sliderError ?? "invalid difficulty detent");
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                "The mission terminal rejected an unsupported slider value.")
+                        });
                     return;
                 }
 
-                int missionQuality = MissionLevelTable.GetMissionQuality(characterLevel, message.LevelSlider);
                 float terminalX = 0f;
                 float terminalZ = 0f;
                 try
@@ -108,6 +124,17 @@ namespace ZoneEngine.Core.MessageHandlers
                     terminalX,
                     terminalZ,
                     characterSide);
+
+                int fee;
+                if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
+                {
+                    client.Server.Info(
+                        client,
+                        "QuestAlternative roll blocked — need {0} credits",
+                        fee);
+                    return;
+                }
+
                 client.SendCompressed(response);
 
                 // Remember what we offered so a following accept (CreateQuest) can look the mission up.

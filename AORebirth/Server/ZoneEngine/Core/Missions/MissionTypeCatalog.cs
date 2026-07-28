@@ -1,12 +1,14 @@
 namespace ZoneEngine.Core.Missions
 {
     /// <summary>
-    /// RK mission types and the client journal icons captured from live rolls
-    /// (capture 20260717-Mission terminal2 / pull-mish-doit / 20260719-Rolling different mishes).
+    /// RK mission types and client journal icons from the live roll fixtures, with Find/Return behavior
+    /// resolved by finalized lifecycle captures 20260728-003410 and 20260728-005042.
     /// Five gameplay types: KillPerson, FindPerson, FindItem, FindItemReturn, RepairMachine.
     /// </summary>
     internal enum MissionRollType
     {
+        Unknown = -1,
+
         KillPerson = 0,
 
         FindPerson = 1,
@@ -25,33 +27,11 @@ namespace ZoneEngine.Core.Missions
 
         internal const int FindPersonIcon = 11335; // 0x2C47
 
-        internal const int FindItemIconA = 11329; // 0x2C41 — Find item (keep)
+        internal const int ReturnItemIcon = 11329; // 0x2C41 — recover item and return it to the terminal
 
-        internal const int FindItemIconB = 11337; // 0x2C49 — Find item and return to terminal
+        internal const int FindItemIcon = 11337; // 0x2C49 — locate/pick up item; no terminal return
 
         internal const int RepairMachineIcon = 11342; // 0x2C4E
-
-        /// <summary>
-        /// Template offer indices inside <see cref="MissionRollCaptureTemplate"/> (0-based) that best match
-        /// each type. The capture has no Kill offer, so Kill reuses a FindPerson shell and swaps the icon.
-        /// </summary>
-        internal static int ArchetypeIndex(MissionRollType type)
-        {
-            switch (type)
-            {
-                case MissionRollType.KillPerson:
-                    return 0; // FindPerson shell → icon overridden to Kill
-                case MissionRollType.FindPerson:
-                    return 1;
-                case MissionRollType.FindItem:
-                case MissionRollType.FindItemReturn:
-                    return 2;
-                case MissionRollType.RepairMachine:
-                    return 3;
-                default:
-                    return 0;
-            }
-        }
 
         internal static int IconId(MissionRollType type, int salt)
         {
@@ -62,19 +42,19 @@ namespace ZoneEngine.Core.Missions
                 case MissionRollType.FindPerson:
                     return FindPersonIcon;
                 case MissionRollType.FindItem:
-                    return FindItemIconA;
+                    return FindItemIcon;
                 case MissionRollType.FindItemReturn:
-                    return FindItemIconB;
+                    return ReturnItemIcon;
                 case MissionRollType.RepairMachine:
                     return RepairMachineIcon;
                 default:
-                    return FindPersonIcon;
+                    return 0;
             }
         }
 
         /// <summary>
-        /// Maps a captured MissionIconId back to the roll type (capture 20260719-Rolling different mishes).
-        /// FindItemA = keep; FindItemB = return to terminal.
+        /// Maps a captured MissionIconId back to the roll type. Finalized accepted missions prove
+        /// 11337 = locate/keep and 11329 = recover/return to the issuing terminal.
         /// </summary>
         internal static MissionRollType TypeFromIcon(int missionIconId)
         {
@@ -88,12 +68,12 @@ namespace ZoneEngine.Core.Missions
                 return MissionRollType.FindPerson;
             }
 
-            if (missionIconId == FindItemIconA)
+            if (missionIconId == FindItemIcon)
             {
                 return MissionRollType.FindItem;
             }
 
-            if (missionIconId == FindItemIconB)
+            if (missionIconId == ReturnItemIcon)
             {
                 return MissionRollType.FindItemReturn;
             }
@@ -103,7 +83,31 @@ namespace ZoneEngine.Core.Missions
                 return MissionRollType.RepairMachine;
             }
 
-            return MissionRollType.FindPerson;
+            return MissionRollType.Unknown;
+        }
+
+        internal static bool TryTypeFromIcon(int missionIconId, out MissionRollType type)
+        {
+            type = TypeFromIcon(missionIconId);
+            return type != MissionRollType.Unknown;
+        }
+
+        internal static int ExpectedActionCode(MissionRollType type)
+        {
+            switch (type)
+            {
+                case MissionRollType.KillPerson:
+                    return 1;
+                case MissionRollType.FindPerson:
+                    return 16;
+                case MissionRollType.FindItem:
+                    return 15;
+                case MissionRollType.FindItemReturn:
+                case MissionRollType.RepairMachine:
+                    return 8;
+                default:
+                    return 0;
+            }
         }
 
         /// <summary>
@@ -120,7 +124,7 @@ namespace ZoneEngine.Core.Missions
                 case MissionRollType.FindItem:
                     return "Find item mission";
                 case MissionRollType.FindItemReturn:
-                    return "Find+return item mission";
+                    return "Return item mission";
                 case MissionRollType.RepairMachine:
                     return "Repair machine mission";
                 default:
@@ -151,77 +155,5 @@ namespace ZoneEngine.Core.Missions
         {
             return type == MissionRollType.FindItem || type == MissionRollType.FindItemReturn;
         }
-
-        /// <summary>
-        /// Builds a 5-offer type mix that changes every roll and is never five-of-a-kind.
-        /// </summary>
-        internal static MissionRollType[] NextMix(System.Random rng)
-        {
-            var mix = new MissionRollType[5];
-            var bag = new[]
-                      {
-                          MissionRollType.KillPerson,
-                          MissionRollType.KillPerson,
-                          MissionRollType.FindPerson,
-                          MissionRollType.FindPerson,
-                          MissionRollType.FindItem,
-                          MissionRollType.FindItemReturn,
-                          MissionRollType.RepairMachine,
-                          MissionRollType.RepairMachine
-                      };
-
-            // Shuffle bag and take 5, then ensure at least 2 distinct types.
-            for (int i = bag.Length - 1; i > 0; i--)
-            {
-                int j = rng.Next(i + 1);
-                MissionRollType tmp = bag[i];
-                bag[i] = bag[j];
-                bag[j] = tmp;
-            }
-
-            for (int i = 0; i < 5; i++)
-            {
-                mix[i] = bag[i];
-            }
-
-            if (CountDistinct(mix) < 2)
-            {
-                mix[0] = MissionRollType.KillPerson;
-                mix[1] = MissionRollType.FindPerson;
-                mix[2] = MissionRollType.FindItem;
-                mix[3] = MissionRollType.FindItemReturn;
-                mix[4] = MissionRollType.RepairMachine;
-            }
-
-            // Final shuffle of the five slots so order varies too.
-            for (int i = 4; i > 0; i--)
-            {
-                int j = rng.Next(i + 1);
-                MissionRollType tmp = mix[i];
-                mix[i] = mix[j];
-                mix[j] = tmp;
-            }
-
-            return mix;
-        }
-
-        private static int CountDistinct(MissionRollType[] mix)
-        {
-            int mask = 0;
-            for (int i = 0; i < mix.Length; i++)
-            {
-                mask |= 1 << (int)mix[i];
-            }
-
-            int count = 0;
-            while (mask != 0)
-            {
-                count += mask & 1;
-                mask >>= 1;
-            }
-
-            return count;
-        }
-
     }
 }
