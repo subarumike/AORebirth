@@ -36,9 +36,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
+      <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
+    </Compile>
     <Compile Include="..\AOSharpLiveCapture\MissionFlowCapture.cs">
       <Link>MissionFlowCapture.cs</Link>
     </Compile>
+    <Compile Include="AcgLayoutExtractor.cs" />
+    <Compile Include="MissionAcgCapturedLayoutCatalogEmitter.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\external\aosharp-github\AOSharp.Common\AOSharp.Common.csproj')">

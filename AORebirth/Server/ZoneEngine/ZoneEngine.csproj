@@ -350,6 +350,13 @@
     <Compile Include="Core\Missions\MissionInstanceDynelCapture.cs" />
     <Compile Include="Core\Missions\MissionInstanceDoorReplay.cs" />
     <Compile Include="Core\Missions\MissionInstanceMobCombat.cs" />
+    <Compile Include="Core\Missions\MissionAcgLayoutRecords.cs" />
+    <Compile Include="Core\Missions\MissionAcgLayoutBundle.cs" />
+    <Compile Include="Core\Missions\MissionAcgInstanceBinding.cs" />
+    <Compile Include="Core\Missions\MissionAcgLayoutCatalog.cs" />
+    <Compile Include="Core\Missions\MissionAcgLayoutSelector.cs" />
+    <Compile Include="Core\Missions\MissionAcgLegacyLayoutCatalogFactory.cs" />
+    <Compile Include="Core\Missions\MissionAcgCapturedLayoutCatalog.g.cs" />
     <Compile Include="Core\Playfields\MissionInstanceShapeCatalog.cs" />
     <Compile Include="Core\Playfields\MissionInstanceSpawn.cs" />
     <Compile Include="Core\Missions\MissionAcceptService.cs" />

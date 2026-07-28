@@ -82,8 +82,37 @@
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="InspectMessageContractTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
+    <Compile Include="MissionAcgLayoutCatalogTests.cs" />
+    <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutRecords.cs">
+      <Link>MissionAcgLayoutRecords.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutBundle.cs">
+      <Link>MissionAcgLayoutBundle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgInstanceBinding.cs">
+      <Link>MissionAcgInstanceBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutCatalog.cs">
+      <Link>MissionAcgLayoutCatalog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutSelector.cs">
+      <Link>MissionAcgLayoutSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLegacyLayoutCatalogFactory.cs">
+      <Link>MissionAcgLegacyLayoutCatalogFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgCapturedLayoutCatalog.g.cs">
+      <Link>MissionAcgCapturedLayoutCatalog.g.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionInstanceDynelCapture.cs">
+      <Link>MissionInstanceDynelCapture.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\MissionInstanceShapeCatalog.cs">
+      <Link>MissionInstanceShapeCatalog.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollCaptureTemplate.cs">
       <Link>MissionRollCaptureTemplate.cs</Link>
     </Compile>

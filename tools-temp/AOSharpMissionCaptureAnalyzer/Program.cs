@@ -31,8 +31,39 @@ namespace AOSharpMissionCaptureAnalyzer
                     "QuestFullUpdate",
                     "Quest",
                     "N3Teleport",
-                    "Teleport"
+                    "Teleport",
+                    "PlayfieldAnarchyF",
+                    "DoorFullUpdate",
+                    "ChestFullUpdate",
+                    "ChestItemFullUpdate",
+                    "SimpleCharFullUpdate",
+                    "CharInPlay",
+                    "VendingMachineFullUpdate",
+                    "WeaponItemFullUpdate",
+                    "StaticItemFullUpdate",
+                    "UseItemOnItem",
+                    "DoorStatusUpdate",
+                    "Despawn",
+                    "CharacterAction"
                 },
+                StringComparer.OrdinalIgnoreCase);
+
+        private static readonly HashSet<string> RawAcgEvidenceMessageTypes =
+            new HashSet<string>(
+                new[]
+                    {
+                        "PlayfieldAnarchyF",
+                        "DoorFullUpdate",
+                        "ChestFullUpdate",
+                        "ChestItemFullUpdate",
+                        "SimpleItemFullUpdate",
+                        "SimpleCharFullUpdate",
+                        "CharInPlay",
+                        "VendingMachineFullUpdate",
+                        "WeaponItemFullUpdate",
+                        "StaticItemFullUpdate",
+                        "UseItemOnItem"
+                    },
                 StringComparer.OrdinalIgnoreCase);
 
         private static int Main(string[] args)
@@ -42,14 +73,42 @@ namespace AOSharpMissionCaptureAnalyzer
                 return RunSelfTest();
             }
 
+            if ((args.Length == 2 || args.Length == 3)
+                && string.Equals(args[0], "--corpus", StringComparison.OrdinalIgnoreCase))
+            {
+                return AcgLayoutExtractor.AnalyzeCorpus(
+                    Path.GetFullPath(args[1]),
+                    args.Length == 3 ? Path.GetFullPath(args[2]) : null);
+            }
+
+            if (args.Length == 2
+                && string.Equals(args[0], "--extract", StringComparison.OrdinalIgnoreCase))
+            {
+                return AcgLayoutExtractor.AnalyzeAndWrite(Path.GetFullPath(args[1]));
+            }
+
+            if (args.Length == 3
+                && string.Equals(
+                    args[0],
+                    "--generate-catalog",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return MissionAcgCapturedLayoutCatalogEmitter.EmitFromCorpus(
+                    Path.GetFullPath(args[1]),
+                    Path.GetFullPath(args[2]));
+            }
+
             if (args.Length != 1)
             {
                 Console.Error.WriteLine(
-                    "Usage: AOSharpMissionCaptureAnalyzer.exe <capture-folder> | --self-test");
+                    "Usage: AOSharpMissionCaptureAnalyzer.exe <capture-folder> | --extract <capture-folder> | --corpus <captures-root> [output-json] | --generate-catalog <captures-root> <output-cs> | --self-test");
                 return 2;
             }
 
-            return ReplayCapture(Path.GetFullPath(args[0]));
+            string captureFolder = Path.GetFullPath(args[0]);
+            int extractionResult = AcgLayoutExtractor.AnalyzeAndWrite(captureFolder);
+            int replayResult = ReplayCapture(captureFolder);
+            return extractionResult != 0 ? extractionResult : replayResult;
         }
 
         private static int ReplayCapture(string captureFolder)
@@ -83,6 +142,7 @@ namespace AOSharpMissionCaptureAnalyzer
             var counts = new SortedDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             int decoded = 0;
             int skipped = 0;
+            int rawPreserved = 0;
 
             try
             {
@@ -94,6 +154,28 @@ namespace AOSharpMissionCaptureAnalyzer
                     if (!MissionMessageTypes.Contains(row.N3TypeName))
                     {
                         skipped++;
+                        continue;
+                    }
+
+                    if (RawAcgEvidenceMessageTypes.Contains(row.N3TypeName))
+                    {
+                        try
+                        {
+                            HexToBytes(row.RawHex);
+                            rawPreserved++;
+                            Increment(counts, "RAW-" + row.Direction + "-" + row.N3TypeName);
+                        }
+                        catch (Exception exception)
+                        {
+                            errors.Add(
+                                FormatError(
+                                    row,
+                                    "raw preservation failed: "
+                                    + exception.GetType().Name
+                                    + ": "
+                                    + exception.Message));
+                        }
+
                         continue;
                     }
 
@@ -159,9 +241,10 @@ namespace AOSharpMissionCaptureAnalyzer
             Console.WriteLine(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "{0}: mission replay decoded={1} skipped={2} errors={3} output={4}",
+                    "{0}: mission replay decoded={1} rawPreserved={2} skipped={3} errors={4} output={5}",
                     Path.GetFileName(captureFolder),
                     decoded,
+                    rawPreserved,
                     skipped,
                     errors.Count,
                     outputPath));
@@ -396,6 +479,7 @@ namespace AOSharpMissionCaptureAnalyzer
                     throw new InvalidOperationException("mission state leaked across capture sessions");
                 }
 
+                AcgLayoutExtractor.RunSelfTest();
                 Console.WriteLine("AOSharp mission capture analyzer self-test PASS");
                 return 0;
             }
