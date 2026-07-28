@@ -179,6 +179,47 @@ namespace AORebirth.Core.Playfields
                                  : value).ToArray(),
                 this.Unknown3);
         }
+
+        internal CapturedEnemyWeaponDefinition WithProductionWeaponLoadout(
+            int lowId,
+            int highId,
+            int quality)
+        {
+            return new CapturedEnemyWeaponDefinition(
+                this.Evidence,
+                this.EvidenceSourceIdentity,
+                this.N3Unknown,
+                this.Unknown1,
+                this.InventorySlot,
+                this.StateMachineType,
+                this.StateMachineInstance,
+                this.Unknown2,
+                this.Stats.Select(
+                    value =>
+                    {
+                        uint replacement;
+                        switch (value.Stat)
+                        {
+                            case CharacterStat.StaticInstance:
+                            case CharacterStat.ACGItemTemplateID:
+                                replacement = unchecked((uint)lowId);
+                                break;
+                            case CharacterStat.ACGItemLevel:
+                                replacement = unchecked((uint)quality);
+                                break;
+                            case CharacterStat.ACGItemTemplateID2:
+                                replacement = unchecked((uint)highId);
+                                break;
+                            default:
+                                return value;
+                        }
+
+                        return new CapturedEnemyWeaponStatDefinition(
+                            value.Stat,
+                            replacement);
+                    }).ToArray(),
+                this.Unknown3);
+        }
     }
 
     internal sealed class CapturedEnemyCombatAttackDefinition
@@ -2392,6 +2433,72 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
+            if (archetype != null
+                && archetype.MonsterData
+                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
+            {
+                OrdinaryEnemySpawnWeaponLoadout meldedWeapon = variant == null
+                    ? null
+                    : variant.WeaponLoadout;
+                OrdinaryEnemyCombatNumericSetup generated;
+                string meldedAtomicFailure;
+                if (!OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                        NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData,
+                        sourceInstance,
+                        variant,
+                        generationEvidence,
+                        out meldedAtomicFailure)
+                    || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            archetype.MonsterData,
+                            variant.Level,
+                            meldedWeapon.LowId,
+                            meldedWeapon.HighId,
+                            meldedWeapon.Quality,
+                            NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot),
+                        out generated))
+                {
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Melded Patterns mathematical setup is unsupported",
+                        true);
+                }
+
+                return CapturedEnemyCombatContract
+                    .EquippedWeaponWithCapturedPacketSequence(
+                        meldedWeapon.Evidence,
+                        sourceInstance,
+                        meldedWeapon.LowId,
+                        meldedWeapon.HighId,
+                        meldedWeapon.Quality,
+                        NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot,
+                        true,
+                        0,
+                        0,
+                        0,
+                        null,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        false,
+                        false,
+                        0,
+                        0,
+                        generated.SpecialAttackWeaponUnknown1,
+                        generated.SpecialAttackWeaponUnknown2,
+                        generated.SpecialAttackWeaponUnknown3,
+                        generated.SpecialAttackWeaponUnknown4,
+                        0,
+                        NpcCombatAttackRules.NormalAttackInfoHitType,
+                        0,
+                        0,
+                        0,
+                        0,
+                        false,
+                        true)
+                    .WithProductionEquippedWeaponValues();
+            }
+
             if (archetype == null
                 || (archetype.MonsterData != WorkmanStrikerMonsterData
                     && archetype.MonsterData != IncompleteRebuildMonsterData

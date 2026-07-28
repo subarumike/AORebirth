@@ -41,6 +41,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { 14, 76 }
             };
 
+        private static readonly IDictionary<int, int> CapturedMeldedPatternsSawValues =
+            new Dictionary<int, int>
+            {
+                { 18, 98 },
+                { 19, 103 },
+                { 20, 109 },
+                { 21, 114 },
+                { 24, 131 },
+                { 25, 136 }
+            };
+
         [TestMethod]
         public void DisobedientBotFormulaReproducesEveryCapturedHeldOutLevelExactly()
         {
@@ -461,6 +472,146 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 attack.AttackInfoWeaponInstance);
         }
 
+        [TestMethod]
+        public void MeldedPatternsFormulaReproducesEveryCapturedHeldOutLevelExactly()
+        {
+            foreach (KeyValuePair<int, int> heldOut in CapturedMeldedPatternsSawValues)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData,
+                            heldOut.Key,
+                            121818,
+                            121818,
+                            20,
+                            NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot),
+                        out setup));
+                Assert.AreEqual(
+                    OrdinaryEnemyCombatSetupGenerator.MeldedPatternsFormulaId,
+                    setup.FormulaId);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(heldOut.Value + 28, setup.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown4);
+            }
+        }
+
+        [TestMethod]
+        public void EveryCapturedMeldedPatternsSawPacketRemainsByteExactUnderTheFormula()
+        {
+            CapturedEnemyCombatProfileDefinition[] profiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => value.MonsterData
+                             == NpcCombatAttackRules
+                                 .CapturedSubwayMeldedPatternsMonsterData)
+                    .ToArray();
+            Assert.AreEqual(11, profiles.Length);
+            foreach (CapturedEnemyCombatProfileDefinition profile in profiles)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            profile.MonsterData,
+                            profile.Level,
+                            profile.WeaponDefinition.LowId,
+                            profile.WeaponDefinition.HighId,
+                            profile.WeaponDefinition.Quality,
+                            profile.WeaponDefinition.InventorySlot),
+                        out setup),
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown1,
+                    setup.SpecialAttackWeaponUnknown1,
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown2,
+                    setup.SpecialAttackWeaponUnknown2,
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown3,
+                    setup.SpecialAttackWeaponUnknown3,
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown4,
+                    setup.SpecialAttackWeaponUnknown4,
+                    profile.ProfileId);
+
+                CapturedEnemyCombatPacketFixture fixture =
+                    CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                        value => value.ProfileId == profile.ProfileId);
+                foreach (CapturedEnemySpecialAttackWeaponPacketFixture saw in
+                    fixture.SpecialAttackWeaponPackets)
+                {
+                    MessageBody generated =
+                        CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                            SimpleChar(saw.SourceIdentity),
+                            profile.SpecialAttacks,
+                            profile.SpecialAttackWeaponN3Unknown,
+                            setup.SpecialAttackWeaponUnknown1,
+                            setup.SpecialAttackWeaponUnknown2,
+                            setup.SpecialAttackWeaponUnknown3,
+                            setup.SpecialAttackWeaponUnknown4,
+                            saw.Unknown5);
+                    Assert.AreEqual(
+                        saw.BodyHex,
+                        BitConverter.ToString(Serialize(generated)).Replace("-", string.Empty),
+                        profile.ProfileId);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MeldedPatternsSharedPathPreservesWifuSawAttackAttackInfoOrder()
+        {
+            CapturedEnemyCombatContract contract =
+                ResolveMeldedPatterns(unchecked((int)0x7954508E));
+            Identity source = SimpleChar(unchecked((int)0x7954508E));
+            Identity target = SimpleChar(unchecked((int)0x7944C065));
+            MessageBody[] packets =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    source,
+                    127,
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = contract.WeaponDefinition.InventorySlot
+                    },
+                    contract.WeaponDefinition),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    source,
+                    contract),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    source,
+                    target,
+                    contract),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    source,
+                    target,
+                    1,
+                    contract.AttackInfoAmmoCount,
+                    contract.AttackInfoWeaponSlot,
+                    contract.AttackInfoUnknown,
+                    contract.AttackInfoHitType,
+                    contract.AttackInfoWeaponInstance,
+                    contract.AttackInfoN3Unknown)
+            };
+
+            Assert.IsInstanceOfType(packets[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(packets[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(packets[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(packets[3], typeof(AttackInfoMessage));
+            Assert.AreEqual(125, contract.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(153, contract.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, contract.AttackInfoHitType);
+            Assert.AreEqual(0, contract.AttackInfoUnknown);
+        }
+
         private static OrdinaryEnemyCombatSetupInput Input(
             int monsterData,
             int level,
@@ -562,6 +713,43 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     profile.DisplayName,
                     profile.MonsterData,
                     level,
+                    sourceInstance,
+                    current,
+                    out resolved,
+                    out failure),
+                failure);
+            return resolved;
+        }
+
+        private static CapturedEnemyCombatContract ResolveMeldedPatterns(
+            int sourceInstance)
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(
+                value => value.DisplayName == "Melded Patterns"
+                         && value.MonsterData
+                            == NpcCombatAttackRules
+                                .CapturedSubwayMeldedPatternsMonsterData);
+            OrdinaryEnemySpawnDefinition spawn = catalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == profile.ProfileKey
+                         && value.SourceIdentity == sourceInstance);
+            OrdinaryEnemySpawnVariant variant =
+                spawn.LevelDefinition.GetExplicitVariants().Single();
+            CapturedEnemyCombatContract current =
+                profile.Combat.ResolveContract(sourceInstance, variant);
+            current.Retaliates = true;
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    profile.DisplayName,
+                    profile.MonsterData,
+                    variant.Level,
                     sourceInstance,
                     current,
                     out resolved,

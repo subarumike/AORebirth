@@ -1050,6 +1050,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatPacketFixture fixture =
                 CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
                     value => value.ProfileId == profileId);
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                value => value.DisplayName == "Melded Patterns"
+                         && value.MonsterData == 203747);
+            OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.SourceIdentity == runtimeSourceIdentity);
+            OrdinaryEnemySpawnVariant runtimeVariant =
+                runtimeSpawn.LevelDefinition.GetExplicitVariants().Single();
+            CapturedEnemyCombatContract baseline =
+                runtimeProfile.Combat.ResolveContract(
+                    runtimeSourceIdentity,
+                    runtimeVariant);
+            baseline.Retaliates = true;
+            baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
             CapturedEnemyCombatContract resolved;
             string failure;
             Assert.IsTrue(
@@ -1059,18 +1077,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     203747,
                     25,
                     runtimeSourceIdentity,
-                    CapturedEnemyCombatContract.EquippedWeapon(
-                            "active subway Melded Patterns production QL20",
-                            121817,
-                            121818,
-                            20,
-                            6)
-                        .WithProductionWeaponQuality(),
+                    baseline,
                     out resolved,
                     out failure),
                 failure);
-            Assert.AreEqual(20, resolved.WeaponQuality);
-            Assert.AreEqual(20, resolved.WeaponDefinition.Quality);
+            Assert.AreEqual(19, resolved.WeaponQuality);
+            Assert.AreEqual(19, resolved.WeaponDefinition.Quality);
 
             CapturedEnemyWeaponPacketFixture weapon = fixture.WeaponPackets.Single(
                 value => value.OwnerIdentity == resolved.EvidenceSourceIdentity
@@ -1121,9 +1133,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsInstanceOfType(capturedSequence[1], typeof(SpecialAttackWeaponMessage));
             Assert.IsInstanceOfType(capturedSequence[2], typeof(AttackMessage));
             Assert.IsInstanceOfType(capturedSequence[3], typeof(AttackInfoMessage));
-            AssertHex(
-                "3B1D22680000C74A25713AC8000000000B0000C350795451DD00122002000F424F0000000001060000276A0000000000000403000000170001DBD9000002BD00000014000002BE0001DBD9000002BF0001DBDA0000019C000000010000001A0000001400000126000000EB000000D2000000EB00000000",
-                capturedSequence[0]);
+            AssertHex(weapon.BodyHex, capturedSequence[0]);
             AssertHex(saw.BodyHex, capturedSequence[1]);
             AssertHex(attack.BodyHex, capturedSequence[2]);
             AssertHex(attackInfo.BodyHex, capturedSequence[3]);

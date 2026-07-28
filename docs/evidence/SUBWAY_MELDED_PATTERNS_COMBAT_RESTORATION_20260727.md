@@ -1,143 +1,285 @@
-# Subway Melded Patterns Combat Restoration
+# Subway Melded Patterns Mathematical Combat Restoration
 
-Date: 2026-07-27
+Date: 2026-07-28
+Resource: PF127
+Family: `Melded Patterns`
+MonsterData: `203747`
+Runtime selector: `subway.ordinary.melded_patterns`
 
-## Selection
+## Result
 
-Melded Patterns is rank 3 in the fixed remaining Subway cohort audit. Rank 1
-Disobedient Bot remains blocked because its twelve active L6/L7/L9/L10 actors
-cannot use the only complete reusable L8 generated archetype. Rank 2 Looter was
-completed in the accepted baseline commit and is excluded.
+All ten active Melded Patterns actors now resolve through the shared
+capture-backed equipped-weapon path. The six actors quarantined at the task
+checkpoint are restored without an identity lookup, per-level output table,
+nearest-level substitution, copied neighboring values, or a family-specific
+combat loop.
 
-The safely restorable rank-3 subset is one actor:
+The accepted numeric setup is:
 
-| Runtime source | Family | MonsterData | Level | Before | After |
-| --- | --- | ---: | ---: | --- | --- |
-| `0x795451DD` | Melded Patterns | 203747 | 25 | quarantined | certified |
+```text
+base = floor((11 * actorLevel - 2) / 2)
 
-Previously certified L25 source `0x795451D8` is an explicit no-regression
-member of the same runtime archetype.
+SpecialAttackWeapon.Unknown1 = base
+SpecialAttackWeapon.Unknown2 = base + 28
+SpecialAttackWeapon.Unknown3 = base
+SpecialAttackWeapon.Unknown4 = base
+```
 
-## Exact Capture Correlation
+The declared domain is PF127, `Melded Patterns`, MonsterData `203747`, actor
+levels `18..25`, equipped attack mode, slot `6`, instance `0`, one normal
+stream, hit wire `3`, damage wire `0`, and one of the three owner-selected
+weapon-template domains below. Unsupported level, weapon, slot, mode, stream,
+hit, or damage semantics fail closed.
 
-The selected runtime actor uses generated semantic profile
-`41ec2f5fb41b8e2f-5f0a16ad1c7c6589`. The profile is source-correlated to
-`0x795451DD` and uses captures `20260709-222339` and `20260709-225408`.
+## Complete Active Actor Inventory
 
-Decisive packet chains:
+Every row occurs exactly once in
+`CapturedSubwayOrdinaryContentProvider.cs:360..369`. The population row owns
+level, QL, health, health damage, scale, run speed, and the owner-linked weapon
+loadout. `binding` and `coverage` are the deterministic active-coverage keys.
+`Q` means quarantined at the task checkpoint and `C` means certified.
 
-- `20260709-222339`: WIFU
-  `IN|11652|38ef58bba40e`, `SpecialAttackWeapon`
-  `IN|12674|e5cb9935961f`, `Attack`
-  `IN|12675|f8ec554edeaa`, and normal `AttackInfo`
-  `IN|12777|42c67b98aeb2` against target `0x7944C065`.
-- `20260709-225408`: WIFU
-  `IN|14817|adde67512877`, `SpecialAttackWeapon`
-  `IN|15077|0e510533da86`, `Attack`
-  `IN|15078|71f716333a3f`, and normal `AttackInfo`
-  `IN|15641|0ec176e6c849` / `IN|15766|f238fa6fe8b4` against the same target.
-- The first chain lands for 25 damage with ammo 19. The later chain lands for
-  34 and 27 damage with ammo 0. These are actor-owned normal results, not
-  observer or player-owned packets.
-- Captured StopFight rows 11981 and 11987 terminate the fight. They are
-  cancellation boundaries, not extra attack streams.
-- The `20260709-225408` target-death boundary occurs at
-  `2026-07-10T04:04:33.622Z`; the source-linked corpse update follows at
-  `04:04:33.890Z`. No NPC-owned critical, miss, or action-99 terminal result is
-  present for this profile, so none is synthesized.
+| Source | Level | Actor QL | Owner weapon low/high | Population line | Binding | Coverage | Start | Final |
+|---|---:|---:|---|---:|---|---|---|---|
+| `0x7954508E` | 23 | 20 | `121818/121818` | 360 | `0a72dc80c14ad2da24ec` | `985f087c44c33121f162` | Q | C |
+| `0x7954517C` | 18 | 19 | `121817/121818` | 361 | `4438f4af05a60d4ffb7a` | `54a5e3f5c2315e91ce40` | C | C |
+| `0x79545185` | 19 | 18 | `121817/121818` | 362 | `b6e61baade38c660a4ca` | `6a0fd6b7ae25569e64de` | C | C |
+| `0x79545187` | 21 | 26 | `121819/121820` | 363 | `cf6917567f6170a88e46` | `637ea641af97bee9f5c3` | Q | C |
+| `0x79545190` | 18 | 20 | `121818/121818` | 364 | `8039dfc932e5c2d5d740` | `2d9109c7d637a0a85a5f` | Q | C |
+| `0x79545196` | 20 | 20 | `121818/121818` | 365 | `9940751ae0f8a9abcf4f` | `d79f6ed76652d466d60d` | Q | C |
+| `0x79545198` | 21 | 20 | `121818/121818` | 366 | `814c7772213c2364f63a` | `f84f35e4c64fa264a9b6` | Q | C |
+| `0x795451BA` | 22 | 26 | `121819/121820` | 367 | `2786011d0521e762cb74` | `13ac9331c18290b915bf` | Q | C |
+| `0x795451D8` | 25 | 25 | `121819/121820` | 368 | `e447d6a1cf0a093a1d47` | `f28020fde6d30a4b6c8c` | C | C |
+| `0x795451DD` | 25 | 19 | `121817/121818` | 369 | `9f50d8b993aa41891dbb` | `b23edfc74adca83936c1` | C | C |
 
-The capture proves one normal stream. Player-owned attacks, incomplete
-prefixes, interleaved attackers, and target-health-only changes were excluded
-by the existing attribution rules.
+The exact six-actor starting quarantine scope was:
 
-## Capture-Bound Contract
+```text
+0x7954508E L23
+0x79545187 L21
+0x79545190 L18
+0x79545196 L20
+0x79545198 L21
+0x795451BA L22
+```
 
-The selected stream retains:
+The certified reference actors were `0x7954517C`, `0x79545185`,
+`0x795451D8`, and `0x795451DD`. Source `0x795451DD` is the previously restored
+level-25 actor. Its old aggregate QL20 baseline was incorrect; its authoritative
+owner-linked population loadout is QL19 `121817/121818`.
 
-- equipped weapon templates `121817/121818`;
-- WIFU inventory slot `6`, state-machine type `1000015`, instance `0`, and
-  captured structure;
-- `SpecialAttackWeapon` N3 unknown `0`, invariant fields
-  `136/164/136/136`, no special list, and ordered mutable field 5 observations
-  `0 -> 85`;
-- `Attack` N3 unknown `0` and action `0`;
-- `AttackInfo` slot `6`, weapon instance `0`, unknown `0`, hit-type wire `3`,
-  damage-type wire `0`, and N3 unknown `0`;
-- exactly one `WIFU -> SpecialAttackWeapon -> Attack -> AttackInfo` stream.
+For every active row, damage, damage bonus, range, attack/recharge cadence,
+health, attack rating, defense, Energy, ammunition, and other derived or
+mutable values remain with the existing spawn, item database, combat rules,
+and per-actor runtime state. None is copied from another level.
 
-Captured first-hit delays are `2.984133` and `18.044752` seconds; the landed
-interval is `4.378445` seconds and the captured item cycle is `4.7` seconds.
-Those observations remain evidence. Existing item/combat and
-`NpcCombatTickCoordinator` owners control runtime phase, cadence, damage,
-range, and cancellation.
+## Categorical Weapon Domains
 
-## Production-Owned State
+`items.dat` proves templates `121817..121835` are one interpolation list.
+The runtime actor QL selects exactly one of these three WIFU template domains:
 
-The active spawn contract selects QL20 through the existing
-`NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponQuality` owner.
-Generated WIFU evidence contains QL19, Energy values 20 and 7, and
-MultipleCount 1. Existing production weapon state owns runtime QL, Energy, and
-ammunition; the generator now emits the complete two-observation SAW replay
-without treating those production-owned values as semantic identity.
+| Actor QL domain | WIFU low/high | Active sources |
+|---|---|---|
+| `1..19` | `121817/121818` | `0x7954517C`, `0x79545185`, `0x795451DD` |
+| `20` | `121818/121818` | `0x7954508E`, `0x79545190`, `0x79545196`, `0x79545198` |
+| `21..40` | `121819/121820` | `0x79545187`, `0x795451BA`, `0x795451D8` |
 
-The extractor extension is conservative: it accepts only a two-state equipped
-SAW replay when the remaining blockers are exactly the already-owned ammo and
-WIFU Energy/MultipleCount state. Longer or semantically unsupported sequences
-remain fail-closed. A complete full-corpus write followed by a second full
-`--check` produced no diff.
+The three tuples are different interpolation positions of one weapon family,
+not three attack semantics. Runtime QL uniquely selects the tuple. No
+most-common, nearest-level, or source-identity selection occurs.
 
-## Incompatible Family Members
+The capture-bound WIFU and attack semantics common to the domains are:
 
-| Source | Level | Result |
-| --- | ---: | --- |
-| `0x79545190` | 18 | Quarantined; its exact captured WIFU is `121818/121818`, not the selected weapon family. |
-| `0x79545196` | 20 | Quarantined; stable weapon tuple is incompatible. |
-| `0x79545187`, `0x79545198` | 21 | Quarantined; no exact compatible selected-family profile. |
-| `0x795451BA` | 22 | Quarantined; no canonical raw combat profile. |
-| `0x7954508E` | 23 | Quarantined; no canonical raw combat profile. |
+- equipped mode; WIFU slot `6`;
+- state-machine type `1000015`, instance `0`;
+- WIFU `Unknown1=11`, `Unknown2=262`, `Unknown3=0`;
+- WIFU flags `1027`, `MultipleCount=1`;
+- captured WIFU `AttackDelay=235`, `RechargeDelay=235`;
+- no serialized weapon name/tag is present; the item interpolation list and
+  template tuple are the categorical family key;
+- `SpecialAttackWeapon n3=0`, no specials;
+- `Attack n3=0`, action `0`;
+- exactly one stream, ordinal `0`;
+- AttackInfo slot `6`, instance `0`, hit wire `3`, damage wire `0`, n3 `0`;
+- exact order `WIFU -> SpecialAttackWeapon -> Attack -> AttackInfo`.
 
-L19 source `0x79545185` remains certified through its distinct exact
-`121819/121820` QL22 generated profile
-`67f518afac8fd529-88660aa55a7b2d5c`; it is not merged with the restored L25
-archetype.
+Normal, miss, critical, and terminal results retain their raw classification.
+A terminal AttackInfo is an outcome of the one scheduled stream, never a
+second repeating stream. Miss attribution uses the embedded attacker and
+defender. Interleaved attackers and unattributed target-health transitions are
+not merged into Melded Patterns evidence.
 
-## Production and Validation Result
+## Generated Combat Profiles
 
-`OrdinaryEnemyCatalog` marks production QL only for the exact L25 Melded
-contract. The generated catalog adds the ordered `0,85` SAW state for profile
-`41ec2f5fb41b8e2f-5f0a16ad1c7c6589`. Focused catalog tests enumerate both L25
-actors exactly once, identify `0x795451DD` as the one newly restored actor,
-retain `0x795451D8`, preserve the distinct L19 weapon profile, and reject every
-unsupported level or weapon family. The packet regression proves exact
-WIFU/SAW/Attack/AttackInfo ordering and byte identity with only production QL
-changed in WIFU.
+Eleven complete semantic profiles validate the formula and the shared packet
+shape:
 
-Counts:
+| Level | Semantic profile IDs | Captured SAW values |
+|---:|---|---|
+| 18 | `a867d5624faafcec-2125d88ca85e181c`, `a867d5624faafcec-8fb16c7c66cd28fc` | `98/126/98/98` |
+| 19 | `67f518afac8fd529-88660aa55a7b2d5c` | `103/131/103/103` |
+| 20 | `477ae7aca2274b51-474eed6223e4ee5c` | `109/137/109/109` |
+| 21 | `507420968010ac73-01ed8f89e4ecb861`, `507420968010ac73-e34cd954337a7dcf`, `507420968010ac73-ef6d2cf09c6524ec`, `507420968010ac73-fc12498b7e77187d` | `114/142/114/114` |
+| 24 | `550de529541c8221-239b7c7cd80ed8c4` | `131/159/131/131` |
+| 25 | `41ec2f5fb41b8e2f-5f0a16ad1c7c6589`, `41ec2f5fb41b8e2f-95101dc382060622` | `136/164/136/136` |
 
-- PF127: `245/77` -> `246/76`.
-- PF1931: unchanged `87/80`.
-- Combined: `332/157` -> `333/156`, denominator `489`.
-- Active Melded Patterns: `3/7` -> `4/6`.
-- Fixed 53-actor scope: `7/46` -> `8/45`.
-- Runtime rejection rows: `156`, matching `156` unique quarantined actors.
+The active L22 and L23 sources have owner-linked WIFU evidence but no
+source-local complete normal chain. Their generated values are respectively
+`120/148/120/120` and `125/153/125/125`. They are safe because the categorical
+selector is unique, every complete same-family stream has the same packet
+semantics, the formula reproduces every observed numeric field exactly, and
+the active generation owns the exact QL/template tuple.
 
-Validation:
+## Decisive Raw Sequences
 
-- Extractor self-test: PASS.
-- Full-corpus generation: PASS at `364` sessions, `2,647` complete chains,
-  `243` certified profiles, `100` runtime-ready definitions, and `0` errors;
-  the monitored second `--check` completed with no generated diff.
-- Active-coverage generator/check: PASS at `1,512` audited actors.
-- Melded Patterns focused resolution and packet tests: `4/4` PASS.
-- Combat catalog: `47/47` PASS; packet factory: `37/37` PASS; generated
-  exact-byte fixtures: `3/3` PASS.
-- Attribution: `1/1` PASS; miss/normal/critical/terminal Filth Flea regression:
-  `7/7` PASS; collision: `17/17` PASS; chase/range/cancellation: `38/38` PASS;
-  Temple: `10/10` PASS; active coverage: `3/3` PASS.
-- Starting-SHA accepted failures remain unchanged: Subway `65/68`, Abmouth
-  `23/26`, and world population `35/39`.
-- Complete messaging suite: `520/559` PASS with `39` accepted unrelated
-  failures. The starting-SHA baseline was `514/556` with `42` failures; this
-  slice adds no failure and repairs the three stale active-coverage failures.
-- Debug build: PASS after the documented engine-stop lock recovery.
-- Engine restart: PASS; ports `6996`, `7012`, `7500`, and `7501` are listening.
+The generated formula dataset records exact UTC timestamps, packet IDs, body
+hex, mutable values, and correlated stream fields for every row below.
+
+| Session | Source/level | WIFU | SAW | Attack | AttackInfo |
+|---|---|---:|---:|---:|---:|
+| `20260709-225408` | `0x79545190` L18 | 9115 | 9811 | 9812 | 9883 |
+| `20260709-225408` | `0x7954517C` L18 | 8200 | 8791 | 8792 | 9056, 9286 |
+| `20260720-051714` | `0x7980F107` L19 | 7491 | 7903 | 7904 | 7971 |
+| `20260709-222339` | `0x79545196` L20 | 7893 | 8730, 8978 | 8731, 8979 | 8741, 8848, 9148 |
+| `20260709-222339` | `0x79545187` L21 | 6835 | 7855 | 7856 | 8122 |
+| `20260709-225408` | `0x79545198` L21 | 9762 | 10519 | 10520 | 10665, 10857 |
+| `20260720-051714` | `0x7980F106` L21 | 7489 | 7914 | 7915 | 7994 |
+| `20260720-051714` | `0x7980F149` L21 | 5406 | 7527 | 7528 | 7582 |
+| `20260720-051714` | `0x798037DE` L24 | 1037 | 2527 | 2528 | 2706 |
+| `20260709-222339` | `0x795451DD` L25 | 11652 | 12674 | 12675 | 12777 |
+| `20260709-225408` | `0x795451DD` L25 | 14817 | 15077 | 15078 | 15641, 15766 |
+| `20260720-051714` | `0x798037E7` L25 | 1039 | 3127 | 3128 | 3242 |
+
+Capture boundaries, StopFight, CharacterAction `99`, target death, and
+interleaved activity are retained in the raw corpus. They are not promoted
+into extra reusable streams. L22 source `0x795451BA` has owner WIFU ordinal
+5387 in `20260709-222339`; L23 source `0x7954508E` has owner WIFU ordinal 4119
+in that session.
+
+## Formula Dataset and Candidate Rejection
+
+`enemy_combat_setup_formula_dataset.json` now includes:
+
+- all 13 exact raw SAW observations across six captured levels;
+- all 11 complete semantic profiles;
+- partial owner-linked L22/L23 evidence;
+- all ten active population bindings and categorical loadouts;
+- item-list endpoints and referenced item stats;
+- WIFU, SAW, stream, damage, timing, Energy, ammunition, and mutable fields;
+- authoritative runtime owners;
+- leave-one-out and cross-family boundaries;
+- rejected candidate families and mismatch counts.
+
+Candidate results:
+
+| Candidate | Exact mismatch result |
+|---|---|
+| unrounded `(11L-2)/2` | 3 captured odd levels are half-integers |
+| ceiling division | 3 captured odd levels round above raw |
+| nearest-away division | 3 captured odd levels round above raw |
+| nearest-even division | L19 differs; 1 mismatch |
+| four identical SAW fields | Unknown2 differs in all 13 raw packets |
+| weapon QL as sole input | 5 conflicts because QL19 and QL20 occur at multiple actor levels with different outputs |
+| direct item-template interpolation for SAW | 6 captured-level mismatches; item data owns loadout/gameplay stats, not SAW base |
+| one unbounded level domain | rejected because categorical/formula proof ends at L18 and L25 |
+
+The bounded floor formula has zero mismatches across all 13 raw packets.
+Leave-one-out validation succeeds for all six captured levels. The existing
+Stim Fiend formula independently confirms the same base expression, while the
+Melded-specific `Unknown2=base+28` and equipped categorical selector prevent
+cross-family reuse. No other family enters the exact MonsterData, equipped
+item-list, slot, and stream domain.
+
+## Runtime Ownership
+
+Authoritative inputs and owners are:
+
+- actor level, actor QL, health, and generation-local stats:
+  `CapturedSubwayOrdinarySpawnDefinition`;
+- family and MonsterData:
+  `CapturedSubwayOrdinaryArchetypeDefinition`;
+- owner-selected templates and weapon QL:
+  atomic generation plus `items.dat`;
+- damage, damage bonus, range, attack/recharge cadence, attack skill, and
+  defense: existing item/combat production owners;
+- Energy, ammunition, SAW Unknown5, and ordered mutable observations:
+  existing per-actor combat runtime state.
+
+Capture retains template family, equipped mode, slot, instance, WIFU shape,
+SAW shape, packet order, attack action, stream count/order, hit type, damage
+type, and result semantics. Production generation is not permitted to alter
+those fields.
+
+## Canonicalization and Multi-Tuple Findings
+
+No generic extractor or canonicalization defect was found. The apparent
+missing profiles at active L22/L23 are source-local incomplete chains, not
+missing categorical data. The apparent incompatible tuples are the three
+documented QL domains of one `items.dat` interpolation list. The active
+generation QL selects exactly one tuple before binding; source identity is
+only evidence provenance and does not participate in formula selection.
+
+Mutable WIFU Energy, AttackInfo ammunition, and SAW Unknown5 caused otherwise
+valid profiles to be marked runtime-unsafe by the older exact-observation
+path. The mathematical resolver now treats those fields as per-actor state
+while retaining every actual packet-semantic distinction.
+
+## Coverage
+
+Before:
+
+- PF127: `264 certified / 58 quarantined`;
+- PF1931: `87 / 80`;
+- combined: `351 / 138` of `489`;
+- Melded Patterns: `4 / 6`;
+- fixed 53-actor Subway scope: `26 / 27`.
+
+After:
+
+- PF127: `270 certified / 52 quarantined`;
+- PF1931: unchanged `87 / 80`;
+- combined: `357 / 132` of `489`;
+- Melded Patterns: `10 / 0`;
+- fixed 53-actor Subway scope: `32 / 21`.
+
+Exactly six unique actors were restored. No additional family was broadened.
+Rejection rows and unique actors remain one-to-one in this family.
+
+## Validation Contract
+
+Focused coverage proves:
+
+- all ten active actors enumerate once;
+- all six starting quarantined sources reconcile uniquely;
+- every owner-linked QL/template tuple resolves one exact categorical domain;
+- all 13 captured SAW bodies remain byte-exact;
+- the captured L25 QL19 WIFU, SAW, Attack, and AttackInfo remain byte-exact;
+- L22/L23 deterministic fields use only authoritative runtime inputs;
+- runtime identity is unnecessary;
+- unsupported levels and weapon domains fail closed;
+- terminal outcomes do not create extra scheduled streams;
+- shared order remains `WIFU -> SAW -> Attack -> AttackInfo`;
+- Disobedient Bot and Stim Fiend formulas remain exact.
+
+## Completed Validation
+
+- extractor self-test: PASS;
+- full corpus write and second deterministic check: PASS, `374` sessions,
+  `358` canonical sessions, `2,827` complete chains, `255` certified profiles,
+  `95` runtime-ready profiles, `303` semantic definitions, `100`
+  runtime-ready definitions, `1,404` unresolved profiles, `0` errors;
+- ordinary setup generator: `16/16` PASS;
+- combat catalog: `47/47` PASS;
+- packet factory: `37/37` PASS;
+- generated exact-byte fixtures: `3/3` PASS;
+- active coverage: `3/3` PASS;
+- Temple regressions: `6/6` PASS;
+- chase/range/cancellation: `38/38` PASS;
+- collision/LOS: `17/17` PASS;
+- world population: `35/39`; four accepted unrelated baseline failures;
+- Subway/Abmouth: `23/26`; three accepted unrelated baseline failures;
+- complete messaging suite: `536/575`; exactly the accepted `39` unrelated
+  baseline failures and no new failure;
+- Debug build: PASS;
+- engine restart: PASS;
+- ports `6996`, `7012`, `7500`, and `7501`: LISTENING.

@@ -1414,7 +1414,7 @@ def classify_level(
     profiles_by_identity: Mapping[Tuple[int, int, int, str], Mapping[str, Any]],
     metadata_by_identity: Mapping[Tuple[int, int, int, str], Sequence[Mapping[str, Any]]],
     mathematical_bindings: Optional[
-        Mapping[Tuple[int, int, int, str], Mapping[str, Any]]
+        Mapping[Tuple[int, int, int, str, Optional[str]], Mapping[str, Any]]
     ] = None,
 ) -> Dict[str, Any]:
     identity = (actor.resource, actor.monster_data, level, actor.name)
@@ -1437,7 +1437,8 @@ def classify_level(
         "disabledGameplayCapability": "NPC auto-attack emission and damage application",
     }
     mathematical_binding = (
-        mathematical_bindings.get(identity)
+        mathematical_bindings.get(identity + (configured_source,))
+        or mathematical_bindings.get(identity + (None,))
         if mathematical_bindings is not None
         else None
     )
@@ -1459,9 +1460,17 @@ def classify_level(
                         "semanticProfileId": mathematical_binding.get(
                             "compatibleSemanticProfileId"
                         ),
+                        "semanticProfileIds": mathematical_binding.get(
+                            "compatibleSemanticProfileIds"
+                        ),
                         "generatedSpecialAttackWeaponValue": (
                             mathematical_binding.get(
                                 "generatedSpecialAttackWeaponValue"
+                            )
+                        ),
+                        "generatedSpecialAttackWeaponValues": (
+                            mathematical_binding.get(
+                                "generatedSpecialAttackWeaponValues"
                             )
                         ),
                     }
@@ -1473,6 +1482,9 @@ def classify_level(
                 "formulaId": mathematical_binding.get("formulaId"),
                 "semanticProfileId": mathematical_binding.get(
                     "compatibleSemanticProfileId"
+                ),
+                "semanticProfileIds": mathematical_binding.get(
+                    "compatibleSemanticProfileIds"
                 ),
             }
         )
@@ -1961,7 +1973,7 @@ def build_inventory(
     merged = merge_actors(actors)
     combat_inventory = json.loads(combat_inventory_path.read_text(encoding="utf-8"))
     mathematical_bindings: Dict[
-        Tuple[int, int, int, str], Mapping[str, Any]
+        Tuple[int, int, int, str, Optional[str]], Mapping[str, Any]
     ] = {}
     if formula_dataset_path is not None and formula_dataset_path.is_file():
         formula_dataset = json.loads(
@@ -1970,6 +1982,7 @@ def build_inventory(
         formulas = [
             formula_dataset.get("acceptedFormula", {}),
             formula_dataset.get("stimFiendFormula", {}),
+            formula_dataset.get("meldedPatternsFormula", {}),
         ]
         for formula in formulas:
             capture_sessions = sorted_unique(
@@ -1986,6 +1999,7 @@ def build_inventory(
                     int(binding["monsterData"]),
                     int(binding["level"]),
                     str(binding["name"]),
+                    binding.get("configuredSourceIdentity"),
                 )
                 if identity in mathematical_bindings:
                     continue

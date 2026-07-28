@@ -62,6 +62,52 @@ STIM_FIEND_PROFILE_IDS = (
     "3f70ab044f0e78d5-d2b65cf5c70d61d6",
     "54d40b70fa1a801a-064305180fc7f1ad",
 )
+MELDED_PATTERNS_FORMULA_ID = (
+    "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1"
+)
+MELDED_PATTERNS_CAPTURED_BASE_VALUES = {
+    18: 98,
+    19: 103,
+    20: 109,
+    21: 114,
+    24: 131,
+    25: 136,
+}
+MELDED_PATTERNS_OBSERVATIONS = (
+    ("20260709-225408", 9811, 18, 0x79545190),
+    ("20260709-225408", 8791, 18, 0x7954517C),
+    ("20260720-051714", 7903, 19, 0x7980F107),
+    ("20260709-222339", 8730, 20, 0x79545196),
+    ("20260709-222339", 8978, 20, 0x79545196),
+    ("20260709-222339", 7855, 21, 0x79545187),
+    ("20260709-225408", 10519, 21, 0x79545198),
+    ("20260720-051714", 7914, 21, 0x7980F106),
+    ("20260720-051714", 7527, 21, 0x7980F149),
+    ("20260720-051714", 2527, 24, 0x798037DE),
+    ("20260709-222339", 12674, 25, 0x795451DD),
+    ("20260709-225408", 15077, 25, 0x795451DD),
+    ("20260720-051714", 3127, 25, 0x798037E7),
+)
+MELDED_PATTERNS_ACTIVE_LOADOUTS = (
+    (0x7954508E, 23, 20, 121818, 121818, "20260709-222339"),
+    (0x7954517C, 18, 19, 121817, 121818, "20260709-222339"),
+    (0x79545185, 19, 18, 121817, 121818, "20260709-222339"),
+    (0x79545187, 21, 26, 121819, 121820, "20260709-222339"),
+    (0x79545190, 18, 20, 121818, 121818, "20260709-222339"),
+    (0x79545196, 20, 20, 121818, 121818, "20260709-222339"),
+    (0x79545198, 21, 20, 121818, 121818, "20260709-222339"),
+    (0x795451BA, 22, 26, 121819, 121820, "20260709-222339"),
+    (0x795451D8, 25, 25, 121819, 121820, "20260709-222339"),
+    (0x795451DD, 25, 19, 121817, 121818, "20260709-222339"),
+)
+MELDED_PATTERNS_STARTING_QUARANTINE_SOURCES = {
+    "0x7954508E",
+    "0x79545187",
+    "0x79545190",
+    "0x79545196",
+    "0x79545198",
+    "0x795451BA",
+}
 
 
 class MessagePackReader:
@@ -388,6 +434,16 @@ def stim_fiend_formula(level: int) -> int:
     return ((11 * level) - 2) // 2
 
 
+def melded_patterns_formula(level: int) -> dict[str, int]:
+    base = ((11 * level) - 2) // 2
+    return {
+        "unknown1": base,
+        "unknown2": base + 28,
+        "unknown3": base,
+        "unknown4": base,
+    }
+
+
 def stim_fiend_chain_evidence(
     inventory: dict[str, Any],
     level: int,
@@ -470,6 +526,91 @@ def stim_fiend_chain_evidence(
             for index, stream in enumerate(variant.get("streams", []))
         ],
     }
+
+
+def melded_patterns_chain_evidence(
+    inventory: dict[str, Any],
+    level: int,
+    source_identity: int,
+    saw_sequence: int,
+) -> dict[str, Any]:
+    source_hex = f"0x{source_identity:08X}"
+    saw_marker = f"|{saw_sequence}|"
+    for profile in inventory.get("profiles", []):
+        metadata = profile.get("metadata") or {}
+        if (
+            metadata.get("monsterData") != 203747
+            or metadata.get("level") != level
+            or metadata.get("name") != "Melded Patterns"
+        ):
+            continue
+        for variant in profile.get("variants", []):
+            raw_chain = next(
+                (
+                    row
+                    for row in variant.get("rawWireVariantObservations", [])
+                    if row.get("sourceIdentity") == source_hex
+                    and saw_marker
+                    in str(row.get("specialAttackWeaponPacketId"))
+                ),
+                None,
+            )
+            if raw_chain is None:
+                continue
+            return {
+                "semanticProfileId": variant.get("semanticProfileId"),
+                "metadataGenerationKey": metadata.get("generationKey"),
+                "weaponItemFullUpdatePacketId": raw_chain.get(
+                    "weaponItemFullUpdatePacketId"
+                ),
+                "specialAttackWeaponPacketId": raw_chain.get(
+                    "specialAttackWeaponPacketId"
+                ),
+                "attackPacketId": raw_chain.get("attackPacketId"),
+                "attackInfoPacketId": raw_chain.get("attackInfoPacketId"),
+                "terminalHit": raw_chain.get("terminalHit"),
+                "baseSignature": variant.get("baseSignature"),
+                "streams": [
+                    {
+                        "streamOrdinal": index,
+                        "signature": stream.get("signature"),
+                        "minimumObservedDamage": stream.get(
+                            "minimumObservedDamage"
+                        ),
+                        "maximumObservedDamage": stream.get(
+                            "maximumObservedDamage"
+                        ),
+                        "damageObservations": stream.get(
+                            "damageObservations"
+                        ),
+                        "attackStartDelayObservationsSeconds": stream.get(
+                            "attackStartDelayObservationsSeconds"
+                        ),
+                        "firstHitDelayObservationsSeconds": stream.get(
+                            "firstHitDelayObservationsSeconds"
+                        ),
+                        "landedIntervalObservationsSeconds": stream.get(
+                            "landedIntervalObservationsSeconds"
+                        ),
+                        "ammoObservationsInOrder": stream.get(
+                            "ammoObservationsInOrder"
+                        ),
+                        "capturedTerminalHitOnly": stream.get(
+                            "capturedTerminalHitOnly"
+                        ),
+                        "attackInfoPacketIds": stream.get(
+                            "attackInfoPacketIds"
+                        ),
+                    }
+                    for index, stream in enumerate(
+                        variant.get("streams", [])
+                    )
+                ],
+            }
+    raise ValueError(
+        "could not correlate Melded Patterns raw chain "
+        f"level={level} source={source_hex} sawSequence={saw_sequence}"
+    )
 
 
 def build_formula_dataset(
@@ -769,6 +910,180 @@ def build_formula_dataset(
                 }
             )
 
+    melded_observations = []
+    for (
+        capture,
+        sequence,
+        level,
+        source_identity,
+    ) in MELDED_PATTERNS_OBSERVATIONS:
+        packet = read_raw_packet(capture, sequence)
+        formula_values = melded_patterns_formula(level)
+        packet.update(
+            {
+                "level": level,
+                "sourceIdentity": f"0x{source_identity:08X}",
+                "formulaValues": formula_values,
+                "exactMatch": all(
+                    packet[field] == value
+                    for field, value in formula_values.items()
+                ),
+            }
+        )
+        packet.update(
+            melded_patterns_chain_evidence(
+                inventory,
+                level,
+                source_identity,
+                sequence,
+            )
+        )
+        melded_observations.append(packet)
+
+    melded_leave_one_out = []
+    for held_out_level, held_out_value in sorted(
+        MELDED_PATTERNS_CAPTURED_BASE_VALUES.items()
+    ):
+        training = {
+            str(level): value
+            for level, value in sorted(
+                MELDED_PATTERNS_CAPTURED_BASE_VALUES.items()
+            )
+            if level != held_out_level
+        }
+        prediction = melded_patterns_formula(held_out_level)
+        melded_leave_one_out.append(
+            {
+                "heldOutLevel": held_out_level,
+                "heldOutObserved": {
+                    "unknown1": held_out_value,
+                    "unknown2": held_out_value + 28,
+                    "unknown3": held_out_value,
+                    "unknown4": held_out_value,
+                },
+                "trainingObservations": training,
+                "candidateFormulaSatisfiedAllTrainingObservations": all(
+                    melded_patterns_formula(int(level))["unknown1"] == value
+                    for level, value in training.items()
+                ),
+                "prediction": prediction,
+                "exactMatch": prediction
+                == {
+                    "unknown1": held_out_value,
+                    "unknown2": held_out_value + 28,
+                    "unknown3": held_out_value,
+                    "unknown4": held_out_value,
+                },
+            }
+        )
+
+    loadout_by_source = {
+        f"0x{source:08X}": {
+            "sourceIdentity": f"0x{source:08X}",
+            "level": level,
+            "actorQualityLevel": quality,
+            "weaponLowTemplate": low_template,
+            "weaponHighTemplate": high_template,
+            "evidenceCapture": (
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                f"{capture}"
+            ),
+        }
+        for (
+            source,
+            level,
+            quality,
+            low_template,
+            high_template,
+            capture,
+        ) in MELDED_PATTERNS_ACTIVE_LOADOUTS
+    }
+    melded_active_bindings = []
+    for row in active_coverage.get("profiles", []):
+        if (
+            row.get("runtimePlayfieldOrResource") != 127
+            or row.get("name") != "Melded Patterns"
+            or row.get("monsterData") != 203747
+        ):
+            continue
+        source_identity = row.get("configuredSourceIdentity")
+        loadout = loadout_by_source.get(source_identity)
+        if loadout is None:
+            raise ValueError(
+                "active Melded Patterns source lacks owner-linked loadout: "
+                f"{source_identity}"
+            )
+        level = row.get("levelCandidates", [None])[0]
+        if level != loadout["level"]:
+            raise ValueError(
+                "active Melded Patterns level differs from owner evidence: "
+                f"{source_identity}"
+            )
+        melded_active_bindings.append(
+            {
+                "resource": 127,
+                "name": "Melded Patterns",
+                "monsterData": 203747,
+                "actorCount": row.get("actorCount", 0),
+                "configuredSourceIdentity": source_identity,
+                "level": level,
+                "actorQualityLevel": loadout["actorQualityLevel"],
+                "weaponLowTemplate": loadout["weaponLowTemplate"],
+                "weaponHighTemplate": loadout["weaponHighTemplate"],
+                "evidenceCapture": loadout["evidenceCapture"],
+                "formulaId": MELDED_PATTERNS_FORMULA_ID,
+                "generatedSpecialAttackWeaponValues": (
+                    melded_patterns_formula(level)
+                ),
+                "startingClassification": (
+                    "quarantined"
+                    if source_identity
+                    in MELDED_PATTERNS_STARTING_QUARANTINE_SOURCES
+                    else "certified"
+                ),
+                "preGenerationCoverageClassification": row.get(
+                    "classification"
+                ),
+                "preGenerationCoverageUnresolvedReasons": row.get(
+                    "unresolvedReasons"
+                ),
+            }
+        )
+
+    melded_profile_ids = sorted(
+        {
+            row["semanticProfileId"]
+            for row in melded_observations
+            if row.get("semanticProfileId")
+        }
+    )
+    melded_cross_family = []
+    for profile in inventory.get("profiles", []):
+        metadata = profile.get("metadata") or {}
+        if metadata.get("monsterData") == 203747:
+            continue
+        for variant in profile.get("variants", []):
+            signature = variant.get("baseSignature", {})
+            wifu = signature.get("weaponItemFullUpdate") or {}
+            if (
+                wifu.get("lowTemplate") not in (121817, 121818, 121819)
+                or wifu.get("highTemplate")
+                not in (121818, 121820)
+            ):
+                continue
+            melded_cross_family.append(
+                {
+                    "name": metadata.get("name"),
+                    "monsterData": metadata.get("monsterData"),
+                    "level": metadata.get("level"),
+                    "semanticProfileId": variant.get("semanticProfileId"),
+                    "reasonExcluded": (
+                        "family and MonsterData are outside the exact "
+                        "Melded Patterns selector"
+                    ),
+                }
+            )
+
     if any(not row["exactMatch"] for row in observations):
         raise ValueError("accepted formula differs from a raw SAW observation")
     if any(not row["exactMatch"] for row in leave_one_out):
@@ -797,6 +1112,34 @@ def build_formula_dataset(
         )
     if sum(row["exactMatch"] for row in stim_cross_family) != 17:
         raise ValueError("Stim Fiend formula cross-family reconciliation changed")
+    if any(not row["exactMatch"] for row in melded_observations):
+        raise ValueError(
+            "Melded Patterns formula differs from a raw SAW observation"
+        )
+    if any(not row["exactMatch"] for row in melded_leave_one_out):
+        raise ValueError(
+            "Melded Patterns formula failed leave-one-out validation"
+        )
+    if len(melded_active_bindings) != 10:
+        raise ValueError(
+            "expected 10 active Melded Patterns bindings, found "
+            f"{len(melded_active_bindings)}"
+        )
+    if (
+        sum(
+            row["startingClassification"] == "quarantined"
+            for row in melded_active_bindings
+        )
+        != 6
+    ):
+        raise ValueError(
+            "expected exactly six starting Melded Patterns quarantine rows"
+        )
+    if len(melded_profile_ids) != 11:
+        raise ValueError(
+            "expected 11 complete Melded Patterns semantic profiles, found "
+            f"{len(melded_profile_ids)}"
+        )
 
     return {
         "schemaVersion": 2,
@@ -968,6 +1311,166 @@ def build_formula_dataset(
                 },
             ],
         },
+        "meldedPatternsFormula": {
+            "formulaId": MELDED_PATTERNS_FORMULA_ID,
+            "family": "Melded Patterns",
+            "monsterData": 203747,
+            "resource": 127,
+            "supportedLevelsInclusive": [18, 25],
+            "exactCategoricalDomains": [
+                {
+                    "actorQualityLevelsInclusive": [1, 19],
+                    "weaponLowTemplate": 121817,
+                    "weaponHighTemplate": 121818,
+                },
+                {
+                    "actorQualityLevelsInclusive": [20, 20],
+                    "weaponLowTemplate": 121818,
+                    "weaponHighTemplate": 121818,
+                },
+                {
+                    "actorQualityLevelsInclusive": [21, 40],
+                    "weaponLowTemplate": 121819,
+                    "weaponHighTemplate": 121820,
+                },
+            ],
+            "sharedCategoricalSemantics": {
+                "attackMode": "equipped",
+                "weaponFamily": "items.dat interpolation list 121817..121835",
+                "slot": 6,
+                "instance": 0,
+                "specials": [],
+                "specialAttackWeaponN3": 0,
+                "attackN3": 0,
+                "attackAction": 0,
+                "streamCount": 1,
+                "streamOrdinal": 0,
+                "numericHitType": 3,
+                "numericDamageType": 0,
+                "packetOrder": [
+                    "WeaponItemFullUpdate",
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+                "terminalOutcomesAreNotAdditionalStreams": True,
+            },
+            "numericOutput": {
+                "fields": {
+                    "SpecialAttackWeapon.unknown1": "base",
+                    "SpecialAttackWeapon.unknown2": "base + 28",
+                    "SpecialAttackWeapon.unknown3": "base",
+                    "SpecialAttackWeapon.unknown4": "base",
+                },
+                "baseExpression": "floor((11 * actorLevel - 2) / 2)",
+                "integerArithmetic": "positive integer truncation equals floor",
+                "clamping": "none inside the proven level domain",
+                "unknown5": (
+                    "per-actor ordered mutable capture state; not formula identity"
+                ),
+            },
+            "runtimeInputOwners": {
+                "actorLevelAndQualityLevel": (
+                    "CapturedSubwayOrdinarySpawnDefinition generated from "
+                    "the owner-linked population row"
+                ),
+                "monsterDataAndFamily": (
+                    "CapturedSubwayOrdinaryArchetypeDefinition"
+                ),
+                "weaponTemplates": (
+                    "owner-linked WeaponItemFullUpdate plus items.dat "
+                    "interpolation-domain validation"
+                ),
+                "weaponSlotAndInstance": (
+                    "NpcCombatAttackRules capture-bound Melded Patterns constants"
+                ),
+                "weaponQlAcgItemLevelDamageRangeAndCadence": (
+                    "active spawn, items.dat, and existing production combat owners"
+                ),
+                "mutableEnergyAmmoAndSawState": (
+                    "existing per-actor combat contract/runtime state"
+                ),
+            },
+            "formulaFamiliesTested": [
+                "exact affine integer formulas",
+                "exact affine rational formulas",
+                "floor division",
+                "ceiling division",
+                "nearest-away division",
+                "nearest-even division",
+                "finite differences",
+                "bounded actor-level formulas",
+                "weapon-quality-only formulas",
+                "item-template transformations",
+                "AttackDelay and RechargeDelay transformations",
+                "stream-specific formulas",
+                "breakpoint and piecewise formulas",
+                "integer clamps",
+                "existing Stim Fiend base formula",
+            ],
+            "rawPacketObservations": melded_observations,
+            "leaveOneOut": melded_leave_one_out,
+            "crossFamilyHeldOut": {
+                "observations": melded_cross_family,
+                "exactMatches": 0,
+                "conclusion": (
+                    "no other family enters the exact MonsterData, equipped "
+                    "weapon-domain, slot, and stream selector"
+                ),
+            },
+            "activeBindings": sorted(
+                melded_active_bindings,
+                key=lambda row: row["configuredSourceIdentity"],
+            ),
+            "compatibleSemanticProfileIds": melded_profile_ids,
+            "rejectedCandidates": [
+                {
+                    "candidate": "unrounded (11 * level - 2) / 2",
+                    "mismatches": 3,
+                    "reason": "levels 19, 21, and 25 are half-integers",
+                },
+                {
+                    "candidate": "ceiling or nearest-away division",
+                    "mismatches": 3,
+                    "reason": "all three captured odd levels round above raw SAW",
+                },
+                {
+                    "candidate": "nearest-even division",
+                    "mismatches": 1,
+                    "reason": "captured level 19 rounds above raw SAW",
+                },
+                {
+                    "candidate": "four identical SAW fields",
+                    "mismatches": len(melded_observations),
+                    "reason": "Unknown2 is exactly base plus 28 in every raw packet",
+                },
+                {
+                    "candidate": "weapon QL as the sole numeric input",
+                    "mismatches": 5,
+                    "reason": (
+                        "QL19 and QL20 each occur at multiple actor levels "
+                        "with different exact SAW values"
+                    ),
+                },
+                {
+                    "candidate": "direct item-template interpolation",
+                    "mismatches": len(
+                        MELDED_PATTERNS_CAPTURED_BASE_VALUES
+                    ),
+                    "reason": (
+                        "items.dat selects loadout, damage, range, and cadence "
+                        "but does not encode the observed SAW base values"
+                    ),
+                },
+                {
+                    "candidate": "unbounded Melded Patterns level domain",
+                    "reason": (
+                        "levels below 18 and above 25 lack categorical and "
+                        "formula proof"
+                    ),
+                },
+            ],
+        },
         "rejectedCandidates": [
             {
                 "candidate": "exact unrounded affine line",
@@ -1074,6 +1577,7 @@ def main() -> int:
     parser.add_argument("--inspect-special-templates", nargs=2, type=int)
     parser.add_argument("--search-disobedient-formula", action="store_true")
     parser.add_argument("--search-stim-formula", action="store_true")
+    parser.add_argument("--search-melded-formula", action="store_true")
     arguments = parser.parse_args()
 
     inventory = load_json(arguments.inventory)
@@ -1166,6 +1670,33 @@ def main() -> int:
             )
         )
         return 0
+    if arguments.search_melded_formula:
+        candidates = affine_candidates(MELDED_PATTERNS_CAPTURED_BASE_VALUES)
+        selected = [
+            row
+            for row in candidates
+            if row["numerator"] == 11
+            and row["intercept"] == -2
+            and row["denominator"] == 2
+            and row["rounding"] == "floor"
+        ]
+        print(
+            json.dumps(
+                {
+                    "capturedBaseValues": (
+                        MELDED_PATTERNS_CAPTURED_BASE_VALUES
+                    ),
+                    "candidateCount": len(candidates),
+                    "selected": selected,
+                    "supportedLevelsInclusive": [18, 25],
+                    "level22Prediction": melded_patterns_formula(22),
+                    "level23Prediction": melded_patterns_formula(23),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
     if arguments.search_disobedient_formula:
         captured = {5: 30, 6: 35, 8: 45, 9: 49, 10: 54}
         candidates = affine_candidates(captured)
@@ -1243,7 +1774,11 @@ def main() -> int:
     rendered = canonical_json(dataset)
     formula_binding_count = sum(
         len(dataset.get(key, {}).get("activeBindings", []))
-        for key in ("acceptedFormula", "stimFiendFormula")
+        for key in (
+            "acceptedFormula",
+            "stimFiendFormula",
+            "meldedPatternsFormula",
+        )
     )
     if arguments.write:
         arguments.output.parent.mkdir(parents=True, exist_ok=True)

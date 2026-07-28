@@ -357,6 +357,16 @@ namespace AORebirth.Core.Playfields
             new CapturedSubwayGenerationVariantDefinition(203729, 0x79545248, 18, 394, 0, 98, 62, 123687, 123687, 21, "20260710-211430:(SimpleChar:7957E5F7)"),
             new CapturedSubwayGenerationVariantDefinition(203729, 0x79545367, 18, 394, 0, 98, 62, 123685, 123686, 18, "20260716-033326:(SimpleChar:796D403F)"),
             new CapturedSubwayGenerationVariantDefinition(203729, 0x79545367, 18, 394, 0, 98, 62, 123685, 123686, 19, "20260709-225408:(SimpleChar:79545367)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x7954508E, 23, 658, 0, 130, 80, 121818, 121818, 20, "20260709-222339:(SimpleChar:7954508E)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x7954517C, 18, 493, 0, 130, 62, 121817, 121818, 19, "20260709-222339:(SimpleChar:7954517C)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x79545185, 19, 526, 0, 130, 66, 121817, 121818, 18, "20260709-222339:(SimpleChar:79545185)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x79545187, 21, 592, 0, 130, 73, 121819, 121820, 26, "20260709-222339:(SimpleChar:79545187)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x79545190, 18, 493, 0, 130, 62, 121818, 121818, 20, "20260709-222339:(SimpleChar:79545190)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x79545196, 20, 559, 0, 130, 69, 121818, 121818, 20, "20260709-222339:(SimpleChar:79545196)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x79545198, 21, 592, 0, 130, 73, 121818, 121818, 20, "20260709-222339:(SimpleChar:79545198)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x795451BA, 22, 625, 0, 130, 76, 121819, 121820, 26, "20260709-222339:(SimpleChar:795451BA)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x795451D8, 25, 724, 0, 130, 86, 121819, 121820, 25, "20260709-222339:(SimpleChar:795451D8)"),
+            new CapturedSubwayGenerationVariantDefinition(203747, 0x795451DD, 25, 724, 0, 130, 86, 121817, 121818, 19, "20260709-222339:(SimpleChar:795451DD)"),
             new CapturedSubwayGenerationVariantDefinition(203727, 0x79545356, 17, 368, 0, 98, 65, 0, 0, 0, "20260712-232848:(SimpleChar:79607A3B)"),
             new CapturedSubwayGenerationVariantDefinition(203727, 0x79545356, 18, 394, 0, 98, 68, 0, 0, 0, "20260709-225408:(SimpleChar:79545356)")
         };
