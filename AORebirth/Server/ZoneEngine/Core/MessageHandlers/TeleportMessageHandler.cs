@@ -290,7 +290,11 @@ namespace ZoneEngine.Core.MessageHandlers
                     x.Playfield2 = new Identity
                                    {
                                        Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
-                                       Instance = CapturedMissionTeleportPlayfield2Instance
+                                       Instance =
+                                           MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                                               playfield.Instance)
+                                               ? playfield.Instance
+                                               : CapturedMissionTeleportPlayfield2Instance
                                    };
                     x.Payload = new byte[0];
                     return;

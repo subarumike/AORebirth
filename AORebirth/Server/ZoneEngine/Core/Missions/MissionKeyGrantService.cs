@@ -108,8 +108,34 @@ namespace ZoneEngine.Core.Missions
                 MissionKeyFlags,
                 MissionKeyIdentityType,
                 false,
+                0,
                 out keyInstance,
                 out inventoryError);
+        }
+
+        public static bool TryGrantReservedMissionKey(
+            IZoneClient client,
+            ICharacter character,
+            int reservedKeyInstance,
+            string keyName,
+            out InventoryError inventoryError)
+        {
+            int actualInstance;
+            bool granted = TryGrantItem(
+                client,
+                character,
+                MissionKeyTemplateId,
+                MissionKeyTemplateId,
+                1,
+                keyName,
+                MissionKeyOverflowSlot,
+                MissionKeyFlags,
+                MissionKeyIdentityType,
+                false,
+                reservedKeyInstance,
+                out actualInstance,
+                out inventoryError);
+            return granted && actualInstance == reservedKeyInstance;
         }
 
         /// <summary>
@@ -149,6 +175,7 @@ namespace ZoneEngine.Core.Missions
                 RepairItemFlags,
                 RepairKitIdentityType,
                 false,
+                0,
                 out itemInstance,
                 out inventoryError);
         }
@@ -179,6 +206,7 @@ namespace ZoneEngine.Core.Missions
                 MissionKeyFlags,
                 MissionKeyIdentityType,
                 true,
+                0,
                 out itemInstance,
                 out inventoryError);
         }
@@ -350,6 +378,7 @@ namespace ZoneEngine.Core.Missions
             uint itemFlags,
             int itemIdentityType,
             bool finishRewardWire,
+            int reservedItemInstance,
             out int itemInstance,
             out InventoryError inventoryError)
         {
@@ -390,7 +419,13 @@ namespace ZoneEngine.Core.Missions
             Item grantedItem;
             try
             {
-                grantedItem = CreateItem(lowId, highId, quality, itemFlags, itemIdentityType);
+                grantedItem = CreateItem(
+                    lowId,
+                    highId,
+                    quality,
+                    itemFlags,
+                    itemIdentityType,
+                    reservedItemInstance);
             }
             catch (Exception ex)
             {
@@ -539,6 +574,32 @@ namespace ZoneEngine.Core.Missions
                     // Match by template ids only — after DB reload the wire identity type is not always
                     // preserved, and requiring MissionKeyIdentityType made zone resync skip the journal.
                     if (item != null && item.LowID == MissionKeyTemplateId && item.HighID == MissionKeyTemplateId)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool HasMissionKeyInstance(ICharacter character, int keyInstance)
+        {
+            if (character == null || character.BaseInventory == null || keyInstance == 0)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List())
+                {
+                    IItem item = itemEntry.Value;
+                    if (item != null
+                        && item.Identity != null
+                        && item.LowID == MissionKeyTemplateId
+                        && item.HighID == MissionKeyTemplateId
+                        && item.Identity.Instance == keyInstance)
                     {
                         return true;
                     }
@@ -774,7 +835,13 @@ namespace ZoneEngine.Core.Missions
                 new DespawnMessage { Identity = itemIdentity, Unknown = 0 });
         }
 
-        private static Item CreateItem(int lowId, int highId, int quality, uint itemFlags, int itemIdentityType)
+        private static Item CreateItem(
+            int lowId,
+            int highId,
+            int quality,
+            uint itemFlags,
+            int itemIdentityType,
+            int reservedItemInstance)
         {
             var item = new Item(quality, lowId, highId)
                        {
@@ -782,7 +849,9 @@ namespace ZoneEngine.Core.Missions
                                new Identity
                                {
                                    Type = (IdentityType)itemIdentityType,
-                                   Instance = CreateMissionKeyInstance()
+                                   Instance = reservedItemInstance != 0
+                                                  ? reservedItemInstance
+                                                  : CreateMissionKeyInstance()
                                },
                            Flags = 1
                        };

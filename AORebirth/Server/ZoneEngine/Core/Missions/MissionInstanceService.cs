@@ -395,6 +395,17 @@ namespace ZoneEngine.Core.Missions
         /// </summary>
         internal static byte[] GetLiveGeneratorPayload(int livePlayfieldInstance)
         {
+            MissionAcgBindingRecord binding;
+            if (MissionAcgBindingRuntime.TryResolveByLivePlayfield(
+                livePlayfieldInstance,
+                out binding))
+            {
+                MissionAcgLayoutBundle bundle =
+                    MissionAcgBindingRuntime.Catalog.FindByLayoutId(
+                        binding.Binding.SelectedBundleId);
+                return bundle == null ? new byte[0] : bundle.CopyGeneratorPayload();
+            }
+
             int shapePf;
             if (TryGetShapeSource(livePlayfieldInstance, out shapePf) && shapePf > 0)
             {
@@ -408,6 +419,14 @@ namespace ZoneEngine.Core.Missions
 
         internal static int GetLiveBuildingInstance(int livePlayfieldInstance)
         {
+            MissionAcgBindingRecord binding;
+            if (MissionAcgBindingRuntime.TryResolveByLivePlayfield(
+                livePlayfieldInstance,
+                out binding))
+            {
+                return binding.Binding.AcgBuildingIdentity.Instance;
+            }
+
             // Must follow ShapeSource stamp — looking up livePf alone returns default/foreign
             // building (capture 20260725-202953: D74192) and opens the grey map.
             byte[] payload = GetLiveGeneratorPayload(livePlayfieldInstance);
@@ -476,6 +495,48 @@ namespace ZoneEngine.Core.Missions
 
             if (IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
             {
+                return false;
+            }
+
+            if (MissionAcgBindingRuntime.HasAnyBindingForOwner(
+                character.Identity.Instance))
+            {
+                // Stage 2 establishes exact durable identity and an isolated PF2, but full safe
+                // interior materialization is Stage 3. Never fall back to the newest mission or
+                // shared PF while a durable binding exists.
+                MissionAcgBindingRecord exact;
+                bool resolved =
+                    MissionAcgBindingRuntime.TryResolveByExteriorMarker(
+                        character.Identity.Instance,
+                        character.Playfield.Identity.Instance,
+                        character.RawCoordinates.X,
+                        character.RawCoordinates.Y,
+                        character.RawCoordinates.Z,
+                        10.0,
+                        14.0,
+                        DateTime.UtcNow,
+                        out exact);
+                if (!resolved
+                    || !MissionKeyGrantService.HasMissionKeyInstance(
+                        character,
+                        exact.Binding.MissionKeyIdentity.Instance))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-REJECT char={0} reason=missing-or-ambiguous-exact-binding",
+                        character.Identity.Instance);
+                    return false;
+                }
+
+                MissionDiagnostics.Log(
+                    "ENTRY-DEFERRED char={0} accepted={1}:{2} key={3} bundle={4} building={5}:{6} livePf2={7} reason=stage3-materialization-required",
+                    character.Identity.Instance,
+                    exact.Binding.AcceptedQuestIdentity.Type,
+                    exact.Binding.AcceptedQuestIdentity.Instance,
+                    exact.Binding.MissionKeyIdentity.Instance,
+                    exact.Binding.SelectedBundleId,
+                    exact.Binding.AcgBuildingIdentity.Type,
+                    exact.Binding.AcgBuildingIdentity.Instance,
+                    exact.Binding.AllocatedLivePlayfield2);
                 return false;
             }
 

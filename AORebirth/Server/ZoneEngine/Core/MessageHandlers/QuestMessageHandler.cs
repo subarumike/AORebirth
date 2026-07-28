@@ -72,6 +72,91 @@ namespace ZoneEngine.Core.MessageHandlers
                         Unknown3 = 0
                     });
 
+                MissionAcgBindingRecord generatedBinding;
+                if (MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
+                    character.Identity.Instance,
+                    deleteMission.Instance,
+                    out generatedBinding))
+                {
+                    MissionAcgBindingRecord abandoned;
+                    string lifecycleFailure;
+                    if (!MissionAcgBindingRuntime.TryTransition(
+                        generatedBinding,
+                        MissionAcgLifecycleState.Abandoned,
+                        MissionAcgCleanupState.KeyRemovalPending,
+                        DateTime.UtcNow,
+                        out abandoned,
+                        out lifecycleFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "JOURNAL-DELETE-FAIL char={0} mission={1:X8} lifecycle={2}",
+                            character.Identity.Instance,
+                            deleteMission.Instance,
+                            lifecycleFailure);
+                        return;
+                    }
+
+                    int exactKey = generatedBinding.Binding.MissionKeyIdentity.Instance;
+                    bool exactKeyRemoved = MissionKeyGrantService.TryRemoveMissionKey(
+                        client,
+                        character,
+                        exactKey);
+                    int exactKit;
+                    bool exactKitRemoved =
+                        MissionKeyStore.TryTakeRepairKit(
+                            character.Identity.Instance,
+                            deleteMission,
+                            out exactKit)
+                        && MissionKeyGrantService.TryRemoveRepairItem(
+                            client,
+                            character,
+                            exactKit);
+                    int ignoredKey;
+                    MissionKeyStore.TryTake(
+                        character.Identity.Instance,
+                        deleteMission,
+                        out ignoredKey);
+                    bool exactStoreRemoved =
+                        MissionAcceptedStore.Remove(
+                            character.Identity.Instance,
+                            deleteMission);
+
+                    MissionAcgBindingRecord cleanupPending;
+                    MissionAcgBindingRecord cleaned;
+                    if (!MissionAcgBindingRuntime.TryTransition(
+                        abandoned,
+                        MissionAcgLifecycleState.CleanupPending,
+                        MissionAcgCleanupState.InstanceReleasePending,
+                        DateTime.UtcNow,
+                        out cleanupPending,
+                        out lifecycleFailure)
+                        || !MissionAcgBindingRuntime.TryTransition(
+                            cleanupPending,
+                            MissionAcgLifecycleState.Cleaned,
+                            MissionAcgCleanupState.Completed,
+                            DateTime.UtcNow,
+                            out cleaned,
+                            out lifecycleFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "JOURNAL-DELETE-CLEANUP-PENDING char={0} mission={1:X8} reason={2}",
+                            character.Identity.Instance,
+                            deleteMission.Instance,
+                            lifecycleFailure);
+                        return;
+                    }
+
+                    MissionDiagnostics.Log(
+                        "JOURNAL-DELETE-BOUND char={0} mission={1:X8} livePf2={2} keyRemoved={3} kitRemoved={4} storeRemoved={5}",
+                        character.Identity.Instance,
+                        deleteMission.Instance,
+                        generatedBinding.Binding.AllocatedLivePlayfield2,
+                        exactKeyRemoved,
+                        exactKitRemoved,
+                        exactStoreRemoved);
+                    return;
+                }
+
                 int kitInstance;
                 bool kitRemoved = false;
                 if (MissionKeyStore.TryTakeRepairKit(character.Identity.Instance, deleteMission, out kitInstance))

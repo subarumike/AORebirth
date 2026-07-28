@@ -19,7 +19,9 @@ namespace ZoneEngine.Core.Playfields.Content
     {
         public bool Supports(Identity playfieldIdentity)
         {
-            return MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance);
+            return MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance)
+                   && !MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                       playfieldIdentity.Instance);
         }
 
         public void Register(PlayfieldContentRegistration registration)

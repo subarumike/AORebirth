@@ -152,6 +152,48 @@ namespace ZoneEngine.Core.Missions
             return SendOneMissionWindow(character, offer, fresh, register: true);
         }
 
+        public static bool SendAcceptedGeneratedMission(
+            ICharacter character,
+            QuestInfo offer,
+            MissionAcgBindingRecord bindingRecord)
+        {
+            if (character == null || offer == null || bindingRecord == null)
+            {
+                return false;
+            }
+
+            MissionAcgInstanceBinding binding = bindingRecord.Binding;
+            ReanchorGameTime(character);
+            var stored = new MissionAcceptedStore.AcceptedMission
+                         {
+                             QuestIdentity =
+                                 new Identity
+                                 {
+                                     Type = (IdentityType)binding.AcceptedQuestIdentity.Type,
+                                     Instance = binding.AcceptedQuestIdentity.Instance
+                                 },
+                             OriginalOfferIdentity = offer.QuestIdentity,
+                             MissionIconId = offer.MissionIconId,
+                             Quality = offer.Quality,
+                             ShortInfo = offer.ShortInfo,
+                             ExpiryUtc = binding.ExpiryUtc,
+                             Offer = offer,
+                             MarkerPlayfield = binding.ExteriorEntranceIdentity.Instance,
+                             EntranceLow = binding.ExteriorEntranceLow,
+                             EntranceHigh = binding.ExteriorEntranceHigh,
+                             MarkerX = binding.ExteriorX,
+                             MarkerY = binding.ExteriorY,
+                             MarkerZ = binding.ExteriorZ
+                         };
+            return SendOneMissionWindow(
+                character,
+                offer,
+                stored,
+                register: false,
+                deleteBeforeSend: false,
+                acgBinding: binding);
+        }
+
         /// <summary>
         /// Re-sends all stored missions with current Remain values (zone/login resync only).
         /// </summary>
@@ -221,7 +263,8 @@ namespace ZoneEngine.Core.Missions
             QuestInfo offer,
             MissionAcceptedStore.AcceptedMission stored,
             bool register,
-            bool deleteBeforeSend = false)
+            bool deleteBeforeSend = false,
+            MissionAcgInstanceBinding acgBinding = null)
         {
             if (character == null || character.Controller == null)
             {
@@ -244,10 +287,10 @@ namespace ZoneEngine.Core.Missions
                     iconId = MissionTypeCatalog.KillPersonIcon;
                 }
 
-                Identity questId = offer != null
-                                       ? offer.QuestIdentity
-                                       : (stored != null
-                                              ? stored.QuestIdentity
+                Identity questId = stored != null && stored.QuestIdentity != null
+                                       ? stored.QuestIdentity
+                                       : (offer != null
+                                              ? offer.QuestIdentity
                                               : new Identity
                                                 {
                                                     Type = (IdentityType)MissionIdentityType,
@@ -256,6 +299,18 @@ namespace ZoneEngine.Core.Missions
                 if ((int)questId.Type == 0 || questId.Instance == 0)
                 {
                     questId = new Identity { Type = (IdentityType)MissionIdentityType, Instance = MissionInstance };
+                }
+
+                if (acgBinding == null)
+                {
+                    MissionAcgBindingRecord restoredBinding;
+                    if (MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
+                        character.Identity.Instance,
+                        questId.Instance,
+                        out restoredBinding))
+                    {
+                        acgBinding = restoredBinding.Binding;
+                    }
                 }
 
                 int remainingSeconds = MissionDurationSeconds;
@@ -305,6 +360,25 @@ namespace ZoneEngine.Core.Missions
                 WriteInt32BigEndian(packet, QuestIdInstanceOffset, questId.Instance);
                 WriteInt32BigEndian(packet, MissionIconIdOffset, iconId);
                 ApplyMarkerLocation(packet, offer, stored);
+                if (acgBinding != null)
+                {
+                    WriteInt32BigEndian(
+                        packet,
+                        MissionAcceptCaptureTemplate.BuildingIdentityTypeOffset,
+                        acgBinding.AcgBuildingIdentity.Type);
+                    WriteInt32BigEndian(
+                        packet,
+                        MissionAcceptCaptureTemplate.BuildingIdentityInstanceOffset,
+                        acgBinding.AcgBuildingIdentity.Instance);
+                    ReplaceInstance(
+                        packet,
+                        MissionAcceptCaptureTemplate.CapturedMissionKeyInstance,
+                        acgBinding.MissionKeyIdentity.Instance);
+                    ReplaceInstance(
+                        packet,
+                        MissionAcceptCaptureTemplate.CapturedIssuingTerminalInstance,
+                        acgBinding.IssuingTerminalIdentity.Instance);
+                }
 
                 string targetName = stored != null ? stored.TargetName : null;
                 int targetSide = stored != null ? stored.TargetSide : 0;

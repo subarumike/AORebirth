@@ -129,7 +129,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     int pf = character.Playfield.Identity.Instance;
                     byte[] payload = MissionInstanceService.GetLiveGeneratorPayload(pf);
                     int buildingInstance =
-                        AORebirth.Core.Playfields.MissionInstanceShapeCatalog.GetBuildingInstance(payload);
+                        MissionInstanceService.GetLiveBuildingInstance(pf);
                     if (payload == null || payload.Length == 0)
                     {
                         payload = CreateCapturedMissionGeneratorPayload();

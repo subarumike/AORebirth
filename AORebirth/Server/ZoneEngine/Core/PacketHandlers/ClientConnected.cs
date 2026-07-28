@@ -127,6 +127,8 @@ namespace ZoneEngine.Core.PacketHandlers
             // (before SCFU/FullCharacter). Delayed-only replay left the map grey/wrong.
             if (client.Controller.Character.Playfield != null
                 && MissionInstanceService.IsMissionInstancePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance)
+                && !MissionAcgBindingRuntime.IsBoundLivePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))
             {
                 MissionInstanceDoorReplay.SendForCharacter(
@@ -241,13 +243,21 @@ client.Controller.Character.Playfield.Identity,
                 {
                     // Same reason as perks: this client often never sends CharInPlay after zone/relog,
                     // so the mission journal must be restored here or it stays empty.
+                    MissionAcgLifecycleService.TryCleanupPendingForCharacter(
+                        client,
+                        client.Controller.Character);
                     ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
 
                     // Gold 080425: Door/Chest FullUpdates land with SCFU before FullCharacter.
                     // Send here (not post-PAF) so the client accepts door meshes + map icons.
-                    ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
-                        client,
-                        client.Controller.Character);
+                    if (client.Controller.Character.Playfield == null
+                        || !MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                            client.Controller.Character.Playfield.Identity.Instance))
+                    {
+                        ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
+                            client,
+                            client.Controller.Character);
+                    }
 
                     CombatXpRuntimeService.LogXpWireSnapshot(
                         client.Controller.Character,

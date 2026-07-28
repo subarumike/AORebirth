@@ -28,6 +28,8 @@ namespace ZoneEngine.Core.Missions
         {
             public Identity QuestIdentity;
 
+            public Identity OriginalOfferIdentity;
+
             public int MissionIconId;
 
             public int Quality;
@@ -96,27 +98,19 @@ namespace ZoneEngine.Core.Missions
                 mz = action.Z;
             }
 
-            var entry = new AcceptedMission
-                        {
-                            QuestIdentity = offer.QuestIdentity,
-                            MissionIconId = offer.MissionIconId != 0
-                                                ? offer.MissionIconId
-                                                : MissionTypeCatalog.KillPersonIcon,
-                            Quality = offer.Quality,
-                            ShortInfo = offer.ShortInfo ?? string.Empty,
-                            TargetName = targetName ?? string.Empty,
-                            TargetSide = targetSide,
-                            CashReward = offer.CashReward,
-                            ExperienceReward = offer.ExperienceReward,
-                            ExpiryUtc = expiryUtc,
-                            Offer = offer,
-                            MarkerPlayfield = markerPf,
-                            EntranceLow = entranceLow,
-                            EntranceHigh = entranceHigh,
-                            MarkerX = mx,
-                            MarkerY = my,
-                            MarkerZ = mz
-                        };
+            var entry = BuildEntry(
+                offer.QuestIdentity,
+                offer.QuestIdentity,
+                offer,
+                expiryUtc,
+                targetName,
+                targetSide,
+                markerPf,
+                entranceLow,
+                entranceHigh,
+                mx,
+                my,
+                mz);
 
             lock (Sync)
             {
@@ -133,6 +127,68 @@ namespace ZoneEngine.Core.Missions
 
                 PruneExpired_NoLock(list);
                 TryWriteSidecar(characterInstance, list);
+            }
+        }
+
+        /// <summary>
+        /// Atomically persists a generated mission under its distinct accepted identity.
+        /// The rolled offer identity remains available for correlation and is never reused as the
+        /// journal identity.
+        /// </summary>
+        public static bool TryRegisterGenerated(
+            int characterInstance,
+            Identity acceptedQuestIdentity,
+            QuestInfo offer,
+            DateTime expiryUtc,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (characterInstance == 0
+                || acceptedQuestIdentity == null
+                || acceptedQuestIdentity.Instance == 0
+                || offer == null
+                || offer.QuestIdentity == null)
+            {
+                failure = "Generated accepted mission identity and offer are required.";
+                return false;
+            }
+
+            QuestActionList action =
+                offer.QuestActions != null
+                && offer.QuestActions.Length > 0
+                    ? offer.QuestActions[0]
+                    : null;
+            var entry = BuildEntry(
+                acceptedQuestIdentity,
+                offer.QuestIdentity,
+                offer,
+                expiryUtc,
+                null,
+                0,
+                action == null ? 0 : action.Playfield.Instance,
+                action == null ? 0 : action.Unknown18,
+                action == null ? 0 : action.Unknown19,
+                action == null ? 0 : action.X,
+                action == null ? 0 : action.Y,
+                action == null ? 0 : action.Z);
+
+            lock (Sync)
+            {
+                List<AcceptedMission> list = GetOrCreateList_NoLock(characterInstance);
+                if (FindIndex_NoLock(list, acceptedQuestIdentity) >= 0)
+                {
+                    failure = "Duplicate accepted mission identity.";
+                    return false;
+                }
+
+                list.Add(entry);
+                if (!TryWriteSidecarAtomic(characterInstance, list, out failure))
+                {
+                    list.Remove(entry);
+                    return false;
+                }
+
+                return true;
             }
         }
 
@@ -340,7 +396,86 @@ namespace ZoneEngine.Core.Missions
                         continue;
                     }
 
-                    sb.AppendFormat(
+                    AppendSidecarEntry(sb, characterInstance, entry);
+                }
+
+                File.WriteAllText(SidecarPath(characterInstance), sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+
+        private static bool TryWriteSidecarAtomic(
+            int characterInstance,
+            List<AcceptedMission> list,
+            out string failure)
+        {
+            failure = string.Empty;
+            string temporary = string.Empty;
+            try
+            {
+                string dir = SidecarDirectory();
+                Directory.CreateDirectory(dir);
+                string target = SidecarPath(characterInstance);
+                temporary =
+                    target + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                var sb = new StringBuilder();
+                foreach (AcceptedMission entry in list)
+                {
+                    if (entry != null)
+                    {
+                        AppendSidecarEntry(sb, characterInstance, entry);
+                    }
+                }
+
+                byte[] bytes = new UTF8Encoding(false).GetBytes(sb.ToString());
+                using (var stream = new FileStream(
+                    temporary,
+                    FileMode.CreateNew,
+                    FileAccess.Write,
+                    FileShare.None))
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                    stream.Flush(true);
+                }
+
+                if (File.Exists(target))
+                {
+                    string backup = target + ".bak";
+                    File.Replace(temporary, target, backup, true);
+                    if (File.Exists(backup))
+                    {
+                        File.Delete(backup);
+                    }
+                }
+                else
+                {
+                    File.Move(temporary, target);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                failure = ex.GetType().Name + ": " + ex.Message;
+                return false;
+            }
+            finally
+            {
+                if (!string.IsNullOrEmpty(temporary) && File.Exists(temporary))
+                {
+                    File.Delete(temporary);
+                }
+            }
+        }
+
+        private static void AppendSidecarEntry(
+            StringBuilder sb,
+            int characterInstance,
+            AcceptedMission entry)
+        {
+            sb.AppendFormat(
                         CultureInfo.InvariantCulture,
                         "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|{13}|{14}|{15}|{16}",
                         characterInstance,
@@ -360,14 +495,45 @@ namespace ZoneEngine.Core.Missions
                         entry.TargetSide,
                         entry.CashReward,
                         entry.ExperienceReward);
-                    sb.AppendLine();
-                }
+            sb.AppendLine();
+        }
 
-                File.WriteAllText(SidecarPath(characterInstance), sb.ToString());
-            }
-            catch
-            {
-            }
+        private static AcceptedMission BuildEntry(
+            Identity acceptedQuestIdentity,
+            Identity originalOfferIdentity,
+            QuestInfo offer,
+            DateTime expiryUtc,
+            string targetName,
+            int targetSide,
+            int markerPf,
+            int entranceLow,
+            int entranceHigh,
+            float markerX,
+            float markerY,
+            float markerZ)
+        {
+            return new AcceptedMission
+                   {
+                       QuestIdentity = acceptedQuestIdentity,
+                       OriginalOfferIdentity = originalOfferIdentity,
+                       MissionIconId = offer.MissionIconId != 0
+                                           ? offer.MissionIconId
+                                           : MissionTypeCatalog.KillPersonIcon,
+                       Quality = offer.Quality,
+                       ShortInfo = offer.ShortInfo ?? string.Empty,
+                       TargetName = targetName ?? string.Empty,
+                       TargetSide = targetSide,
+                       CashReward = offer.CashReward,
+                       ExperienceReward = offer.ExperienceReward,
+                       ExpiryUtc = expiryUtc,
+                       Offer = offer,
+                       MarkerPlayfield = markerPf,
+                       EntranceLow = entranceLow,
+                       EntranceHigh = entranceHigh,
+                       MarkerX = markerX,
+                       MarkerY = markerY,
+                       MarkerZ = markerZ
+                   };
         }
 
         private static bool TryReadSidecar(int characterInstance, out List<AcceptedMission> list)

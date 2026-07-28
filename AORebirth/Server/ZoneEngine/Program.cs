@@ -411,6 +411,7 @@ namespace ZoneEngine
                 AreteFrameworkRegistries contentRegistries =
                     AreteFrameworkBootstrap.InitializeCheckedInContent();
                 MissionRuntime.Initialize(contentRegistries);
+                MissionAcgBindingRuntime.Initialize();
             }
             catch (Exception exception)
             {
