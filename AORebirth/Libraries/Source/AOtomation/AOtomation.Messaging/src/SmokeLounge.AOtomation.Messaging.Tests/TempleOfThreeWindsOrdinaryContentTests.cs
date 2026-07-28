@@ -326,35 +326,50 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(profiles.All(value => value.Combat.EvidenceState == OrdinaryEnemyEvidenceState.Observed));
             OrdinaryEnemySpawnDefinition[] cultistSpawns = spawns.Where(
                 value => value.ProfileKey.StartsWith("totw.cultist.", StringComparison.Ordinal)).ToArray();
-            CapturedEnemyCombatContract[] cultistContracts = cultistSpawns.Select(
-                spawn => profilesByKey[spawn.ProfileKey].Combat.ResolveContract(
-                    spawn.SourceIdentity,
-                    spawn.Level)).ToArray();
-            Assert.AreEqual(14, cultistContracts.Count(value => value.IsCombatReady));
-            Assert.AreEqual(135, cultistContracts.Count(value => value.IsQuarantined));
-            foreach (CapturedEnemyCombatContract contract in cultistContracts.Where(
-                value => value.IsCombatReady))
+            var cultistContracts = new List<CapturedEnemyCombatContract>();
+            foreach (OrdinaryEnemySpawnDefinition spawn in cultistSpawns)
             {
+                OrdinaryEnemySpawnVariant variant = spawn.SelectVariant(null);
+                Assert.IsNotNull(variant.WeaponLoadout);
+                CapturedEnemyCombatContract current =
+                    profilesByKey[spawn.ProfileKey].Combat.ResolveContract(
+                        spawn.SourceIdentity,
+                        variant);
+                CapturedEnemyCombatContract contract;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        1931,
+                        "Cultist",
+                        profilesByKey[spawn.ProfileKey].MonsterData,
+                        variant.Level,
+                        spawn.SourceIdentity,
+                        current,
+                        out contract,
+                        out failure),
+                    failure);
+                cultistContracts.Add(contract);
                 Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
+                Assert.IsTrue(contract.IsCombatReady);
+                Assert.IsTrue(contract.UsesCaptureProvenArchetype);
+                Assert.IsTrue(contract.UsesProductionEquippedWeaponValues);
                 Assert.IsNull(contract.SpecialAttackSequence);
-                Assert.AreEqual(
-                    CapturedTempleOfThreeWindsCombatCatalog.CultistFirstSuccessfulHitDelaySeconds,
-                    contract.FirstHitDelaySeconds);
-                Assert.AreEqual(15, contract.MinDamage);
-                Assert.AreEqual(32, contract.MaxDamage);
-                Assert.AreEqual(
-                    CapturedTempleOfThreeWindsCombatCatalog.CultistRechargeSeconds,
-                    contract.RechargeSeconds);
                 Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
                 Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
                 Assert.AreEqual(3, contract.AttackInfoHitType);
                 Assert.AreEqual(0, contract.AttackInfoN3Unknown);
                 Assert.IsNotNull(contract.WeaponDefinition);
-                Assert.AreEqual(contract.EvidenceSourceIdentity, contract.WeaponDefinition.EvidenceSourceIdentity);
-                Assert.IsTrue(
-                    contract.SpecialAttackWeaponUnknown5 == 0
-                    || contract.SpecialAttackWeaponUnknown5 == 5);
+                Assert.AreEqual(
+                    variant.WeaponLoadout.LowId,
+                    contract.WeaponDefinition.LowId);
+                Assert.AreEqual(
+                    variant.WeaponLoadout.HighId,
+                    contract.WeaponDefinition.HighId);
+                Assert.AreEqual(
+                    variant.WeaponLoadout.Quality,
+                    contract.WeaponDefinition.Quality);
             }
+            Assert.AreEqual(149, cultistContracts.Count);
             Assert.AreEqual(74, cultists.Sum(value => value.Loot.ObservedCompleteInventories));
             Assert.AreEqual(57, cultists.Sum(value => value.Loot.ObservedEmptyInventories));
             Assert.AreEqual(17, cultists.Sum(value => value.Loot.Entries.Sum(entry => entry.ObservedCount)));
@@ -367,10 +382,42 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             foreach (OrdinaryEnemySpawnDefinition sentinelSpawn in spawns.Where(
                 value => value.ProfileKey == sentinel.ProfileKey))
             {
-                Assert.IsFalse(
-                    sentinel.Combat.ResolveContract(
-                        sentinelSpawn.SourceIdentity,
-                        sentinelSpawn.Level).IsCombatReady);
+                OrdinaryEnemySpawnVariant variant = sentinelSpawn.SelectVariant(null);
+                CapturedEnemyCombatContract current = sentinel.Combat.ResolveContract(
+                    sentinelSpawn.SourceIdentity,
+                    variant);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    1931,
+                    sentinel.DisplayName,
+                    sentinel.MonsterData,
+                    variant.Level,
+                    sentinelSpawn.SourceIdentity,
+                    current,
+                    out resolved,
+                    out failure);
+                if (variant.Level == 20)
+                {
+                    Assert.IsTrue(success, failure);
+                    Assert.IsTrue(resolved.IsCombatReady);
+                    Assert.AreEqual(123381, resolved.WeaponLowId);
+                    Assert.AreEqual(123382, resolved.WeaponHighId);
+                    Assert.AreEqual(16, resolved.WeaponQuality);
+                    CollectionAssert.AreEqual(
+                        new[] { 0, 20 },
+                        resolved.CapturedSpecialAttackWeaponUnknown5Observations);
+                }
+                else
+                {
+                    Assert.IsFalse(success);
+                    StringAssert.Contains(
+                        current.QuarantineReason,
+                        "captured attack contract is unresolved");
+                    StringAssert.Contains(
+                        current.Evidence,
+                        "no complete same-level normal AttackInfo contract");
+                }
             }
             Assert.AreEqual(5, sentinel.Loot.ObservedCompleteInventories);
             Assert.AreEqual(5, sentinel.Loot.ObservedEmptyInventories);
@@ -380,10 +427,115 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemyProfile murial = profiles.Single(value => value.DisplayName == "Murial the Faithful");
             OrdinaryEnemySpawnDefinition murialSpawn = spawns.Single(
                 value => value.ProfileKey == murial.ProfileKey);
-            Assert.IsFalse(
+            CapturedEnemyCombatContract murialContract =
                 murial.Combat.ResolveContract(
                     murialSpawn.SourceIdentity,
-                    murialSpawn.Level).IsCombatReady);
+                    murialSpawn.SelectVariant(null));
+            Assert.IsTrue(murialContract.IsCombatReady);
+            Assert.AreEqual(122180, murialContract.WeaponDefinition.LowId);
+            Assert.AreEqual(122181, murialContract.WeaponDefinition.HighId);
+            Assert.AreEqual(36, murialContract.WeaponDefinition.Quality);
+            Assert.AreEqual(10, murialContract.WeaponDefinition.InitialEnergy);
+        }
+
+        [TestMethod]
+        public void TempleCultistSetupFormulaIsExactBoundedAndWeaponFamilySafe()
+        {
+            var observed = new Dictionary<int, int>
+            {
+                { 20, 305 }, { 21, 320 }, { 23, 351 }, { 24, 367 },
+                { 25, 382 }, { 26, 400 }, { 27, 416 }, { 28, 434 },
+                { 29, 450 }, { 30, 468 }, { 31, 484 }, { 32, 502 },
+                { 33, 518 }, { 34, 535 }, { 35, 552 }
+            };
+            var fourth = new Dictionary<int, int>
+            {
+                { 20, 12 }, { 21, 12 }, { 23, 13 }, { 24, 14 },
+                { 25, 14 }, { 26, 16 }, { 27, 16 }, { 28, 17 },
+                { 29, 17 }, { 30, 18 }, { 31, 18 }, { 32, 19 },
+                { 33, 19 }, { 34, 20 }, { 35, 20 }
+            };
+
+            foreach (KeyValuePair<int, int> value in observed)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            26137,
+                            value.Key,
+                            204747,
+                            204747,
+                            1,
+                            6),
+                        out setup));
+                Assert.AreEqual(value.Value, setup.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(value.Value, setup.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(value.Value, setup.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(fourth[value.Key], setup.SpecialAttackWeaponUnknown4);
+            }
+
+            OrdinaryEnemyCombatNumericSetup level22;
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        26137,
+                        22,
+                        204747,
+                        204747,
+                        1,
+                        6),
+                    out level22));
+            Assert.AreEqual(336, level22.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(13, level22.SpecialAttackWeaponUnknown4);
+
+            OrdinaryEnemyCombatNumericSetup rejected;
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        26137,
+                        19,
+                        204747,
+                        204747,
+                        1,
+                        6),
+                    out rejected));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        26137,
+                        36,
+                        204747,
+                        204747,
+                        1,
+                        6),
+                    out rejected));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        26137,
+                        28,
+                        129028,
+                        129029,
+                        29,
+                        6),
+                    out rejected));
+
+            OrdinaryEnemyCombatNumericSetup raisedPrimary;
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        26135,
+                        29,
+                        158298,
+                        158299,
+                        34,
+                        6),
+                    out raisedPrimary));
+            Assert.AreEqual(470, raisedPrimary.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(450, raisedPrimary.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(450, raisedPrimary.SpecialAttackWeaponUnknown3);
+            Assert.AreEqual(17, raisedPrimary.SpecialAttackWeaponUnknown4);
         }
 
         [TestMethod]

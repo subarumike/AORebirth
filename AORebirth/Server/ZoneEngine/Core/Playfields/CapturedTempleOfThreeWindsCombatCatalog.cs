@@ -520,6 +520,71 @@ namespace AORebirth.Core.Playfields
                 true);
         }
 
+        internal static CapturedEnemyCombatContract EternalSentinel(
+            int sourceIdentity,
+            OrdinaryEnemySpawnVariant variant)
+        {
+            OrdinaryEnemySpawnWeaponLoadout weapon =
+                variant == null ? null : variant.WeaponLoadout;
+            if (variant == null || weapon == null || !weapon.IsValid)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Eternal Sentinel requires its exact active-spawn WIFU loadout",
+                    true);
+            }
+
+            if (variant.Level != 20
+                || weapon.LowId != 123381
+                || weapon.HighId != 123382)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Eternal Sentinel source 0x" + sourceIdentity.ToString("X8")
+                    + " L" + variant.Level + " weapon " + weapon.LowId + "/"
+                    + weapon.HighId
+                    + " has no complete same-level normal AttackInfo contract; "
+                    + "captured WIFU and miss packets are insufficient",
+                    true);
+            }
+
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    weapon.Evidence
+                    + ": exact active L20 WIFU; complete L20 profiles prove "
+                    + "WIFU-SAW-Attack-AttackInfo with mutable Unknown5 state",
+                    sourceIdentity,
+                    weapon.LowId,
+                    weapon.HighId,
+                    weapon.Quality,
+                    6,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    -1,
+                    0,
+                    109,
+                    109,
+                    109,
+                    12,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues()
+                .WithProductionWeaponQuality();
+        }
+
         internal static CapturedEnemyCombatContract Cultist(int monsterData, int level)
         {
             return CapturedEnemyCombatContract.Unresolved(
@@ -607,6 +672,76 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        internal static CapturedEnemyCombatContract Cultist(
+            int monsterData,
+            int sourceIdentity,
+            OrdinaryEnemySpawnVariant variant)
+        {
+            OrdinaryEnemySpawnWeaponLoadout weapon =
+                variant == null ? null : variant.WeaponLoadout;
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (variant == null
+                || weapon == null
+                || !weapon.IsValid
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        monsterData,
+                        variant.Level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        6),
+                    out generated))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Temple Cultist requires one exact active-spawn WIFU loadout "
+                    + "inside its bounded combat setup formula domain; monsterData="
+                    + monsterData + " source=0x" + sourceIdentity.ToString("X8"),
+                    true)
+                    .WithProductionEquippedWeaponValues();
+            }
+
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    weapon.Evidence
+                    + ": exact active-spawn weapon; numeric SAW setup="
+                    + generated.FormulaId
+                    + "; item and actor state own damage, range, cadence, Energy, "
+                    + "ammunition, and mutable SAW state",
+                    sourceIdentity,
+                    weapon.LowId,
+                    weapon.HighId,
+                    weapon.Quality,
+                    6,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues()
+                .WithProductionWeaponQuality();
+        }
+
         internal static CapturedEnemyCombatContract MurialTheFaithful()
         {
             return CapturedEnemyCombatContract.CapturedSpecialSequence(
@@ -628,6 +763,58 @@ namespace AORebirth.Core.Playfields
                     0,
                     0,
                     0));
+        }
+
+        internal static CapturedEnemyCombatContract MurialTheFaithful(
+            int sourceIdentity,
+            OrdinaryEnemySpawnVariant variant)
+        {
+            OrdinaryEnemySpawnWeaponLoadout weapon =
+                variant == null ? null : variant.WeaponLoadout;
+            if (variant == null
+                || variant.Level != 34
+                || weapon == null
+                || !weapon.IsValid
+                || weapon.LowId != 122180
+                || weapon.HighId != 122181
+                || weapon.Quality != 36)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Murial the Faithful requires the exact captured L34 QL36 "
+                    + "122180/122181 right-hand loadout",
+                    true);
+            }
+
+            var capturedWeapon = new CapturedEnemyWeaponDefinition(
+                weapon.Evidence,
+                sourceIdentity,
+                0,
+                11,
+                6,
+                1000015,
+                0,
+                262,
+                new[]
+                {
+                    WeaponStat(CharacterStat.Flags, 1027),
+                    WeaponStat(CharacterStat.StaticInstance, weapon.LowId),
+                    WeaponStat(CharacterStat.ACGItemLevel, weapon.Quality),
+                    WeaponStat(CharacterStat.ACGItemTemplateID, weapon.LowId),
+                    WeaponStat(CharacterStat.ACGItemTemplateID2, weapon.HighId),
+                    WeaponStat(CharacterStat.MultipleCount, 1),
+                    WeaponStat(CharacterStat.Energy, 10),
+                    WeaponStat(CharacterStat.AttackDelay, 235),
+                    WeaponStat(CharacterStat.RechargeDelay, 235)
+                },
+                0);
+            CapturedEnemyCombatContract contract = MurialTheFaithful();
+            return contract
+                .WithCaptureCertification(
+                    contract.Evidence + "; " + weapon.Evidence
+                    + ": exact Murial WIFU",
+                    sourceIdentity,
+                    capturedWeapon)
+                .WithEvidenceSourceHint(sourceIdentity);
         }
 
         internal static CapturedEnemyCombatContract For(string profileKey)

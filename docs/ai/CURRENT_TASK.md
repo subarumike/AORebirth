@@ -2,35 +2,29 @@
 
 ## Active
 
-### Fixed-scope Subway combat completion
+### PF1931 Temple ordinary-combat completion
 
-The remaining fixed 15-actor checkpoint is resolved. Fourteen actors are
-restored:
+All `80` actors in the starting PF1931 ordinary-combat quarantine were
+re-evaluated against the existing generated profiles, exact active WIFU
+loadouts, and bounded production formulas. `78` are restored:
 
-- Incomplete Rebuild: `6/6`
-- Workman Striker: `3/3`
-- Molested Molecules: `3/3`
-- Bloodcreeper: `1/1`
-- Redundant Scan: `1/1`
+- Cultist: `76/76`
+- Eternal Sentinel L20 `0x7983FA26`: restored
+- Murial the Faithful `0x7987F12D`: restored
 
-Incomplete Rebuild and Molested Molecules use bounded equipped formula domains.
-Workman Striker and Redundant Scan use the exact active atomic generation.
-Bloodcreeper uses its captured Bite/Spit dual-stream contract with
-production-owned timing/range and mutable state. Exact weapon family, mode,
-slot, instance, stream structure, action, hit/damage type, and packet order
-remain capture-bound.
+The seven Cultist MonsterData families use their exact equipped weapon
+families and one-stream packet semantics. Production derives only the bounded
+L20..L35 SpecialAttackWeapon numeric setup; active WIFU data continues to own
+template pair, QL, Energy, and slot. The two L18 Eternal Sentinels remain
+quarantined because no complete same-level landed normal AttackInfo contract
+exists for either active weapon loadout.
 
-Stim Fiend `0x7957E415`, MD `203739`, L9 remains quarantined. Capture
-`20260710-202132` contains SCFU `IN 1016` and movement/despawn only; WIFU, SAW,
-Attack, AttackInfo, and MissedAttackInfo are absent. The existing Stim formula
-remains bounded to L10..L17.
-
-PF127/PF1931 coverage is now `377/112` of `489` unique actors (`290/32` and
-unchanged `87/80`). The fixed 53-actor Subway checkpoint is `52/1`.
+The fixed PF127/PF1931 checkpoint is now `455/34` of `489`: PF127 remains
+`290/32`, while PF1931 moves from `87/80` to `165/2`.
 
 Evidence:
 
-- `docs/evidence/SUBWAY_FIXED_SCOPE_COMBAT_COMPLETION_20260728.md`
+- `docs/evidence/TEMPLE_ORDINARY_COMBAT_COMPLETION_20260728.md`
+- `docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md`
 - `docs/generated/enemy_combat_setup_formula_dataset.json`
 - `docs/generated/capture_backed_npc_combat_active_coverage.json`
-- `docs/evidence/SUBWAY_REMAINING_COMBAT_COHORT_RESTORATION_20260726.md`

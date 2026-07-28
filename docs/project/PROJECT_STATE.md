@@ -4,6 +4,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- PF1931 ordinary combat now restores `78` of the `80` actors that entered the
+  2026-07-28 quarantine pass. All `76` quarantined Cultists resolve their exact
+  active WIFU loadout and a capture-proven semantic archetype through bounded
+  L20..L35 SpecialAttackWeapon formulas; L20 Eternal Sentinel
+  `0x7983FA26` and Murial `0x7987F12D` are also restored from exact capture
+  contracts. Only L18 Eternal Sentinels `0x7983FA22` and `0x7983FBC2` remain
+  fail-closed because their active WIFU/start/miss evidence has no complete
+  same-level landed normal AttackInfo contract. The fixed PF127/PF1931
+  checkpoint is `455/34` of `489` (`290/32` and `165/2`). Evidence:
+  `docs/evidence/TEMPLE_ORDINARY_COMBAT_COMPLETION_20260728.md`.
+
 - The fixed 53-actor Subway combat checkpoint is now `52` certified and `1`
   quarantined. This completion pass restores all six Incomplete Rebuild, all
   three Workman Strikers, all three Molested Molecules, Bloodcreeper, and

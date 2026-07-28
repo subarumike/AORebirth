@@ -1,5 +1,12 @@
 # Temple Cultist combat quarantine audit — 2026-07-26
 
+> Superseded on 2026-07-28 by
+> `docs/evidence/TEMPLE_ORDINARY_COMBAT_COMPLETION_20260728.md`. The earlier
+> conclusion below predated the exact active WIFU catalog and bounded
+> cross-family SpecialAttackWeapon formula proof. All `76` Cultists listed in
+> this historical audit are now restored; the table remains as provenance for
+> the starting quarantine.
+
 ## Outcome
 
 No remaining Cultist cohort can be restored from the generated profiles without
