@@ -1282,14 +1282,16 @@ def _write_parse_capture_worker_shard(capture: Path, shard: Path) -> None:
     if shard in {OUTPUT.resolve(), CATALOG_OUTPUT.resolve(), FIXTURE_OUTPUT.resolve()}:
         raise RuntimeError("capture worker cannot write a production generated output")
 
-    with shard.open("w", encoding="utf-8", newline="\n") as handle:
-        json.dump(
+    shard.write_text(
+        json.dumps(
             _parse_capture_payload(parse_capture(capture)),
-            handle,
             ensure_ascii=True,
             separators=(",", ":"),
             sort_keys=True,
-        )
+        ),
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def _is_native_child_failure(return_code: int) -> bool:

@@ -1636,7 +1636,8 @@ namespace AORebirth.Core.Playfields
             string sourceCapture,
             string sourceTimestamp,
             OrdinaryEnemySpawnLevelDefinition levelDefinition = null,
-            WorldRespawnPolicyAssignment respawnPolicy = null)
+            WorldRespawnPolicyAssignment respawnPolicy = null,
+            OrdinaryEnemySpawnWeaponLoadout weaponLoadout = null)
         {
             this.SpawnKey = spawnKey;
             this.SourceIdentity = sourceIdentity;
@@ -1675,7 +1676,8 @@ namespace AORebirth.Core.Playfields
                 healthDamage,
                 monsterScale,
                 runSpeed,
-                sourceCapture);
+                sourceCapture,
+                weaponLoadout);
             this.LevelDefinition = levelDefinition
                                    ?? OrdinaryEnemySpawnLevelDefinition.Fixed(
                                        this.DefaultVariant,

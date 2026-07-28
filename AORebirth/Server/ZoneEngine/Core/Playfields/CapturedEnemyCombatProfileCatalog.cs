@@ -1731,17 +1731,32 @@ namespace AORebirth.Core.Playfields
                 }
                 else
                 {
-                    CapturedEnemyCombatProfileDefinition[] sourceMatches =
-                        exactProductionFamily.Where(
-                            value => value.ContainsSource(sourceIdentityHint)).ToArray();
-                    if (sourceMatches.Length == 1)
-                    {
-                        productionProfile = sourceMatches[0];
-                    }
-                    else
+                    CapturedEnemyCombatProfileDefinition compatibleArchetype =
+                        exactProductionFamily[0];
+                    if (exactProductionFamily.Any(
+                        value => !compatibleArchetype
+                            .MatchesCaptureProvenEquippedWeaponPacketSemantics(
+                                value)))
                     {
                         return false;
                     }
+
+                    CapturedEnemyCombatProfileDefinition[] exactLoadoutMatches =
+                        exactProductionFamily.Where(
+                            value => value.MatchesStableWeaponProfile(current))
+                            .ToArray();
+                    CapturedEnemyCombatProfileDefinition[] sourceMatches =
+                        exactProductionFamily.Where(
+                            value => value.ContainsSource(sourceIdentityHint)).ToArray();
+                    productionProfile = exactLoadoutMatches.Length == 1
+                        ? exactLoadoutMatches[0]
+                        : sourceMatches.Length == 1
+                            ? sourceMatches[0]
+                            : exactProductionFamily
+                                .OrderBy(
+                                    value => value.ProfileId,
+                                    StringComparer.Ordinal)
+                                .First();
                 }
 
                 int productionEvidenceSourceIdentity =

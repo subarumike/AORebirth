@@ -356,15 +356,15 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyScfuProfile.CapturedExact),
                 CultistAggression,
                 new OrdinaryEnemyCombatProfile(
-                    OrdinaryEnemyCombatMode.UnarmedMelee,
-                    OrdinaryEnemyDamageSource.CapturedFixed,
-                    false,
+                    OrdinaryEnemyCombatMode.EquippedRanged,
+                    OrdinaryEnemyDamageSource.WeaponRoll,
+                    true,
                     EternalSentinelCombat,
                     OrdinaryEnemyEvidenceState.Observed,
-                    sourceContractResolver: (sourceIdentity, level) =>
+                    sourceVariantContractResolver: (sourceIdentity, variant) =>
                         CapturedTempleOfThreeWindsCombatCatalog.EternalSentinel(
                             sourceIdentity,
-                            level)),
+                            variant)),
                 BuildEternalSentinelLoot(evidence),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,
@@ -477,7 +477,11 @@ namespace AORebirth.Core.Playfields
                 "20260721-041439",
                 string.Empty,
                 null,
-                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn),
+                CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.Resolve(
+                    sourceIdentity,
+                    41690,
+                    level));
         }
 
         private static OrdinaryEnemyProfile BuildDeathlessLegionnaireProfile()
@@ -803,7 +807,11 @@ namespace AORebirth.Core.Playfields
                     OrdinaryEnemyDamageSource.CapturedFixed,
                     true,
                     MurialCombat,
-                    OrdinaryEnemyEvidenceState.Observed),
+                    OrdinaryEnemyEvidenceState.Observed,
+                    sourceVariantContractResolver: (sourceIdentity, variant) =>
+                        CapturedTempleOfThreeWindsCombatCatalog.MurialTheFaithful(
+                            sourceIdentity,
+                            variant)),
                 new OrdinaryEnemyLootProfile(
                     OrdinaryEnemyLootEvidence.NoneProven,
                     new OrdinaryEnemyLootEntry[0],
@@ -880,7 +888,11 @@ namespace AORebirth.Core.Playfields
                 "20260721-232051,20260721-234614",
                 "2026-07-22T04:36:41.2783126Z",
                 null,
-                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn),
+                CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.Resolve(
+                    unchecked((int)0x7987F12Du),
+                    26090,
+                    34));
         }
 
         private static OrdinaryEnemyProfile BuildProfile(ProfileSeed seed)
@@ -927,15 +939,15 @@ namespace AORebirth.Core.Playfields
                 CultistAggression,
                 new OrdinaryEnemyCombatProfile(
                     OrdinaryEnemyCombatMode.EquippedRanged,
-                    OrdinaryEnemyDamageSource.CapturedFixed,
+                    OrdinaryEnemyDamageSource.WeaponRoll,
                     true,
                     CultistCombat,
                     OrdinaryEnemyEvidenceState.Observed,
-                    sourceContractResolver: (sourceIdentity, level) =>
+                    sourceVariantContractResolver: (sourceIdentity, variant) =>
                         CapturedTempleOfThreeWindsCombatCatalog.Cultist(
                             seed.MonsterData,
                             sourceIdentity,
-                            level)),
+                            variant)),
                 BuildLoot(seed.MonsterData),
                 new OrdinaryEnemyCorpseProfile(
                     OrdinaryEnemyCorpsePacketProfile.Generic,
@@ -994,7 +1006,11 @@ namespace AORebirth.Core.Playfields
                 seed.SourceCapture,
                 string.Empty,
                 null,
-                WorldRespawnPolicyAssignment.Explicit(CultistRespawn));
+                WorldRespawnPolicyAssignment.Explicit(CultistRespawn),
+                CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.Resolve(
+                    seed.SourceIdentity,
+                    profile.MonsterData,
+                    seed.Level));
         }
 
         private static OrdinaryEnemyLootProfile BuildLoot(int monsterData)

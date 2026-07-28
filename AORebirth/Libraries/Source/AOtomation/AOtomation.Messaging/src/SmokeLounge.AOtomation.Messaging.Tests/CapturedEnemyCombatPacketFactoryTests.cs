@@ -2793,7 +2793,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void TempleOrdinaryCoverageHasFourteenExactContractsAndQuarantinesTheRest()
+        public void TempleOrdinaryCoverageRestoresEveryCompleteContractAndKeepsOnlyTwoExactBlockers()
         {
             var provider = new CapturedTempleOfThreeWindsContentProvider();
             Dictionary<string, OrdinaryEnemyProfile> profiles = provider.GetProfiles()
@@ -2804,28 +2804,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
             {
-                CapturedEnemyCombatContract contract = profiles[spawn.ProfileKey].Combat.ResolveContract(
+                CapturedEnemyCombatContract contract = ResolveRuntimeContract(
+                    profiles[spawn.ProfileKey],
                     spawn.SourceIdentity,
-                    spawn.Level);
+                    spawn);
                 if (contract.IsCombatReady)
                 {
-                    Assert.AreEqual(spawn.SourceIdentity, contract.EvidenceSourceIdentity);
-                    Assert.IsNotNull(contract.WeaponDefinition);
-                    Assert.AreEqual(
-                        spawn.SourceIdentity,
-                        contract.WeaponDefinition.EvidenceSourceIdentity);
-                    Assert.AreEqual(
-                        CapturedTempleOfThreeWindsCombatCatalog.CultistFirstSuccessfulHitDelaySeconds,
-                        contract.FirstHitDelaySeconds,
-                        0.00000001);
-                    Assert.IsFalse(contract.UsesEquippedWeaponDamage);
-                    Assert.AreEqual(15, contract.MinDamage);
-                    Assert.AreEqual(32, contract.MaxDamage);
-                    Assert.AreEqual(0, contract.CapturedDamageBonus);
-                    Assert.AreEqual(
-                        CapturedTempleOfThreeWindsCombatCatalog.CultistRechargeSeconds,
-                        contract.RechargeSeconds,
-                        0.00000001);
                     ready.Add(spawn);
                 }
                 else
@@ -2837,20 +2821,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(167, spawns.Length);
-            Assert.AreEqual(14, ready.Count);
-            Assert.AreEqual(153, quarantined.Count);
+            Assert.AreEqual(165, ready.Count);
+            Assert.AreEqual(2, quarantined.Count);
             CollectionAssert.AreEquivalent(
                 new[]
                 {
-                    unchecked((int)0x79834EC1), unchecked((int)0x79834EC3),
-                    unchecked((int)0x79834ECC), unchecked((int)0x79834ECD),
-                    unchecked((int)0x79834ECF), unchecked((int)0x7983FB96),
-                    unchecked((int)0x7983FB98), unchecked((int)0x7983FB9B),
-                    unchecked((int)0x7983FBDF), unchecked((int)0x7983FC37),
-                    unchecked((int)0x7984B374), unchecked((int)0x7984B375),
-                    unchecked((int)0x7984B379), unchecked((int)0x7984B37C)
+                    unchecked((int)0x7983FA22),
+                    unchecked((int)0x7983FBC2)
                 },
-                ready.Select(value => value.SourceIdentity).ToArray());
+                quarantined.Select(value => value.SourceIdentity).ToArray());
         }
 
         [TestMethod]
@@ -2875,9 +2854,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn.SourceIdentity,
                     spawn.Level)).ToArray();
             CapturedEnemyCombatContract[] templeContracts = templeSpawns.Select(
-                spawn => profiles[spawn.ProfileKey].Combat.ResolveContract(
+                spawn => ResolveRuntimeContract(
+                    profiles[spawn.ProfileKey],
                     spawn.SourceIdentity,
-                    spawn.Level)).ToArray();
+                    spawn)).ToArray();
 
             Assert.AreEqual(322, subwaySpawns.Length);
             Assert.AreEqual(1, subwayContracts.Count(value => value.IsCombatReady));
@@ -2889,8 +2869,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Where(value => value.Contract.IsCombatReady)
                     .All(value => value.Spawn.SourceIdentity == 0x7953AEA5));
             Assert.AreEqual(167, templeSpawns.Length);
-            Assert.AreEqual(14, templeContracts.Count(value => value.IsCombatReady));
-            Assert.AreEqual(153, templeContracts.Count(value => value.IsQuarantined));
+            Assert.AreEqual(165, templeContracts.Count(value => value.IsCombatReady));
+            Assert.AreEqual(2, templeContracts.Count(value => value.IsQuarantined));
 
             CapturedEnemyCombatContract[] sourceUnboundSubwayEncounters =
             {
@@ -3049,6 +3029,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 sourceOwnedWeaponCallers.Select(Path.GetFileName).ToArray());
             Assert.IsFalse(combatSources.Any(
                 path => File.ReadAllText(path).Contains("WithEvidenceSource(")));
+        }
+
+        private static CapturedEnemyCombatContract ResolveRuntimeContract(
+            OrdinaryEnemyProfile profile,
+            int sourceIdentity,
+            OrdinaryEnemySpawnDefinition spawn)
+        {
+            OrdinaryEnemySpawnVariant variant = spawn.SelectVariant(null);
+            CapturedEnemyCombatContract current = profile.Combat.ResolveContract(
+                sourceIdentity,
+                variant);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            return CapturedEnemyCombatProfileCatalog.TryResolve(
+                       spawn.PlayfieldInstance,
+                       profile.DisplayName,
+                       profile.MonsterData,
+                       variant.Level,
+                       sourceIdentity,
+                       current,
+                       out resolved,
+                       out failure)
+                ? resolved
+                : current;
         }
 
         private static CapturedEnemyCombatContract ThiefAttackStartContract()

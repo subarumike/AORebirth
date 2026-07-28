@@ -98,7 +98,9 @@ namespace AORebirth.Core.Playfields
         MeldedPatterns,
         FragmentedSoul,
         IncompleteRebuild,
-        MolestedMolecules
+        MolestedMolecules,
+        TempleCultist,
+        TempleCultistRaisedPrimary
     }
 
     internal sealed class OrdinaryEnemyEquippedFormulaDomain
@@ -183,6 +185,14 @@ namespace AORebirth.Core.Playfields
                             lowTemplate,
                             highTemplate,
                             quality);
+                case OrdinaryEnemyEquippedFormulaKind.TempleCultist:
+                case OrdinaryEnemyEquippedFormulaKind.TempleCultistRaisedPrimary:
+                    return OrdinaryEnemyCombatSetupGenerator
+                        .IsTempleCultistWeaponLoadout(
+                            this.MonsterData,
+                            lowTemplate,
+                            highTemplate,
+                            quality);
                 default:
                     return false;
             }
@@ -233,6 +243,39 @@ namespace AORebirth.Core.Playfields
                         value,
                         value,
                         value);
+                }
+                case OrdinaryEnemyEquippedFormulaKind.TempleCultist:
+                case OrdinaryEnemyEquippedFormulaKind.TempleCultistRaisedPrimary:
+                {
+                    int baseValue;
+                    if (actorLevel <= 25)
+                    {
+                        baseValue = checked((31 * actorLevel) - 10) / 2;
+                    }
+                    else if (actorLevel <= 33)
+                    {
+                        baseValue = checked((17 * actorLevel) - 42)
+                                    - (actorLevel & 1);
+                    }
+                    else
+                    {
+                        baseValue = checked((17 * actorLevel) - 43);
+                    }
+
+                    int fourthValue = actorLevel <= 25
+                        ? checked(actorLevel + 4) / 2
+                        : checked(actorLevel + 6) / 2;
+                    int primaryValue =
+                        this.Kind == OrdinaryEnemyEquippedFormulaKind
+                            .TempleCultistRaisedPrimary
+                            ? checked(baseValue + 20)
+                            : baseValue;
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        primaryValue,
+                        baseValue,
+                        baseValue,
+                        fourthValue);
                 }
                 default:
                     throw new InvalidOperationException(
@@ -290,6 +333,16 @@ namespace AORebirth.Core.Playfields
 
         internal const int MolestedMoleculesMaximumLevel = 25;
 
+        internal const string TempleCultistFormulaId =
+            "temple-cultist-saw-bounded-level-piecewise-v1";
+
+        internal const string TempleCultistRaisedPrimaryFormulaId =
+            "temple-cultist-26135-saw-bounded-level-piecewise-plus-20-v1";
+
+        internal const int TempleCultistMinimumLevel = 20;
+
+        internal const int TempleCultistMaximumLevel = 35;
+
         private const int RightHandWeaponSlot = 6;
 
         private static readonly OrdinaryEnemyEquippedFormulaDomain[]
@@ -330,7 +383,22 @@ namespace AORebirth.Core.Playfields
                     MolestedMoleculesMinimumLevel,
                     MolestedMoleculesMaximumLevel,
                     RightHandWeaponSlot,
-                    "122216..122219")
+                    "122216..122219"),
+                TempleCultistDomain(26074, "204747"),
+                TempleCultistDomain(26082, "130163..130164"),
+                TempleCultistDomain(26103, "129028..129029"),
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.TempleCultistRaisedPrimary,
+                    TempleCultistRaisedPrimaryFormulaId,
+                    CapturedTempleOfThreeWindsContentProvider.PlayfieldInstance,
+                    26135,
+                    TempleCultistMinimumLevel,
+                    TempleCultistMaximumLevel,
+                    RightHandWeaponSlot,
+                    "158298..158299"),
+                TempleCultistDomain(26137, "204747"),
+                TempleCultistDomain(26147, "144103..144104"),
+                TempleCultistDomain(26149, "124313..124314")
             };
 
         internal static bool TryGenerate(
@@ -525,6 +593,56 @@ namespace AORebirth.Core.Playfields
                        && highTemplate == 122219
                        && quality >= 21
                        && quality <= 40);
+        }
+
+        internal static bool IsTempleCultistWeaponLoadout(
+            int monsterData,
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            if (quality <= 0)
+            {
+                return false;
+            }
+
+            switch (monsterData)
+            {
+                case 26074:
+                case 26137:
+                    return lowTemplate == 204747 && highTemplate == 204747;
+                case 26082:
+                    return (lowTemplate == 130163 && highTemplate == 130164)
+                           || (lowTemplate == 130164 && highTemplate == 130164);
+                case 26103:
+                    return lowTemplate == 129028 && highTemplate == 129029;
+                case 26135:
+                    return lowTemplate == 158298 && highTemplate == 158299;
+                case 26147:
+                    return (lowTemplate == 144103 && highTemplate == 144103)
+                           || (lowTemplate == 144103 && highTemplate == 144104)
+                           || (lowTemplate == 144104 && highTemplate == 144104);
+                case 26149:
+                    return (lowTemplate == 124313 && highTemplate == 124314)
+                           || (lowTemplate == 124314 && highTemplate == 124314);
+                default:
+                    return false;
+            }
+        }
+
+        private static OrdinaryEnemyEquippedFormulaDomain TempleCultistDomain(
+            int monsterData,
+            string weaponFamilyId)
+        {
+            return new OrdinaryEnemyEquippedFormulaDomain(
+                OrdinaryEnemyEquippedFormulaKind.TempleCultist,
+                TempleCultistFormulaId,
+                CapturedTempleOfThreeWindsContentProvider.PlayfieldInstance,
+                monsterData,
+                TempleCultistMinimumLevel,
+                TempleCultistMaximumLevel,
+                RightHandWeaponSlot,
+                weaponFamilyId);
         }
 
         internal static bool MatchesGeneratedSetup(

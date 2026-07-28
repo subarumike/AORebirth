@@ -9,9 +9,13 @@ import math
 import json
 import re
 import struct
+import sys
 import zlib
 from pathlib import Path
 from typing import Any
+
+if hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits(0)
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -43,6 +47,30 @@ SUBWAY_ORDINARY_CONTENT_PROVIDER = (
     / "Playfields"
     / "CapturedSubwayOrdinaryContentProvider.cs"
 )
+TEMPLE_ORDINARY_CONTENT_PROVIDER = (
+    REPOSITORY_ROOT
+    / "AORebirth"
+    / "Server"
+    / "ZoneEngine"
+    / "Core"
+    / "Playfields"
+    / "CapturedTempleOfThreeWindsContentProvider.cs"
+)
+TEMPLE_ORDINARY_COMBAT_LOADOUT_CATALOG = (
+    REPOSITORY_ROOT
+    / "AORebirth"
+    / "Server"
+    / "ZoneEngine"
+    / "Core"
+    / "Playfields"
+    / "CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs"
+)
+TEMPLE_CULTIST_QUARANTINE_EVIDENCE = (
+    REPOSITORY_ROOT
+    / "docs"
+    / "evidence"
+    / "TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md"
+)
 
 DISOBEDIENT_BOT_OBSERVATIONS = (
     ("20260709-210452", 3469, 5, 0x794E807A),
@@ -73,6 +101,12 @@ STIM_FIEND_PROFILE_IDS = (
 )
 MELDED_PATTERNS_FORMULA_ID = (
     "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1"
+)
+TEMPLE_CULTIST_FORMULA_ID = (
+    "temple-cultist-saw-bounded-level-piecewise-v1"
+)
+TEMPLE_CULTIST_RAISED_PRIMARY_FORMULA_ID = (
+    "temple-cultist-26135-saw-bounded-level-piecewise-plus-20-v1"
 )
 MELDED_PATTERNS_CAPTURED_BASE_VALUES = {
     18: 98,
@@ -513,6 +547,24 @@ def molested_molecules_formula(level: int) -> dict[str, int]:
         "unknown2": value,
         "unknown3": value,
         "unknown4": value,
+    }
+
+
+def temple_cultist_formula(level: int, monster_data: int) -> dict[str, int]:
+    if level < 20 or level > 35:
+        raise ValueError(f"Temple Cultist level outside proven domain: {level}")
+    if level <= 25:
+        base = ((31 * level) - 10) // 2
+    elif level <= 33:
+        base = ((17 * level) - 42) - (level & 1)
+    else:
+        base = (17 * level) - 43
+    fourth = (level + (4 if level <= 25 else 6)) // 2
+    return {
+        "unknown1": base + (20 if monster_data == 26135 else 0),
+        "unknown2": base,
+        "unknown3": base,
+        "unknown4": fourth,
     }
 
 
@@ -1588,8 +1640,336 @@ def build_formula_dataset(
             "Molested Molecules formula differs from capture evidence"
         )
 
+    temple_cultist_observations = []
+    for profile in inventory.get("profiles", []):
+        metadata = profile.get("metadata") or {}
+        if (
+            profile_resource(str(profile.get("profileKey", ""))) != 1931
+            or metadata.get("name") != "Cultist"
+        ):
+            continue
+        monster_data = int(metadata["monsterData"])
+        level = int(metadata["level"])
+        for variant in profile.get("variants", []):
+            if not variant.get("captureEvidenceSafe"):
+                continue
+            saw = variant.get("baseSignature", {}).get(
+                "specialAttackWeapon", {}
+            )
+            weapon = variant.get("baseSignature", {}).get(
+                "weaponItemFullUpdate", {}
+            )
+            streams = variant.get("streams", [])
+            if (
+                not weapon
+                or len(streams) != 1
+                or not streams[0].get("runtimeContractReady")
+            ):
+                continue
+            observed = {
+                f"unknown{index}": int(saw[f"unknown{index}"])
+                for index in range(1, 5)
+            }
+            predicted = temple_cultist_formula(level, monster_data)
+            temple_cultist_observations.append(
+                {
+                    "monsterData": monster_data,
+                    "level": level,
+                    "semanticProfileId": variant.get("semanticProfileId"),
+                    "captureSession": metadata.get("capture"),
+                    "weaponLowTemplate": next(
+                        int(row["value"])
+                        for row in weapon.get("stats", [])
+                        if int(row["stat"]) == 702
+                    ),
+                    "weaponHighTemplate": next(
+                        int(row["value"])
+                        for row in weapon.get("stats", [])
+                        if int(row["stat"]) == 703
+                    ),
+                    "weaponQuality": next(
+                        int(row["value"])
+                        for row in weapon.get("stats", [])
+                        if int(row["stat"]) == 701
+                    ),
+                    "observed": observed,
+                    "prediction": predicted,
+                    "exactMatch": observed == predicted,
+                    "unknown5Observations": sorted(
+                        {
+                            int(row["unknown5"])
+                            for row in variant.get(
+                                "mutableSawStateObservations", []
+                            )
+                        }
+                    ),
+                    "streamSignature": streams[0].get("signature"),
+                    "attackInfoPacketIds": streams[0].get(
+                        "attackInfoPacketIds", []
+                    ),
+                }
+            )
+    if not temple_cultist_observations or any(
+        not row["exactMatch"] for row in temple_cultist_observations
+    ):
+        raise ValueError(
+            "Temple Cultist formula differs from complete capture evidence"
+        )
+
+    temple_monster_data = sorted(
+        {row["monsterData"] for row in temple_cultist_observations}
+    )
+    temple_held_out_validation = []
+    for held_out_monster_data in temple_monster_data:
+        training = [
+            row
+            for row in temple_cultist_observations
+            if row["monsterData"] != held_out_monster_data
+        ]
+        held_out = [
+            row
+            for row in temple_cultist_observations
+            if row["monsterData"] == held_out_monster_data
+        ]
+        temple_held_out_validation.append(
+            {
+                "heldOutMonsterData": held_out_monster_data,
+                "trainingObservationCount": len(training),
+                "heldOutObservationCount": len(held_out),
+                "trainingExact": all(row["exactMatch"] for row in training),
+                "heldOutExact": all(row["exactMatch"] for row in held_out),
+            }
+        )
+    if any(
+        not row["trainingExact"] or not row["heldOutExact"]
+        for row in temple_held_out_validation
+    ):
+        raise ValueError("Temple Cultist cross-family held-out validation failed")
+
+    cultist_actors, cultist_loadouts = temple_active_loadouts()
+    noncultist_actors, noncultist_loadouts = temple_noncultist_loadouts()
+    active_temple_actors = cultist_actors + noncultist_actors
+    active_temple_loadouts = dict(cultist_loadouts)
+    active_temple_loadouts.update(noncultist_loadouts)
+    starting_sources = temple_starting_quarantine_sources()
+    temple_starting_dispositions = []
+    for actor in sorted(
+        (
+            row
+            for row in active_temple_actors
+            if row["sourceIdentity"] in starting_sources
+        ),
+        key=lambda row: row["sourceIdentity"],
+    ):
+        source = actor["sourceIdentity"]
+        stable_loadouts = sorted(
+            {
+                (
+                    row["lowTemplate"],
+                    row["highTemplate"],
+                    row["quality"],
+                    row["slot"],
+                )
+                for row in active_temple_loadouts[source]
+            }
+        )
+        if len(stable_loadouts) != 1:
+            raise ValueError(
+                f"0x{source:08X}: starting actor lacks one exact loadout"
+            )
+        low_template, high_template, quality, slot = stable_loadouts[0]
+        remains_quarantined = source in {0x7983FA22, 0x7983FBC2}
+        temple_starting_dispositions.append(
+            {
+                "sourceIdentity": f"0x{source:08X}",
+                "name": actor.get("name", "Cultist"),
+                "monsterData": actor["monsterData"],
+                "level": actor["level"],
+                "weaponLowTemplate": low_template,
+                "weaponHighTemplate": high_template,
+                "weaponQuality": quality,
+                "slot": slot,
+                "startingDisposition": "quarantined",
+                "finalDisposition": (
+                    "quarantined" if remains_quarantined else "restored"
+                ),
+                "formulaId": (
+                    None
+                    if actor["monsterData"] in (41690, 26090)
+                    else (
+                        TEMPLE_CULTIST_RAISED_PRIMARY_FORMULA_ID
+                        if actor["monsterData"] == 26135
+                        else TEMPLE_CULTIST_FORMULA_ID
+                    )
+                ),
+                "exactBlocker": (
+                    "L18 active WIFU and miss/start evidence exists, but no "
+                    "complete same-level normal AttackInfo contract proves "
+                    "landed-hit semantics for this weapon loadout"
+                    if remains_quarantined
+                    else None
+                ),
+            }
+        )
+    if len(temple_starting_dispositions) != 80:
+        raise ValueError(
+            "expected 80 starting Temple quarantine dispositions, found "
+            f"{len(temple_starting_dispositions)}"
+        )
+    if (
+        sum(
+            row["finalDisposition"] == "restored"
+            for row in temple_starting_dispositions
+        )
+        != 78
+    ):
+        raise ValueError("expected 78 restored Temple starting actors")
+
+    temple_active_bindings = []
+    for disposition in temple_starting_dispositions:
+        if disposition["finalDisposition"] != "restored":
+            continue
+        monster_data = disposition["monsterData"]
+        binding = {
+            "resource": 1931,
+            "name": disposition["name"],
+            "monsterData": monster_data,
+            "configuredSourceIdentity": disposition["sourceIdentity"],
+            "level": disposition["level"],
+            "formulaId": disposition["formulaId"],
+            "finalDisposition": "restored",
+        }
+        if monster_data not in (41690, 26090):
+            compatible_profile_ids = sorted(
+                {
+                    row["semanticProfileId"]
+                    for row in temple_cultist_observations
+                    if row["monsterData"] == monster_data
+                }
+            )
+            if not compatible_profile_ids:
+                raise ValueError(
+                    f"{disposition['sourceIdentity']}: restored Temple Cultist "
+                    "lacks an exact compatible semantic profile"
+                )
+            binding["compatibleSemanticProfileIds"] = compatible_profile_ids
+            binding["generatedSpecialAttackWeaponValues"] = list(
+                temple_cultist_formula(disposition["level"], monster_data).values()
+            )
+        elif monster_data == 41690:
+            binding["formulaId"] = "temple-eternal-sentinel-l20-exact-v1"
+            binding["compatibleSemanticProfileIds"] = [
+                "e037cf6f4165eff5-71ebcc342951c27c",
+                "e037cf6f4165eff5-c036f50d1289554a",
+            ]
+        else:
+            binding["formulaId"] = "temple-murial-faithful-exact-v1"
+        temple_active_bindings.append(binding)
+
+    bound_temple_sources = {
+        row["configuredSourceIdentity"] for row in temple_active_bindings
+    }
+    for actor in sorted(
+        (
+            row
+            for row in active_temple_actors
+            if row.get("name", "Cultist") == "Cultist"
+            and f"0x{row['sourceIdentity']:08X}" not in bound_temple_sources
+        ),
+        key=lambda row: row["sourceIdentity"],
+    ):
+        source = actor["sourceIdentity"]
+        stable_loadouts = sorted(
+            {
+                (
+                    row["lowTemplate"],
+                    row["highTemplate"],
+                    row["quality"],
+                    row["slot"],
+                )
+                for row in active_temple_loadouts[source]
+            }
+        )
+        if len(stable_loadouts) != 1:
+            raise ValueError(
+                f"0x{source:08X}: active Temple Cultist lacks one exact loadout"
+            )
+        monster_data = actor["monsterData"]
+        compatible_profile_ids = sorted(
+            {
+                row["semanticProfileId"]
+                for row in temple_cultist_observations
+                if row["monsterData"] == monster_data
+            }
+        )
+        if not compatible_profile_ids:
+            raise ValueError(
+                f"0x{source:08X}: active Temple Cultist lacks an exact "
+                "compatible semantic profile"
+            )
+        temple_active_bindings.append(
+            {
+                "resource": 1931,
+                "name": "Cultist",
+                "monsterData": monster_data,
+                "configuredSourceIdentity": f"0x{source:08X}",
+                "level": actor["level"],
+                "formulaId": (
+                    TEMPLE_CULTIST_RAISED_PRIMARY_FORMULA_ID
+                    if monster_data == 26135
+                    else TEMPLE_CULTIST_FORMULA_ID
+                ),
+                "finalDisposition": "already-certified",
+                "compatibleSemanticProfileIds": compatible_profile_ids,
+                "generatedSpecialAttackWeaponValues": list(
+                    temple_cultist_formula(
+                        actor["level"],
+                        monster_data,
+                    ).values()
+                ),
+            }
+        )
+    if len(temple_active_bindings) != 151:
+        raise ValueError(
+            "expected 151 active Temple completion bindings, found "
+            f"{len(temple_active_bindings)}"
+        )
+
+    temple_raw_packet_observations = [
+        {
+            "captureSession": observation["captureSession"],
+            "packetId": packet_id,
+        }
+        for observation in temple_cultist_observations
+        for packet_id in observation["attackInfoPacketIds"]
+    ]
+    temple_raw_packet_observations.extend(
+        [
+            {
+                "captureSession": (
+                    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                    "20260721-043204"
+                ),
+                "packetId": (
+                    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                    "20260721-043204|IN|667|b78141f5ef8a"
+                ),
+            },
+            {
+                "captureSession": (
+                    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                    "20260721-232051"
+                ),
+                "packetId": (
+                    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                    "20260721-232051|IN|11660|b4696ab852c6"
+                ),
+            },
+        ]
+    )
+
     return {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "scope": {
             "runtimeResources": [127, 1931],
             "sourceInventory": (
@@ -2410,6 +2790,206 @@ def build_formula_dataset(
                 },
             ],
         },
+        "templeOrdinaryCombatCompletion": {
+            "resource": 1931,
+            "startingActors": {
+                "certified": 87,
+                "quarantined": 80,
+                "ordinaryTotal": 167,
+            },
+            "finalActors": {
+                "certified": 165,
+                "quarantined": 2,
+                "ordinaryTotal": 167,
+            },
+            "restoredStartingActors": 78,
+            "formulaIds": [
+                TEMPLE_CULTIST_FORMULA_ID,
+                TEMPLE_CULTIST_RAISED_PRIMARY_FORMULA_ID,
+            ],
+            "supportedLevelsInclusive": [20, 35],
+            "numericOutput": {
+                "base": {
+                    "L20To25": "floor((31 * actorLevel - 10) / 2)",
+                    "L26To33": (
+                        "17 * actorLevel - 42 - (actorLevel bitwise-and 1)"
+                    ),
+                    "L34To35": "17 * actorLevel - 43",
+                },
+                "unknown1": (
+                    "base + 20 for MonsterData 26135; base otherwise"
+                ),
+                "unknown2": "base",
+                "unknown3": "base",
+                "unknown4": (
+                    "floor((actorLevel + 4) / 2) for L20..25; "
+                    "floor((actorLevel + 6) / 2) for L26..35"
+                ),
+                "integerArithmetic": (
+                    "checked positive integer arithmetic; division truncates "
+                    "toward zero and therefore equals floor"
+                ),
+                "clamping": "none inside L20..35; fail closed outside",
+                "unknown5": "ordered mutable per-actor state",
+            },
+            "exactCategoricalDomains": [
+                {
+                    "monsterData": 26074,
+                    "weaponPairs": [[204747, 204747]],
+                },
+                {
+                    "monsterData": 26082,
+                    "weaponPairs": [
+                        [130163, 130164],
+                        [130164, 130164],
+                    ],
+                },
+                {
+                    "monsterData": 26103,
+                    "weaponPairs": [[129028, 129029]],
+                },
+                {
+                    "monsterData": 26135,
+                    "weaponPairs": [[158298, 158299]],
+                },
+                {
+                    "monsterData": 26137,
+                    "weaponPairs": [[204747, 204747]],
+                },
+                {
+                    "monsterData": 26147,
+                    "weaponPairs": [
+                        [144103, 144103],
+                        [144103, 144104],
+                        [144104, 144104],
+                    ],
+                },
+                {
+                    "monsterData": 26149,
+                    "weaponPairs": [
+                        [124313, 124314],
+                        [124314, 124314],
+                    ],
+                },
+            ],
+            "sharedCategoricalSemantics": {
+                "attackMode": "equipped",
+                "slot": 6,
+                "instance": 0,
+                "specials": [],
+                "streamCount": 1,
+                "numericHitType": 3,
+                "numericDamageType": 0,
+                "packetOrder": [
+                    "WeaponItemFullUpdate",
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+                "repeatedInitializationIsNotAStream": True,
+                "terminalOutcomesAreNotAdditionalStreams": True,
+            },
+            "runtimeInputOwners": {
+                "actorLevel": "active captured spawn",
+                "weaponTemplatesAndQuality": (
+                    "exact active-spawn WeaponItemFullUpdate catalog"
+                ),
+                "damageRangeCadenceEnergyAndAmmo": (
+                    "active spawn, items.dat, and existing combat runtime"
+                ),
+                "mutableUnknown5": (
+                    "existing ordered per-actor SpecialAttackWeapon state"
+                ),
+            },
+            "completeProfileObservations": temple_cultist_observations,
+            "crossFamilyHeldOutValidation": temple_held_out_validation,
+            "formulaFamiliesTested": [
+                "integer affine",
+                "rational affine",
+                "floor and ceiling division",
+                "nearest-away and nearest-even rounding",
+                "finite differences",
+                "bounded actor-level",
+                "bounded weapon-QL",
+                "level plus QL",
+                "item interpolation",
+                "weapon AttackDelay and RechargeDelay transformations",
+                "attack-rating and initiative transformations",
+                "piecewise breakpoint",
+                "stream-specific",
+                "integer clamps",
+                "existing proven formula families",
+            ],
+            "rejectedCandidates": [
+                {
+                    "candidate": "single affine expression across L20..35",
+                    "reason": (
+                        "exact first differences change at the proven L25/L26 "
+                        "and L33/L34 breakpoints"
+                    ),
+                },
+                {
+                    "candidate": "weapon QL lookup",
+                    "reason": (
+                        "multiple QLs at one level share the same numeric setup "
+                        "and QL1 204747 spans multiple numeric setups"
+                    ),
+                },
+                {
+                    "candidate": "source-identity lookup",
+                    "reason": "source identity is generation-local",
+                },
+                {
+                    "candidate": "nearest-level substitution",
+                    "reason": (
+                        "adjacent captured levels have different exact numeric "
+                        "values"
+                    ),
+                },
+                {
+                    "candidate": "unbounded level domain",
+                    "reason": "levels outside L20..35 lack categorical proof",
+                },
+            ],
+            "rawPacketObservations": temple_raw_packet_observations,
+            "activeBindings": temple_active_bindings,
+            "startingActorDispositions": temple_starting_dispositions,
+            "nonCultistResults": [
+                {
+                    "sourceIdentity": "0x7983FA22",
+                    "name": "Eternal Sentinel",
+                    "monsterData": 41690,
+                    "level": 18,
+                    "finalDisposition": "quarantined",
+                },
+                {
+                    "sourceIdentity": "0x7983FA26",
+                    "name": "Eternal Sentinel",
+                    "monsterData": 41690,
+                    "level": 20,
+                    "finalDisposition": "restored",
+                    "canonicalProfileIds": [
+                        "e037cf6f4165eff5-71ebcc342951c27c",
+                        "e037cf6f4165eff5-c036f50d1289554a",
+                    ],
+                },
+                {
+                    "sourceIdentity": "0x7983FBC2",
+                    "name": "Eternal Sentinel",
+                    "monsterData": 41690,
+                    "level": 18,
+                    "finalDisposition": "quarantined",
+                },
+                {
+                    "sourceIdentity": "0x7987F12D",
+                    "name": "Murial the Faithful",
+                    "monsterData": 26090,
+                    "level": 34,
+                    "finalDisposition": "restored",
+                    "captureContract": "source-local exact packet sequence",
+                },
+            ],
+        },
         "equippedFormulaDomainRegistry": [
             {
                 "formulaId": MELDED_PATTERNS_FORMULA_ID,
@@ -2438,6 +3018,48 @@ def build_formula_dataset(
                 "monsterData": 203746,
                 "levelsInclusive": [17, 25],
                 "weaponFamily": "122216..122219",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_FORMULA_ID,
+                "monsterData": 26074,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "204747",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_FORMULA_ID,
+                "monsterData": 26082,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "130163..130164",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_FORMULA_ID,
+                "monsterData": 26103,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "129028..129029",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_RAISED_PRIMARY_FORMULA_ID,
+                "monsterData": 26135,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "158298..158299",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_FORMULA_ID,
+                "monsterData": 26137,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "204747",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_FORMULA_ID,
+                "monsterData": 26147,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "144103..144104",
+            },
+            {
+                "formulaId": TEMPLE_CULTIST_FORMULA_ID,
+                "monsterData": 26149,
+                "levelsInclusive": [20, 35],
+                "weaponFamily": "124313..124314",
             },
         ],
         "fixedScopeSelectorBindings": {
@@ -2624,6 +3246,506 @@ def inspect_family(inventory: dict[str, Any], family: str) -> None:
     print(json.dumps(matches, indent=2, sort_keys=True))
 
 
+def inspect_temple_cultists(inventory: dict[str, Any]) -> None:
+    rows = []
+    for profile in inventory.get("profiles", []):
+        metadata = profile.get("metadata") or {}
+        if (
+            profile_resource(str(profile.get("profileKey", ""))) != 1931
+            or metadata.get("name") != "Cultist"
+        ):
+            continue
+        for variant in profile.get("variants", []):
+            signature = variant.get("baseSignature") or {}
+            wifu = signature.get("weaponItemFullUpdate") or {}
+            saw = signature.get("specialAttackWeapon") or {}
+            stats = {
+                int(row.get("stat")): row.get("value")
+                for row in wifu.get("stats", [])
+                if isinstance(row.get("stat"), int)
+            }
+            rows.append(
+                {
+                    "monsterData": metadata.get("monsterData"),
+                    "level": metadata.get("level"),
+                    "sourceIdentity": metadata.get("sourceIdentity"),
+                    "profileId": variant.get("semanticProfileId"),
+                    "weaponLowTemplate": stats.get(702),
+                    "weaponHighTemplate": stats.get(703),
+                    "weaponQuality": stats.get(701),
+                    "weaponEnergy": stats.get(26),
+                    "weaponAttackDelay": stats.get(294),
+                    "weaponRechargeDelay": stats.get(210),
+                    "slot": wifu.get("inventorySlot"),
+                    "saw": [
+                        saw.get("unknown1"),
+                        saw.get("unknown2"),
+                        saw.get("unknown3"),
+                        saw.get("unknown4"),
+                        saw.get("unknown5"),
+                    ],
+                    "streams": [
+                        row.get("signature")
+                        for row in variant.get("streams", [])
+                    ],
+                    "captures": sorted(
+                        {
+                            row.get("capture")
+                            for row in variant.get(
+                                "mutableSawStateObservations", []
+                            )
+                            if row.get("capture")
+                        }
+                    ),
+                }
+            )
+    rows.sort(
+        key=lambda row: (
+            row["monsterData"],
+            row["level"],
+            row["weaponLowTemplate"],
+            row["weaponHighTemplate"],
+            row["weaponQuality"],
+            row["profileId"],
+        )
+    )
+    print(
+        "monsterData\tlevel\tsource\tprofileId\tweapon\tQL\tenergy\t"
+        "delay/recharge\tslot\tSAW1:2:3:4:5\tstreams"
+    )
+    for row in rows:
+        print(
+            f"{row['monsterData']}\t{row['level']}\t{row['sourceIdentity']}\t"
+            f"{row['profileId']}\t{row['weaponLowTemplate']}/"
+            f"{row['weaponHighTemplate']}\t{row['weaponQuality']}\t"
+            f"{row['weaponEnergy']}\t{row['weaponAttackDelay']}/"
+            f"{row['weaponRechargeDelay']}\t{row['slot']}\t"
+            f"{':'.join(str(value) for value in row['saw'])}\t"
+            f"{json.dumps(row['streams'], sort_keys=True, separators=(',', ':'))}"
+        )
+
+
+def temple_active_loadouts() -> tuple[
+    list[dict[str, Any]],
+    dict[int, list[dict[str, Any]]],
+]:
+    import extract_capture_backed_npc_combat as extractor
+
+    provider = TEMPLE_ORDINARY_CONTENT_PROVIDER.read_text(encoding="utf-8")
+    pattern = re.compile(
+        r"new SpawnSeed\(0x([0-9A-Fa-f]+),\s*"
+        r"\"totw\.cultist\.(\d+)\",\s*(\d+),.*?"
+        r"\"(\d{8}-\d{6})\"\)",
+        re.DOTALL,
+    )
+    actors = [
+        {
+            "sourceIdentity": int(match.group(1), 16),
+            "monsterData": int(match.group(2)),
+            "level": int(match.group(3)),
+            "capture": match.group(4),
+        }
+        for match in pattern.finditer(provider)
+    ]
+    source_ids = {row["sourceIdentity"] for row in actors}
+    loadouts_by_source: dict[int, list[dict[str, Any]]] = {}
+    for capture in sorted({row["capture"] for row in actors}):
+        records, _, session, errors = extractor.parse_capture(
+            extractor.CAPTURE_ROOT / capture
+        )
+        if not session["canonicalValid"] or errors:
+            raise ValueError(
+                f"{capture}: canonical={session['canonicalValid']} errors={errors}"
+            )
+        for record in records:
+            if (
+                record.message_type != "WeaponItemFullUpdate"
+                or record.source not in source_ids
+            ):
+                continue
+            decoded = record.decoded
+            loadouts_by_source.setdefault(record.source, []).append(
+                {
+                    "capture": capture,
+                    "sequence": record.sequence,
+                    "packetId": record.packet_id,
+                    "lowTemplate": decoded["lowTemplate"],
+                    "highTemplate": decoded["highTemplate"],
+                    "quality": decoded["quality"],
+                    "energy": decoded["energy"],
+                    "slot": decoded["inventorySlot"],
+                    "flags": decoded["flags"],
+                    "attackDelay": decoded["attackDelay"],
+                    "rechargeDelay": decoded["rechargeDelay"],
+                }
+            )
+
+    return actors, loadouts_by_source
+
+
+def inspect_temple_active_loadouts() -> None:
+    actors, loadouts_by_source = temple_active_loadouts()
+    print(
+        "source\tmonsterData\tlevel\tcapture\tloadoutCount\t"
+        "stableLoadouts"
+    )
+    for actor in sorted(
+        actors,
+        key=lambda row: (
+            row["monsterData"],
+            row["level"],
+            row["sourceIdentity"],
+        ),
+    ):
+        observations = loadouts_by_source.get(actor["sourceIdentity"], [])
+        stable = sorted(
+            {
+                (
+                    row["lowTemplate"],
+                    row["highTemplate"],
+                    row["quality"],
+                    row["slot"],
+                    row["flags"],
+                    row["attackDelay"],
+                    row["rechargeDelay"],
+                )
+                for row in observations
+            }
+        )
+        print(
+            f"0x{actor['sourceIdentity']:08X}\t{actor['monsterData']}\t"
+            f"{actor['level']}\t{actor['capture']}\t{len(observations)}\t"
+            f"{json.dumps(stable, separators=(',', ':'))}"
+        )
+
+
+def summarize_temple_active_loadouts() -> None:
+    actors, loadouts_by_source = temple_active_loadouts()
+    summary: dict[int, dict[str, Any]] = {}
+    for actor in actors:
+        observations = loadouts_by_source.get(actor["sourceIdentity"], [])
+        stable = {
+            (
+                row["lowTemplate"],
+                row["highTemplate"],
+                row["quality"],
+                row["slot"],
+            )
+            for row in observations
+        }
+        if len(stable) != 1:
+            raise ValueError(
+                f"0x{actor['sourceIdentity']:08X}: expected one stable WIFU loadout"
+            )
+        low_template, high_template, quality, slot = next(iter(stable))
+        group = summary.setdefault(
+            actor["monsterData"],
+            {
+                "actors": 0,
+                "levels": set(),
+                "loadouts": set(),
+                "qualities": set(),
+            },
+        )
+        group["actors"] += 1
+        group["levels"].add(actor["level"])
+        group["loadouts"].add((low_template, high_template, slot))
+        group["qualities"].add(quality)
+
+    normalized = {
+        str(monster_data): {
+            "actors": group["actors"],
+            "levels": sorted(group["levels"]),
+            "loadouts": sorted(group["loadouts"]),
+            "qualities": sorted(group["qualities"]),
+        }
+        for monster_data, group in sorted(summary.items())
+    }
+    print(json.dumps(normalized, indent=2, sort_keys=True))
+
+
+def temple_noncultist_loadouts() -> tuple[
+    list[dict[str, Any]],
+    dict[int, list[dict[str, Any]]],
+]:
+    import extract_capture_backed_npc_combat as extractor
+
+    sources = {
+        0x7983FA22: ("Eternal Sentinel", 41690, 18),
+        0x7983FA26: ("Eternal Sentinel", 41690, 20),
+        0x7983FBC2: ("Eternal Sentinel", 41690, 18),
+        0x7987F12D: ("Murial the Faithful", 26090, 34),
+    }
+    observations: dict[int, list[dict[str, Any]]] = {
+        source: [] for source in sources
+    }
+    for capture in (
+        "20260721-041439",
+        "20260721-042139",
+        "20260721-043204",
+        "20260721-232051",
+        "20260721-234614",
+    ):
+        records, _, session, errors = extractor.parse_capture(
+            extractor.CAPTURE_ROOT / capture
+        )
+        if not session["canonicalValid"] or errors:
+            raise ValueError(
+                f"{capture}: canonical={session['canonicalValid']} errors={errors}"
+            )
+        for record in records:
+            if (
+                record.message_type != "WeaponItemFullUpdate"
+                or record.source not in sources
+            ):
+                continue
+            decoded = record.decoded
+            observations[record.source].append(
+                {
+                    "capture": capture,
+                    "sequence": record.sequence,
+                    "packetId": record.packet_id,
+                    "lowTemplate": decoded["lowTemplate"],
+                    "highTemplate": decoded["highTemplate"],
+                    "quality": decoded["quality"],
+                    "energy": decoded["energy"],
+                    "slot": decoded["inventorySlot"],
+                    "flags": decoded["flags"],
+                    "attackDelay": decoded["attackDelay"],
+                    "rechargeDelay": decoded["rechargeDelay"],
+                }
+            )
+    actors = []
+    for source, (name, monster_data, level) in sources.items():
+        actors.append(
+            {
+                "sourceIdentity": source,
+                "name": name,
+                "monsterData": monster_data,
+                "level": level,
+                "capture": observations[source][0]["capture"]
+                if observations[source]
+                else "",
+            }
+        )
+    return actors, observations
+
+
+def inspect_temple_noncultist_loadouts() -> None:
+    actors, observations = temple_noncultist_loadouts()
+    result = []
+    for actor in actors:
+        source = actor["sourceIdentity"]
+        result.append(
+            {
+                "sourceIdentity": f"0x{source:08X}",
+                "name": actor["name"],
+                "monsterData": actor["monsterData"],
+                "level": actor["level"],
+                "observations": observations[source],
+            }
+        )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def write_temple_active_loadouts() -> None:
+    actors, loadouts_by_source = temple_active_loadouts()
+    noncultist_actors, noncultist_loadouts = temple_noncultist_loadouts()
+    actors.extend(noncultist_actors)
+    loadouts_by_source.update(noncultist_loadouts)
+    entries = []
+    for actor in sorted(actors, key=lambda row: row["sourceIdentity"]):
+        observations = loadouts_by_source.get(actor["sourceIdentity"], [])
+        stable = {
+            (
+                row["lowTemplate"],
+                row["highTemplate"],
+                row["quality"],
+                row["slot"],
+                row["flags"],
+                row["attackDelay"],
+                row["rechargeDelay"],
+            )
+            for row in observations
+        }
+        if len(stable) != 1:
+            raise ValueError(
+                f"0x{actor['sourceIdentity']:08X}: expected one stable WIFU "
+                f"loadout, found {sorted(stable)}"
+            )
+        low_template, high_template, quality, slot, flags, attack_delay, recharge_delay = (
+            next(iter(stable))
+        )
+        if slot != 6 or attack_delay != 235 or recharge_delay != 235:
+            raise ValueError(
+                f"0x{actor['sourceIdentity']:08X}: unsupported WIFU semantics "
+                f"slot={slot} delay={attack_delay}/{recharge_delay}"
+            )
+        first = min(
+            observations,
+            key=lambda row: (row["capture"], row["sequence"], row["packetId"]),
+        )
+        evidence = (
+            f"{first['capture']} packet {first['packetId']} sequence "
+            f"{first['sequence']}: exact active-spawn WIFU; flags={flags}; "
+            f"attack/recharge={attack_delay}/{recharge_delay}"
+        )
+        entries.append(
+            (
+                actor["sourceIdentity"],
+                actor["monsterData"],
+                actor["level"],
+                low_template,
+                high_template,
+                quality,
+                evidence,
+            )
+        )
+
+    lines = [
+        "// <auto-generated />",
+        "namespace AORebirth.Core.Playfields",
+        "{",
+        "    using System;",
+        "    using System.Collections.Generic;",
+        "",
+        "    internal static class CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog",
+        "    {",
+        "        private static readonly IReadOnlyDictionary<int, Entry> Entries =",
+        "            new Dictionary<int, Entry>",
+        "            {",
+    ]
+    for (
+        source_identity,
+        monster_data,
+        level,
+        low_template,
+        high_template,
+        quality,
+        evidence,
+    ) in entries:
+        escaped_evidence = evidence.replace("\\", "\\\\").replace('"', '\\"')
+        lines.append(
+            "                { unchecked((int)0x"
+            f"{source_identity:08X}u), new Entry("
+            f"{monster_data}, {level}, {low_template}, {high_template}, "
+            f"{quality}, \"{escaped_evidence}\") }},"
+        )
+    lines.extend(
+        [
+            "            };",
+            "",
+            "        internal static OrdinaryEnemySpawnWeaponLoadout Resolve(",
+            "            int sourceIdentity,",
+            "            int monsterData,",
+            "            int level)",
+            "        {",
+            "            Entry entry;",
+            "            if (!Entries.TryGetValue(sourceIdentity, out entry))",
+            "            {",
+            "                throw new InvalidOperationException(",
+            '                    "No exact active-spawn WIFU for Temple source 0x"',
+            '                    + sourceIdentity.ToString("X8"));',
+            "            }",
+            "",
+            "            if (entry.MonsterData != monsterData || entry.Level != level)",
+            "            {",
+            "                throw new InvalidOperationException(",
+            '                    "Temple active-spawn WIFU correlation mismatch for source 0x"',
+            '                    + sourceIdentity.ToString("X8"));',
+            "            }",
+            "",
+            "            return new OrdinaryEnemySpawnWeaponLoadout(",
+            "                entry.LowTemplate,",
+            "                entry.HighTemplate,",
+            "                entry.Quality,",
+            "                entry.Evidence);",
+            "        }",
+            "",
+            "        private sealed class Entry",
+            "        {",
+            "            internal Entry(",
+            "                int monsterData,",
+            "                int level,",
+            "                int lowTemplate,",
+            "                int highTemplate,",
+            "                int quality,",
+            "                string evidence)",
+            "            {",
+            "                this.MonsterData = monsterData;",
+            "                this.Level = level;",
+            "                this.LowTemplate = lowTemplate;",
+            "                this.HighTemplate = highTemplate;",
+            "                this.Quality = quality;",
+            "                this.Evidence = evidence;",
+            "            }",
+            "",
+            "            internal int MonsterData { get; private set; }",
+            "            internal int Level { get; private set; }",
+            "            internal int LowTemplate { get; private set; }",
+            "            internal int HighTemplate { get; private set; }",
+            "            internal int Quality { get; private set; }",
+            "            internal string Evidence { get; private set; }",
+            "        }",
+            "    }",
+            "}",
+            "",
+        ]
+    )
+    output = "\n".join(lines)
+    TEMPLE_ORDINARY_COMBAT_LOADOUT_CATALOG.write_text(
+        output,
+        encoding="utf-8",
+        newline="\n",
+    )
+    print(
+        f"wrote {len(entries)} exact Temple active-spawn WIFU loadouts to "
+        f"{TEMPLE_ORDINARY_COMBAT_LOADOUT_CATALOG}"
+    )
+
+
+def inspect_temple_active_coverage(active_coverage: dict[str, Any]) -> None:
+    rows = [
+        row
+        for row in active_coverage.get("profiles", [])
+        if row.get("runtimePlayfieldOrResource") == 1931
+    ]
+    print(json.dumps(rows, indent=2, sort_keys=True))
+
+
+def temple_starting_quarantine_sources() -> set[int]:
+    evidence = TEMPLE_CULTIST_QUARANTINE_EVIDENCE.read_text(encoding="utf-8")
+    start = evidence.index("## Every resolver-rejected active row")
+    end = evidence.index("\n## ", start + 4)
+    cultist_sources = {
+        int(value, 16)
+        for value in re.findall(r"`0x([0-9A-Fa-f]{8})`", evidence[start:end])
+    }
+    if len(cultist_sources) != 76:
+        raise ValueError(
+            "expected 76 starting Cultist quarantine sources, found "
+            f"{len(cultist_sources)}"
+        )
+    return cultist_sources | {
+        0x7983FA22,
+        0x7983FA26,
+        0x7983FBC2,
+        0x7987F12D,
+    }
+
+
+def emit_temple_starting_quarantine_constant(
+    active_coverage: dict[str, Any],
+) -> None:
+    del active_coverage
+    identities = temple_starting_quarantine_sources()
+    print("TEMPLE_ORDINARY_STARTING_QUARANTINE_SOURCES = {")
+    for source in sorted(identities):
+        print(f"    0x{source:08X},")
+    print("}")
+    print(f"# count={len(identities)}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--inventory", type=Path, default=DEFAULT_INVENTORY)
@@ -2640,6 +3762,16 @@ def main() -> int:
     parser.add_argument("--inspect-monster-data", type=int)
     parser.add_argument("--inspect-profile-key")
     parser.add_argument("--inspect-special-templates", nargs=2, type=int)
+    parser.add_argument("--inspect-temple-cultists", action="store_true")
+    parser.add_argument("--inspect-temple-active-loadouts", action="store_true")
+    parser.add_argument("--summarize-temple-active-loadouts", action="store_true")
+    parser.add_argument("--inspect-temple-noncultist-loadouts", action="store_true")
+    parser.add_argument("--write-temple-active-loadouts", action="store_true")
+    parser.add_argument("--inspect-temple-active-coverage", action="store_true")
+    parser.add_argument(
+        "--emit-temple-starting-quarantine-constant",
+        action="store_true",
+    )
     parser.add_argument("--search-disobedient-formula", action="store_true")
     parser.add_argument("--search-stim-formula", action="store_true")
     parser.add_argument("--search-melded-formula", action="store_true")
@@ -2711,6 +3843,29 @@ def main() -> int:
                     }
                 )
         print(json.dumps(matches, sort_keys=True, separators=(",", ":")))
+        return 0
+    if arguments.inspect_temple_cultists:
+        inspect_temple_cultists(inventory)
+        return 0
+    if arguments.inspect_temple_active_loadouts:
+        inspect_temple_active_loadouts()
+        return 0
+    if arguments.summarize_temple_active_loadouts:
+        summarize_temple_active_loadouts()
+        return 0
+    if arguments.inspect_temple_noncultist_loadouts:
+        inspect_temple_noncultist_loadouts()
+        return 0
+    if arguments.write_temple_active_loadouts:
+        write_temple_active_loadouts()
+        return 0
+    if arguments.inspect_temple_active_coverage:
+        inspect_temple_active_coverage(load_json(arguments.active_coverage))
+        return 0
+    if arguments.emit_temple_starting_quarantine_constant:
+        emit_temple_starting_quarantine_constant(
+            load_json(arguments.active_coverage)
+        )
         return 0
     if arguments.search_stim_formula:
         candidates = affine_candidates(STIM_FIEND_CAPTURED_VALUES)

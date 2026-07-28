@@ -25,6 +25,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
+if hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits(0)
+
 
 EXPECTED_INITIAL_ACTORS = 1512
 
@@ -1987,6 +1990,7 @@ def build_inventory(
             formula_dataset.get("incompleteRebuildFormula", {}),
             formula_dataset.get("molestedMoleculesFormula", {}),
             formula_dataset.get("fixedScopeSelectorBindings", {}),
+            formula_dataset.get("templeOrdinaryCombatCompletion", {}),
         ]
         for formula in formulas:
             capture_sessions = sorted_unique(
