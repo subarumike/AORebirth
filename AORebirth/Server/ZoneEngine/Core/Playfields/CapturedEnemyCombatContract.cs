@@ -2121,20 +2121,6 @@ namespace AORebirth.Core.Playfields
             unchecked((int)0x795451D3)
         };
 
-        private static readonly int[] FragmentedSoulSourceInstances =
-        {
-            unchecked((int)0x7954516A),
-            unchecked((int)0x7954516F),
-            unchecked((int)0x7954517A),
-            unchecked((int)0x7954518A),
-            unchecked((int)0x7954518B),
-            unchecked((int)0x7954518E),
-            unchecked((int)0x795451AA),
-            unchecked((int)0x795451AE),
-            unchecked((int)0x79545248),
-            unchecked((int)0x79545367)
-        };
-
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
             return For(name, monsterData, null);
@@ -2895,42 +2881,75 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
                 ? null
                 : variant.WeaponLoadout;
+            OrdinaryEnemyCombatNumericSetup generated;
             string atomicFailure = string.Empty;
             if (!hasExactCombatEvidence
                 || archetype == null
-                || Array.IndexOf(FragmentedSoulSourceInstances, sourceInstance) < 0
                 || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
                     FragmentedSoulMonsterData,
                     sourceInstance,
                     variant,
                     generationEvidence,
-                    out atomicFailure))
+                    out atomicFailure)
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        archetype.MonsterData,
+                        variant.Level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot),
+                    out generated))
             {
                 return CapturedEnemyCombatContract.Unresolved(
-                    "Fragmented Soul combat requires one exact reviewed atomic level/stat/weapon generation for the selected source",
+                    "Fragmented Soul combat requires one exact owner-linked weapon generation inside the proven mathematical setup domain",
                     hasExactCombatEvidence);
             }
 
-            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
-                string.Format(
-                    "{0}: Fragmented Soul source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; two normal local-player hits span 18..23 with ammo 24, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; uniform selection over distinct captured generations is private policy",
-                    weapon.Evidence,
+            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    string.Format(
+                        "{0}: Fragmented Soul source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5}; numeric SAW setup={6}; item owns damage, range, and cadence",
+                        weapon.Evidence,
+                        sourceInstance,
+                        variant.Level,
+                        weapon.Quality,
+                        weapon.LowId,
+                        weapon.HighId,
+                        generated.FormulaId),
                     sourceInstance,
-                    variant.Level,
-                    weapon.Quality,
                     weapon.LowId,
-                    weapon.HighId),
-                weapon.LowId,
-                weapon.HighId,
-                weapon.Quality,
-                (int)WeaponSlots.Righthand,
-                24,
-                (int)WeaponSlots.Righthand,
-                0,
-                0,
-                0,
-                0)
+                    weapon.HighId,
+                    weapon.Quality,
+                    NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues()
                 .WithProductionWeaponQuality();
+            return contract;
         }
 
         private static CapturedEnemyCombatContract ForRedundantScan(

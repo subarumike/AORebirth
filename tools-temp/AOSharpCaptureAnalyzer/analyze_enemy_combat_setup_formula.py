@@ -34,6 +34,15 @@ DEFAULT_OUTPUT = (
     / "generated"
     / "enemy_combat_setup_formula_dataset.json"
 )
+SUBWAY_ORDINARY_CONTENT_PROVIDER = (
+    REPOSITORY_ROOT
+    / "AORebirth"
+    / "Server"
+    / "ZoneEngine"
+    / "Core"
+    / "Playfields"
+    / "CapturedSubwayOrdinaryContentProvider.cs"
+)
 
 DISOBEDIENT_BOT_OBSERVATIONS = (
     ("20260709-210452", 3469, 5, 0x794E807A),
@@ -108,6 +117,39 @@ MELDED_PATTERNS_STARTING_QUARANTINE_SOURCES = {
     "0x79545198",
     "0x795451BA",
 }
+FRAGMENTED_SOUL_FORMULA_ID = (
+    "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1"
+)
+FRAGMENTED_SOUL_CAPTURED_VALUES = {
+    17: (101, 101, 101, 117),
+    18: (107, 107, 107, 125),
+    19: (113, 113, 113, 131),
+    20: (119, 119, 119, 139),
+    21: (125, 125, 125, 145),
+}
+FRAGMENTED_SOUL_OBSERVATIONS = (
+    ("20260716-222007", 316, 17, 0x7970245D, "complete-chain"),
+    ("20260709-222339", 5883, 17, 0x7954516A, "complete-chain"),
+    ("20260709-222339", 6244, 17, 0x7954516F, "orphan-prefix"),
+    ("20260712-223719", 2970, 18, 0x796079B3, "complete-chain"),
+    ("20260709-222339", 3243, 18, 0x79545248, "complete-chain"),
+    ("20260720-051714", 3474, 18, 0x7980F138, "complete-chain"),
+    ("20260709-222339", 6922, 18, 0x7954518B, "orphan-prefix"),
+    ("20260709-222339", 7119, 18, 0x7954518E, "orphan-prefix"),
+    ("20260709-222339", 6542, 19, 0x7954517A, "orphan-prefix"),
+    ("20260720-051714", 4465, 19, 0x7980F12F, "orphan-prefix"),
+    ("20260720-051714", 5469, 20, 0x7980F122, "complete-chain"),
+    ("20260709-222339", 6915, 20, 0x7954518A, "orphan-prefix"),
+    ("20260720-051714", 5456, 20, 0x7980F125, "orphan-prefix"),
+    ("20260709-225408", 12066, 21, 0x795451AA, "complete-chain"),
+    ("20260709-222339", 8817, 21, 0x795451AE, "complete-chain"),
+    ("20260709-225408", 11681, 21, 0x795451AE, "complete-chain"),
+    ("20260720-051714", 5833, 21, 0x7980F120, "complete-chain"),
+    ("20260709-222339", 8994, 21, 0x795451AA, "orphan-prefix"),
+    ("20260709-222339", 9713, 21, 0x795451AA, "orphan-prefix"),
+    ("20260709-225408", 12011, 21, 0x795451AA, "orphan-prefix"),
+    ("20260709-225408", 11631, 21, 0x795451AE, "orphan-prefix"),
+)
 
 
 class MessagePackReader:
@@ -442,6 +484,62 @@ def melded_patterns_formula(level: int) -> dict[str, int]:
         "unknown3": base,
         "unknown4": base,
     }
+
+
+def fragmented_soul_formula(level: int) -> dict[str, int]:
+    base = (6 * level) - 1
+    return {
+        "unknown1": base,
+        "unknown2": base,
+        "unknown3": base,
+        "unknown4": base + (2 * (level // 2)),
+    }
+
+
+def fragmented_soul_active_generation_variants() -> list[dict[str, Any]]:
+    provider = SUBWAY_ORDINARY_CONTENT_PROVIDER.read_text(encoding="utf-8")
+    pattern = re.compile(
+        r"new CapturedSubwayGenerationVariantDefinition\("
+        r"203729,\s*0x([0-9A-Fa-f]+),\s*"
+        r"(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*"
+        r"(\d+),\s*(\d+),\s*(\d+),\s*\"([^\"]+)\"\)"
+    )
+    variants = []
+    for match in pattern.finditer(provider):
+        (
+            source,
+            level,
+            health,
+            damage_bonus,
+            attack_rating,
+            defense,
+            weapon_low,
+            weapon_high,
+            weapon_quality,
+            evidence,
+        ) = match.groups()
+        variants.append(
+            {
+                "resource": 127,
+                "name": "Fragmented Soul",
+                "monsterData": 203729,
+                "configuredSourceIdentity": f"0x{int(source, 16):08X}",
+                "level": int(level),
+                "health": int(health),
+                "damageBonus": int(damage_bonus),
+                "attackRating": int(attack_rating),
+                "defense": int(defense),
+                "weaponLowTemplate": int(weapon_low),
+                "weaponHighTemplate": int(weapon_high),
+                "actorQualityLevel": int(weapon_quality),
+                "ownerEvidence": evidence,
+                "formulaId": FRAGMENTED_SOUL_FORMULA_ID,
+                "generatedSpecialAttackWeaponValues": (
+                    fragmented_soul_formula(int(level))
+                ),
+            }
+        )
+    return variants
 
 
 def stim_fiend_chain_evidence(
@@ -1084,6 +1182,156 @@ def build_formula_dataset(
                 }
             )
 
+    fragmented_profiles = [
+        profile
+        for profile in inventory.get("profiles", [])
+        if (profile.get("metadata") or {}).get("monsterData") == 203729
+        and (profile.get("metadata") or {}).get("name") == "Fragmented Soul"
+        and profile_resource(str(profile.get("profileKey", ""))) == 127
+    ]
+    fragmented_profile_ids = sorted(
+        variant.get("semanticProfileId")
+        for profile in fragmented_profiles
+        for variant in profile.get("variants", [])
+        if variant.get("semanticProfileId")
+    )
+    fragmented_raw_observations = []
+    for (
+        capture,
+        sequence,
+        level,
+        source_identity,
+        chain_classification,
+    ) in FRAGMENTED_SOUL_OBSERVATIONS:
+        packet = read_raw_packet(capture, sequence)
+        predicted = fragmented_soul_formula(level)
+        observed = {
+            f"unknown{index}": packet[f"unknown{index}"]
+            for index in range(1, 5)
+        }
+        packet.update(
+            {
+                "level": level,
+                "sourceIdentity": f"0x{source_identity:08X}",
+                "chainClassification": chain_classification,
+                "formulaId": FRAGMENTED_SOUL_FORMULA_ID,
+                "formulaPrediction": predicted,
+                "exactMatch": observed == predicted,
+            }
+        )
+        fragmented_raw_observations.append(packet)
+
+    fragmented_leave_one_out = []
+    for held_out_level, held_out_values in sorted(
+        FRAGMENTED_SOUL_CAPTURED_VALUES.items()
+    ):
+        training = {
+            str(level): {
+                f"unknown{index + 1}": value
+                for index, value in enumerate(values)
+            }
+            for level, values in sorted(
+                FRAGMENTED_SOUL_CAPTURED_VALUES.items()
+            )
+            if level != held_out_level
+        }
+        prediction = fragmented_soul_formula(held_out_level)
+        observed = {
+            f"unknown{index + 1}": value
+            for index, value in enumerate(held_out_values)
+        }
+        fragmented_leave_one_out.append(
+            {
+                "heldOutLevel": held_out_level,
+                "heldOutObserved": observed,
+                "trainingObservations": training,
+                "candidateFormulaSatisfiedAllTrainingObservations": all(
+                    fragmented_soul_formula(int(level)) == value
+                    for level, value in training.items()
+                ),
+                "prediction": prediction,
+                "exactMatch": prediction == observed,
+            }
+        )
+
+    fragmented_generation_variants = (
+        fragmented_soul_active_generation_variants()
+    )
+    variants_by_source: dict[str, list[dict[str, Any]]] = {}
+    for variant in fragmented_generation_variants:
+        variants_by_source.setdefault(
+            variant["configuredSourceIdentity"], []
+        ).append(variant)
+    fragmented_active_bindings = []
+    fragmented_active_actors = []
+    for row in active_coverage.get("profiles", []):
+        if (
+            row.get("runtimePlayfieldOrResource") != 127
+            or row.get("name") != "Fragmented Soul"
+            or row.get("monsterData") != 203729
+        ):
+            continue
+        source_identity = row.get("configuredSourceIdentity")
+        atomic_variants = variants_by_source.get(source_identity, [])
+        fragmented_active_actors.append(
+            {
+                "resource": 127,
+                "name": "Fragmented Soul",
+                "monsterData": 203729,
+                "actorCount": row.get("actorCount", 0),
+                "configuredSourceIdentity": source_identity,
+                "formulaId": FRAGMENTED_SOUL_FORMULA_ID,
+                "compatibleSemanticProfileIds": fragmented_profile_ids,
+                "atomicVariants": atomic_variants,
+            }
+        )
+        for level in sorted(
+            {variant["level"] for variant in atomic_variants}
+        ):
+            fragmented_active_bindings.append(
+                {
+                    "resource": 127,
+                    "name": "Fragmented Soul",
+                    "monsterData": 203729,
+                    "level": level,
+                    "actorCount": row.get("actorCount", 0),
+                    "configuredSourceIdentity": source_identity,
+                    "formulaId": FRAGMENTED_SOUL_FORMULA_ID,
+                    "compatibleSemanticProfileIds": fragmented_profile_ids,
+                    "atomicVariants": [
+                        variant
+                        for variant in atomic_variants
+                        if variant["level"] == level
+                    ],
+                }
+            )
+
+    fragmented_cross_family = []
+    for profile in inventory.get("profiles", []):
+        metadata = profile.get("metadata") or {}
+        if metadata.get("monsterData") == 203729:
+            continue
+        for variant in profile.get("variants", []):
+            signature = variant.get("baseSignature", {})
+            wifu = signature.get("weaponItemFullUpdate") or {}
+            if (
+                wifu.get("lowTemplate") not in range(123685, 123704)
+                and wifu.get("highTemplate") not in range(123685, 123704)
+            ):
+                continue
+            fragmented_cross_family.append(
+                {
+                    "name": metadata.get("name"),
+                    "monsterData": metadata.get("monsterData"),
+                    "level": metadata.get("level"),
+                    "semanticProfileId": variant.get("semanticProfileId"),
+                    "reasonExcluded": (
+                        "family and MonsterData are outside the exact "
+                        "Fragmented Soul selector"
+                    ),
+                }
+            )
+
     if any(not row["exactMatch"] for row in observations):
         raise ValueError("accepted formula differs from a raw SAW observation")
     if any(not row["exactMatch"] for row in leave_one_out):
@@ -1139,6 +1387,53 @@ def build_formula_dataset(
         raise ValueError(
             "expected 11 complete Melded Patterns semantic profiles, found "
             f"{len(melded_profile_ids)}"
+        )
+    if len(fragmented_profiles) != 5:
+        raise ValueError(
+            "expected five Fragmented Soul level profiles, found "
+            f"{len(fragmented_profiles)}"
+        )
+    if len(fragmented_profile_ids) != 8:
+        raise ValueError(
+            "expected eight complete Fragmented Soul semantic profiles, found "
+            f"{len(fragmented_profile_ids)}"
+        )
+    if sum(
+        int(profile.get("normalCompleteChainCount", 0))
+        for profile in fragmented_profiles
+    ) != 22:
+        raise ValueError("expected 22 complete Fragmented Soul combat chains")
+    if len(fragmented_raw_observations) != 21:
+        raise ValueError("expected 21 unique raw Fragmented Soul SAW packets")
+    if any(not row["exactMatch"] for row in fragmented_raw_observations):
+        raise ValueError(
+            "Fragmented Soul formula differs from a raw SAW packet"
+        )
+    if any(not row["exactMatch"] for row in fragmented_leave_one_out):
+        raise ValueError(
+            "Fragmented Soul formula failed leave-one-out validation"
+        )
+    if len(fragmented_active_actors) != 10:
+        raise ValueError(
+            "expected 10 active Fragmented Soul actors, found "
+            f"{len(fragmented_active_actors)}"
+        )
+    if len(fragmented_active_bindings) != 16:
+        raise ValueError(
+            "expected 16 source-level Fragmented Soul bindings, found "
+            f"{len(fragmented_active_bindings)}"
+        )
+    if len(fragmented_generation_variants) != 19:
+        raise ValueError(
+            "expected 19 active Fragmented Soul generation variants, found "
+            f"{len(fragmented_generation_variants)}"
+        )
+    if any(
+        not 17 <= variant["level"] <= 21
+        for variant in fragmented_generation_variants
+    ):
+        raise ValueError(
+            "Fragmented Soul active generation level is outside 17..21"
         )
 
     return {
@@ -1471,6 +1766,205 @@ def build_formula_dataset(
                 },
             ],
         },
+        "fragmentedSoulFormula": {
+            "formulaId": FRAGMENTED_SOUL_FORMULA_ID,
+            "family": "Fragmented Soul",
+            "monsterData": 203729,
+            "resource": 127,
+            "supportedLevelsInclusive": [17, 21],
+            "exactCategoricalDomains": [
+                {
+                    "actorQualityLevelsInclusive": [1, 19],
+                    "weaponLowTemplate": 123685,
+                    "weaponHighTemplate": 123686,
+                },
+                {
+                    "actorQualityLevelsInclusive": [20, 20],
+                    "weaponLowTemplate": 123686,
+                    "weaponHighTemplate": 123686,
+                },
+                {
+                    "actorQualityLevelsInclusive": [21, 21],
+                    "weaponLowTemplate": 123687,
+                    "weaponHighTemplate": 123687,
+                },
+                {
+                    "actorQualityLevelsInclusive": [22, 40],
+                    "weaponLowTemplate": 123687,
+                    "weaponHighTemplate": 123688,
+                },
+            ],
+            "sharedCategoricalSemantics": {
+                "attackMode": "equipped",
+                "weaponFamily": "items.dat interpolation list 123685..123703",
+                "weaponItemFullUpdateSlot": 6,
+                "weaponItemFullUpdateInstance": 0,
+                "weaponItemFullUpdateStateMachine": [1000015, 0],
+                "weaponItemFullUpdateUnknown1": 11,
+                "weaponItemFullUpdateUnknown2": 262,
+                "weaponItemFullUpdateUnknown3": 0,
+                "weaponItemFullUpdateFlags": 1027,
+                "weaponItemFullUpdateMultipleCount": 1,
+                "weaponItemFullUpdateEnergy": 25,
+                "specials": [],
+                "specialAttackWeaponN3": 0,
+                "attackN3": 0,
+                "attackAction": 0,
+                "streamCount": 1,
+                "streamOrdinal": 0,
+                "numericHitType": 3,
+                "numericDamageType": 0,
+                "packetOrder": [
+                    "WeaponItemFullUpdate",
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+                "terminalOutcomesAreNotAdditionalStreams": True,
+            },
+            "numericOutput": {
+                "fields": {
+                    "SpecialAttackWeapon.unknown1": "base",
+                    "SpecialAttackWeapon.unknown2": "base",
+                    "SpecialAttackWeapon.unknown3": "base",
+                    "SpecialAttackWeapon.unknown4": (
+                        "base + 2 * floor(actorLevel / 2)"
+                    ),
+                },
+                "baseExpression": "6 * actorLevel - 1",
+                "integerArithmetic": (
+                    "positive C# integer division equals floor"
+                ),
+                "clamping": "none inside the proven level domain",
+                "unknown5": (
+                    "per-actor ordered mutable capture state; not formula identity"
+                ),
+            },
+            "runtimeInputOwners": {
+                "actorLevelQualityAndLoadout": (
+                    "CapturedSubwayGenerationVariantDefinition in "
+                    "CapturedSubwayOrdinaryContentProvider"
+                ),
+                "monsterDataAndFamily": (
+                    "CapturedSubwayOrdinaryArchetypeDefinition"
+                ),
+                "weaponTemplates": (
+                    "owner-linked generation variant plus items.dat "
+                    "interpolation-domain validation"
+                ),
+                "weaponSlotAndInstance": (
+                    "NpcCombatAttackRules capture-bound Fragmented Soul constants"
+                ),
+                "weaponQlAcgItemLevelDamageRangeAndCadence": (
+                    "active spawn, items.dat, and existing production combat owners"
+                ),
+                "mutableEnergyAmmoAndSawState": (
+                    "existing per-actor combat contract/runtime state"
+                ),
+            },
+            "formulaFamiliesTested": [
+                "exact affine integer formulas",
+                "exact affine rational formulas",
+                "floor division",
+                "ceiling division",
+                "nearest-away division",
+                "nearest-even division",
+                "finite differences",
+                "bounded actor-level formulas",
+                "weapon-quality-only formulas",
+                "item-template transformations",
+                "AttackDelay and RechargeDelay transformations",
+                "stream-specific formulas",
+                "breakpoint and piecewise formulas",
+                "integer clamps",
+                "unbounded extensions",
+            ],
+            "capturedValuesByLevel": {
+                str(level): {
+                    f"unknown{index + 1}": value
+                    for index, value in enumerate(values)
+                }
+                for level, values in sorted(
+                    FRAGMENTED_SOUL_CAPTURED_VALUES.items()
+                )
+            },
+            "rawPacketObservations": fragmented_raw_observations,
+            "leaveOneOut": fragmented_leave_one_out,
+            "crossFamilyHeldOut": {
+                "observations": fragmented_cross_family,
+                "exactMatches": 0,
+                "conclusion": (
+                    "no other family enters the exact MonsterData, equipped "
+                    "weapon-domain, slot, and stream selector"
+                ),
+            },
+            "activeBindings": sorted(
+                fragmented_active_bindings,
+                key=lambda row: (
+                    row["configuredSourceIdentity"],
+                    row["level"],
+                ),
+            ),
+            "activeActors": sorted(
+                fragmented_active_actors,
+                key=lambda row: row["configuredSourceIdentity"],
+            ),
+            "activeGenerationVariants": sorted(
+                fragmented_generation_variants,
+                key=lambda row: (
+                    row["configuredSourceIdentity"],
+                    row["level"],
+                    row["actorQualityLevel"],
+                    row["weaponLowTemplate"],
+                    row["weaponHighTemplate"],
+                ),
+            ),
+            "compatibleSemanticProfileIds": fragmented_profile_ids,
+            "rejectedCandidates": [
+                {
+                    "candidate": "Unknown4 = 7 * actorLevel - 1",
+                    "mismatches": 3,
+                    "reason": "captured odd levels 17, 19, and 21 are one lower",
+                },
+                {
+                    "candidate": "Unknown4 = 7 * actorLevel - 2",
+                    "mismatches": 2,
+                    "reason": "captured even levels 18 and 20 are one higher",
+                },
+                {
+                    "candidate": "four identical SAW fields",
+                    "mismatches": len(fragmented_raw_observations),
+                    "reason": (
+                        "Unknown4 exceeds the shared base in every raw packet"
+                    ),
+                },
+                {
+                    "candidate": "weapon QL as the sole numeric input",
+                    "mismatches": 6,
+                    "reason": (
+                        "QL14, QL17, QL18, QL19, and QL25 occur at "
+                        "different actor levels with different exact SAW values"
+                    ),
+                },
+                {
+                    "candidate": "direct item-template interpolation",
+                    "mismatches": len(
+                        FRAGMENTED_SOUL_CAPTURED_VALUES
+                    ),
+                    "reason": (
+                        "items.dat selects loadout, damage, range, and cadence "
+                        "but does not encode the observed SAW values"
+                    ),
+                },
+                {
+                    "candidate": "unbounded Fragmented Soul level domain",
+                    "reason": (
+                        "levels below 17 and above 21 lack categorical and "
+                        "formula proof"
+                    ),
+                },
+            ],
+        },
         "rejectedCandidates": [
             {
                 "candidate": "exact unrounded affine line",
@@ -1578,6 +2072,7 @@ def main() -> int:
     parser.add_argument("--search-disobedient-formula", action="store_true")
     parser.add_argument("--search-stim-formula", action="store_true")
     parser.add_argument("--search-melded-formula", action="store_true")
+    parser.add_argument("--search-fragmented-formula", action="store_true")
     arguments = parser.parse_args()
 
     inventory = load_json(arguments.inventory)
@@ -1697,6 +2192,32 @@ def main() -> int:
             )
         )
         return 0
+    if arguments.search_fragmented_formula:
+        unknown4_observations = {
+            level: values[3]
+            for level, values in FRAGMENTED_SOUL_CAPTURED_VALUES.items()
+        }
+        candidates = affine_candidates(
+            unknown4_observations,
+            maximum_denominator=64,
+        )
+        print(
+            json.dumps(
+                {
+                    "capturedValues": FRAGMENTED_SOUL_CAPTURED_VALUES,
+                    "singleAffineCandidateCountForUnknown4": len(candidates),
+                    "selectedFormulaId": FRAGMENTED_SOUL_FORMULA_ID,
+                    "selectedPredictions": {
+                        level: fragmented_soul_formula(level)
+                        for level in range(17, 22)
+                    },
+                    "supportedLevelsInclusive": [17, 21],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
     if arguments.search_disobedient_formula:
         captured = {5: 30, 6: 35, 8: 45, 9: 49, 10: 54}
         candidates = affine_candidates(captured)
@@ -1778,6 +2299,7 @@ def main() -> int:
             "acceptedFormula",
             "stimFiendFormula",
             "meldedPatternsFormula",
+            "fragmentedSoulFormula",
         )
     )
     if arguments.write:

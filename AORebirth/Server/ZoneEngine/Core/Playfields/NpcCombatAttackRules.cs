@@ -264,6 +264,10 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayMeldedPatternsWeaponSlot = 6;
 
+        public const int CapturedSubwayFragmentedSoulMonsterData = 203729;
+
+        public const int CapturedSubwayFragmentedSoulWeaponSlot = 6;
+
         public const int CapturedSubwayAbmouthMonsterData = 155962;
 
         public const int CapturedSubwayAbmouthXopzMinimumDamage = 73;

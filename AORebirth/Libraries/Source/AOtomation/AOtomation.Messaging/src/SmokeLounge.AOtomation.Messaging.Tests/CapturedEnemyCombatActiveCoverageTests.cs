@@ -443,7 +443,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         runtimeCatalog.GetProfiles().Single(
                             value => value.DisplayName == name
                                      && value.MonsterData == monsterData);
-                    if (name == "Melded Patterns")
+                    if (name == "Melded Patterns"
+                        || name == "Fragmented Soul")
                     {
                         OrdinaryEnemySpawnDefinition runtimeSpawn =
                             runtimeCatalog.GetSpawns().Single(
@@ -452,8 +453,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                             == sourceIdentity);
                         OrdinaryEnemySpawnVariant runtimeVariant =
                             runtimeSpawn.LevelDefinition
-                                .GetExplicitVariants().Single(
-                                    value => value.Level == level);
+                                .GetExplicitVariants()
+                                .Where(value => value.Level == level)
+                                .OrderBy(
+                                    value => value.WeaponLoadout == null
+                                                 ? int.MinValue
+                                                 : value.WeaponLoadout.Quality)
+                                .First();
                         runtimeBaseline =
                             runtimeProfile.Combat.ResolveContract(
                                 sourceIdentity,

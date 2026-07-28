@@ -1435,20 +1435,6 @@ namespace AORebirth.Core.Playfields
             0x795451D3
         };
 
-        private static readonly int[] FragmentedSoulSourceInstances =
-        {
-            0x7954516A,
-            0x7954516F,
-            0x7954517A,
-            0x7954518A,
-            0x7954518B,
-            0x7954518E,
-            0x795451AA,
-            0x795451AE,
-            0x79545248,
-            0x79545367
-        };
-
         internal static CapturedEnemyCombatContract For(string name, int monsterData)
         {
             if (monsterData == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData)
@@ -2087,46 +2073,68 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
                 ? null
                 : variant.WeaponLoadout;
+            OrdinaryEnemyCombatNumericSetup generated;
             string atomicFailure = string.Empty;
             if (!hasExactCombatEvidence
-                || !FragmentedSoulSourceInstances.Contains(sourceInstance)
                 || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
                     FragmentedSoulMonsterData,
                     sourceInstance,
                     variant,
                     generationEvidence,
-                    out atomicFailure))
+                    out atomicFailure)
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        archetype.MonsterData,
+                        variant.Level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot),
+                    out generated))
             {
-                return new CapturedEnemyCombatContract
-                {
-                    AttackModel = CapturedEnemyAttackModel.Unresolved,
-                    IsCombatReady = false,
-                    Evidence = "Fragmented Soul atomic generation evidence is incomplete: "
-                               + atomicFailure
-                };
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Fragmented Soul mathematical setup is unsupported",
+                    hasExactCombatEvidence);
             }
 
-            return new CapturedEnemyCombatContract
-            {
-                AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
-                IsCombatReady = true,
-                Retaliates = true,
-                AiProfile = ZoneEngine.Core.NpcAiProfile.Passive,
-                Evidence = weapon.Evidence
-                           + ": Fragmented Soul selected one captured atomic level/stat/weapon generation; "
-                           + "two normal local-player hits span 18..23; item owns runtime damage and recharge; "
-                           + "captured AttackInfo ammo 24, slot 6, unknown 0.",
-                WeaponLowId = weapon.LowId,
-                WeaponHighId = weapon.HighId,
-                WeaponQuality = weapon.Quality,
-                WeaponInventorySlot = 6,
-                UsesProductionWeaponQuality = true,
-                HasCapturedEquippedAttackInfo = true,
-                AttackInfoAmmoCount = 24,
-                AttackInfoWeaponSlot = 6,
-                AttackInfoUnknown = 0,
-                AttackInfoWeaponInstance = 0
-            };
+            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    weapon.Evidence,
+                    sourceInstance,
+                    weapon.LowId,
+                    weapon.HighId,
+                    weapon.Quality,
+                    NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues()
+                .WithProductionWeaponQuality();
+            contract.Retaliates = true;
+            contract.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
+            return contract;
         }
 
         private static CapturedEnemyCombatContract ForWorkmanStriker(

@@ -1983,6 +1983,7 @@ def build_inventory(
             formula_dataset.get("acceptedFormula", {}),
             formula_dataset.get("stimFiendFormula", {}),
             formula_dataset.get("meldedPatternsFormula", {}),
+            formula_dataset.get("fragmentedSoulFormula", {}),
         ]
         for formula in formulas:
             capture_sessions = sorted_unique(

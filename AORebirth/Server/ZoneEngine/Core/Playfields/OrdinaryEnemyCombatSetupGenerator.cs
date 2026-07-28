@@ -119,6 +119,13 @@ namespace AORebirth.Core.Playfields
 
         internal const int MeldedPatternsMaximumLevel = 25;
 
+        internal const string FragmentedSoulFormulaId =
+            "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1";
+
+        internal const int FragmentedSoulMinimumLevel = 17;
+
+        internal const int FragmentedSoulMaximumLevel = 21;
+
         internal static bool TryGenerate(
             OrdinaryEnemyCombatSetupInput input,
             out OrdinaryEnemyCombatNumericSetup setup)
@@ -172,32 +179,62 @@ namespace AORebirth.Core.Playfields
             out OrdinaryEnemyCombatNumericSetup setup)
         {
             setup = null;
-            if (input == null
-                || input.MonsterData
-                   != NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
-                || input.ActorLevel < MeldedPatternsMinimumLevel
-                || input.ActorLevel > MeldedPatternsMaximumLevel
-                || input.WeaponSlot
-                   != NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot
-                || !IsMeldedPatternsWeaponLoadout(
-                    input.WeaponLowTemplate,
-                    input.WeaponHighTemplate,
-                    input.WeaponQuality))
+            if (input == null)
             {
                 return false;
             }
 
-            // Exact positive-integer floor division. Captured L18, L19, L20,
-            // L21, L24, and L25 rows reproduce exactly. Unknown2 is the
-            // independently observed family offset from the same base value.
-            int value = checked((11 * input.ActorLevel) - 2) / 2;
-            setup = new OrdinaryEnemyCombatNumericSetup(
-                MeldedPatternsFormulaId,
-                value,
-                checked(value + 28),
-                value,
-                value);
-            return true;
+            if (input.MonsterData
+                == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                && input.ActorLevel >= MeldedPatternsMinimumLevel
+                && input.ActorLevel <= MeldedPatternsMaximumLevel
+                && input.WeaponSlot
+                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot
+                && IsMeldedPatternsWeaponLoadout(
+                    input.WeaponLowTemplate,
+                    input.WeaponHighTemplate,
+                    input.WeaponQuality))
+            {
+                // Exact positive-integer floor division. Captured L18, L19, L20,
+                // L21, L24, and L25 rows reproduce exactly. Unknown2 is the
+                // independently observed family offset from the same base value.
+                int value = checked((11 * input.ActorLevel) - 2) / 2;
+                setup = new OrdinaryEnemyCombatNumericSetup(
+                    MeldedPatternsFormulaId,
+                    value,
+                    checked(value + 28),
+                    value,
+                    value);
+                return true;
+            }
+
+            if (input.MonsterData
+                == NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData
+                && input.ActorLevel >= FragmentedSoulMinimumLevel
+                && input.ActorLevel <= FragmentedSoulMaximumLevel
+                && input.WeaponSlot
+                   == NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot
+                && IsFragmentedSoulWeaponLoadout(
+                    input.WeaponLowTemplate,
+                    input.WeaponHighTemplate,
+                    input.WeaponQuality))
+            {
+                // All twenty-one unique raw Fragmented Soul SAW packets across L17..L21
+                // reproduce this bounded integer setup. Unknown4 adds the even
+                // level step using positive integer floor division.
+                int baseValue = checked((6 * input.ActorLevel) - 1);
+                int fourthValue = checked(
+                    baseValue + (2 * (input.ActorLevel / 2)));
+                setup = new OrdinaryEnemyCombatNumericSetup(
+                    FragmentedSoulFormulaId,
+                    baseValue,
+                    baseValue,
+                    baseValue,
+                    fourthValue);
+                return true;
+            }
+
+            return false;
         }
 
         internal static bool MatchesGeneratedEquippedSetup(
@@ -248,6 +285,27 @@ namespace AORebirth.Core.Playfields
                    || (lowTemplate == 121819
                        && highTemplate == 121820
                        && quality >= 21
+                       && quality <= 40);
+        }
+
+        internal static bool IsFragmentedSoulWeaponLoadout(
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            return (lowTemplate == 123685
+                    && highTemplate == 123686
+                    && quality >= 1
+                    && quality <= 19)
+                   || (lowTemplate == 123686
+                       && highTemplate == 123686
+                       && quality == 20)
+                   || (lowTemplate == 123687
+                       && highTemplate == 123687
+                       && quality == 21)
+                   || (lowTemplate == 123687
+                       && highTemplate == 123688
+                       && quality >= 22
                        && quality <= 40);
         }
 
