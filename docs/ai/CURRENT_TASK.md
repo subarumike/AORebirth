@@ -2,6 +2,25 @@
 
 ## Active
 
+### RK terminal missions: Stage 2 durable instance binding
+
+Generated terminal-mission acceptance now creates a distinct accepted quest
+identity and atomically persists one version-2 ACG binding under
+`mission-state/acg-bindings`. The binding owns the exact offer, owner/no-team
+state, mission seed/key/exterior/terminal, selected bundle/hash/building,
+isolated live PF2, expiry, and lifecycle. Startup validates and restores active
+reservations before allocation. Exact key/marker resolution replaces the
+newest-mission fallback for bound missions.
+
+Allocated live PF2 values are bounded to `0x160000..0x16FFFF`, excluding every
+captured PF2 and shared PF `1419349`. Bound production entry remains
+fail-closed until Stage 3 can safely materialize doors, chests, NPCs,
+objectives, collision, and navigation.
+
+Evidence and architecture:
+
+- `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`
+
 ### PF127 Subway combat completion
 
 All `51` PF127 Filth Fleas now resolve capture-backed combat. The final nine

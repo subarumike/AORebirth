@@ -31,6 +31,14 @@ namespace ZoneEngine.Core.Missions
 
         public const int LocationZOffset = 711;
 
+        public const int BuildingIdentityTypeOffset = 767;
+
+        public const int BuildingIdentityInstanceOffset = 771;
+
+        public const int CapturedMissionKeyInstance = 0x00F6706A;
+
+        public const int CapturedIssuingTerminalInstance = unchecked((int)0xC00402DF);
+
         /// <summary>Kill target name embedded in the captured accept Info text (journal).</summary>
         public const string TemplateKillTargetName = "Suzie Mirabelli";
 

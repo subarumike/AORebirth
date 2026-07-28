@@ -15,8 +15,9 @@ those five artifacts into five `CompleteSelectable` runtime bundle definitions.
 This is a captured-layout catalog, not a reconstruction of AO's procedural
 interior generator. It does not prove room-graph grammar, tile probabilities,
 collision generation, or any interpretation of the opaque C79F generator
-payload. Runtime mission-instance allocation, persistence, entry, spawning,
-completion, and cleanup remain deferred.
+payload. Stage 2 now persists the exact selected bundle and allocates one
+isolated live PF2 per accepted generated mission. Production entry remains
+fail-closed until Stage 3 can safely materialize the captured interior content.
 
 No database schema or destructive database operation is part of this stage.
 
@@ -198,15 +199,98 @@ These three layers have different responsibilities:
   mission type and policy QL, then derives a stable choice from the seed,
   mission inputs, and owner/team identity. It is not the official AO layout
   RNG.
-- `MissionAcgInstanceBinding` is an immutable descriptor for a future accepted
-  mission instance: accepted quest, owner/team, type, QL, mission key, exterior
-  entrance, selected bundle, ACG building, allocated live PF2, expiry, and
-  optional seed. The class does not itself persist, allocate, enter, spawn, or
-  clean up an instance.
+- `MissionAcgInstanceBinding` version 2 is the immutable durable identity for an
+  accepted generated mission. Mutable lifecycle and cleanup state remain in
+  `MissionAcgInstanceState`; no chest, NPC, door, or objective state is stored
+  in the captured layout.
 
 The generated `.g.cs` catalog is deterministic source material. It does not
 randomly generate a new room graph and does not by itself make mission entry
 operational.
+
+## Stage 2 binding persistence and allocation
+
+Generated terminal missions use sidecars under
+`mission-state/acg-bindings`. Authored-quest persistence and database schemas
+are unchanged. Each accepted mission has one
+`<accepted-type>-<accepted-instance>.acg` record with:
+
+- header `AORebirth-MissionAcgBinding`;
+- `FormatVersion=2`;
+- distinct accepted quest and original offer identities;
+- exact owner plus either an exact team identity or `ExplicitNoTeam=true`;
+- mission type, QL, deterministic seed, key, exterior playfield/entrance/XYZ,
+  and issuing terminal;
+- selected bundle ID, exact generator-payload SHA-256, ACG building, and
+  allocated live PF2;
+- accepted/expiry/update timestamps; and
+- lifecycle, cleanup, and optional cleanup-start timestamp.
+
+Fields are serialized in ordinal key order as invariant UTF-8 `key=value`
+lines. `RecordSha256` covers the complete canonical field block. Writes use a
+same-directory temporary file, flush it to disk, validate a full readback, and
+then move or replace the target atomically. `.tmp` files are never loaded.
+Unknown versions, malformed/truncated records, record-hash mismatch, missing
+bundles, bundle-payload hash mismatch, building mismatch, duplicate accepted
+IDs, and duplicate active PF2 ownership all fail closed. No invalid record
+causes bundle reselection or replacement PF2 allocation.
+
+The allocated live-PF2 range is inclusive `0x160000..0x16FFFF`. The allocator
+excludes every captured catalog PF2 and legacy shared PF2 `1419349`. Captured
+PF2 values remain provenance in `MissionAcgLayoutBundle`; only
+`AllocatedLivePlayfield2` from the binding is used as live instance identity.
+Reservations are restored from all non-cleaned sidecars before a new
+allocation. Exhaustion fails acceptance without an accepted mission, key, or
+binding. A PF2 is released only after lifecycle `Cleaned` and cleanup
+`Completed`.
+
+Current generated terminal missions use durable solo ownership because the
+existing team IDs are process-local and cannot be safely persisted. A binding
+therefore records explicit no-team state, and another character cannot resolve
+it. No team identity is inferred. Durable team-owned generated missions remain
+fail-closed until a stable team identity exists.
+
+Acceptance is ordered as follows:
+
+1. Validate the player, exact rolled offer, mission type/QL, issuing terminal,
+   and exterior action.
+2. Reserve a distinct accepted quest ID.
+3. Derive the deterministic seed and select one complete compatible bundle.
+4. Reserve a non-captured, non-shared live PF2.
+5. Reserve the exact mission-key identity.
+6. Construct and atomically persist a `Reserved` binding.
+7. Atomically persist accepted mission state under the distinct accepted ID.
+8. Grant only the reserved key identity and the repair tool when required.
+9. Send the accepted QFU using the accepted ID, bound key, building, terminal,
+   and exterior marker.
+10. Atomically transition the binding to `Accepted`.
+
+Selection, PF2, key-ID, or first-sidecar failures release every process
+reservation before any player artifact exists. Accepted-state failure marks
+the durable binding for cleanup and releases it after `Cleaned`. Key/tool or
+QFU failure removes the exact accepted state and exact granted artifacts before
+terminal cleanup. If the final acceptance transition itself cannot be
+persisted, the durable `Reserved` record is retained for explicit startup
+reconciliation and its PF2 is not reused.
+
+Lifecycle values are `Reserved`, `Accepted`, `Active`,
+`CompletionStarted`, `Completed`, `Abandoned`, `Expired`,
+`CleanupPending`, `Cleaned`, and `Invalid`. Cleanup values are `None`,
+`KeyRemovalPending`, `InstanceReleasePending`, `Completed`, and `Failed`.
+Shutdown does not transition active bindings. Startup validates the complete
+catalog relationship, restores all reservations, and moves expired accepted or
+active records to `Expired/KeyRemovalPending`; their PF2 remains reserved until
+exact key/instance cleanup completes.
+
+Entry resolution has no newest-mission fallback for bound missions. Exact key
+lookup is owner plus mission-key identity. Exterior use resolves a unique
+active owner binding by exterior playfield and captured marker proximity; zero
+or multiple matches fail closed. The exact key instance must still exist in
+that owner's inventory. The resulting non-production `MissionAcgEntryPlan`
+carries one accepted ID, bundle ID/hash/payload, ACG building, key, and
+allocated live PF2. QFU resync, teleport identity helpers, and PAF
+payload/building helpers use that same binding. Production entry logs the exact
+plan and remains blocked until Stage 3 materialization is safe.
 
 ## Validation commands and observed output
 
@@ -257,21 +341,17 @@ probability, or seed semantics. The payload is retained as immutable captured
 evidence. Reproducing it is different from understanding or implementing AO's
 procedural-layout algorithm.
 
-## Deferred production stage
+## Deferred Stage 3 production materialization
 
-The following work is intentionally not completed by this evidence/catalog
-stage:
+The following work is intentionally not completed by Stage 2:
 
-- persist one selected bundle against an accepted mission;
-- allocate and isolate a unique live mission PF2;
-- wire exterior entry, teleport, PAF, and re-entry to that binding;
 - instantiate doors, chests, NPCs, terminals, and objective objects from the
   selected bundle with safe live identities;
 - derive or implement collision and room/tile resource loading;
 - preserve per-instance door, chest, NPC, and objective state;
-- implement all five objective completion paths and rewards;
-- prevent cross-mission and cross-team state leakage;
-- expire and clean up completed or abandoned instances; and
+- implement all five objective completion paths and exactly-once rewards;
+- implement durable team-owned generated missions after a stable team identity
+  exists; and
 - perform private-server lifecycle regression capture after runtime wiring.
 
 Any future database-schema change still requires separate explicit approval.

@@ -83,6 +83,7 @@
     <Compile Include="InspectMessageContractTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="MissionAcgLayoutCatalogTests.cs" />
+    <Compile Include="MissionAcgBindingPersistenceTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
@@ -94,6 +95,21 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgInstanceBinding.cs">
       <Link>MissionAcgInstanceBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgInstanceState.cs">
+      <Link>MissionAcgInstanceState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingRecord.cs">
+      <Link>MissionAcgBindingRecord.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingStore.cs">
+      <Link>MissionAcgBindingStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAllocationService.cs">
+      <Link>MissionAcgAllocationService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingResolver.cs">
+      <Link>MissionAcgBindingResolver.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutCatalog.cs">
       <Link>MissionAcgLayoutCatalog.cs</Link>

@@ -81,14 +81,20 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
   `20260727-223041` replay with zero decoder/extractor errors.
 
-- Generated RK mission interiors now have a capture-backed Stage 1 ACG
-  foundation. Five finalized lifecycle captures are canonicalized into
-  immutable, independently hash-validated, complete/selectable layout bundles;
-  eight older coherent shapes remain structural/objective-incomplete audit
-  bundles, and PF2 `1441804` remains explicitly excluded. A versioned mission
-  instance binding and deterministic fail-closed selector exist, but production
-  mission acceptance, persistence, mutable instance state, navigation, and
-  collision are intentionally not wired. Evidence:
+- Generated RK mission interiors now have a capture-backed Stage 2 durable
+  instance foundation. Five finalized lifecycle captures remain immutable,
+  independently hash-validated, complete/selectable layout bundles; eight
+  older shapes remain nonselectable and PF2 `1441804` remains excluded.
+  Terminal acceptance now creates a distinct accepted quest identity and
+  atomically persists one version-2 binding with exact offer/owner/key/exterior/
+  terminal/bundle/hash/building/expiry identity. The bounded
+  `0x160000..0x16FFFF` allocator restores active reservations before allocating,
+  excludes captured PF2 values and shared PF `1419349`, and releases only after
+  cleanup completes. Exact owner/key/marker resolution has no newest-mission
+  fallback. QFU, teleport, and PAF identity helpers use the binding, while
+  production entry remains fail-closed until Stage 3 safely materializes
+  interior content. No database schema, procedural generator, reward, slider,
+  or authored-quest behavior changed. Evidence:
   `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
 
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
