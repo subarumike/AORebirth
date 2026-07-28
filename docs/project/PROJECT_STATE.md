@@ -4,6 +4,18 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Mission capture tooling now records usable structured terminal, roll, offer,
+  Cash, acceptance, key/tool, quest-action, local teleport, playfield-init, and
+  cleanup evidence while preserving the raw packet superset. The extractor
+  uses the current AOSharp property names, keeps offer and accepted quest
+  identities distinct, treats inbound slider bytes and acceptance matching as
+  non-semantic/temporal evidence, filters raw teleports to the local player,
+  and resets all correlation state between capture sessions. The separate x86
+  `AOSharpMissionCaptureAnalyzer` retro-decodes existing `raw-packets.csv`
+  sessions through that same extractor without changing the 64-bit PF127
+  geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
+  `20260727-223041` replay with zero decoder/extractor errors.
+
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
   `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the
   proven L10..L17 domain. Five exact raw SIW1 packets and five leave-one-out
