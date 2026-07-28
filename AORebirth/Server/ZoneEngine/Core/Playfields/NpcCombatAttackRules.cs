@@ -101,6 +101,20 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayDisobedientBotInitialSpecialAttackWeaponUnknown5 = 0;
 
+        public const int CapturedSubwayStimFiendMonsterData = 203739;
+
+        public const int CapturedSubwayStimFiendWeaponSlot = 0;
+
+        public const int CapturedSubwayStimFiendLowTemplate = 0x00023566;
+
+        public const int CapturedSubwayStimFiendHighTemplate = 0x00023567;
+
+        public const int CapturedSubwayStimFiendWeaponTag = 0x53495731;
+
+        public const string CapturedSubwayStimFiendWeaponName = "SIW1";
+
+        public const int CapturedSubwayStimFiendInitialSpecialAttackWeaponUnknown5 = 0;
+
         // Official-live Vagabonds produced only misses, so their damage is a private
         // playability policy using the captured 9..12 normal range of the adjacent,
         // same-level Subway Mugger family. Cadence and packet shape remain Vagabond-

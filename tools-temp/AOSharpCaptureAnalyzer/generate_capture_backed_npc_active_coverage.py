@@ -1967,28 +1967,32 @@ def build_inventory(
         formula_dataset = json.loads(
             formula_dataset_path.read_text(encoding="utf-8")
         )
-        formula = formula_dataset.get("acceptedFormula", {})
-        capture_sessions = sorted_unique(
-            row.get("captureSession")
-            for row in formula.get("rawPacketObservations", [])
-        )
-        evidence_packet_ids = sorted_unique(
-            row.get("packetId")
-            for row in formula.get("rawPacketObservations", [])
-        )
-        for binding in formula.get("activeBindings", []):
-            identity = (
-                int(binding["resource"]),
-                int(binding["monsterData"]),
-                int(binding["level"]),
-                str(binding["name"]),
+        formulas = [
+            formula_dataset.get("acceptedFormula", {}),
+            formula_dataset.get("stimFiendFormula", {}),
+        ]
+        for formula in formulas:
+            capture_sessions = sorted_unique(
+                row.get("captureSession")
+                for row in formula.get("rawPacketObservations", [])
             )
-            if identity in mathematical_bindings:
-                continue
-            enriched_binding = dict(binding)
-            enriched_binding["captureSessions"] = capture_sessions
-            enriched_binding["evidencePacketIds"] = evidence_packet_ids
-            mathematical_bindings[identity] = enriched_binding
+            evidence_packet_ids = sorted_unique(
+                row.get("packetId")
+                for row in formula.get("rawPacketObservations", [])
+            )
+            for binding in formula.get("activeBindings", []):
+                identity = (
+                    int(binding["resource"]),
+                    int(binding["monsterData"]),
+                    int(binding["level"]),
+                    str(binding["name"]),
+                )
+                if identity in mathematical_bindings:
+                    continue
+                enriched_binding = dict(binding)
+                enriched_binding["captureSessions"] = capture_sessions
+                enriched_binding["evidencePacketIds"] = evidence_packet_ids
+                mathematical_bindings[identity] = enriched_binding
     searched_sessions = sorted_unique(
         session.get("capture") for session in combat_inventory.get("sessions", [])
     )

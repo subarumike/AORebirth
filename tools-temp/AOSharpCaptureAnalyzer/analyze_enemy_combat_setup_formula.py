@@ -46,6 +46,22 @@ DISOBEDIENT_BOT_CAPTURED_VALUES = {5: 30, 6: 35, 8: 45, 9: 49, 10: 54}
 DISOBEDIENT_BOT_FORMULA_ID = (
     "disobedient-bot-siw1-floor-19L-plus-28-over-4-v1"
 )
+STIM_FIEND_OBSERVATIONS = (
+    ("20260708-143600", 17386, 10, 0x794CD773),
+    ("20260708-143600", 17877, 11, 0x794CD77C),
+    ("20260708-143600", 18584, 12, 0x794CD778),
+    ("20260709-212115", 12882, 13, 0x7953AA4B),
+    ("20260709-220439", 7612, 14, 0x7953ABAF),
+)
+STIM_FIEND_CAPTURED_VALUES = {10: 54, 11: 59, 12: 65, 13: 70, 14: 76}
+STIM_FIEND_FORMULA_ID = "stim-fiend-siw1-floor-11L-minus-2-over-2-v1"
+STIM_FIEND_PROFILE_IDS = (
+    "5aa2541e7645c589-9bcb7a58208cf1e0",
+    "8dc794414961f6e6-63cd3e499be4e58b",
+    "963ecf2aa60f045c-de110ebeb7e358cd",
+    "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+    "54d40b70fa1a801a-064305180fc7f1ad",
+)
 
 
 class MessagePackReader:
@@ -331,10 +347,13 @@ def read_raw_packet(capture: str, sequence: int) -> dict[str, Any]:
         for row in path.read_text(encoding="utf-8").splitlines()
         if marker in row
     )
-    match = re.search(r"\b(IN|OUT) #\d+ .*?\bn3=([^ ]+) hex=([0-9A-F]+)$", line)
+    match = re.search(
+        r"^(\S+)\s+(IN|OUT) #\d+ .*?\bn3=([^ ]+) hex=([0-9A-F]+)$",
+        line,
+    )
     if match is None:
         raise ValueError(f"could not decode raw packet {capture} #{sequence}")
-    wire = bytes.fromhex(match.group(3))
+    wire = bytes.fromhex(match.group(4))
     body_marker = bytes.fromhex("1D3C0F1C")
     body_offset = wire.index(body_marker)
     body = wire[body_offset:]
@@ -343,13 +362,15 @@ def read_raw_packet(capture: str, sequence: int) -> dict[str, Any]:
     return {
         "packetId": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
-            f"{capture}|{match.group(1)}|{sequence}|{packet_hash}"
+            f"{capture}|{match.group(2)}|{sequence}|{packet_hash}"
         ),
         "captureSession": (
             f"tools-temp/AOSharpLiveCapture/bin/Debug/captures/{capture}"
         ),
+        "timestampUtc": match.group(1),
+        "direction": match.group(2),
         "sequence": sequence,
-        "messageType": match.group(2),
+        "messageType": match.group(3),
         "bodyHex": body.hex().upper(),
         "unknown1": unknowns[0],
         "unknown2": unknowns[1],
@@ -361,6 +382,94 @@ def read_raw_packet(capture: str, sequence: int) -> dict[str, Any]:
 
 def disobedient_bot_formula(level: int) -> int:
     return ((19 * level) + 28) // 4
+
+
+def stim_fiend_formula(level: int) -> int:
+    return ((11 * level) - 2) // 2
+
+
+def stim_fiend_chain_evidence(
+    inventory: dict[str, Any],
+    level: int,
+    source_identity: int,
+    saw_sequence: int,
+) -> dict[str, Any]:
+    profile = next(
+        row
+        for row in inventory.get("profiles", [])
+        if row.get("profileKey")
+        == f"resource=127|md=203739|level={level}|name=Stim Fiend"
+    )
+    variant = profile.get("variants", [])[0]
+    source_hex = f"0x{source_identity:08X}"
+    saw_marker = f"|{saw_sequence}|"
+    raw_chain = next(
+        row
+        for row in variant.get("rawWireVariantObservations", [])
+        if row.get("sourceIdentity") == source_hex
+        and saw_marker in str(row.get("specialAttackWeaponPacketId"))
+    )
+    target_identity = None
+    for stream in variant.get("streams", []):
+        timing = next(
+            (
+                row
+                for row in stream.get("pairedFightTimingObservations", [])
+                if row.get("specialAttackWeaponPacketId")
+                == raw_chain.get("specialAttackWeaponPacketId")
+            ),
+            None,
+        )
+        if timing is not None:
+            target_identity = timing.get("targetIdentity")
+            break
+    return {
+        "metadataGenerationKey": (profile.get("metadata") or {}).get(
+            "generationKey"
+        ),
+        "actorQualityLevel": None,
+        "weaponItemFullUpdatePacketId": raw_chain.get(
+            "weaponItemFullUpdatePacketId"
+        ),
+        "specialAttackWeaponPacketId": raw_chain.get(
+            "specialAttackWeaponPacketId"
+        ),
+        "attackPacketId": raw_chain.get("attackPacketId"),
+        "attackInfoPacketId": raw_chain.get("attackInfoPacketId"),
+        "targetIdentity": target_identity,
+        "terminalHit": raw_chain.get("terminalHit"),
+        "baseSignature": variant.get("baseSignature"),
+        "streams": [
+            {
+                "streamOrdinal": index,
+                "signature": stream.get("signature"),
+                "minimumObservedDamage": stream.get(
+                    "minimumObservedDamage"
+                ),
+                "maximumObservedDamage": stream.get(
+                    "maximumObservedDamage"
+                ),
+                "damageObservations": stream.get("damageObservations"),
+                "attackStartDelayObservationsSeconds": stream.get(
+                    "attackStartDelayObservationsSeconds"
+                ),
+                "firstHitDelayObservationsSeconds": stream.get(
+                    "firstHitDelayObservationsSeconds"
+                ),
+                "landedIntervalObservationsSeconds": stream.get(
+                    "landedIntervalObservationsSeconds"
+                ),
+                "ammoObservationsInOrder": stream.get(
+                    "ammoObservationsInOrder"
+                ),
+                "capturedTerminalHitOnly": stream.get(
+                    "capturedTerminalHitOnly"
+                ),
+                "attackInfoPacketIds": stream.get("attackInfoPacketIds"),
+            }
+            for index, stream in enumerate(variant.get("streams", []))
+        ],
+    }
 
 
 def build_formula_dataset(
@@ -501,6 +610,165 @@ def build_formula_dataset(
                 }
             )
 
+    stim_observations = []
+    for capture, sequence, level, source_identity in STIM_FIEND_OBSERVATIONS:
+        packet = read_raw_packet(capture, sequence)
+        packet.update(
+            {
+                "level": level,
+                "sourceIdentity": f"0x{source_identity:08X}",
+                "formulaValue": stim_fiend_formula(level),
+                "exactMatch": all(
+                    packet[f"unknown{index}"] == stim_fiend_formula(level)
+                    for index in range(1, 5)
+                ),
+            }
+        )
+        packet.update(
+            stim_fiend_chain_evidence(
+                inventory,
+                level,
+                source_identity,
+                sequence,
+            )
+        )
+        stim_observations.append(packet)
+
+    stim_leave_one_out = []
+    for held_out_level, held_out_value in sorted(
+        STIM_FIEND_CAPTURED_VALUES.items()
+    ):
+        training = {
+            str(level): value
+            for level, value in sorted(STIM_FIEND_CAPTURED_VALUES.items())
+            if level != held_out_level
+        }
+        prediction = stim_fiend_formula(held_out_level)
+        stim_leave_one_out.append(
+            {
+                "heldOutLevel": held_out_level,
+                "heldOutObserved": held_out_value,
+                "trainingObservations": training,
+                "candidateFormulaSatisfiedAllTrainingObservations": all(
+                    stim_fiend_formula(int(level)) == value
+                    for level, value in training.items()
+                ),
+                "prediction": prediction,
+                "exactMatch": prediction == held_out_value,
+            }
+        )
+
+    stim_active_bindings = []
+    for row in active_coverage.get("profiles", []):
+        if (
+            row.get("runtimePlayfieldOrResource") != 127
+            or row.get("name") != "Stim Fiend"
+            or row.get("monsterData") != 203739
+        ):
+            continue
+        for level in row.get("levelCandidates", []):
+            if not 10 <= level <= 17:
+                continue
+            stim_active_bindings.append(
+                {
+                    "resource": 127,
+                    "name": "Stim Fiend",
+                    "monsterData": 203739,
+                    "level": level,
+                    "actorCount": row.get("actorCount", 0),
+                    "configuredSourceIdentity": row.get(
+                        "configuredSourceIdentity"
+                    ),
+                    "formulaId": STIM_FIEND_FORMULA_ID,
+                    "generatedSpecialAttackWeaponValue": (
+                        stim_fiend_formula(level)
+                    ),
+                    "compatibleSemanticProfileIds": list(
+                        STIM_FIEND_PROFILE_IDS
+                    ),
+                }
+            )
+
+    starting_scope_sources = {
+        "0x7953ABAD",
+        "0x7953ABBF",
+        "0x7953AD68",
+        "0x79545069",
+        "0x79545072",
+        "0x7957E128",
+        "0x7957E415",
+    }
+    stim_starting_scope = []
+    for row in active_coverage.get("profiles", []):
+        if (
+            row.get("runtimePlayfieldOrResource") != 127
+            or row.get("name") != "Stim Fiend"
+            or row.get("configuredSourceIdentity") not in starting_scope_sources
+        ):
+            continue
+        level = row.get("levelCandidates", [None])[0]
+        supported = isinstance(level, int) and 10 <= level <= 17
+        stim_starting_scope.append(
+            {
+                "configuredSourceIdentity": row.get(
+                    "configuredSourceIdentity"
+                ),
+                "level": level,
+                "formulaDomainSupported": supported,
+                "generatedSpecialAttackWeaponValue": (
+                    stim_fiend_formula(level) if supported else None
+                ),
+                "result": (
+                    "restored through exact Stim Fiend archetype"
+                    if supported
+                    else "fail closed: level outside proven Stim Fiend domain"
+                ),
+            }
+        )
+
+    stim_cross_family = []
+    for profile in inventory.get("profiles", []):
+        metadata = profile.get("metadata") or {}
+        if (
+            metadata.get("monsterData") == 203739
+            or profile_resource(str(profile.get("profileKey", "")))
+            not in (127, 1931)
+        ):
+            continue
+        for variant in profile.get("variants", []):
+            saw = variant.get("baseSignature", {}).get(
+                "specialAttackWeapon", {}
+            )
+            specials = saw.get("specials", [])
+            values = [saw.get(f"unknown{index}") for index in range(1, 5)]
+            if (
+                not any(
+                    row.get("lowTemplate") == 144742
+                    and row.get("highTemplate") == 144743
+                    and row.get("tag") == 1397315377
+                    and row.get("nameHex") == "53495731"
+                    for row in specials
+                )
+                or len(set(values)) != 1
+            ):
+                continue
+            level = metadata.get("level")
+            if not isinstance(level, int):
+                continue
+            observed = values[0]
+            predicted = stim_fiend_formula(level)
+            stim_cross_family.append(
+                {
+                    "name": metadata.get("name"),
+                    "monsterData": metadata.get("monsterData"),
+                    "level": level,
+                    "semanticProfileId": variant.get("semanticProfileId"),
+                    "observed": observed,
+                    "stimFiendFormulaPrediction": predicted,
+                    "exactMatch": observed == predicted,
+                }
+            )
+
     if any(not row["exactMatch"] for row in observations):
         raise ValueError("accepted formula differs from a raw SAW observation")
     if any(not row["exactMatch"] for row in leave_one_out):
@@ -509,9 +777,29 @@ def build_formula_dataset(
         raise ValueError(
             f"expected 12 active Disobedient Bot bindings, found {len(active_bindings)}"
         )
+    if any(not row["exactMatch"] for row in stim_observations):
+        raise ValueError("Stim Fiend formula differs from a raw SAW observation")
+    if any(not row["exactMatch"] for row in stim_leave_one_out):
+        raise ValueError("Stim Fiend formula failed leave-one-out validation")
+    if len(stim_active_bindings) != 14:
+        raise ValueError(
+            f"expected 14 active Stim Fiend bindings, found {len(stim_active_bindings)}"
+        )
+    if len(stim_starting_scope) != 7:
+        raise ValueError(
+            f"expected 7 starting-scope Stim Fiends, found {len(stim_starting_scope)}"
+        )
+    if sum(row["formulaDomainSupported"] for row in stim_starting_scope) != 6:
+        raise ValueError("Stim Fiend starting scope did not restore exactly six actors")
+    if len(stim_cross_family) != 23:
+        raise ValueError(
+            f"expected 23 cross-family SIW1 observations, found {len(stim_cross_family)}"
+        )
+    if sum(row["exactMatch"] for row in stim_cross_family) != 17:
+        raise ValueError("Stim Fiend formula cross-family reconciliation changed")
 
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "scope": {
             "runtimeResources": [127, 1931],
             "sourceInventory": (
@@ -561,6 +849,124 @@ def build_formula_dataset(
             "rawPacketObservations": observations,
             "leaveOneOut": leave_one_out,
             "activeBindings": active_bindings,
+        },
+        "stimFiendFormula": {
+            "formulaId": STIM_FIEND_FORMULA_ID,
+            "family": "Stim Fiend",
+            "monsterData": 203739,
+            "resource": 127,
+            "supportedLevelsInclusive": [10, 17],
+            "exactCategoricalDomain": {
+                "attackMode": "natural-specialized",
+                "lowTemplate": 144742,
+                "highTemplate": 144743,
+                "weaponTag": 1397315377,
+                "weaponName": "SIW1",
+                "slot": 0,
+                "instance": 1397315377,
+                "numericHitType": 3,
+                "numericDamageType": 0,
+                "packetOrder": [
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+                "terminalOnlyStreamsExcludedFromRepeatingRuntime": True,
+            },
+            "numericOutput": {
+                "fields": [
+                    "SpecialAttackWeapon.unknown1",
+                    "SpecialAttackWeapon.unknown2",
+                    "SpecialAttackWeapon.unknown3",
+                    "SpecialAttackWeapon.unknown4",
+                ],
+                "expression": "floor((11 * actorLevel - 2) / 2)",
+                "integerArithmetic": "positive integer truncation equals floor",
+                "unknown5": (
+                    "per-actor ordered mutable capture state; not formula identity"
+                ),
+            },
+            "runtimeInputOwners": {
+                "actorLevel": (
+                    "OrdinaryEnemySpawnDefinition.Level through "
+                    "OrdinaryEnemyCombatProfile.ResolveContract(level)"
+                ),
+                "monsterDataAndFamily": (
+                    "CapturedSubwayOrdinaryArchetypeDefinition"
+                ),
+                "weaponTemplatesTagAndName": (
+                    "NpcCombatAttackRules capture-bound Stim Fiend constants"
+                ),
+                "damageRangeAndCadence": (
+                    "CapturedSubwayCombatEvidenceDefinition on the active archetype"
+                ),
+                "mutableEnergyAmmoAndSawState": (
+                    "existing per-actor combat contract/runtime state"
+                ),
+            },
+            "formulaFamiliesTested": [
+                "exact affine integer formulas",
+                "exact affine rational formulas",
+                "floor division",
+                "ceiling division",
+                "nearest-away division",
+                "nearest-even division",
+                "bounded family-scoped formulas",
+                "generic four-equal SIW1 weapon-family formulas",
+                "direct item-template transformations",
+                "level and quality breakpoint formulas",
+                "integer clamps and unbounded extensions",
+                "finite-difference sequences",
+                "stream-specific formulas",
+            ],
+            "compatibleSemanticProfileIds": list(STIM_FIEND_PROFILE_IDS),
+            "rawPacketObservations": stim_observations,
+            "leaveOneOut": stim_leave_one_out,
+            "activeBindings": stim_active_bindings,
+            "startingQuarantineScope": sorted(
+                stim_starting_scope,
+                key=lambda row: row["configuredSourceIdentity"],
+            ),
+            "crossFamilyHeldOut": {
+                "observations": stim_cross_family,
+                "exactMatches": sum(
+                    row["exactMatch"] for row in stim_cross_family
+                ),
+                "mismatches": sum(
+                    not row["exactMatch"] for row in stim_cross_family
+                ),
+                "conclusion": (
+                    "the numeric rule is reusable only after the exact "
+                    "Stim Fiend semantic selector succeeds"
+                ),
+            },
+            "rejectedCandidates": [
+                {
+                    "candidate": "unrounded 5.5 * level - 1",
+                    "mismatches": 2,
+                    "reason": "levels 11 and 13 produce noninteger values",
+                },
+                {
+                    "candidate": "Disobedient Bot formula",
+                    "mismatches": 3,
+                    "reason": "levels 12, 13, and 14 differ from raw Stim Fiend SAW",
+                },
+                {
+                    "candidate": "direct item-template interpolation",
+                    "mismatches": 5,
+                    "reason": "item templates do not encode the five observed SAW values",
+                },
+                {
+                    "candidate": "generic reuse across every four-equal SIW1 family",
+                    "mismatches": 6,
+                    "observations": 23,
+                    "reason": "family and stream semantics remain part of the exact selector",
+                },
+                {
+                    "candidate": "unbounded Stim Fiend level domain",
+                    "reason": "levels below 10 and above 17 lack categorical and formula proof",
+                },
+            ],
         },
         "rejectedCandidates": [
             {
@@ -667,6 +1073,7 @@ def main() -> int:
     parser.add_argument("--inspect-profile-key")
     parser.add_argument("--inspect-special-templates", nargs=2, type=int)
     parser.add_argument("--search-disobedient-formula", action="store_true")
+    parser.add_argument("--search-stim-formula", action="store_true")
     arguments = parser.parse_args()
 
     inventory = load_json(arguments.inventory)
@@ -734,6 +1141,30 @@ def main() -> int:
                     }
                 )
         print(json.dumps(matches, sort_keys=True, separators=(",", ":")))
+        return 0
+    if arguments.search_stim_formula:
+        candidates = affine_candidates(STIM_FIEND_CAPTURED_VALUES)
+        selected = [
+            row
+            for row in candidates
+            if row["numerator"] == 11
+            and row["intercept"] == -2
+            and row["denominator"] == 2
+            and row["rounding"] == "floor"
+        ]
+        print(
+            json.dumps(
+                {
+                    "captured": STIM_FIEND_CAPTURED_VALUES,
+                    "candidateCount": len(candidates),
+                    "selected": selected,
+                    "supportedLevelsInclusive": [10, 17],
+                    "level17Prediction": stim_fiend_formula(17),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
         return 0
     if arguments.search_disobedient_formula:
         captured = {5: 30, 6: 35, 8: 45, 9: 49, 10: 54}
@@ -810,13 +1241,17 @@ def main() -> int:
         load_item_templates(arguments.items),
     )
     rendered = canonical_json(dataset)
+    formula_binding_count = sum(
+        len(dataset.get(key, {}).get("activeBindings", []))
+        for key in ("acceptedFormula", "stimFiendFormula")
+    )
     if arguments.write:
         arguments.output.parent.mkdir(parents=True, exist_ok=True)
         arguments.output.write_text(rendered, encoding="utf-8", newline="\n")
         print(
             f"WROTE {arguments.output.relative_to(REPOSITORY_ROOT)} "
             f"profiles={len(dataset['profiles'])} "
-            f"activeBindings={len(dataset['acceptedFormula']['activeBindings'])}"
+            f"activeBindings={formula_binding_count}"
         )
         return 0
     if not arguments.output.is_file():
@@ -827,7 +1262,7 @@ def main() -> int:
         return 1
     print(
         f"PASS profiles={len(dataset['profiles'])} "
-        f"activeBindings={len(dataset['acceptedFormula']['activeBindings'])}"
+        f"activeBindings={formula_binding_count}"
     )
     return 0
 

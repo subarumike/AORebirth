@@ -2321,11 +2321,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
             }
 
-            Assert.AreEqual(345, certifiedKeys.Count);
-            Assert.AreEqual(144, rejected.Count);
+            Assert.AreEqual(351, certifiedKeys.Count);
+            Assert.AreEqual(138, rejected.Count);
             Assert.AreEqual(spawns.Length, certifiedKeys.Count + rejected.Count);
-            Assert.AreEqual(258, certifiedKeys.Count(value => value.StartsWith("127|")));
-            Assert.AreEqual(64, rejected.Keys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(264, certifiedKeys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(58, rejected.Keys.Count(value => value.StartsWith("127|")));
             Assert.AreEqual(87, certifiedKeys.Count(value => value.StartsWith("1931|")));
             Assert.AreEqual(80, rejected.Keys.Count(value => value.StartsWith("1931|")));
 
@@ -4615,12 +4615,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(spawns.Length, certified + quarantined);
-            Assert.AreEqual(258, subwayCertified);
-            Assert.AreEqual(64, subwayQuarantined);
+            Assert.AreEqual(264, subwayCertified);
+            Assert.AreEqual(58, subwayQuarantined);
             Assert.AreEqual(87, templeCertified);
             Assert.AreEqual(80, templeQuarantined);
-            Assert.AreEqual(345, certified);
-            Assert.AreEqual(144, quarantined);
+            Assert.AreEqual(351, certified);
+            Assert.AreEqual(138, quarantined);
             Assert.IsTrue(
                 certified > 15,
                 "The generated corpus did not improve active dungeon certification beyond the seed audit. "
@@ -4721,6 +4721,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int restoredLooters = 0;
             int restoredMeldedPatterns = 0;
             int restoredDisobedientBots = 0;
+            int restoredStimFiends = 0;
             int remainingQuarantined = 0;
             foreach (OrdinaryEnemySpawnDefinition spawn in auditSpawns)
             {
@@ -4780,6 +4781,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     continue;
                 }
 
+                if (runtimeProfile.DisplayName == "Stim Fiend"
+                    && spawn.SourceIdentity != unchecked((int)0x7957E415))
+                {
+                    Assert.IsTrue(success, failure);
+                    Assert.IsTrue(baseline.UsesProductionSpecializedValues);
+                    Assert.IsTrue(resolved.IsCombatReady);
+                    Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                    restoredStimFiends++;
+                    continue;
+                }
+
                 Assert.IsFalse(
                     success,
                     string.Format(
@@ -4793,7 +4805,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(7, restoredLooters);
             Assert.AreEqual(1, restoredMeldedPatterns);
             Assert.AreEqual(12, restoredDisobedientBots);
-            Assert.AreEqual(33, remainingQuarantined);
+            Assert.AreEqual(6, restoredStimFiends);
+            Assert.AreEqual(27, remainingQuarantined);
         }
 
         private static void AssertProductionQlFamily(

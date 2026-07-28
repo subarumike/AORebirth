@@ -439,9 +439,7 @@ namespace AORebirth.Core.Playfields
             {
                 return this.CaptureEvidenceSafe
                        && this.WeaponDefinition == null
-                       && this.Streams.Length == 1
-                       && this.Streams[0].CapturedUsesEquippedWeapon == false
-                       && this.Streams[0].CapturedSendAttackInfo == true;
+                       && this.GetReusableNaturalAttackStreams().Length == 1;
             }
         }
 
@@ -459,8 +457,10 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            CapturedEnemyCombatProfileStreamDefinition left = this.Streams[0];
-            CapturedEnemyCombatProfileStreamDefinition right = other.Streams[0];
+            CapturedEnemyCombatProfileStreamDefinition left =
+                this.GetReusableNaturalAttackStreams()[0];
+            CapturedEnemyCombatProfileStreamDefinition right =
+                other.GetReusableNaturalAttackStreams()[0];
             return left.WeaponSlot == right.WeaponSlot
                    && left.DamageTypeWire == right.DamageTypeWire
                    && left.HitTypeWire == right.HitTypeWire
@@ -468,6 +468,15 @@ namespace AORebirth.Core.Playfields
                    && left.N3Unknown == right.N3Unknown
                    && left.CapturedUsesEquippedWeapon == right.CapturedUsesEquippedWeapon
                    && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
+        }
+
+        internal CapturedEnemyCombatProfileStreamDefinition[]
+            GetReusableNaturalAttackStreams()
+        {
+            return this.Streams.Where(
+                value => value.CapturedUsesEquippedWeapon == false
+                         && value.CapturedSendAttackInfo == true
+                         && !value.CapturedTerminalHitOnly).ToArray();
         }
 
         internal bool MatchesSpecialized(CapturedEnemyCombatContract contract)
@@ -1271,7 +1280,8 @@ namespace AORebirth.Core.Playfields
             }
 
             int evidenceSourceIdentity = profile.RepresentativeEvidenceSourceIdentity;
-            CapturedEnemyCombatProfileStreamDefinition stream = profile.Streams[0];
+            CapturedEnemyCombatProfileStreamDefinition stream =
+                profile.GetReusableNaturalAttackStreams()[0];
             string evidence = string.Join(
                 "; ",
                 family.Select(value => value.Evidence).Distinct().ToArray());

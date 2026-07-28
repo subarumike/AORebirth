@@ -4,6 +4,21 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
+  `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the
+  proven L10..L17 domain. Five exact raw SIW1 packets and five leave-one-out
+  evaluations pass. Exact family, templates `144742/144743`, natural-specialized
+  mode, slot `0`, instance/tag `0x53495731`, numeric hit/damage wires `3/0`,
+  action, normal stream structure, and packet order remain capture-bound.
+  Production retains damage, range, cadence, health, energy/ammunition, and
+  mutable SAW state. The L12 terminal-only damage-type-4 observation is not a
+  reusable repeating stream. Six fixed-scope actors are restored; L9 remains
+  fail-closed outside the proven domain. The full active family is `14/1`.
+  PF127/PF1931 are now `351` certified and `138` quarantined of `489` unique
+  actors (`264/58` in PF127 and unchanged `87/80` in PF1931); the fixed
+  53-actor scope is `26/27`. Evidence:
+  `docs/evidence/STIM_FIEND_COMBAT_SETUP_FORMULA_20260727.md`.
+
 - Disobedient Bot MonsterData `17649` now uses the bounded mathematical setup
   `floor((19 * actorLevel + 28) / 4)` for SAW numeric fields 1-4 across the
   proven L5..L10 domain. Population/runtime owns actor level; the exact SIW1
@@ -12,9 +27,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   packet order remain capture-bound. Five raw captured levels and five
   leave-one-out evaluations are exact. All 12 active L6/L7/L9/L10 actors are
   restored without identity, nearest-level, or per-level output mappings.
-  PF127/PF1931 are now `345` certified and `144` quarantined of `489` unique
-  actors (`258/64` in PF127 and unchanged `87/80` in PF1931). The fixed
-  53-actor PF127 scope is `20/33`. Evidence:
+  Those accepted totals were `345/144` before the later Stim Fiend restoration;
+  the then-current fixed 53-actor PF127 scope was `20/33`. Evidence:
   `docs/evidence/ENEMY_COMBAT_SETUP_FORMULA_20260727.md`.
 
 - Historical foundation checkpoint (superseded totals): capture-backed NPC

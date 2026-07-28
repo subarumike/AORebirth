@@ -6145,7 +6145,7 @@
     {
       "actorCount": 1,
       "bindingKey": "3a8edcf736f4e91c62f9",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA4B",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6158,7 +6158,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AA4B",
@@ -6167,7 +6167,7 @@
     {
       "actorCount": 1,
       "bindingKey": "521392679ed324ea3014",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953ABAD",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6180,7 +6180,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953ABAD",
@@ -6189,7 +6189,7 @@
     {
       "actorCount": 1,
       "bindingKey": "8507c659041ce08c3793",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953ABBF",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6202,7 +6202,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953ABBF",
@@ -6211,7 +6211,7 @@
     {
       "actorCount": 1,
       "bindingKey": "b0e9808aea0916cbda30",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD66",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6224,7 +6224,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AD66",
@@ -6233,7 +6233,7 @@
     {
       "actorCount": 1,
       "bindingKey": "898d24c9fc99fccb42f5",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD68",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6246,7 +6246,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AD68",
@@ -6255,7 +6255,7 @@
     {
       "actorCount": 1,
       "bindingKey": "ce9086512411db1d178f",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD7D",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6268,7 +6268,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AD7D",
@@ -6277,7 +6277,7 @@
     {
       "actorCount": 1,
       "bindingKey": "c0c8fe6afc105bd53b0b",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545069",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6290,7 +6290,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x79545069",
@@ -6299,7 +6299,7 @@
     {
       "actorCount": 1,
       "bindingKey": "07206fb734f380e844a4",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545072",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6312,7 +6312,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x79545072",
@@ -6321,7 +6321,7 @@
     {
       "actorCount": 1,
       "bindingKey": "22acaa8c7ffa456af7ee",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x795451F5",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6334,7 +6334,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x795451F5",
@@ -6343,7 +6343,7 @@
     {
       "actorCount": 1,
       "bindingKey": "92537f6888d38ab34c2d",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79557F12",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6356,7 +6356,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x79557F12",
@@ -6365,7 +6365,7 @@
     {
       "actorCount": 1,
       "bindingKey": "72d471568a8c059e7eff",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E128",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6378,7 +6378,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E128",
@@ -6409,7 +6409,7 @@
     {
       "actorCount": 1,
       "bindingKey": "43d1427c3026c781653e",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E5CF",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6422,7 +6422,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E5CF",
@@ -6431,7 +6431,7 @@
     {
       "actorCount": 1,
       "bindingKey": "1f03999d1e04a355183e",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E5D0",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6444,7 +6444,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E5D0",
@@ -6453,7 +6453,7 @@
     {
       "actorCount": 1,
       "bindingKey": "651b00acecad762b0047",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E5D1",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -6466,7 +6466,7 @@
       ],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E5D1",
@@ -36656,12 +36656,12 @@
     "captureCertifiedVariantCountWithMutableSawState": 76,
     "captureCertifiedVariantCountWithMutableWeaponState": 3,
     "exactRawWireObservationCount": 2284,
-    "finalCaptureCertifiedActorCount": 97,
-    "finalQuarantinedActorCount": 1415,
-    "fixedCertifiedProfileRowCount": 97,
+    "finalCaptureCertifiedActorCount": 111,
+    "finalQuarantinedActorCount": 1401,
+    "fixedCertifiedProfileRowCount": 111,
     "fixedProfileRowCount": 766,
-    "fixedUnresolvedProfileRowCount": 669,
-    "newlyCaptureCertifiedActorCount": 82,
+    "fixedUnresolvedProfileRowCount": 655,
+    "newlyCaptureCertifiedActorCount": 96,
     "priorCaptureCertifiedActorCount": 15,
     "remainingConflictedSourceIdentityCount": 2,
     "restoredEnemyNames": [
@@ -36675,6 +36675,7 @@
       "Mugger",
       "Redundant Scan",
       "Reverend Gulard",
+      "Stim Fiend",
       "The Re-Animator",
       "Thief",
       "Workman Striker"
@@ -107114,72 +107115,39 @@
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD66",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "3a12164df21619cca53b",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 10,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 10,
       "levelCandidates": [
@@ -107189,167 +107157,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=10|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 15,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AD66",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E5CF",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "6be87934bedc30564a19",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 10,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 10,
       "levelCandidates": [
@@ -107359,167 +107243,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=10|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 15,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E5CF",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E5D0",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "37e8ee37d3c19c97eb2c",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 10,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 10,
       "levelCandidates": [
@@ -107529,167 +107329,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=10|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 15,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E5D0",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E5D1",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "3d1c0452f11022d7fc8a",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 10,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 10,
       "levelCandidates": [
@@ -107699,155 +107415,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260713-013906",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-012651",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-033513",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=10|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
-              ],
-              "sourceIdentities": [
-                "0x794CD773",
-                "0x794CD779",
-                "0x794CD78A",
-                "0x795312BD",
-                "0x7953ADAB",
-                "0x7953ADBE"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 54,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 10,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 15,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 14, 31, 34]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E5D1",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79557F12",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "1cef20c998450476f1fa",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 11,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 37, 49]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17878|e21944516ef0",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c"
-              ],
-              "sourceIdentities": [
-                "0x794CD77C",
-                "0x7953ADB1"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 59,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17878|e21944516ef0",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 11,
       "levelCandidates": [
@@ -107857,152 +107501,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=11|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 37, 49]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17878|e21944516ef0",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c"
-              ],
-              "sourceIdentities": [
-                "0x794CD77C",
-                "0x7953ADB1"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 59,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17878|e21944516ef0",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 11,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 37, 49]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 37, 49]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 7,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 37, 49]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 37, 49]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x79557F12",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD68",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "26e744a2b100cdbaf80e",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 12,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 12,
       "levelCandidates": [
@@ -108012,169 +107587,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=12|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 12,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 10,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AD68",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545069",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "c34a66eae0e77786741e",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 12,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 12,
       "levelCandidates": [
@@ -108184,169 +107673,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=12|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 12,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 10,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x79545069",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545072",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "d462074facc2a9e76ba9",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 12,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 12,
       "levelCandidates": [
@@ -108356,169 +107759,83 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=12|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 12,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 10,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x79545072",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7957E128",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "cee2fd5f19f42fafaa52",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 12,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 12,
       "levelCandidates": [
@@ -108528,285 +107845,84 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=12|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-                "exact specialized runtime sequence for multiple captured AttackInfo streams"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
-              ],
-              "sourceIdentities": [
-                "0x794CD778",
-                "0x794CD78D",
-                "0x795312C9",
-                "0x7953AD99"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 65,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 12,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-            "exact specialized runtime sequence for multiple captured AttackInfo streams"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 10,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 29, 37, 46, 49]",
-        "exact specialized runtime sequence for multiple captured AttackInfo streams"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7957E128",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AA4B",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "a78fe96bd75c85138d88",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 13,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11995|f670e28fcddb",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  },
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13132|f670e28fcddb",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 2,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11994|b647eccdd681",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13131|b647eccdd681",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 2,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "non-normal-landed",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": true,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11903|96321c3bbe39",
-                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11990|9fbaa511abc6",
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11902|07a2e659133e",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  },
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13040|96321c3bbe39",
-                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13127|9fbaa511abc6",
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13039|07a2e659133e",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 2,
-              "observationType": "non-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {},
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 2,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 70,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
+      ],
       "level": 13,
       "levelCandidates": [
         13
@@ -108814,307 +107930,85 @@
       "levelCoverage": [
         {
           "captureSessions": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=13|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11995|f670e28fcddb",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  },
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13132|f670e28fcddb",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 2,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11994|b647eccdd681",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13131|b647eccdd681",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 2,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "non-normal-landed",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": true,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11903|96321c3bbe39",
-                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11990|9fbaa511abc6",
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11902|07a2e659133e",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  },
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13040|96321c3bbe39",
-                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13127|9fbaa511abc6",
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13039|07a2e659133e",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 2,
-              "observationType": "non-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {},
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 2,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AA4B"
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 70,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
+          ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 13,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 5,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AA4B",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953AD7D",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "b809006c031500eba894",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 13,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1675|f29a5350d7aa",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD7D"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1674|e7363c440a2a",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD7D"
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 70,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
+      ],
       "level": 13,
       "levelCandidates": [
         13
@@ -109122,179 +108016,84 @@
       "levelCoverage": [
         {
           "captureSessions": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=13|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1675|f29a5350d7aa",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD7D"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|1674|e7363c440a2a",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7953AD7D"
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 70,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
+          ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 13,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 5,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953AD7D",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x795451F5",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "c0358e414447731394f8",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 13,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12883|782b7c81d8c3",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12922|aae15d453a63"
-              ],
-              "sourceIdentities": [
-                "0x7953AA4B"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 70,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12883|782b7c81d8c3",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12922|aae15d453a63"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 13,
       "levelCandidates": [
@@ -109303,137 +108102,84 @@
       "levelCoverage": [
         {
           "captureSessions": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=13|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12883|782b7c81d8c3",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12922|aae15d453a63"
-              ],
-              "sourceIdentities": [
-                "0x7953AA4B"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 70,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12883|782b7c81d8c3",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12922|aae15d453a63"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 13,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 5,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "deterministic runtime SpecialAttackWeapon Unknown5 state selection across captured values [0, 40]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x795451F5",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-042205",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-043018"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953ABBF",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "1d10691a9ab3459d9d74",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 14,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7613|d4f1a2d4ae13",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73"
-              ],
-              "sourceIdentities": [
-                "0x7953ABAF"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 76,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ]
         }
       ],
       "evidencePacketIds": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7613|d4f1a2d4ae13",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
       ],
       "level": 14,
       "levelCandidates": [
@@ -109442,106 +108188,85 @@
       "levelCoverage": [
         {
           "captureSessions": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-042205",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-043018"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=14|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
-              ],
-              "excludedReason": "variant source identity does not match the runtime binding hint and semantic fallback is not capture-proven",
-              "observationType": "capture-certified-variant-not-runtime-ready",
-              "runtimeContractReady": false,
-              "runtimeMissingEvidence": [
-                "capture-backed non-equipped attack range",
-                "captured same-fight landed AttackInfo interval"
-              ],
-              "samplePacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7613|d4f1a2d4ae13",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73"
-              ],
-              "sourceIdentities": [
-                "0x7953ABAF"
-              ]
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 76,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
             }
           ],
           "evidencePacketIds": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7613|d4f1a2d4ae13",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
           ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
           "level": 14,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "capture-backed non-equipped attack range",
-            "captured same-fight landed AttackInfo interval"
-          ],
-          "semanticFallbackCaptureProven": true,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 5,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "capture-backed non-equipped attack range",
-        "captured same-fight landed AttackInfo interval"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953ABBF",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 364,
+      "captureSearchScope": null,
       "captureSessions": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7953ABAD",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "247a87f50d21866fe322",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
+      "disabledGameplayCapabilities": [],
+      "evidenceFound": [
+        {
+          "level": 17,
+          "observations": [
+            {
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 92,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
+            }
+          ]
+        }
       ],
-      "evidenceFound": [],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
+      ],
       "level": 17,
       "levelCandidates": [
         17
@@ -109549,45 +108274,48 @@
       "levelCoverage": [
         {
           "captureSessions": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-incomplete-sequence",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203739|level=17|name=Stim Fiend",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
-          "evidenceFound": [],
-          "evidencePacketIds": [],
-          "level": 17,
-          "missingEvidence": [
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "disabledGameplayCapability": null,
+          "evidenceFound": [
+            {
+              "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+              "generatedSpecialAttackWeaponValue": 92,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null
+            }
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde"
+          ],
+          "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+          "level": 17,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": null
         }
       ],
-      "matchingEvidenceSessionCount": 4,
-      "missingEvidence": [
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203739,
       "name": "Stim Fiend",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.stim_fiend",
       "runtimeSourceIdentityHint": "0x7953ABAD",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
@@ -244756,9 +243484,9 @@
   "surfaces": [
     {
       "actorCount": 322,
-      "certified": 43,
+      "certified": 57,
       "surface": "subway-ordinary",
-      "unresolved": 279
+      "unresolved": 265
     },
     {
       "actorCount": 3,
@@ -244828,8 +243556,8 @@
     }
   ],
   "totals": {
-    "certified": 97,
+    "certified": 111,
     "initialActorCount": 1512,
-    "unresolved": 1415
+    "unresolved": 1401
   }
 }
