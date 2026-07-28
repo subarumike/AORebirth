@@ -72,6 +72,16 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
   `20260727-223041` replay with zero decoder/extractor errors.
 
+- Generated RK mission interiors now have a capture-backed Stage 1 ACG
+  foundation. Five finalized lifecycle captures are canonicalized into
+  immutable, independently hash-validated, complete/selectable layout bundles;
+  eight older coherent shapes remain structural/objective-incomplete audit
+  bundles, and PF2 `1441804` remains explicitly excluded. A versioned mission
+  instance binding and deterministic fail-closed selector exist, but production
+  mission acceptance, persistence, mutable instance state, navigation, and
+  collision are intentionally not wired. Evidence:
+  `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
+
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
   `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the
   proven L10..L17 domain. Five exact raw SIW1 packets and five leave-one-out
