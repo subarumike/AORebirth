@@ -60,6 +60,37 @@ namespace AORebirth.Core.Playfields
         internal int SpecialAttackWeaponUnknown4 { get; private set; }
     }
 
+    internal sealed class OrdinaryEnemyEquippedCombatSetupInput
+    {
+        internal OrdinaryEnemyEquippedCombatSetupInput(
+            int monsterData,
+            int actorLevel,
+            int weaponLowTemplate,
+            int weaponHighTemplate,
+            int weaponQuality,
+            int weaponSlot)
+        {
+            this.MonsterData = monsterData;
+            this.ActorLevel = actorLevel;
+            this.WeaponLowTemplate = weaponLowTemplate;
+            this.WeaponHighTemplate = weaponHighTemplate;
+            this.WeaponQuality = weaponQuality;
+            this.WeaponSlot = weaponSlot;
+        }
+
+        internal int MonsterData { get; private set; }
+
+        internal int ActorLevel { get; private set; }
+
+        internal int WeaponLowTemplate { get; private set; }
+
+        internal int WeaponHighTemplate { get; private set; }
+
+        internal int WeaponQuality { get; private set; }
+
+        internal int WeaponSlot { get; private set; }
+    }
+
     /// <summary>
     /// Produces only numeric combat state whose exact runtime formula has been
     /// independently proven. Weapon identity and packet semantics remain selected
@@ -80,6 +111,13 @@ namespace AORebirth.Core.Playfields
         internal const int StimFiendMinimumLevel = 10;
 
         internal const int StimFiendMaximumLevel = 17;
+
+        internal const string MeldedPatternsFormulaId =
+            "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1";
+
+        internal const int MeldedPatternsMinimumLevel = 18;
+
+        internal const int MeldedPatternsMaximumLevel = 25;
 
         internal static bool TryGenerate(
             OrdinaryEnemyCombatSetupInput input,
@@ -127,6 +165,90 @@ namespace AORebirth.Core.Playfields
             }
 
             return false;
+        }
+
+        internal static bool TryGenerateEquipped(
+            OrdinaryEnemyEquippedCombatSetupInput input,
+            out OrdinaryEnemyCombatNumericSetup setup)
+        {
+            setup = null;
+            if (input == null
+                || input.MonsterData
+                   != NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                || input.ActorLevel < MeldedPatternsMinimumLevel
+                || input.ActorLevel > MeldedPatternsMaximumLevel
+                || input.WeaponSlot
+                   != NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot
+                || !IsMeldedPatternsWeaponLoadout(
+                    input.WeaponLowTemplate,
+                    input.WeaponHighTemplate,
+                    input.WeaponQuality))
+            {
+                return false;
+            }
+
+            // Exact positive-integer floor division. Captured L18, L19, L20,
+            // L21, L24, and L25 rows reproduce exactly. Unknown2 is the
+            // independently observed family offset from the same base value.
+            int value = checked((11 * input.ActorLevel) - 2) / 2;
+            setup = new OrdinaryEnemyCombatNumericSetup(
+                MeldedPatternsFormulaId,
+                value,
+                checked(value + 28),
+                value,
+                value);
+            return true;
+        }
+
+        internal static bool MatchesGeneratedEquippedSetup(
+            int monsterData,
+            int actorLevel,
+            CapturedEnemyCombatContract contract,
+            out OrdinaryEnemyCombatNumericSetup setup)
+        {
+            setup = null;
+            if (contract == null
+                || contract.AttackModel != CapturedEnemyAttackModel.EquippedWeapon
+                || !contract.UsesProductionEquippedWeaponValues
+                || !TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        monsterData,
+                        actorLevel,
+                        contract.WeaponLowId,
+                        contract.WeaponHighId,
+                        contract.WeaponQuality,
+                        contract.WeaponInventorySlot),
+                    out setup))
+            {
+                return false;
+            }
+
+            return contract.SpecialAttackWeaponUnknown1
+                   == setup.SpecialAttackWeaponUnknown1
+                   && contract.SpecialAttackWeaponUnknown2
+                   == setup.SpecialAttackWeaponUnknown2
+                   && contract.SpecialAttackWeaponUnknown3
+                   == setup.SpecialAttackWeaponUnknown3
+                   && contract.SpecialAttackWeaponUnknown4
+                   == setup.SpecialAttackWeaponUnknown4;
+        }
+
+        internal static bool IsMeldedPatternsWeaponLoadout(
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            return (lowTemplate == 121817
+                    && highTemplate == 121818
+                    && quality >= 1
+                    && quality <= 19)
+                   || (lowTemplate == 121818
+                       && highTemplate == 121818
+                       && quality == 20)
+                   || (lowTemplate == 121819
+                       && highTemplate == 121820
+                       && quality >= 21
+                       && quality <= 40);
         }
 
         internal static bool MatchesGeneratedSetup(

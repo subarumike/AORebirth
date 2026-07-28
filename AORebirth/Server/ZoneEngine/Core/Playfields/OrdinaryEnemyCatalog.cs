@@ -437,14 +437,12 @@ namespace AORebirth.Core.Playfields
                                 archetype.MonsterData
                                 == NpcCombatAttackRules
                                     .CapturedSubwayMeldedPatternsMonsterData
-                                && level == 25
-                                    ? CapturedSubwayCombatCatalog.ForOrdinary(
-                                            archetype,
-                                            sourceIdentity)
-                                        .WithProductionWeaponQuality()
+                                    ? CapturedEnemyCombatContract.Unresolved(
+                                        "Melded Patterns requires the exact owner-linked generation variant",
+                                        true)
                                     : archetype.MonsterData == DerangedShopperMonsterData
-                                      || archetype.MonsterData == LooterMonsterData
-                                      || CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
+                                || archetype.MonsterData == LooterMonsterData
+                                || CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)
                                     ? CapturedSubwayCombatCatalog.ForOrdinary(
                                         archetype,
                                         sourceIdentity)
@@ -461,6 +459,8 @@ namespace AORebirth.Core.Playfields
                         || archetype.MonsterData == IncompleteRebuildMonsterData
                         || archetype.MonsterData == RedundantScanMonsterData
                         || archetype.MonsterData == FragmentedSoulMonsterData
+                        || archetype.MonsterData
+                           == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
                             ? new Func<int, OrdinaryEnemySpawnVariant, CapturedEnemyCombatContract>(
                                 (sourceIdentity, variant) =>
                                     CapturedSubwayCombatCatalog.ForOrdinary(
@@ -667,13 +667,19 @@ namespace AORebirth.Core.Playfields
                             "fragmented_soul",
                             StringComparison.Ordinal)
                             ? FragmentedSoulMonsterData
-                            : string.Equals(
-                                source.ArchetypeKey,
-                                "premature_pattern",
+                        : string.Equals(
+                            source.ArchetypeKey,
+                            "premature_pattern",
                                 StringComparison.Ordinal)
                               && source.SourceInstance == PrematurePatternVariantSource
                                 ? PrematurePatternMonsterData
-                                : 0;
+                                : string.Equals(
+                                    source.ArchetypeKey,
+                                    "melded_patterns",
+                                    StringComparison.Ordinal)
+                                    ? NpcCombatAttackRules
+                                        .CapturedSubwayMeldedPatternsMonsterData
+                                    : 0;
             CapturedSubwayGenerationVariantDefinition[] capturedVariants =
                 expectedMonsterData == 0
                     ? new CapturedSubwayGenerationVariantDefinition[0]

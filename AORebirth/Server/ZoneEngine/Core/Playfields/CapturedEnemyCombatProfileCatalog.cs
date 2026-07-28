@@ -433,6 +433,48 @@ namespace AORebirth.Core.Playfields
                    && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
         }
 
+        internal bool SupportsMeldedPatternsMathematicalPacketSemantics
+        {
+            get
+            {
+                return this.SupportsCaptureProvenEquippedWeaponPacketSemantics
+                       && OrdinaryEnemyCombatSetupGenerator
+                           .IsMeldedPatternsWeaponLoadout(
+                               this.WeaponDefinition.LowId,
+                               this.WeaponDefinition.HighId,
+                               this.WeaponDefinition.Quality);
+            }
+        }
+
+        internal bool MatchesMeldedPatternsMathematicalPacketSemantics(
+            CapturedEnemyCombatProfileDefinition other)
+        {
+            if (!this.SupportsMeldedPatternsMathematicalPacketSemantics
+                || other == null
+                || !other.SupportsMeldedPatternsMathematicalPacketSemantics
+                || this.SpecialAttackWeaponN3Unknown
+                   != other.SpecialAttackWeaponN3Unknown
+                || this.AttackN3Unknown != other.AttackN3Unknown
+                || this.AttackAction != other.AttackAction
+                || !WeaponPacketStructureMatches(
+                    this.WeaponDefinition,
+                    other.WeaponDefinition))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileStreamDefinition left = this.Streams[0];
+            CapturedEnemyCombatProfileStreamDefinition right = other.Streams[0];
+            return left.WeaponSlot == right.WeaponSlot
+                   && left.DamageTypeWire == right.DamageTypeWire
+                   && left.HitTypeWire == right.HitTypeWire
+                   && left.WeaponInstance == right.WeaponInstance
+                   && left.N3Unknown == right.N3Unknown
+                   && left.CapturedUsesEquippedWeapon
+                      == right.CapturedUsesEquippedWeapon
+                   && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
+        }
+
         internal bool SupportsCaptureProvenNaturalAttackPacketSemantics
         {
             get
@@ -865,6 +907,54 @@ namespace AORebirth.Core.Playfields
             return true;
         }
 
+        private static bool WeaponPacketStructureMatches(
+            CapturedEnemyWeaponDefinition left,
+            CapturedEnemyWeaponDefinition right)
+        {
+            if (left == null
+                || right == null
+                || left.N3Unknown != right.N3Unknown
+                || left.Unknown1 != right.Unknown1
+                || left.InventorySlot != right.InventorySlot
+                || left.StateMachineType != right.StateMachineType
+                || left.StateMachineInstance != right.StateMachineInstance
+                || left.Unknown2 != right.Unknown2
+                || left.Unknown3 != right.Unknown3
+                || left.Stats.Length != right.Stats.Length)
+            {
+                return false;
+            }
+
+            for (int index = 0; index < left.Stats.Length; index++)
+            {
+                CapturedEnemyWeaponStatDefinition leftStat = left.Stats[index];
+                CapturedEnemyWeaponStatDefinition rightStat = right.Stats[index];
+                if (leftStat == null
+                    || rightStat == null
+                    || leftStat.Stat != rightStat.Stat)
+                {
+                    return false;
+                }
+
+                switch (leftStat.Stat)
+                {
+                    case CharacterStat.StaticInstance:
+                    case CharacterStat.ACGItemLevel:
+                    case CharacterStat.ACGItemTemplateID:
+                    case CharacterStat.ACGItemTemplateID2:
+                    case CharacterStat.Energy:
+                        continue;
+                }
+
+                if (leftStat.Value != rightStat.Value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private static bool NullableDoubleEquals(double? left, double? right)
         {
             return left.HasValue == right.HasValue
@@ -949,6 +1039,20 @@ namespace AORebirth.Core.Playfields
                     out naturalAttackContract))
             {
                 resolved = naturalAttackContract;
+                return true;
+            }
+
+            CapturedEnemyCombatContract generatedEquippedAttackContract;
+            if (TryResolveMathematicallyGeneratedEquippedWeaponArchetype(
+                    resourceId,
+                    name,
+                    monsterData,
+                    level,
+                    sourceIdentityHint,
+                    current,
+                    out generatedEquippedAttackContract))
+            {
+                resolved = generatedEquippedAttackContract;
                 return true;
             }
 
@@ -1242,6 +1346,136 @@ namespace AORebirth.Core.Playfields
             return resolved.IsCombatReady;
         }
 
+        private static bool TryResolveMathematicallyGeneratedEquippedWeaponArchetype(
+            int resourceId,
+            string name,
+            int monsterData,
+            int level,
+            int sourceIdentityHint,
+            CapturedEnemyCombatContract current,
+            out CapturedEnemyCombatContract resolved)
+        {
+            resolved = null;
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (!OrdinaryEnemyCombatSetupGenerator.MatchesGeneratedEquippedSetup(
+                    monsterData,
+                    level,
+                    current,
+                    out generated))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition[] family = Profiles.Where(
+                    value => value.MatchesArchetypeKey(resourceId, name, monsterData)
+                             && value
+                                 .SupportsMeldedPatternsMathematicalPacketSemantics)
+                .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
+                .ToArray();
+            if (family.Length == 0)
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition archetype = family[0];
+            if (family.Any(
+                value => !archetype
+                    .MatchesMeldedPatternsMathematicalPacketSemantics(value)))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition[] exactLoadout = family.Where(
+                value => value.MatchesStableWeaponProfile(current)).ToArray();
+            CapturedEnemyCombatProfileDefinition[] exactPair = family.Where(
+                value => value.MatchesStableWeaponFamily(current)).ToArray();
+            CapturedEnemyCombatProfileDefinition packetContext =
+                exactLoadout.FirstOrDefault(
+                    value => value.Level == level
+                             && value.ContainsSource(sourceIdentityHint))
+                ?? exactLoadout.FirstOrDefault(value => value.Level == level)
+                ?? exactLoadout.FirstOrDefault(
+                    value => value.ContainsSource(sourceIdentityHint))
+                ?? exactLoadout.FirstOrDefault()
+                ?? exactPair.FirstOrDefault(
+                    value => value.Level == level
+                             && value.ContainsSource(sourceIdentityHint))
+                ?? exactPair.FirstOrDefault(value => value.Level == level)
+                ?? exactPair.FirstOrDefault(
+                    value => value.ContainsSource(sourceIdentityHint))
+                ?? exactPair.FirstOrDefault()
+                ?? family[0];
+            int evidenceSourceIdentity =
+                packetContext.ContainsSource(sourceIdentityHint)
+                    ? sourceIdentityHint
+                    : packetContext.RepresentativeEvidenceSourceIdentity;
+            CapturedEnemyWeaponDefinition weapon =
+                packetContext.WeaponDefinition
+                    .WithEvidenceSourceIdentity(evidenceSourceIdentity)
+                    .WithProductionWeaponLoadout(
+                        current.WeaponLowId,
+                        current.WeaponHighId,
+                        current.WeaponQuality);
+            CapturedEnemyCombatProfileStreamDefinition stream =
+                packetContext.Streams[0];
+            int initialAmmo = weapon.InitialEnergy > 0
+                ? weapon.InitialEnergy - 1
+                : weapon.InitialEnergy;
+            string evidence = string.Join(
+                "; ",
+                family.Select(value => value.Evidence).Distinct().ToArray());
+            string archetypeId = string.Format(
+                "formula={0}|resource={1}|name={2}|MonsterData={3}|weaponFamily=121817..121835|profiles={4}",
+                generated.FormulaId,
+                resourceId,
+                name,
+                monsterData,
+                string.Join(
+                    ",",
+                    family.Select(value => value.ProfileId).ToArray()));
+
+            resolved = CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    evidence + "; generated numeric setup=" + generated.FormulaId,
+                    evidenceSourceIdentity,
+                    current.WeaponLowId,
+                    current.WeaponHighId,
+                    current.WeaponQuality,
+                    current.WeaponInventorySlot,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    initialAmmo,
+                    stream.DamageTypeWire,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    packetContext.SpecialAttackWeaponUnknown5,
+                    stream.HitTypeWire,
+                    stream.N3Unknown,
+                    packetContext.SpecialAttackWeaponN3Unknown,
+                    packetContext.AttackN3Unknown,
+                    packetContext.AttackAction,
+                    current.RequiresDamageLineOfSight,
+                    true,
+                    current.AiProfile)
+                .WithCapturedWeapon(weapon)
+                .WithCapturedSpecialAttackWeaponUnknown5Observations(
+                    packetContext.SpecialAttackWeaponUnknown5Observations)
+                .WithProductionEquippedWeaponValues()
+                .WithCaptureProvenArchetype(archetypeId);
+            return resolved.IsCombatReady;
+        }
+
         private static bool TryResolveProductionOwnedNaturalAttackProfile(
             int resourceId,
             string name,
@@ -1354,6 +1588,14 @@ namespace AORebirth.Core.Playfields
                     resourceId,
                     name,
                     monsterData)).ToArray();
+            if (current.UsesProductionEquippedWeaponValues
+                && monsterData
+                   == ZoneEngine.Core.Playfields.NpcCombatAttackRules
+                       .CapturedSubwayMeldedPatternsMonsterData)
+            {
+                return false;
+            }
+
             if (current.UsesProductionEquippedWeaponValues)
             {
                 CapturedEnemyCombatProfileDefinition[] exactProductionFamily = family.Where(

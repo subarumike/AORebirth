@@ -329,6 +329,2199 @@
       10
     ]
   },
+  "meldedPatternsFormula": {
+    "activeBindings": [
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 20,
+        "configuredSourceIdentity": "0x7954508E",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 153,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "level": 23,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "quarantined",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121818
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 19,
+        "configuredSourceIdentity": "0x7954517C",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 98,
+          "unknown2": 126,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "level": 18,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "certified",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121817
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 18,
+        "configuredSourceIdentity": "0x79545185",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 103,
+          "unknown2": 131,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "level": 19,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "certified",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121817
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 26,
+        "configuredSourceIdentity": "0x79545187",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "level": 21,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "quarantined",
+        "weaponHighTemplate": 121820,
+        "weaponLowTemplate": 121819
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 20,
+        "configuredSourceIdentity": "0x79545190",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 98,
+          "unknown2": 126,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "level": 18,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "quarantined",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121818
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 20,
+        "configuredSourceIdentity": "0x79545196",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 109,
+          "unknown2": 137,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "level": 20,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "quarantined",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121818
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 20,
+        "configuredSourceIdentity": "0x79545198",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "level": 21,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "quarantined",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121818
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 26,
+        "configuredSourceIdentity": "0x795451BA",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 120,
+          "unknown2": 148,
+          "unknown3": 120,
+          "unknown4": 120
+        },
+        "level": 22,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "quarantined",
+        "weaponHighTemplate": 121820,
+        "weaponLowTemplate": 121819
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 25,
+        "configuredSourceIdentity": "0x795451D8",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "level": 25,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "certified",
+        "weaponHighTemplate": 121820,
+        "weaponLowTemplate": 121819
+      },
+      {
+        "actorCount": 1,
+        "actorQualityLevel": 19,
+        "configuredSourceIdentity": "0x795451DD",
+        "evidenceCapture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "level": 25,
+        "monsterData": 203747,
+        "name": "Melded Patterns",
+        "preGenerationCoverageClassification": "certified",
+        "preGenerationCoverageUnresolvedReasons": [],
+        "resource": 127,
+        "startingClassification": "certified",
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121817
+      }
+    ],
+    "compatibleSemanticProfileIds": [
+      "41ec2f5fb41b8e2f-5f0a16ad1c7c6589",
+      "41ec2f5fb41b8e2f-95101dc382060622",
+      "477ae7aca2274b51-474eed6223e4ee5c",
+      "507420968010ac73-01ed8f89e4ecb861",
+      "507420968010ac73-e34cd954337a7dcf",
+      "507420968010ac73-ef6d2cf09c6524ec",
+      "507420968010ac73-fc12498b7e77187d",
+      "550de529541c8221-239b7c7cd80ed8c4",
+      "67f518afac8fd529-88660aa55a7b2d5c",
+      "a867d5624faafcec-2125d88ca85e181c",
+      "a867d5624faafcec-8fb16c7c66cd28fc"
+    ],
+    "crossFamilyHeldOut": {
+      "conclusion": "no other family enters the exact MonsterData, equipped weapon-domain, slot, and stream selector",
+      "exactMatches": 0,
+      "observations": []
+    },
+    "exactCategoricalDomains": [
+      {
+        "actorQualityLevelsInclusive": [
+          1,
+          19
+        ],
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121817
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          20,
+          20
+        ],
+        "weaponHighTemplate": 121818,
+        "weaponLowTemplate": 121818
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          21,
+          40
+        ],
+        "weaponHighTemplate": 121820,
+        "weaponLowTemplate": 121819
+      }
+    ],
+    "family": "Melded Patterns",
+    "formulaFamiliesTested": [
+      "exact affine integer formulas",
+      "exact affine rational formulas",
+      "floor division",
+      "ceiling division",
+      "nearest-away division",
+      "nearest-even division",
+      "finite differences",
+      "bounded actor-level formulas",
+      "weapon-quality-only formulas",
+      "item-template transformations",
+      "AttackDelay and RechargeDelay transformations",
+      "stream-specific formulas",
+      "breakpoint and piecewise formulas",
+      "integer clamps",
+      "existing Stim Fiend base formula"
+    ],
+    "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+    "leaveOneOut": [
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 18,
+        "heldOutObserved": {
+          "unknown1": 98,
+          "unknown2": 126,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "prediction": {
+          "unknown1": 98,
+          "unknown2": 126,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "trainingObservations": {
+          "19": 103,
+          "20": 109,
+          "21": 114,
+          "24": 131,
+          "25": 136
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 19,
+        "heldOutObserved": {
+          "unknown1": 103,
+          "unknown2": 131,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "prediction": {
+          "unknown1": 103,
+          "unknown2": 131,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "trainingObservations": {
+          "18": 98,
+          "20": 109,
+          "21": 114,
+          "24": 131,
+          "25": 136
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 20,
+        "heldOutObserved": {
+          "unknown1": 109,
+          "unknown2": 137,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "prediction": {
+          "unknown1": 109,
+          "unknown2": 137,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "trainingObservations": {
+          "18": 98,
+          "19": 103,
+          "21": 114,
+          "24": 131,
+          "25": 136
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 21,
+        "heldOutObserved": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "prediction": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "trainingObservations": {
+          "18": 98,
+          "19": 103,
+          "20": 109,
+          "24": 131,
+          "25": 136
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 24,
+        "heldOutObserved": {
+          "unknown1": 131,
+          "unknown2": 159,
+          "unknown3": 131,
+          "unknown4": 131
+        },
+        "prediction": {
+          "unknown1": 131,
+          "unknown2": 159,
+          "unknown3": 131,
+          "unknown4": 131
+        },
+        "trainingObservations": {
+          "18": 98,
+          "19": 103,
+          "20": 109,
+          "21": 114,
+          "25": 136
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 25,
+        "heldOutObserved": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "prediction": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "trainingObservations": {
+          "18": 98,
+          "19": 103,
+          "20": 109,
+          "21": 114,
+          "24": 131
+        }
+      }
+    ],
+    "monsterData": 203747,
+    "numericOutput": {
+      "baseExpression": "floor((11 * actorLevel - 2) / 2)",
+      "clamping": "none inside the proven level domain",
+      "fields": {
+        "SpecialAttackWeapon.unknown1": "base",
+        "SpecialAttackWeapon.unknown2": "base + 28",
+        "SpecialAttackWeapon.unknown3": "base",
+        "SpecialAttackWeapon.unknown4": "base"
+      },
+      "integerArithmetic": "positive integer truncation equals floor",
+      "unknown5": "per-actor ordered mutable capture state; not formula identity"
+    },
+    "rawPacketObservations": [
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9883|98e2b395b62c",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9812|bd6b83df633e",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 98,
+            "unknown2": 126,
+            "unknown3": 98,
+            "unknown4": 98,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121818
+              },
+              {
+                "stat": 701,
+                "value": 20
+              },
+              {
+                "stat": 702,
+                "value": 121818
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507954519000000003F1000000620000007E000000620000006200000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 98,
+          "unknown2": 126,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|0x7954517C|scfu=8199",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9811|b5636ccbdb2d",
+        "semanticProfileId": "a867d5624faafcec-2125d88ca85e181c",
+        "sequence": 9811,
+        "sourceIdentity": "0x79545190",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9811|b5636ccbdb2d",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9883|98e2b395b62c"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              23
+            ],
+            "firstHitDelayObservationsSeconds": [
+              2.100003
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 23,
+            "minimumObservedDamage": 23,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T04:00:20.4508927Z",
+        "unknown1": 98,
+        "unknown2": 126,
+        "unknown3": 98,
+        "unknown4": 98,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9115|248da964b211"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9056|db54a10b514a",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8792|35ad69f1dc98",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 98,
+            "unknown2": 126,
+            "unknown3": 98,
+            "unknown4": 98,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121817
+              },
+              {
+                "stat": 701,
+                "value": 19
+              },
+              {
+                "stat": 702,
+                "value": 121817
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507954517C00000003F1000000620000007E000000620000006200000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 98,
+          "unknown2": 126,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|0x7954517C|scfu=8199",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8791|2540333ef429",
+        "semanticProfileId": "a867d5624faafcec-8fb16c7c66cd28fc",
+        "sequence": 8791,
+        "sourceIdentity": "0x7954517C",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8791|2540333ef429",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19,
+              18
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9056|db54a10b514a",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9286|b2d602e5a801"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              17,
+              17
+            ],
+            "firstHitDelayObservationsSeconds": [
+              8.584313
+            ],
+            "landedIntervalObservationsSeconds": [
+              7.658567
+            ],
+            "maximumObservedDamage": 17,
+            "minimumObservedDamage": 17,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T03:59:48.8839186Z",
+        "unknown1": 98,
+        "unknown2": 126,
+        "unknown3": 98,
+        "unknown4": 98,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|8200|b658ccc34af9"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7971|864813ac9c4a",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7904|b910dadd3ed4",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 103,
+            "unknown2": 131,
+            "unknown3": 103,
+            "unknown4": 103,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121819
+              },
+              {
+                "stat": 701,
+                "value": 22
+              },
+              {
+                "stat": 702,
+                "value": 121819
+              },
+              {
+                "stat": 703,
+                "value": 121820
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507980F10700000003F10000006700000083000000670000006700000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 103,
+          "unknown2": 131,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "level": 19,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|0x7980F13F|scfu=3436",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7903|dafa91521296",
+        "semanticProfileId": "67f518afac8fd529-88660aa55a7b2d5c",
+        "sequence": 7903,
+        "sourceIdentity": "0x7980F107",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7903|dafa91521296",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7971|864813ac9c4a"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              17
+            ],
+            "firstHitDelayObservationsSeconds": [
+              3.369501
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 17,
+            "minimumObservedDamage": 17,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-20T10:24:16.0540504Z",
+        "unknown1": 103,
+        "unknown2": 131,
+        "unknown3": 103,
+        "unknown4": 103,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7491|3ef7e2bc2bd4"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8741|d5e6fba49125",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8731|93d8ce935bc8",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 109,
+            "unknown2": 137,
+            "unknown3": 109,
+            "unknown4": 109,
+            "unknown5": 49
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121818
+              },
+              {
+                "stat": 701,
+                "value": 20
+              },
+              {
+                "stat": 702,
+                "value": 121818
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507954519600000003F10000006D000000890000006D0000006D00000031",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 109,
+          "unknown2": 137,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "level": 20,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545196|scfu=7892",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8730|d175c0c7a232",
+        "semanticProfileId": "477ae7aca2274b51-474eed6223e4ee5c",
+        "sequence": 8730,
+        "sourceIdentity": "0x79545196",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8730|d175c0c7a232",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19,
+              18,
+              17
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8741|d5e6fba49125",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8848|befce1e2c074",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9148|2f8900fb2730"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              22,
+              25,
+              28
+            ],
+            "firstHitDelayObservationsSeconds": [
+              0.483201,
+              5.433583
+            ],
+            "landedIntervalObservationsSeconds": [
+              4.533262
+            ],
+            "maximumObservedDamage": 28,
+            "minimumObservedDamage": 22,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T03:30:25.7643937Z",
+        "unknown1": 109,
+        "unknown2": 137,
+        "unknown3": 109,
+        "unknown4": 109,
+        "unknown5": 49,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7893|e6fbfc34c65b"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9148|2f8900fb2730",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8979|fef8d78ebeaa",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 109,
+            "unknown2": 137,
+            "unknown3": 109,
+            "unknown4": 109,
+            "unknown5": 49
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121818
+              },
+              {
+                "stat": 701,
+                "value": 20
+              },
+              {
+                "stat": 702,
+                "value": 121818
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507954519600000003F10000006D000000890000006D0000006D0000003A",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 109,
+          "unknown2": 137,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "level": 20,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545196|scfu=7892",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8978|b9f213f54530",
+        "semanticProfileId": "477ae7aca2274b51-474eed6223e4ee5c",
+        "sequence": 8978,
+        "sourceIdentity": "0x79545196",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8978|b9f213f54530",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19,
+              18,
+              17
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8741|d5e6fba49125",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8848|befce1e2c074",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9148|2f8900fb2730"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              22,
+              25,
+              28
+            ],
+            "firstHitDelayObservationsSeconds": [
+              0.483201,
+              5.433583
+            ],
+            "landedIntervalObservationsSeconds": [
+              4.533262
+            ],
+            "maximumObservedDamage": 28,
+            "minimumObservedDamage": 22,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T03:30:36.5308625Z",
+        "unknown1": 109,
+        "unknown2": 137,
+        "unknown3": 109,
+        "unknown4": 109,
+        "unknown5": 58,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7893|e6fbfc34c65b"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8122|fa23fbcd4eef",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7856|fb1e0838a8c8",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 114,
+            "unknown2": 142,
+            "unknown3": 114,
+            "unknown4": 114,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121819
+              },
+              {
+                "stat": 701,
+                "value": 26
+              },
+              {
+                "stat": 702,
+                "value": 121819
+              },
+              {
+                "stat": 703,
+                "value": 121820
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507954518700000003F1000000720000008E000000720000007200000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545187|scfu=6834",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7855|d04345becb44",
+        "semanticProfileId": "507420968010ac73-01ed8f89e4ecb861",
+        "sequence": 7855,
+        "sourceIdentity": "0x79545187",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7855|d04345becb44",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8122|fa23fbcd4eef"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              34
+            ],
+            "firstHitDelayObservationsSeconds": [
+              4.092869
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 34,
+            "minimumObservedDamage": 34,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T03:30:07.6714251Z",
+        "unknown1": 114,
+        "unknown2": 142,
+        "unknown3": 114,
+        "unknown4": 114,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6835|383398c1928c"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10665|08c8f62ec865",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10520|c5d7ff615e43",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 114,
+            "unknown2": 142,
+            "unknown3": 114,
+            "unknown4": 114,
+            "unknown5": 52
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121818
+              },
+              {
+                "stat": 701,
+                "value": 20
+              },
+              {
+                "stat": 702,
+                "value": 121818
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507954519800000003F1000000720000008E000000720000007200000034",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545187|scfu=6834",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10519|8ac926b443d3",
+        "semanticProfileId": "507420968010ac73-e34cd954337a7dcf",
+        "sequence": 10519,
+        "sourceIdentity": "0x79545198",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10519|8ac926b443d3",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19,
+              18
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10665|08c8f62ec865",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10857|ef406bf5ae39"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              33,
+              27
+            ],
+            "firstHitDelayObservationsSeconds": [
+              3.432471
+            ],
+            "landedIntervalObservationsSeconds": [
+              4.466488
+            ],
+            "maximumObservedDamage": 33,
+            "minimumObservedDamage": 27,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T04:00:41.7178142Z",
+        "unknown1": 114,
+        "unknown2": 142,
+        "unknown3": 114,
+        "unknown4": 114,
+        "unknown5": 52,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|9762|af049abfc804"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7994|0d11880d7bac",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7915|deb6ad8f9a8b",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 114,
+            "unknown2": 142,
+            "unknown3": 114,
+            "unknown4": 114,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121819
+              },
+              {
+                "stat": 701,
+                "value": 22
+              },
+              {
+                "stat": 702,
+                "value": 121819
+              },
+              {
+                "stat": 703,
+                "value": 121820
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507980F10600000003F1000000720000008E000000720000007200000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545187|scfu=6834",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7914|702f190544b0",
+        "semanticProfileId": "507420968010ac73-ef6d2cf09c6524ec",
+        "sequence": 7914,
+        "sourceIdentity": "0x7980F106",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7914|702f190544b0",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7994|0d11880d7bac"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              19
+            ],
+            "firstHitDelayObservationsSeconds": [
+              4.201018
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 19,
+            "minimumObservedDamage": 19,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-20T10:24:16.9160660Z",
+        "unknown1": 114,
+        "unknown2": 142,
+        "unknown3": 114,
+        "unknown4": 114,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7489|66621ce17e5d"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7582|167526e32116",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7528|d577b1bb69ef",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 114,
+            "unknown2": 142,
+            "unknown3": 114,
+            "unknown4": 114,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121819
+              },
+              {
+                "stat": 701,
+                "value": 23
+              },
+              {
+                "stat": 702,
+                "value": 121819
+              },
+              {
+                "stat": 703,
+                "value": 121820
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C3507980F14900000003F1000000720000008E000000720000007200000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 114,
+          "unknown2": 142,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545187|scfu=6834",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7527|92b27529ca50",
+        "semanticProfileId": "507420968010ac73-fc12498b7e77187d",
+        "sequence": 7527,
+        "sourceIdentity": "0x7980F149",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7527|92b27529ca50",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|7582|167526e32116"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              15
+            ],
+            "firstHitDelayObservationsSeconds": [
+              3.221999
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 15,
+            "minimumObservedDamage": 15,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-20T10:23:58.9050719Z",
+        "unknown1": 114,
+        "unknown2": 142,
+        "unknown3": 114,
+        "unknown4": 114,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5406|4e6c246a3cd3"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2706|4541a5000892",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2528|82ad52f4a6fa",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 131,
+            "unknown2": 159,
+            "unknown3": 131,
+            "unknown4": 131,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121819
+              },
+              {
+                "stat": 701,
+                "value": 30
+              },
+              {
+                "stat": 702,
+                "value": 121819
+              },
+              {
+                "stat": 703,
+                "value": 121820
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C350798037DE00000003F1000000830000009F000000830000008300000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 131,
+          "unknown2": 159,
+          "unknown3": 131,
+          "unknown4": 131
+        },
+        "level": 24,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|0x798037DE|scfu=1036",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2527|6e6a03106de2",
+        "semanticProfileId": "550de529541c8221-239b7c7cd80ed8c4",
+        "sequence": 2527,
+        "sourceIdentity": "0x798037DE",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2527|6e6a03106de2",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              18
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2706|4541a5000892"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              21
+            ],
+            "firstHitDelayObservationsSeconds": [
+              10.785799
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 21,
+            "minimumObservedDamage": 21,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-20T10:19:19.2878023Z",
+        "unknown1": 131,
+        "unknown2": 159,
+        "unknown3": 131,
+        "unknown4": 131,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1037|2a2a3b349719"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12777|42c67b98aeb2",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12675|f8ec554edeaa",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 136,
+            "unknown2": 164,
+            "unknown3": 136,
+            "unknown4": 136,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121817
+              },
+              {
+                "stat": 701,
+                "value": 19
+              },
+              {
+                "stat": 702,
+                "value": 121817
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C350795451DD00000003F100000088000000A4000000880000008800000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "level": 25,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x795451DD|scfu=11651",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12674|e5cb9935961f",
+        "semanticProfileId": "41ec2f5fb41b8e2f-5f0a16ad1c7c6589",
+        "sequence": 12674,
+        "sourceIdentity": "0x795451DD",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12674|e5cb9935961f",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19,
+              0,
+              0
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12777|42c67b98aeb2",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15641|0ec176e6c849",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15766|f238fa6fe8b4"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              25,
+              34,
+              27
+            ],
+            "firstHitDelayObservationsSeconds": [
+              2.984133,
+              18.044752
+            ],
+            "landedIntervalObservationsSeconds": [
+              4.378445
+            ],
+            "maximumObservedDamage": 34,
+            "minimumObservedDamage": 25,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T03:31:58.5101861Z",
+        "unknown1": 136,
+        "unknown2": 164,
+        "unknown3": 136,
+        "unknown4": 136,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|11652|38ef58bba40e"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15641|0ec176e6c849",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15078|71f716333a3f",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 136,
+            "unknown2": 164,
+            "unknown3": 136,
+            "unknown4": 136,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121817
+              },
+              {
+                "stat": 701,
+                "value": 19
+              },
+              {
+                "stat": 702,
+                "value": 121817
+              },
+              {
+                "stat": 703,
+                "value": 121818
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C350795451DD00000003F100000088000000A4000000880000008800000055",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "level": 25,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x795451DD|scfu=11651",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15077|0e510533da86",
+        "semanticProfileId": "41ec2f5fb41b8e2f-5f0a16ad1c7c6589",
+        "sequence": 15077,
+        "sourceIdentity": "0x795451DD",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15077|0e510533da86",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19,
+              0,
+              0
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12777|42c67b98aeb2",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15641|0ec176e6c849",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15766|f238fa6fe8b4"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              25,
+              34,
+              27
+            ],
+            "firstHitDelayObservationsSeconds": [
+              2.984133,
+              18.044752
+            ],
+            "landedIntervalObservationsSeconds": [
+              4.378445
+            ],
+            "maximumObservedDamage": 34,
+            "minimumObservedDamage": 25,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T04:04:00.5335139Z",
+        "unknown1": 136,
+        "unknown2": 164,
+        "unknown3": 136,
+        "unknown4": 136,
+        "unknown5": 85,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|14817|adde67512877"
+      },
+      {
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3242|100f511696d7",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3128|b9983c3a5d15",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [],
+            "unknown1": 136,
+            "unknown2": 164,
+            "unknown3": 136,
+            "unknown4": 136,
+            "unknown5": 0
+          },
+          "weaponContextKind": "equipped",
+          "weaponItemFullUpdate": {
+            "inventorySlot": 6,
+            "n3Unknown": 0,
+            "stateMachineInstance": 0,
+            "stateMachineType": 1000015,
+            "stats": [
+              {
+                "stat": 0,
+                "value": 1027
+              },
+              {
+                "stat": 23,
+                "value": 121819
+              },
+              {
+                "stat": 701,
+                "value": 27
+              },
+              {
+                "stat": 702,
+                "value": 121819
+              },
+              {
+                "stat": 703,
+                "value": 121820
+              },
+              {
+                "stat": 412,
+                "value": 1
+              },
+              {
+                "stat": 26,
+                "value": 20
+              },
+              {
+                "stat": 294,
+                "value": 235
+              },
+              {
+                "stat": 210,
+                "value": 235
+              }
+            ],
+            "unknown1": 11,
+            "unknown2": 262,
+            "unknown3": 0
+          }
+        },
+        "bodyHex": "1D3C0F1C0000C350798037E700000003F100000088000000A4000000880000008800000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValues": {
+          "unknown1": 136,
+          "unknown2": 164,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "level": 25,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x795451DD|scfu=11651",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3127|25e550543b11",
+        "semanticProfileId": "41ec2f5fb41b8e2f-95101dc382060622",
+        "sequence": 3127,
+        "sourceIdentity": "0x798037E7",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3127|25e550543b11",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              19
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3242|100f511696d7"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              22
+            ],
+            "firstHitDelayObservationsSeconds": [
+              6.355736
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 22,
+            "minimumObservedDamage": 22,
+            "signature": {
+              "ammoMode": "finite-mutable",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 0,
+              "weaponSlot": 6
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "terminalHit": false,
+        "timestampUtc": "2026-07-20T10:19:44.7732058Z",
+        "unknown1": 136,
+        "unknown2": 164,
+        "unknown3": 136,
+        "unknown4": 136,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1039|18adfcb43302"
+      }
+    ],
+    "rejectedCandidates": [
+      {
+        "candidate": "unrounded (11 * level - 2) / 2",
+        "mismatches": 3,
+        "reason": "levels 19, 21, and 25 are half-integers"
+      },
+      {
+        "candidate": "ceiling or nearest-away division",
+        "mismatches": 3,
+        "reason": "all three captured odd levels round above raw SAW"
+      },
+      {
+        "candidate": "nearest-even division",
+        "mismatches": 1,
+        "reason": "captured level 19 rounds above raw SAW"
+      },
+      {
+        "candidate": "four identical SAW fields",
+        "mismatches": 13,
+        "reason": "Unknown2 is exactly base plus 28 in every raw packet"
+      },
+      {
+        "candidate": "weapon QL as the sole numeric input",
+        "mismatches": 5,
+        "reason": "QL19 and QL20 each occur at multiple actor levels with different exact SAW values"
+      },
+      {
+        "candidate": "direct item-template interpolation",
+        "mismatches": 6,
+        "reason": "items.dat selects loadout, damage, range, and cadence but does not encode the observed SAW base values"
+      },
+      {
+        "candidate": "unbounded Melded Patterns level domain",
+        "reason": "levels below 18 and above 25 lack categorical and formula proof"
+      }
+    ],
+    "resource": 127,
+    "runtimeInputOwners": {
+      "actorLevelAndQualityLevel": "CapturedSubwayOrdinarySpawnDefinition generated from the owner-linked population row",
+      "monsterDataAndFamily": "CapturedSubwayOrdinaryArchetypeDefinition",
+      "mutableEnergyAmmoAndSawState": "existing per-actor combat contract/runtime state",
+      "weaponQlAcgItemLevelDamageRangeAndCadence": "active spawn, items.dat, and existing production combat owners",
+      "weaponSlotAndInstance": "NpcCombatAttackRules capture-bound Melded Patterns constants",
+      "weaponTemplates": "owner-linked WeaponItemFullUpdate plus items.dat interpolation-domain validation"
+    },
+    "sharedCategoricalSemantics": {
+      "attackAction": 0,
+      "attackMode": "equipped",
+      "attackN3": 0,
+      "instance": 0,
+      "numericDamageType": 0,
+      "numericHitType": 3,
+      "packetOrder": [
+        "WeaponItemFullUpdate",
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo"
+      ],
+      "slot": 6,
+      "specialAttackWeaponN3": 0,
+      "specials": [],
+      "streamCount": 1,
+      "streamOrdinal": 0,
+      "terminalOutcomesAreNotAdditionalStreams": true,
+      "weaponFamily": "items.dat interpolation list 121817..121835"
+    },
+    "supportedLevelsInclusive": [
+      18,
+      25
+    ]
+  },
   "profiles": [
     {
       "incompleteObservationCount": 7,
@@ -218377,9 +220570,18 @@
           "name": "Uncontrollable Anger",
           "observed": 120,
           "semanticProfileId": "0f23e947e073a1aa-89afb5ae2e3ad61b"
+        },
+        {
+          "disobedientBotFormulaPrediction": 206,
+          "exactMatch": false,
+          "level": 42,
+          "monsterData": 26097,
+          "name": "Pedro Peasley",
+          "observed": 239,
+          "semanticProfileId": "37d3167c706c473c-b075dd488bd14418"
         }
       ],
-      "reason": "only 7 of 27 other-family observations match; MonsterData/family remains exact"
+      "reason": "only 7 of 28 other-family observations match; MonsterData/family remains exact"
     },
     {
       "candidate": "unbounded extrapolation",

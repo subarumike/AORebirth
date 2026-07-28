@@ -288,7 +288,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 "corpusSearch.sessionsSearched",
                 StringMember(cursed, "captureSearchScope"));
-            Assert.AreEqual(364, IntMember(cursed, "captureSessionCountSearched"));
+            Assert.AreEqual(374, IntMember(cursed, "captureSessionCountSearched"));
             Assert.AreEqual(
                 IntMember(corpusSearch, "sessionCount"),
                 IntMember(cursed, "captureSessionCountSearched"));
@@ -443,9 +443,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         runtimeCatalog.GetProfiles().Single(
                             value => value.DisplayName == name
                                      && value.MonsterData == monsterData);
-                    runtimeBaseline = runtimeProfile.Combat.ResolveContract(
-                        sourceIdentity,
-                        level);
+                    if (name == "Melded Patterns")
+                    {
+                        OrdinaryEnemySpawnDefinition runtimeSpawn =
+                            runtimeCatalog.GetSpawns().Single(
+                                value => value.PlayfieldInstance == resource
+                                         && value.SourceIdentity
+                                            == sourceIdentity);
+                        OrdinaryEnemySpawnVariant runtimeVariant =
+                            runtimeSpawn.LevelDefinition
+                                .GetExplicitVariants().Single(
+                                    value => value.Level == level);
+                        runtimeBaseline =
+                            runtimeProfile.Combat.ResolveContract(
+                                sourceIdentity,
+                                runtimeVariant);
+                        runtimeBaseline.Retaliates = true;
+                        runtimeBaseline.AiProfile =
+                            ZoneEngine.Core.NpcAiProfile.Passive;
+                    }
+                    else
+                    {
+                        runtimeBaseline =
+                            runtimeProfile.Combat.ResolveContract(
+                                sourceIdentity,
+                                level);
+                    }
                 }
                 else
                 {

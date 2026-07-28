@@ -4,6 +4,20 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Melded Patterns MonsterData `203747` now uses the bounded mathematical setup
+  `base=floor((11*actorLevel-2)/2)` and SAW fields
+  `base/base+28/base/base` across the exact L18..L25 equipped-weapon domain.
+  All `13` raw SAW observations, `11` complete semantic profiles, and `6`
+  leave-one-out evaluations are exact. Active generation state owns level, QL,
+  and the exact `items.dat` interpolation tuple (`121817/121818`,
+  `121818/121818`, or `121819/121820`); capture retains equipped mode, slot
+  `6`, instance `0`, action `0`, one normal stream, hit/damage wires `3/0`,
+  and WIFU -> SAW -> Attack -> AttackInfo order. All `10` active actors are
+  certified, restoring the six checkpoint quarantine actors. PF127/PF1931 are
+  now `357/132` of `489` (`270/52` and `87/80`); the fixed 53-actor Subway
+  scope is `32/21`. Evidence:
+  `docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md`.
+
 - Mission capture tooling now records usable structured terminal, roll, offer,
   Cash, acceptance, key/tool, quest-action, local teleport, playfield-init, and
   cleanup evidence while preserving the raw packet superset. The extractor
@@ -26,9 +40,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   mutable SAW state. The L12 terminal-only damage-type-4 observation is not a
   reusable repeating stream. Six fixed-scope actors are restored; L9 remains
   fail-closed outside the proven domain. The full active family is `14/1`.
-  PF127/PF1931 are now `351` certified and `138` quarantined of `489` unique
-  actors (`264/58` in PF127 and unchanged `87/80` in PF1931); the fixed
-  53-actor scope is `26/27`. Evidence:
+  Those accepted totals were `351/138` before the later Melded Patterns
+  restoration (`264/58` in PF127 and unchanged `87/80` in PF1931); the then
+  current fixed 53-actor scope was `26/27`. Evidence:
   `docs/evidence/STIM_FIEND_COMBAT_SETUP_FORMULA_20260727.md`.
 
 - Disobedient Bot MonsterData `17649` now uses the bounded mathematical setup

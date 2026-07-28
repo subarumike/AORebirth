@@ -190,6 +190,47 @@ namespace AORebirth.Core.Playfields
                                  : value).ToArray(),
                 this.Unknown3);
         }
+
+        internal CapturedEnemyWeaponDefinition WithProductionWeaponLoadout(
+            int lowId,
+            int highId,
+            int quality)
+        {
+            return new CapturedEnemyWeaponDefinition(
+                this.Evidence,
+                this.EvidenceSourceIdentity,
+                this.N3Unknown,
+                this.Unknown1,
+                this.InventorySlot,
+                this.StateMachineType,
+                this.StateMachineInstance,
+                this.Unknown2,
+                this.Stats.Select(
+                    value =>
+                    {
+                        uint replacement;
+                        switch (value.Stat)
+                        {
+                            case CharacterStat.StaticInstance:
+                            case CharacterStat.ACGItemTemplateID:
+                                replacement = unchecked((uint)lowId);
+                                break;
+                            case CharacterStat.ACGItemLevel:
+                                replacement = unchecked((uint)quality);
+                                break;
+                            case CharacterStat.ACGItemTemplateID2:
+                                replacement = unchecked((uint)highId);
+                                break;
+                            default:
+                                return value;
+                        }
+
+                        return new CapturedEnemyWeaponStatDefinition(
+                            value.Stat,
+                            replacement);
+                    }).ToArray(),
+                this.Unknown3);
+        }
     }
 
     internal sealed class CapturedEnemyCombatAttackDefinition
@@ -3259,6 +3300,90 @@ namespace AORebirth.Core.Playfields
                 (int)WeaponSlots.Righthand);
         }
 
+        private static CapturedEnemyCombatContract ForMeldedPatterns(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            OrdinaryEnemySpawnVariant variant,
+            CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat = archetype == null
+                ? null
+                : archetype.Combat;
+            OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
+                ? null
+                : variant.WeaponLoadout;
+            OrdinaryEnemyCombatNumericSetup generated;
+            string atomicFailure;
+            if (combat == null
+                || !combat.Observed
+                || !combat.RuntimeReady
+                || archetype.MonsterData
+                   != NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                || !OrdinaryEnemyAtomicGenerationEvidenceValidator.TryValidateSelectedVariant(
+                    NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData,
+                    sourceInstance,
+                    variant,
+                    generationEvidence,
+                    out atomicFailure)
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        archetype.MonsterData,
+                        variant.Level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot),
+                    out generated))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Melded Patterns combat requires one exact owner-linked weapon generation inside the proven mathematical setup domain",
+                    combat != null && combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    string.Format(
+                        "{0}: Melded Patterns source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5}; numeric SAW setup={6}; weapon item owns damage, range, and cadence",
+                        weapon.Evidence,
+                        sourceInstance,
+                        variant.Level,
+                        weapon.Quality,
+                        weapon.LowId,
+                        weapon.HighId,
+                        generated.FormulaId),
+                    sourceInstance,
+                    weapon.LowId,
+                    weapon.HighId,
+                    weapon.Quality,
+                    NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues();
+        }
+
         internal static CapturedEnemyCombatContract ForOrdinary(
             CapturedSubwayOrdinaryArchetypeDefinition archetype)
         {
@@ -3476,6 +3601,17 @@ namespace AORebirth.Core.Playfields
                 && archetype.MonsterData == FragmentedSoulMonsterData)
             {
                 return ForFragmentedSoul(
+                    archetype,
+                    sourceInstance,
+                    variant,
+                    generationEvidence);
+            }
+
+            if (archetype != null
+                && archetype.MonsterData
+                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
+            {
+                return ForMeldedPatterns(
                     archetype,
                     sourceInstance,
                     variant,

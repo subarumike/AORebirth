@@ -3138,6 +3138,50 @@ def premature_pattern_generation_variants() -> list[dict[str, object]]:
     )
 
 
+def melded_patterns_generation_variants(
+    spawns: list[dict[str, str]],
+) -> list[dict[str, object]]:
+    rows = [row for row in spawns if row["Name"] == "Melded Patterns"]
+    if len(rows) != 10:
+        raise ValueError(
+            "Melded Patterns active population drifted expected=10 actual={0}".format(
+                len(rows)
+            )
+        )
+
+    records = []
+    for row in rows:
+        capture = row["EvidenceCapture"]
+        identity = row["Identity"]
+        captured_weapons = captured_weapon_tuples(capture, identity)
+        if len(captured_weapons) != 1:
+            raise ValueError(
+                "Melded Patterns owner-linked weapon is not unique capture={0} identity={1} tuples={2}".format(
+                    capture, identity, sorted(captured_weapons)
+                )
+            )
+        low, high, quality = next(iter(captured_weapons))
+        records.append(
+            {
+                "monsterData": 203747,
+                "source": int(identity_hex(identity), 16),
+                "level": int(row["Level"]),
+                "health": int(row["Health"]),
+                "healthDamage": int(row["HealthDamage"]),
+                "monsterScale": int(row["MonsterScale"]),
+                "runSpeed": int(row["RunSpeedBase"]),
+                "low": low,
+                "high": high,
+                "quality": quality,
+                "evidence": [capture + ":" + identity],
+            }
+        )
+
+    if len({int(record["source"]) for record in records}) != len(records):
+        raise ValueError("Melded Patterns active source identities are not unique")
+    return sorted(records, key=lambda value: int(value["source"]))
+
+
 def workman_striker_generation_variants(
     spawns: list[dict[str, str]],
 ) -> list[dict[str, object]]:
@@ -4819,6 +4863,7 @@ def generate() -> str:
     spawns = select_spawns()
     premature_pattern_variants = premature_pattern_generation_variants()
     workman_striker_variants = workman_striker_generation_variants(spawns)
+    melded_patterns_variants = melded_patterns_generation_variants(spawns)
     spawns = apply_premature_pattern_reviewed_patrol(spawns)
     spawns = apply_reviewed_patrol_associations(spawns)
     source_weapons = source_weapon_evidence_profiles(spawns)
@@ -4827,6 +4872,7 @@ def generate() -> str:
         + incomplete_rebuild_generation_variants()
         + redundant_scan_generation_variants()
         + fragmented_soul_generation_variants()
+        + melded_patterns_variants
         + premature_pattern_variants
     )
     profiles = select_archetype_profiles(spawns)

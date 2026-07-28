@@ -2,26 +2,34 @@
 
 ## Active
 
-### Mathematical Stim Fiend combat setup
+### Mathematical Melded Patterns combat setup
 
-Stim Fiend MonsterData `203739` now uses the bounded
-`stim-fiend-siw1-floor-11L-minus-2-over-2-v1` setup generator. The actor level
-comes from the existing PF127 population row; no actor identity or
-user-supplied level participates. For levels `10..17`, SAW numeric fields 1-4
-are `floor((11 * level - 2) / 2)`, reproducing captured L10/L11/L12/L13/L14
-values exactly and generating L15=`81`, L16=`87`, and L17=`92`. The generator
-fails closed outside the family, level, and exact SIW1 categorical domain.
+Melded Patterns MonsterData `203747` now uses the bounded
+`melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1` setup generator.
+Population state supplies actor level, QL, and the exact owner-linked equipped
+weapon tuple. Across the proven L18..L25 domain:
 
-Six of the seven fixed-scope Stim Fiends now resolve the capture-backed SIW1
-packet archetype through the shared combat path. L9 remains fail-closed outside
-the proven domain. The full active Stim family is `14/1`. PF127/PF1931 coverage
-is `351` certified and `138` quarantined of `489` unique actors (`264/58` in
-PF127 and unchanged `87/80` in PF1931). The fixed 53-actor PF127 scope is now
-`26` certified and `27` quarantined.
+```text
+base = floor((11 * actorLevel - 2) / 2)
+SAW = base, base + 28, base, base
+```
+
+All 13 raw SAW packets, all 11 complete semantic profiles, and six
+leave-one-out evaluations are exact. Templates `121817/121818`,
+`121818/121818`, and `121819/121820` remain separate QL-selected positions in
+one `items.dat` interpolation family. Equipped mode, slot `6`, instance `0`,
+one normal stream, action `0`, hit/damage wires `3/0`, and
+`WIFU -> SAW -> Attack -> AttackInfo` remain capture-bound. Production retains
+damage, range, cadence, health, Energy/ammunition, and mutable SAW state.
+
+All ten active Melded Patterns actors are certified; the six starting
+quarantined actors are restored. PF127/PF1931 coverage is `357` certified and
+`132` quarantined of `489` unique actors (`270/52` in PF127 and unchanged
+`87/80` in PF1931). The fixed 53-actor PF127 scope is `32/21`.
 
 Evidence:
 
-- `docs/evidence/STIM_FIEND_COMBAT_SETUP_FORMULA_20260727.md`
-- `docs/evidence/ENEMY_COMBAT_SETUP_FORMULA_20260727.md`
+- `docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md`
 - `docs/generated/enemy_combat_setup_formula_dataset.json`
+- `docs/generated/capture_backed_npc_combat_active_coverage.json`
 - `docs/evidence/SUBWAY_REMAINING_COMBAT_COHORT_RESTORATION_20260726.md`

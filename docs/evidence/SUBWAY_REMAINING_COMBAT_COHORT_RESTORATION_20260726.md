@@ -239,3 +239,33 @@ Full evidence is in
 `docs/evidence/STIM_FIEND_COMBAT_SETUP_FORMULA_20260727.md`, and the shared
 machine-readable formula dataset now records both accepted ordinary-enemy
 formulas and 26 active mathematical bindings.
+
+## 2026-07-28 Mathematical Melded Patterns Restoration
+
+The remaining six Melded Patterns actors are restored through the bounded
+equipped-weapon setup:
+
+```text
+base = floor((11 * actorLevel - 2) / 2)
+SAW Unknown1/2/3/4 = base / base+28 / base / base
+```
+
+Thirteen raw SAW packets at L18/L19/L20/L21/L24/L25 and all six
+leave-one-out evaluations are exact. The domain is restricted to PF127,
+MonsterData `203747`, L18..L25, equipped mode, slot `6`, instance `0`, one
+normal stream, action `0`, hit/damage wires `3/0`, and the owner-selected
+`items.dat` interpolation tuples `121817/121818`, `121818/121818`, or
+`121819/121820`. Actor QL selects the tuple; runtime identity does not.
+
+The previous exact-observation path incorrectly treated owner-selected QL,
+template position, Energy/ammunition, and mutable SAW state as reusable
+contract identity. Production now owns those values while the captured WIFU,
+SAW, Attack, AttackInfo structure and order remain exact. All ten active
+Melded Patterns actors are certified, including the partial-chain L22/L23
+sources whose categorical loadouts are owner-linked and whose numeric setup is
+mathematically proven.
+
+The fixed 53-actor scope is now `32` certified and `21` quarantined. PF127 is
+`270/52`; PF1931 remains `87/80`; combined coverage is `357/132` of `489`.
+Full evidence is in
+`docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md`.
