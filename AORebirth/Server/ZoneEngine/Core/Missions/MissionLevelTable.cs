@@ -14,13 +14,17 @@ namespace ZoneEngine.Core.Missions
     /// per-level table shipped in <c>XML Data/MissionLevels.csv</c> (levels 1-220, 11 slider columns from
     /// easiest/left to hardest/right, plus the token count).
     ///
-    /// The Easy/Hard slider has 11 detents; the client sends its position in
+    /// The Easy/Hard slider has 11 detents; finalized requests prove that the client sends its position in
     /// <see cref="SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAlternativeMessage.LevelSlider"/>
-    /// as a 0-based index. QL = table[characterLevel][sliderIndex].
+    /// as a one-based wire value (1..11). QL = table[clampedCharacterLevel][wireValue - 1].
     /// </summary>
     internal static class MissionLevelTable
     {
         internal const int SliderPositions = 11;
+
+        internal const byte MinimumDifficultyWireValue = 1;
+
+        internal const byte MaximumDifficultyWireValue = 11;
 
         private const int MinLevel = 1;
 
@@ -34,28 +38,68 @@ namespace ZoneEngine.Core.Missions
         private static int[] tokensByLevel;
 
         /// <summary>
-        /// Returns the mission QL for a character level and slider index. Level is clamped to 1-220 and the
-        /// slider index to 0-10. Returns 1 if the table could not be loaded.
+        /// Returns the mission QL for a character level and one-based difficulty wire value. Character level
+        /// is clamped to the table's 1..220 range. Unsupported wire values and missing rows fail closed.
         /// </summary>
-        public static int GetMissionQuality(int characterLevel, int sliderIndex)
+        public static int GetMissionQuality(int characterLevel, int difficultyWireValue)
         {
-            EnsureLoaded();
+            int quality;
+            if (!TryGetMissionQuality(characterLevel, difficultyWireValue, out quality))
+            {
+                throw new ArgumentOutOfRangeException(
+                    "difficultyWireValue",
+                    difficultyWireValue,
+                    "Mission difficulty must be a captured one-based detent from 1 through 11.");
+            }
 
+            return quality;
+        }
+
+        internal static bool TryGetMissionQuality(
+            int characterLevel,
+            int difficultyWireValue,
+            out int missionQuality)
+        {
+            missionQuality = 0;
+            int sliderIndex;
+            if (!TryDecodeDifficultySlider(difficultyWireValue, out sliderIndex))
+            {
+                return false;
+            }
+
+            EnsureLoaded();
             if (qualityByLevel == null)
             {
-                return 1;
+                return false;
             }
 
-            int level = Clamp(characterLevel, MinLevel, MaxLevel);
-            int slider = Clamp(sliderIndex, 0, SliderPositions - 1);
-
+            int level = ClampCharacterLevel(characterLevel);
             int[] row = qualityByLevel[level - 1];
-            if (row == null)
+            if (row == null || sliderIndex < 0 || sliderIndex >= row.Length)
             {
-                return 1;
+                return false;
             }
 
-            return row[slider];
+            missionQuality = row[sliderIndex];
+            return missionQuality > 0;
+        }
+
+        internal static bool TryDecodeDifficultySlider(int difficultyWireValue, out int sliderIndex)
+        {
+            sliderIndex = -1;
+            if (difficultyWireValue < MinimumDifficultyWireValue
+                || difficultyWireValue > MaximumDifficultyWireValue)
+            {
+                return false;
+            }
+
+            sliderIndex = difficultyWireValue - MinimumDifficultyWireValue;
+            return true;
+        }
+
+        internal static int ClampCharacterLevel(int characterLevel)
+        {
+            return Clamp(characterLevel, MinLevel, MaxLevel);
         }
 
         /// <summary>
@@ -70,7 +114,7 @@ namespace ZoneEngine.Core.Missions
                 return 0;
             }
 
-            int level = Clamp(characterLevel, MinLevel, MaxLevel);
+            int level = ClampCharacterLevel(characterLevel);
             return tokensByLevel[level - 1];
         }
 

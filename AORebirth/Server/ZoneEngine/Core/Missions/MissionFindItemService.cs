@@ -70,23 +70,23 @@ namespace ZoneEngine.Core.Missions
         public static bool IsFindItemOffer(QuestInfo offer)
         {
             return offer != null
-                   && (offer.MissionIconId == MissionTypeCatalog.FindItemIconA
-                       || offer.MissionIconId == MissionTypeCatalog.FindItemIconB);
+                   && (offer.MissionIconId == MissionTypeCatalog.FindItemIcon
+                       || offer.MissionIconId == MissionTypeCatalog.ReturnItemIcon);
         }
 
         public static bool IsFindItemReturnOffer(QuestInfo offer)
         {
-            return offer != null && offer.MissionIconId == MissionTypeCatalog.FindItemIconB;
+            return offer != null && offer.MissionIconId == MissionTypeCatalog.ReturnItemIcon;
         }
 
         public static bool IsFindItemKeepMission(MissionAcceptedStore.AcceptedMission entry)
         {
-            return entry != null && entry.MissionIconId == MissionTypeCatalog.FindItemIconA;
+            return entry != null && entry.MissionIconId == MissionTypeCatalog.FindItemIcon;
         }
 
         public static bool IsFindItemReturnMission(MissionAcceptedStore.AcceptedMission entry)
         {
-            return entry != null && entry.MissionIconId == MissionTypeCatalog.FindItemIconB;
+            return entry != null && entry.MissionIconId == MissionTypeCatalog.ReturnItemIcon;
         }
 
         public static bool IsObjectiveItem(IItem item)

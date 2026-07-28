@@ -83,14 +83,33 @@
     <Compile Include="InspectMessageContractTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
+    <Compile Include="MissionRollSemanticsTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollCaptureTemplate.cs">
       <Link>MissionRollCaptureTemplate.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollCaptureLibrary.cs">
       <Link>MissionRollCaptureLibrary.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionSliderProfile.cs">
+      <Link>MissionSliderProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferCompatibility.cs">
+      <Link>MissionOfferCompatibility.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollEvidenceCatalog.cs">
+      <Link>MissionRollEvidenceCatalog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardEvidenceModel.cs">
+      <Link>MissionRewardEvidenceModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferTextBuilder.cs">
+      <Link>MissionOfferTextBuilder.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollService.cs">
       <Link>MissionRollService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollFeeRules.cs">
+      <Link>MissionRollFeeRules.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionTypeCatalog.cs">
       <Link>MissionTypeCatalog.cs</Link>
@@ -409,6 +428,34 @@
     </None>
     <None Include="..\..\test\TestData\InfoPacket #6 - 0x57">
       <Link>TestData\InfoPacket #6 - 0x57</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionLevels.csv">
+      <Link>XML Data\MissionLevels.csv</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Clusters.json">
+      <Link>XML Data\MissionRewards\ItemDb_Clusters.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDB_Implants.json">
+      <Link>XML Data\MissionRewards\ItemDB_Implants.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Nanos.json">
+      <Link>XML Data\MissionRewards\ItemDb_Nanos.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Refined.json">
+      <Link>XML Data\MissionRewards\ItemDb_Refined.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Rest.json">
+      <Link>XML Data\MissionRewards\ItemDb_Rest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\MissionRewardNanoNames.txt">
+      <Link>XML Data\MissionRewards\MissionRewardNanoNames.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

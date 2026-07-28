@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.Missions
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading;
 
@@ -18,10 +19,9 @@ namespace ZoneEngine.Core.Missions
 
     /// <summary>
     /// Produces the QuestAlternative "roll" response a mission terminal sends back to the client.
-    /// Starts from a whole captured 5-offer roll (library: capture 20260719-Rolling different mishes,
-    /// fallback: 20260717-Mission terminal2) so icons stay paired with ShortInfo/Info. Variety across
-    /// pulls comes from selecting different captured rolls. Safe fixed-size fields (QL, quest id, cash/XP,
-    /// item reward ids, XYZ, terminal retarget) are mutated — never variable-length strings.
+    /// Selects capture-backed five-offer type cohorts, then clones independently compatible captured
+    /// offer shells. Mutable location, quality, identity and reward fields are applied before structured
+    /// text is regenerated, while a materially unchanged captured combination keeps its exact text.
     /// </summary>
     internal static class MissionRollService
     {
@@ -33,6 +33,8 @@ namespace ZoneEngine.Core.Missions
 
         private static readonly object InitLock = new object();
 
+        private static volatile bool initialized;
+
         private static SerializerResolver serializerResolver;
 
         private static ISerializer questAlternativeSerializer;
@@ -40,6 +42,8 @@ namespace ZoneEngine.Core.Missions
         private static byte[] templateBody;
 
         private static byte[][] libraryBodies;
+
+        private static CapturedOfferReference[] capturedOfferReferences;
 
         private static int questInstanceSeed =
             Math.Max(0x55569000, unchecked((int)(DateTime.UtcNow.Ticks & 0x3fffffff)));
@@ -64,18 +68,113 @@ namespace ZoneEngine.Core.Missions
         {
             EnsureInitialized();
 
-            int missionQuality = MissionLevelTable.GetMissionQuality(characterLevel, request.LevelSlider);
+            int missionQuality;
+            if (request == null
+                || !MissionLevelTable.TryGetMissionQuality(characterLevel, request.LevelSlider, out missionQuality))
+            {
+                throw new ArgumentOutOfRangeException(
+                    "request",
+                    "Mission roll contains an unsupported difficulty detent.");
+            }
+
+            MissionSliderProfile sliders;
+            string sliderError;
+            if (!MissionSliderProfile.TryCreate(request, out sliders, out sliderError))
+            {
+                throw new ArgumentOutOfRangeException("request", sliderError);
+            }
+
             var rng = new Random(unchecked(Environment.TickCount * 397) ^ character.Instance ^ missionQuality);
+            return BuildRollResponseCore(
+                request,
+                character,
+                characterLevel,
+                terminalPlayfieldId,
+                terminalX,
+                terminalZ,
+                characterSide,
+                missionQuality,
+                sliders,
+                rng,
+                unchecked((int)(uint)Environment.TickCount),
+                NextQuestInstance);
+        }
+
+        internal static QuestAlternativeMessage BuildRollResponseDeterministic(
+            QuestAlternativeMessage request,
+            Identity character,
+            int characterLevel,
+            int terminalPlayfieldId,
+            float terminalX,
+            float terminalZ,
+            MissionLocationSide characterSide,
+            int seed,
+            int responseNonce,
+            int firstQuestInstance)
+        {
+            EnsureInitialized();
+
+            int missionQuality;
+            if (request == null
+                || !MissionLevelTable.TryGetMissionQuality(characterLevel, request.LevelSlider, out missionQuality))
+            {
+                throw new ArgumentOutOfRangeException(
+                    "request",
+                    "Mission roll contains an unsupported difficulty detent.");
+            }
+
+            MissionSliderProfile sliders;
+            string sliderError;
+            if (!MissionSliderProfile.TryCreate(request, out sliders, out sliderError))
+            {
+                throw new ArgumentOutOfRangeException("request", sliderError);
+            }
+
+            int nextQuestInstance = firstQuestInstance;
+            return BuildRollResponseCore(
+                request,
+                character,
+                characterLevel,
+                terminalPlayfieldId,
+                terminalX,
+                terminalZ,
+                characterSide,
+                missionQuality,
+                sliders,
+                new Random(seed),
+                responseNonce,
+                delegate
+                {
+                    int allocated = nextQuestInstance;
+                    nextQuestInstance++;
+                    return allocated;
+                });
+        }
+
+        private static QuestAlternativeMessage BuildRollResponseCore(
+            QuestAlternativeMessage request,
+            Identity character,
+            int characterLevel,
+            int terminalPlayfieldId,
+            float terminalX,
+            float terminalZ,
+            MissionLocationSide characterSide,
+            int missionQuality,
+            MissionSliderProfile sliders,
+            Random rng,
+            int responseNonce,
+            Func<int> questIdAllocator)
+        {
+            int effectiveCharacterLevel = MissionLevelTable.ClampCharacterLevel(characterLevel);
             MissionLocationSide citySide;
-            MissionLocationSide poolSide = MissionLocationPool.TryGetCityAffiliation(terminalPlayfieldId, out citySide)
-                                              ? citySide
-                                              : characterSide;
+            MissionLocationSide poolSide = MissionLocationPool.TryGetCityAffiliation(
+                                                   terminalPlayfieldId,
+                                                   out citySide)
+                                               ? citySide
+                                               : characterSide;
 
-            // Whole captured roll — keeps Kill / Find / Repair / Broken-Machine texts matched to icons.
-            QuestAlternativeMessage response = DecodeRollBody(PickLibraryBody(rng));
-            Identity templateTerminal = response.MissionTerminalIdentity;
+            QuestAlternativeMessage response = DecodeTemplate();
             Identity terminal = request.MissionTerminalIdentity;
-
             response.Identity = character;
             response.MissionTerminalIdentity = terminal;
             response.VersionId = request.VersionId;
@@ -87,84 +186,134 @@ namespace ZoneEngine.Core.Missions
             response.PhysicalMysticalSlider = request.PhysicalMysticalSlider;
             response.HeadOnStealthSlider = request.HeadOnStealthSlider;
             response.MoneyExperienceSlider = request.MoneyExperienceSlider;
-            response.Unknown4 = unchecked((int)(uint)Environment.TickCount);
+            response.Unknown4 = responseNonce;
 
-            QuestInfo[] offers = response.QuestInfos;
-            if (offers == null || offers.Length == 0)
-            {
-                MissionDiagnostics.Log("ROLL-EMPTY-LIBRARY fallback to single template");
-                response = DecodeTemplate();
-                offers = response.QuestInfos;
-                templateTerminal = response.MissionTerminalIdentity;
-                response.Identity = character;
-                response.MissionTerminalIdentity = terminal;
-            }
-
+            MissionRollType[] typeMix = MissionRollEvidenceCatalog.SelectTypeMix(
+                effectiveCharacterLevel,
+                request.LevelSlider,
+                missionQuality,
+                sliders,
+                rng);
+            var offers = new QuestInfo[typeMix.Length];
             var usedSpotIndexes = new int[offers.Length];
             for (int i = 0; i < usedSpotIndexes.Length; i++)
             {
                 usedSpotIndexes[i] = -1;
             }
 
+            int[] allowedSpotIndexes = BuildAllowedSpotIndexes(
+                poolSide,
+                effectiveCharacterLevel,
+                terminalPlayfieldId,
+                terminalX,
+                terminalZ);
+            bool preferDistinctPlayfields = effectiveCharacterLevel > 40;
+
             MissionDiagnostics.Log(
-                "ROLL-SIDE terminalPf={0} poolSide={1} charSide={2} charLvl={3} termXZ=({4:F0},{5:F0})",
+                "ROLL-SIDE terminalPf={0} poolSide={1} charSide={2} charLvl={3} termXZ=({4:F0},{5:F0}) sliderEvidence={6}",
                 terminalPlayfieldId,
                 poolSide,
                 characterSide,
-                characterLevel,
+                effectiveCharacterLevel,
                 terminalX,
-                terminalZ);
-
-            // Whole captured roll — icons stay paired with ShortInfo/Info (do NOT retype icons).
-            // ApplyMissionType used to overwrite MissionIconId onto foreign text and made
-            // Find Person show Kill/Find-Item descriptions ("clean out his stronghold").
-            int[] allowedSpotIndexes = BuildAllowedSpotIndexes(
-                poolSide,
-                characterLevel,
-                terminalPlayfieldId,
-                terminalX,
-                terminalZ);
-
-            // Prefer distinct playfields at higher levels; low-level same-zone rolls allow multiple
-            // XYZ markers inside one PF so all five offers stay near the terminal.
-            bool preferDistinctPlayfields = characterLevel > 40;
+                terminalZ,
+                sliders.EvidenceProfile);
 
             for (int i = 0; i < offers.Length; i++)
             {
-                QuestInfo offer = offers[i];
+                MissionRollType type = typeMix[i];
+                Identity capturedTerminal;
+                QuestInfo offer = PickCompatibleCapturedOffer(type, sliders, rng, out capturedTerminal);
                 if (offer == null)
                 {
-                    continue;
+                    throw new InvalidOperationException(
+                        "No compatible captured mission template exists for "
+                        + MissionTypeCatalog.TypeName(type)
+                        + ".");
                 }
 
-                MissionRollType type = MissionTypeCatalog.TypeFromIcon(offer.MissionIconId);
+                MissionOfferDescriptor descriptor;
+                string compatibilityError;
+                if (!MissionOfferCompatibility.TryDescribeCaptured(
+                        offer,
+                        capturedTerminal,
+                        out descriptor,
+                        out compatibilityError)
+                    || !MissionOfferCompatibility.IsCompatibleWithSliders(descriptor, sliders))
+                {
+                    throw new InvalidOperationException(
+                        "Captured mission template failed compatibility validation: "
+                        + (compatibilityError ?? MissionTypeCatalog.TypeName(type)));
+                }
 
-                // Assign a Rubi-Ka marker from the live roll capture pool.
-                ApplyPoolLocation(offer, rng, usedSpotIndexes, i, allowedSpotIndexes, preferDistinctPlayfields);
+                MissionOfferTextBuilder.Snapshot originalText = MissionOfferTextBuilder.Capture(offer);
+                ApplyPoolLocation(
+                    offer,
+                    rng,
+                    usedSpotIndexes,
+                    i,
+                    allowedSpotIndexes,
+                    preferDistinctPlayfields);
 
                 offer.QuestIdentity = new Identity
                                       {
                                           Type = (IdentityType)MissionIdentityTypeRaw,
-                                          Instance = NextQuestInstance()
+                                          Instance = questIdAllocator()
                                       };
-                offer.Unknown5 = RetargetTerminal(offer.Unknown5, templateTerminal, terminal);
-                offer.Unknown14 = RetargetTerminal(offer.Unknown14, templateTerminal, terminal);
-                offer.Unknown23 = RetargetTerminal(offer.Unknown23, templateTerminal, terminal);
+                offer.Unknown5 = RetargetTerminal(offer.Unknown5, capturedTerminal, terminal);
+                offer.Unknown14 = RetargetTerminal(offer.Unknown14, capturedTerminal, terminal);
+                offer.Unknown23 = RetargetTerminal(offer.Unknown23, capturedTerminal, terminal);
+                if (offer.QuestActions != null
+                    && offer.QuestActions.Length > 0
+                    && offer.QuestActions[0] != null)
+                {
+                    offer.QuestActions[0].Unknown1 = RetargetTerminal(
+                        offer.QuestActions[0].Unknown1,
+                        capturedTerminal,
+                        terminal);
+                }
                 offer.Quality = missionQuality;
-
-                ApplyMoneyExperienceSlider(offer, request.MoneyExperienceSlider, missionQuality);
-                ApplyMaliReward(offer, missionQuality, rng, type);
 
                 int markerPf = 0;
                 float markerX = 0;
                 float markerZ = 0;
-                if (offer.QuestActions != null && offer.QuestActions.Length > 0 && offer.QuestActions[0] != null)
+                if (offer.QuestActions != null
+                    && offer.QuestActions.Length > 0
+                    && offer.QuestActions[0] != null)
                 {
                     markerPf = offer.QuestActions[0].Playfield.Instance;
                     markerX = offer.QuestActions[0].X;
                     markerZ = offer.QuestActions[0].Z;
                 }
 
+                MissionRewardEvidenceModel.Apply(
+                    offer,
+                    type,
+                    effectiveCharacterLevel,
+                    request.LevelSlider,
+                    missionQuality,
+                    sliders,
+                    markerPf,
+                    rng);
+                ApplyMaliReward(offer, missionQuality, rng, type);
+                MissionOfferTextBuilder.Apply(offer, descriptor, originalText);
+
+                MissionOfferDescriptor generatedDescriptor;
+                if (!MissionOfferCompatibility.TryValidateGenerated(
+                        offer,
+                        descriptor,
+                        sliders,
+                        terminal,
+                        out generatedDescriptor,
+                        out compatibilityError)
+                    || generatedDescriptor.Type != type)
+                {
+                    throw new InvalidOperationException(
+                        "Generated mission offer failed compatibility validation: "
+                        + (compatibilityError ?? MissionTypeCatalog.TypeName(type)));
+                }
+
+                offers[i] = offer;
                 MissionDiagnostics.Log(
                     "ROLL-OFFER slot={0} type={1} icon={2} ql={3} quest={4:X8} pf={5} xz=({6:F0},{7:F0}) rewardLow={8} rewardQl={9}",
                     i,
@@ -175,8 +324,12 @@ namespace ZoneEngine.Core.Missions
                     markerPf,
                     markerX,
                     markerZ,
-                    offer.ItemRewards != null && offer.ItemRewards.Length > 0 ? offer.ItemRewards[0].LowId : 0,
-                    offer.ItemRewards != null && offer.ItemRewards.Length > 0 ? offer.ItemRewards[0].Quality : 0);
+                    offer.ItemRewards != null && offer.ItemRewards.Length > 0
+                        ? offer.ItemRewards[0].LowId
+                        : 0,
+                    offer.ItemRewards != null && offer.ItemRewards.Length > 0
+                        ? offer.ItemRewards[0].Quality
+                        : 0);
             }
 
             response.QuestInfos = offers;
@@ -223,42 +376,85 @@ namespace ZoneEngine.Core.Missions
             get
             {
                 EnsureInitialized();
-                return templateBody;
+                return (byte[])templateBody.Clone();
             }
         }
 
-        private static QuestInfo CloneArchetype(QuestInfo[] archetypes, int index)
+        internal static int CapturedRollCount
         {
-            // DecodeTemplate gives a deep copy of all five; pick by index from a fresh decode so each offer
-            // is an independent object graph (no shared QuestActions arrays across slots).
-            QuestInfo[] fresh = DecodeTemplate().QuestInfos;
-            int safe = index;
-            if (fresh == null || fresh.Length == 0)
+            get
             {
-                return archetypes != null && archetypes.Length > 0 ? archetypes[0] : null;
+                EnsureInitialized();
+                return libraryBodies.Length;
             }
-
-            if (safe < 0)
-            {
-                safe = 0;
-            }
-
-            if (safe >= fresh.Length)
-            {
-                safe = fresh.Length - 1;
-            }
-
-            return fresh[safe];
         }
 
-        private static byte[] PickLibraryBody(Random rng)
+        internal static byte[] CapturedRollBody(int index)
         {
-            if (libraryBodies == null || libraryBodies.Length == 0)
+            EnsureInitialized();
+            if (index < 0 || index >= libraryBodies.Length)
             {
-                return templateBody;
+                throw new ArgumentOutOfRangeException("index");
             }
 
-            return libraryBodies[rng.Next(libraryBodies.Length)];
+            return (byte[])libraryBodies[index].Clone();
+        }
+
+        internal static QuestAlternativeMessage DecodeCapturedRoll(int index)
+        {
+            return DecodeRollBody(CapturedRollBody(index));
+        }
+
+        private static QuestInfo PickCompatibleCapturedOffer(
+            MissionRollType type,
+            MissionSliderProfile sliders,
+            Random rng,
+            out Identity capturedTerminal)
+        {
+            capturedTerminal = new Identity();
+            var candidates = new List<CapturedOfferReference>();
+            for (int i = 0; i < capturedOfferReferences.Length; i++)
+            {
+                CapturedOfferReference candidate = capturedOfferReferences[i];
+                if (candidate.Type == type)
+                {
+                    candidates.Add(candidate);
+                }
+            }
+
+            while (candidates.Count > 0)
+            {
+                int selectedIndex = rng.Next(candidates.Count);
+                CapturedOfferReference selected = candidates[selectedIndex];
+                candidates.RemoveAt(selectedIndex);
+
+                QuestAlternativeMessage roll = DecodeRollBody(libraryBodies[selected.BodyIndex]);
+                if (roll.QuestInfos == null
+                    || selected.OfferIndex < 0
+                    || selected.OfferIndex >= roll.QuestInfos.Length)
+                {
+                    continue;
+                }
+
+                QuestInfo offer = roll.QuestInfos[selected.OfferIndex];
+                MissionOfferDescriptor descriptor;
+                string error;
+                if (!MissionOfferCompatibility.TryDescribeCaptured(
+                        offer,
+                        roll.MissionTerminalIdentity,
+                        out descriptor,
+                        out error)
+                    || descriptor.Type != type
+                    || !MissionOfferCompatibility.IsCompatibleWithSliders(descriptor, sliders))
+                {
+                    continue;
+                }
+
+                capturedTerminal = roll.MissionTerminalIdentity;
+                return offer;
+            }
+
+            return null;
         }
 
         private static QuestAlternativeMessage DecodeRollBody(byte[] body)
@@ -533,17 +729,6 @@ namespace ZoneEngine.Core.Missions
             return MissionLocationPool.ApproxTravelMeters(terminalPlayfieldId, spot.Playfield);
         }
 
-        /// <summary>
-        /// Retypes a captured offer shell by MissionIconId only.
-        /// Do not rewrite ShortInfo / CharInfos / Info — those lengths are capture-aligned and mutating
-        /// them has broken client roll parsing ("rolling mission not work at all").
-        /// Invented kill/find names are applied at instance spawn instead.
-        /// </summary>
-        private static void ApplyMissionType(QuestInfo offer, MissionRollType type, Random rng)
-        {
-            offer.MissionIconId = MissionTypeCatalog.IconId(type, 0);
-        }
-
         private static void ApplyMaliReward(QuestInfo offer, int missionQuality, Random rng, MissionRollType type)
         {
             QuestItemShort reward;
@@ -557,7 +742,10 @@ namespace ZoneEngine.Core.Missions
                     MissionTypeCatalog.TypeName(type),
                     MissionRewardCatalog.ItemCount,
                     MissionRewardCatalog.LastLoadError ?? string.Empty);
-                return;
+                throw new InvalidOperationException(
+                    "No QL-aware mission item reward is available for QL "
+                    + missionQuality
+                    + ".");
             }
 
             // Keep the captured ItemRewards array length when possible — only overwrite the first slot's
@@ -584,59 +772,20 @@ namespace ZoneEngine.Core.Missions
                 itemName ?? string.Empty);
         }
 
-        private static void ApplyMoneyExperienceSlider(QuestInfo offer, byte moneyExperienceSlider, int missionQuality)
-        {
-            int slider;
-            if (moneyExperienceSlider <= 100)
-            {
-                slider = moneyExperienceSlider;
-            }
-            else
-            {
-                slider = 50 + (unchecked((sbyte)moneyExperienceSlider) / 2);
-                if (slider < 0)
-                {
-                    slider = 0;
-                }
-
-                if (slider > 100)
-                {
-                    slider = 100;
-                }
-            }
-
-            int ql = missionQuality > 0 ? missionQuality : 1;
-            int baseCash = BaseCashForMissionQl(ql);
-            int baseXp = BaseXpForMissionQl(ql);
-
-            offer.CashReward = Math.Max(0, baseCash * (150 - slider) / 100);
-            // Live capture 20260724-144103: cash-heavy slider can yield 0 XP on the description/finish line.
-            offer.ExperienceReward = Math.Max(0, baseXp * (50 + slider) / 100);
-            if (offer.CashReward <= 0 && offer.ExperienceReward <= 0)
-            {
-                offer.CashReward = Math.Max(1, baseCash / 2);
-            }
-
-            // Absolute safety vs any future template regression.
-            if (offer.CashReward > 150000)
-            {
-                offer.CashReward = baseCash;
-            }
-
-            if (offer.ExperienceReward > 2500000)
-            {
-                offer.ExperienceReward = baseXp;
-            }
-        }
-
-        /// <summary>Balanced (slider mid) cash for a mission QL.</summary>
+        /// <summary>
+        /// Legacy completion fallback retained for <see cref="MissionCompleteService"/>.
+        /// Generated roll rewards do not use this approximation.
+        /// </summary>
         internal static int BaseCashForMissionQl(int missionQuality)
         {
             int ql = missionQuality > 0 ? missionQuality : 1;
             return Math.Max(25, ql * ql * 2);
         }
 
-        /// <summary>Balanced (slider mid) XP for a mission QL.</summary>
+        /// <summary>
+        /// Legacy completion fallback retained for <see cref="MissionCompleteService"/>.
+        /// Generated roll rewards do not use this approximation.
+        /// </summary>
         internal static int BaseXpForMissionQl(int missionQuality)
         {
             int ql = missionQuality > 0 ? missionQuality : 1;
@@ -683,14 +832,14 @@ namespace ZoneEngine.Core.Missions
 
         private static void EnsureInitialized()
         {
-            if (questAlternativeSerializer != null)
+            if (initialized)
             {
                 return;
             }
 
             lock (InitLock)
             {
-                if (questAlternativeSerializer != null)
+                if (initialized)
                 {
                     return;
                 }
@@ -715,9 +864,45 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 libraryBodies = loaded;
+                var compatibleOffers = new List<CapturedOfferReference>();
+                for (int bodyIndex = 0; bodyIndex < libraryBodies.Length; bodyIndex++)
+                {
+                    var roll = (QuestAlternativeMessage)Deserialize(libraryBodies[bodyIndex]);
+                    RestoreStringTerminators(roll);
+                    if (roll.QuestInfos == null)
+                    {
+                        continue;
+                    }
+
+                    for (int offerIndex = 0; offerIndex < roll.QuestInfos.Length; offerIndex++)
+                    {
+                        MissionOfferDescriptor descriptor;
+                        string error;
+                        if (!MissionOfferCompatibility.TryDescribeCaptured(
+                                roll.QuestInfos[offerIndex],
+                                roll.MissionTerminalIdentity,
+                                out descriptor,
+                                out error))
+                        {
+                            MissionDiagnostics.Log(
+                                "ROLL-TEMPLATE-REJECT body={0} offer={1} reason={2}",
+                                bodyIndex,
+                                offerIndex,
+                                error ?? string.Empty);
+                            continue;
+                        }
+
+                        compatibleOffers.Add(
+                            new CapturedOfferReference(bodyIndex, offerIndex, descriptor.Type));
+                    }
+                }
+
+                capturedOfferReferences = compatibleOffers.ToArray();
+                initialized = true;
                 MissionDiagnostics.Log(
-                    "ROLL-LIBRARY loaded={0} fallbackTemplateBytes={1}",
+                    "ROLL-LIBRARY loaded={0} compatibleOffers={1} fallbackTemplateBytes={2}",
                     libraryBodies.Length,
+                    capturedOfferReferences.Length,
                     templateBody.Length);
             }
         }
@@ -744,6 +929,20 @@ namespace ZoneEngine.Core.Missions
             }
 
             return bytes;
+        }
+
+        private sealed class CapturedOfferReference
+        {
+            internal readonly int BodyIndex;
+            internal readonly int OfferIndex;
+            internal readonly MissionRollType Type;
+
+            internal CapturedOfferReference(int bodyIndex, int offerIndex, MissionRollType type)
+            {
+                BodyIndex = bodyIndex;
+                OfferIndex = offerIndex;
+                Type = type;
+            }
         }
     }
 }
