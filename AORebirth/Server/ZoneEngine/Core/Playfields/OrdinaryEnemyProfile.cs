@@ -1198,7 +1198,8 @@ namespace AORebirth.Core.Playfields
             OrdinaryEnemyLevelRerollPolicy rerollPolicy,
             OrdinaryEnemyEvidenceState evidenceState,
             string evidence,
-            OrdinaryEnemySpawnVariant[] explicitVariants = null)
+            OrdinaryEnemySpawnVariant[] explicitVariants = null,
+            OrdinaryEnemySpawnVariant fixedVariant = null)
         {
             this.Mode = mode;
             this.MinimumLevel = minimumLevel;
@@ -1216,6 +1217,7 @@ namespace AORebirth.Core.Playfields
             this.explicitVariants = explicitVariants == null
                 ? new OrdinaryEnemySpawnVariant[0]
                 : (OrdinaryEnemySpawnVariant[])explicitVariants.Clone();
+            this.fixedVariant = fixedVariant;
         }
 
         internal OrdinaryEnemySpawnLevelMode Mode { get; private set; }
@@ -1233,6 +1235,8 @@ namespace AORebirth.Core.Playfields
         internal string Evidence { get; private set; }
 
         private readonly OrdinaryEnemySpawnVariant[] explicitVariants;
+
+        private readonly OrdinaryEnemySpawnVariant fixedVariant;
 
         internal static OrdinaryEnemySpawnLevelDefinition Fixed(
             OrdinaryEnemySpawnVariant variant,
@@ -1257,7 +1261,9 @@ namespace AORebirth.Core.Playfields
                 0,
                 OrdinaryEnemyLevelRerollPolicy.Never,
                 evidenceState,
-                evidence);
+                evidence,
+                null,
+                variant);
         }
 
         internal static OrdinaryEnemySpawnLevelDefinition ExplicitObservedVariants(
@@ -1302,7 +1308,8 @@ namespace AORebirth.Core.Playfields
             {
                 if (this.Mode == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants)
                 {
-                    if (this.explicitVariants.Length == 0
+                    if (this.fixedVariant != null
+                        || this.explicitVariants.Length == 0
                         || this.RerollPolicy
                            != OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration
                         || this.EvidenceState != OrdinaryEnemyEvidenceState.Policy
@@ -1361,13 +1368,21 @@ namespace AORebirth.Core.Playfields
                         || this.ReferenceLevel != this.MinimumLevel
                         || this.HealthPerLevel != 0
                         || this.RunSpeedPerLevel != 0
-                        || this.RerollPolicy != OrdinaryEnemyLevelRerollPolicy.Never))
+                        || this.RerollPolicy != OrdinaryEnemyLevelRerollPolicy.Never
+                        || this.fixedVariant == null
+                        || !this.fixedVariant.IsValid
+                        || this.fixedVariant.Level != this.MinimumLevel
+                        || this.fixedVariant.Health != this.ReferenceHealth
+                        || this.fixedVariant.HealthDamage != this.HealthDamage
+                        || this.fixedVariant.MonsterScale != this.MonsterScale
+                        || this.fixedVariant.RunSpeed != this.ReferenceRunSpeed))
                 {
                     return false;
                 }
 
                 if (this.Mode == OrdinaryEnemySpawnLevelMode.InclusiveRange
-                    && this.MaximumLevel == this.MinimumLevel)
+                    && (this.MaximumLevel == this.MinimumLevel
+                        || this.fixedVariant != null))
                 {
                     return false;
                 }
@@ -1456,6 +1471,11 @@ namespace AORebirth.Core.Playfields
                 }
 
                 return matches[0];
+            }
+
+            if (this.Mode == OrdinaryEnemySpawnLevelMode.Fixed)
+            {
+                return this.fixedVariant;
             }
 
             return new OrdinaryEnemySpawnVariant(

@@ -1,5 +1,11 @@
 # Stim Fiend Combat Setup Formula
 
+> Final 2026-07-28 disposition: the authoritative active-generation SIW1
+> selector proves the L9 category, so the exact formula domain is now bounded
+> to L9..L17 and source `0x7957E415` is certified at value `48`. The earlier
+> L10 lower bound below is historical. See
+> `FINAL_ORDINARY_DUNGEON_COMBAT_COMPLETION_20260728.md`.
+
 Date: 2026-07-27
 
 ## Result

@@ -95,10 +95,12 @@ namespace AORebirth.Core.Playfields
 
     internal enum OrdinaryEnemyEquippedFormulaKind
     {
+        ViolentVagabond,
         MeldedPatterns,
         FragmentedSoul,
         IncompleteRebuild,
         MolestedMolecules,
+        EternalSentinel,
         TempleCultist,
         TempleCultistRaisedPrimary
     }
@@ -161,6 +163,10 @@ namespace AORebirth.Core.Playfields
         {
             switch (this.Kind)
             {
+                case OrdinaryEnemyEquippedFormulaKind.ViolentVagabond:
+                    return lowTemplate == 130590
+                           && highTemplate == 130590
+                           && quality == 1;
                 case OrdinaryEnemyEquippedFormulaKind.MeldedPatterns:
                     return OrdinaryEnemyCombatSetupGenerator
                         .IsMeldedPatternsWeaponLoadout(
@@ -184,6 +190,12 @@ namespace AORebirth.Core.Playfields
                         .IsMolestedMoleculesWeaponLoadout(
                             lowTemplate,
                             highTemplate,
+                        quality);
+                case OrdinaryEnemyEquippedFormulaKind.EternalSentinel:
+                    return OrdinaryEnemyCombatSetupGenerator
+                        .IsEternalSentinelWeaponLoadout(
+                            lowTemplate,
+                            highTemplate,
                             quality);
                 case OrdinaryEnemyEquippedFormulaKind.TempleCultist:
                 case OrdinaryEnemyEquippedFormulaKind.TempleCultistRaisedPrimary:
@@ -202,6 +214,13 @@ namespace AORebirth.Core.Playfields
         {
             switch (this.Kind)
             {
+                case OrdinaryEnemyEquippedFormulaKind.ViolentVagabond:
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        checked((17 * actorLevel) + 26) / 4,
+                        checked((19 * actorLevel) + 26) / 4,
+                        checked((15 * actorLevel) + 26) / 4,
+                        checked((17 * actorLevel) + 25) / 4);
                 case OrdinaryEnemyEquippedFormulaKind.MeldedPatterns:
                 {
                     int value = checked((11 * actorLevel) - 2) / 2;
@@ -243,6 +262,16 @@ namespace AORebirth.Core.Playfields
                         value,
                         value,
                         value);
+                }
+                case OrdinaryEnemyEquippedFormulaKind.EternalSentinel:
+                {
+                    int primary = checked((11 * actorLevel) - 2) / 2;
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        primary,
+                        primary,
+                        primary,
+                        checked(actorLevel + 4) / 2);
                 }
                 case OrdinaryEnemyEquippedFormulaKind.TempleCultist:
                 case OrdinaryEnemyEquippedFormulaKind.TempleCultistRaisedPrimary:
@@ -301,7 +330,7 @@ namespace AORebirth.Core.Playfields
         internal const string StimFiendFormulaId =
             "stim-fiend-siw1-floor-11L-minus-2-over-2-v1";
 
-        internal const int StimFiendMinimumLevel = 10;
+        internal const int StimFiendMinimumLevel = 9;
 
         internal const int StimFiendMaximumLevel = 17;
 
@@ -311,6 +340,13 @@ namespace AORebirth.Core.Playfields
         internal const int FilthFleaMinimumLevel = 4;
 
         internal const int FilthFleaMaximumLevel = 21;
+
+        internal const string ViolentVagabondFormulaId =
+            "violent-vagabond-saw-bounded-affine-floor-v1";
+
+        internal const int ViolentVagabondMinimumLevel = 6;
+
+        internal const int ViolentVagabondMaximumLevel = 10;
 
         internal const string MeldedPatternsFormulaId =
             "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1";
@@ -340,6 +376,13 @@ namespace AORebirth.Core.Playfields
 
         internal const int MolestedMoleculesMaximumLevel = 25;
 
+        internal const string EternalSentinelFormulaId =
+            "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1";
+
+        internal const int EternalSentinelMinimumLevel = 18;
+
+        internal const int EternalSentinelMaximumLevel = 20;
+
         internal const string TempleCultistFormulaId =
             "temple-cultist-saw-bounded-level-piecewise-v1";
 
@@ -355,6 +398,15 @@ namespace AORebirth.Core.Playfields
         private static readonly OrdinaryEnemyEquippedFormulaDomain[]
             EquippedFormulaDomains =
             {
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.ViolentVagabond,
+                    ViolentVagabondFormulaId,
+                    127,
+                    203733,
+                    ViolentVagabondMinimumLevel,
+                    ViolentVagabondMaximumLevel,
+                    RightHandWeaponSlot,
+                    "130590"),
                 new OrdinaryEnemyEquippedFormulaDomain(
                     OrdinaryEnemyEquippedFormulaKind.MeldedPatterns,
                     MeldedPatternsFormulaId,
@@ -391,6 +443,15 @@ namespace AORebirth.Core.Playfields
                     MolestedMoleculesMaximumLevel,
                     RightHandWeaponSlot,
                     "122216..122219"),
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.EternalSentinel,
+                    EternalSentinelFormulaId,
+                    CapturedTempleOfThreeWindsContentProvider.PlayfieldInstance,
+                    41690,
+                    EternalSentinelMinimumLevel,
+                    EternalSentinelMaximumLevel,
+                    RightHandWeaponSlot,
+                    "123381..123384"),
                 TempleCultistDomain(26074, "204747"),
                 TempleCultistDomain(26082, "130163..130164"),
                 TempleCultistDomain(26103, "129028..129029"),
@@ -602,6 +663,23 @@ namespace AORebirth.Core.Playfields
                        && quality <= 40);
         }
 
+        internal static bool IsEternalSentinelWeaponLoadout(
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            return (lowTemplate == 123381
+                    && highTemplate == 123382
+                    && quality >= 15
+                    && quality <= 18)
+                   || (lowTemplate == 123383
+                       && highTemplate == 123383
+                       && quality == 21)
+                   || (lowTemplate == 123383
+                       && highTemplate == 123384
+                       && quality == 22);
+        }
+
         internal static bool IsMolestedMoleculesWeaponLoadout(
             int lowTemplate,
             int highTemplate,
@@ -794,6 +872,150 @@ namespace AORebirth.Core.Playfields
                 value,
                 value,
                 value);
+        }
+    }
+
+    internal sealed class OrdinaryEnemyCombatResultDomain
+    {
+        internal OrdinaryEnemyCombatResultDomain(
+            string domainId,
+            int resourceId,
+            string name,
+            int monsterData,
+            int weaponLowTemplate,
+            int weaponHighTemplate,
+            int weaponQuality,
+            int weaponSlot,
+            int attackInfoAmmoCount,
+            int damageTypeWire,
+            int hitTypeWire,
+            int weaponInstance,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction,
+            string evidence)
+        {
+            this.DomainId = domainId;
+            this.ResourceId = resourceId;
+            this.Name = name;
+            this.MonsterData = monsterData;
+            this.WeaponLowTemplate = weaponLowTemplate;
+            this.WeaponHighTemplate = weaponHighTemplate;
+            this.WeaponQuality = weaponQuality;
+            this.WeaponSlot = weaponSlot;
+            this.AttackInfoAmmoCount = attackInfoAmmoCount;
+            this.DamageTypeWire = damageTypeWire;
+            this.HitTypeWire = hitTypeWire;
+            this.WeaponInstance = weaponInstance;
+            this.SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown;
+            this.AttackN3Unknown = attackN3Unknown;
+            this.AttackAction = attackAction;
+            this.Evidence = evidence;
+        }
+
+        internal string DomainId { get; private set; }
+
+        internal int ResourceId { get; private set; }
+
+        internal string Name { get; private set; }
+
+        internal int MonsterData { get; private set; }
+
+        internal int WeaponLowTemplate { get; private set; }
+
+        internal int WeaponHighTemplate { get; private set; }
+
+        internal int WeaponQuality { get; private set; }
+
+        internal int WeaponSlot { get; private set; }
+
+        internal int AttackInfoAmmoCount { get; private set; }
+
+        internal int DamageTypeWire { get; private set; }
+
+        internal int HitTypeWire { get; private set; }
+
+        internal int WeaponInstance { get; private set; }
+
+        internal byte SpecialAttackWeaponN3Unknown { get; private set; }
+
+        internal byte AttackN3Unknown { get; private set; }
+
+        internal byte AttackAction { get; private set; }
+
+        internal string Evidence { get; private set; }
+
+        internal bool Matches(
+            int resourceId,
+            string name,
+            int monsterData,
+            CapturedEnemyCombatContract contract)
+        {
+            return contract != null
+                   && resourceId == this.ResourceId
+                   && string.Equals(name, this.Name, StringComparison.Ordinal)
+                   && monsterData == this.MonsterData
+                   && contract.AttackModel == CapturedEnemyAttackModel.EquippedWeapon
+                   && contract.WeaponLowId == this.WeaponLowTemplate
+                   && contract.WeaponHighId == this.WeaponHighTemplate
+                   && contract.WeaponQuality == this.WeaponQuality
+                   && contract.WeaponInventorySlot == this.WeaponSlot
+                   && contract.HasEmptySpecialAttackWeaponContext
+                   && contract.HasCapturedAttackStartContext
+                   && contract.HasCapturedEquippedAttackInfo
+                   && contract.AttackInfoAmmoCount == this.AttackInfoAmmoCount
+                   && contract.AttackInfoWeaponSlot == this.WeaponSlot
+                   && contract.AttackInfoUnknown == this.DamageTypeWire
+                   && contract.AttackInfoHitType == this.HitTypeWire
+                   && contract.AttackInfoWeaponInstance == this.WeaponInstance
+                   && contract.SpecialAttackWeaponN3Unknown
+                      == this.SpecialAttackWeaponN3Unknown
+                   && contract.AttackN3Unknown == this.AttackN3Unknown
+                   && contract.AttackAction == this.AttackAction;
+        }
+    }
+
+    internal static class OrdinaryEnemyCombatResultDomainRegistry
+    {
+        internal const string ViolentVagabondResultDomainId =
+            "equipped-melee-empty-saw-slot6-normal-result-v1";
+
+        private static readonly OrdinaryEnemyCombatResultDomain[] Domains =
+        {
+            new OrdinaryEnemyCombatResultDomain(
+                ViolentVagabondResultDomainId,
+                127,
+                "Violent Vagabond",
+                203733,
+                130590,
+                130590,
+                1,
+                6,
+                0,
+                0,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
+                0,
+                0,
+                0,
+                0,
+                "40 distinct Vagabond miss chains prove empty SAW, Attack action 0, "
+                + "slot 6, instance 0, and packet order; all 166 compatible captured "
+                + "ordinary equipped-melee normal-result streams use AttackInfo "
+                + "damage wire 0 and hit wire 3, while finite ranged damage-wire-4 "
+                + "streams are categorically excluded")
+        };
+
+        internal static bool TryResolve(
+            int resourceId,
+            string name,
+            int monsterData,
+            CapturedEnemyCombatContract contract,
+            out OrdinaryEnemyCombatResultDomain domain)
+        {
+            domain = Array.Find(
+                Domains,
+                value => value.Matches(resourceId, name, monsterData, contract));
+            return domain != null;
         }
     }
 }

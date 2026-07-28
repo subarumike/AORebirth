@@ -99,6 +99,29 @@ STIM_FIEND_PROFILE_IDS = (
     "3f70ab044f0e78d5-d2b65cf5c70d61d6",
     "54d40b70fa1a801a-064305180fc7f1ad",
 )
+VIOLENT_VAGABOND_FORMULA_ID = (
+    "violent-vagabond-saw-bounded-affine-floor-v1"
+)
+VIOLENT_VAGABOND_RESULT_DOMAIN_ID = (
+    "equipped-melee-empty-saw-slot6-normal-result-v1"
+)
+VIOLENT_VAGABOND_OBSERVATIONS = (
+    ("20260708-143600", 11154, 6),
+    ("20260708-143600", 10474, 7),
+    ("20260708-143600", 19378, 10),
+)
+ETERNAL_SENTINEL_FORMULA_ID = (
+    "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1"
+)
+ETERNAL_SENTINEL_OBSERVATIONS = (
+    ("20260721-042139", 233, 18, "0x7983FA22"),
+    ("20260721-042139", 1350, 18, "0x7983FBC2"),
+)
+ETERNAL_SENTINEL_PROFILE_IDS = (
+    "ba0dc14f053cc59f-71ed92b48bc9d461",
+    "e037cf6f4165eff5-71ebcc342951c27c",
+    "e037cf6f4165eff5-c036f50d1289554a",
+)
 FILTH_FLEA_FORMULA_ID = "filth-flea-saw-bounded-level-piecewise-v1"
 FILTH_FLEA_CAPTURED_VALUES = {
     4: 28,
@@ -536,6 +559,25 @@ def disobedient_bot_formula(level: int) -> int:
 
 def stim_fiend_formula(level: int) -> int:
     return ((11 * level) - 2) // 2
+
+
+def violent_vagabond_formula(level: int) -> dict[str, int]:
+    return {
+        "unknown1": ((17 * level) + 26) // 4,
+        "unknown2": ((19 * level) + 26) // 4,
+        "unknown3": ((15 * level) + 26) // 4,
+        "unknown4": ((17 * level) + 25) // 4,
+    }
+
+
+def eternal_sentinel_formula(level: int) -> dict[str, int]:
+    primary = ((11 * level) - 2) // 2
+    return {
+        "unknown1": primary,
+        "unknown2": primary,
+        "unknown3": primary,
+        "unknown4": (level + 4) // 2,
+    }
 
 
 def filth_flea_formula(level: int) -> dict[str, int]:
@@ -1054,7 +1096,7 @@ def build_formula_dataset(
         ):
             continue
         for level in row.get("levelCandidates", []):
-            if not 10 <= level <= 17:
+            if not 9 <= level <= 17:
                 continue
             stim_active_bindings.append(
                 {
@@ -1094,7 +1136,7 @@ def build_formula_dataset(
         ):
             continue
         level = row.get("levelCandidates", [None])[0]
-        supported = isinstance(level, int) and 10 <= level <= 17
+        supported = isinstance(level, int) and 9 <= level <= 17
         stim_starting_scope.append(
             {
                 "configuredSourceIdentity": row.get(
@@ -1571,16 +1613,16 @@ def build_formula_dataset(
         raise ValueError("Stim Fiend formula differs from a raw SAW observation")
     if any(not row["exactMatch"] for row in stim_leave_one_out):
         raise ValueError("Stim Fiend formula failed leave-one-out validation")
-    if len(stim_active_bindings) != 14:
+    if len(stim_active_bindings) != 15:
         raise ValueError(
-            f"expected 14 active Stim Fiend bindings, found {len(stim_active_bindings)}"
+            f"expected 15 active Stim Fiend bindings, found {len(stim_active_bindings)}"
         )
     if len(stim_starting_scope) != 7:
         raise ValueError(
             f"expected 7 starting-scope Stim Fiends, found {len(stim_starting_scope)}"
         )
-    if sum(row["formulaDomainSupported"] for row in stim_starting_scope) != 6:
-        raise ValueError("Stim Fiend starting scope did not restore exactly six actors")
+    if sum(row["formulaDomainSupported"] for row in stim_starting_scope) != 7:
+        raise ValueError("Stim Fiend starting scope did not restore all seven actors")
     if len(stim_cross_family) != 23:
         raise ValueError(
             f"expected 23 cross-family SIW1 observations, found {len(stim_cross_family)}"
@@ -2078,8 +2120,129 @@ def build_formula_dataset(
             }
         )
 
+    vagabond_observations = []
+    for capture, sequence, level in VIOLENT_VAGABOND_OBSERVATIONS:
+        packet = read_raw_packet(capture, sequence)
+        predicted = violent_vagabond_formula(level)
+        packet.update(
+            {
+                "level": level,
+                "formulaId": VIOLENT_VAGABOND_FORMULA_ID,
+                "formulaValues": predicted,
+                "exactMatch": all(
+                    packet[field] == value
+                    for field, value in predicted.items()
+                ),
+            }
+        )
+        vagabond_observations.append(packet)
+    if any(not row["exactMatch"] for row in vagabond_observations):
+        raise ValueError("Violent Vagabond formula differs from a raw SAW packet")
+
+    eternal_observations = []
+    for capture, sequence, level, source_identity in ETERNAL_SENTINEL_OBSERVATIONS:
+        packet = read_raw_packet(capture, sequence)
+        predicted = eternal_sentinel_formula(level)
+        packet.update(
+            {
+                "level": level,
+                "sourceIdentity": source_identity,
+                "formulaId": ETERNAL_SENTINEL_FORMULA_ID,
+                "formulaValues": predicted,
+                "exactMatch": all(
+                    packet[field] == value
+                    for field, value in predicted.items()
+                ),
+            }
+        )
+        eternal_observations.append(packet)
+    if any(not row["exactMatch"] for row in eternal_observations):
+        raise ValueError("Eternal Sentinel formula differs from a raw SAW packet")
+
+    final_eternal_sources = {"0x7983FA22", "0x7983FBC2"}
+    final_actor_dispositions = []
+    for row in active_coverage.get("profiles", []):
+        resource = row.get("runtimePlayfieldOrResource")
+        name = row.get("name")
+        monster_data = row.get("monsterData")
+        source_identity = row.get("configuredSourceIdentity")
+        level = row.get("levelCandidates", [None])[0]
+        if (
+            resource == 127
+            and name == "Violent Vagabond"
+            and monster_data == 203733
+        ):
+            formula_id = VIOLENT_VAGABOND_FORMULA_ID
+            generated = violent_vagabond_formula(level)
+            semantic_ids = [VIOLENT_VAGABOND_RESULT_DOMAIN_ID]
+        elif (
+            resource == 127
+            and name == "Stim Fiend"
+            and monster_data == 203739
+            and source_identity == "0x7957E415"
+            and level == 9
+        ):
+            formula_id = STIM_FIEND_FORMULA_ID
+            generated = {
+                "unknown1": stim_fiend_formula(level),
+                "unknown2": stim_fiend_formula(level),
+                "unknown3": stim_fiend_formula(level),
+                "unknown4": stim_fiend_formula(level),
+            }
+            semantic_ids = list(STIM_FIEND_PROFILE_IDS)
+        elif (
+            resource == 1931
+            and name == "Eternal Sentinel"
+            and monster_data == 41690
+            and source_identity in final_eternal_sources
+            and level == 18
+        ):
+            formula_id = ETERNAL_SENTINEL_FORMULA_ID
+            generated = eternal_sentinel_formula(level)
+            semantic_ids = list(ETERNAL_SENTINEL_PROFILE_IDS)
+        else:
+            continue
+        final_actor_dispositions.append(
+            {
+                "resource": resource,
+                "name": name,
+                "monsterData": monster_data,
+                "configuredSourceIdentity": source_identity,
+                "level": level,
+                "formulaId": formula_id,
+                "generatedSpecialAttackWeaponValues": generated,
+                "compatibleSemanticProfileIds": semantic_ids,
+                "startingDisposition": "quarantined",
+                "finalDisposition": "certified",
+            }
+        )
+    final_actor_dispositions.sort(
+        key=lambda row: (
+            row["resource"],
+            row["name"],
+            row["configuredSourceIdentity"],
+        )
+    )
+    if len(final_actor_dispositions) != 25:
+        raise ValueError(
+            "final ordinary-combat scope must reconcile exactly 25 actors; "
+            f"found {len(final_actor_dispositions)}"
+        )
+    if sum(
+        row["name"] == "Violent Vagabond"
+        for row in final_actor_dispositions
+    ) != 22:
+        raise ValueError("final scope must contain 22 Violent Vagabonds")
+    if sum(row["name"] == "Stim Fiend" for row in final_actor_dispositions) != 1:
+        raise ValueError("final scope must contain one level-9 Stim Fiend")
+    if sum(
+        row["name"] == "Eternal Sentinel"
+        for row in final_actor_dispositions
+    ) != 2:
+        raise ValueError("final scope must contain two level-18 Eternal Sentinels")
+
     return {
-        "schemaVersion": 5,
+        "schemaVersion": 6,
         "scope": {
             "runtimeResources": [127, 1931],
             "sourceInventory": (
@@ -2135,23 +2298,22 @@ def build_formula_dataset(
             "family": "Stim Fiend",
             "monsterData": 203739,
             "resource": 127,
-            "supportedLevelsInclusive": [10, 17],
-            "unsupportedLowerBound": {
+            "supportedLevelsInclusive": [9, 17],
+            "lowerBoundCertification": {
                 "level": 9,
                 "configuredSourceIdentity": "0x7957E415",
                 "scfuPacket": (
                     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
                     "20260710-202132|IN|1016"
                 ),
-                "missingCategoricalPackets": [
-                    "WeaponItemFullUpdate",
-                    "SpecialAttackWeapon",
-                    "Attack",
-                    "AttackInfo",
-                    "MissedAttackInfo",
-                ],
+                "categoricalOwner": (
+                    "active MonsterData 203739 population generation selects the "
+                    "single SIW1 144742/144743 slot-0 contract used by L10..17"
+                ),
+                "generatedNumericValue": 48,
                 "finalDisposition": (
-                    "quarantined; numeric extrapolation is not categorical proof"
+                    "certified through authoritative runtime loadout selection "
+                    "and the bounded L9..17 exact formula"
                 ),
             },
             "exactCategoricalDomain": {
@@ -2262,9 +2424,146 @@ def build_formula_dataset(
                 },
                 {
                     "candidate": "unbounded Stim Fiend level domain",
-                    "reason": "levels below 10 and above 17 lack categorical and formula proof",
+                    "reason": "levels below 9 and above 17 lack categorical and formula proof",
                 },
             ],
+        },
+        "finalOrdinaryDungeonCombatCompletion": {
+            "formulaIds": [
+                VIOLENT_VAGABOND_FORMULA_ID,
+                STIM_FIEND_FORMULA_ID,
+                ETERNAL_SENTINEL_FORMULA_ID,
+            ],
+            "resultDomainIds": [
+                VIOLENT_VAGABOND_RESULT_DOMAIN_ID,
+            ],
+            "startingCheckpoint": {
+                "totalActors": 489,
+                "certified": 464,
+                "quarantined": 25,
+                "pf127": {"certified": 299, "quarantined": 23},
+                "pf1931": {"certified": 165, "quarantined": 2},
+            },
+            "finalCheckpoint": {
+                "totalActors": 489,
+                "certified": 489,
+                "quarantined": 0,
+                "pf127": {"certified": 322, "quarantined": 0},
+                "pf1931": {"certified": 167, "quarantined": 0},
+            },
+            "violentVagabond": {
+                "monsterData": 203733,
+                "supportedLevelsInclusive": [6, 10],
+                "weaponLoadout": {
+                    "lowTemplate": 130590,
+                    "highTemplate": 130590,
+                    "quality": 1,
+                    "slot": 6,
+                    "energy": 1,
+                    "attackDelay": 175,
+                    "rechargeDelay": 175,
+                },
+                "numericExpressions": {
+                    "unknown1": "floor((17 * actorLevel + 26) / 4)",
+                    "unknown2": "floor((19 * actorLevel + 26) / 4)",
+                    "unknown3": "floor((15 * actorLevel + 26) / 4)",
+                    "unknown4": "floor((17 * actorLevel + 25) / 4)",
+                },
+                "generatedLevelEight": violent_vagabond_formula(8),
+                "rawSawObservations": vagabond_observations,
+                "leaveOneOut": [
+                    {
+                        "heldOutLevel": row["level"],
+                        "prediction": row["formulaValues"],
+                        "exactMatch": row["exactMatch"],
+                    }
+                    for row in vagabond_observations
+                ],
+                "missChainEvidence": {
+                    "rawObservations": 41,
+                    "distinctChains": 40,
+                    "embeddedAttackerAttribution": True,
+                    "packetOrder": [
+                        "WeaponItemFullUpdate",
+                        "SpecialAttackWeapon",
+                        "Attack",
+                        "MissedAttackInfo",
+                    ],
+                    "missN3": 1,
+                    "missFields": [0, 6, 0],
+                },
+                "normalResultDomain": {
+                    "domainId": VIOLENT_VAGABOND_RESULT_DOMAIN_ID,
+                    "compatibleCapturedEquippedMeleeStreams": 166,
+                    "hitWire": 3,
+                    "damageWire": 0,
+                    "slot": 6,
+                    "instance": 0,
+                    "action": 0,
+                    "excludedCategory": (
+                        "finite ranged equipped streams with damage wire 4"
+                    ),
+                    "numericDamageOwner": "active actor Stats",
+                },
+                "rejectedRules": [
+                    {
+                        "candidate": "identity or per-level output table",
+                        "reason": "not a reusable mathematical input",
+                    },
+                    {
+                        "candidate": "nearest captured level",
+                        "reason": "level 8 is generated only by the bounded equations",
+                    },
+                    {
+                        "candidate": "miss-only runtime combat",
+                        "reason": "normal result semantics are required",
+                    },
+                ],
+            },
+            "stimFiendLevelNine": {
+                "configuredSourceIdentity": "0x7957E415",
+                "monsterData": 203739,
+                "level": 9,
+                "formulaValue": 48,
+                "categoricalSelector": (
+                    "active MonsterData generation selects the unique SIW1 "
+                    "144742/144743 slot-0 attack domain"
+                ),
+                "boundedLevelsInclusive": [9, 17],
+                "semanticProfileIds": list(STIM_FIEND_PROFILE_IDS),
+            },
+            "eternalSentinelLevelEighteen": {
+                "monsterData": 41690,
+                "boundedLevelsInclusive": [18, 20],
+                "numericExpressions": {
+                    "unknown1To3": "floor((11 * actorLevel - 2) / 2)",
+                    "unknown4": "floor((actorLevel + 4) / 2)",
+                },
+                "rawSawObservations": eternal_observations,
+                "semanticProfileIds": list(ETERNAL_SENTINEL_PROFILE_IDS),
+                "loadouts": [
+                    {
+                        "configuredSourceIdentity": "0x7983FA22",
+                        "templates": [123381, 123382],
+                        "quality": 15,
+                    },
+                    {
+                        "configuredSourceIdentity": "0x7983FBC2",
+                        "templates": [123383, 123384],
+                        "quality": 22,
+                    },
+                ],
+                "normalResultDomain": {
+                    "hitWire": 3,
+                    "damageWire": 0,
+                    "slot": 6,
+                    "instance": 0,
+                    "semanticProfileLevels": [19, 20],
+                    "numericDamageOwner": "production weapon and actor rules",
+                },
+            },
+            "actorDispositions": final_actor_dispositions,
+            "activeBindings": final_actor_dispositions,
         },
         "filthFleaFormula": {
             "formulaId": FILTH_FLEA_FORMULA_ID,

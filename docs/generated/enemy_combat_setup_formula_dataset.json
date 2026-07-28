@@ -2187,6 +2187,1298 @@
       21
     ]
   },
+  "finalOrdinaryDungeonCombatCompletion": {
+    "activeBindings": [
+      {
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E415",
+        "finalDisposition": "certified",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 48,
+          "unknown2": 48,
+          "unknown3": 48,
+          "unknown4": 48
+        },
+        "level": 9,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AA4A",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD40",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD48",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD49",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD4A",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD4C",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD54",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 40,
+          "unknown2": 44,
+          "unknown3": 36,
+          "unknown4": 40
+        },
+        "level": 8,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD58",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD76",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AF49",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AFA1",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x79557CAC",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957405C",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x795743A7",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x795743A8",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E02C",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E02E",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E123",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E40E",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E5BF",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E5C4",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E5C5",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "ba0dc14f053cc59f-71ed92b48bc9d461",
+          "e037cf6f4165eff5-71ebcc342951c27c",
+          "e037cf6f4165eff5-c036f50d1289554a"
+        ],
+        "configuredSourceIdentity": "0x7983FA22",
+        "finalDisposition": "certified",
+        "formulaId": "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 11
+        },
+        "level": 18,
+        "monsterData": 41690,
+        "name": "Eternal Sentinel",
+        "resource": 1931,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "ba0dc14f053cc59f-71ed92b48bc9d461",
+          "e037cf6f4165eff5-71ebcc342951c27c",
+          "e037cf6f4165eff5-c036f50d1289554a"
+        ],
+        "configuredSourceIdentity": "0x7983FBC2",
+        "finalDisposition": "certified",
+        "formulaId": "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 11
+        },
+        "level": 18,
+        "monsterData": 41690,
+        "name": "Eternal Sentinel",
+        "resource": 1931,
+        "startingDisposition": "quarantined"
+      }
+    ],
+    "actorDispositions": [
+      {
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E415",
+        "finalDisposition": "certified",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 48,
+          "unknown2": 48,
+          "unknown3": 48,
+          "unknown4": 48
+        },
+        "level": 9,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AA4A",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD40",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD48",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD49",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD4A",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD4C",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD54",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 40,
+          "unknown2": 44,
+          "unknown3": 36,
+          "unknown4": 40
+        },
+        "level": 8,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD58",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AD76",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AF49",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7953AFA1",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x79557CAC",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957405C",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x795743A7",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x795743A8",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48
+        },
+        "level": 10,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E02C",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E02E",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E123",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E40E",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E5BF",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E5C4",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36
+        },
+        "level": 7,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "equipped-melee-empty-saw-slot6-normal-result-v1"
+        ],
+        "configuredSourceIdentity": "0x7957E5C5",
+        "finalDisposition": "certified",
+        "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31
+        },
+        "level": 6,
+        "monsterData": 203733,
+        "name": "Violent Vagabond",
+        "resource": 127,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "ba0dc14f053cc59f-71ed92b48bc9d461",
+          "e037cf6f4165eff5-71ebcc342951c27c",
+          "e037cf6f4165eff5-c036f50d1289554a"
+        ],
+        "configuredSourceIdentity": "0x7983FA22",
+        "finalDisposition": "certified",
+        "formulaId": "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 11
+        },
+        "level": 18,
+        "monsterData": 41690,
+        "name": "Eternal Sentinel",
+        "resource": 1931,
+        "startingDisposition": "quarantined"
+      },
+      {
+        "compatibleSemanticProfileIds": [
+          "ba0dc14f053cc59f-71ed92b48bc9d461",
+          "e037cf6f4165eff5-71ebcc342951c27c",
+          "e037cf6f4165eff5-c036f50d1289554a"
+        ],
+        "configuredSourceIdentity": "0x7983FBC2",
+        "finalDisposition": "certified",
+        "formulaId": "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 11
+        },
+        "level": 18,
+        "monsterData": 41690,
+        "name": "Eternal Sentinel",
+        "resource": 1931,
+        "startingDisposition": "quarantined"
+      }
+    ],
+    "eternalSentinelLevelEighteen": {
+      "boundedLevelsInclusive": [
+        18,
+        20
+      ],
+      "loadouts": [
+        {
+          "configuredSourceIdentity": "0x7983FA22",
+          "quality": 15,
+          "templates": [
+            123381,
+            123382
+          ]
+        },
+        {
+          "configuredSourceIdentity": "0x7983FBC2",
+          "quality": 22,
+          "templates": [
+            123383,
+            123384
+          ]
+        }
+      ],
+      "monsterData": 41690,
+      "normalResultDomain": {
+        "damageWire": 0,
+        "hitWire": 3,
+        "instance": 0,
+        "numericDamageOwner": "production weapon and actor rules",
+        "semanticProfileLevels": [
+          19,
+          20
+        ],
+        "slot": 6
+      },
+      "numericExpressions": {
+        "unknown1To3": "floor((11 * actorLevel - 2) / 2)",
+        "unknown4": "floor((actorLevel + 4) / 2)"
+      },
+      "rawSawObservations": [
+        {
+          "bodyHex": "1D3C0F1C0000C3507983FA2200000003F10000006200000062000000620000000B00000014",
+          "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139",
+          "direction": "IN",
+          "exactMatch": true,
+          "formulaId": "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1",
+          "formulaValues": {
+            "unknown1": 98,
+            "unknown2": 98,
+            "unknown3": 98,
+            "unknown4": 11
+          },
+          "level": 18,
+          "messageType": "SpecialAttackWeapon",
+          "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139|IN|233|b5ead192b8a0",
+          "sequence": 233,
+          "sourceIdentity": "0x7983FA22",
+          "timestampUtc": "2026-07-21T09:21:42.0200879Z",
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 11,
+          "unknown5": 20
+        },
+        {
+          "bodyHex": "1D3C0F1C0000C3507983FBC200000003F10000006200000062000000620000000B00000000",
+          "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139",
+          "direction": "IN",
+          "exactMatch": true,
+          "formulaId": "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1",
+          "formulaValues": {
+            "unknown1": 98,
+            "unknown2": 98,
+            "unknown3": 98,
+            "unknown4": 11
+          },
+          "level": 18,
+          "messageType": "SpecialAttackWeapon",
+          "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139|IN|1350|b8d44340ed01",
+          "sequence": 1350,
+          "sourceIdentity": "0x7983FBC2",
+          "timestampUtc": "2026-07-21T09:24:40.3614686Z",
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 11,
+          "unknown5": 0
+        }
+      ],
+      "semanticProfileIds": [
+        "ba0dc14f053cc59f-71ed92b48bc9d461",
+        "e037cf6f4165eff5-71ebcc342951c27c",
+        "e037cf6f4165eff5-c036f50d1289554a"
+      ]
+    },
+    "finalCheckpoint": {
+      "certified": 489,
+      "pf127": {
+        "certified": 322,
+        "quarantined": 0
+      },
+      "pf1931": {
+        "certified": 167,
+        "quarantined": 0
+      },
+      "quarantined": 0,
+      "totalActors": 489
+    },
+    "formulaIds": [
+      "violent-vagabond-saw-bounded-affine-floor-v1",
+      "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+      "eternal-sentinel-saw-floor-11L-minus-2-over-2-plus-floor-L-plus-4-over-2-v1"
+    ],
+    "resultDomainIds": [
+      "equipped-melee-empty-saw-slot6-normal-result-v1"
+    ],
+    "startingCheckpoint": {
+      "certified": 464,
+      "pf127": {
+        "certified": 299,
+        "quarantined": 23
+      },
+      "pf1931": {
+        "certified": 165,
+        "quarantined": 2
+      },
+      "quarantined": 25,
+      "totalActors": 489
+    },
+    "stimFiendLevelNine": {
+      "boundedLevelsInclusive": [
+        9,
+        17
+      ],
+      "categoricalSelector": "active MonsterData generation selects the unique SIW1 144742/144743 slot-0 attack domain",
+      "configuredSourceIdentity": "0x7957E415",
+      "formulaValue": 48,
+      "level": 9,
+      "monsterData": 203739,
+      "semanticProfileIds": [
+        "5aa2541e7645c589-9bcb7a58208cf1e0",
+        "8dc794414961f6e6-63cd3e499be4e58b",
+        "963ecf2aa60f045c-de110ebeb7e358cd",
+        "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+        "54d40b70fa1a801a-064305180fc7f1ad"
+      ]
+    },
+    "violentVagabond": {
+      "generatedLevelEight": {
+        "unknown1": 40,
+        "unknown2": 44,
+        "unknown3": 36,
+        "unknown4": 40
+      },
+      "leaveOneOut": [
+        {
+          "exactMatch": true,
+          "heldOutLevel": 6,
+          "prediction": {
+            "unknown1": 32,
+            "unknown2": 35,
+            "unknown3": 29,
+            "unknown4": 31
+          }
+        },
+        {
+          "exactMatch": true,
+          "heldOutLevel": 7,
+          "prediction": {
+            "unknown1": 36,
+            "unknown2": 39,
+            "unknown3": 32,
+            "unknown4": 36
+          }
+        },
+        {
+          "exactMatch": true,
+          "heldOutLevel": 10,
+          "prediction": {
+            "unknown1": 49,
+            "unknown2": 54,
+            "unknown3": 44,
+            "unknown4": 48
+          }
+        }
+      ],
+      "missChainEvidence": {
+        "distinctChains": 40,
+        "embeddedAttackerAttribution": true,
+        "missFields": [
+          0,
+          6,
+          0
+        ],
+        "missN3": 1,
+        "packetOrder": [
+          "WeaponItemFullUpdate",
+          "SpecialAttackWeapon",
+          "Attack",
+          "MissedAttackInfo"
+        ],
+        "rawObservations": 41
+      },
+      "monsterData": 203733,
+      "normalResultDomain": {
+        "action": 0,
+        "compatibleCapturedEquippedMeleeStreams": 166,
+        "damageWire": 0,
+        "domainId": "equipped-melee-empty-saw-slot6-normal-result-v1",
+        "excludedCategory": "finite ranged equipped streams with damage wire 4",
+        "hitWire": 3,
+        "instance": 0,
+        "numericDamageOwner": "active actor Stats",
+        "slot": 6
+      },
+      "numericExpressions": {
+        "unknown1": "floor((17 * actorLevel + 26) / 4)",
+        "unknown2": "floor((19 * actorLevel + 26) / 4)",
+        "unknown3": "floor((15 * actorLevel + 26) / 4)",
+        "unknown4": "floor((17 * actorLevel + 25) / 4)"
+      },
+      "rawSawObservations": [
+        {
+          "bodyHex": "1D3C0F1C0000C350794CD4CC00000003F100000020000000230000001D0000001F00000000",
+          "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+          "direction": "IN",
+          "exactMatch": true,
+          "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+          "formulaValues": {
+            "unknown1": 32,
+            "unknown2": 35,
+            "unknown3": 29,
+            "unknown4": 31
+          },
+          "level": 6,
+          "messageType": "SpecialAttackWeapon",
+          "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|11154|ed28a9b81b02",
+          "sequence": 11154,
+          "timestampUtc": "2026-07-08T19:45:38.8630764Z",
+          "unknown1": 32,
+          "unknown2": 35,
+          "unknown3": 29,
+          "unknown4": 31,
+          "unknown5": 0
+        },
+        {
+          "bodyHex": "1D3C0F1C0000C350794CD74B00000003F10000002400000027000000200000002400000000",
+          "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+          "direction": "IN",
+          "exactMatch": true,
+          "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+          "formulaValues": {
+            "unknown1": 36,
+            "unknown2": 39,
+            "unknown3": 32,
+            "unknown4": 36
+          },
+          "level": 7,
+          "messageType": "SpecialAttackWeapon",
+          "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10474|6a2e6c9e48f5",
+          "sequence": 10474,
+          "timestampUtc": "2026-07-08T19:44:55.7139522Z",
+          "unknown1": 36,
+          "unknown2": 39,
+          "unknown3": 32,
+          "unknown4": 36,
+          "unknown5": 0
+        },
+        {
+          "bodyHex": "1D3C0F1C0000C350794DF33F00000003F100000031000000360000002C0000003000000000",
+          "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+          "direction": "IN",
+          "exactMatch": true,
+          "formulaId": "violent-vagabond-saw-bounded-affine-floor-v1",
+          "formulaValues": {
+            "unknown1": 49,
+            "unknown2": 54,
+            "unknown3": 44,
+            "unknown4": 48
+          },
+          "level": 10,
+          "messageType": "SpecialAttackWeapon",
+          "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19378|79fe827bc7ad",
+          "sequence": 19378,
+          "timestampUtc": "2026-07-08T20:01:14.8966591Z",
+          "unknown1": 49,
+          "unknown2": 54,
+          "unknown3": 44,
+          "unknown4": 48,
+          "unknown5": 0
+        }
+      ],
+      "rejectedRules": [
+        {
+          "candidate": "identity or per-level output table",
+          "reason": "not a reusable mathematical input"
+        },
+        {
+          "candidate": "nearest captured level",
+          "reason": "level 8 is generated only by the bounded equations"
+        },
+        {
+          "candidate": "miss-only runtime combat",
+          "reason": "normal result semantics are required"
+        }
+      ],
+      "supportedLevelsInclusive": [
+        6,
+        10
+      ],
+      "weaponLoadout": {
+        "attackDelay": 175,
+        "energy": 1,
+        "highTemplate": 130590,
+        "lowTemplate": 130590,
+        "quality": 1,
+        "rechargeDelay": 175,
+        "slot": 6
+      }
+    }
+  },
   "fixedScopeSelectorBindings": {
     "activeBindings": [
       {
@@ -226252,7 +227544,7 @@
       "reason": "no capture-backed categorical proof exists outside levels 5..10"
     }
   ],
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "scope": {
     "completeAndPartialProfilesIncluded": true,
     "profileCount": 422,
@@ -226265,6 +227557,23 @@
   },
   "stimFiendFormula": {
     "activeBindings": [
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E415",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 48,
+        "level": 9,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
       {
         "actorCount": 1,
         "compatibleSemanticProfileIds": [
@@ -226826,6 +228135,14 @@
         }
       }
     ],
+    "lowerBoundCertification": {
+      "categoricalOwner": "active MonsterData 203739 population generation selects the single SIW1 144742/144743 slot-0 contract used by L10..17",
+      "configuredSourceIdentity": "0x7957E415",
+      "finalDisposition": "certified through authoritative runtime loadout selection and the bounded L9..17 exact formula",
+      "generatedNumericValue": 48,
+      "level": 9,
+      "scfuPacket": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132|IN|1016"
+    },
     "monsterData": 203739,
     "numericOutput": {
       "expression": "floor((11 * actorLevel - 2) / 2)",
@@ -227532,7 +228849,7 @@
       },
       {
         "candidate": "unbounded Stim Fiend level domain",
-        "reason": "levels below 10 and above 17 lack categorical and formula proof"
+        "reason": "levels below 9 and above 17 lack categorical and formula proof"
       }
     ],
     "resource": 127,
@@ -227588,29 +228905,16 @@
       },
       {
         "configuredSourceIdentity": "0x7957E415",
-        "formulaDomainSupported": false,
-        "generatedSpecialAttackWeaponValue": null,
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 48,
         "level": 9,
-        "result": "fail closed: level outside proven Stim Fiend domain"
+        "result": "restored through exact Stim Fiend archetype"
       }
     ],
     "supportedLevelsInclusive": [
-      10,
+      9,
       17
-    ],
-    "unsupportedLowerBound": {
-      "configuredSourceIdentity": "0x7957E415",
-      "finalDisposition": "quarantined; numeric extrapolation is not categorical proof",
-      "level": 9,
-      "missingCategoricalPackets": [
-        "WeaponItemFullUpdate",
-        "SpecialAttackWeapon",
-        "Attack",
-        "AttackInfo",
-        "MissedAttackInfo"
-      ],
-      "scfuPacket": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132|IN|1016"
-    }
+    ]
   },
   "templeOrdinaryCombatCompletion": {
     "activeBindings": [

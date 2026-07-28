@@ -294,10 +294,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 92,
                 generatedLevelSeventeen.SpecialAttackWeaponUnknown1);
+            OrdinaryEnemyCombatNumericSetup generatedLevelNine;
+            Assert.IsTrue(TryGenerateStimFiend(9, out generatedLevelNine));
+            Assert.AreEqual(
+                48,
+                generatedLevelNine.SpecialAttackWeaponUnknown1);
         }
 
         [TestMethod]
-        public void StimFiendUsesRuntimeLevelAndRestoresSixOfSevenStartingActors()
+        public void StimFiendUsesRuntimeLevelAndRestoresAllSevenStartingActors()
         {
             int[] startingQuarantinedSources =
             {
@@ -331,7 +336,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 starting.Select(value => value.Level).ToArray());
 
             int restored = 0;
-            int remainedClosed = 0;
             foreach (OrdinaryEnemySpawnDefinition spawn in starting)
             {
                 CapturedEnemyCombatContract current =
@@ -347,16 +351,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     current,
                     out resolved,
                     out failure);
-                if (spawn.Level == 9)
-                {
-                    Assert.IsFalse(success);
-                    StringAssert.Contains(
-                        failure,
-                        "no canonical raw combat profile");
-                    remainedClosed++;
-                    continue;
-                }
-
                 Assert.IsTrue(success, failure);
                 Assert.IsTrue(current.UsesProductionSpecializedValues);
                 Assert.IsTrue(resolved.IsCombatReady);
@@ -369,8 +363,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 restored++;
             }
 
-            Assert.AreEqual(6, restored);
-            Assert.AreEqual(1, remainedClosed);
+            Assert.AreEqual(7, restored);
         }
 
         [TestMethod]
@@ -423,7 +416,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void StimFiendFormulaFailsClosedOutsideItsProvenDomain()
         {
             OrdinaryEnemyCombatNumericSetup ignored;
-            Assert.IsFalse(TryGenerateStimFiend(9, out ignored));
+            Assert.IsFalse(TryGenerateStimFiend(8, out ignored));
             Assert.IsFalse(TryGenerateStimFiend(18, out ignored));
             Assert.IsFalse(
                 OrdinaryEnemyCombatSetupGenerator.TryGenerate(
@@ -512,6 +505,254 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
                 attack.AttackInfoWeaponInstance);
+        }
+
+        [TestMethod]
+        public void ViolentVagabondFormulaReproducesEveryObservationAndGeneratesLevelEight()
+        {
+            var observations = new Dictionary<int, int[]>
+            {
+                { 6, new[] { 32, 35, 29, 31 } },
+                { 7, new[] { 36, 39, 32, 36 } },
+                { 10, new[] { 49, 54, 44, 48 } }
+            };
+            foreach (KeyValuePair<int, int[]> observation in observations)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(TryGenerateViolentVagabond(observation.Key, out setup));
+                Assert.AreEqual(
+                    OrdinaryEnemyCombatSetupGenerator.ViolentVagabondFormulaId,
+                    setup.FormulaId);
+                Assert.AreEqual(observation.Value[0], setup.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(observation.Value[1], setup.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(observation.Value[2], setup.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(observation.Value[3], setup.SpecialAttackWeaponUnknown4);
+            }
+
+            OrdinaryEnemyCombatNumericSetup levelEight;
+            Assert.IsTrue(TryGenerateViolentVagabond(8, out levelEight));
+            CollectionAssert.AreEqual(
+                new[] { 40, 44, 36, 40 },
+                new[]
+                {
+                    levelEight.SpecialAttackWeaponUnknown1,
+                    levelEight.SpecialAttackWeaponUnknown2,
+                    levelEight.SpecialAttackWeaponUnknown3,
+                    levelEight.SpecialAttackWeaponUnknown4
+                });
+        }
+
+        [TestMethod]
+        public void ViolentVagabondFormulaAndResultDomainFailClosedAcrossCategories()
+        {
+            OrdinaryEnemyCombatNumericSetup ignored;
+            Assert.IsFalse(TryGenerateViolentVagabond(5, out ignored));
+            Assert.IsFalse(TryGenerateViolentVagabond(11, out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        203733,
+                        7,
+                        130591,
+                        130591,
+                        1,
+                        6),
+                    out ignored));
+
+            CapturedEnemyCombatContract contract =
+                CapturedSubwayCombatCatalog.For("Violent Vagabond", 203733, 7);
+            OrdinaryEnemyCombatResultDomain domain;
+            Assert.IsTrue(
+                OrdinaryEnemyCombatResultDomainRegistry.TryResolve(
+                    127,
+                    "Violent Vagabond",
+                    203733,
+                    contract,
+                    out domain));
+            Assert.AreEqual(
+                OrdinaryEnemyCombatResultDomainRegistry.ViolentVagabondResultDomainId,
+                domain.DomainId);
+            Assert.IsFalse(
+                OrdinaryEnemyCombatResultDomainRegistry.TryResolve(
+                    127,
+                    "Mugger",
+                    203733,
+                    contract,
+                    out domain));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatResultDomainRegistry.TryResolve(
+                    127,
+                    "Violent Vagabond",
+                    203734,
+                    contract,
+                    out domain));
+        }
+
+        [TestMethod]
+        public void ViolentVagabondSharedPathPreservesSawAttackAttackInfoOrder()
+        {
+            CapturedEnemyCombatContract current =
+                CapturedSubwayCombatCatalog.For(
+                    "Violent Vagabond",
+                    203733,
+                    8);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Violent Vagabond",
+                    203733,
+                    8,
+                    unchecked((int)0x7953AD54),
+                    current,
+                    out resolved,
+                    out failure),
+                failure);
+            Identity source = SimpleChar(unchecked((int)0x7953AD54));
+            Identity target = SimpleChar(unchecked((int)0x7944C065));
+            MessageBody[] packets =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    source,
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    source,
+                    target,
+                    resolved),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    source,
+                    target,
+                    1,
+                    resolved.AttackInfoAmmoCount,
+                    resolved.AttackInfoWeaponSlot,
+                    resolved.AttackInfoUnknown,
+                    resolved.AttackInfoHitType,
+                    resolved.AttackInfoWeaponInstance,
+                    resolved.AttackInfoN3Unknown)
+            };
+            Assert.IsInstanceOfType(packets[0], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(packets[1], typeof(AttackMessage));
+            Assert.IsInstanceOfType(packets[2], typeof(AttackInfoMessage));
+            Assert.AreEqual(40, resolved.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(44, resolved.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(36, resolved.SpecialAttackWeaponUnknown3);
+            Assert.AreEqual(40, resolved.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+            Assert.AreEqual(3, resolved.AttackInfoHitType);
+            Assert.AreEqual(0, resolved.AttackInfoUnknown);
+            Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+        }
+
+        [TestMethod]
+        public void EternalSentinelFormulaRestoresBothLevelEighteenLoadouts()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(
+                value => value.DisplayName == "Eternal Sentinel"
+                         && value.MonsterData == 41690);
+            int[] sources =
+            {
+                unchecked((int)0x7983FA22),
+                unchecked((int)0x7983FBC2)
+            };
+            OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns().Where(
+                    value => value.PlayfieldInstance
+                             == CapturedTempleOfThreeWindsContentProvider.PlayfieldInstance
+                             && value.ProfileKey == profile.ProfileKey
+                             && sources.Contains(value.SourceIdentity))
+                .ToArray();
+            Assert.AreEqual(2, spawns.Length);
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                OrdinaryEnemySpawnVariant variant = spawn.SelectVariant(value => 0);
+                Assert.AreEqual(18, variant.Level);
+                Assert.IsNotNull(variant.WeaponLoadout);
+                Assert.IsTrue(variant.WeaponLoadout.IsValid);
+                CapturedEnemyCombatContract current =
+                    profile.Combat.ResolveContract(spawn.SourceIdentity, variant);
+                Assert.AreEqual(
+                    CapturedEnemyAttackModel.EquippedWeapon,
+                    current.AttackModel,
+                    current.Evidence);
+                Assert.IsTrue(current.UsesProductionEquippedWeaponValues);
+                Assert.AreEqual(98, current.SpecialAttackWeaponUnknown1);
+                OrdinaryEnemyEquippedFormulaDomain domain;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGetEquippedFormulaDomain(
+                        profile.MonsterData,
+                        out domain));
+                CapturedEnemyCombatProfileDefinition[] compatibleProfiles =
+                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                            value => value.MatchesArchetypeKey(
+                                         CapturedTempleOfThreeWindsContentProvider
+                                             .PlayfieldInstance,
+                                         profile.DisplayName,
+                                         profile.MonsterData)
+                                     && value
+                                         .SupportsGeneratedEquippedWeaponPacketSemantics(
+                                             domain))
+                        .ToArray();
+                Assert.AreEqual(3, compatibleProfiles.Length);
+                Assert.IsTrue(
+                    compatibleProfiles.All(
+                        value => compatibleProfiles[0]
+                            .MatchesGeneratedEquippedWeaponPacketSemantics(
+                                value,
+                                domain)));
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        CapturedTempleOfThreeWindsContentProvider.PlayfieldInstance,
+                        profile.DisplayName,
+                        profile.MonsterData,
+                        variant.Level,
+                        spawn.SourceIdentity,
+                        current,
+                        out resolved,
+                        out failure),
+                    failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                StringAssert.Contains(
+                    resolved.CaptureProvenArchetypeId,
+                    OrdinaryEnemyCombatSetupGenerator.EternalSentinelFormulaId);
+                Assert.AreEqual(98, resolved.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(98, resolved.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(98, resolved.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(11, resolved.SpecialAttackWeaponUnknown4);
+                Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+                Assert.AreEqual(3, resolved.AttackInfoHitType);
+                Assert.AreEqual(0, resolved.AttackInfoUnknown);
+                Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+            }
+
+            OrdinaryEnemyCombatNumericSetup ignored;
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        41690,
+                        18,
+                        123381,
+                        123384,
+                        22,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        41690,
+                        17,
+                        123381,
+                        123382,
+                        15,
+                        6),
+                    out ignored));
         }
 
         [TestMethod]
@@ -1114,6 +1355,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     NpcCombatAttackRules.CapturedSubwayStimFiendHighTemplate,
                     NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
                     NpcCombatAttackRules.CapturedSubwayStimFiendWeaponName),
+                out setup);
+        }
+
+        private static bool TryGenerateViolentVagabond(
+            int level,
+            out OrdinaryEnemyCombatNumericSetup setup)
+        {
+            return OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                new OrdinaryEnemyEquippedCombatSetupInput(
+                    203733,
+                    level,
+                    130590,
+                    130590,
+                    1,
+                    6),
                 out setup);
         }
 

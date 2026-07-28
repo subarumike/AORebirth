@@ -425,15 +425,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 OrdinaryEnemyEvidenceState.Observed,
                 violentVagabond.Aggression.EvidenceState);
-            Assert.IsFalse(violentVagabond.Combat.Contract.IsCombatReady);
-            Assert.IsTrue(violentVagabond.Combat.Contract.IsQuarantined);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(
-                violentVagabond.Combat.Contract.QuarantineReason));
+            Assert.IsTrue(violentVagabond.Combat.Contract.IsCombatReady);
+            Assert.IsFalse(violentVagabond.Combat.Contract.IsQuarantined);
             Assert.AreEqual(
-                CapturedEnemyAttackModel.Unresolved,
+                CapturedEnemyAttackModel.EquippedWeapon,
                 violentVagabond.Combat.Contract.AttackModel);
-            Assert.AreEqual(0, violentVagabond.Combat.Contract.WeaponLowId);
-            Assert.AreEqual(0, violentVagabond.Combat.Contract.WeaponHighId);
+            Assert.AreEqual(130590, violentVagabond.Combat.Contract.WeaponLowId);
+            Assert.AreEqual(130590, violentVagabond.Combat.Contract.WeaponHighId);
 
             var promotedCombatExpectations = new[]
                 {
