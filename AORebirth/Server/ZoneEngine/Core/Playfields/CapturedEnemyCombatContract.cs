@@ -2269,6 +2269,22 @@ namespace AORebirth.Core.Playfields
                             0,
                             0));
                 case 17657:
+                {
+                    OrdinaryEnemyCombatNumericSetup setup;
+                    if (!level.HasValue
+                        || !OrdinaryEnemyCombatSetupGenerator
+                            .TryGenerateFilthFlea(level.Value, out setup))
+                    {
+                        return CapturedEnemyCombatContract.Unresolved(
+                            "Filth Flea combat requires the bounded capture-proven level domain "
+                            + OrdinaryEnemyCombatSetupGenerator
+                                .FilthFleaMinimumLevel
+                            + ".."
+                            + OrdinaryEnemyCombatSetupGenerator
+                                .FilthFleaMaximumLevel,
+                            true);
+                    }
+
                     return CapturedEnemyCombatContract.CapturedSpecialSequence(
                         "20260708-004038 and 20260709-193914: Filth Flea normal slot rolls with criticals excluded",
                         new CapturedEnemySpecialAttackSequenceDefinition(
@@ -2314,15 +2330,16 @@ namespace AORebirth.Core.Playfields
                                     NpcCombatAttackRules.CapturedSubwayFilthFleaArmsTag,
                                     NpcCombatAttackRules.CapturedSubwayFilthFleaArmsName)
                             },
-                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
-                            NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                            setup.SpecialAttackWeaponUnknown1,
+                            setup.SpecialAttackWeaponUnknown2,
+                            setup.SpecialAttackWeaponUnknown3,
+                            setup.SpecialAttackWeaponUnknown4,
                             NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
                             0,
                             0,
                             0))
                         .WithProductionSpecializedValues();
+                }
                 case 17720:
                     return CapturedEnemyCombatContract.FixedAttack(
                         "20260708-143600 and 20260709-210452: 37 normal local-player Discarded Pet SIW1 hits span 9..18; four 30..33 criticals remain report-only; 30 same-source landed-hit intervals span 4.609299..5.950416 seconds with conventional median 5.089763; AttackInfo uses ammo -1, slot 0, unknown 0, and instance SIW1; raw SpecialAttackWeapon first four fields are exact by level while the varying fifth field remains unresolved and is not synthesized",

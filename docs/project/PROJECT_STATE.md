@@ -4,6 +4,14 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- PF127 Filth Flea combat is complete for all `51` actors. The last nine L7,
+  L8, L14, and L15 actors resolve the exact EPAH/AZUS semantic profile through
+  bounded formula `filth-flea-saw-bounded-level-piecewise-v1`; production
+  continues to own level-dependent gameplay values and mutable SAW state.
+  PF127 moves from `290/32` to `299/23`. The fixed PF127/PF1931 checkpoint is
+  now `464/25` of `489`, with PF1931 unchanged at `165/2`. Evidence:
+  `docs/evidence/SUBWAY_FILTH_FLEA_COMBAT_RESTORATION_20260726.md`.
+
 - PF1931 ordinary combat now restores `78` of the `80` actors that entered the
   2026-07-28 quarantine pass. All `76` quarantined Cultists resolve their exact
   active WIFU loadout and a capture-proven semantic archetype through bounded
@@ -12,7 +20,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   contracts. Only L18 Eternal Sentinels `0x7983FA22` and `0x7983FBC2` remain
   fail-closed because their active WIFU/start/miss evidence has no complete
   same-level landed normal AttackInfo contract. The fixed PF127/PF1931
-  checkpoint is `455/34` of `489` (`290/32` and `165/2`). Evidence:
+  checkpoint before the final Filth Flea pass was `455/34` of `489`
+  (`290/32` and `165/2`). Evidence:
   `docs/evidence/TEMPLE_ORDINARY_COMBAT_COMPLETION_20260728.md`.
 
 - The fixed 53-actor Subway combat checkpoint is now `52` certified and `1`

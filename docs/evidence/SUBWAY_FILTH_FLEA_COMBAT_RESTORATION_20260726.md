@@ -1,5 +1,52 @@
 # Subway Filth Flea Combat Restoration - 2026-07-26
 
+## Completion update - 2026-07-28
+
+The nine actors previously left quarantined are now restored, so all `51/51`
+active PF127 Filth Fleas are capture-certified:
+
+- L7: `0x795317F5`, `0x7953AD30`, `0x7953AFAA`, `0x7953AFC4`
+- L8: `0x7953AD2F`, `0x7953AD36`
+- L14: `0x7953A9C6`
+- L15: `0x7953A9C2`, `0x7953AA0B`
+
+The reusable numeric setup is
+`filth-flea-saw-bounded-level-piecewise-v1`, bounded to L4..L21:
+
+```text
+L4..L10: floor((21 * actorLevel + 28) / 4)
+L11..L21: 6 * actorLevel - 1
+```
+
+It reproduces every stable captured `SpecialAttackWeapon.Unknown1..4`
+observation exactly: L4 `28`, L5 `33`, L6 `38`, L10 `59`, L11 `65`, L12
+`71`, L13 `77`, L16 `95`, L19 `113`, L20 `119`, and L21 `125`. The newly
+bound levels produce L7 `43`, L8 `49`, L14 `83`, and L15 `89`. Leave-one-out
+checks pass for every captured level. The independent L19 observation with
+`Unknown2=141` is retained as ordered mutable generation-local state; the
+independent same-level initial stream and the stable cross-level result are
+`113`.
+
+Capture remains authoritative for natural mode, EPAH `201059/201060`
+tag/instance `1162887496` in slot `1`, AZUS `201056/201057` tag/instance
+`1096439123` in slot `0`, hit wire `3`, normal damage wire `0`, terminal
+damage wire `4`, N3/action fields `0`, the two scheduled streams, and
+`SpecialAttackWeapon -> Attack -> AttackInfo` ordering. Production continues
+to own level, damage, range, cadence, Energy/ammunition, and mutable SAW state.
+No nearest-level selection, source-identity whitelist, generic fallback,
+cross-family reuse, or duplicate contract was added.
+
+The canonical semantic profile is
+`218eb3509f2be66b-12f99a4c2f732061`. Formula evidence uses capture sessions
+`20260708-004038`, `20260708-143600`, `20260709-193914`,
+`20260709-225408`, and `20260720-051714`.
+
+The fixed PF127/PF1931 checkpoint moves from `455/34` to `464/25` of `489`.
+PF127 moves from `290/32` to `299/23`; PF1931 remains `165/2`.
+
+The sections below preserve the earlier 2026-07-26 exact-level restoration
+checkpoint and are superseded only where this completion update says so.
+
 ## Result
 
 PF127 contains 51 active `Filth Flea` actors with `MonsterData 17657`.

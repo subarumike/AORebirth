@@ -1653,17 +1653,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertCapturedOrder(new MessageBody[] { specialAttackWeapon, attack, attackInfo });
             Assert.AreEqual(2, specialAttackWeapon.Specials.Length);
             Assert.AreEqual((byte)0, specialAttackWeapon.Unknown);
+            OrdinaryEnemyCombatNumericSetup generatedSetup;
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    activeSpawn.Level,
+                    out generatedSetup));
             Assert.AreEqual(
-                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                generatedSetup.SpecialAttackWeaponUnknown1,
                 specialAttackWeapon.Unknown1);
             Assert.AreEqual(
-                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                generatedSetup.SpecialAttackWeaponUnknown2,
                 specialAttackWeapon.Unknown2);
             Assert.AreEqual(
-                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                generatedSetup.SpecialAttackWeaponUnknown3,
                 specialAttackWeapon.Unknown3);
             Assert.AreEqual(
-                NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                generatedSetup.SpecialAttackWeaponUnknown4,
                 specialAttackWeapon.Unknown4);
             Assert.AreEqual(
                 NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,

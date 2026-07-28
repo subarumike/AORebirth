@@ -1812,6 +1812,41 @@ namespace AORebirth.Core.Playfields
         internal static CapturedEnemyCombatContract For(string name, int monsterData, int? level)
         {
             if (monsterData
+                == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData)
+            {
+                OrdinaryEnemyCombatNumericSetup generated;
+                if (!level.HasValue
+                    || !OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                        level.Value,
+                        out generated))
+                {
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Filth Flea mathematical combat setup is unsupported.",
+                        true);
+                }
+
+                CapturedEnemyCombatContract baseline = For(name, monsterData);
+                CapturedEnemySpecialAttackSequenceDefinition sequence =
+                    baseline.SpecialAttackSequence;
+                return CapturedEnemyCombatContract.CapturedSpecialSequence(
+                        baseline.Evidence,
+                        new CapturedEnemySpecialAttackSequenceDefinition(
+                            sequence.InitialAttackDelaySeconds,
+                            sequence.OpeningAttack,
+                            sequence.RepeatingAttack,
+                            sequence.SpecialAttacks,
+                            generated.SpecialAttackWeaponUnknown1,
+                            generated.SpecialAttackWeaponUnknown2,
+                            generated.SpecialAttackWeaponUnknown3,
+                            generated.SpecialAttackWeaponUnknown4,
+                            sequence.SpecialAttackWeaponUnknown5,
+                            sequence.SpecialAttackWeaponN3Unknown,
+                            sequence.AttackN3Unknown,
+                            sequence.AttackAction))
+                    .WithProductionSpecializedValues();
+            }
+
+            if (monsterData
                 == NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData)
             {
                 OrdinaryEnemyCombatNumericSetup generated;

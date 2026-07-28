@@ -281,6 +281,7 @@ namespace AORebirth.Core.Playfields
                 CapturedSubwaySpawnDefinition first = group.First();
                 Func<int, CapturedEnemyCombatContract> contractResolver =
                     first.MonsterData == NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData
+                    || first.MonsterData == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData
                         ? new Func<int, CapturedEnemyCombatContract>(
                             level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level))
                         : null;
