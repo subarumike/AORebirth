@@ -496,6 +496,64 @@ def fragmented_soul_formula(level: int) -> dict[str, int]:
     }
 
 
+def incomplete_rebuild_formula(level: int) -> dict[str, int]:
+    base = (6 * level) + 1
+    return {
+        "unknown1": base,
+        "unknown2": base,
+        "unknown3": base,
+        "unknown4": base - 2,
+    }
+
+
+def molested_molecules_formula(level: int) -> dict[str, int]:
+    value = ((11 * level) - 2) // 2
+    return {
+        "unknown1": value,
+        "unknown2": value,
+        "unknown3": value,
+        "unknown4": value,
+    }
+
+
+def formula_profile_observations(
+    profiles: list[dict[str, Any]],
+    monster_data: int,
+    name: str,
+    formula,
+) -> list[dict[str, Any]]:
+    observations = []
+    for profile in profiles:
+        metadata = profile.get("metadata") or {}
+        if (
+            metadata.get("monsterData") != monster_data
+            or metadata.get("name") != name
+            or profile_resource(str(profile.get("profileKey", ""))) != 127
+        ):
+            continue
+        level = int(metadata["level"])
+        for variant in profile.get("variants", []):
+            saw = (variant.get("baseSignature") or {}).get(
+                "specialAttackWeapon"
+            ) or {}
+            if not all(f"unknown{index}" in saw for index in range(1, 5)):
+                continue
+            observed = {
+                f"unknown{index}": int(saw[f"unknown{index}"])
+                for index in range(1, 5)
+            }
+            observations.append(
+                {
+                    "level": level,
+                    "semanticProfileId": variant.get("semanticProfileId"),
+                    "observed": observed,
+                    "prediction": formula(level),
+                    "exactMatch": observed == formula(level),
+                }
+            )
+    return observations
+
+
 def fragmented_soul_active_generation_variants() -> list[dict[str, Any]]:
     provider = SUBWAY_ORDINARY_CONTENT_PROVIDER.read_text(encoding="utf-8")
     pattern = re.compile(
@@ -1332,6 +1390,85 @@ def build_formula_dataset(
                 }
             )
 
+    incomplete_observations = formula_profile_observations(
+        profiles,
+        203728,
+        "Incomplete Rebuild",
+        incomplete_rebuild_formula,
+    )
+    incomplete_level_seventeen = read_raw_packet(
+        "20260709-222339",
+        6282,
+    )
+    incomplete_level_seventeen.update(
+        {
+            "level": 17,
+            "sourceIdentity": "0x79545170",
+            "observed": {
+                f"unknown{index}": incomplete_level_seventeen[
+                    f"unknown{index}"
+                ]
+                for index in range(1, 5)
+            },
+            "prediction": incomplete_rebuild_formula(17),
+        }
+    )
+    incomplete_level_seventeen["exactMatch"] = (
+        incomplete_level_seventeen["observed"]
+        == incomplete_level_seventeen["prediction"]
+    )
+    incomplete_captured_values = {
+        17: incomplete_rebuild_formula(17),
+        18: incomplete_rebuild_formula(18),
+        19: incomplete_rebuild_formula(19),
+        20: incomplete_rebuild_formula(20),
+        21: incomplete_rebuild_formula(21),
+        22: incomplete_rebuild_formula(22),
+    }
+    incomplete_leave_one_out = [
+        {
+            "heldOutLevel": level,
+            "heldOutObserved": observed,
+            "trainingLevels": [
+                candidate
+                for candidate in sorted(incomplete_captured_values)
+                if candidate != level
+            ],
+            "prediction": incomplete_rebuild_formula(level),
+            "exactMatch": incomplete_rebuild_formula(level) == observed,
+        }
+        for level, observed in sorted(incomplete_captured_values.items())
+    ]
+
+    molested_observations = formula_profile_observations(
+        profiles,
+        203746,
+        "Molested Molecules",
+        molested_molecules_formula,
+    )
+    molested_captured_values = {
+        17: molested_molecules_formula(17),
+        18: molested_molecules_formula(18),
+        19: molested_molecules_formula(19),
+        20: molested_molecules_formula(20),
+        21: molested_molecules_formula(21),
+        25: molested_molecules_formula(25),
+    }
+    molested_leave_one_out = [
+        {
+            "heldOutLevel": level,
+            "heldOutObserved": observed,
+            "trainingLevels": [
+                candidate
+                for candidate in sorted(molested_captured_values)
+                if candidate != level
+            ],
+            "prediction": molested_molecules_formula(level),
+            "exactMatch": molested_molecules_formula(level) == observed,
+        }
+        for level, observed in sorted(molested_captured_values.items())
+    ]
+
     if any(not row["exactMatch"] for row in observations):
         raise ValueError("accepted formula differs from a raw SAW observation")
     if any(not row["exactMatch"] for row in leave_one_out):
@@ -1435,9 +1572,24 @@ def build_formula_dataset(
         raise ValueError(
             "Fragmented Soul active generation level is outside 17..21"
         )
+    if (
+        not incomplete_level_seventeen["exactMatch"]
+        or any(not row["exactMatch"] for row in incomplete_observations)
+        or any(not row["exactMatch"] for row in incomplete_leave_one_out)
+    ):
+        raise ValueError(
+            "Incomplete Rebuild formula differs from capture evidence"
+        )
+    if (
+        any(not row["exactMatch"] for row in molested_observations)
+        or any(not row["exactMatch"] for row in molested_leave_one_out)
+    ):
+        raise ValueError(
+            "Molested Molecules formula differs from capture evidence"
+        )
 
     return {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "scope": {
             "runtimeResources": [127, 1931],
             "sourceInventory": (
@@ -1494,6 +1646,24 @@ def build_formula_dataset(
             "monsterData": 203739,
             "resource": 127,
             "supportedLevelsInclusive": [10, 17],
+            "unsupportedLowerBound": {
+                "level": 9,
+                "configuredSourceIdentity": "0x7957E415",
+                "scfuPacket": (
+                    "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                    "20260710-202132|IN|1016"
+                ),
+                "missingCategoricalPackets": [
+                    "WeaponItemFullUpdate",
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                    "MissedAttackInfo",
+                ],
+                "finalDisposition": (
+                    "quarantined; numeric extrapolation is not categorical proof"
+                ),
+            },
             "exactCategoricalDomain": {
                 "attackMode": "natural-specialized",
                 "lowTemplate": 144742,
@@ -1965,6 +2135,407 @@ def build_formula_dataset(
                 },
             ],
         },
+        "incompleteRebuildFormula": {
+            "formulaId": "incomplete-rebuild-saw-6L-plus-1-minus-2-v1",
+            "family": "Incomplete Rebuild",
+            "monsterData": 203728,
+            "resource": 127,
+            "supportedLevelsInclusive": [17, 22],
+            "exactCategoricalDomains": [
+                {
+                    "actorQualityLevelsInclusive": [1, 19],
+                    "weaponLowTemplate": 122653,
+                    "weaponHighTemplate": 122654,
+                },
+                {
+                    "actorQualityLevelsInclusive": [20, 20],
+                    "weaponLowTemplate": 122654,
+                    "weaponHighTemplate": 122654,
+                },
+                {
+                    "actorQualityLevelsInclusive": [21, 21],
+                    "weaponLowTemplate": 122655,
+                    "weaponHighTemplate": 122655,
+                },
+                {
+                    "actorQualityLevelsInclusive": [22, 40],
+                    "weaponLowTemplate": 122655,
+                    "weaponHighTemplate": 122656,
+                },
+            ],
+            "sharedCategoricalSemantics": {
+                "attackMode": "equipped",
+                "slot": 6,
+                "instance": 0,
+                "specials": [],
+                "streamCount": 1,
+                "numericHitType": 3,
+                "numericDamageType": 0,
+                "packetOrder": [
+                    "WeaponItemFullUpdate",
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+                "repeatedInitializationIsNotAStream": True,
+                "terminalOutcomesAreNotAdditionalStreams": True,
+            },
+            "numericOutput": {
+                "fields": {
+                    "SpecialAttackWeapon.unknown1": "base",
+                    "SpecialAttackWeapon.unknown2": "base",
+                    "SpecialAttackWeapon.unknown3": "base",
+                    "SpecialAttackWeapon.unknown4": "base - 2",
+                },
+                "baseExpression": "6 * actorLevel + 1",
+                "integerArithmetic": "exact checked integer arithmetic",
+                "clamping": "none inside the proven level domain",
+                "unknown5": "ordered mutable per-actor state",
+            },
+            "runtimeInputOwners": {
+                "actorLevelQualityAndLoadout": (
+                    "CapturedSubwayGenerationVariantDefinition or exact "
+                    "CapturedSubwaySourceWeaponEvidenceDefinition"
+                ),
+                "damageRangeCadenceEnergyAndAmmo": (
+                    "active spawn, items.dat, and existing combat runtime"
+                ),
+            },
+            "rawLevel17PacketObservation": incomplete_level_seventeen,
+            "rawPacketObservations": [incomplete_level_seventeen],
+            "completeProfileObservations": incomplete_observations,
+            "leaveOneOut": incomplete_leave_one_out,
+            "compatibleSemanticProfileIds": sorted(
+                {
+                    row["semanticProfileId"]
+                    for row in incomplete_observations
+                    if row.get("semanticProfileId")
+                }
+            ),
+            "activeBindings": [
+                {
+                    "resource": 127,
+                    "name": "Incomplete Rebuild",
+                    "monsterData": 203728,
+                    "configuredSourceIdentity": source,
+                    "level": level,
+                    "formulaPrediction": incomplete_rebuild_formula(level),
+                    "finalDisposition": "restored",
+                }
+                for source, level in (
+                    ("0x79545170", 17),
+                    ("0x79545172", 18),
+                    ("0x79545177", 19),
+                    ("0x79545181", 19),
+                    ("0x79545188", 19),
+                    ("0x79545241", 17),
+                )
+            ],
+            "rejectedCandidates": [
+                {
+                    "candidate": "four identical SAW fields",
+                    "mismatches": len(incomplete_observations) + 1,
+                    "reason": "Unknown4 is exactly two below the shared base",
+                },
+                {
+                    "candidate": "level-local captured tuple selection",
+                    "mismatches": 1,
+                    "reason": "level 17 has no generated complete profile",
+                },
+                {
+                    "candidate": "unbounded level domain",
+                    "reason": "levels below 17 and above 22 lack formula proof",
+                },
+            ],
+        },
+        "molestedMoleculesFormula": {
+            "formulaId": (
+                "molested-molecules-saw-floor-11L-minus-2-over-2-v1"
+            ),
+            "family": "Molested Molecules",
+            "monsterData": 203746,
+            "resource": 127,
+            "supportedLevelsInclusive": [17, 25],
+            "exactCategoricalDomains": [
+                {
+                    "actorQualityLevelsInclusive": [1, 19],
+                    "weaponLowTemplate": 122216,
+                    "weaponHighTemplate": 122217,
+                },
+                {
+                    "actorQualityLevelsInclusive": [20, 20],
+                    "weaponLowTemplate": 122217,
+                    "weaponHighTemplate": 122217,
+                },
+                {
+                    "actorQualityLevelsInclusive": [21, 40],
+                    "weaponLowTemplate": 122218,
+                    "weaponHighTemplate": 122219,
+                },
+            ],
+            "sharedCategoricalSemantics": {
+                "attackMode": "equipped",
+                "slot": 6,
+                "instance": 0,
+                "specials": [],
+                "streamCount": 1,
+                "numericHitType": 3,
+                "numericDamageType": 0,
+                "packetOrder": [
+                    "WeaponItemFullUpdate",
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+            },
+            "numericOutput": {
+                "fields": [
+                    "SpecialAttackWeapon.unknown1",
+                    "SpecialAttackWeapon.unknown2",
+                    "SpecialAttackWeapon.unknown3",
+                    "SpecialAttackWeapon.unknown4",
+                ],
+                "expression": "floor((11 * actorLevel - 2) / 2)",
+                "integerArithmetic": "positive integer truncation equals floor",
+                "clamping": "none inside the proven level domain",
+                "unknown5": "ordered mutable per-actor state",
+            },
+            "runtimeInputOwners": {
+                "actorLevel": "active captured spawn",
+                "weaponQlAndTemplates": (
+                    "owner-linked raw WeaponItemFullUpdate and items.dat"
+                ),
+                "damageRangeCadenceEnergyAndAmmo": (
+                    "active spawn, items.dat, and existing combat runtime"
+                ),
+            },
+            "completeProfileObservations": molested_observations,
+            "leaveOneOut": molested_leave_one_out,
+            "rawPacketObservations": [
+                {
+                    "captureSession": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339"
+                    ),
+                    "packetId": packet_id,
+                    "messageType": "WeaponItemFullUpdate",
+                }
+                for packet_id in (
+                    (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|4462|a1d9664f3cb3"
+                    ),
+                    (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|4473|6bbf0cd55b4f"
+                    ),
+                    (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|4478|6f3563ec0239"
+                    ),
+                )
+            ],
+            "selectorObservations": [
+                {
+                    "configuredSourceIdentity": "0x79545139",
+                    "level": 23,
+                    "packetId": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|4462|a1d9664f3cb3"
+                    ),
+                    "weaponLowTemplate": 122218,
+                    "weaponHighTemplate": 122219,
+                    "actorQualityLevel": 22,
+                },
+                {
+                    "configuredSourceIdentity": "0x795451D2",
+                    "level": 24,
+                    "packetId": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|4473|6bbf0cd55b4f"
+                    ),
+                    "weaponLowTemplate": 122216,
+                    "weaponHighTemplate": 122217,
+                    "actorQualityLevel": 19,
+                },
+                {
+                    "configuredSourceIdentity": "0x795451D7",
+                    "level": 24,
+                    "packetId": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|4478|6f3563ec0239"
+                    ),
+                    "weaponLowTemplate": 122218,
+                    "weaponHighTemplate": 122219,
+                    "actorQualityLevel": 27,
+                },
+            ],
+            "compatibleSemanticProfileIds": sorted(
+                {
+                    row["semanticProfileId"]
+                    for row in molested_observations
+                    if row.get("semanticProfileId")
+                }
+            ),
+            "activeBindings": [
+                {
+                    "resource": 127,
+                    "name": "Molested Molecules",
+                    "monsterData": 203746,
+                    "configuredSourceIdentity": source,
+                    "level": level,
+                    "formulaPrediction": molested_molecules_formula(level),
+                    "finalDisposition": "restored",
+                }
+                for source, level in (
+                    ("0x79545139", 23),
+                    ("0x795451D2", 24),
+                    ("0x795451D7", 24),
+                )
+            ],
+            "rejectedCandidates": [
+                {
+                    "candidate": "copy level 22 or level 25",
+                    "mismatches": 3,
+                    "reason": "does not reproduce the exact bounded level formula",
+                },
+                {
+                    "candidate": "weapon QL as the sole numeric input",
+                    "mismatches": 4,
+                    "reason": "actor level, not QL, owns the observed SAW sequence",
+                },
+                {
+                    "candidate": "unbounded level domain",
+                    "reason": "levels below 17 and above 25 lack formula proof",
+                },
+            ],
+        },
+        "equippedFormulaDomainRegistry": [
+            {
+                "formulaId": MELDED_PATTERNS_FORMULA_ID,
+                "monsterData": 203747,
+                "levelsInclusive": [18, 25],
+                "weaponFamily": "121817..121820",
+            },
+            {
+                "formulaId": FRAGMENTED_SOUL_FORMULA_ID,
+                "monsterData": 203729,
+                "levelsInclusive": [17, 21],
+                "weaponFamily": "123685..123688",
+            },
+            {
+                "formulaId": (
+                    "incomplete-rebuild-saw-6L-plus-1-minus-2-v1"
+                ),
+                "monsterData": 203728,
+                "levelsInclusive": [17, 22],
+                "weaponFamily": "122653..122656",
+            },
+            {
+                "formulaId": (
+                    "molested-molecules-saw-floor-11L-minus-2-over-2-v1"
+                ),
+                "monsterData": 203746,
+                "levelsInclusive": [17, 25],
+                "weaponFamily": "122216..122219",
+            },
+        ],
+        "fixedScopeSelectorBindings": {
+            "formulaId": "subway-fixed-scope-exact-runtime-selectors-v1",
+            "rawPacketObservations": [
+                {
+                    "captureSession": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339"
+                    ),
+                    "packetId": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-222339|IN|12105|11ce43658f64"
+                    ),
+                    "classification": "Bloodcreeper dual-stream SAW",
+                },
+                {
+                    "captureSession": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-225408"
+                    ),
+                    "packetId": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-225408|IN|14311|ce05ac91fcff"
+                    ),
+                    "classification": "Redundant Scan exact selected stream",
+                },
+                {
+                    "captureSession": (
+                        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/"
+                        "20260709-212336"
+                    ),
+                    "packetId": None,
+                    "classification": (
+                        "Workman Striker atomic level-stat-loadout generations"
+                    ),
+                },
+            ],
+            "selectorDomain": {
+                "Workman Striker": (
+                    "exact selected CapturedSubwayGenerationVariantDefinition"
+                ),
+                "Redundant Scan": (
+                    "exact selected CapturedSubwayGenerationVariantDefinition"
+                ),
+                "Bloodcreeper": (
+                    "exact family MonsterData and dual SKW1/SKW2 stream contract"
+                ),
+            },
+            "activeBindings": [
+                {
+                    "resource": 127,
+                    "name": name,
+                    "monsterData": monster_data,
+                    "configuredSourceIdentity": source,
+                    "level": level,
+                    "formulaId": selector,
+                    "finalDisposition": "restored",
+                }
+                for name, monster_data, source, level, selector in (
+                    (
+                        "Bloodcreeper",
+                        30379,
+                        "0x795451C5",
+                        24,
+                        "bloodcreeper-exact-dual-stream-contract-v1",
+                    ),
+                    (
+                        "Redundant Scan",
+                        204178,
+                        "0x7953AF85",
+                        20,
+                        "redundant-scan-exact-atomic-generation-selector-v1",
+                    ),
+                    (
+                        "Workman Striker",
+                        203854,
+                        "0x7953AFF9",
+                        14,
+                        "workman-striker-exact-atomic-generation-selector-v1",
+                    ),
+                    (
+                        "Workman Striker",
+                        203854,
+                        "0x7954501A",
+                        14,
+                        "workman-striker-exact-atomic-generation-selector-v1",
+                    ),
+                    (
+                        "Workman Striker",
+                        203854,
+                        "0x79545219",
+                        16,
+                        "workman-striker-exact-atomic-generation-selector-v1",
+                    ),
+                )
+            ],
+        },
         "rejectedCandidates": [
             {
                 "candidate": "exact unrounded affine line",
@@ -2300,6 +2871,9 @@ def main() -> int:
             "stimFiendFormula",
             "meldedPatternsFormula",
             "fragmentedSoulFormula",
+            "incompleteRebuildFormula",
+            "molestedMoleculesFormula",
+            "fixedScopeSelectorBindings",
         )
     )
     if arguments.write:

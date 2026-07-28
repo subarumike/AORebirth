@@ -62,6 +62,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { 21, new[] { 125, 145 } }
             };
 
+        private static readonly IDictionary<int, int[]> CapturedIncompleteRebuildSawValues =
+            new Dictionary<int, int[]>
+            {
+                { 17, new[] { 103, 101 } },
+                { 18, new[] { 109, 107 } },
+                { 19, new[] { 115, 113 } },
+                { 20, new[] { 121, 119 } },
+                { 21, new[] { 127, 125 } },
+                { 22, new[] { 133, 131 } }
+            };
+
+        private static readonly IDictionary<int, int> CapturedMolestedMoleculesSawValues =
+            new Dictionary<int, int>
+            {
+                { 17, 92 },
+                { 18, 98 },
+                { 19, 103 },
+                { 20, 109 },
+                { 21, 114 },
+                { 25, 136 }
+            };
+
         private static readonly int[] StartingFragmentedSoulQuarantineSources =
         {
             unchecked((int)0x7954516F),
@@ -657,6 +679,116 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(heldOut.Value[0], setup.SpecialAttackWeaponUnknown3);
                 Assert.AreEqual(heldOut.Value[1], setup.SpecialAttackWeaponUnknown4);
             }
+        }
+
+        [TestMethod]
+        public void FinalSubwayEquippedFormulaDomainsReproduceEveryObservationAndFailClosed()
+        {
+            foreach (KeyValuePair<int, int[]> observation in
+                CapturedIncompleteRebuildSawValues)
+            {
+                OrdinaryEnemyCombatNumericSetup generated;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            NpcCombatAttackRules
+                                .CapturedSubwayIncompleteRebuildMonsterData,
+                            observation.Key,
+                            122653,
+                            122654,
+                            18,
+                            6),
+                        out generated));
+                Assert.AreEqual(
+                    OrdinaryEnemyCombatSetupGenerator
+                        .IncompleteRebuildFormulaId,
+                    generated.FormulaId);
+                Assert.AreEqual(
+                    observation.Value[0],
+                    generated.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    observation.Value[0],
+                    generated.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(
+                    observation.Value[0],
+                    generated.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(
+                    observation.Value[1],
+                    generated.SpecialAttackWeaponUnknown4);
+            }
+
+            foreach (KeyValuePair<int, int> observation in
+                CapturedMolestedMoleculesSawValues)
+            {
+                OrdinaryEnemyCombatNumericSetup generated;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            NpcCombatAttackRules
+                                .CapturedSubwayMolestedMoleculesMonsterData,
+                            observation.Key,
+                            122217,
+                            122217,
+                            20,
+                            6),
+                        out generated));
+                Assert.AreEqual(
+                    OrdinaryEnemyCombatSetupGenerator
+                        .MolestedMoleculesFormulaId,
+                    generated.FormulaId);
+                Assert.AreEqual(
+                    observation.Value,
+                    generated.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    observation.Value,
+                    generated.SpecialAttackWeaponUnknown4);
+            }
+
+            OrdinaryEnemyCombatNumericSetup ignored;
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules
+                            .CapturedSubwayIncompleteRebuildMonsterData,
+                        16,
+                        122653,
+                        122654,
+                        18,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules
+                            .CapturedSubwayIncompleteRebuildMonsterData,
+                        17,
+                        122653,
+                        122655,
+                        18,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules
+                            .CapturedSubwayMolestedMoleculesMonsterData,
+                        26,
+                        122218,
+                        122219,
+                        27,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules
+                            .CapturedSubwayMolestedMoleculesMonsterData,
+                        24,
+                        122218,
+                        122219,
+                        27,
+                        5),
+                    out ignored));
         }
 
         [TestMethod]

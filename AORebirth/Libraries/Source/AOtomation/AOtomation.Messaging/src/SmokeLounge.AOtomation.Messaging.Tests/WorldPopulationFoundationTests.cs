@@ -1788,12 +1788,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemyAttackModel.Unresolved,
                 redundantScan.Combat.ResolveContract(spawns[0].Level).AttackModel,
                 "A Redundant Scan contract without its source identity must fail closed.");
-            Assert.AreEqual(
-                CapturedEnemyAttackModel.Unresolved,
+            CapturedEnemyCombatContract selectedActiveGeneration =
                 redundantScan.Combat.ResolveContract(
                     spawns[0].SourceIdentity,
-                    spawns[0].Level).AttackModel,
-                "A Redundant Scan source plus level without its atomic selected variant must fail closed.");
+                    spawns[0].Level);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.EquippedWeapon,
+                selectedActiveGeneration.AttackModel,
+                "The active Redundant Scan source and level select one exact atomic generation.");
+            Assert.AreEqual(122027, selectedActiveGeneration.WeaponLowId);
+            Assert.AreEqual(122027, selectedActiveGeneration.WeaponHighId);
+            Assert.AreEqual(20, selectedActiveGeneration.WeaponQuality);
 
             CollectionAssert.AreEqual(
                 new[]

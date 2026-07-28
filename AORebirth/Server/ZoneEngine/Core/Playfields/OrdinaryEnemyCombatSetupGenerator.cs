@@ -1,5 +1,7 @@
 namespace AORebirth.Core.Playfields
 {
+    using System;
+
     using ZoneEngine.Core.Playfields;
 
     internal sealed class OrdinaryEnemyCombatSetupInput
@@ -91,6 +93,154 @@ namespace AORebirth.Core.Playfields
         internal int WeaponSlot { get; private set; }
     }
 
+    internal enum OrdinaryEnemyEquippedFormulaKind
+    {
+        MeldedPatterns,
+        FragmentedSoul,
+        IncompleteRebuild,
+        MolestedMolecules
+    }
+
+    internal sealed class OrdinaryEnemyEquippedFormulaDomain
+    {
+        internal OrdinaryEnemyEquippedFormulaDomain(
+            OrdinaryEnemyEquippedFormulaKind kind,
+            string formulaId,
+            int resourceId,
+            int monsterData,
+            int minimumLevel,
+            int maximumLevel,
+            int weaponSlot,
+            string weaponFamilyId)
+        {
+            this.Kind = kind;
+            this.FormulaId = formulaId;
+            this.ResourceId = resourceId;
+            this.MonsterData = monsterData;
+            this.MinimumLevel = minimumLevel;
+            this.MaximumLevel = maximumLevel;
+            this.WeaponSlot = weaponSlot;
+            this.WeaponFamilyId = weaponFamilyId;
+        }
+
+        internal OrdinaryEnemyEquippedFormulaKind Kind { get; private set; }
+
+        internal string FormulaId { get; private set; }
+
+        internal int ResourceId { get; private set; }
+
+        internal int MonsterData { get; private set; }
+
+        internal int MinimumLevel { get; private set; }
+
+        internal int MaximumLevel { get; private set; }
+
+        internal int WeaponSlot { get; private set; }
+
+        internal string WeaponFamilyId { get; private set; }
+
+        internal bool Matches(OrdinaryEnemyEquippedCombatSetupInput input)
+        {
+            return input != null
+                   && input.MonsterData == this.MonsterData
+                   && input.ActorLevel >= this.MinimumLevel
+                   && input.ActorLevel <= this.MaximumLevel
+                   && input.WeaponSlot == this.WeaponSlot
+                   && this.MatchesWeaponLoadout(
+                       input.WeaponLowTemplate,
+                       input.WeaponHighTemplate,
+                       input.WeaponQuality);
+        }
+
+        internal bool MatchesWeaponLoadout(
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            switch (this.Kind)
+            {
+                case OrdinaryEnemyEquippedFormulaKind.MeldedPatterns:
+                    return OrdinaryEnemyCombatSetupGenerator
+                        .IsMeldedPatternsWeaponLoadout(
+                            lowTemplate,
+                            highTemplate,
+                            quality);
+                case OrdinaryEnemyEquippedFormulaKind.FragmentedSoul:
+                    return OrdinaryEnemyCombatSetupGenerator
+                        .IsFragmentedSoulWeaponLoadout(
+                            lowTemplate,
+                            highTemplate,
+                            quality);
+                case OrdinaryEnemyEquippedFormulaKind.IncompleteRebuild:
+                    return OrdinaryEnemyCombatSetupGenerator
+                        .IsIncompleteRebuildWeaponLoadout(
+                            lowTemplate,
+                            highTemplate,
+                            quality);
+                case OrdinaryEnemyEquippedFormulaKind.MolestedMolecules:
+                    return OrdinaryEnemyCombatSetupGenerator
+                        .IsMolestedMoleculesWeaponLoadout(
+                            lowTemplate,
+                            highTemplate,
+                            quality);
+                default:
+                    return false;
+            }
+        }
+
+        internal OrdinaryEnemyCombatNumericSetup Generate(int actorLevel)
+        {
+            switch (this.Kind)
+            {
+                case OrdinaryEnemyEquippedFormulaKind.MeldedPatterns:
+                {
+                    int value = checked((11 * actorLevel) - 2) / 2;
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        value,
+                        checked(value + 28),
+                        value,
+                        value);
+                }
+                case OrdinaryEnemyEquippedFormulaKind.FragmentedSoul:
+                {
+                    int baseValue = checked((6 * actorLevel) - 1);
+                    int fourthValue = checked(
+                        baseValue + (2 * (actorLevel / 2)));
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        baseValue,
+                        baseValue,
+                        baseValue,
+                        fourthValue);
+                }
+                case OrdinaryEnemyEquippedFormulaKind.IncompleteRebuild:
+                {
+                    int baseValue = checked((6 * actorLevel) + 1);
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        baseValue,
+                        baseValue,
+                        baseValue,
+                        checked(baseValue - 2));
+                }
+                case OrdinaryEnemyEquippedFormulaKind.MolestedMolecules:
+                {
+                    int value = checked((11 * actorLevel) - 2) / 2;
+                    return new OrdinaryEnemyCombatNumericSetup(
+                        this.FormulaId,
+                        value,
+                        value,
+                        value,
+                        value);
+                }
+                default:
+                    throw new InvalidOperationException(
+                        "Unsupported equipped combat formula domain.");
+            }
+        }
+    }
+
     /// <summary>
     /// Produces only numeric combat state whose exact runtime formula has been
     /// independently proven. Weapon identity and packet semantics remain selected
@@ -125,6 +275,63 @@ namespace AORebirth.Core.Playfields
         internal const int FragmentedSoulMinimumLevel = 17;
 
         internal const int FragmentedSoulMaximumLevel = 21;
+
+        internal const string IncompleteRebuildFormulaId =
+            "incomplete-rebuild-saw-6L-plus-1-minus-2-v1";
+
+        internal const int IncompleteRebuildMinimumLevel = 17;
+
+        internal const int IncompleteRebuildMaximumLevel = 22;
+
+        internal const string MolestedMoleculesFormulaId =
+            "molested-molecules-saw-floor-11L-minus-2-over-2-v1";
+
+        internal const int MolestedMoleculesMinimumLevel = 17;
+
+        internal const int MolestedMoleculesMaximumLevel = 25;
+
+        private const int RightHandWeaponSlot = 6;
+
+        private static readonly OrdinaryEnemyEquippedFormulaDomain[]
+            EquippedFormulaDomains =
+            {
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.MeldedPatterns,
+                    MeldedPatternsFormulaId,
+                    127,
+                    NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData,
+                    MeldedPatternsMinimumLevel,
+                    MeldedPatternsMaximumLevel,
+                    NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot,
+                    "121817..121820"),
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.FragmentedSoul,
+                    FragmentedSoulFormulaId,
+                    127,
+                    NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                    FragmentedSoulMinimumLevel,
+                    FragmentedSoulMaximumLevel,
+                    NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot,
+                    "123685..123688"),
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.IncompleteRebuild,
+                    IncompleteRebuildFormulaId,
+                    127,
+                    NpcCombatAttackRules.CapturedSubwayIncompleteRebuildMonsterData,
+                    IncompleteRebuildMinimumLevel,
+                    IncompleteRebuildMaximumLevel,
+                    RightHandWeaponSlot,
+                    "122653..122656"),
+                new OrdinaryEnemyEquippedFormulaDomain(
+                    OrdinaryEnemyEquippedFormulaKind.MolestedMolecules,
+                    MolestedMoleculesFormulaId,
+                    127,
+                    NpcCombatAttackRules.CapturedSubwayMolestedMoleculesMonsterData,
+                    MolestedMoleculesMinimumLevel,
+                    MolestedMoleculesMaximumLevel,
+                    RightHandWeaponSlot,
+                    "122216..122219")
+            };
 
         internal static bool TryGenerate(
             OrdinaryEnemyCombatSetupInput input,
@@ -184,57 +391,29 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            if (input.MonsterData
-                == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
-                && input.ActorLevel >= MeldedPatternsMinimumLevel
-                && input.ActorLevel <= MeldedPatternsMaximumLevel
-                && input.WeaponSlot
-                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsWeaponSlot
-                && IsMeldedPatternsWeaponLoadout(
-                    input.WeaponLowTemplate,
-                    input.WeaponHighTemplate,
-                    input.WeaponQuality))
+            foreach (OrdinaryEnemyEquippedFormulaDomain domain in
+                EquippedFormulaDomains)
             {
-                // Exact positive-integer floor division. Captured L18, L19, L20,
-                // L21, L24, and L25 rows reproduce exactly. Unknown2 is the
-                // independently observed family offset from the same base value.
-                int value = checked((11 * input.ActorLevel) - 2) / 2;
-                setup = new OrdinaryEnemyCombatNumericSetup(
-                    MeldedPatternsFormulaId,
-                    value,
-                    checked(value + 28),
-                    value,
-                    value);
-                return true;
-            }
+                if (!domain.Matches(input))
+                {
+                    continue;
+                }
 
-            if (input.MonsterData
-                == NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData
-                && input.ActorLevel >= FragmentedSoulMinimumLevel
-                && input.ActorLevel <= FragmentedSoulMaximumLevel
-                && input.WeaponSlot
-                   == NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot
-                && IsFragmentedSoulWeaponLoadout(
-                    input.WeaponLowTemplate,
-                    input.WeaponHighTemplate,
-                    input.WeaponQuality))
-            {
-                // All twenty-one unique raw Fragmented Soul SAW packets across L17..L21
-                // reproduce this bounded integer setup. Unknown4 adds the even
-                // level step using positive integer floor division.
-                int baseValue = checked((6 * input.ActorLevel) - 1);
-                int fourthValue = checked(
-                    baseValue + (2 * (input.ActorLevel / 2)));
-                setup = new OrdinaryEnemyCombatNumericSetup(
-                    FragmentedSoulFormulaId,
-                    baseValue,
-                    baseValue,
-                    baseValue,
-                    fourthValue);
+                setup = domain.Generate(input.ActorLevel);
                 return true;
             }
 
             return false;
+        }
+
+        internal static bool TryGetEquippedFormulaDomain(
+            int monsterData,
+            out OrdinaryEnemyEquippedFormulaDomain domain)
+        {
+            domain = Array.Find(
+                EquippedFormulaDomains,
+                value => value.MonsterData == monsterData);
+            return domain != null;
         }
 
         internal static bool MatchesGeneratedEquippedSetup(
@@ -306,6 +485,45 @@ namespace AORebirth.Core.Playfields
                    || (lowTemplate == 123687
                        && highTemplate == 123688
                        && quality >= 22
+                       && quality <= 40);
+        }
+
+        internal static bool IsIncompleteRebuildWeaponLoadout(
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            return (lowTemplate == 122653
+                    && highTemplate == 122654
+                    && quality >= 1
+                    && quality <= 19)
+                   || (lowTemplate == 122654
+                       && highTemplate == 122654
+                       && quality == 20)
+                   || (lowTemplate == 122655
+                       && highTemplate == 122655
+                       && quality == 21)
+                   || (lowTemplate == 122655
+                       && highTemplate == 122656
+                       && quality >= 22
+                       && quality <= 40);
+        }
+
+        internal static bool IsMolestedMoleculesWeaponLoadout(
+            int lowTemplate,
+            int highTemplate,
+            int quality)
+        {
+            return (lowTemplate == 122216
+                    && highTemplate == 122217
+                    && quality >= 1
+                    && quality <= 19)
+                   || (lowTemplate == 122217
+                       && highTemplate == 122217
+                       && quality == 20)
+                   || (lowTemplate == 122218
+                       && highTemplate == 122219
+                       && quality >= 21
                        && quality <= 40);
         }
 

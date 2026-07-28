@@ -782,6 +782,7 @@ namespace AORebirth.Core.Playfields
                 AttackModel = CapturedEnemyAttackModel.EquippedWeapon,
                 IsCombatReady = false,
                 Evidence = evidence,
+                Retaliates = true,
                 EvidenceSourceIdentity = evidenceSourceIdentity,
                 HasCapturedRequiredPacketFields = true,
                 UsesEquippedWeaponDamage = usesEquippedWeaponDamage,
@@ -1497,12 +1498,93 @@ namespace AORebirth.Core.Playfields
 
             if (monsterData == BloodcreeperMonsterData)
             {
-                return new CapturedEnemyCombatContract
-                    {
-                        AttackModel = CapturedEnemyAttackModel.Specialized,
-                        IsCombatReady = true,
-                        Evidence = "Bloodcreeper captured dual natural attack sequence."
-                    };
+                return CapturedEnemyCombatContract.CapturedParallelAttackSequence(
+                    "Bloodcreeper captured dual natural attack sequence.",
+                    new CapturedEnemyParallelAttackSequenceDefinition(
+                        new[]
+                        {
+                            new CapturedEnemyParallelAttackStreamDefinition(
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperSpitInitialSeconds,
+                                new CapturedEnemyCombatAttackDefinition(
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperSpitMinimumDamage,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperSpitMaximumDamage,
+                                    0,
+                                    NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperSpitRechargeSeconds,
+                                    false,
+                                    NpcCombatAttackRules
+                                        .UnarmedAttackInfoAmmoCount,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperSpitWeaponSlot,
+                                    0,
+                                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperSpitTag,
+                                    0,
+                                    true)),
+                            new CapturedEnemyParallelAttackStreamDefinition(
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperBiteInitialSeconds,
+                                new CapturedEnemyCombatAttackDefinition(
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperBiteMinimumDamage,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperBiteMaximumDamage,
+                                    0,
+                                    NpcCombatAttackRules.MaxMeleeCombatDistance,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperBiteRechargeSeconds,
+                                    false,
+                                    NpcCombatAttackRules
+                                        .UnarmedAttackInfoAmmoCount,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperBiteWeaponSlot,
+                                    0,
+                                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                                    NpcCombatAttackRules
+                                        .CapturedSubwayBloodcreeperBiteTag,
+                                    0,
+                                    true))
+                        },
+                        new[]
+                        {
+                            new CapturedEnemySpecialAttackDefinition(
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperSpitLowTemplate,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperSpitHighTemplate,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperSpitTag,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperSpitName),
+                            new CapturedEnemySpecialAttackDefinition(
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperBiteLowTemplate,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperBiteHighTemplate,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperBiteTag,
+                                NpcCombatAttackRules
+                                    .CapturedSubwayBloodcreeperBiteName)
+                        },
+                        NpcCombatAttackRules
+                            .CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                        NpcCombatAttackRules
+                            .CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                        NpcCombatAttackRules
+                            .CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                        NpcCombatAttackRules
+                            .CapturedSubwayBloodcreeperSpecialAttackWeaponValue,
+                        NpcCombatAttackRules
+                            .CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue,
+                        0,
+                        0,
+                        0))
+                    .WithProductionSpecializedValues();
             }
 
             if (monsterData == DiscardedPetMonsterData)
@@ -2053,6 +2135,150 @@ namespace AORebirth.Core.Playfields
                 .WithProductionSpecializedValues();
         }
 
+        private static CapturedEnemyCombatContract ForGeneratedEquippedWeaponSetup(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            int level,
+            OrdinaryEnemySpawnWeaponLoadout weapon)
+        {
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (archetype == null
+                || weapon == null
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        archetype.MonsterData,
+                        level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        6),
+                    out generated))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Selected equipped generation is outside its proven formula domain",
+                    archetype != null
+                    && archetype.Combat != null
+                    && archetype.Combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    weapon.Evidence,
+                    sourceInstance,
+                    weapon.LowId,
+                    weapon.HighId,
+                    weapon.Quality,
+                    6,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues()
+                .WithProductionWeaponQuality();
+        }
+
+        internal static CapturedEnemyCombatContract ForOrdinaryGeneratedSetup(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            int level)
+        {
+            if (archetype == null)
+            {
+                return ForOrdinary(archetype);
+            }
+
+            if (archetype.MonsterData == IncompleteRebuildMonsterData
+                || archetype.MonsterData
+                   == NpcCombatAttackRules.CapturedSubwayMolestedMoleculesMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition matched =
+                    archetype.SourceWeaponEvidence.SingleOrDefault(
+                        value => value.SourceInstance == sourceInstance);
+                return matched == null
+                    ? (archetype.MonsterData
+                       == NpcCombatAttackRules
+                           .CapturedSubwayMolestedMoleculesMonsterData
+                           ? ForOrdinary(archetype)
+                               .WithEvidenceSourceHint(sourceInstance)
+                           : CapturedEnemyCombatContract.Unresolved(
+                               "Exact source weapon loadout is unavailable",
+                               archetype.Combat != null
+                               && archetype.Combat.Observed))
+                    : ForGeneratedEquippedWeaponSetup(
+                        archetype,
+                        sourceInstance,
+                        level,
+                        new OrdinaryEnemySpawnWeaponLoadout(
+                            matched.LowId,
+                            matched.HighId,
+                            matched.Quality,
+                            matched.EvidenceCaptures));
+            }
+
+            return ForOrdinary(archetype, sourceInstance);
+        }
+
+        internal static CapturedEnemyCombatContract
+            ForOrdinarySelectedAtomicGeneration(
+                CapturedSubwayOrdinaryArchetypeDefinition archetype,
+                int sourceInstance,
+                int level,
+                CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayGenerationVariantDefinition[] matches =
+                (generationEvidence
+                 ?? new CapturedSubwayGenerationVariantDefinition[0])
+                    .Where(value => value != null && value.Level == level)
+                    .ToArray();
+            if (matches.Length != 1)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Runtime level does not select one atomic generation",
+                    archetype != null
+                    && archetype.Combat != null
+                    && archetype.Combat.Observed);
+            }
+
+            CapturedSubwayGenerationVariantDefinition selected = matches[0];
+            return ForOrdinary(
+                archetype,
+                sourceInstance,
+                new OrdinaryEnemySpawnVariant(
+                    selected.Level,
+                    selected.Health,
+                    selected.HealthDamage,
+                    selected.MonsterScale,
+                    selected.RunSpeed,
+                    selected.Evidence,
+                    new OrdinaryEnemySpawnWeaponLoadout(
+                        selected.WeaponLowId,
+                        selected.WeaponHighId,
+                        selected.WeaponQuality,
+                        selected.Evidence)),
+                generationEvidence);
+        }
+
         private static CapturedEnemyCombatContract ForFragmentedSoul(
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance,
@@ -2534,11 +2760,34 @@ namespace AORebirth.Core.Playfields
                     generationEvidence);
             }
 
+            if (archetype.MonsterData == IncompleteRebuildMonsterData)
+            {
+                string incompleteFailure;
+                if (!OrdinaryEnemyAtomicGenerationEvidenceValidator
+                        .TryValidateSelectedVariant(
+                            IncompleteRebuildMonsterData,
+                            sourceInstance,
+                            variant,
+                            generationEvidence,
+                            out incompleteFailure))
+                {
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Incomplete Rebuild atomic generation evidence is incomplete: "
+                        + incompleteFailure,
+                        archetype.Combat != null
+                        && archetype.Combat.Observed);
+                }
+
+                return ForGeneratedEquippedWeaponSetup(
+                    archetype,
+                    sourceInstance,
+                    variant.Level,
+                    variant.WeaponLoadout);
+            }
+
             CapturedEnemyCombatContract baseline = ForOrdinary(archetype, sourceInstance);
             int monsterData = archetype.MonsterData;
-            string displayName = monsterData == IncompleteRebuildMonsterData
-                ? "Incomplete Rebuild"
-                : "Redundant Scan";
+            const string displayName = "Redundant Scan";
             OrdinaryEnemySpawnWeaponLoadout weapon = variant == null
                 ? null
                 : variant.WeaponLoadout;
@@ -2569,19 +2818,18 @@ namespace AORebirth.Core.Playfields
                 Evidence = weapon.Evidence
                            + ": " + displayName
                            + " selected one captured atomic level/stat/weapon generation; "
-                           + (monsterData == IncompleteRebuildMonsterData
-                               ? "two normal local-player hits span 17..35; "
-                               : "one normal local-player hit is 19; ")
+                           + "one normal local-player hit is 19; "
                            + "item owns runtime damage and recharge; captured AttackInfo ammo "
-                           + (monsterData == IncompleteRebuildMonsterData ? "9" : "17")
+                           + "17"
                            + ", slot 6, unknown 0.",
                 WeaponLowId = weapon.LowId,
                 WeaponHighId = weapon.HighId,
                 WeaponQuality = weapon.Quality,
                 WeaponInventorySlot = 6,
                 UsesProductionWeaponQuality = true,
+                UsesProductionEquippedWeaponValues = true,
                 HasCapturedEquippedAttackInfo = true,
-                AttackInfoAmmoCount = monsterData == IncompleteRebuildMonsterData ? 9 : 17,
+                AttackInfoAmmoCount = 17,
                 AttackInfoWeaponSlot = 6,
                 AttackInfoUnknown = 0,
                 AttackInfoWeaponInstance = 0

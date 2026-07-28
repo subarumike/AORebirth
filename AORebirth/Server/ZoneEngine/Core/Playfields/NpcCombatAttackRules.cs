@@ -145,6 +145,10 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayBloodcreeperMonsterData = 30379;
 
+        public const int CapturedSubwayIncompleteRebuildMonsterData = 203728;
+
+        public const int CapturedSubwayMolestedMoleculesMonsterData = 203746;
+
         public const int CapturedSubwayBloodcreeperBiteMinimumDamage = 21;
 
         public const int CapturedSubwayBloodcreeperBiteMaximumDamage = 35;
@@ -183,7 +187,7 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayBloodcreeperSpecialAttackWeaponValue = 131;
 
-        public const int CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue = 37;
+        public const int CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue = 0;
 
         public const int CapturedSubwayVergilMonsterData = 203748;
 

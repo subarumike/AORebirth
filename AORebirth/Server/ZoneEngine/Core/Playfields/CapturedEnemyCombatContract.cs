@@ -2397,7 +2397,8 @@ namespace AORebirth.Core.Playfields
                             NpcCombatAttackRules.CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue,
                             0,
                             0,
-                            0));
+                            0))
+                        .WithProductionSpecializedValues();
                 case 203734:
                     return CapturedEnemyCombatContract.Unresolved(
                         "Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden",
@@ -2704,6 +2705,35 @@ namespace AORebirth.Core.Playfields
         private static CapturedEnemyCombatContract ForIncompleteRebuild(
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance,
+            int level)
+        {
+            CapturedSubwaySourceWeaponEvidenceDefinition matched =
+                archetype == null
+                    ? null
+                    : archetype.SourceWeaponEvidence.SingleOrDefault(
+                        value => value.SourceInstance == sourceInstance);
+            return matched == null
+                ? CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Incomplete Rebuild source 0x{0:X8} has no unique owner-linked weapon loadout",
+                        sourceInstance),
+                    archetype != null
+                    && archetype.Combat != null
+                    && archetype.Combat.Observed)
+                : ForGeneratedEquippedWeaponSetup(
+                    archetype,
+                    sourceInstance,
+                    level,
+                    new OrdinaryEnemySpawnWeaponLoadout(
+                        matched.LowId,
+                        matched.HighId,
+                        matched.Quality,
+                        matched.EvidenceCaptures));
+        }
+
+        private static CapturedEnemyCombatContract ForIncompleteRebuild(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
             OrdinaryEnemySpawnVariant variant,
             CapturedSubwayGenerationVariantDefinition[] generationEvidence)
         {
@@ -2739,25 +2769,81 @@ namespace AORebirth.Core.Playfields
                     hasExactCombatEvidence);
             }
 
-            return CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(
-                string.Format(
-                    "{0}: Incomplete Rebuild source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5} as one atomic generation; two normal local-player hits span 17..35 and one captured miss shares ammo 9, slot 6, unknown 0, and weapon instance 0; item owns runtime damage and recharge; uniform selection over distinct captured generations is private policy",
-                    weapon.Evidence,
+            return ForGeneratedEquippedWeaponSetup(
+                archetype,
+                sourceInstance,
+                variant.Level,
+                weapon);
+        }
+
+        private static CapturedEnemyCombatContract ForGeneratedEquippedWeaponSetup(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            int level,
+            OrdinaryEnemySpawnWeaponLoadout weapon)
+        {
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (archetype == null
+                || weapon == null
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        archetype.MonsterData,
+                        level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        (int)WeaponSlots.Righthand),
+                    out generated))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Selected equipped generation is outside its proven formula domain",
+                    archetype != null
+                    && archetype.Combat != null
+                    && archetype.Combat.Observed);
+            }
+
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    string.Format(
+                        "{0}: source 0x{1:X8} selected captured L{2} QL{3} weapon {4}/{5}; numeric SAW setup={6}; item and actor state own damage, range, cadence, Energy, and ammunition",
+                        weapon.Evidence,
+                        sourceInstance,
+                        level,
+                        weapon.Quality,
+                        weapon.LowId,
+                        weapon.HighId,
+                        generated.FormulaId),
                     sourceInstance,
-                    variant.Level,
-                    weapon.Quality,
                     weapon.LowId,
-                    weapon.HighId),
-                weapon.LowId,
-                weapon.HighId,
-                weapon.Quality,
-                (int)WeaponSlots.Righthand,
-                9,
-                (int)WeaponSlots.Righthand,
-                0,
-                0,
-                0,
-                0)
+                    weapon.HighId,
+                    weapon.Quality,
+                    (int)WeaponSlots.Righthand,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithProductionEquippedWeaponValues()
                 .WithProductionWeaponQuality();
         }
 
@@ -3009,6 +3095,7 @@ namespace AORebirth.Core.Playfields
                 0,
                 0,
                 0)
+                .WithProductionEquippedWeaponValues()
                 .WithProductionWeaponQuality();
         }
 
@@ -3488,6 +3575,89 @@ namespace AORebirth.Core.Playfields
                    == NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData
                 ? ForStimFiend(archetype, level)
                 : ForOrdinary(archetype);
+        }
+
+        internal static CapturedEnemyCombatContract ForOrdinaryGeneratedSetup(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int sourceInstance,
+            int level)
+        {
+            if (archetype == null)
+            {
+                return ForOrdinary(archetype);
+            }
+
+            if (archetype.MonsterData == IncompleteRebuildMonsterData)
+            {
+                return ForIncompleteRebuild(archetype, sourceInstance, level);
+            }
+
+            if (archetype.MonsterData
+                == NpcCombatAttackRules.CapturedSubwayMolestedMoleculesMonsterData)
+            {
+                CapturedSubwaySourceWeaponEvidenceDefinition matched =
+                    archetype.SourceWeaponEvidence.SingleOrDefault(
+                        value => value.SourceInstance == sourceInstance);
+                return matched == null
+                    ? ForOrdinary(archetype)
+                        .WithEvidenceSourceHint(sourceInstance)
+                    : ForGeneratedEquippedWeaponSetup(
+                        archetype,
+                        sourceInstance,
+                        level,
+                        new OrdinaryEnemySpawnWeaponLoadout(
+                            matched.LowId,
+                            matched.HighId,
+                            matched.Quality,
+                            matched.EvidenceCaptures));
+            }
+
+            return ForOrdinary(archetype, sourceInstance);
+        }
+
+        internal static CapturedEnemyCombatContract
+            ForOrdinarySelectedAtomicGeneration(
+                CapturedSubwayOrdinaryArchetypeDefinition archetype,
+                int sourceInstance,
+                int level,
+                CapturedSubwayGenerationVariantDefinition[] generationEvidence)
+        {
+            CapturedSubwayGenerationVariantDefinition[] levelMatches =
+                (generationEvidence
+                 ?? new CapturedSubwayGenerationVariantDefinition[0])
+                    .Where(value => value != null && value.Level == level)
+                    .ToArray();
+            if (levelMatches.Length != 1)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    string.Format(
+                        "Source 0x{0:X8} level {1} has {2} atomic generations; runtime loadout selection is required",
+                        sourceInstance,
+                        level,
+                        levelMatches.Length),
+                    archetype != null
+                    && archetype.Combat != null
+                    && archetype.Combat.Observed);
+            }
+
+            CapturedSubwayGenerationVariantDefinition selected = levelMatches[0];
+            var variant = new OrdinaryEnemySpawnVariant(
+                selected.Level,
+                selected.Health,
+                selected.HealthDamage,
+                selected.MonsterScale,
+                selected.RunSpeed,
+                selected.Evidence,
+                new OrdinaryEnemySpawnWeaponLoadout(
+                    selected.WeaponLowId,
+                    selected.WeaponHighId,
+                    selected.WeaponQuality,
+                    selected.Evidence));
+            return ForOrdinary(
+                archetype,
+                sourceInstance,
+                variant,
+                generationEvidence);
         }
 
         private static CapturedEnemyCombatContract ForStimFiend(
