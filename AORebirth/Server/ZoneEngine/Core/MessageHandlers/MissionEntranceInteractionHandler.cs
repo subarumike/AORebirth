@@ -44,6 +44,14 @@ namespace ZoneEngine.Core.MessageHandlers
             // clients target Building/Statel instead of Door when mesh replay is partial.
             if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
             {
+                // Bound ACG exits are handled earlier by exact owner + PF2 + runtime identity.
+                // Never let the legacy near-door fallback exit a persisted instance.
+                if (MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    character.Playfield.Identity.Instance))
+                {
+                    return false;
+                }
+
                 bool doorTarget = MissionInstanceService.IsMissionExitDoorTarget(target);
                 bool nearExit = MissionInstanceService.IsNearInteriorExitDoor(character, 8.0, 10.0);
                 if (!doorTarget && !nearExit)

@@ -81,20 +81,19 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
   `20260727-223041` replay with zero decoder/extractor errors.
 
-- Generated RK mission interiors now have a capture-backed Stage 2 durable
-  instance foundation. Five finalized lifecycle captures remain immutable,
-  independently hash-validated, complete/selectable layout bundles; eight
-  older shapes remain nonselectable and PF2 `1441804` remains excluded.
-  Terminal acceptance now creates a distinct accepted quest identity and
-  atomically persists one version-2 binding with exact offer/owner/key/exterior/
-  terminal/bundle/hash/building/expiry identity. The bounded
-  `0x160000..0x16FFFF` allocator restores active reservations before allocating,
-  excludes captured PF2 values and shared PF `1419349`, and releases only after
-  cleanup completes. Exact owner/key/marker resolution has no newest-mission
-  fallback. QFU, teleport, and PAF identity helpers use the binding, while
-  production entry remains fail-closed until Stage 3 safely materializes
-  interior content. No database schema, procedural generator, reward, slider,
-  or authored-quest behavior changed. Evidence:
+- Generated RK mission interiors now have a capture-backed Stage 3 runtime.
+  The five immutable selectable bundles and their payload hashes are unchanged;
+  eight legacy shapes remain nonselectable and PF2 `1441804` remains excluded.
+  An accepted binding enters its persisted isolated PF2 with the exact bundle
+  payload, building, spawn, exit, captured structural dynels, objective objects,
+  and NPC placeholders. Runtime identities are deterministic, reversible, and
+  isolated by live PF2; version-1 mutable sidecars preserve identity maps plus
+  door/chest state across restart. Every interaction lookup requires owner,
+  allocated PF2, and runtime identity, and bound missions cannot reach shared
+  replay or PF `1419349`. Cleanup removes only the exact runtime instance;
+  Stage 2 still owns PF release. Completion, rewards, loot, combat, collision,
+  navigation, and procedural generation remain deferred. No schema changed.
+  Evidence:
   `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
 
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup

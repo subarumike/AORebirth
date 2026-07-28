@@ -217,10 +217,23 @@ namespace ZoneEngine.Core.MessageHandlers
                 missionWindowResent,
                 thrakMissionResent);
 
-            // Mission interiors: re-send Door/Chest FullUpdates (texture/mesh) after CharInPlay.
-            ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
-                client,
-                client.Controller.Character);
+            // Mission interiors: re-send exact instance-local captured objects after CharInPlay.
+            if (client.Controller.Character.Playfield != null
+                && ZoneEngine.Core.Missions.MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                ZoneEngine.Core.Missions.MissionAcgRuntimeManager.ClearSent(
+                    client.Controller.Character);
+                ZoneEngine.Core.Missions.MissionAcgRuntimeManager.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
+            else
+            {
+                ZoneEngine.Core.Missions.MissionInstanceDoorReplay.SendForCharacter(
+                    client,
+                    client.Controller.Character);
+            }
 
             client.Controller.Character.DoNotDoTimers = false;
             PlayfieldLifecycleTrace.Record(

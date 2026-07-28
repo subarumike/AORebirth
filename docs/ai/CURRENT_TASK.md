@@ -2,20 +2,19 @@
 
 ## Active
 
-### RK terminal missions: Stage 2 durable instance binding
+### RK terminal missions: Stage 3 captured interior materialization
 
-Generated terminal-mission acceptance now creates a distinct accepted quest
-identity and atomically persists one version-2 ACG binding under
-`mission-state/acg-bindings`. The binding owns the exact offer, owner/no-team
-state, mission seed/key/exterior/terminal, selected bundle/hash/building,
-isolated live PF2, expiry, and lifecycle. Startup validates and restores active
-reservations before allocation. Exact key/marker resolution replaces the
-newest-mission fallback for bound missions.
+Accepted generated missions now enter their exact isolated live PF2 and
+materialize only the selected bundle's captured PAF payload, building, spawn,
+exit, doors, chests, terminals, objective objects, and NPC placeholders.
+Deterministic PF2-local runtime identities are persisted separately under
+`mission-state/acg-runtime`; owner + live PF2 + runtime identity is required
+for every lookup. Door/chest mutable state survives restart, shared replay is
+blocked for bound missions, and abandoned/expired/cleaned bindings remove only
+their own runtime registry and state.
 
-Allocated live PF2 values are bounded to `0x160000..0x16FFFF`, excluding every
-captured PF2 and shared PF `1419349`. Bound production entry remains
-fail-closed until Stage 3 can safely materialize doors, chests, NPCs,
-objectives, collision, and navigation.
+Completion, rewards, loot outcomes, NPC combat, collision, navigation, and
+procedural generation remain deferred. No database schema changed.
 
 Evidence and architecture:
 

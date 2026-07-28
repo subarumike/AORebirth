@@ -92,6 +92,14 @@ namespace ZoneEngine.Core.Missions
 
         public static void SendForCharacter(IZoneClient client, ICharacter character)
         {
+            if (character != null
+                && character.Playfield != null
+                && MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    character.Playfield.Identity.Instance))
+            {
+                return;
+            }
+
             // Force flood must always retransmit. Early post-PAF sends are often ignored by the
             // client (see ClientConnected); if we keep those keys in SentByCharacter, the later
             // FullCharacter / CharInPlay retries log sent=0 and the instance stays doorless
@@ -109,6 +117,12 @@ namespace ZoneEngine.Core.Missions
             }
 
             if (!MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
+            {
+                return;
+            }
+
+            if (MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                character.Playfield.Identity.Instance))
             {
                 return;
             }

@@ -143,9 +143,14 @@ namespace ZoneEngine.Core.MessageHandlers
             client.Controller.Move(moveType, coordinates, heading);
             AreteRoboticGuardDogRuntime.NoteMoveType(client.Controller.Character, rawMoveType);
 
-            ZoneEngine.Core.Missions.MissionInstanceDoorReplay.TrySendNearbyOnMove(
-                client,
-                client.Controller.Character);
+            if (client.Controller.Character.Playfield == null
+                || !ZoneEngine.Core.Missions.MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+            {
+                ZoneEngine.Core.Missions.MissionInstanceDoorReplay.TrySendNearbyOnMove(
+                    client,
+                    client.Controller.Character);
+            }
 
             // Garden save: only when standing on the save pad (once per visit).
             ZoneEngine.Core.ShadowlandsGardenSaveRuntimeService.TryApplyWhenOnSavePad(

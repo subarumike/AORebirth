@@ -15,9 +15,9 @@ those five artifacts into five `CompleteSelectable` runtime bundle definitions.
 This is a captured-layout catalog, not a reconstruction of AO's procedural
 interior generator. It does not prove room-graph grammar, tile probabilities,
 collision generation, or any interpretation of the opaque C79F generator
-payload. Stage 2 now persists the exact selected bundle and allocates one
-isolated live PF2 per accepted generated mission. Production entry remains
-fail-closed until Stage 3 can safely materialize the captured interior content.
+payload. Stage 2 persists the exact selected bundle and isolated PF2. Stage 3
+now materializes that exact captured bundle into the bound live PF2 without
+regenerating or substituting layout evidence.
 
 No database schema or destructive database operation is part of this stage.
 
@@ -322,6 +322,19 @@ cmd /d /c tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptu
 ACG corpus analyzed=97 extractionFailures=0 selectable=5
 ```
 
+Stage 3 deterministic runtime validation:
+
+```text
+MissionAcgRuntimeMaterializationTests: 6/6 PASS
+All MissionAcg Stage 1/2/3 tests: 50/50 PASS
+Mission-filtered regression suite: 93/93 PASS
+ZoneEngine isolated Debug build: PASS
+```
+
+The broader `PlayfieldLifecycleTraceTests` checkpoint remains `50/66`; its
+sixteen existing combat, Arete, corpse, and session-architecture guardrail
+failures are outside the mission ACG change. No Stage 3 assertion fails there.
+
 Kill capture extraction and replay:
 
 ```text
@@ -341,15 +354,80 @@ probability, or seed semantics. The payload is retained as immutable captured
 evidence. Reproducing it is different from understanding or implementing AO's
 procedural-layout algorithm.
 
-## Deferred Stage 3 production materialization
+## Stage 3 runtime materialization
 
-The following work is intentionally not completed by Stage 2:
+`MissionAcgRuntimeMaterializer` consumes exactly one validated
+`MissionAcgInstanceBinding` and its selected `MissionAcgLayoutBundle`. It
+constructs an instance-local registry for captured doors, the exact exit,
+chests, mission terminals, repair/static objective objects, objective NPC
+placeholders, and ambient NPC placeholders. Raw captured wire is copied before
+retargeting. Explicit Stage 1 retarget slots are used for door/chest/terminal
+wire; captured NPC and objective packets replace only their exact captured
+identity, captured PF2, and captured player instance values.
 
-- instantiate doors, chests, NPCs, terminals, and objective objects from the
-  selected bundle with safe live identities;
-- derive or implement collision and room/tile resource loading;
-- preserve per-instance door, chest, NPC, and objective state;
+Runtime identities use:
+
+```text
+0x60000000 | ((allocatedLivePF2 - 0x160000) << 8) | localOrdinal
+```
+
+Captured identities are sorted by type then instance and assigned ordinals
+`1..255`. Because active PF2 ownership is unique, the mapping is collision-free
+between simultaneous instances, deterministic across restart, and reversible
+to live PF2 plus local ordinal for diagnostics. The runtime identity retains
+the captured identity type. A shared captured identity used by both an
+objective overlay and its structural/NPC record receives one runtime identity.
+
+Mutable state is separate from both immutable bundles and version-2 bindings.
+Version-1 sidecars under `mission-state/acg-runtime` contain:
+
+- accepted quest identity;
+- selected bundle ID and exact payload SHA-256;
+- building identity and allocated live PF2;
+- the complete captured-to-runtime identity map;
+- per-door open and lock state;
+- per-chest open state; and
+- last-update timestamp.
+
+The format uses invariant, ordinal `key=value` fields, indexed identity/door/
+chest records, a SHA-256 over the canonical field block, atomic same-directory
+temporary write plus flush/readback validation, and atomic replace. Unknown,
+truncated, hash-invalid, or binding/bundle-mismatched state fails closed.
+
+Startup loads Stage 2 bindings first, restores PF2 reservations, validates any
+runtime sidecar, and deterministically rematerializes accepted/active
+instances. A missing runtime sidecar is created from the persisted binding and
+immutable bundle; no bundle or PF2 is rerolled. Door/chest state and runtime
+identities survive restart.
+
+Entry now resolves the exact owner/marker/key binding, validates its plan,
+ensures materialization, transitions `Accepted` to `Active`, and teleports to
+the bundle's captured entry point in `AllocatedLivePlayfield2`. PAF emits the
+same binding's exact generator payload and building identity. Bound
+`ClientConnected` and `CharInPlay` paths emit only the materialized instance
+packets; movement and login cannot invoke `MissionInstanceDoorReplay` for a
+bound PF2. Empty bound payloads fail closed instead of using a legacy payload,
+and PF `1419349` is never substituted.
+
+Every runtime interaction lookup requires the active binding owner, allocated
+live PF2, and exact runtime identity. Doors toggle only their own persisted
+open state and respect lock state. Chests preserve isolated open state without
+inventing loot. Terminals, repair/static objectives, and NPC placeholders are
+owned and acknowledged by the correct instance; type-specific objective,
+combat, loot, completion, and reward effects remain deferred. Abandoned,
+expired, cleanup-pending, cleaned, or invalid bindings remove only their own
+runtime objects, identity maps, registry entries, send state, and mutable
+sidecar. Stage 2 lifecycle remains the sole owner of PF2 release.
+
+## Deferred Stage 4 behavior
+
+The following work remains intentionally deferred:
+
 - implement all five objective completion paths and exactly-once rewards;
+- implement captured/proven loot behavior and NPC combat/lifecycle;
+- derive or implement collision, navigation, and room/tile resource loading;
+- emit capture-proven server door/chest state-change packets if required beyond
+  GenericCmd acknowledgement;
 - implement durable team-owned generated missions after a stable team identity
   exists; and
 - perform private-server lifecycle regression capture after runtime wiring.
