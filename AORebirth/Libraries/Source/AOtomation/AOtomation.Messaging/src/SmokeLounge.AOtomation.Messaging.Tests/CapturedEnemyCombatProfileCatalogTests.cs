@@ -2940,6 +2940,63 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(levelFive.Evidence.Contains("20260708-143600"));
             Assert.IsTrue(levelFive.Evidence.Contains("20260709-193914"));
 
+            var exactFormulaObservations = new Dictionary<int, int>
+            {
+                { 4, 28 },
+                { 5, 33 },
+                { 6, 38 },
+                { 10, 59 },
+                { 11, 65 },
+                { 12, 71 },
+                { 13, 77 },
+                { 16, 95 },
+                { 19, 113 },
+                { 20, 119 },
+                { 21, 125 }
+            };
+            foreach (KeyValuePair<int, int> observation in exactFormulaObservations)
+            {
+                OrdinaryEnemyCombatNumericSetup observedSetup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                        observation.Key,
+                        out observedSetup));
+                Assert.AreEqual(observation.Value, observedSetup.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(observation.Value, observedSetup.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(observation.Value, observedSetup.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(observation.Value, observedSetup.SpecialAttackWeaponUnknown4);
+            }
+
+            OrdinaryEnemyCombatNumericSetup heldOutSetup;
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    7,
+                    out heldOutSetup));
+            Assert.AreEqual(43, heldOutSetup.SpecialAttackWeaponUnknown1);
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    8,
+                    out heldOutSetup));
+            Assert.AreEqual(49, heldOutSetup.SpecialAttackWeaponUnknown1);
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    14,
+                    out heldOutSetup));
+            Assert.AreEqual(83, heldOutSetup.SpecialAttackWeaponUnknown1);
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    15,
+                    out heldOutSetup));
+            Assert.AreEqual(89, heldOutSetup.SpecialAttackWeaponUnknown1);
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    3,
+                    out heldOutSetup));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                    22,
+                    out heldOutSetup));
+
             int restoredActors = 0;
             int restoredVariants = 0;
             foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
@@ -2954,17 +3011,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         activeSpawn.Level);
                 Assert.IsTrue(baseline.UsesProductionSpecializedValues);
 
-                bool shouldResolve =
-                    activeSpawn.Level == 4
-                    || activeSpawn.Level == 5
-                    || activeSpawn.Level == 6
-                    || activeSpawn.Level == 10
-                    || activeSpawn.Level == 11
-                    || activeSpawn.Level == 12
-                    || activeSpawn.Level == 13
-                    || activeSpawn.Level == 19
-                    || activeSpawn.Level == 20
-                    || activeSpawn.Level == 21;
                 CapturedEnemyCombatContract resolved;
                 string failure;
                 bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
@@ -2976,22 +3022,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     baseline,
                     out resolved,
                     out failure);
-                Assert.AreEqual(
-                    shouldResolve,
+                Assert.IsTrue(
                     success,
                     string.Format(
                         "source=0x{0:X8} level={1}: {2}",
                         activeSpawn.SourceIdentity,
                         activeSpawn.Level,
                         failure));
-                if (!success)
-                {
-                    Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
-                    continue;
-                }
 
                 Assert.IsTrue(resolved.IsCombatReady);
                 Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+                bool usesDerivedArchetype =
+                    activeSpawn.Level == 7
+                    || activeSpawn.Level == 8
+                    || activeSpawn.Level == 14
+                    || activeSpawn.Level == 15;
+                if (usesDerivedArchetype)
+                {
+                    Assert.IsTrue(
+                        resolved.CaptureProvenArchetypeId.Contains(
+                            OrdinaryEnemyCombatSetupGenerator.FilthFleaFormulaId));
+                    Assert.IsTrue(
+                        resolved.CaptureProvenArchetypeId.Contains(
+                            "218eb3509f2be66b-12f99a4c2f732061"));
+                }
                 Assert.IsNotNull(resolved.SpecialAttackSequence);
                 Assert.AreEqual(
                     NpcCombatAttackRules.CapturedSubwayFilthFleaPoisonMinimumDamage,
@@ -3027,7 +3081,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     resolved.SpecialAttackSequence.OpeningAttack
                         .LethalAttackInfoUnknown.HasValue);
                 Assert.AreEqual(
-                    activeSpawn.Level == 5 ? (int?)4 : null,
+                    (int?)4,
                     resolved.SpecialAttackSequence.RepeatingAttack
                         .LethalAttackInfoUnknown);
                 Assert.AreEqual(
@@ -3040,9 +3094,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.IsTrue(
                     resolved.SpecialAttackSequence.RepeatingAttack
                         .CapturedDamageObservations.Length > 0);
+                OrdinaryEnemyCombatNumericSetup generatedSetup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateFilthFlea(
+                        activeSpawn.Level,
+                        out generatedSetup));
                 Assert.AreEqual(
-                    NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponValue,
+                    generatedSetup.SpecialAttackWeaponUnknown1,
                     resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(
+                    generatedSetup.SpecialAttackWeaponUnknown2,
+                    resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(
+                    generatedSetup.SpecialAttackWeaponUnknown3,
+                    resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(
+                    generatedSetup.SpecialAttackWeaponUnknown4,
+                    resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown4);
                 Assert.AreEqual(
                     NpcCombatAttackRules.CapturedSubwayFilthFleaSpecialAttackWeaponLastValue,
                     resolved.SpecialAttackSequence.SpecialAttackWeaponUnknown5);
@@ -3050,8 +3118,57 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 restoredActors++;
             }
 
-            Assert.AreEqual(42, restoredActors);
+            Assert.AreEqual(51, restoredActors);
             Assert.AreEqual(0, restoredVariants);
+        }
+
+        [TestMethod]
+        public void FilthFleaGeneratedArchetypeRejectsCrossWeaponSpecialSequence()
+        {
+            CapturedEnemyCombatContract baseline =
+                CapturedSubwayCombatCatalog.For("Filth Flea", 17657, 7);
+            CapturedEnemySpecialAttackSequenceDefinition exact =
+                baseline.SpecialAttackSequence;
+            var wrongSpecials = new[]
+            {
+                exact.SpecialAttacks[0],
+                new CapturedEnemySpecialAttackDefinition(
+                    exact.SpecialAttacks[1].LowTemplate,
+                    exact.SpecialAttacks[1].HighTemplate,
+                    exact.SpecialAttacks[1].Tag + 1,
+                    exact.SpecialAttacks[1].Name)
+            };
+            CapturedEnemyCombatContract crossWeapon =
+                CapturedEnemyCombatContract.CapturedSpecialSequence(
+                    "Filth Flea cross-weapon rejection",
+                    new CapturedEnemySpecialAttackSequenceDefinition(
+                        exact.InitialAttackDelaySeconds,
+                        exact.OpeningAttack,
+                        exact.RepeatingAttack,
+                        wrongSpecials,
+                        exact.SpecialAttackWeaponUnknown1,
+                        exact.SpecialAttackWeaponUnknown2,
+                        exact.SpecialAttackWeaponUnknown3,
+                        exact.SpecialAttackWeaponUnknown4,
+                        exact.SpecialAttackWeaponUnknown5,
+                        exact.SpecialAttackWeaponN3Unknown,
+                        exact.AttackN3Unknown,
+                        exact.AttackAction))
+                    .WithProductionSpecializedValues();
+
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Filth Flea",
+                    17657,
+                    7,
+                    unchecked((int)0x795317F5),
+                    crossWeapon,
+                    out resolved,
+                    out failure));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
         }
 
         [TestMethod]

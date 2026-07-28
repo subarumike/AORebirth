@@ -430,6 +430,1763 @@
       "weaponFamily": "124313..124314"
     }
   ],
+  "filthFleaFormula": {
+    "activeBindings": [
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AEEA",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "level": 4,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AEFC",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "level": 4,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF18",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "level": 4,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x795313FC",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79531752",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79531754",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD2C",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD3E",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AEEE",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF04",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF10",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF57",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AFAE",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AFC6",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AFCC",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "level": 5,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953174B",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "level": 6,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD2B",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "level": 6,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF22",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "level": 6,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF4A",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "level": 6,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x795317F5",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 43,
+          "unknown2": 43,
+          "unknown3": 43,
+          "unknown4": 43
+        },
+        "level": 7,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD30",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 43,
+          "unknown2": 43,
+          "unknown3": 43,
+          "unknown4": 43
+        },
+        "level": 7,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AFAA",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 43,
+          "unknown2": 43,
+          "unknown3": 43,
+          "unknown4": 43
+        },
+        "level": 7,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AFC4",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 43,
+          "unknown2": 43,
+          "unknown3": 43,
+          "unknown4": 43
+        },
+        "level": 7,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD2F",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 49,
+          "unknown3": 49,
+          "unknown4": 49
+        },
+        "level": 8,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD36",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 49,
+          "unknown2": 49,
+          "unknown3": 49,
+          "unknown4": 49
+        },
+        "level": 8,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD73",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "level": 10,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD78",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "level": 10,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953A9E7",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953A9EA",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953A9FC",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD70",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD71",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AD75",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79545227",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "level": 11,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79513A87",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "level": 12,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79513A8F",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "level": 12,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79513AAF",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "level": 13,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79513AC2",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "level": 13,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953A9E1",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "level": 13,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AA0C",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "level": 13,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79545223",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "level": 13,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953A9C6",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 83,
+          "unknown2": 83,
+          "unknown3": 83,
+          "unknown4": 83
+        },
+        "level": 14,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953A9C2",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 89,
+          "unknown2": 89,
+          "unknown3": 89,
+          "unknown4": 89
+        },
+        "level": 15,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AA0B",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 89,
+          "unknown2": 89,
+          "unknown3": 89,
+          "unknown4": 89
+        },
+        "level": 15,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF6D",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "level": 19,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79545191",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "level": 19,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF76",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "level": 20,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79531120",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "level": 21,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x79531122",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "level": 21,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x7953AF71",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "level": 21,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+        "configuredSourceIdentity": "0x795451A4",
+        "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "level": 21,
+        "monsterData": 17657,
+        "name": "Filth Flea",
+        "resource": 127
+      }
+    ],
+    "canonicalSemanticProfileId": "218eb3509f2be66b-12f99a4c2f732061",
+    "captureSessions": [
+      "20260708-004038",
+      "20260708-143600",
+      "20260709-193914",
+      "20260709-225408",
+      "20260720-051714"
+    ],
+    "compatibleSemanticProfileIds": [
+      "0442e5cb9bb937c9-f9031b9d5776b541",
+      "12e4e4cadd5f9059-c3b0e4a3ccaa520e",
+      "218eb3509f2be66b-12f99a4c2f732061",
+      "3fb47a16c3e0d523-34d5dfe5ced96cb2",
+      "4c05b2ad557f829b-d2d9cb741e270fa8",
+      "654ce3810a403892-7a547a1f84232faa",
+      "654ce3810a403892-d3072a2954c06011",
+      "9e402946526c7a7d-9523e84139c96f2b",
+      "a631010e67f24903-0bb5ffe744d13dff",
+      "cf3233957f32e56f-5ba592afcf44fdff",
+      "deda2240caee7272-f66c89ab2748e17c",
+      "f71cf6db73bcfadd-9de45b855e6806de"
+    ],
+    "exactCategoricalDomain": {
+      "attackAction": 0,
+      "attackMode": "natural-specialized",
+      "attackN3": 0,
+      "normalNumericDamageType": 0,
+      "numericHitType": 3,
+      "packetOrder": [
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo"
+      ],
+      "specialAttackWeaponN3": 0,
+      "specials": [
+        {
+          "highTemplate": 201060,
+          "instance": 1162887496,
+          "lowTemplate": 201059,
+          "name": "EPAH",
+          "slot": 1,
+          "tag": 1162887496
+        },
+        {
+          "highTemplate": 201057,
+          "instance": 1096439123,
+          "lowTemplate": 201056,
+          "name": "AZUS",
+          "slot": 0,
+          "tag": 1096439123
+        }
+      ],
+      "terminalNumericDamageType": 4,
+      "weaponItemFullUpdate": "natural-none"
+    },
+    "family": "Filth Flea",
+    "formulaId": "filth-flea-saw-bounded-level-piecewise-v1",
+    "leaveOneOut": [
+      {
+        "exactMatch": true,
+        "heldOutLevel": 4,
+        "heldOutObserved": 28,
+        "prediction": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "trainingLevels": [
+          5,
+          6,
+          10,
+          11,
+          12,
+          13,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 5,
+        "heldOutObserved": 33,
+        "prediction": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "trainingLevels": [
+          4,
+          6,
+          10,
+          11,
+          12,
+          13,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 6,
+        "heldOutObserved": 38,
+        "prediction": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "trainingLevels": [
+          4,
+          5,
+          10,
+          11,
+          12,
+          13,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 10,
+        "heldOutObserved": 59,
+        "prediction": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          11,
+          12,
+          13,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 11,
+        "heldOutObserved": 65,
+        "prediction": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          12,
+          13,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 12,
+        "heldOutObserved": 71,
+        "prediction": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          11,
+          13,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 13,
+        "heldOutObserved": 77,
+        "prediction": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          11,
+          12,
+          16,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 16,
+        "heldOutObserved": 95,
+        "prediction": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          11,
+          12,
+          13,
+          19,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 19,
+        "heldOutObserved": 113,
+        "prediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          11,
+          12,
+          13,
+          16,
+          20,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 20,
+        "heldOutObserved": 119,
+        "prediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          11,
+          12,
+          13,
+          16,
+          19,
+          21
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 21,
+        "heldOutObserved": 125,
+        "prediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "trainingLevels": [
+          4,
+          5,
+          6,
+          10,
+          11,
+          12,
+          13,
+          16,
+          19,
+          20
+        ]
+      }
+    ],
+    "monsterData": 17657,
+    "numericOutput": {
+      "expression": "L4..10: floor((21 * actorLevel + 28) / 4); L11..21: 6 * actorLevel - 1",
+      "fields": [
+        "SpecialAttackWeapon.unknown1",
+        "SpecialAttackWeapon.unknown2",
+        "SpecialAttackWeapon.unknown3",
+        "SpecialAttackWeapon.unknown4"
+      ],
+      "level19Unknown2Equals141": "mutable generation-local observation; the independent same-level initial stream and stable formula value are 113",
+      "unknown5": "per-actor ordered mutable capture state; not formula identity"
+    },
+    "rawPacketObservations": [
+      {
+        "exactMatch": true,
+        "level": 10,
+        "observed": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "prediction": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "semanticProfileId": "12e4e4cadd5f9059-c3b0e4a3ccaa520e"
+      },
+      {
+        "exactMatch": true,
+        "level": 11,
+        "observed": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "prediction": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "semanticProfileId": "3fb47a16c3e0d523-34d5dfe5ced96cb2"
+      },
+      {
+        "exactMatch": true,
+        "level": 12,
+        "observed": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "prediction": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "semanticProfileId": "a631010e67f24903-0bb5ffe744d13dff"
+      },
+      {
+        "exactMatch": true,
+        "level": 13,
+        "observed": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "prediction": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "semanticProfileId": "9e402946526c7a7d-9523e84139c96f2b"
+      },
+      {
+        "exactMatch": true,
+        "level": 16,
+        "observed": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "prediction": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "semanticProfileId": "cf3233957f32e56f-5ba592afcf44fdff"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "semanticProfileId": "654ce3810a403892-d3072a2954c06011"
+      },
+      {
+        "exactMatch": true,
+        "level": 20,
+        "observed": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "prediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "semanticProfileId": "f71cf6db73bcfadd-9de45b855e6806de"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "prediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "semanticProfileId": "0442e5cb9bb937c9-f9031b9d5776b541"
+      },
+      {
+        "exactMatch": true,
+        "level": 4,
+        "observed": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "prediction": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "semanticProfileId": "deda2240caee7272-f66c89ab2748e17c"
+      },
+      {
+        "exactMatch": true,
+        "level": 5,
+        "observed": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "prediction": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "semanticProfileId": "218eb3509f2be66b-12f99a4c2f732061"
+      },
+      {
+        "exactMatch": true,
+        "level": 6,
+        "observed": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "prediction": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "semanticProfileId": "4c05b2ad557f829b-d2d9cb741e270fa8"
+      }
+    ],
+    "rawProfileObservations": [
+      {
+        "exactMatch": true,
+        "level": 10,
+        "observed": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "prediction": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "semanticProfileId": "12e4e4cadd5f9059-c3b0e4a3ccaa520e"
+      },
+      {
+        "exactMatch": true,
+        "level": 11,
+        "observed": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "prediction": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "semanticProfileId": "3fb47a16c3e0d523-34d5dfe5ced96cb2"
+      },
+      {
+        "exactMatch": true,
+        "level": 12,
+        "observed": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "prediction": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "semanticProfileId": "a631010e67f24903-0bb5ffe744d13dff"
+      },
+      {
+        "exactMatch": true,
+        "level": 13,
+        "observed": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "prediction": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "semanticProfileId": "9e402946526c7a7d-9523e84139c96f2b"
+      },
+      {
+        "exactMatch": true,
+        "level": 16,
+        "observed": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "prediction": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "semanticProfileId": "cf3233957f32e56f-5ba592afcf44fdff"
+      },
+      {
+        "exactMatch": false,
+        "level": 19,
+        "observed": {
+          "unknown1": 113,
+          "unknown2": 141,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "semanticProfileId": "654ce3810a403892-7a547a1f84232faa"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "semanticProfileId": "654ce3810a403892-d3072a2954c06011"
+      },
+      {
+        "exactMatch": true,
+        "level": 20,
+        "observed": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "prediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "semanticProfileId": "f71cf6db73bcfadd-9de45b855e6806de"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "prediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "semanticProfileId": "0442e5cb9bb937c9-f9031b9d5776b541"
+      },
+      {
+        "exactMatch": true,
+        "level": 4,
+        "observed": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "prediction": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "semanticProfileId": "deda2240caee7272-f66c89ab2748e17c"
+      },
+      {
+        "exactMatch": true,
+        "level": 5,
+        "observed": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "prediction": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "semanticProfileId": "218eb3509f2be66b-12f99a4c2f732061"
+      },
+      {
+        "exactMatch": true,
+        "level": 6,
+        "observed": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "prediction": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "semanticProfileId": "4c05b2ad557f829b-d2d9cb741e270fa8"
+      }
+    ],
+    "rejectedCandidates": [
+      {
+        "candidate": "exact integer level as reusable identity",
+        "reason": "uncaptured active levels retain the exact family, special sequence, slots, instances, and stream semantics"
+      },
+      {
+        "candidate": "nearest-level contract selection",
+        "reason": "numeric setup is derived from actor level, never copied"
+      },
+      {
+        "candidate": "unbounded level domain",
+        "reason": "levels outside L4..21 lack categorical proof"
+      },
+      {
+        "candidate": "cross-family or cross-special reuse",
+        "reason": "family, MonsterData, EPAH/AZUS templates, tags, slots, instances, and stream signature remain exact"
+      }
+    ],
+    "resource": 127,
+    "runtimeInputOwners": {
+      "actorLevel": "OrdinaryEnemySpawnDefinition.Level through OrdinaryEnemyCombatProfile.ResolveContract(level)",
+      "damageRangeAndCadence": "CapturedSubwayCombatEvidenceDefinition on the active archetype",
+      "familyAndMonsterData": "CapturedSubwayOrdinaryArchetypeDefinition",
+      "mutableEnergyAmmoAndSawState": "existing per-actor combat contract/runtime state"
+    },
+    "stableFormulaObservations": [
+      {
+        "exactMatch": true,
+        "level": 10,
+        "observed": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "prediction": {
+          "unknown1": 59,
+          "unknown2": 59,
+          "unknown3": 59,
+          "unknown4": 59
+        },
+        "semanticProfileId": "12e4e4cadd5f9059-c3b0e4a3ccaa520e"
+      },
+      {
+        "exactMatch": true,
+        "level": 11,
+        "observed": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "prediction": {
+          "unknown1": 65,
+          "unknown2": 65,
+          "unknown3": 65,
+          "unknown4": 65
+        },
+        "semanticProfileId": "3fb47a16c3e0d523-34d5dfe5ced96cb2"
+      },
+      {
+        "exactMatch": true,
+        "level": 12,
+        "observed": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "prediction": {
+          "unknown1": 71,
+          "unknown2": 71,
+          "unknown3": 71,
+          "unknown4": 71
+        },
+        "semanticProfileId": "a631010e67f24903-0bb5ffe744d13dff"
+      },
+      {
+        "exactMatch": true,
+        "level": 13,
+        "observed": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "prediction": {
+          "unknown1": 77,
+          "unknown2": 77,
+          "unknown3": 77,
+          "unknown4": 77
+        },
+        "semanticProfileId": "9e402946526c7a7d-9523e84139c96f2b"
+      },
+      {
+        "exactMatch": true,
+        "level": 16,
+        "observed": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "prediction": {
+          "unknown1": 95,
+          "unknown2": 95,
+          "unknown3": 95,
+          "unknown4": 95
+        },
+        "semanticProfileId": "cf3233957f32e56f-5ba592afcf44fdff"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 113
+        },
+        "semanticProfileId": "654ce3810a403892-d3072a2954c06011"
+      },
+      {
+        "exactMatch": true,
+        "level": 20,
+        "observed": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "prediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 119
+        },
+        "semanticProfileId": "f71cf6db73bcfadd-9de45b855e6806de"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "prediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "semanticProfileId": "0442e5cb9bb937c9-f9031b9d5776b541"
+      },
+      {
+        "exactMatch": true,
+        "level": 4,
+        "observed": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "prediction": {
+          "unknown1": 28,
+          "unknown2": 28,
+          "unknown3": 28,
+          "unknown4": 28
+        },
+        "semanticProfileId": "deda2240caee7272-f66c89ab2748e17c"
+      },
+      {
+        "exactMatch": true,
+        "level": 5,
+        "observed": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "prediction": {
+          "unknown1": 33,
+          "unknown2": 33,
+          "unknown3": 33,
+          "unknown4": 33
+        },
+        "semanticProfileId": "218eb3509f2be66b-12f99a4c2f732061"
+      },
+      {
+        "exactMatch": true,
+        "level": 6,
+        "observed": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "prediction": {
+          "unknown1": 38,
+          "unknown2": 38,
+          "unknown3": 38,
+          "unknown4": 38
+        },
+        "semanticProfileId": "4c05b2ad557f829b-d2d9cb741e270fa8"
+      }
+    ],
+    "supportedLevelsInclusive": [
+      4,
+      21
+    ]
+  },
   "fixedScopeSelectorBindings": {
     "activeBindings": [
       {
@@ -224495,7 +226252,7 @@
       "reason": "no capture-backed categorical proof exists outside levels 5..10"
     }
   ],
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "scope": {
     "completeAndPartialProfilesIncluded": true,
     "profileCount": 422,

@@ -305,6 +305,13 @@ namespace AORebirth.Core.Playfields
 
         internal const int StimFiendMaximumLevel = 17;
 
+        internal const string FilthFleaFormulaId =
+            "filth-flea-saw-bounded-level-piecewise-v1";
+
+        internal const int FilthFleaMinimumLevel = 4;
+
+        internal const int FilthFleaMaximumLevel = 21;
+
         internal const string MeldedPatternsFormulaId =
             "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1";
 
@@ -447,6 +454,24 @@ namespace AORebirth.Core.Playfields
             }
 
             return false;
+        }
+
+        internal static bool TryGenerateFilthFlea(
+            int actorLevel,
+            out OrdinaryEnemyCombatNumericSetup setup)
+        {
+            setup = null;
+            if (actorLevel < FilthFleaMinimumLevel
+                || actorLevel > FilthFleaMaximumLevel)
+            {
+                return false;
+            }
+
+            int value = actorLevel <= 10
+                ? checked((21 * actorLevel) + 28) / 4
+                : checked((6 * actorLevel) - 1);
+            setup = RepeatedSetup(FilthFleaFormulaId, value);
+            return true;
         }
 
         internal static bool TryGenerateEquipped(
@@ -655,8 +680,28 @@ namespace AORebirth.Core.Playfields
             if (contract == null
                 || contract.AttackModel != CapturedEnemyAttackModel.Specialized
                 || !contract.UsesProductionSpecializedValues
-                || contract.CapturedSpecialAttacks == null
-                || contract.CapturedSpecialAttacks.Length != 1)
+                || contract.CapturedSpecialAttacks == null)
+            {
+                return false;
+            }
+
+            if (monsterData
+                    == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData
+                && contract.CapturedSpecialAttacks.Length == 2
+                && FilthFleaSpecialsMatch(contract.CapturedSpecialAttacks)
+                && TryGenerateFilthFlea(actorLevel, out setup))
+            {
+                return contract.SpecialAttackWeaponUnknown1
+                           == setup.SpecialAttackWeaponUnknown1
+                       && contract.SpecialAttackWeaponUnknown2
+                           == setup.SpecialAttackWeaponUnknown2
+                       && contract.SpecialAttackWeaponUnknown3
+                           == setup.SpecialAttackWeaponUnknown3
+                       && contract.SpecialAttackWeaponUnknown4
+                           == setup.SpecialAttackWeaponUnknown4;
+            }
+
+            if (contract.CapturedSpecialAttacks.Length != 1)
             {
                 return false;
             }
@@ -684,6 +729,37 @@ namespace AORebirth.Core.Playfields
                    == setup.SpecialAttackWeaponUnknown3
                    && contract.SpecialAttackWeaponUnknown4
                    == setup.SpecialAttackWeaponUnknown4;
+        }
+
+        private static bool FilthFleaSpecialsMatch(
+            CapturedEnemySpecialAttackDefinition[] specials)
+        {
+            return specials != null
+                   && specials.Length == 2
+                   && specials[0].LowTemplate
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaStickToHeadLowTemplate
+                   && specials[0].HighTemplate
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaStickToHeadHighTemplate
+                   && specials[0].Tag
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaStickToHeadTag
+                   && specials[0].Name
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaStickToHeadName
+                   && specials[1].LowTemplate
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaArmsLowTemplate
+                   && specials[1].HighTemplate
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaArmsHighTemplate
+                   && specials[1].Tag
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaArmsTag
+                   && specials[1].Name
+                      == NpcCombatAttackRules
+                          .CapturedSubwayFilthFleaArmsName;
         }
 
         private static bool MatchesCategoricalInput(

@@ -1048,6 +1048,9 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedEnemyCombatProfileCatalog
     {
+        private const string FilthFleaSemanticProfileId =
+            "218eb3509f2be66b-12f99a4c2f732061";
+
         private static readonly CapturedEnemyCombatProfileDefinition[] Profiles =
             CapturedEnemyCombatGeneratedProfiles.Create();
 
@@ -1110,6 +1113,19 @@ namespace AORebirth.Core.Playfields
                     out generatedNaturalAttackContract))
             {
                 resolved = generatedNaturalAttackContract;
+                return true;
+            }
+
+            CapturedEnemyCombatContract generatedSpecializedAttackContract;
+            if (TryResolveMathematicallyGeneratedSpecializedAttackArchetype(
+                    resourceId,
+                    name,
+                    monsterData,
+                    level,
+                    current,
+                    out generatedSpecializedAttackContract))
+            {
+                resolved = generatedSpecializedAttackContract;
                 return true;
             }
 
@@ -1427,6 +1443,72 @@ namespace AORebirth.Core.Playfields
                     evidence + "; generated numeric setup=" + generated.FormulaId,
                     evidenceSourceIdentity,
                     null)
+                .WithCaptureProvenArchetype(archetypeId);
+            return resolved.IsCombatReady;
+        }
+
+        private static bool TryResolveMathematicallyGeneratedSpecializedAttackArchetype(
+            int resourceId,
+            string name,
+            int monsterData,
+            int level,
+            CapturedEnemyCombatContract current,
+            out CapturedEnemyCombatContract resolved)
+        {
+            resolved = null;
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (!OrdinaryEnemyCombatSetupGenerator.MatchesGeneratedSetup(
+                    monsterData,
+                    level,
+                    current,
+                    out generated)
+                || generated.FormulaId
+                   != OrdinaryEnemyCombatSetupGenerator.FilthFleaFormulaId)
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileDefinition[] compatibleFamily =
+                Profiles.Where(
+                    value => value.MatchesArchetypeKey(
+                                 resourceId,
+                                 name,
+                                 monsterData)
+                             && value.CaptureEvidenceSafe
+                             && value.MatchesSpecialized(current))
+                    .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
+                    .ToArray();
+            CapturedEnemyCombatProfileDefinition profile =
+                compatibleFamily.SingleOrDefault(
+                    value => value.ProfileId == FilthFleaSemanticProfileId);
+            if (profile == null)
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatContract enriched;
+            if (!profile.TryEnrichSpecialized(current, out enriched))
+            {
+                return false;
+            }
+
+            int evidenceSourceIdentity =
+                profile.RepresentativeEvidenceSourceIdentity;
+            string archetypeId = string.Format(
+                "formula={0}|resource={1}|name={2}|MonsterData={3}|profile={4}",
+                generated.FormulaId,
+                resourceId,
+                name,
+                monsterData,
+                profile.ProfileId);
+            resolved = enriched
+                .WithCaptureCertification(
+                    profile.Evidence
+                    + "; generated numeric setup=" + generated.FormulaId,
+                    evidenceSourceIdentity,
+                    null)
+                .WithCapturedSpecialAttackWeaponUnknown5Observations(
+                    profile.SpecialAttackWeaponUnknown5Observations)
                 .WithCaptureProvenArchetype(archetypeId);
             return resolved.IsCombatReady;
         }

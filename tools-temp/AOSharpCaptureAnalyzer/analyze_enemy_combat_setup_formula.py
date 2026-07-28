@@ -99,6 +99,34 @@ STIM_FIEND_PROFILE_IDS = (
     "3f70ab044f0e78d5-d2b65cf5c70d61d6",
     "54d40b70fa1a801a-064305180fc7f1ad",
 )
+FILTH_FLEA_FORMULA_ID = "filth-flea-saw-bounded-level-piecewise-v1"
+FILTH_FLEA_CAPTURED_VALUES = {
+    4: 28,
+    5: 33,
+    6: 38,
+    10: 59,
+    11: 65,
+    12: 71,
+    13: 77,
+    16: 95,
+    19: 113,
+    20: 119,
+    21: 125,
+}
+FILTH_FLEA_PROFILE_IDS = (
+    "0442e5cb9bb937c9-f9031b9d5776b541",
+    "12e4e4cadd5f9059-c3b0e4a3ccaa520e",
+    "218eb3509f2be66b-12f99a4c2f732061",
+    "3fb47a16c3e0d523-34d5dfe5ced96cb2",
+    "4c05b2ad557f829b-d2d9cb741e270fa8",
+    "654ce3810a403892-7a547a1f84232faa",
+    "654ce3810a403892-d3072a2954c06011",
+    "9e402946526c7a7d-9523e84139c96f2b",
+    "a631010e67f24903-0bb5ffe744d13dff",
+    "cf3233957f32e56f-5ba592afcf44fdff",
+    "deda2240caee7272-f66c89ab2748e17c",
+    "f71cf6db73bcfadd-9de45b855e6806de",
+)
 MELDED_PATTERNS_FORMULA_ID = (
     "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1"
 )
@@ -508,6 +536,16 @@ def disobedient_bot_formula(level: int) -> int:
 
 def stim_fiend_formula(level: int) -> int:
     return ((11 * level) - 2) // 2
+
+
+def filth_flea_formula(level: int) -> dict[str, int]:
+    value = ((21 * level) + 28) // 4 if level <= 10 else (6 * level) - 1
+    return {
+        "unknown1": value,
+        "unknown2": value,
+        "unknown3": value,
+        "unknown4": value,
+    }
 
 
 def melded_patterns_formula(level: int) -> dict[str, int]:
@@ -1968,8 +2006,80 @@ def build_formula_dataset(
         ]
     )
 
+    filth_flea_observations = formula_profile_observations(
+        profiles,
+        17657,
+        "Filth Flea",
+        filth_flea_formula,
+    )
+    stable_filth_flea_observations = [
+        row for row in filth_flea_observations if row["exactMatch"]
+    ]
+    observed_filth_flea_levels = {
+        row["level"] for row in stable_filth_flea_observations
+    }
+    if observed_filth_flea_levels != set(FILTH_FLEA_CAPTURED_VALUES):
+        raise ValueError(
+            "Filth Flea stable formula observations do not cover the "
+            "capture-proven levels"
+        )
+    filth_flea_leave_one_out = [
+        {
+            "heldOutLevel": level,
+            "heldOutObserved": observed,
+            "trainingLevels": [
+                candidate
+                for candidate in sorted(FILTH_FLEA_CAPTURED_VALUES)
+                if candidate != level
+            ],
+            "prediction": filth_flea_formula(level),
+            "exactMatch": (
+                filth_flea_formula(level)
+                == {
+                    "unknown1": observed,
+                    "unknown2": observed,
+                    "unknown3": observed,
+                    "unknown4": observed,
+                }
+            ),
+        }
+        for level, observed in sorted(FILTH_FLEA_CAPTURED_VALUES.items())
+    ]
+    filth_flea_active_bindings = []
+    for row in active_coverage.get("profiles", []):
+        if (
+            row.get("runtimePlayfieldOrResource") != 127
+            or row.get("name") != "Filth Flea"
+            or row.get("monsterData") != 17657
+        ):
+            continue
+        level = row.get("levelCandidates", [None])[0]
+        if not isinstance(level, int) or not 4 <= level <= 21:
+            raise ValueError(
+                "active Filth Flea lies outside the capture-proven formula domain"
+            )
+        filth_flea_active_bindings.append(
+            {
+                "resource": 127,
+                "name": "Filth Flea",
+                "monsterData": 17657,
+                "actorCount": row.get("actorCount", 0),
+                "configuredSourceIdentity": row.get(
+                    "configuredSourceIdentity"
+                ),
+                "level": level,
+                "formulaId": FILTH_FLEA_FORMULA_ID,
+                "generatedSpecialAttackWeaponValues": (
+                    filth_flea_formula(level)
+                ),
+                "compatibleSemanticProfileId": (
+                    "218eb3509f2be66b-12f99a4c2f732061"
+                ),
+            }
+        )
+
     return {
-        "schemaVersion": 4,
+        "schemaVersion": 5,
         "scope": {
             "runtimeResources": [127, 1931],
             "sourceInventory": (
@@ -2153,6 +2263,120 @@ def build_formula_dataset(
                 {
                     "candidate": "unbounded Stim Fiend level domain",
                     "reason": "levels below 10 and above 17 lack categorical and formula proof",
+                },
+            ],
+        },
+        "filthFleaFormula": {
+            "formulaId": FILTH_FLEA_FORMULA_ID,
+            "family": "Filth Flea",
+            "monsterData": 17657,
+            "resource": 127,
+            "supportedLevelsInclusive": [4, 21],
+            "exactCategoricalDomain": {
+                "attackMode": "natural-specialized",
+                "weaponItemFullUpdate": "natural-none",
+                "specials": [
+                    {
+                        "lowTemplate": 201059,
+                        "highTemplate": 201060,
+                        "tag": 1162887496,
+                        "name": "EPAH",
+                        "slot": 1,
+                        "instance": 1162887496,
+                    },
+                    {
+                        "lowTemplate": 201056,
+                        "highTemplate": 201057,
+                        "tag": 1096439123,
+                        "name": "AZUS",
+                        "slot": 0,
+                        "instance": 1096439123,
+                    },
+                ],
+                "numericHitType": 3,
+                "normalNumericDamageType": 0,
+                "terminalNumericDamageType": 4,
+                "specialAttackWeaponN3": 0,
+                "attackN3": 0,
+                "attackAction": 0,
+                "packetOrder": [
+                    "SpecialAttackWeapon",
+                    "Attack",
+                    "AttackInfo",
+                ],
+            },
+            "numericOutput": {
+                "fields": [
+                    "SpecialAttackWeapon.unknown1",
+                    "SpecialAttackWeapon.unknown2",
+                    "SpecialAttackWeapon.unknown3",
+                    "SpecialAttackWeapon.unknown4",
+                ],
+                "expression": (
+                    "L4..10: floor((21 * actorLevel + 28) / 4); "
+                    "L11..21: 6 * actorLevel - 1"
+                ),
+                "unknown5": (
+                    "per-actor ordered mutable capture state; not formula identity"
+                ),
+                "level19Unknown2Equals141": (
+                    "mutable generation-local observation; the independent "
+                    "same-level initial stream and stable formula value are 113"
+                ),
+            },
+            "runtimeInputOwners": {
+                "actorLevel": (
+                    "OrdinaryEnemySpawnDefinition.Level through "
+                    "OrdinaryEnemyCombatProfile.ResolveContract(level)"
+                ),
+                "familyAndMonsterData": (
+                    "CapturedSubwayOrdinaryArchetypeDefinition"
+                ),
+                "damageRangeAndCadence": (
+                    "CapturedSubwayCombatEvidenceDefinition on the active archetype"
+                ),
+                "mutableEnergyAmmoAndSawState": (
+                    "existing per-actor combat contract/runtime state"
+                ),
+            },
+            "compatibleSemanticProfileIds": list(FILTH_FLEA_PROFILE_IDS),
+            "canonicalSemanticProfileId": (
+                "218eb3509f2be66b-12f99a4c2f732061"
+            ),
+            "captureSessions": [
+                "20260708-004038",
+                "20260708-143600",
+                "20260709-193914",
+                "20260709-225408",
+                "20260720-051714",
+            ],
+            "rawPacketObservations": stable_filth_flea_observations,
+            "rawProfileObservations": filth_flea_observations,
+            "stableFormulaObservations": stable_filth_flea_observations,
+            "leaveOneOut": filth_flea_leave_one_out,
+            "activeBindings": filth_flea_active_bindings,
+            "rejectedCandidates": [
+                {
+                    "candidate": "exact integer level as reusable identity",
+                    "reason": (
+                        "uncaptured active levels retain the exact family, "
+                        "special sequence, slots, instances, and stream semantics"
+                    ),
+                },
+                {
+                    "candidate": "nearest-level contract selection",
+                    "reason": "numeric setup is derived from actor level, never copied",
+                },
+                {
+                    "candidate": "unbounded level domain",
+                    "reason": "levels outside L4..21 lack categorical proof",
+                },
+                {
+                    "candidate": "cross-family or cross-special reuse",
+                    "reason": (
+                        "family, MonsterData, EPAH/AZUS templates, tags, "
+                        "slots, instances, and stream signature remain exact"
+                    ),
                 },
             ],
         },
