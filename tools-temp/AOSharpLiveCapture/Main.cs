@@ -291,7 +291,9 @@ namespace AOSharpLiveCapture
             }
 
             this.combatLootSmoke = new CombatLootSmoke(pluginDir, this.LogSmokeEvent);
-            this.missionFlowCapture = new MissionFlowCapture(this.LogEvent);
+            this.missionFlowCapture = new MissionFlowCapture(
+                this.LogEvent,
+                this.CreateMissionPlayerSnapshot);
             this.missionFlowCapture.BindSession(this.sessionDirectory);
 
             Network.N3MessageReceived += this.OnN3MessageReceivedBoundary;
@@ -1328,7 +1330,7 @@ namespace AOSharpLiveCapture
                     sequence,
                     message,
                     "mission-flow",
-                    () => this.missionFlowCapture?.OnN3MessageReceived(message));
+                    () => this.missionFlowCapture?.OnN3MessageReceived(sequence, message));
                 this.RunN3CaptureStage(
                     "IN-N3",
                     sequence,
@@ -1361,7 +1363,7 @@ namespace AOSharpLiveCapture
                     sequence,
                     message,
                     "mission-flow",
-                    () => this.missionFlowCapture?.OnN3MessageSent(message));
+                    () => this.missionFlowCapture?.OnN3MessageSent(sequence, message));
                 this.RunN3CaptureStage(
                     "OUT-N3",
                     sequence,
@@ -5077,6 +5079,23 @@ namespace AOSharpLiveCapture
             {
                 return null;
             }
+        }
+
+        private MissionPlayerSnapshot CreateMissionPlayerSnapshot()
+        {
+            LocalPlayer localPlayer = DynelManager.LocalPlayer;
+            if (localPlayer == null)
+            {
+                return null;
+            }
+
+            return new MissionPlayerSnapshot
+            {
+                Identity = localPlayer.Identity,
+                Level = TryGetCharacterStat(localPlayer, Stat.Level),
+                Cash = TryGetCharacterStat(localPlayer, Stat.Cash),
+                Xp = TryGetCharacterStat(localPlayer, Stat.XP)
+            };
         }
 
         private void WriteCaptureSessionMetadata(DateTime captureStartUtc, DateTime captureStartLocal)
