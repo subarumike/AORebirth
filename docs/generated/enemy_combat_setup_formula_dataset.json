@@ -329,6 +329,116 @@
       10
     ]
   },
+  "equippedFormulaDomainRegistry": [
+    {
+      "formulaId": "melded-patterns-saw-floor-11L-minus-2-over-2-plus-28-v1",
+      "levelsInclusive": [
+        18,
+        25
+      ],
+      "monsterData": 203747,
+      "weaponFamily": "121817..121820"
+    },
+    {
+      "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+      "levelsInclusive": [
+        17,
+        21
+      ],
+      "monsterData": 203729,
+      "weaponFamily": "123685..123688"
+    },
+    {
+      "formulaId": "incomplete-rebuild-saw-6L-plus-1-minus-2-v1",
+      "levelsInclusive": [
+        17,
+        22
+      ],
+      "monsterData": 203728,
+      "weaponFamily": "122653..122656"
+    },
+    {
+      "formulaId": "molested-molecules-saw-floor-11L-minus-2-over-2-v1",
+      "levelsInclusive": [
+        17,
+        25
+      ],
+      "monsterData": 203746,
+      "weaponFamily": "122216..122219"
+    }
+  ],
+  "fixedScopeSelectorBindings": {
+    "activeBindings": [
+      {
+        "configuredSourceIdentity": "0x795451C5",
+        "finalDisposition": "restored",
+        "formulaId": "bloodcreeper-exact-dual-stream-contract-v1",
+        "level": 24,
+        "monsterData": 30379,
+        "name": "Bloodcreeper",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x7953AF85",
+        "finalDisposition": "restored",
+        "formulaId": "redundant-scan-exact-atomic-generation-selector-v1",
+        "level": 20,
+        "monsterData": 204178,
+        "name": "Redundant Scan",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x7953AFF9",
+        "finalDisposition": "restored",
+        "formulaId": "workman-striker-exact-atomic-generation-selector-v1",
+        "level": 14,
+        "monsterData": 203854,
+        "name": "Workman Striker",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x7954501A",
+        "finalDisposition": "restored",
+        "formulaId": "workman-striker-exact-atomic-generation-selector-v1",
+        "level": 14,
+        "monsterData": 203854,
+        "name": "Workman Striker",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x79545219",
+        "finalDisposition": "restored",
+        "formulaId": "workman-striker-exact-atomic-generation-selector-v1",
+        "level": 16,
+        "monsterData": 203854,
+        "name": "Workman Striker",
+        "resource": 127
+      }
+    ],
+    "formulaId": "subway-fixed-scope-exact-runtime-selectors-v1",
+    "rawPacketObservations": [
+      {
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "classification": "Bloodcreeper dual-stream SAW",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|12105|11ce43658f64"
+      },
+      {
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "classification": "Redundant Scan exact selected stream",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|14311|ce05ac91fcff"
+      },
+      {
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
+        "classification": "Workman Striker atomic level-stat-loadout generations",
+        "packetId": null
+      }
+    ],
+    "selectorDomain": {
+      "Bloodcreeper": "exact family MonsterData and dual SKW1/SKW2 stream contract",
+      "Redundant Scan": "exact selected CapturedSubwayGenerationVariantDefinition",
+      "Workman Striker": "exact selected CapturedSubwayGenerationVariantDefinition"
+    }
+  },
   "fragmentedSoulFormula": {
     "activeActors": [
       {
@@ -3059,6 +3169,551 @@
       21
     ]
   },
+  "incompleteRebuildFormula": {
+    "activeBindings": [
+      {
+        "configuredSourceIdentity": "0x79545170",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 101
+        },
+        "level": 17,
+        "monsterData": 203728,
+        "name": "Incomplete Rebuild",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x79545172",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "level": 18,
+        "monsterData": 203728,
+        "name": "Incomplete Rebuild",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x79545177",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "level": 19,
+        "monsterData": 203728,
+        "name": "Incomplete Rebuild",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x79545181",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "level": 19,
+        "monsterData": 203728,
+        "name": "Incomplete Rebuild",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x79545188",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "level": 19,
+        "monsterData": 203728,
+        "name": "Incomplete Rebuild",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x79545241",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 101
+        },
+        "level": 17,
+        "monsterData": 203728,
+        "name": "Incomplete Rebuild",
+        "resource": 127
+      }
+    ],
+    "compatibleSemanticProfileIds": [
+      "31deaf88c6cc3395-51d0a02033e2bde1",
+      "82eccee02b323f4a-3408ca7897406958",
+      "82eccee02b323f4a-68e0e1e1c990a006",
+      "82eccee02b323f4a-dbff7d760eeb8d8a",
+      "87a2f60683a3943d-ea9679a34f531d59",
+      "8bd8ca936bf5aab4-78471b95becc1d68",
+      "8bd8ca936bf5aab4-900bd9d4e4558df5",
+      "f4b7f149cee5b2ad-b4c320f0187034b8",
+      "f4b7f149cee5b2ad-c24feb267ea895a9"
+    ],
+    "completeProfileObservations": [
+      {
+        "exactMatch": true,
+        "level": 18,
+        "observed": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "prediction": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "semanticProfileId": "f4b7f149cee5b2ad-b4c320f0187034b8"
+      },
+      {
+        "exactMatch": true,
+        "level": 18,
+        "observed": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "prediction": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "semanticProfileId": "f4b7f149cee5b2ad-c24feb267ea895a9"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "semanticProfileId": "82eccee02b323f4a-3408ca7897406958"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "semanticProfileId": "82eccee02b323f4a-68e0e1e1c990a006"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "semanticProfileId": "82eccee02b323f4a-dbff7d760eeb8d8a"
+      },
+      {
+        "exactMatch": true,
+        "level": 20,
+        "observed": {
+          "unknown1": 121,
+          "unknown2": 121,
+          "unknown3": 121,
+          "unknown4": 119
+        },
+        "prediction": {
+          "unknown1": 121,
+          "unknown2": 121,
+          "unknown3": 121,
+          "unknown4": 119
+        },
+        "semanticProfileId": "8bd8ca936bf5aab4-78471b95becc1d68"
+      },
+      {
+        "exactMatch": true,
+        "level": 20,
+        "observed": {
+          "unknown1": 121,
+          "unknown2": 121,
+          "unknown3": 121,
+          "unknown4": 119
+        },
+        "prediction": {
+          "unknown1": 121,
+          "unknown2": 121,
+          "unknown3": 121,
+          "unknown4": 119
+        },
+        "semanticProfileId": "8bd8ca936bf5aab4-900bd9d4e4558df5"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 127,
+          "unknown2": 127,
+          "unknown3": 127,
+          "unknown4": 125
+        },
+        "prediction": {
+          "unknown1": 127,
+          "unknown2": 127,
+          "unknown3": 127,
+          "unknown4": 125
+        },
+        "semanticProfileId": "87a2f60683a3943d-ea9679a34f531d59"
+      },
+      {
+        "exactMatch": true,
+        "level": 22,
+        "observed": {
+          "unknown1": 133,
+          "unknown2": 133,
+          "unknown3": 133,
+          "unknown4": 131
+        },
+        "prediction": {
+          "unknown1": 133,
+          "unknown2": 133,
+          "unknown3": 133,
+          "unknown4": 131
+        },
+        "semanticProfileId": "31deaf88c6cc3395-51d0a02033e2bde1"
+      }
+    ],
+    "exactCategoricalDomains": [
+      {
+        "actorQualityLevelsInclusive": [
+          1,
+          19
+        ],
+        "weaponHighTemplate": 122654,
+        "weaponLowTemplate": 122653
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          20,
+          20
+        ],
+        "weaponHighTemplate": 122654,
+        "weaponLowTemplate": 122654
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          21,
+          21
+        ],
+        "weaponHighTemplate": 122655,
+        "weaponLowTemplate": 122655
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          22,
+          40
+        ],
+        "weaponHighTemplate": 122656,
+        "weaponLowTemplate": 122655
+      }
+    ],
+    "family": "Incomplete Rebuild",
+    "formulaId": "incomplete-rebuild-saw-6L-plus-1-minus-2-v1",
+    "leaveOneOut": [
+      {
+        "exactMatch": true,
+        "heldOutLevel": 17,
+        "heldOutObserved": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 101
+        },
+        "prediction": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 101
+        },
+        "trainingLevels": [
+          18,
+          19,
+          20,
+          21,
+          22
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 18,
+        "heldOutObserved": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "prediction": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 107
+        },
+        "trainingLevels": [
+          17,
+          19,
+          20,
+          21,
+          22
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 19,
+        "heldOutObserved": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "prediction": {
+          "unknown1": 115,
+          "unknown2": 115,
+          "unknown3": 115,
+          "unknown4": 113
+        },
+        "trainingLevels": [
+          17,
+          18,
+          20,
+          21,
+          22
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 20,
+        "heldOutObserved": {
+          "unknown1": 121,
+          "unknown2": 121,
+          "unknown3": 121,
+          "unknown4": 119
+        },
+        "prediction": {
+          "unknown1": 121,
+          "unknown2": 121,
+          "unknown3": 121,
+          "unknown4": 119
+        },
+        "trainingLevels": [
+          17,
+          18,
+          19,
+          21,
+          22
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 21,
+        "heldOutObserved": {
+          "unknown1": 127,
+          "unknown2": 127,
+          "unknown3": 127,
+          "unknown4": 125
+        },
+        "prediction": {
+          "unknown1": 127,
+          "unknown2": 127,
+          "unknown3": 127,
+          "unknown4": 125
+        },
+        "trainingLevels": [
+          17,
+          18,
+          19,
+          20,
+          22
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 22,
+        "heldOutObserved": {
+          "unknown1": 133,
+          "unknown2": 133,
+          "unknown3": 133,
+          "unknown4": 131
+        },
+        "prediction": {
+          "unknown1": 133,
+          "unknown2": 133,
+          "unknown3": 133,
+          "unknown4": 131
+        },
+        "trainingLevels": [
+          17,
+          18,
+          19,
+          20,
+          21
+        ]
+      }
+    ],
+    "monsterData": 203728,
+    "numericOutput": {
+      "baseExpression": "6 * actorLevel + 1",
+      "clamping": "none inside the proven level domain",
+      "fields": {
+        "SpecialAttackWeapon.unknown1": "base",
+        "SpecialAttackWeapon.unknown2": "base",
+        "SpecialAttackWeapon.unknown3": "base",
+        "SpecialAttackWeapon.unknown4": "base - 2"
+      },
+      "integerArithmetic": "exact checked integer arithmetic",
+      "unknown5": "ordered mutable per-actor state"
+    },
+    "rawLevel17PacketObservation": {
+      "bodyHex": "1D3C0F1C0000C3507954517000000003F10000006700000067000000670000006500000000",
+      "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+      "direction": "IN",
+      "exactMatch": true,
+      "level": 17,
+      "messageType": "SpecialAttackWeapon",
+      "observed": {
+        "unknown1": 103,
+        "unknown2": 103,
+        "unknown3": 103,
+        "unknown4": 101
+      },
+      "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6282|da4cff1e990e",
+      "prediction": {
+        "unknown1": 103,
+        "unknown2": 103,
+        "unknown3": 103,
+        "unknown4": 101
+      },
+      "sequence": 6282,
+      "sourceIdentity": "0x79545170",
+      "timestampUtc": "2026-07-10T03:29:31.2168326Z",
+      "unknown1": 103,
+      "unknown2": 103,
+      "unknown3": 103,
+      "unknown4": 101,
+      "unknown5": 0
+    },
+    "rawPacketObservations": [
+      {
+        "bodyHex": "1D3C0F1C0000C3507954517000000003F10000006700000067000000670000006500000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "direction": "IN",
+        "exactMatch": true,
+        "level": 17,
+        "messageType": "SpecialAttackWeapon",
+        "observed": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 101
+        },
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6282|da4cff1e990e",
+        "prediction": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 101
+        },
+        "sequence": 6282,
+        "sourceIdentity": "0x79545170",
+        "timestampUtc": "2026-07-10T03:29:31.2168326Z",
+        "unknown1": 103,
+        "unknown2": 103,
+        "unknown3": 103,
+        "unknown4": 101,
+        "unknown5": 0
+      }
+    ],
+    "rejectedCandidates": [
+      {
+        "candidate": "four identical SAW fields",
+        "mismatches": 10,
+        "reason": "Unknown4 is exactly two below the shared base"
+      },
+      {
+        "candidate": "level-local captured tuple selection",
+        "mismatches": 1,
+        "reason": "level 17 has no generated complete profile"
+      },
+      {
+        "candidate": "unbounded level domain",
+        "reason": "levels below 17 and above 22 lack formula proof"
+      }
+    ],
+    "resource": 127,
+    "runtimeInputOwners": {
+      "actorLevelQualityAndLoadout": "CapturedSubwayGenerationVariantDefinition or exact CapturedSubwaySourceWeaponEvidenceDefinition",
+      "damageRangeCadenceEnergyAndAmmo": "active spawn, items.dat, and existing combat runtime"
+    },
+    "sharedCategoricalSemantics": {
+      "attackMode": "equipped",
+      "instance": 0,
+      "numericDamageType": 0,
+      "numericHitType": 3,
+      "packetOrder": [
+        "WeaponItemFullUpdate",
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo"
+      ],
+      "repeatedInitializationIsNotAStream": true,
+      "slot": 6,
+      "specials": [],
+      "streamCount": 1,
+      "terminalOutcomesAreNotAdditionalStreams": true
+    },
+    "supportedLevelsInclusive": [
+      17,
+      22
+    ]
+  },
   "meldedPatternsFormula": {
     "activeBindings": [
       {
@@ -5249,6 +5904,465 @@
     },
     "supportedLevelsInclusive": [
       18,
+      25
+    ]
+  },
+  "molestedMoleculesFormula": {
+    "activeBindings": [
+      {
+        "configuredSourceIdentity": "0x79545139",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 125
+        },
+        "level": 23,
+        "monsterData": 203746,
+        "name": "Molested Molecules",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x795451D2",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 131,
+          "unknown2": 131,
+          "unknown3": 131,
+          "unknown4": 131
+        },
+        "level": 24,
+        "monsterData": 203746,
+        "name": "Molested Molecules",
+        "resource": 127
+      },
+      {
+        "configuredSourceIdentity": "0x795451D7",
+        "finalDisposition": "restored",
+        "formulaPrediction": {
+          "unknown1": 131,
+          "unknown2": 131,
+          "unknown3": 131,
+          "unknown4": 131
+        },
+        "level": 24,
+        "monsterData": 203746,
+        "name": "Molested Molecules",
+        "resource": 127
+      }
+    ],
+    "compatibleSemanticProfileIds": [
+      "46500f6c2cd2882a-2422c91610d14b94",
+      "4ba26b078c2496d9-2e2fc4992159adf3",
+      "76842c25578f7757-3ece59f3d788220e",
+      "76842c25578f7757-40413a3d0b4d835d",
+      "76842c25578f7757-481470fb8a9a189f",
+      "91251aa18cd96ec5-6d07601f79a79e03",
+      "b7a9f2fa5901b542-1a1c4a09ea74f89c",
+      "c384b7027842ef47-6420b0f90fc9019f"
+    ],
+    "completeProfileObservations": [
+      {
+        "exactMatch": true,
+        "level": 17,
+        "observed": {
+          "unknown1": 92,
+          "unknown2": 92,
+          "unknown3": 92,
+          "unknown4": 92
+        },
+        "prediction": {
+          "unknown1": 92,
+          "unknown2": 92,
+          "unknown3": 92,
+          "unknown4": 92
+        },
+        "semanticProfileId": "46500f6c2cd2882a-2422c91610d14b94"
+      },
+      {
+        "exactMatch": true,
+        "level": 18,
+        "observed": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "prediction": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "semanticProfileId": "b7a9f2fa5901b542-1a1c4a09ea74f89c"
+      },
+      {
+        "exactMatch": true,
+        "level": 19,
+        "observed": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "prediction": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "semanticProfileId": "91251aa18cd96ec5-6d07601f79a79e03"
+      },
+      {
+        "exactMatch": true,
+        "level": 20,
+        "observed": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "prediction": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "semanticProfileId": "4ba26b078c2496d9-2e2fc4992159adf3"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "prediction": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "semanticProfileId": "76842c25578f7757-3ece59f3d788220e"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "prediction": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "semanticProfileId": "76842c25578f7757-40413a3d0b4d835d"
+      },
+      {
+        "exactMatch": true,
+        "level": 21,
+        "observed": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "prediction": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "semanticProfileId": "76842c25578f7757-481470fb8a9a189f"
+      },
+      {
+        "exactMatch": true,
+        "level": 25,
+        "observed": {
+          "unknown1": 136,
+          "unknown2": 136,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "prediction": {
+          "unknown1": 136,
+          "unknown2": 136,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "semanticProfileId": "c384b7027842ef47-6420b0f90fc9019f"
+      }
+    ],
+    "exactCategoricalDomains": [
+      {
+        "actorQualityLevelsInclusive": [
+          1,
+          19
+        ],
+        "weaponHighTemplate": 122217,
+        "weaponLowTemplate": 122216
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          20,
+          20
+        ],
+        "weaponHighTemplate": 122217,
+        "weaponLowTemplate": 122217
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          21,
+          40
+        ],
+        "weaponHighTemplate": 122219,
+        "weaponLowTemplate": 122218
+      }
+    ],
+    "family": "Molested Molecules",
+    "formulaId": "molested-molecules-saw-floor-11L-minus-2-over-2-v1",
+    "leaveOneOut": [
+      {
+        "exactMatch": true,
+        "heldOutLevel": 17,
+        "heldOutObserved": {
+          "unknown1": 92,
+          "unknown2": 92,
+          "unknown3": 92,
+          "unknown4": 92
+        },
+        "prediction": {
+          "unknown1": 92,
+          "unknown2": 92,
+          "unknown3": 92,
+          "unknown4": 92
+        },
+        "trainingLevels": [
+          18,
+          19,
+          20,
+          21,
+          25
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 18,
+        "heldOutObserved": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "prediction": {
+          "unknown1": 98,
+          "unknown2": 98,
+          "unknown3": 98,
+          "unknown4": 98
+        },
+        "trainingLevels": [
+          17,
+          19,
+          20,
+          21,
+          25
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 19,
+        "heldOutObserved": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "prediction": {
+          "unknown1": 103,
+          "unknown2": 103,
+          "unknown3": 103,
+          "unknown4": 103
+        },
+        "trainingLevels": [
+          17,
+          18,
+          20,
+          21,
+          25
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 20,
+        "heldOutObserved": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "prediction": {
+          "unknown1": 109,
+          "unknown2": 109,
+          "unknown3": 109,
+          "unknown4": 109
+        },
+        "trainingLevels": [
+          17,
+          18,
+          19,
+          21,
+          25
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 21,
+        "heldOutObserved": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "prediction": {
+          "unknown1": 114,
+          "unknown2": 114,
+          "unknown3": 114,
+          "unknown4": 114
+        },
+        "trainingLevels": [
+          17,
+          18,
+          19,
+          20,
+          25
+        ]
+      },
+      {
+        "exactMatch": true,
+        "heldOutLevel": 25,
+        "heldOutObserved": {
+          "unknown1": 136,
+          "unknown2": 136,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "prediction": {
+          "unknown1": 136,
+          "unknown2": 136,
+          "unknown3": 136,
+          "unknown4": 136
+        },
+        "trainingLevels": [
+          17,
+          18,
+          19,
+          20,
+          21
+        ]
+      }
+    ],
+    "monsterData": 203746,
+    "numericOutput": {
+      "clamping": "none inside the proven level domain",
+      "expression": "floor((11 * actorLevel - 2) / 2)",
+      "fields": [
+        "SpecialAttackWeapon.unknown1",
+        "SpecialAttackWeapon.unknown2",
+        "SpecialAttackWeapon.unknown3",
+        "SpecialAttackWeapon.unknown4"
+      ],
+      "integerArithmetic": "positive integer truncation equals floor",
+      "unknown5": "ordered mutable per-actor state"
+    },
+    "rawPacketObservations": [
+      {
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "messageType": "WeaponItemFullUpdate",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4462|a1d9664f3cb3"
+      },
+      {
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "messageType": "WeaponItemFullUpdate",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4473|6bbf0cd55b4f"
+      },
+      {
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "messageType": "WeaponItemFullUpdate",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4478|6f3563ec0239"
+      }
+    ],
+    "rejectedCandidates": [
+      {
+        "candidate": "copy level 22 or level 25",
+        "mismatches": 3,
+        "reason": "does not reproduce the exact bounded level formula"
+      },
+      {
+        "candidate": "weapon QL as the sole numeric input",
+        "mismatches": 4,
+        "reason": "actor level, not QL, owns the observed SAW sequence"
+      },
+      {
+        "candidate": "unbounded level domain",
+        "reason": "levels below 17 and above 25 lack formula proof"
+      }
+    ],
+    "resource": 127,
+    "runtimeInputOwners": {
+      "actorLevel": "active captured spawn",
+      "damageRangeCadenceEnergyAndAmmo": "active spawn, items.dat, and existing combat runtime",
+      "weaponQlAndTemplates": "owner-linked raw WeaponItemFullUpdate and items.dat"
+    },
+    "selectorObservations": [
+      {
+        "actorQualityLevel": 22,
+        "configuredSourceIdentity": "0x79545139",
+        "level": 23,
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4462|a1d9664f3cb3",
+        "weaponHighTemplate": 122219,
+        "weaponLowTemplate": 122218
+      },
+      {
+        "actorQualityLevel": 19,
+        "configuredSourceIdentity": "0x795451D2",
+        "level": 24,
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4473|6bbf0cd55b4f",
+        "weaponHighTemplate": 122217,
+        "weaponLowTemplate": 122216
+      },
+      {
+        "actorQualityLevel": 27,
+        "configuredSourceIdentity": "0x795451D7",
+        "level": 24,
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4478|6f3563ec0239",
+        "weaponHighTemplate": 122219,
+        "weaponLowTemplate": 122218
+      }
+    ],
+    "sharedCategoricalSemantics": {
+      "attackMode": "equipped",
+      "instance": 0,
+      "numericDamageType": 0,
+      "numericHitType": 3,
+      "packetOrder": [
+        "WeaponItemFullUpdate",
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo"
+      ],
+      "slot": 6,
+      "specials": [],
+      "streamCount": 1
+    },
+    "supportedLevelsInclusive": [
+      17,
       25
     ]
   },
@@ -223318,7 +224432,7 @@
       "reason": "no capture-backed categorical proof exists outside levels 5..10"
     }
   ],
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "scope": {
     "completeAndPartialProfilesIncluded": true,
     "profileCount": 422,
@@ -224663,6 +225777,19 @@
     "supportedLevelsInclusive": [
       10,
       17
-    ]
+    ],
+    "unsupportedLowerBound": {
+      "configuredSourceIdentity": "0x7957E415",
+      "finalDisposition": "quarantined; numeric extrapolation is not categorical proof",
+      "level": 9,
+      "missingCategoricalPackets": [
+        "WeaponItemFullUpdate",
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo",
+        "MissedAttackInfo"
+      ],
+      "scfuPacket": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202132|IN|1016"
+    }
   }
 }

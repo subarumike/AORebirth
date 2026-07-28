@@ -2413,6 +2413,12 @@ namespace AORebirth.Core.Playfields
                     "20260716-221358",
                     "20260716-222007",
                     "20260716-222201"
+                },
+                new CapturedSubwaySourceWeaponEvidenceDefinition[]
+                {
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x79545139, 122218, 122219, 22, "20260709-222339:WIFU#4462"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451D2, 122216, 122217, 19, "20260709-222339:WIFU#4473"),
+                    new CapturedSubwaySourceWeaponEvidenceDefinition(0x795451D7, 122218, 122219, 27, "20260709-222339:WIFU#4478")
                 }),
             new CapturedSubwayOrdinaryArchetypeDefinition(
                 "premature_pattern",

@@ -517,6 +517,47 @@ namespace AORebirth.Core.Playfields
                    && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
         }
 
+        internal bool SupportsGeneratedEquippedWeaponPacketSemantics(
+            OrdinaryEnemyEquippedFormulaDomain domain)
+        {
+            return domain != null
+                   && this.SupportsCaptureProvenEquippedWeaponPacketSemantics
+                   && domain.MatchesWeaponLoadout(
+                       this.WeaponDefinition.LowId,
+                       this.WeaponDefinition.HighId,
+                       this.WeaponDefinition.Quality);
+        }
+
+        internal bool MatchesGeneratedEquippedWeaponPacketSemantics(
+            CapturedEnemyCombatProfileDefinition other,
+            OrdinaryEnemyEquippedFormulaDomain domain)
+        {
+            if (!this.SupportsGeneratedEquippedWeaponPacketSemantics(domain)
+                || other == null
+                || !other.SupportsGeneratedEquippedWeaponPacketSemantics(domain)
+                || this.SpecialAttackWeaponN3Unknown
+                   != other.SpecialAttackWeaponN3Unknown
+                || this.AttackN3Unknown != other.AttackN3Unknown
+                || this.AttackAction != other.AttackAction
+                || !WeaponPacketStructureMatches(
+                    this.WeaponDefinition,
+                    other.WeaponDefinition))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileStreamDefinition left = this.Streams[0];
+            CapturedEnemyCombatProfileStreamDefinition right = other.Streams[0];
+            return left.WeaponSlot == right.WeaponSlot
+                   && left.DamageTypeWire == right.DamageTypeWire
+                   && left.HitTypeWire == right.HitTypeWire
+                   && left.WeaponInstance == right.WeaponInstance
+                   && left.N3Unknown == right.N3Unknown
+                   && left.CapturedUsesEquippedWeapon
+                      == right.CapturedUsesEquippedWeapon
+                   && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
+        }
+
         internal bool SupportsCaptureProvenNaturalAttackPacketSemantics
         {
             get
@@ -1247,7 +1288,8 @@ namespace AORebirth.Core.Playfields
                     evidenceSourceIdentity,
                     weapon)
                     .WithCapturedSpecialAttackWeaponUnknown5Observations(
-                        profile.SpecialAttackWeaponUnknown5Observations);
+                        profile.SpecialAttackWeaponUnknown5Observations)
+                    .WithCaptureProvenArchetype(profile.ProfileId);
                 return resolved.IsCombatReady;
             }
 
@@ -1311,7 +1353,8 @@ namespace AORebirth.Core.Playfields
             }
 
             resolved = resolved.WithCapturedSpecialAttackWeaponUnknown5Observations(
-                profile.SpecialAttackWeaponUnknown5Observations);
+                profile.SpecialAttackWeaponUnknown5Observations)
+                .WithCaptureProvenArchetype(profile.ProfileId);
             if (!resolved.IsCombatReady)
             {
                 failure = "selected raw profile failed shared contract readiness: "
@@ -1408,22 +1451,19 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            bool isMeldedPatterns =
-                monsterData
-                == ZoneEngine.Core.Playfields.NpcCombatAttackRules
-                    .CapturedSubwayMeldedPatternsMonsterData;
-            bool isFragmentedSoul =
-                monsterData
-                == ZoneEngine.Core.Playfields.NpcCombatAttackRules
-                    .CapturedSubwayFragmentedSoulMonsterData;
+            OrdinaryEnemyEquippedFormulaDomain domain;
+            if (!OrdinaryEnemyCombatSetupGenerator.TryGetEquippedFormulaDomain(
+                    monsterData,
+                    out domain))
+            {
+                return false;
+            }
+
             CapturedEnemyCombatProfileDefinition[] family = Profiles.Where(
                     value => value.MatchesArchetypeKey(resourceId, name, monsterData)
-                             && (isMeldedPatterns
-                                     ? value
-                                         .SupportsMeldedPatternsMathematicalPacketSemantics
-                                     : isFragmentedSoul
-                                       && value
-                                           .SupportsFragmentedSoulMathematicalPacketSemantics))
+                             && value
+                                 .SupportsGeneratedEquippedWeaponPacketSemantics(
+                                     domain))
                 .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
                 .ToArray();
             if (family.Length == 0)
@@ -1433,11 +1473,10 @@ namespace AORebirth.Core.Playfields
 
             CapturedEnemyCombatProfileDefinition archetype = family[0];
             if (family.Any(
-                value => isMeldedPatterns
-                    ? !archetype
-                        .MatchesMeldedPatternsMathematicalPacketSemantics(value)
-                    : !archetype
-                        .MatchesFragmentedSoulMathematicalPacketSemantics(value)))
+                value => !archetype
+                    .MatchesGeneratedEquippedWeaponPacketSemantics(
+                        value,
+                        domain)))
             {
                 return false;
             }
@@ -1487,7 +1526,7 @@ namespace AORebirth.Core.Playfields
                 resourceId,
                 name,
                 monsterData,
-                isMeldedPatterns ? "121817..121835" : "123685..123703",
+                domain.WeaponFamilyId,
                 string.Join(
                     ",",
                     family.Select(value => value.ProfileId).ToArray()));
@@ -1646,19 +1685,25 @@ namespace AORebirth.Core.Playfields
                     resourceId,
                     name,
                     monsterData)).ToArray();
+            OrdinaryEnemyEquippedFormulaDomain generatedDomain;
             if (current.UsesProductionEquippedWeaponValues
-                && (monsterData
-                    == ZoneEngine.Core.Playfields.NpcCombatAttackRules
-                        .CapturedSubwayMeldedPatternsMonsterData
-                    || monsterData
-                       == ZoneEngine.Core.Playfields.NpcCombatAttackRules
-                           .CapturedSubwayFragmentedSoulMonsterData))
+                && OrdinaryEnemyCombatSetupGenerator.TryGetEquippedFormulaDomain(
+                    monsterData,
+                    out generatedDomain)
+                && current.AttackModel
+                   == CapturedEnemyAttackModel.EquippedWeapon)
             {
                 return false;
             }
 
             if (current.UsesProductionEquippedWeaponValues)
             {
+                bool hasSelectedProductionLoadout =
+                    current.AttackModel
+                    == CapturedEnemyAttackModel.EquippedWeapon
+                    && current.WeaponLowId > 0
+                    && current.WeaponHighId > 0
+                    && current.WeaponInventorySlot > 0;
                 CapturedEnemyCombatProfileDefinition[] exactProductionFamily = family.Where(
                     value => value.Level == level
                              && value
@@ -1666,6 +1711,17 @@ namespace AORebirth.Core.Playfields
                 if (exactProductionFamily.Length == 0)
                 {
                     return false;
+                }
+
+                if (hasSelectedProductionLoadout)
+                {
+                    CapturedEnemyCombatProfileDefinition[] selectedWeaponFamily =
+                        exactProductionFamily.Where(
+                            value => value.MatchesStableWeaponFamily(current)).ToArray();
+                    if (selectedWeaponFamily.Length > 0)
+                    {
+                        exactProductionFamily = selectedWeaponFamily;
+                    }
                 }
 
                 CapturedEnemyCombatProfileDefinition productionProfile;
@@ -1678,12 +1734,14 @@ namespace AORebirth.Core.Playfields
                     CapturedEnemyCombatProfileDefinition[] sourceMatches =
                         exactProductionFamily.Where(
                             value => value.ContainsSource(sourceIdentityHint)).ToArray();
-                    if (sourceMatches.Length != 1)
+                    if (sourceMatches.Length == 1)
+                    {
+                        productionProfile = sourceMatches[0];
+                    }
+                    else
                     {
                         return false;
                     }
-
-                    productionProfile = sourceMatches[0];
                 }
 
                 int productionEvidenceSourceIdentity =
@@ -1693,6 +1751,15 @@ namespace AORebirth.Core.Playfields
                 CapturedEnemyWeaponDefinition productionWeapon =
                     productionProfile.WeaponDefinition.WithEvidenceSourceIdentity(
                         productionEvidenceSourceIdentity);
+                if (hasSelectedProductionLoadout)
+                {
+                    productionWeapon =
+                        productionWeapon.WithProductionWeaponLoadout(
+                            current.WeaponLowId,
+                            current.WeaponHighId,
+                            current.WeaponQuality);
+                }
+
                 CapturedEnemyCombatProfileStreamDefinition productionStream =
                     productionProfile.Streams[0];
                 string productionArchetypeId = string.Format(
@@ -1742,6 +1809,7 @@ namespace AORebirth.Core.Playfields
                     .WithCapturedWeapon(productionWeapon)
                     .WithCapturedSpecialAttackWeaponUnknown5Observations(
                         productionProfile.SpecialAttackWeaponUnknown5Observations)
+                    .WithProductionEquippedWeaponValues()
                     .WithCaptureProvenArchetype(productionArchetypeId);
                 return resolved.IsCombatReady;
             }

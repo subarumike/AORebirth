@@ -444,7 +444,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             value => value.DisplayName == name
                                      && value.MonsterData == monsterData);
                     if (name == "Melded Patterns"
-                        || name == "Fragmented Soul")
+                        || name == "Fragmented Soul"
+                        || name == "Workman Striker"
+                        || name == "Redundant Scan")
                     {
                         OrdinaryEnemySpawnDefinition runtimeSpawn =
                             runtimeCatalog.GetSpawns().Single(

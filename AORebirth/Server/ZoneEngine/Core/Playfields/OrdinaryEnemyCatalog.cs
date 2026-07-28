@@ -434,9 +434,29 @@ namespace AORebirth.Core.Playfields
                            == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
-                                archetype.MonsterData
-                                == NpcCombatAttackRules
-                                    .CapturedSubwayMeldedPatternsMonsterData
+                                archetype.MonsterData == WorkmanStrikerMonsterData
+                                || archetype.MonsterData == RedundantScanMonsterData
+                                    ? CapturedSubwayCombatCatalog
+                                        .ForOrdinarySelectedAtomicGeneration(
+                                            archetype,
+                                            sourceIdentity,
+                                            level,
+                                            content.GetGenerationVariants(
+                                                archetype.MonsterData,
+                                                sourceIdentity))
+                                    : archetype.MonsterData
+                                      == IncompleteRebuildMonsterData
+                                      || archetype.MonsterData
+                                      == NpcCombatAttackRules
+                                          .CapturedSubwayMolestedMoleculesMonsterData
+                                        ? CapturedSubwayCombatCatalog
+                                            .ForOrdinaryGeneratedSetup(
+                                                archetype,
+                                                sourceIdentity,
+                                                level)
+                                        : archetype.MonsterData
+                                          == NpcCombatAttackRules
+                                              .CapturedSubwayMeldedPatternsMonsterData
                                     ? CapturedEnemyCombatContract.Unresolved(
                                         "Melded Patterns requires the exact owner-linked generation variant",
                                         true)

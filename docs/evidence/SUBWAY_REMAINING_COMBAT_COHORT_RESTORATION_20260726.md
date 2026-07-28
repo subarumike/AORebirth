@@ -300,3 +300,28 @@ All ten active Fragmented Soul actors are certified. The fixed 53-actor scope
 is now `38` certified and `15` quarantined. PF127 is `276/46`; PF1931 remains
 `87/80`; combined coverage is `363/126` of `489`. Full evidence is in
 `docs/evidence/SUBWAY_FRAGMENTED_SOUL_COMBAT_RESTORATION_20260728.md`.
+
+## 2026-07-28 Fixed-Scope Completion
+
+The remaining 15-actor checkpoint was processed as one scope. Fourteen actors
+are restored: six Incomplete Rebuilds, three Workman Strikers, three Molested
+Molecules, Bloodcreeper, and Redundant Scan.
+
+Incomplete Rebuild now uses the bounded L17..L22 setup
+`base=6*actorLevel+1`, with SAW `base/base/base/base-2`. Molested Molecules
+uses `floor((11*actorLevel-2)/2)` for all four SAW numeric fields across
+L17..L25. Exact runtime QL selects each family's capture-proven equipped
+template tuple. Workman Striker and Redundant Scan select the exact active
+atomic generation rather than treating generation-local or mutable state as
+separate reusable archetypes. Bloodcreeper retains its two genuine captured
+Bite and Spit streams while timing, range, and mutable state remain
+production-owned.
+
+Stim Fiend `0x7957E415`, MD `203739`, L9 is the only remaining actor.
+Capture `20260710-202132` contains SCFU `IN 1016` plus movement/despawn, but
+contains no WIFU, SAW, Attack, AttackInfo, or MissedAttackInfo. It remains
+fail-closed outside the proven L10..L17 Stim domain.
+
+The fixed 53-actor scope is now `52/1`. PF127 is `290/32`; PF1931 remains
+`87/80`; combined coverage is `377/112` of `489`. Full evidence is in
+`docs/evidence/SUBWAY_FIXED_SCOPE_COMBAT_COMPLETION_20260728.md`.

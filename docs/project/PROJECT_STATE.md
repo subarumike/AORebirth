@@ -4,6 +4,23 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- The fixed 53-actor Subway combat checkpoint is now `52` certified and `1`
+  quarantined. This completion pass restores all six Incomplete Rebuild, all
+  three Workman Strikers, all three Molested Molecules, Bloodcreeper, and
+  Redundant Scan: `14` actors total. Incomplete Rebuild uses
+  `base=6*actorLevel+1` with SAW
+  `base/base/base/base-2` across L17..L22. Molested Molecules uses
+  `floor((11*actorLevel-2)/2)` for all four numeric SAW fields across L17..L25.
+  Both retain exact QL-selected captured weapon families. Workman and Redundant
+  use exact active atomic-generation selectors; Bloodcreeper retains two
+  genuine captured Bite/Spit streams. PF127/PF1931 are now `377/112` of `489`
+  (`290/32` and unchanged `87/80`). Stim Fiend `0x7957E415`, MD `203739`, L9
+  is the only remaining fixed-scope actor: capture `20260710-202132` has SCFU
+  and movement/despawn but no WIFU, SAW, Attack, AttackInfo, or
+  MissedAttackInfo, so the L10..L17 Stim formula cannot be extended
+  categorically. Evidence:
+  `docs/evidence/SUBWAY_FIXED_SCOPE_COMBAT_COMPLETION_20260728.md`.
+
 - Fragmented Soul MonsterData `203729` now uses the bounded mathematical
   equipped setup `base=6*actorLevel-1`, with SAW fields
   `base/base/base/base+2*floor(actorLevel/2)` across exact levels L17..L21.
