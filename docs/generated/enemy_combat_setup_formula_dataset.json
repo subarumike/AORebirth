@@ -235,6 +235,7 @@
       {
         "bodyHex": "1D3C0F1C0000C350794E807A00000007E2000235660002356753495731534957310000001E0000001E0000001E0000001E00000000",
         "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
+        "direction": "IN",
         "exactMatch": true,
         "formulaValue": 30,
         "level": 5,
@@ -242,6 +243,7 @@
         "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|3469|ca6cb1253109",
         "sequence": 3469,
         "sourceIdentity": "0x794E807A",
+        "timestampUtc": "2026-07-10T02:07:29.1657410Z",
         "unknown1": 30,
         "unknown2": 30,
         "unknown3": 30,
@@ -251,6 +253,7 @@
       {
         "bodyHex": "1D3C0F1C0000C350794F608000000007E2000235660002356753495731534957310000002300000023000000230000002300000000",
         "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
+        "direction": "IN",
         "exactMatch": true,
         "formulaValue": 35,
         "level": 6,
@@ -258,6 +261,7 @@
         "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|4295|18de75508f9b",
         "sequence": 4295,
         "sourceIdentity": "0x794F6080",
+        "timestampUtc": "2026-07-10T02:08:02.5305895Z",
         "unknown1": 35,
         "unknown2": 35,
         "unknown3": 35,
@@ -267,6 +271,7 @@
       {
         "bodyHex": "1D3C0F1C0000C350794DF07400000007E2000235660002356753495731534957310000002D0000002D0000002D0000002D00000000",
         "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "direction": "IN",
         "exactMatch": true,
         "formulaValue": 45,
         "level": 8,
@@ -274,6 +279,7 @@
         "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|10058|ae43dc7ffd9f",
         "sequence": 10058,
         "sourceIdentity": "0x794DF074",
+        "timestampUtc": "2026-07-08T19:44:30.2136475Z",
         "unknown1": 45,
         "unknown2": 45,
         "unknown3": 45,
@@ -283,6 +289,7 @@
       {
         "bodyHex": "1D3C0F1C0000C3507953AD6900000007E2000235660002356753495731534957310000003100000031000000310000003100000000",
         "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
+        "direction": "IN",
         "exactMatch": true,
         "formulaValue": 49,
         "level": 9,
@@ -290,6 +297,7 @@
         "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|5792|9e525db63d1c",
         "sequence": 5792,
         "sourceIdentity": "0x7953AD69",
+        "timestampUtc": "2026-07-10T03:06:19.8301322Z",
         "unknown1": 49,
         "unknown2": 49,
         "unknown3": 49,
@@ -299,6 +307,7 @@
       {
         "bodyHex": "1D3C0F1C0000C3507953AA8100000007E2000235660002356753495731534957310000003600000036000000360000003600000000",
         "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
+        "direction": "IN",
         "exactMatch": true,
         "formulaValue": 54,
         "level": 10,
@@ -306,6 +315,7 @@
         "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7237|7440d355ad2e",
         "sequence": 7237,
         "sourceIdentity": "0x7953AA81",
+        "timestampUtc": "2026-07-10T03:07:03.3258022Z",
         "unknown1": 54,
         "unknown2": 54,
         "unknown3": 54,
@@ -218376,7 +218386,7 @@
       "reason": "no capture-backed categorical proof exists outside levels 5..10"
     }
   ],
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "scope": {
     "completeAndPartialProfilesIncluded": true,
     "profileCount": 422,
@@ -218386,5 +218396,1341 @@
     ],
     "sourceInventory": "docs/generated/capture_backed_npc_combat_inventory.json",
     "sourceItemDatabase": "AORebirth/Datafiles/items.dat"
+  },
+  "stimFiendFormula": {
+    "activeBindings": [
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7953AD66",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 54,
+        "level": 10,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E5CF",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 54,
+        "level": 10,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E5D0",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 54,
+        "level": 10,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E5D1",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 54,
+        "level": 10,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x79557F12",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 59,
+        "level": 11,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7953AD68",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x79545069",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x79545072",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7957E128",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7953AA4B",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 70,
+        "level": 13,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7953AD7D",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 70,
+        "level": 13,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x795451F5",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 70,
+        "level": 13,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7953ABBF",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 76,
+        "level": 14,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "compatibleSemanticProfileIds": [
+          "5aa2541e7645c589-9bcb7a58208cf1e0",
+          "8dc794414961f6e6-63cd3e499be4e58b",
+          "963ecf2aa60f045c-de110ebeb7e358cd",
+          "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+          "54d40b70fa1a801a-064305180fc7f1ad"
+        ],
+        "configuredSourceIdentity": "0x7953ABAD",
+        "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+        "generatedSpecialAttackWeaponValue": 92,
+        "level": 17,
+        "monsterData": 203739,
+        "name": "Stim Fiend",
+        "resource": 127
+      }
+    ],
+    "compatibleSemanticProfileIds": [
+      "5aa2541e7645c589-9bcb7a58208cf1e0",
+      "8dc794414961f6e6-63cd3e499be4e58b",
+      "963ecf2aa60f045c-de110ebeb7e358cd",
+      "3f70ab044f0e78d5-d2b65cf5c70d61d6",
+      "54d40b70fa1a801a-064305180fc7f1ad"
+    ],
+    "crossFamilyHeldOut": {
+      "conclusion": "the numeric rule is reusable only after the exact Stim Fiend semantic selector succeeds",
+      "exactMatches": 17,
+      "mismatches": 6,
+      "observations": [
+        {
+          "exactMatch": false,
+          "level": 8,
+          "monsterData": 17649,
+          "name": "Disobedient Bot",
+          "observed": 45,
+          "semanticProfileId": "ff1685d6a9c45e2c-370328526bcb32c7",
+          "stimFiendFormulaPrediction": 43
+        },
+        {
+          "exactMatch": true,
+          "level": 10,
+          "monsterData": 17720,
+          "name": "Discarded Pet",
+          "observed": 54,
+          "semanticProfileId": "95d366ebb4f855e2-9bcb7a58208cf1e0",
+          "stimFiendFormulaPrediction": 54
+        },
+        {
+          "exactMatch": false,
+          "level": 7,
+          "monsterData": 17720,
+          "name": "Discarded Pet",
+          "observed": 39,
+          "semanticProfileId": "abcad39356c40905-a60091518e8654c5",
+          "stimFiendFormulaPrediction": 37
+        },
+        {
+          "exactMatch": false,
+          "level": 8,
+          "monsterData": 17720,
+          "name": "Discarded Pet",
+          "observed": 45,
+          "semanticProfileId": "947eb7806de2ef00-370328526bcb32c7",
+          "stimFiendFormulaPrediction": 43
+        },
+        {
+          "exactMatch": false,
+          "level": 9,
+          "monsterData": 17720,
+          "name": "Discarded Pet",
+          "observed": 49,
+          "semanticProfileId": "2a1d4cb7813554fa-90a0c301751057c4",
+          "stimFiendFormulaPrediction": 48
+        },
+        {
+          "exactMatch": false,
+          "level": 17,
+          "monsterData": 203727,
+          "name": "Premature Pattern",
+          "observed": 101,
+          "semanticProfileId": "16398bc466394441-4396dd013773b1a8",
+          "stimFiendFormulaPrediction": 92
+        },
+        {
+          "exactMatch": false,
+          "level": 18,
+          "monsterData": 203727,
+          "name": "Premature Pattern",
+          "observed": 107,
+          "semanticProfileId": "623438ff48197091-8248575e9d33a84a",
+          "stimFiendFormulaPrediction": 98
+        },
+        {
+          "exactMatch": true,
+          "level": 13,
+          "monsterData": 203743,
+          "name": "Architect Striker",
+          "observed": 70,
+          "semanticProfileId": "67a276f9e41a99e6-d2b65cf5c70d61d6",
+          "stimFiendFormulaPrediction": 70
+        },
+        {
+          "exactMatch": true,
+          "level": 14,
+          "monsterData": 203743,
+          "name": "Architect Striker",
+          "observed": 76,
+          "semanticProfileId": "a7299bdccc469543-064305180fc7f1ad",
+          "stimFiendFormulaPrediction": 76
+        },
+        {
+          "exactMatch": true,
+          "level": 15,
+          "monsterData": 203743,
+          "name": "Architect Striker",
+          "observed": 81,
+          "semanticProfileId": "277c54b4c6a1bcfd-53522a00642b7972",
+          "stimFiendFormulaPrediction": 81
+        },
+        {
+          "exactMatch": true,
+          "level": 11,
+          "monsterData": 96056,
+          "name": "Infected Attendant",
+          "observed": 59,
+          "semanticProfileId": "e7b6e43fd381d4aa-63cd3e499be4e58b",
+          "stimFiendFormulaPrediction": 59
+        },
+        {
+          "exactMatch": true,
+          "level": 22,
+          "monsterData": 96056,
+          "name": "Infected Attendant",
+          "observed": 120,
+          "semanticProfileId": "3883a2fbbbc16a0f-89afb5ae2e3ad61b",
+          "stimFiendFormulaPrediction": 120
+        },
+        {
+          "exactMatch": true,
+          "level": 16,
+          "monsterData": 96193,
+          "name": "Lost Thought",
+          "observed": 87,
+          "semanticProfileId": "a9e27de26c24fc0b-5c8f4c3638fcd560",
+          "stimFiendFormulaPrediction": 87
+        },
+        {
+          "exactMatch": true,
+          "level": 18,
+          "monsterData": 96193,
+          "name": "Lost Thought",
+          "observed": 98,
+          "semanticProfileId": "485016ecdf4af63f-dfa9d79e1b1f4242",
+          "stimFiendFormulaPrediction": 98
+        },
+        {
+          "exactMatch": true,
+          "level": 21,
+          "monsterData": 96193,
+          "name": "Lost Thought",
+          "observed": 114,
+          "semanticProfileId": "ee439e0bd1ea74d1-04f40b95697ea22a",
+          "stimFiendFormulaPrediction": 114
+        },
+        {
+          "exactMatch": true,
+          "level": 22,
+          "monsterData": 96193,
+          "name": "Lost Thought",
+          "observed": 120,
+          "semanticProfileId": "12a2cf0418be7fb8-89afb5ae2e3ad61b",
+          "stimFiendFormulaPrediction": 120
+        },
+        {
+          "exactMatch": true,
+          "level": 11,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 59,
+          "semanticProfileId": "e0af63ed4c2ef5d3-63cd3e499be4e58b",
+          "stimFiendFormulaPrediction": 59
+        },
+        {
+          "exactMatch": true,
+          "level": 12,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 65,
+          "semanticProfileId": "c75b256b0b85f4f7-de110ebeb7e358cd",
+          "stimFiendFormulaPrediction": 65
+        },
+        {
+          "exactMatch": true,
+          "level": 13,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 70,
+          "semanticProfileId": "e6ac36360bc6ec9c-d2b65cf5c70d61d6",
+          "stimFiendFormulaPrediction": 70
+        },
+        {
+          "exactMatch": true,
+          "level": 19,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 103,
+          "semanticProfileId": "e9d7651ce1c37bf6-0d385e2afb1c234c",
+          "stimFiendFormulaPrediction": 103
+        },
+        {
+          "exactMatch": true,
+          "level": 20,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 109,
+          "semanticProfileId": "a9d8950a9c1ecc18-7f2f30e11d41b30e",
+          "stimFiendFormulaPrediction": 109
+        },
+        {
+          "exactMatch": true,
+          "level": 21,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 114,
+          "semanticProfileId": "29ea7ad995035923-04f40b95697ea22a",
+          "stimFiendFormulaPrediction": 114
+        },
+        {
+          "exactMatch": true,
+          "level": 22,
+          "monsterData": 96195,
+          "name": "Uncontrollable Anger",
+          "observed": 120,
+          "semanticProfileId": "0f23e947e073a1aa-89afb5ae2e3ad61b",
+          "stimFiendFormulaPrediction": 120
+        }
+      ]
+    },
+    "exactCategoricalDomain": {
+      "attackMode": "natural-specialized",
+      "highTemplate": 144743,
+      "instance": 1397315377,
+      "lowTemplate": 144742,
+      "numericDamageType": 0,
+      "numericHitType": 3,
+      "packetOrder": [
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo"
+      ],
+      "slot": 0,
+      "terminalOnlyStreamsExcludedFromRepeatingRuntime": true,
+      "weaponName": "SIW1",
+      "weaponTag": 1397315377
+    },
+    "family": "Stim Fiend",
+    "formulaFamiliesTested": [
+      "exact affine integer formulas",
+      "exact affine rational formulas",
+      "floor division",
+      "ceiling division",
+      "nearest-away division",
+      "nearest-even division",
+      "bounded family-scoped formulas",
+      "generic four-equal SIW1 weapon-family formulas",
+      "direct item-template transformations",
+      "level and quality breakpoint formulas",
+      "integer clamps and unbounded extensions",
+      "finite-difference sequences",
+      "stream-specific formulas"
+    ],
+    "formulaId": "stim-fiend-siw1-floor-11L-minus-2-over-2-v1",
+    "leaveOneOut": [
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 10,
+        "heldOutObserved": 54,
+        "prediction": 54,
+        "trainingObservations": {
+          "11": 59,
+          "12": 65,
+          "13": 70,
+          "14": 76
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 11,
+        "heldOutObserved": 59,
+        "prediction": 59,
+        "trainingObservations": {
+          "10": 54,
+          "12": 65,
+          "13": 70,
+          "14": 76
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 12,
+        "heldOutObserved": 65,
+        "prediction": 65,
+        "trainingObservations": {
+          "10": 54,
+          "11": 59,
+          "13": 70,
+          "14": 76
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 13,
+        "heldOutObserved": 70,
+        "prediction": 70,
+        "trainingObservations": {
+          "10": 54,
+          "11": 59,
+          "12": 65,
+          "14": 76
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 14,
+        "heldOutObserved": 76,
+        "prediction": 76,
+        "trainingObservations": {
+          "10": 54,
+          "11": 59,
+          "12": 65,
+          "13": 70
+        }
+      }
+    ],
+    "monsterData": 203739,
+    "numericOutput": {
+      "expression": "floor((11 * actorLevel - 2) / 2)",
+      "fields": [
+        "SpecialAttackWeapon.unknown1",
+        "SpecialAttackWeapon.unknown2",
+        "SpecialAttackWeapon.unknown3",
+        "SpecialAttackWeapon.unknown4"
+      ],
+      "integerArithmetic": "positive integer truncation equals floor",
+      "unknown5": "per-actor ordered mutable capture state; not formula identity"
+    },
+    "rawPacketObservations": [
+      {
+        "actorQualityLevel": null,
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17387|4bd4281b6a48",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [
+              {
+                "highTemplate": 144743,
+                "lowTemplate": 144742,
+                "nameHex": "53495731",
+                "tag": 1397315377
+              }
+            ],
+            "unknown1": 54,
+            "unknown2": 54,
+            "unknown3": 54,
+            "unknown4": 54,
+            "unknown5": 0
+          },
+          "weaponContextKind": "natural-or-special"
+        },
+        "bodyHex": "1D3C0F1C0000C350794CD77300000007E2000235660002356753495731534957310000003600000036000000360000003600000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValue": 54,
+        "level": 10,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|0x794CD773|scfu=11428",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "sequence": 17386,
+        "sourceIdentity": "0x794CD773",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17386|452b9d831fea",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17440|cc20833646b7",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17467|7504b843c2fe",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17501|a5275b23c1eb",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18110|eb29e6406202",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18156|a19d61913167",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18196|1d66f278074a",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18243|c87b3dbbed22",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18293|b6987c58fe63",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18335|dee180ea70de",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18606|69489b8a8fce",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18643|8a7bfe1e1265",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18675|c6b947901ccd",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18719|8da78ca0a1a4",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18765|b8993b2c5704",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18798|92c3a5f1af82",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18846|832fb5873c6f",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18886|ae7b5b975090",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18953|86152bc40fee",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19006|bb1cd65986f1",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19036|df613f98a795",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19070|8ad74fdf38dd",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19128|1d7c42e7836f",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19172|c55376ce1e68",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19216|46461e0e8b9c",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19251|486762cae9fe",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9010|a3923d5fea7a",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9074|83ea2f3eedf6",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9114|477257e85d41",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9882|ecda2782d43c",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9910|6400dc08478b",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9911|4bd201715cd5",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9960|d92af3d77af0",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9998|277be249e9bc",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|10033|353e0b8201a7"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              11,
+              15,
+              18,
+              19,
+              13,
+              19,
+              13,
+              12,
+              19,
+              16,
+              18,
+              17,
+              12,
+              13,
+              12,
+              18,
+              16,
+              13,
+              14,
+              18,
+              17,
+              16,
+              16,
+              12,
+              13,
+              10,
+              14,
+              11,
+              11,
+              11,
+              25,
+              11,
+              11,
+              17
+            ],
+            "firstHitDelayObservationsSeconds": [
+              7.818686,
+              3.280454,
+              2.080391,
+              2.948748,
+              2.46657,
+              1.483583,
+              2.698234,
+              6.183733,
+              1.583255
+            ],
+            "landedIntervalObservationsSeconds": [
+              5.009837,
+              5.000774,
+              5.34923,
+              5.180712,
+              4.890166,
+              5.02951,
+              5.090054,
+              5.7001,
+              5.56923,
+              5.330241,
+              5.679988,
+              5.329901,
+              5.380693,
+              5.418725,
+              5.450551,
+              5.450085,
+              5.419841,
+              5.45073,
+              5.389345,
+              5.040686,
+              5.03927,
+              5.080804,
+              5.684366,
+              5.666535,
+              5.716103
+            ],
+            "maximumObservedDamage": 25,
+            "minimumObservedDamage": 10,
+            "signature": {
+              "ammoMode": "unlimited",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 1397315377,
+              "weaponSlot": 0
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "targetIdentity": "0x7944C065",
+        "terminalHit": false,
+        "timestampUtc": "2026-07-08T19:56:26.0037455Z",
+        "unknown1": 54,
+        "unknown2": 54,
+        "unknown3": 54,
+        "unknown4": 54,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": null
+      },
+      {
+        "actorQualityLevel": null,
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17878|e21944516ef0",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [
+              {
+                "highTemplate": 144743,
+                "lowTemplate": 144742,
+                "nameHex": "53495731",
+                "tag": 1397315377
+              }
+            ],
+            "unknown1": 59,
+            "unknown2": 59,
+            "unknown3": 59,
+            "unknown4": 59,
+            "unknown5": 0
+          },
+          "weaponContextKind": "natural-or-special"
+        },
+        "bodyHex": "1D3C0F1C0000C350794CD77C00000007E2000235660002356753495731534957310000003B0000003B0000003B0000003B00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValue": 59,
+        "level": 11,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|0x794CD77C|scfu=11433",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "sequence": 17877,
+        "sourceIdentity": "0x794CD77C",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17877|e9078ce9ca92",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17888|f2de303c0e0c",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17925|f752bb1d2a89",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|17957|29f19ea67e8a",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9483|ea78ded6d6c8",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|9524|59f3aca583c3"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              16,
+              16,
+              16,
+              11,
+              26
+            ],
+            "firstHitDelayObservationsSeconds": [
+              0.619144,
+              3.600325,
+              2.68383,
+              1.916506
+            ],
+            "landedIntervalObservationsSeconds": [
+              5.070275
+            ],
+            "maximumObservedDamage": 26,
+            "minimumObservedDamage": 11,
+            "signature": {
+              "ammoMode": "unlimited",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 1397315377,
+              "weaponSlot": 0
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "targetIdentity": "0x7944C065",
+        "terminalHit": false,
+        "timestampUtc": "2026-07-08T19:58:12.2950322Z",
+        "unknown1": 59,
+        "unknown2": 59,
+        "unknown3": 59,
+        "unknown4": 59,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": null
+      },
+      {
+        "actorQualityLevel": null,
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18585|57560dd62b53",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [
+              {
+                "highTemplate": 144743,
+                "lowTemplate": 144742,
+                "nameHex": "53495731",
+                "tag": 1397315377
+              }
+            ],
+            "unknown1": 65,
+            "unknown2": 65,
+            "unknown3": 65,
+            "unknown4": 65,
+            "unknown5": 0
+          },
+          "weaponContextKind": "natural-or-special"
+        },
+        "bodyHex": "1D3C0F1C0000C350794CD77800000007E2000235660002356753495731534957310000004100000041000000410000004100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValue": 65,
+        "level": 12,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|0x794CD778|scfu=11431",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "sequence": 18584,
+        "sourceIdentity": "0x794CD778",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18584|7ea207248743",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              -1
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18825|0f6d21c4dab0"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": true,
+            "damageObservations": [
+              26
+            ],
+            "firstHitDelayObservationsSeconds": [
+              33.000651
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 26,
+            "minimumObservedDamage": 26,
+            "signature": {
+              "ammoMode": "unlimited",
+              "damageTypeWire": 4,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 1397315377,
+              "weaponSlot": 0
+            },
+            "streamOrdinal": 0
+          },
+          {
+            "ammoObservationsInOrder": [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18647|b53a191e85e9",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18678|731756666a61",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18715|21f90be8f590",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18756|4a6cd7bf5c35",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|18789|98c86660a6a8",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|19972|70aa6582e73b",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20005|44cb04ce3c70",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20045|c33940038a42",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20120|e55dd2c9962d",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600|IN|20162|880164682522",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|8857|84e5d997afb2",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|8901|d21a0142a1be",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452|IN|10183|2bc56d375d06"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              28,
+              23,
+              15,
+              27,
+              29,
+              16,
+              21,
+              16,
+              17,
+              29,
+              13,
+              14,
+              13
+            ],
+            "firstHitDelayObservationsSeconds": [
+              8.229502,
+              2.689793,
+              3.899835,
+              2.373371,
+              1.710553,
+              0.439822,
+              2.16609,
+              3.04982,
+              8.123701
+            ],
+            "landedIntervalObservationsSeconds": [
+              4.699917,
+              5.070521,
+              4.899745,
+              5.009931
+            ],
+            "maximumObservedDamage": 29,
+            "minimumObservedDamage": 13,
+            "signature": {
+              "ammoMode": "unlimited",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 1397315377,
+              "weaponSlot": 0
+            },
+            "streamOrdinal": 1
+          }
+        ],
+        "targetIdentity": "0x794DF23C",
+        "terminalHit": false,
+        "timestampUtc": "2026-07-08T19:59:35.8156937Z",
+        "unknown1": 65,
+        "unknown2": 65,
+        "unknown3": 65,
+        "unknown4": 65,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": null
+      },
+      {
+        "actorQualityLevel": null,
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12922|aae15d453a63",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12883|782b7c81d8c3",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [
+              {
+                "highTemplate": 144743,
+                "lowTemplate": 144742,
+                "nameHex": "53495731",
+                "tag": 1397315377
+              }
+            ],
+            "unknown1": 70,
+            "unknown2": 70,
+            "unknown3": 70,
+            "unknown4": 70,
+            "unknown5": 0
+          },
+          "weaponContextKind": "natural-or-special"
+        },
+        "bodyHex": "1D3C0F1C0000C3507953AA4B00000007E2000235660002356753495731534957310000004600000046000000460000004600000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValue": 70,
+        "level": 13,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|0x7953AA4B|scfu=4135",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "sequence": 12882,
+        "sourceIdentity": "0x7953AA4B",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12882|2b1416b86cc4",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              -1,
+              -1,
+              -1,
+              -1
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12922|aae15d453a63",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11849|35c962e5e669",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12986|35c962e5e669",
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13060|2c7a40f9f913"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              11,
+              16,
+              16,
+              13
+            ],
+            "firstHitDelayObservationsSeconds": [
+              8.255845,
+              3.041422,
+              0.885464
+            ],
+            "landedIntervalObservationsSeconds": [
+              5.214425
+            ],
+            "maximumObservedDamage": 16,
+            "minimumObservedDamage": 11,
+            "signature": {
+              "ammoMode": "unlimited",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 1397315377,
+              "weaponSlot": 0
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "targetIdentity": "0x7944C065",
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T02:31:31.6440848Z",
+        "unknown1": 70,
+        "unknown2": 70,
+        "unknown3": 70,
+        "unknown4": 70,
+        "unknown5": 0,
+        "weaponItemFullUpdatePacketId": null
+      },
+      {
+        "actorQualityLevel": null,
+        "attackInfoPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73",
+        "attackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7613|d4f1a2d4ae13",
+        "baseSignature": {
+          "attack": {
+            "action": 0,
+            "n3Unknown": 0
+          },
+          "specialAttackWeapon": {
+            "n3Unknown": 0,
+            "specials": [
+              {
+                "highTemplate": 144743,
+                "lowTemplate": 144742,
+                "nameHex": "53495731",
+                "tag": 1397315377
+              }
+            ],
+            "unknown1": 76,
+            "unknown2": 76,
+            "unknown3": 76,
+            "unknown4": 76,
+            "unknown5": 52
+          },
+          "weaponContextKind": "natural-or-special"
+        },
+        "bodyHex": "1D3C0F1C0000C3507953ABAF00000007E2000235660002356753495731534957310000004C0000004C0000004C0000004C00000034",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaValue": 76,
+        "level": 14,
+        "messageType": "SpecialAttackWeapon",
+        "metadataGenerationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|0x7953ABAF|scfu=6160",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde",
+        "sequence": 7612,
+        "sourceIdentity": "0x7953ABAF",
+        "specialAttackWeaponPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7612|55035cb49cde",
+        "streams": [
+          {
+            "ammoObservationsInOrder": [
+              -1
+            ],
+            "attackInfoPacketIds": [
+              "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|IN|7616|c92dbf5a0f73"
+            ],
+            "attackStartDelayObservationsSeconds": [
+              0.0
+            ],
+            "capturedTerminalHitOnly": false,
+            "damageObservations": [
+              15
+            ],
+            "firstHitDelayObservationsSeconds": [
+              0.250998
+            ],
+            "landedIntervalObservationsSeconds": [],
+            "maximumObservedDamage": 15,
+            "minimumObservedDamage": 15,
+            "signature": {
+              "ammoMode": "unlimited",
+              "damageTypeWire": 0,
+              "hitTypeWire": 3,
+              "n3Unknown": 0,
+              "weaponInstance": 1397315377,
+              "weaponSlot": 0
+            },
+            "streamOrdinal": 0
+          }
+        ],
+        "targetIdentity": "0x7944C065",
+        "terminalHit": false,
+        "timestampUtc": "2026-07-10T03:07:13.2244462Z",
+        "unknown1": 76,
+        "unknown2": 76,
+        "unknown3": 76,
+        "unknown4": 76,
+        "unknown5": 52,
+        "weaponItemFullUpdatePacketId": null
+      }
+    ],
+    "rejectedCandidates": [
+      {
+        "candidate": "unrounded 5.5 * level - 1",
+        "mismatches": 2,
+        "reason": "levels 11 and 13 produce noninteger values"
+      },
+      {
+        "candidate": "Disobedient Bot formula",
+        "mismatches": 3,
+        "reason": "levels 12, 13, and 14 differ from raw Stim Fiend SAW"
+      },
+      {
+        "candidate": "direct item-template interpolation",
+        "mismatches": 5,
+        "reason": "item templates do not encode the five observed SAW values"
+      },
+      {
+        "candidate": "generic reuse across every four-equal SIW1 family",
+        "mismatches": 6,
+        "observations": 23,
+        "reason": "family and stream semantics remain part of the exact selector"
+      },
+      {
+        "candidate": "unbounded Stim Fiend level domain",
+        "reason": "levels below 10 and above 17 lack categorical and formula proof"
+      }
+    ],
+    "resource": 127,
+    "runtimeInputOwners": {
+      "actorLevel": "OrdinaryEnemySpawnDefinition.Level through OrdinaryEnemyCombatProfile.ResolveContract(level)",
+      "damageRangeAndCadence": "CapturedSubwayCombatEvidenceDefinition on the active archetype",
+      "monsterDataAndFamily": "CapturedSubwayOrdinaryArchetypeDefinition",
+      "mutableEnergyAmmoAndSawState": "existing per-actor combat contract/runtime state",
+      "weaponTemplatesTagAndName": "NpcCombatAttackRules capture-bound Stim Fiend constants"
+    },
+    "startingQuarantineScope": [
+      {
+        "configuredSourceIdentity": "0x7953ABAD",
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 92,
+        "level": 17,
+        "result": "restored through exact Stim Fiend archetype"
+      },
+      {
+        "configuredSourceIdentity": "0x7953ABBF",
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 76,
+        "level": 14,
+        "result": "restored through exact Stim Fiend archetype"
+      },
+      {
+        "configuredSourceIdentity": "0x7953AD68",
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "result": "restored through exact Stim Fiend archetype"
+      },
+      {
+        "configuredSourceIdentity": "0x79545069",
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "result": "restored through exact Stim Fiend archetype"
+      },
+      {
+        "configuredSourceIdentity": "0x79545072",
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "result": "restored through exact Stim Fiend archetype"
+      },
+      {
+        "configuredSourceIdentity": "0x7957E128",
+        "formulaDomainSupported": true,
+        "generatedSpecialAttackWeaponValue": 65,
+        "level": 12,
+        "result": "restored through exact Stim Fiend archetype"
+      },
+      {
+        "configuredSourceIdentity": "0x7957E415",
+        "formulaDomainSupported": false,
+        "generatedSpecialAttackWeaponValue": null,
+        "level": 9,
+        "result": "fail closed: level outside proven Stim Fiend domain"
+      }
+    ],
+    "supportedLevelsInclusive": [
+      10,
+      17
+    ]
   }
 }

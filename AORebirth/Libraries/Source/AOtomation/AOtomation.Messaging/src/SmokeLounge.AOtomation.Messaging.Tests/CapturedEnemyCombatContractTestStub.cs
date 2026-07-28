@@ -1951,6 +1951,81 @@ namespace AORebirth.Core.Playfields
                        : contract;
         }
 
+        internal static CapturedEnemyCombatContract ForOrdinaryGeneratedSetup(
+            CapturedSubwayOrdinaryArchetypeDefinition archetype,
+            int level)
+        {
+            CapturedSubwayCombatEvidenceDefinition combat =
+                archetype == null ? null : archetype.Combat;
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (archetype == null
+                || archetype.MonsterData
+                   != NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData
+                || combat == null
+                || !combat.Observed
+                || !combat.RuntimeReady
+                || !OrdinaryEnemyCombatSetupGenerator.TryGenerate(
+                    new OrdinaryEnemyCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData,
+                        level,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendLowTemplate,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendHighTemplate,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendWeaponName),
+                    out generated))
+            {
+                return new CapturedEnemyCombatContract
+                {
+                    AttackModel = CapturedEnemyAttackModel.Unresolved,
+                    IsCombatReady = false,
+                    Retaliates = combat != null && combat.Observed,
+                    Evidence = "Stim Fiend generated setup is unsupported for level "
+                               + level
+                };
+            }
+
+            return CapturedEnemyCombatContract
+                .CapturedSpecialSequence(
+                    string.Join(",", archetype.EvidenceCaptures)
+                    + ": Stim Fiend mathematical SIW1 setup "
+                    + generated.FormulaId,
+                    new CapturedEnemySpecialAttackSequenceDefinition(
+                        0.0d,
+                        null,
+                        new CapturedEnemyCombatAttackDefinition(
+                            combat.MinDamage,
+                            combat.MaxDamage,
+                            0,
+                            NpcCombatAttackRules.MaxMeleeCombatDistance,
+                            combat.RechargeSeconds,
+                            false,
+                            NpcCombatAttackRules.UnarmedAttackInfoAmmoCount,
+                            NpcCombatAttackRules.CapturedSubwayStimFiendWeaponSlot,
+                            0,
+                            NpcCombatAttackRules.NormalAttackInfoHitType,
+                            NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                            0,
+                            true),
+                        new[]
+                        {
+                            new CapturedEnemySpecialAttackDefinition(
+                                NpcCombatAttackRules.CapturedSubwayStimFiendLowTemplate,
+                                NpcCombatAttackRules.CapturedSubwayStimFiendHighTemplate,
+                                NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                                NpcCombatAttackRules.CapturedSubwayStimFiendWeaponName)
+                        },
+                        generated.SpecialAttackWeaponUnknown1,
+                        generated.SpecialAttackWeaponUnknown2,
+                        generated.SpecialAttackWeaponUnknown3,
+                        generated.SpecialAttackWeaponUnknown4,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStimFiendInitialSpecialAttackWeaponUnknown5,
+                        0,
+                        0,
+                        0))
+                .WithProductionSpecializedValues();
+        }
+
         private static CapturedEnemyCombatContract ForFragmentedSoul(
             CapturedSubwayOrdinaryArchetypeDefinition archetype,
             int sourceInstance,

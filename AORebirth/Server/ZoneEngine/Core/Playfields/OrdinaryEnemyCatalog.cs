@@ -419,10 +419,19 @@ namespace AORebirth.Core.Playfields
             {
                 uint appearance = archetype.AppearanceValue;
                 CapturedEnemyCombatContract contract = CapturedSubwayCombatCatalog.ForOrdinary(archetype);
+                Func<int, CapturedEnemyCombatContract> contractResolver =
+                    archetype.MonsterData
+                    == NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData
+                        ? new Func<int, CapturedEnemyCombatContract>(
+                            level => CapturedSubwayCombatCatalog
+                                .ForOrdinaryGeneratedSetup(archetype, level))
+                        : null;
                 Func<int, int, CapturedEnemyCombatContract> sourceContractResolver =
-                    archetype.SourceWeaponEvidence.Length > 0
-                    || archetype.MonsterData
-                       == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                    archetype.MonsterData
+                    != NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData
+                    && (archetype.SourceWeaponEvidence.Length > 0
+                        || archetype.MonsterData
+                           == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData)
                         ? new Func<int, int, CapturedEnemyCombatContract>(
                             (sourceIdentity, level) =>
                                 archetype.MonsterData
@@ -525,7 +534,7 @@ namespace AORebirth.Core.Playfields
                         BuildCombatProfile(
                             contract,
                             archetype.MonsterData,
-                            null,
+                            contractResolver,
                             sourceContractResolver,
                             sourceVariantContractResolver,
                             archetype.Combat != null && archetype.Combat.Observed),

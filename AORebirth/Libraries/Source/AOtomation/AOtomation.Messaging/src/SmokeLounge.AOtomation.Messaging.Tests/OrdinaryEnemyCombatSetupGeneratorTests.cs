@@ -31,6 +31,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { 10, 54 }
             };
 
+        private static readonly IDictionary<int, int> CapturedStimFiendSawValues =
+            new Dictionary<int, int>
+            {
+                { 10, 54 },
+                { 11, 59 },
+                { 12, 65 },
+                { 13, 70 },
+                { 14, 76 }
+            };
+
         [TestMethod]
         public void DisobedientBotFormulaReproducesEveryCapturedHeldOutLevelExactly()
         {
@@ -210,6 +220,247 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsInstanceOfType(packets[2], typeof(AttackInfoMessage));
         }
 
+        [TestMethod]
+        public void StimFiendFormulaReproducesEveryCapturedHeldOutLevelExactly()
+        {
+            foreach (KeyValuePair<int, int> heldOut in CapturedStimFiendSawValues)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(TryGenerateStimFiend(heldOut.Key, out setup));
+                Assert.AreEqual(
+                    OrdinaryEnemyCombatSetupGenerator.StimFiendFormulaId,
+                    setup.FormulaId);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(heldOut.Value, setup.SpecialAttackWeaponUnknown4);
+            }
+
+            OrdinaryEnemyCombatNumericSetup generatedLevelSeventeen;
+            Assert.IsTrue(TryGenerateStimFiend(17, out generatedLevelSeventeen));
+            Assert.AreEqual(
+                92,
+                generatedLevelSeventeen.SpecialAttackWeaponUnknown1);
+        }
+
+        [TestMethod]
+        public void StimFiendUsesRuntimeLevelAndRestoresSixOfSevenStartingActors()
+        {
+            int[] startingQuarantinedSources =
+            {
+                unchecked((int)0x7953ABAD),
+                unchecked((int)0x7953ABBF),
+                unchecked((int)0x7953AD68),
+                unchecked((int)0x79545069),
+                unchecked((int)0x79545072),
+                unchecked((int)0x7957E128),
+                unchecked((int)0x7957E415)
+            };
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(
+                value => value.DisplayName == "Stim Fiend"
+                         && value.MonsterData
+                         == NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData);
+            OrdinaryEnemySpawnDefinition[] active =
+                catalog.GetSpawns().Where(
+                    value => value.PlayfieldInstance == 127
+                             && value.ProfileKey == profile.ProfileKey).ToArray();
+            Assert.AreEqual(15, active.Length);
+            OrdinaryEnemySpawnDefinition[] starting = active.Where(
+                value => startingQuarantinedSources.Contains(value.SourceIdentity))
+                .ToArray();
+            Assert.AreEqual(7, starting.Length);
+            CollectionAssert.AreEquivalent(
+                new[] { 9, 12, 12, 12, 12, 14, 17 },
+                starting.Select(value => value.Level).ToArray());
+
+            int restored = 0;
+            int remainedClosed = 0;
+            foreach (OrdinaryEnemySpawnDefinition spawn in starting)
+            {
+                CapturedEnemyCombatContract current =
+                    profile.Combat.ResolveContract(spawn.SourceIdentity, spawn.Level);
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    profile.DisplayName,
+                    profile.MonsterData,
+                    spawn.Level,
+                    spawn.SourceIdentity,
+                    current,
+                    out resolved,
+                    out failure);
+                if (spawn.Level == 9)
+                {
+                    Assert.IsFalse(success);
+                    StringAssert.Contains(
+                        failure,
+                        "no canonical raw combat profile");
+                    remainedClosed++;
+                    continue;
+                }
+
+                Assert.IsTrue(success, failure);
+                Assert.IsTrue(current.UsesProductionSpecializedValues);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                OrdinaryEnemyCombatNumericSetup generated;
+                Assert.IsTrue(TryGenerateStimFiend(spawn.Level, out generated));
+                Assert.AreEqual(
+                    generated.SpecialAttackWeaponUnknown1,
+                    resolved.SpecialAttackWeaponUnknown1);
+                restored++;
+            }
+
+            Assert.AreEqual(6, restored);
+            Assert.AreEqual(1, remainedClosed);
+        }
+
+        [TestMethod]
+        public void StimFiendTerminalOnlyResultDoesNotBecomeAReusableAttackStream()
+        {
+            CapturedEnemyCombatProfileDefinition levelTwelve =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "963ecf2aa60f045c-de110ebeb7e358cd");
+            Assert.AreEqual(2, levelTwelve.Streams.Length);
+            Assert.AreEqual(
+                1,
+                levelTwelve.Streams.Count(value => value.CapturedTerminalHitOnly));
+            CapturedEnemyCombatProfileStreamDefinition reusable =
+                levelTwelve.GetReusableNaturalAttackStreams().Single();
+            Assert.AreEqual(0, reusable.DamageTypeWire);
+            Assert.AreEqual(3, reusable.HitTypeWire);
+            Assert.AreEqual(0, reusable.WeaponSlot);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                reusable.WeaponInstance);
+            Assert.IsTrue(
+                levelTwelve.SupportsCaptureProvenNaturalAttackPacketSemantics);
+        }
+
+        [TestMethod]
+        public void StimFiendLevelFourteenUsesProductionCadenceWithoutInventingTiming()
+        {
+            CapturedEnemyCombatProfileDefinition captured =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    value => value.ProfileId
+                             == "54d40b70fa1a801a-064305180fc7f1ad");
+            Assert.IsTrue(captured.CaptureEvidenceSafe);
+            Assert.AreEqual(
+                0,
+                captured.Streams.Single().CapturedLandedIntervalObservationsSeconds.Length);
+
+            CapturedEnemyCombatContract resolved =
+                ResolveStimFiend(14, unchecked((int)0x7953ABBF));
+            Assert.IsTrue(resolved.UsesProductionSpecializedValues);
+            Assert.AreEqual(76, resolved.SpecialAttackWeaponUnknown1);
+            Assert.IsTrue(
+                resolved.SpecialAttackSequence.RepeatingAttack.RechargeSeconds > 0.0d);
+            StringAssert.Contains(
+                resolved.CaptureProvenArchetypeId,
+                captured.ProfileId);
+        }
+
+        [TestMethod]
+        public void StimFiendFormulaFailsClosedOutsideItsProvenDomain()
+        {
+            OrdinaryEnemyCombatNumericSetup ignored;
+            Assert.IsFalse(TryGenerateStimFiend(9, out ignored));
+            Assert.IsFalse(TryGenerateStimFiend(18, out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerate(
+                    Input(
+                        NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData,
+                        12,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendLowTemplate,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendHighTemplate,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                        "SIW2"),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerate(
+                    Input(
+                        NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData + 1,
+                        12,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendLowTemplate,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendHighTemplate,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                        NpcCombatAttackRules.CapturedSubwayStimFiendWeaponName),
+                    out ignored));
+        }
+
+        [TestMethod]
+        public void CapturedStimFiendSawPacketsRemainExactAndGeneratedLevelSeventeenIsDeterministic()
+        {
+            AssertStimFiendSawHex(
+                10,
+                unchecked((int)0x794CD773),
+                "1D3C0F1C0000C350794CD77300000007E2000235660002356753495731534957310000003600000036000000360000003600000000");
+            AssertStimFiendSawHex(
+                11,
+                unchecked((int)0x794CD77C),
+                "1D3C0F1C0000C350794CD77C00000007E2000235660002356753495731534957310000003B0000003B0000003B0000003B00000000");
+            AssertStimFiendSawHex(
+                12,
+                unchecked((int)0x794CD778),
+                "1D3C0F1C0000C350794CD77800000007E2000235660002356753495731534957310000004100000041000000410000004100000000");
+            AssertStimFiendSawHex(
+                13,
+                unchecked((int)0x7953AA4B),
+                "1D3C0F1C0000C3507953AA4B00000007E2000235660002356753495731534957310000004600000046000000460000004600000000");
+            AssertStimFiendSawHex(
+                14,
+                unchecked((int)0x7953ABAF),
+                "1D3C0F1C0000C3507953ABAF00000007E2000235660002356753495731534957310000004C0000004C0000004C0000004C00000000");
+
+            CapturedEnemyCombatContract generated =
+                ResolveStimFiend(17, unchecked((int)0x7953ABAD));
+            Assert.AreEqual(92, generated.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(92, generated.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(0, generated.SpecialAttackWeaponUnknown5);
+        }
+
+        [TestMethod]
+        public void StimFiendSharedPathPreservesSawAttackAttackInfoOrder()
+        {
+            CapturedEnemyCombatContract contract =
+                ResolveStimFiend(17, unchecked((int)0x7953ABAD));
+            Identity source = SimpleChar(unchecked((int)0x7953ABAD));
+            Identity target = SimpleChar(unchecked((int)0x7944C065));
+            CapturedEnemyCombatAttackDefinition attack =
+                contract.SpecialAttackSequence.RepeatingAttack;
+            MessageBody[] packets =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(source, contract),
+                CapturedEnemyCombatPacketFactory.CreateAttack(source, target, contract),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    source,
+                    target,
+                    attack.MinDamage,
+                    attack.AttackInfoAmmoCount,
+                    attack.AttackInfoWeaponSlot,
+                    attack.AttackInfoUnknown,
+                    attack.AttackInfoHitType,
+                    attack.AttackInfoWeaponInstance,
+                    attack.AttackInfoN3Unknown)
+            };
+
+            Assert.IsInstanceOfType(packets[0], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(packets[1], typeof(AttackMessage));
+            Assert.IsInstanceOfType(packets[2], typeof(AttackInfoMessage));
+            Assert.AreEqual(0, attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(3, attack.AttackInfoHitType);
+            Assert.AreEqual(0, attack.AttackInfoUnknown);
+            Assert.AreEqual(
+                NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                attack.AttackInfoWeaponInstance);
+        }
+
         private static OrdinaryEnemyCombatSetupInput Input(
             int monsterData,
             int level,
@@ -242,6 +493,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 out setup);
         }
 
+        private static bool TryGenerateStimFiend(
+            int level,
+            out OrdinaryEnemyCombatNumericSetup setup)
+        {
+            return OrdinaryEnemyCombatSetupGenerator.TryGenerate(
+                Input(
+                    NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData,
+                    level,
+                    NpcCombatAttackRules.CapturedSubwayStimFiendLowTemplate,
+                    NpcCombatAttackRules.CapturedSubwayStimFiendHighTemplate,
+                    NpcCombatAttackRules.CapturedSubwayStimFiendWeaponTag,
+                    NpcCombatAttackRules.CapturedSubwayStimFiendWeaponName),
+                out setup);
+        }
+
         private static void AssertSawHex(int level, int sourceInstance, string expected)
         {
             CapturedEnemyCombatContract contract =
@@ -256,6 +522,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static Identity SimpleChar(int instance)
         {
             return new Identity { Type = IdentityType.CanbeAffected, Instance = instance };
+        }
+
+        private static void AssertStimFiendSawHex(
+            int level,
+            int sourceInstance,
+            string expected)
+        {
+            CapturedEnemyCombatContract contract =
+                ResolveStimFiend(level, sourceInstance);
+            MessageBody message =
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    SimpleChar(sourceInstance),
+                    contract);
+            Assert.AreEqual(
+                expected,
+                BitConverter.ToString(Serialize(message)).Replace("-", string.Empty));
+        }
+
+        private static CapturedEnemyCombatContract ResolveStimFiend(
+            int level,
+            int sourceInstance)
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(
+                value => value.DisplayName == "Stim Fiend"
+                         && value.MonsterData
+                         == NpcCombatAttackRules.CapturedSubwayStimFiendMonsterData);
+            CapturedEnemyCombatContract current =
+                profile.Combat.ResolveContract(sourceInstance, level);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    profile.DisplayName,
+                    profile.MonsterData,
+                    level,
+                    sourceInstance,
+                    current,
+                    out resolved,
+                    out failure),
+                failure);
+            return resolved;
         }
 
         private static CapturedEnemyCombatContract Resolve(

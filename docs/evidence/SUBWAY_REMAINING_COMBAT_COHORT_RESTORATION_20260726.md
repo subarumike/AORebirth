@@ -57,7 +57,7 @@ The fixed scope contains no Filth Flea or Violent Vagabond actor.
 | 1 | Disobedient Bot | 12 | **Superseded 2026-07-27:** L8 supplies the exact categorical stream; five captured levels prove the bounded mathematical SAW setup now used by all 12 active actors. |
 | 2 | Looter | 7 | Complete L9/L10 equipped-weapon streams exist. Runtime source weapon QL was incorrectly treated as captured contract identity instead of a production-selected value. |
 | 3 | Melded Patterns | 7 | L22/L23 have no exact compatible generated profile; remaining captured-level rows include incompatible stable weapon QL observations. |
-| 4 | Stim Fiend | 7 | L9/L17 have no exact profile; L12 is runtime-unsafe and L14 lacks complete timing/evidence semantics. |
+| 4 | Stim Fiend | 7 | **Superseded 2026-07-27:** exact L10..L14 SAW observations prove the bounded L10..L17 mathematical setup; six actors are restored and only L9 remains fail-closed. |
 | 5 | Fragmented Soul | 6 | Compatible-looking rows remain ambiguous between multiple exact generated streams; L19 has no exact profile. |
 | 6 | Incomplete Rebuild | 6 | L17 has no exact profile; L18/L19 still have unresolved multi-stream ambiguity. |
 | 7 | Workman Striker | 3 | Multiple generated profiles remain semantically ambiguous for these source variants. |
@@ -211,3 +211,31 @@ PF127 is `258/64`; PF1931 remains `87/80`; combined coverage is `345/144` of
 Full evidence and the machine-readable PF127/PF1931 dataset are in
 `docs/evidence/ENEMY_COMBAT_SETUP_FORMULA_20260727.md` and
 `docs/generated/enemy_combat_setup_formula_dataset.json`.
+
+## 2026-07-27 Mathematical Stim Fiend Restoration
+
+The former Stim Fiend blocker is resolved for its bounded captured domain
+without another capture. Exact raw L10/L11/L12/L13/L14 SIW1 packets prove:
+
+```text
+SpecialAttackWeapon fields 1-4 = floor((11 * actorLevel - 2) / 2)
+```
+
+All five leave-one-out evaluations reproduce the held-out packet value. The
+selector is restricted to MonsterData `203739`, PF127, levels `10..17`, exact
+SIW1 templates `144742/144743`, tag/instance `0x53495731`, natural-specialized
+mode, slot `0`, hit type `3`, damage type `0`, and the captured packet
+structure. L12 terminal-only damage-type-4 evidence is retained but cannot
+become a repeating attack stream. Production continues to own damage, range,
+cadence, health, mutable energy/ammunition, and per-actor mutable SAW state.
+
+Six fixed-scope actors are restored: four at L12, one at L14, and one at L17.
+L9 source `0x7957E415` remains fail-closed outside the proven domain. The full
+active Stim Fiend family is now `14/1`; the fixed 53-actor scope is `26`
+certified and `27` quarantined. PF127 is `264/58`; PF1931 remains `87/80`;
+combined coverage is `351/138` of `489`.
+
+Full evidence is in
+`docs/evidence/STIM_FIEND_COMBAT_SETUP_FORMULA_20260727.md`, and the shared
+machine-readable formula dataset now records both accepted ordinary-enemy
+formulas and 26 active mathematical bindings.
