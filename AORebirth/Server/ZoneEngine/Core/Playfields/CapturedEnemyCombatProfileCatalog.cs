@@ -475,6 +475,48 @@ namespace AORebirth.Core.Playfields
                    && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
         }
 
+        internal bool SupportsFragmentedSoulMathematicalPacketSemantics
+        {
+            get
+            {
+                return this.SupportsCaptureProvenEquippedWeaponPacketSemantics
+                       && OrdinaryEnemyCombatSetupGenerator
+                           .IsFragmentedSoulWeaponLoadout(
+                               this.WeaponDefinition.LowId,
+                               this.WeaponDefinition.HighId,
+                               this.WeaponDefinition.Quality);
+            }
+        }
+
+        internal bool MatchesFragmentedSoulMathematicalPacketSemantics(
+            CapturedEnemyCombatProfileDefinition other)
+        {
+            if (!this.SupportsFragmentedSoulMathematicalPacketSemantics
+                || other == null
+                || !other.SupportsFragmentedSoulMathematicalPacketSemantics
+                || this.SpecialAttackWeaponN3Unknown
+                   != other.SpecialAttackWeaponN3Unknown
+                || this.AttackN3Unknown != other.AttackN3Unknown
+                || this.AttackAction != other.AttackAction
+                || !WeaponPacketStructureMatches(
+                    this.WeaponDefinition,
+                    other.WeaponDefinition))
+            {
+                return false;
+            }
+
+            CapturedEnemyCombatProfileStreamDefinition left = this.Streams[0];
+            CapturedEnemyCombatProfileStreamDefinition right = other.Streams[0];
+            return left.WeaponSlot == right.WeaponSlot
+                   && left.DamageTypeWire == right.DamageTypeWire
+                   && left.HitTypeWire == right.HitTypeWire
+                   && left.WeaponInstance == right.WeaponInstance
+                   && left.N3Unknown == right.N3Unknown
+                   && left.CapturedUsesEquippedWeapon
+                      == right.CapturedUsesEquippedWeapon
+                   && left.CapturedSendAttackInfo == right.CapturedSendAttackInfo;
+        }
+
         internal bool SupportsCaptureProvenNaturalAttackPacketSemantics
         {
             get
@@ -1366,10 +1408,22 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            bool isMeldedPatterns =
+                monsterData
+                == ZoneEngine.Core.Playfields.NpcCombatAttackRules
+                    .CapturedSubwayMeldedPatternsMonsterData;
+            bool isFragmentedSoul =
+                monsterData
+                == ZoneEngine.Core.Playfields.NpcCombatAttackRules
+                    .CapturedSubwayFragmentedSoulMonsterData;
             CapturedEnemyCombatProfileDefinition[] family = Profiles.Where(
                     value => value.MatchesArchetypeKey(resourceId, name, monsterData)
-                             && value
-                                 .SupportsMeldedPatternsMathematicalPacketSemantics)
+                             && (isMeldedPatterns
+                                     ? value
+                                         .SupportsMeldedPatternsMathematicalPacketSemantics
+                                     : isFragmentedSoul
+                                       && value
+                                           .SupportsFragmentedSoulMathematicalPacketSemantics))
                 .OrderBy(value => value.ProfileId, StringComparer.Ordinal)
                 .ToArray();
             if (family.Length == 0)
@@ -1379,8 +1433,11 @@ namespace AORebirth.Core.Playfields
 
             CapturedEnemyCombatProfileDefinition archetype = family[0];
             if (family.Any(
-                value => !archetype
-                    .MatchesMeldedPatternsMathematicalPacketSemantics(value)))
+                value => isMeldedPatterns
+                    ? !archetype
+                        .MatchesMeldedPatternsMathematicalPacketSemantics(value)
+                    : !archetype
+                        .MatchesFragmentedSoulMathematicalPacketSemantics(value)))
             {
                 return false;
             }
@@ -1425,11 +1482,12 @@ namespace AORebirth.Core.Playfields
                 "; ",
                 family.Select(value => value.Evidence).Distinct().ToArray());
             string archetypeId = string.Format(
-                "formula={0}|resource={1}|name={2}|MonsterData={3}|weaponFamily=121817..121835|profiles={4}",
+                "formula={0}|resource={1}|name={2}|MonsterData={3}|weaponFamily={4}|profiles={5}",
                 generated.FormulaId,
                 resourceId,
                 name,
                 monsterData,
+                isMeldedPatterns ? "121817..121835" : "123685..123703",
                 string.Join(
                     ",",
                     family.Select(value => value.ProfileId).ToArray()));
@@ -1589,9 +1647,12 @@ namespace AORebirth.Core.Playfields
                     name,
                     monsterData)).ToArray();
             if (current.UsesProductionEquippedWeaponValues
-                && monsterData
-                   == ZoneEngine.Core.Playfields.NpcCombatAttackRules
-                       .CapturedSubwayMeldedPatternsMonsterData)
+                && (monsterData
+                    == ZoneEngine.Core.Playfields.NpcCombatAttackRules
+                        .CapturedSubwayMeldedPatternsMonsterData
+                    || monsterData
+                       == ZoneEngine.Core.Playfields.NpcCombatAttackRules
+                           .CapturedSubwayFragmentedSoulMonsterData))
             {
                 return false;
             }

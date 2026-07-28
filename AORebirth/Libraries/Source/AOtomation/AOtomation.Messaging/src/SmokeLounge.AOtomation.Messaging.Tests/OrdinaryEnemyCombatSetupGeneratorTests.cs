@@ -52,6 +52,26 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { 25, 136 }
             };
 
+        private static readonly IDictionary<int, int[]> CapturedFragmentedSoulSawValues =
+            new Dictionary<int, int[]>
+            {
+                { 17, new[] { 101, 117 } },
+                { 18, new[] { 107, 125 } },
+                { 19, new[] { 113, 131 } },
+                { 20, new[] { 119, 139 } },
+                { 21, new[] { 125, 145 } }
+            };
+
+        private static readonly int[] StartingFragmentedSoulQuarantineSources =
+        {
+            unchecked((int)0x7954516F),
+            unchecked((int)0x7954517A),
+            unchecked((int)0x7954518B),
+            unchecked((int)0x7954518E),
+            unchecked((int)0x795451AE),
+            unchecked((int)0x79545367)
+        };
+
         [TestMethod]
         public void DisobedientBotFormulaReproducesEveryCapturedHeldOutLevelExactly()
         {
@@ -612,6 +632,312 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0, contract.AttackInfoUnknown);
         }
 
+        [TestMethod]
+        public void FragmentedSoulFormulaReproducesEveryCapturedHeldOutLevelExactly()
+        {
+            foreach (KeyValuePair<int, int[]> heldOut in
+                     CapturedFragmentedSoulSawValues)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                            heldOut.Key,
+                            123685,
+                            123686,
+                            18,
+                            NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot),
+                        out setup));
+                Assert.AreEqual(
+                    OrdinaryEnemyCombatSetupGenerator.FragmentedSoulFormulaId,
+                    setup.FormulaId);
+                Assert.AreEqual(heldOut.Value[0], setup.SpecialAttackWeaponUnknown1);
+                Assert.AreEqual(heldOut.Value[0], setup.SpecialAttackWeaponUnknown2);
+                Assert.AreEqual(heldOut.Value[0], setup.SpecialAttackWeaponUnknown3);
+                Assert.AreEqual(heldOut.Value[1], setup.SpecialAttackWeaponUnknown4);
+            }
+        }
+
+        [TestMethod]
+        public void EveryCapturedFragmentedSoulSawPacketRemainsByteExactUnderTheFormula()
+        {
+            CapturedEnemyCombatProfileDefinition[] profiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => value.MonsterData
+                             == NpcCombatAttackRules
+                                 .CapturedSubwayFragmentedSoulMonsterData)
+                    .ToArray();
+            Assert.AreEqual(8, profiles.Length);
+            foreach (CapturedEnemyCombatProfileDefinition profile in profiles)
+            {
+                OrdinaryEnemyCombatNumericSetup setup;
+                Assert.IsTrue(
+                    OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            profile.MonsterData,
+                            profile.Level,
+                            profile.WeaponDefinition.LowId,
+                            profile.WeaponDefinition.HighId,
+                            profile.WeaponDefinition.Quality,
+                            profile.WeaponDefinition.InventorySlot),
+                        out setup),
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown1,
+                    setup.SpecialAttackWeaponUnknown1,
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown2,
+                    setup.SpecialAttackWeaponUnknown2,
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown3,
+                    setup.SpecialAttackWeaponUnknown3,
+                    profile.ProfileId);
+                Assert.AreEqual(
+                    profile.SpecialAttackWeaponUnknown4,
+                    setup.SpecialAttackWeaponUnknown4,
+                    profile.ProfileId);
+
+                CapturedEnemyCombatPacketFixture fixture =
+                    CapturedEnemyCombatGeneratedPacketFixtures.Create().Single(
+                        value => value.ProfileId == profile.ProfileId);
+                foreach (CapturedEnemySpecialAttackWeaponPacketFixture saw in
+                    fixture.SpecialAttackWeaponPackets)
+                {
+                    MessageBody generated =
+                        CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                            SimpleChar(saw.SourceIdentity),
+                            profile.SpecialAttacks,
+                            profile.SpecialAttackWeaponN3Unknown,
+                            setup.SpecialAttackWeaponUnknown1,
+                            setup.SpecialAttackWeaponUnknown2,
+                            setup.SpecialAttackWeaponUnknown3,
+                            setup.SpecialAttackWeaponUnknown4,
+                            saw.Unknown5);
+                    Assert.AreEqual(
+                        saw.BodyHex,
+                        BitConverter.ToString(Serialize(generated)).Replace("-", string.Empty),
+                        profile.ProfileId);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void FragmentedSoulRestoresAllTenActorsAndNineteenAtomicVariants()
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(
+                value => value.DisplayName == "Fragmented Soul"
+                         && value.MonsterData
+                            == NpcCombatAttackRules
+                                .CapturedSubwayFragmentedSoulMonsterData);
+            OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns().Where(
+                    value => value.PlayfieldInstance == 127
+                             && value.ProfileKey == profile.ProfileKey)
+                .OrderBy(value => value.SourceIdentity)
+                .ToArray();
+            Assert.AreEqual(10, spawns.Length);
+            Assert.AreEqual(
+                6,
+                spawns.Count(
+                    value => StartingFragmentedSoulQuarantineSources.Contains(
+                        value.SourceIdentity)));
+            Assert.AreEqual(
+                19,
+                spawns.Sum(
+                    value => value.LevelDefinition.GetExplicitVariants().Length));
+
+            foreach (OrdinaryEnemySpawnDefinition spawn in spawns)
+            {
+                foreach (OrdinaryEnemySpawnVariant variant in
+                    spawn.LevelDefinition.GetExplicitVariants())
+                {
+                    CapturedEnemyCombatContract current =
+                        profile.Combat.ResolveContract(
+                            spawn.SourceIdentity,
+                            variant);
+                    Assert.IsTrue(
+                        current.UsesProductionEquippedWeaponValues,
+                        string.Format(
+                            "0x{0:X8} L{1} QL{2}",
+                            spawn.SourceIdentity,
+                            variant.Level,
+                            variant.WeaponLoadout.Quality));
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    Assert.IsTrue(
+                        CapturedEnemyCombatProfileCatalog.TryResolve(
+                            127,
+                            profile.DisplayName,
+                            profile.MonsterData,
+                            variant.Level,
+                            spawn.SourceIdentity,
+                            current,
+                            out resolved,
+                            out failure),
+                        string.Format(
+                            "0x{0:X8} L{1} QL{2}: {3}",
+                            spawn.SourceIdentity,
+                            variant.Level,
+                            variant.WeaponLoadout.Quality,
+                            failure));
+                    Assert.IsTrue(resolved.IsCombatReady);
+                    Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
+                    Assert.IsTrue(
+                        resolved.CaptureProvenArchetypeId.Contains(
+                            OrdinaryEnemyCombatSetupGenerator
+                                .FragmentedSoulFormulaId));
+                    Assert.AreEqual(
+                        variant.WeaponLoadout.LowId,
+                        resolved.WeaponLowId);
+                    Assert.AreEqual(
+                        variant.WeaponLoadout.HighId,
+                        resolved.WeaponHighId);
+                    Assert.AreEqual(
+                        variant.WeaponLoadout.Quality,
+                        resolved.WeaponQuality);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void FragmentedSoulFormulaUsesRuntimeLevelAndLoadoutWithoutIdentity()
+        {
+            OrdinaryEnemyCombatNumericSetup ql14;
+            OrdinaryEnemyCombatNumericSetup ql20;
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                        18,
+                        123685,
+                        123686,
+                        14,
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot),
+                    out ql14));
+            Assert.IsTrue(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                        18,
+                        123686,
+                        123686,
+                        20,
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulWeaponSlot),
+                    out ql20));
+            Assert.AreEqual(ql14.SpecialAttackWeaponUnknown1, ql20.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(ql14.SpecialAttackWeaponUnknown4, ql20.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(107, ql14.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(125, ql14.SpecialAttackWeaponUnknown4);
+        }
+
+        [TestMethod]
+        public void FragmentedSoulFormulaFailsClosedOutsideItsBoundedCategoricalDomains()
+        {
+            OrdinaryEnemyCombatNumericSetup ignored;
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                        16,
+                        123685,
+                        123686,
+                        18,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                        22,
+                        123687,
+                        123688,
+                        25,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                        19,
+                        121817,
+                        121818,
+                        19,
+                        6),
+                    out ignored));
+            Assert.IsFalse(
+                OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        NpcCombatAttackRules.CapturedSubwayFragmentedSoulMonsterData,
+                        19,
+                        123687,
+                        123688,
+                        21,
+                        6),
+                    out ignored));
+        }
+
+        [TestMethod]
+        public void FragmentedSoulLevelNineteenUsesTheSharedCapturedPacketOrder()
+        {
+            CapturedEnemyCombatContract contract = ResolveFragmentedSoul(
+                unchecked((int)0x7954517A),
+                19,
+                123685,
+                123686,
+                19);
+            Identity source = SimpleChar(unchecked((int)0x7954517A));
+            Identity target = SimpleChar(unchecked((int)0x7944C065));
+            MessageBody[] packets =
+            {
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    source,
+                    127,
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = contract.WeaponDefinition.InventorySlot
+                    },
+                    contract.WeaponDefinition),
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    source,
+                    contract),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    source,
+                    target,
+                    contract),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    source,
+                    target,
+                    1,
+                    contract.AttackInfoAmmoCount,
+                    contract.AttackInfoWeaponSlot,
+                    contract.AttackInfoUnknown,
+                    contract.AttackInfoHitType,
+                    contract.AttackInfoWeaponInstance,
+                    contract.AttackInfoN3Unknown)
+            };
+
+            Assert.IsInstanceOfType(packets[0], typeof(WeaponItemFullUpdateMessage));
+            Assert.IsInstanceOfType(packets[1], typeof(SpecialAttackWeaponMessage));
+            Assert.IsInstanceOfType(packets[2], typeof(AttackMessage));
+            Assert.IsInstanceOfType(packets[3], typeof(AttackInfoMessage));
+            Assert.AreEqual(113, contract.SpecialAttackWeaponUnknown1);
+            Assert.AreEqual(113, contract.SpecialAttackWeaponUnknown2);
+            Assert.AreEqual(113, contract.SpecialAttackWeaponUnknown3);
+            Assert.AreEqual(131, contract.SpecialAttackWeaponUnknown4);
+            Assert.AreEqual(24, contract.AttackInfoAmmoCount);
+            Assert.AreEqual(6, contract.AttackInfoWeaponSlot);
+            Assert.AreEqual(0, contract.AttackInfoWeaponInstance);
+            Assert.AreEqual(3, contract.AttackInfoHitType);
+            Assert.AreEqual(0, contract.AttackInfoUnknown);
+        }
+
         private static OrdinaryEnemyCombatSetupInput Input(
             int monsterData,
             int level,
@@ -742,6 +1068,50 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatContract current =
                 profile.Combat.ResolveContract(sourceInstance, variant);
             current.Retaliates = true;
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    profile.DisplayName,
+                    profile.MonsterData,
+                    variant.Level,
+                    sourceInstance,
+                    current,
+                    out resolved,
+                    out failure),
+                failure);
+            return resolved;
+        }
+
+        private static CapturedEnemyCombatContract ResolveFragmentedSoul(
+            int sourceInstance,
+            int level,
+            int lowId,
+            int highId,
+            int quality)
+        {
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(
+                value => value.DisplayName == "Fragmented Soul"
+                         && value.MonsterData
+                            == NpcCombatAttackRules
+                                .CapturedSubwayFragmentedSoulMonsterData);
+            OrdinaryEnemySpawnDefinition spawn = catalog.GetSpawns().Single(
+                value => value.PlayfieldInstance == 127
+                         && value.ProfileKey == profile.ProfileKey
+                         && value.SourceIdentity == sourceInstance);
+            OrdinaryEnemySpawnVariant variant =
+                spawn.LevelDefinition.GetExplicitVariants().Single(
+                    value => value.Level == level
+                             && value.WeaponLoadout.LowId == lowId
+                             && value.WeaponLoadout.HighId == highId
+                             && value.WeaponLoadout.Quality == quality);
+            CapturedEnemyCombatContract current =
+                profile.Combat.ResolveContract(sourceInstance, variant);
             CapturedEnemyCombatContract resolved;
             string failure;
             Assert.IsTrue(

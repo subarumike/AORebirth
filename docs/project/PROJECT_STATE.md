@@ -4,6 +4,20 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Fragmented Soul MonsterData `203729` now uses the bounded mathematical
+  equipped setup `base=6*actorLevel-1`, with SAW fields
+  `base/base/base/base+2*floor(actorLevel/2)` across exact levels L17..L21.
+  All `21` unique raw SAW packets, `8` complete semantic profiles, and `5`
+  leave-one-out evaluations are exact. Active generation state retains all
+  `19` level/stat/QL/loadout variants for the ten actors; capture retains the
+  exact `123685..123703` item family, equipped mode, slot `6`, instance `0`,
+  one normal stream, hit/damage wires `3/0`, and
+  WIFU -> SAW -> Attack -> AttackInfo order. All `10` active actors are
+  certified, restoring the six checkpoint quarantine actors. PF127/PF1931
+  are now `363/126` of `489` (`276/46` and unchanged `87/80`); the fixed
+  53-actor Subway scope is `38/15`. Evidence:
+  `docs/evidence/SUBWAY_FRAGMENTED_SOUL_COMBAT_RESTORATION_20260728.md`.
+
 - Melded Patterns MonsterData `203747` now uses the bounded mathematical setup
   `base=floor((11*actorLevel-2)/2)` and SAW fields
   `base/base+28/base/base` across the exact L18..L25 equipped-weapon domain.

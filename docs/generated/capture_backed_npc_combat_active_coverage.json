@@ -3065,7 +3065,7 @@
     {
       "actorCount": 1,
       "bindingKey": "0bdf425894b544d64f2d",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954516F",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3078,7 +3078,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954516F",
@@ -3087,7 +3087,7 @@
     {
       "actorCount": 1,
       "bindingKey": "07e1d86eb3d7ba653148",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954517A",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3100,7 +3100,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954517A",
@@ -3131,7 +3131,7 @@
     {
       "actorCount": 1,
       "bindingKey": "218e144ba52a17c8f621",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954518B",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3144,7 +3144,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954518B",
@@ -3153,7 +3153,7 @@
     {
       "actorCount": 1,
       "bindingKey": "4f7766105e870121b03a",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954518E",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3166,7 +3166,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954518E",
@@ -3197,7 +3197,7 @@
     {
       "actorCount": 1,
       "bindingKey": "b1bd0d29955f626e41a5",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x795451AE",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3210,7 +3210,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x795451AE",
@@ -3219,7 +3219,7 @@
     {
       "actorCount": 1,
       "bindingKey": "dcb6054c0b8b6916721a",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545248",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3232,7 +3232,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x79545248",
@@ -3241,7 +3241,7 @@
     {
       "actorCount": 1,
       "bindingKey": "ebd566a9bd4c004677dd",
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545367",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
@@ -3254,7 +3254,7 @@
       ],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x79545367",
@@ -36666,12 +36666,12 @@
     "captureCertifiedVariantCountWithMutableSawState": 76,
     "captureCertifiedVariantCountWithMutableWeaponState": 4,
     "exactRawWireObservationCount": 2462,
-    "finalCaptureCertifiedActorCount": 116,
-    "finalQuarantinedActorCount": 1396,
-    "fixedCertifiedProfileRowCount": 116,
+    "finalCaptureCertifiedActorCount": 123,
+    "finalQuarantinedActorCount": 1389,
+    "fixedCertifiedProfileRowCount": 123,
     "fixedProfileRowCount": 766,
-    "fixedUnresolvedProfileRowCount": 650,
-    "newlyCaptureCertifiedActorCount": 101,
+    "fixedUnresolvedProfileRowCount": 643,
+    "newlyCaptureCertifiedActorCount": 108,
     "priorCaptureCertifiedActorCount": 15,
     "remainingConflictedSourceIdentityCount": 2,
     "restoredEnemyNames": [
@@ -71950,7 +71950,11 @@
       "actorCount": 1,
       "captureSearchScope": null,
       "captureSessions": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
       "classification": "certified",
       "configuredSourceIdentity": "0x7954516A",
@@ -71965,27 +71969,47 @@
           "level": 17,
           "observations": [
             {
-              "attackInfoPacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6165|8674373256a1"
-              ],
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "representativeAttackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5884|54a189cda4d3",
-              "representativeSawPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
-              "representativeWifuPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4465|a4107f93cf3a",
-              "sourceIdentities": [
-                "0x7954516A"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
               ]
             }
           ]
         }
       ],
       "evidencePacketIds": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4465|a4107f93cf3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5884|54a189cda4d3",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6165|8674373256a1"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
       ],
       "level": 17,
       "levelCandidates": [
@@ -71994,43 +72018,74 @@
       "levelCoverage": [
         {
           "captureSessions": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
           "classification": "certified",
-          "combatInventoryStatus": "capture-certified",
           "combatProfileKey": "resource=127|md=203729|level=17|name=Fragmented Soul",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "attackInfoPacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6165|8674373256a1"
-              ],
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "representativeAttackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5884|54a189cda4d3",
-              "representativeSawPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
-              "representativeWifuPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4465|a4107f93cf3a",
-              "sourceIdentities": [
-                "0x7954516A"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
               ]
             }
           ],
           "evidencePacketIds": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|4465|a4107f93cf3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5884|54a189cda4d3",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6165|8674373256a1"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
           ],
-          "evidenceSourceIdentities": [
-            "0x7954516A"
-          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 17,
           "missingEvidence": [],
-          "resolutionMode": "exact-runtime-source-identity",
+          "resolutionMode": "exact-mathematical-combat-setup",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
       "missingEvidence": [],
@@ -72047,154 +72102,69 @@
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224840",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954516F",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "ca9f19717618dc08c9be",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 17,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6245|6c02c8f44355",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954516F"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954516F"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5765|477bc2eae95a",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7839|43de75a49444",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9740|8339fffcb601",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 3,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954516F"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 17,
       "levelCandidates": [
         17
@@ -72204,324 +72174,151 @@
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224840",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=17|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6245|6c02c8f44355",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954516F"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954516F"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5765|477bc2eae95a",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7839|43de75a49444",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9740|8339fffcb601",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 3,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954516F"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
-          "level": 17,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+          "level": 17,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 9,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954516F",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954518B",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "e2794791aaa28d7a1082",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 18,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6923|5b77d72bb3ef",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5985|976a33cf75eb",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|10178|669af61c1998",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|10260|3c2ae9a7c40e",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 3,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518B"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 18,
       "levelCandidates": [
         18
@@ -72531,339 +72328,151 @@
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=18|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6923|5b77d72bb3ef",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518B"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5985|976a33cf75eb",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|10178|669af61c1998",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|10260|3c2ae9a7c40e",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 3,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518B"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 18,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 14,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954518B",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954518E",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "db9292ddf0171780721b",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 18,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7120|963dbbc238cb",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518E"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518E"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6079|edf0ab556c7d",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6225|284c96195a99",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9172|b48ab12900e2",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 5,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518E"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 18,
       "levelCandidates": [
         18
@@ -72873,269 +72482,151 @@
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=18|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7120|963dbbc238cb",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518E"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518E"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6079|edf0ab556c7d",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6225|284c96195a99",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9172|b48ab12900e2",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 5,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954518E"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 18,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 14,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954518E",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545248",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "4edcaabee4b53ed94248",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 18,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "nano",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x79545248"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {},
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 2,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x79545248"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 18,
       "levelCandidates": [
         18
@@ -73145,191 +72636,151 @@
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=18|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "nano",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x79545248"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {},
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 2,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x79545248"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 18,
-          "missingEvidence": [
-            "Attack missing inside the current fight boundary",
-            "Attack same-capture preceding SCFU generation metadata",
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "SpecialAttackWeapon same-capture preceding SCFU generation metadata",
-            "owner-linked complete WIFU for AttackInfo slot 6",
-            "runtime-ready capture-certified variant for the runtime source-identity hint",
-            "same-capture preceding SCFU generation metadata",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 14,
-      "missingEvidence": [
-        "Attack missing inside the current fight boundary",
-        "Attack same-capture preceding SCFU generation metadata",
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "SpecialAttackWeapon same-capture preceding SCFU generation metadata",
-        "owner-linked complete WIFU for AttackInfo slot 6",
-        "runtime-ready capture-certified variant for the runtime source-identity hint",
-        "same-capture preceding SCFU generation metadata",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x79545248",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x79545367",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "d344d71a704ed4babe44",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 18,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15577|e3359599b8c8",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x79545367"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 18,
       "levelCandidates": [
         18
@@ -73339,244 +72790,151 @@
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-224608",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-232711",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-234401",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-033326",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034559",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-044358",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-053542"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=18|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|15577|e3359599b8c8",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x79545367"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 18,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 14,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719 source=0x796079B3 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2723|701ca74cf945 AttackInfo index=1 ammo=22 expected=23",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714 source=0x7980F138 WIFU tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|1377|86880e923e8d AttackInfo index=0 ammo=23 expected=24"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x79545367",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x7954517A",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "8efad07567fed4828f92",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 19,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6543|975a59cad2f4",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954517A"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954517A"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5776|74a2e5ca6ece",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7849|bd1f93130bcc",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9750|a692397ac215",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 3,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954517A"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 19,
       "levelCandidates": [
         19
@@ -73585,168 +72943,95 @@
         {
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034656",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "unresolved-unsupported-sequence-only",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=19|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6543|975a59cad2f4",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954517A"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954517A"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5776|74a2e5ca6ece",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7849|bd1f93130bcc",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9750|a692397ac215",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 3,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x7954517A"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
-          "level": 19,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
           ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+          "level": 19,
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 3,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
+      "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x7954517A",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "unresolved-unsupported-sequence-only: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
       "captureSearchScope": null,
       "captureSessions": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
       "classification": "certified",
@@ -73762,27 +73047,47 @@
           "level": 20,
           "observations": [
             {
-              "attackInfoPacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5535|90e0f365fa7c"
-              ],
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
-              ],
-              "representativeAttackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5470|bff1e6889cb0",
-              "representativeSawPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
-              "representativeWifuPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2956|125c3a2db518",
-              "sourceIdentities": [
-                "0x7980F122"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
               ]
             }
           ]
         }
       ],
       "evidencePacketIds": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2956|125c3a2db518",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5470|bff1e6889cb0",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5535|90e0f365fa7c"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
       ],
       "level": 20,
       "levelCandidates": [
@@ -73791,43 +73096,74 @@
       "levelCoverage": [
         {
           "captureSessions": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
           "classification": "certified",
-          "combatInventoryStatus": "capture-certified",
           "combatProfileKey": "resource=127|md=203729|level=20|name=Fragmented Soul",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "attackInfoPacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5535|90e0f365fa7c"
-              ],
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
-              ],
-              "representativeAttackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5470|bff1e6889cb0",
-              "representativeSawPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
-              "representativeWifuPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2956|125c3a2db518",
-              "sourceIdentities": [
-                "0x7980F122"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
               ]
             }
           ],
           "evidencePacketIds": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|2956|125c3a2db518",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5470|bff1e6889cb0",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5535|90e0f365fa7c"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
           ],
-          "evidenceSourceIdentities": [
-            "0x7980F122"
-          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 20,
           "missingEvidence": [],
-          "resolutionMode": "capture-proven-unique-semantic-fallback",
+          "resolutionMode": "exact-mathematical-combat-setup",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": true
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
       "missingEvidence": [],
@@ -73846,7 +73182,11 @@
       "actorCount": 1,
       "captureSearchScope": null,
       "captureSessions": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
       "classification": "certified",
       "configuredSourceIdentity": "0x795451AA",
@@ -73861,29 +73201,47 @@
           "level": 21,
           "observations": [
             {
-              "attackInfoPacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12202|ba26bd2fc3b4",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12285|4cbf8cfb148e",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12340|e8ae949d723c"
-              ],
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "representativeAttackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12067|04d6b91897d1",
-              "representativeSawPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
-              "representativeWifuPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10234|f555ee32c385",
-              "sourceIdentities": [
-                "0x795451AA"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
               ]
             }
           ]
         }
       ],
       "evidencePacketIds": [
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10234|f555ee32c385",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12067|04d6b91897d1",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12202|ba26bd2fc3b4"
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
       ],
       "level": 21,
       "levelCandidates": [
@@ -73892,45 +73250,74 @@
       "levelCoverage": [
         {
           "captureSessions": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
           "classification": "certified",
-          "combatInventoryStatus": "capture-certified",
           "combatProfileKey": "resource=127|md=203729|level=21|name=Fragmented Soul",
           "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "attackInfoPacketIds": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12202|ba26bd2fc3b4",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12285|4cbf8cfb148e",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12340|e8ae949d723c"
-              ],
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "representativeAttackPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12067|04d6b91897d1",
-              "representativeSawPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
-              "representativeWifuPacketId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10234|f555ee32c385",
-              "sourceIdentities": [
-                "0x795451AA"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
               ]
             }
           ],
           "evidencePacketIds": [
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10234|f555ee32c385",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12067|04d6b91897d1",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12202|ba26bd2fc3b4"
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
           ],
-          "evidenceSourceIdentities": [
-            "0x795451AA"
-          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 21,
           "missingEvidence": [],
-          "resolutionMode": "exact-runtime-source-identity",
+          "resolutionMode": "exact-mathematical-combat-setup",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "semanticFallbackCaptureProven": false
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
       "missingEvidence": [],
@@ -73947,190 +73334,69 @@
     },
     {
       "actorCount": 1,
-      "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSearchScope": null,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
       ],
-      "classification": "unresolved",
+      "classification": "certified",
       "configuredSourceIdentity": "0x795451AE",
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs"
       ],
       "coverageKey": "83e062112e178745053a",
-      "disabledGameplayCapabilities": [
-        "NPC auto-attack emission and damage application"
-      ],
+      "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
           "level": 21,
           "observations": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11632|84204dcf9201",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8041|f715d5805e9f",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10150|6db64fa5d85e",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 2,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "nano",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {},
-                  {},
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 3,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ]
         }
       ],
-      "evidencePacketIds": [],
+      "evidencePacketIds": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+      ],
       "level": 21,
       "levelCandidates": [
         21
@@ -74140,210 +73406,85 @@
           "captureSessions": [
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
-            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714"
           ],
-          "classification": "unresolved",
-          "combatInventoryStatus": "capture-certified",
+          "classification": "certified",
           "combatProfileKey": "resource=127|md=203729|level=21|name=Fragmented Soul",
-          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "disabledGameplayCapability": null,
           "evidenceFound": [
             {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11632|84204dcf9201",
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
-                    "WeaponItemFullUpdate": null,
-                    "WeaponItemFullUpdateDefinitionComplete": null,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "missing"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 1,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "orphan-combat-prefix",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8041|f715d5805e9f",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  },
-                  {
-                    "Attack": null,
-                    "AttackInfo": null,
-                    "SpecialAttackWeapon": null,
-                    "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|10150|6db64fa5d85e",
-                    "WeaponItemFullUpdateDefinitionComplete": true,
-                    "WeaponItemFullUpdateProblems": [],
-                    "WeaponItemFullUpdateResolution": "orphan-prefix"
-                  }
-                ]
-              },
-              "missingEvidence": [
-                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
-              ],
-              "observationCount": 2,
-              "observationType": "incomplete-normal-attack",
-              "runtimeSupport": null,
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "nano",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 1,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
-            },
-            {
-              "captureSessions": [
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
-                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
-              ],
-              "classification": "unsupported-message",
-              "conflicts": [],
-              "evidenceFound": {
-                "AttackInfo": false,
-                "MissedAttackInfo": false,
-                "metadataResolution": [
-                  "capture-local-generation"
-                ],
-                "samples": [
-                  {},
-                  {},
-                  {}
-                ]
-              },
-              "missingEvidence": [],
-              "observationCount": 3,
-              "observationType": "unsupported-sequence",
-              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
-              "samplePacketIds": [],
-              "sourceIdentity": "0x795451AE"
+              "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+              "generatedSpecialAttackWeaponValue": null,
+              "generatedSpecialAttackWeaponValues": null,
+              "observationType": "capture-validated-mathematical-combat-setup",
+              "semanticProfileId": null,
+              "semanticProfileIds": [
+                "41ec8ecff96a0c8c-4f4ed102043d7370",
+                "41ec8ecff96a0c8c-fedb453533892b94",
+                "4b6baa7ad81c6eb1-8aa88308817eb871",
+                "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+                "76e772d3e32e2f5c-ef9cfa622cae4d22",
+                "d066cff0134deb5d-6cbbbf63bf40882d",
+                "d066cff0134deb5d-88401ddd47b9cf67",
+                "d066cff0134deb5d-8c9873fc6b350927"
+              ]
             }
           ],
-          "evidencePacketIds": [],
+          "evidencePacketIds": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c"
+          ],
+          "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
           "level": 21,
-          "missingEvidence": [
-            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-            "deterministic runtime WIFU Energy/MultipleCount state selection across captured values [{'energy': 24, 'multipleCount': 1}, {'energy': 25, 'multipleCount': 1}]",
-            "runtime-ready capture-certified variant for the runtime source-identity hint"
-          ],
-          "resolutionMode": "none",
-          "runtimeContractReady": false,
-          "runtimeMissingEvidence": [
-            "deterministic runtime WIFU Energy/MultipleCount state selection across captured values [{'energy': 24, 'multipleCount': 1}, {'energy': 25, 'multipleCount': 1}]"
-          ],
-          "semanticFallbackCaptureProven": false,
-          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+          "missingEvidence": [],
+          "resolutionMode": "exact-mathematical-combat-setup",
+          "runtimeContractReady": true,
+          "runtimeMissingEvidence": [],
+          "semanticProfileId": null,
+          "semanticProfileIds": [
+            "41ec8ecff96a0c8c-4f4ed102043d7370",
+            "41ec8ecff96a0c8c-fedb453533892b94",
+            "4b6baa7ad81c6eb1-8aa88308817eb871",
+            "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+            "76e772d3e32e2f5c-ef9cfa622cae4d22",
+            "d066cff0134deb5d-6cbbbf63bf40882d",
+            "d066cff0134deb5d-88401ddd47b9cf67",
+            "d066cff0134deb5d-8c9873fc6b350927"
+          ]
         }
       ],
-      "matchingEvidenceSessionCount": 4,
-      "missingEvidence": [
-        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
-        "deterministic runtime WIFU Energy/MultipleCount state selection across captured values [{'energy': 24, 'multipleCount': 1}, {'energy': 25, 'multipleCount': 1}]",
-        "runtime-ready capture-certified variant for the runtime source-identity hint"
-      ],
+      "missingEvidence": [],
       "monsterData": 203729,
       "name": "Fragmented Soul",
-      "noMatchingEvidenceAfterExhaustiveSearch": false,
       "notes": [],
-      "runtimeContractReady": false,
-      "runtimeMissingEvidence": [
-        "deterministic runtime WIFU Energy/MultipleCount state selection across captured values [{'energy': 24, 'multipleCount': 1}, {'energy': 25, 'multipleCount': 1}]"
-      ],
+      "runtimeContractReady": true,
+      "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 127,
       "runtimeProfileSelector": "subway.ordinary.fragmented_soul",
       "runtimeSourceIdentityHint": "0x795451AE",
       "surface": "subway-ordinary",
-      "unresolvedReasons": [
-        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
-      ]
+      "unresolvedReasons": []
     },
     {
       "actorCount": 1,
@@ -242803,9 +241944,9 @@
   "surfaces": [
     {
       "actorCount": 322,
-      "certified": 62,
+      "certified": 69,
       "surface": "subway-ordinary",
-      "unresolved": 260
+      "unresolved": 253
     },
     {
       "actorCount": 3,
@@ -242875,8 +242016,8 @@
     }
   ],
   "totals": {
-    "certified": 116,
+    "certified": 123,
     "initialActorCount": 1512,
-    "unresolved": 1396
+    "unresolved": 1389
   }
 }

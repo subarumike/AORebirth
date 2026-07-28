@@ -269,3 +269,34 @@ The fixed 53-actor scope is now `32` certified and `21` quarantined. PF127 is
 `270/52`; PF1931 remains `87/80`; combined coverage is `357/132` of `489`.
 Full evidence is in
 `docs/evidence/SUBWAY_MELDED_PATTERNS_COMBAT_RESTORATION_20260727.md`.
+
+## 2026-07-28 Mathematical Fragmented Soul Restoration
+
+The remaining six Fragmented Soul actors are restored through the bounded
+equipped-weapon setup:
+
+```text
+base = 6 * actorLevel - 1
+SAW Unknown1/2/3 = base
+SAW Unknown4 = base + 2 * floor(actorLevel / 2)
+```
+
+Twenty-one unique raw SAW packets at L17..L21 and all five leave-one-out
+evaluations are exact. The domain is restricted to PF127, MonsterData
+`203729`, L17..L21, equipped mode, slot `6`, instance `0`, one normal stream,
+action `0`, hit/damage wires `3/0`, and the exact owner-selected
+`items.dat` interpolation family `123685..123703`. Actor QL selects the
+captured template position; runtime identity does not.
+
+The existing population owner retains all ten actors and nineteen atomic
+generation variants. The shared combat contract now derives only the four SAW
+numeric fields after validating the selected actor level and loadout.
+Production continues to own QL, item damage, range, cadence, health, Energy,
+ammunition, and mutable SAW state. All exact packet structure and ordering
+remain capture-bound. Cross-family, cross-weapon, wrong-slot, and
+out-of-domain inputs remain fail-closed.
+
+All ten active Fragmented Soul actors are certified. The fixed 53-actor scope
+is now `38` certified and `15` quarantined. PF127 is `276/46`; PF1931 remains
+`87/80`; combined coverage is `363/126` of `489`. Full evidence is in
+`docs/evidence/SUBWAY_FRAGMENTED_SOUL_COMBAT_RESTORATION_20260728.md`.

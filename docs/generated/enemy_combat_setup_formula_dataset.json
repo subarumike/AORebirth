@@ -329,6 +329,2736 @@
       10
     ]
   },
+  "fragmentedSoulFormula": {
+    "activeActors": [
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 14,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954516A",
+            "damageBonus": 0,
+            "defense": 59,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 101,
+              "unknown2": 101,
+              "unknown3": 101,
+              "unknown4": 117
+            },
+            "health": 368,
+            "level": 17,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954516A);20260716-033326:(SimpleChar:796D403E)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954516A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 17,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954516F",
+            "damageBonus": 0,
+            "defense": 59,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 101,
+              "unknown2": 101,
+              "unknown3": 101,
+              "unknown4": 117
+            },
+            "health": 368,
+            "level": 17,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954516F)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954516F",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034559:(SimpleChar:796D401F)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954516F",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 20,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954517A",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034559:(SimpleChar:796D4013)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123686
+          },
+          {
+            "actorQualityLevel": 19,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954517A",
+            "damageBonus": 0,
+            "defense": 66,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 113,
+              "unknown2": 113,
+              "unknown3": 113,
+              "unknown4": 131
+            },
+            "health": 421,
+            "level": 19,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954517A)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954517A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 15,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518A",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034656:(SimpleChar:796D4002)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 25,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x7954518A",
+            "damageBonus": 0,
+            "defense": 69,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 119,
+              "unknown2": 119,
+              "unknown3": 119,
+              "unknown4": 139
+            },
+            "health": 447,
+            "level": 20,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954518A)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          },
+          {
+            "actorQualityLevel": 17,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x7954518A",
+            "damageBonus": 0,
+            "defense": 73,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 125,
+              "unknown2": 125,
+              "unknown3": 125,
+              "unknown4": 145
+            },
+            "health": 474,
+            "level": 21,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260717-215250:(SimpleChar:79748629)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 14,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518B",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954518B)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 23,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518B",
+            "damageBonus": 0,
+            "defense": 66,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 113,
+              "unknown2": 113,
+              "unknown3": 113,
+              "unknown4": 131
+            },
+            "health": 421,
+            "level": 19,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034656:(SimpleChar:796D4004)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          },
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x7954518B",
+            "damageBonus": 0,
+            "defense": 69,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 119,
+              "unknown2": 119,
+              "unknown3": 119,
+              "unknown4": 139
+            },
+            "health": 447,
+            "level": 20,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260717-215250:(SimpleChar:7974862E)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518B",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 17,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518E",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954518E)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 20,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518E",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260717-215250:(SimpleChar:7974862B)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123686
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518E",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 26,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x795451AA",
+            "damageBonus": 0,
+            "defense": 73,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 125,
+              "unknown2": 125,
+              "unknown3": 125,
+              "unknown4": 145
+            },
+            "health": 474,
+            "level": 21,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:795451AA)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x795451AA",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 25,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x795451AE",
+            "damageBonus": 0,
+            "defense": 73,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 125,
+              "unknown2": 125,
+              "unknown3": 125,
+              "unknown4": 145
+            },
+            "health": 474,
+            "level": 21,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:795451AE)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x795451AE",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545248",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:79545248)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 21,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545248",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260710-211430:(SimpleChar:7957E5F7)",
+            "resource": 127,
+            "weaponHighTemplate": 123687,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x79545248",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545367",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-033326:(SimpleChar:796D403F)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 19,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545367",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-225408:(SimpleChar:79545367)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x79545367",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      }
+    ],
+    "activeBindings": [
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 14,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954516A",
+            "damageBonus": 0,
+            "defense": 59,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 101,
+              "unknown2": 101,
+              "unknown3": 101,
+              "unknown4": 117
+            },
+            "health": 368,
+            "level": 17,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954516A);20260716-033326:(SimpleChar:796D403E)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954516A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 17,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 17,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954516F",
+            "damageBonus": 0,
+            "defense": 59,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 101,
+              "unknown2": 101,
+              "unknown3": 101,
+              "unknown4": 117
+            },
+            "health": 368,
+            "level": 17,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954516F)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954516F",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 17,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954516F",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034559:(SimpleChar:796D401F)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954516F",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 20,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954517A",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034559:(SimpleChar:796D4013)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123686
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954517A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 19,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954517A",
+            "damageBonus": 0,
+            "defense": 66,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 113,
+              "unknown2": 113,
+              "unknown3": 113,
+              "unknown4": 131
+            },
+            "health": 421,
+            "level": 19,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954517A)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954517A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 19,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 15,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518A",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034656:(SimpleChar:796D4002)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 25,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x7954518A",
+            "damageBonus": 0,
+            "defense": 69,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 119,
+              "unknown2": 119,
+              "unknown3": 119,
+              "unknown4": 139
+            },
+            "health": 447,
+            "level": 20,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954518A)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 20,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 17,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x7954518A",
+            "damageBonus": 0,
+            "defense": 73,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 125,
+              "unknown2": 125,
+              "unknown3": 125,
+              "unknown4": 145
+            },
+            "health": 474,
+            "level": 21,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260717-215250:(SimpleChar:79748629)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518A",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 21,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 14,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518B",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954518B)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518B",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 23,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518B",
+            "damageBonus": 0,
+            "defense": 66,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 113,
+              "unknown2": 113,
+              "unknown3": 113,
+              "unknown4": 131
+            },
+            "health": 421,
+            "level": 19,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-034656:(SimpleChar:796D4004)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518B",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 19,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x7954518B",
+            "damageBonus": 0,
+            "defense": 69,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 119,
+              "unknown2": 119,
+              "unknown3": 119,
+              "unknown4": 139
+            },
+            "health": 447,
+            "level": 20,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260717-215250:(SimpleChar:7974862E)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518B",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 20,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 17,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518E",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:7954518E)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 20,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x7954518E",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260717-215250:(SimpleChar:7974862B)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123686
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x7954518E",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 26,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x795451AA",
+            "damageBonus": 0,
+            "defense": 73,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 125,
+              "unknown2": 125,
+              "unknown3": 125,
+              "unknown4": 145
+            },
+            "health": 474,
+            "level": 21,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:795451AA)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x795451AA",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 21,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 25,
+            "attackRating": 99,
+            "configuredSourceIdentity": "0x795451AE",
+            "damageBonus": 0,
+            "defense": 73,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 125,
+              "unknown2": 125,
+              "unknown3": 125,
+              "unknown4": 145
+            },
+            "health": 474,
+            "level": 21,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:795451AE)",
+            "resource": 127,
+            "weaponHighTemplate": 123688,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x795451AE",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 21,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545248",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-222339:(SimpleChar:79545248)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 21,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545248",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260710-211430:(SimpleChar:7957E5F7)",
+            "resource": 127,
+            "weaponHighTemplate": 123687,
+            "weaponLowTemplate": 123687
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x79545248",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      },
+      {
+        "actorCount": 1,
+        "atomicVariants": [
+          {
+            "actorQualityLevel": 18,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545367",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260716-033326:(SimpleChar:796D403F)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          },
+          {
+            "actorQualityLevel": 19,
+            "attackRating": 98,
+            "configuredSourceIdentity": "0x79545367",
+            "damageBonus": 0,
+            "defense": 62,
+            "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+            "generatedSpecialAttackWeaponValues": {
+              "unknown1": 107,
+              "unknown2": 107,
+              "unknown3": 107,
+              "unknown4": 125
+            },
+            "health": 394,
+            "level": 18,
+            "monsterData": 203729,
+            "name": "Fragmented Soul",
+            "ownerEvidence": "20260709-225408:(SimpleChar:79545367)",
+            "resource": 127,
+            "weaponHighTemplate": 123686,
+            "weaponLowTemplate": 123685
+          }
+        ],
+        "compatibleSemanticProfileIds": [
+          "41ec8ecff96a0c8c-4f4ed102043d7370",
+          "41ec8ecff96a0c8c-fedb453533892b94",
+          "4b6baa7ad81c6eb1-8aa88308817eb871",
+          "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+          "76e772d3e32e2f5c-ef9cfa622cae4d22",
+          "d066cff0134deb5d-6cbbbf63bf40882d",
+          "d066cff0134deb5d-88401ddd47b9cf67",
+          "d066cff0134deb5d-8c9873fc6b350927"
+        ],
+        "configuredSourceIdentity": "0x79545367",
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "resource": 127
+      }
+    ],
+    "activeGenerationVariants": [
+      {
+        "actorQualityLevel": 14,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954516A",
+        "damageBonus": 0,
+        "defense": 59,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "health": 368,
+        "level": 17,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:7954516A);20260716-033326:(SimpleChar:796D403E)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 17,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954516F",
+        "damageBonus": 0,
+        "defense": 59,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "health": 368,
+        "level": 17,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:7954516F)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 18,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954516F",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260716-034559:(SimpleChar:796D401F)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 20,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954517A",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260716-034559:(SimpleChar:796D4013)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123686
+      },
+      {
+        "actorQualityLevel": 19,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954517A",
+        "damageBonus": 0,
+        "defense": 66,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 131
+        },
+        "health": 421,
+        "level": 19,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:7954517A)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 15,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954518A",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260716-034656:(SimpleChar:796D4002)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 25,
+        "attackRating": 99,
+        "configuredSourceIdentity": "0x7954518A",
+        "damageBonus": 0,
+        "defense": 69,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "health": 447,
+        "level": 20,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:7954518A)",
+        "resource": 127,
+        "weaponHighTemplate": 123688,
+        "weaponLowTemplate": 123687
+      },
+      {
+        "actorQualityLevel": 17,
+        "attackRating": 99,
+        "configuredSourceIdentity": "0x7954518A",
+        "damageBonus": 0,
+        "defense": 73,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "health": 474,
+        "level": 21,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260717-215250:(SimpleChar:79748629)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 14,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954518B",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:7954518B)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 23,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954518B",
+        "damageBonus": 0,
+        "defense": 66,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 131
+        },
+        "health": 421,
+        "level": 19,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260716-034656:(SimpleChar:796D4004)",
+        "resource": 127,
+        "weaponHighTemplate": 123688,
+        "weaponLowTemplate": 123687
+      },
+      {
+        "actorQualityLevel": 18,
+        "attackRating": 99,
+        "configuredSourceIdentity": "0x7954518B",
+        "damageBonus": 0,
+        "defense": 69,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "health": 447,
+        "level": 20,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260717-215250:(SimpleChar:7974862E)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 17,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954518E",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:7954518E)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 20,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x7954518E",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260717-215250:(SimpleChar:7974862B)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123686
+      },
+      {
+        "actorQualityLevel": 26,
+        "attackRating": 99,
+        "configuredSourceIdentity": "0x795451AA",
+        "damageBonus": 0,
+        "defense": 73,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "health": 474,
+        "level": 21,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:795451AA)",
+        "resource": 127,
+        "weaponHighTemplate": 123688,
+        "weaponLowTemplate": 123687
+      },
+      {
+        "actorQualityLevel": 25,
+        "attackRating": 99,
+        "configuredSourceIdentity": "0x795451AE",
+        "damageBonus": 0,
+        "defense": 73,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "health": 474,
+        "level": 21,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:795451AE)",
+        "resource": 127,
+        "weaponHighTemplate": 123688,
+        "weaponLowTemplate": 123687
+      },
+      {
+        "actorQualityLevel": 18,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x79545248",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-222339:(SimpleChar:79545248)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 21,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x79545248",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260710-211430:(SimpleChar:7957E5F7)",
+        "resource": 127,
+        "weaponHighTemplate": 123687,
+        "weaponLowTemplate": 123687
+      },
+      {
+        "actorQualityLevel": 18,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x79545367",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260716-033326:(SimpleChar:796D403F)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevel": 19,
+        "attackRating": 98,
+        "configuredSourceIdentity": "0x79545367",
+        "damageBonus": 0,
+        "defense": 62,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "generatedSpecialAttackWeaponValues": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "health": 394,
+        "level": 18,
+        "monsterData": 203729,
+        "name": "Fragmented Soul",
+        "ownerEvidence": "20260709-225408:(SimpleChar:79545367)",
+        "resource": 127,
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      }
+    ],
+    "capturedValuesByLevel": {
+      "17": {
+        "unknown1": 101,
+        "unknown2": 101,
+        "unknown3": 101,
+        "unknown4": 117
+      },
+      "18": {
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 125
+      },
+      "19": {
+        "unknown1": 113,
+        "unknown2": 113,
+        "unknown3": 113,
+        "unknown4": 131
+      },
+      "20": {
+        "unknown1": 119,
+        "unknown2": 119,
+        "unknown3": 119,
+        "unknown4": 139
+      },
+      "21": {
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145
+      }
+    },
+    "compatibleSemanticProfileIds": [
+      "41ec8ecff96a0c8c-4f4ed102043d7370",
+      "41ec8ecff96a0c8c-fedb453533892b94",
+      "4b6baa7ad81c6eb1-8aa88308817eb871",
+      "76e772d3e32e2f5c-71b81d8ddfcffc8a",
+      "76e772d3e32e2f5c-ef9cfa622cae4d22",
+      "d066cff0134deb5d-6cbbbf63bf40882d",
+      "d066cff0134deb5d-88401ddd47b9cf67",
+      "d066cff0134deb5d-8c9873fc6b350927"
+    ],
+    "crossFamilyHeldOut": {
+      "conclusion": "no other family enters the exact MonsterData, equipped weapon-domain, slot, and stream selector",
+      "exactMatches": 0,
+      "observations": []
+    },
+    "exactCategoricalDomains": [
+      {
+        "actorQualityLevelsInclusive": [
+          1,
+          19
+        ],
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123685
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          20,
+          20
+        ],
+        "weaponHighTemplate": 123686,
+        "weaponLowTemplate": 123686
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          21,
+          21
+        ],
+        "weaponHighTemplate": 123687,
+        "weaponLowTemplate": 123687
+      },
+      {
+        "actorQualityLevelsInclusive": [
+          22,
+          40
+        ],
+        "weaponHighTemplate": 123688,
+        "weaponLowTemplate": 123687
+      }
+    ],
+    "family": "Fragmented Soul",
+    "formulaFamiliesTested": [
+      "exact affine integer formulas",
+      "exact affine rational formulas",
+      "floor division",
+      "ceiling division",
+      "nearest-away division",
+      "nearest-even division",
+      "finite differences",
+      "bounded actor-level formulas",
+      "weapon-quality-only formulas",
+      "item-template transformations",
+      "AttackDelay and RechargeDelay transformations",
+      "stream-specific formulas",
+      "breakpoint and piecewise formulas",
+      "integer clamps",
+      "unbounded extensions"
+    ],
+    "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+    "leaveOneOut": [
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 17,
+        "heldOutObserved": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "prediction": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "trainingObservations": {
+          "18": {
+            "unknown1": 107,
+            "unknown2": 107,
+            "unknown3": 107,
+            "unknown4": 125
+          },
+          "19": {
+            "unknown1": 113,
+            "unknown2": 113,
+            "unknown3": 113,
+            "unknown4": 131
+          },
+          "20": {
+            "unknown1": 119,
+            "unknown2": 119,
+            "unknown3": 119,
+            "unknown4": 139
+          },
+          "21": {
+            "unknown1": 125,
+            "unknown2": 125,
+            "unknown3": 125,
+            "unknown4": 145
+          }
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 18,
+        "heldOutObserved": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "prediction": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "trainingObservations": {
+          "17": {
+            "unknown1": 101,
+            "unknown2": 101,
+            "unknown3": 101,
+            "unknown4": 117
+          },
+          "19": {
+            "unknown1": 113,
+            "unknown2": 113,
+            "unknown3": 113,
+            "unknown4": 131
+          },
+          "20": {
+            "unknown1": 119,
+            "unknown2": 119,
+            "unknown3": 119,
+            "unknown4": 139
+          },
+          "21": {
+            "unknown1": 125,
+            "unknown2": 125,
+            "unknown3": 125,
+            "unknown4": 145
+          }
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 19,
+        "heldOutObserved": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 131
+        },
+        "prediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 131
+        },
+        "trainingObservations": {
+          "17": {
+            "unknown1": 101,
+            "unknown2": 101,
+            "unknown3": 101,
+            "unknown4": 117
+          },
+          "18": {
+            "unknown1": 107,
+            "unknown2": 107,
+            "unknown3": 107,
+            "unknown4": 125
+          },
+          "20": {
+            "unknown1": 119,
+            "unknown2": 119,
+            "unknown3": 119,
+            "unknown4": 139
+          },
+          "21": {
+            "unknown1": 125,
+            "unknown2": 125,
+            "unknown3": 125,
+            "unknown4": 145
+          }
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 20,
+        "heldOutObserved": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "prediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "trainingObservations": {
+          "17": {
+            "unknown1": 101,
+            "unknown2": 101,
+            "unknown3": 101,
+            "unknown4": 117
+          },
+          "18": {
+            "unknown1": 107,
+            "unknown2": 107,
+            "unknown3": 107,
+            "unknown4": 125
+          },
+          "19": {
+            "unknown1": 113,
+            "unknown2": 113,
+            "unknown3": 113,
+            "unknown4": 131
+          },
+          "21": {
+            "unknown1": 125,
+            "unknown2": 125,
+            "unknown3": 125,
+            "unknown4": 145
+          }
+        }
+      },
+      {
+        "candidateFormulaSatisfiedAllTrainingObservations": true,
+        "exactMatch": true,
+        "heldOutLevel": 21,
+        "heldOutObserved": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "prediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "trainingObservations": {
+          "17": {
+            "unknown1": 101,
+            "unknown2": 101,
+            "unknown3": 101,
+            "unknown4": 117
+          },
+          "18": {
+            "unknown1": 107,
+            "unknown2": 107,
+            "unknown3": 107,
+            "unknown4": 125
+          },
+          "19": {
+            "unknown1": 113,
+            "unknown2": 113,
+            "unknown3": 113,
+            "unknown4": 131
+          },
+          "20": {
+            "unknown1": 119,
+            "unknown2": 119,
+            "unknown3": 119,
+            "unknown4": 139
+          }
+        }
+      }
+    ],
+    "monsterData": 203729,
+    "numericOutput": {
+      "baseExpression": "6 * actorLevel - 1",
+      "clamping": "none inside the proven level domain",
+      "fields": {
+        "SpecialAttackWeapon.unknown1": "base",
+        "SpecialAttackWeapon.unknown2": "base",
+        "SpecialAttackWeapon.unknown3": "base",
+        "SpecialAttackWeapon.unknown4": "base + 2 * floor(actorLevel / 2)"
+      },
+      "integerArithmetic": "positive C# integer division equals floor",
+      "unknown5": "per-actor ordered mutable capture state; not formula identity"
+    },
+    "rawPacketObservations": [
+      {
+        "bodyHex": "1D3C0F1C0000C3507970245D00000003F10000006500000065000000650000007500000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "level": 17,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|IN|316|3afacb33afee",
+        "sequence": 316,
+        "sourceIdentity": "0x7970245D",
+        "timestampUtc": "2026-07-17T03:20:21.0358587Z",
+        "unknown1": 101,
+        "unknown2": 101,
+        "unknown3": 101,
+        "unknown4": 117,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954516A00000003F10000006500000065000000650000007500000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "level": 17,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|5883|e244bef634b6",
+        "sequence": 5883,
+        "sourceIdentity": "0x7954516A",
+        "timestampUtc": "2026-07-10T03:29:22.9505566Z",
+        "unknown1": 101,
+        "unknown2": 101,
+        "unknown3": 101,
+        "unknown4": 117,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954516F00000003F10000006500000065000000650000007500000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 101,
+          "unknown2": 101,
+          "unknown3": 101,
+          "unknown4": 117
+        },
+        "level": 17,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6244|1cfd89f65ade",
+        "sequence": 6244,
+        "sourceIdentity": "0x7954516F",
+        "timestampUtc": "2026-07-10T03:29:30.0003532Z",
+        "unknown1": 101,
+        "unknown2": 101,
+        "unknown3": 101,
+        "unknown4": 117,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350796079B300000003F10000006B0000006B0000006B0000007D00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719|IN|2970|53a6c10f524e",
+        "sequence": 2970,
+        "sourceIdentity": "0x796079B3",
+        "timestampUtc": "2026-07-13T03:39:38.8407032Z",
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 125,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954524800000003F10000006B0000006B0000006B0000007D00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|3243|438dc6b0d9f7",
+        "sequence": 3243,
+        "sourceIdentity": "0x79545248",
+        "timestampUtc": "2026-07-10T03:27:00.6561045Z",
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 125,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507980F13800000003F10000006B0000006B0000006B0000007D00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|3474|d94fcf953ed9",
+        "sequence": 3474,
+        "sourceIdentity": "0x7980F138",
+        "timestampUtc": "2026-07-20T10:19:55.5548657Z",
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 125,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954518B00000003F10000006B0000006B0000006B0000007D00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6922|a64044b39ed3",
+        "sequence": 6922,
+        "sourceIdentity": "0x7954518B",
+        "timestampUtc": "2026-07-10T03:29:50.5495357Z",
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 125,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954518E00000003F10000006B0000006B0000006B0000007D00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 107,
+          "unknown2": 107,
+          "unknown3": 107,
+          "unknown4": 125
+        },
+        "level": 18,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|7119|19d21c952fc9",
+        "sequence": 7119,
+        "sourceIdentity": "0x7954518E",
+        "timestampUtc": "2026-07-10T03:29:52.7154679Z",
+        "unknown1": 107,
+        "unknown2": 107,
+        "unknown3": 107,
+        "unknown4": 125,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954517A00000003F10000007100000071000000710000008300000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 131
+        },
+        "level": 19,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6542|3152d976f645",
+        "sequence": 6542,
+        "sourceIdentity": "0x7954517A",
+        "timestampUtc": "2026-07-10T03:29:39.7833632Z",
+        "unknown1": 113,
+        "unknown2": 113,
+        "unknown3": 113,
+        "unknown4": 131,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507980F12F00000003F10000007100000071000000710000008300000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 113,
+          "unknown2": 113,
+          "unknown3": 113,
+          "unknown4": 131
+        },
+        "level": 19,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|4465|ffdc82ee2516",
+        "sequence": 4465,
+        "sourceIdentity": "0x7980F12F",
+        "timestampUtc": "2026-07-20T10:20:52.2149570Z",
+        "unknown1": 113,
+        "unknown2": 113,
+        "unknown3": 113,
+        "unknown4": 131,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507980F12200000003F10000007700000077000000770000008B00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "level": 20,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5469|4be30c18ceff",
+        "sequence": 5469,
+        "sourceIdentity": "0x7980F122",
+        "timestampUtc": "2026-07-20T10:21:44.3118268Z",
+        "unknown1": 119,
+        "unknown2": 119,
+        "unknown3": 119,
+        "unknown4": 139,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507954518A00000003F10000007700000077000000770000008B00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "level": 20,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|6915|3e5fe549fe3e",
+        "sequence": 6915,
+        "sourceIdentity": "0x7954518A",
+        "timestampUtc": "2026-07-10T03:29:50.3491617Z",
+        "unknown1": 119,
+        "unknown2": 119,
+        "unknown3": 119,
+        "unknown4": 139,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507980F12500000003F10000007700000077000000770000008B00000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 119,
+          "unknown2": 119,
+          "unknown3": 119,
+          "unknown4": 139
+        },
+        "level": 20,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5456|0cc9da5d4c2f",
+        "sequence": 5456,
+        "sourceIdentity": "0x7980F125",
+        "timestampUtc": "2026-07-20T10:21:44.0567670Z",
+        "unknown1": 119,
+        "unknown2": 119,
+        "unknown3": 119,
+        "unknown4": 139,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AA00000003F10000007D0000007D0000007D000000910000002E",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12066|fad8cb7d32cb",
+        "sequence": 12066,
+        "sourceIdentity": "0x795451AA",
+        "timestampUtc": "2026-07-10T04:01:40.5123884Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 46
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AE00000003F10000007D0000007D0000007D0000009100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8817|95dba6ab00a8",
+        "sequence": 8817,
+        "sourceIdentity": "0x795451AE",
+        "timestampUtc": "2026-07-10T03:30:29.6976411Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AE00000003F10000007D0000007D0000007D0000009100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11681|fe2cabc698c6",
+        "sequence": 11681,
+        "sourceIdentity": "0x795451AE",
+        "timestampUtc": "2026-07-10T04:01:19.9707234Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C3507980F12000000003F10000007D0000007D0000007D0000009100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714",
+        "chainClassification": "complete-chain",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-051714|IN|5833|12b2c642233c",
+        "sequence": 5833,
+        "sourceIdentity": "0x7980F120",
+        "timestampUtc": "2026-07-20T10:22:02.3663948Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AA00000003F10000007D0000007D0000007D0000009100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|8994|064564cd423c",
+        "sequence": 8994,
+        "sourceIdentity": "0x795451AA",
+        "timestampUtc": "2026-07-10T03:30:36.7313008Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AA00000003F10000007D0000007D0000007D000000910000003D",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|IN|9713|cf885a12dc8a",
+        "sequence": 9713,
+        "sourceIdentity": "0x795451AA",
+        "timestampUtc": "2026-07-10T03:30:53.7460129Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 61
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AA00000003F10000007D0000007D0000007D0000009100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|12011|0000a0351a3a",
+        "sequence": 12011,
+        "sourceIdentity": "0x795451AA",
+        "timestampUtc": "2026-07-10T04:01:38.3462125Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 0
+      },
+      {
+        "bodyHex": "1D3C0F1C0000C350795451AE00000003F10000007D0000007D0000007D0000009100000000",
+        "captureSession": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
+        "chainClassification": "orphan-prefix",
+        "direction": "IN",
+        "exactMatch": true,
+        "formulaId": "fragmented-soul-saw-6L-minus-1-plus-2-floor-L-over-2-v1",
+        "formulaPrediction": {
+          "unknown1": 125,
+          "unknown2": 125,
+          "unknown3": 125,
+          "unknown4": 145
+        },
+        "level": 21,
+        "messageType": "SpecialAttackWeapon",
+        "packetId": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408|IN|11631|5415c06347a6",
+        "sequence": 11631,
+        "sourceIdentity": "0x795451AE",
+        "timestampUtc": "2026-07-10T04:01:17.9821556Z",
+        "unknown1": 125,
+        "unknown2": 125,
+        "unknown3": 125,
+        "unknown4": 145,
+        "unknown5": 0
+      }
+    ],
+    "rejectedCandidates": [
+      {
+        "candidate": "Unknown4 = 7 * actorLevel - 1",
+        "mismatches": 3,
+        "reason": "captured odd levels 17, 19, and 21 are one lower"
+      },
+      {
+        "candidate": "Unknown4 = 7 * actorLevel - 2",
+        "mismatches": 2,
+        "reason": "captured even levels 18 and 20 are one higher"
+      },
+      {
+        "candidate": "four identical SAW fields",
+        "mismatches": 21,
+        "reason": "Unknown4 exceeds the shared base in every raw packet"
+      },
+      {
+        "candidate": "weapon QL as the sole numeric input",
+        "mismatches": 6,
+        "reason": "QL14, QL17, QL18, QL19, and QL25 occur at different actor levels with different exact SAW values"
+      },
+      {
+        "candidate": "direct item-template interpolation",
+        "mismatches": 5,
+        "reason": "items.dat selects loadout, damage, range, and cadence but does not encode the observed SAW values"
+      },
+      {
+        "candidate": "unbounded Fragmented Soul level domain",
+        "reason": "levels below 17 and above 21 lack categorical and formula proof"
+      }
+    ],
+    "resource": 127,
+    "runtimeInputOwners": {
+      "actorLevelQualityAndLoadout": "CapturedSubwayGenerationVariantDefinition in CapturedSubwayOrdinaryContentProvider",
+      "monsterDataAndFamily": "CapturedSubwayOrdinaryArchetypeDefinition",
+      "mutableEnergyAmmoAndSawState": "existing per-actor combat contract/runtime state",
+      "weaponQlAcgItemLevelDamageRangeAndCadence": "active spawn, items.dat, and existing production combat owners",
+      "weaponSlotAndInstance": "NpcCombatAttackRules capture-bound Fragmented Soul constants",
+      "weaponTemplates": "owner-linked generation variant plus items.dat interpolation-domain validation"
+    },
+    "sharedCategoricalSemantics": {
+      "attackAction": 0,
+      "attackMode": "equipped",
+      "attackN3": 0,
+      "numericDamageType": 0,
+      "numericHitType": 3,
+      "packetOrder": [
+        "WeaponItemFullUpdate",
+        "SpecialAttackWeapon",
+        "Attack",
+        "AttackInfo"
+      ],
+      "specialAttackWeaponN3": 0,
+      "specials": [],
+      "streamCount": 1,
+      "streamOrdinal": 0,
+      "terminalOutcomesAreNotAdditionalStreams": true,
+      "weaponFamily": "items.dat interpolation list 123685..123703",
+      "weaponItemFullUpdateEnergy": 25,
+      "weaponItemFullUpdateFlags": 1027,
+      "weaponItemFullUpdateInstance": 0,
+      "weaponItemFullUpdateMultipleCount": 1,
+      "weaponItemFullUpdateSlot": 6,
+      "weaponItemFullUpdateStateMachine": [
+        1000015,
+        0
+      ],
+      "weaponItemFullUpdateUnknown1": 11,
+      "weaponItemFullUpdateUnknown2": 262,
+      "weaponItemFullUpdateUnknown3": 0
+    },
+    "supportedLevelsInclusive": [
+      17,
+      21
+    ]
+  },
   "meldedPatternsFormula": {
     "activeBindings": [
       {
