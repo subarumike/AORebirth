@@ -1,5 +1,11 @@
 # Temple ordinary-combat completion — 2026-07-28
 
+> Final cross-dungeon update: L18 Eternal Sentinel sources `0x7983FA22` and
+> `0x7983FBC2` are certified through the exact active WIFU loadouts, bounded
+> L18..L20 setup formula, and compatible L19/L20 normal-result domain. PF1931
+> ordinary combat is now `167/0`. The two-blocker checkpoint below is
+> historical. See `FINAL_ORDINARY_DUNGEON_COMBAT_COMPLETION_20260728.md`.
+
 ## Outcome
 
 This pass processed every actor in the starting `80`-actor PF1931

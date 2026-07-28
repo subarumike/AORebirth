@@ -1103,6 +1103,19 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            CapturedEnemyCombatContract generatedResultDomainContract;
+            if (TryResolveMathematicallyGeneratedResultDomain(
+                    resourceId,
+                    name,
+                    monsterData,
+                    level,
+                    current,
+                    out generatedResultDomainContract))
+            {
+                resolved = generatedResultDomainContract;
+                return true;
+            }
+
             CapturedEnemyCombatContract generatedNaturalAttackContract;
             if (TryResolveMathematicallyGeneratedNaturalAttackArchetype(
                     resourceId,
@@ -1379,6 +1392,52 @@ namespace AORebirth.Core.Playfields
             }
 
             return true;
+        }
+
+        private static bool TryResolveMathematicallyGeneratedResultDomain(
+            int resourceId,
+            string name,
+            int monsterData,
+            int level,
+            CapturedEnemyCombatContract current,
+            out CapturedEnemyCombatContract resolved)
+        {
+            resolved = null;
+            OrdinaryEnemyCombatNumericSetup generated;
+            OrdinaryEnemyCombatResultDomain domain;
+            if (!OrdinaryEnemyCombatSetupGenerator.MatchesGeneratedEquippedSetup(
+                    monsterData,
+                    level,
+                    current,
+                    out generated)
+                || generated.FormulaId
+                   != OrdinaryEnemyCombatSetupGenerator.ViolentVagabondFormulaId
+                || !OrdinaryEnemyCombatResultDomainRegistry.TryResolve(
+                    resourceId,
+                    name,
+                    monsterData,
+                    current,
+                    out domain)
+                || current.WeaponDefinition == null
+                || !current.WeaponDefinition.IsValid)
+            {
+                return false;
+            }
+
+            string archetypeId = string.Format(
+                "formula={0}|resultDomain={1}|resource={2}|name={3}|MonsterData={4}|weaponFamily=130590",
+                generated.FormulaId,
+                domain.DomainId,
+                resourceId,
+                name,
+                monsterData);
+            resolved = current
+                .WithCaptureCertification(
+                    current.Evidence + "; result-domain evidence=" + domain.Evidence,
+                    current.EvidenceSourceIdentity,
+                    current.WeaponDefinition)
+                .WithCaptureProvenArchetype(archetypeId);
+            return resolved.IsCombatReady;
         }
 
         private static bool TryResolveMathematicallyGeneratedNaturalAttackArchetype(

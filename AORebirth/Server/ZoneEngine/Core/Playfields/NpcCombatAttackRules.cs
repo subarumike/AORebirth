@@ -115,34 +115,6 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayStimFiendInitialSpecialAttackWeaponUnknown5 = 0;
 
-        // Official-live Vagabonds produced only misses, so their damage is a private
-        // playability policy using the captured 9..12 normal range of the adjacent,
-        // same-level Subway Mugger family. Cadence and packet shape remain Vagabond-
-        // specific capture evidence; Red Wine template 130590 is not a combat weapon.
-        public const int PolicySubwayViolentVagabondMinimumDamage = 9;
-
-        public const int PolicySubwayViolentVagabondMaximumDamage = 12;
-
-        public const double CapturedSubwayViolentVagabondAttackSeconds = 4.5802404;
-
-        public const int CapturedSubwayViolentVagabondAttackInfoAmmoCount = 0;
-
-        public const int CapturedSubwayViolentVagabondAttackInfoWeaponSlot = 6;
-
-        public const int CapturedSubwayViolentVagabondAttackInfoUnknown = 0;
-
-        public const int CapturedSubwayViolentVagabondAttackInfoWeaponInstance = 0;
-
-        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown1 = 32;
-
-        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown2 = 35;
-
-        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown3 = 29;
-
-        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown4 = 31;
-
-        public const int CapturedSubwayViolentVagabondSpecialAttackWeaponUnknown5 = 0;
-
         public const int CapturedSubwayBloodcreeperMonsterData = 30379;
 
         public const int CapturedSubwayIncompleteRebuildMonsterData = 203728;

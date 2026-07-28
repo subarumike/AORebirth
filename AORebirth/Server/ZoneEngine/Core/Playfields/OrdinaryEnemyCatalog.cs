@@ -282,6 +282,7 @@ namespace AORebirth.Core.Playfields
                 Func<int, CapturedEnemyCombatContract> contractResolver =
                     first.MonsterData == NpcCombatAttackRules.CapturedSubwayDisobedientBotMonsterData
                     || first.MonsterData == NpcCombatAttackRules.CapturedSubwayFilthFleaMonsterData
+                    || first.MonsterData == ViolentVagabondMonsterData
                         ? new Func<int, CapturedEnemyCombatContract>(
                             level => CapturedSubwayCombatCatalog.For(first.Name, first.MonsterData, level))
                         : null;
@@ -883,11 +884,7 @@ namespace AORebirth.Core.Playfields
         {
             OrdinaryEnemyProfile profile = profiles.Single(
                 value => value.MonsterData == ViolentVagabondMonsterData);
-            CapturedEnemyCombatContract contract = profile.Combat.Contract;
-            if (contract == null
-                || contract.IsCombatReady
-                || contract.AttackModel != CapturedEnemyAttackModel.Unresolved
-                || profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Retaliate
+            if (profile.Aggression.Mode != OrdinaryEnemyAggressionMode.Retaliate
                 || profile.Aggression.AutomaticAggroRadius.HasValue
                 || !profile.Aggression.Chase
                 || profile.Aggression.ReturnToSpawn
@@ -901,6 +898,23 @@ namespace AORebirth.Core.Playfields
                 .Where(value => value.ProfileKey == profile.ProfileKey)
                 .ToArray();
             if (rows.Length != 22
+                || rows.Any(
+                    value =>
+                    {
+                        CapturedEnemyCombatContract contract =
+                            profile.Combat.ResolveContract(
+                                value.SourceIdentity,
+                                value.Level);
+                        return contract == null
+                               || contract.AttackModel
+                                  != CapturedEnemyAttackModel.EquippedWeapon
+                               || contract.WeaponLowId != 130590
+                               || contract.WeaponHighId != 130590
+                               || contract.WeaponQuality != 1
+                               || contract.WeaponInventorySlot != 6
+                               || !contract
+                                   .UsesProductionActorValuesForPresentationWeapon;
+                    })
                 || rows.Any(
                     value => value.Disposition
                              != OrdinaryEnemyRuntimeDisposition.Active)
@@ -990,6 +1004,7 @@ namespace AORebirth.Core.Playfields
                         mode = monsterData == 26092
                                || monsterData
                                   == NpcCombatAttackRules.CapturedSubwayMeldedPatternsMonsterData
+                               || monsterData == ViolentVagabondMonsterData
                             ? OrdinaryEnemyCombatMode.EquippedRanged
                             : OrdinaryEnemyCombatMode.Unresolved;
                         damageSource = OrdinaryEnemyDamageSource.WeaponRoll;

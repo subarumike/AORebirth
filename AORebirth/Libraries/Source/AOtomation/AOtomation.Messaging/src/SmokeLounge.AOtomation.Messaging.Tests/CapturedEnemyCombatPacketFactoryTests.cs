@@ -2798,7 +2798,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void TempleOrdinaryCoverageRestoresEveryCompleteContractAndKeepsOnlyTwoExactBlockers()
+        public void TempleOrdinaryCoverageRestoresEveryCompleteContract()
         {
             var provider = new CapturedTempleOfThreeWindsContentProvider();
             Dictionary<string, OrdinaryEnemyProfile> profiles = provider.GetProfiles()
@@ -2826,15 +2826,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(167, spawns.Length);
-            Assert.AreEqual(165, ready.Count);
-            Assert.AreEqual(2, quarantined.Count);
-            CollectionAssert.AreEquivalent(
-                new[]
-                {
-                    unchecked((int)0x7983FA22),
-                    unchecked((int)0x7983FBC2)
-                },
-                quarantined.Select(value => value.SourceIdentity).ToArray());
+            Assert.AreEqual(167, ready.Count);
+            Assert.AreEqual(0, quarantined.Count);
         }
 
         [TestMethod]
@@ -2865,17 +2858,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     spawn)).ToArray();
 
             Assert.AreEqual(322, subwaySpawns.Length);
-            Assert.AreEqual(1, subwayContracts.Count(value => value.IsCombatReady));
-            Assert.AreEqual(321, subwayContracts.Count(value => value.IsQuarantined));
+            Assert.AreEqual(23, subwayContracts.Count(value => value.IsCombatReady));
+            Assert.AreEqual(299, subwayContracts.Count(value => value.IsQuarantined));
             Assert.IsTrue(
                 subwaySpawns.Zip(
                         subwayContracts,
                         (spawn, contract) => new { Spawn = spawn, Contract = contract })
                     .Where(value => value.Contract.IsCombatReady)
-                    .All(value => value.Spawn.SourceIdentity == 0x7953AEA5));
+                    .All(
+                        value => value.Spawn.SourceIdentity == 0x7953AEA5
+                                 || profiles[value.Spawn.ProfileKey].DisplayName
+                                    == "Violent Vagabond"));
             Assert.AreEqual(167, templeSpawns.Length);
-            Assert.AreEqual(165, templeContracts.Count(value => value.IsCombatReady));
-            Assert.AreEqual(2, templeContracts.Count(value => value.IsQuarantined));
+            Assert.AreEqual(167, templeContracts.Count(value => value.IsCombatReady));
+            Assert.AreEqual(0, templeContracts.Count(value => value.IsQuarantined));
 
             CapturedEnemyCombatContract[] sourceUnboundSubwayEncounters =
             {

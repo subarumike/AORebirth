@@ -533,24 +533,33 @@ namespace AORebirth.Core.Playfields
                     true);
             }
 
-            if (variant.Level != 20
-                || weapon.LowId != 123381
-                || weapon.HighId != 123382)
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (!OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        41690,
+                        variant.Level,
+                        weapon.LowId,
+                        weapon.HighId,
+                        weapon.Quality,
+                        6),
+                    out generated))
             {
                 return CapturedEnemyCombatContract.Unresolved(
                     "Eternal Sentinel source 0x" + sourceIdentity.ToString("X8")
                     + " L" + variant.Level + " weapon " + weapon.LowId + "/"
                     + weapon.HighId
-                    + " has no complete same-level normal AttackInfo contract; "
-                    + "captured WIFU and miss packets are insufficient",
+                    + " is outside the bounded 123381..123384 mathematical combat domain",
                     true);
             }
 
             return CapturedEnemyCombatContract
                 .EquippedWeaponWithCapturedPacketSequence(
                     weapon.Evidence
-                    + ": exact active L20 WIFU; complete L20 profiles prove "
-                    + "WIFU-SAW-Attack-AttackInfo with mutable Unknown5 state",
+                    + ": exact active WIFU; 20260721-042139 proves the L18 "
+                    + "98/98/98/11 SAW and miss chain; complete L19/L20 Eternal "
+                    + "profiles independently prove slot-6 normal AttackInfo "
+                    + "hit/damage 3/0 and WIFU-SAW-Attack-AttackInfo ordering; "
+                    + "generated setup=" + generated.FormulaId,
                     sourceIdentity,
                     weapon.LowId,
                     weapon.HighId,
@@ -569,10 +578,10 @@ namespace AORebirth.Core.Playfields
                     false,
                     -1,
                     0,
-                    109,
-                    109,
-                    109,
-                    12,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
                     0,
                     NpcCombatAttackRules.NormalAttackInfoHitType,
                     0,

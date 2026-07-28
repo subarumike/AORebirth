@@ -546,6 +546,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesProductionEquippedWeaponValues { get; private set; }
 
+        internal bool UsesProductionActorValuesForPresentationWeapon { get; private set; }
+
         internal bool UsesCaptureProvenArchetype { get; private set; }
 
         internal string CaptureProvenArchetypeId { get; private set; }
@@ -837,6 +839,13 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionEquippedWeaponValues = true;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionActorValuesForPresentationWeapon()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionActorValuesForPresentationWeapon = true;
             return clone;
         }
 
@@ -1983,7 +1992,8 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            if (contract.RequiresPhysicalWeaponPresentation)
+            if (contract.RequiresPhysicalWeaponPresentation
+                && !contract.UsesProductionActorValuesForPresentationWeapon)
             {
                 int rawRange = weapon.GetAttribute((int)StatIds.attackrange);
                 if (rawRange == MissingItemStatValue || rawRange <= 0)
@@ -2465,14 +2475,102 @@ namespace AORebirth.Core.Playfields
                         .WithCapturedWeapon(ThiefCapturedWeaponDefinition(thiefEvidence));
                 }
                 case 203733:
-                    return CapturedEnemyCombatContract.Unresolved(
-                        "20260719-010047/020104 contain Violent Vagabond misses but no landed own-source damage; adjacent Mugger damage substitution is forbidden",
-                        true);
+                    return level.HasValue
+                        ? ViolentVagabond(level.Value)
+                        : CapturedEnemyCombatContract.Unresolved(
+                            "Violent Vagabond requires its active runtime level",
+                            true);
                 default:
                     return CapturedEnemyCombatContract.Unresolved(
                         "No captured combat contract for " + name + " monsterData=" + monsterData,
                         false);
             }
+        }
+
+        private static CapturedEnemyCombatContract ViolentVagabond(int level)
+        {
+            OrdinaryEnemyCombatNumericSetup generated;
+            if (!OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                    new OrdinaryEnemyEquippedCombatSetupInput(
+                        203733,
+                        level,
+                        130590,
+                        130590,
+                        1,
+                        (int)WeaponSlots.Righthand),
+                    out generated))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Violent Vagabond mathematical combat setup is unsupported for level "
+                    + level,
+                    true);
+            }
+
+            const int evidenceSourceIdentity = unchecked((int)0x794CD4CCu);
+            const string evidence =
+                "20260708-143600,20260709-205921/210452/212115/212336: "
+                + "owner-linked 130590 QL1 WIFU, 40 distinct embedded-attacker misses, "
+                + "empty SAW, Attack action 0, and exact miss-chain ordering; "
+                + "normal-result semantics supplied by "
+                + OrdinaryEnemyCombatResultDomainRegistry.ViolentVagabondResultDomainId;
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    evidence,
+                    evidenceSourceIdentity,
+                    130590,
+                    130590,
+                    1,
+                    (int)WeaponSlots.Righthand,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    false,
+                    false,
+                    0,
+                    0,
+                    generated.SpecialAttackWeaponUnknown1,
+                    generated.SpecialAttackWeaponUnknown2,
+                    generated.SpecialAttackWeaponUnknown3,
+                    generated.SpecialAttackWeaponUnknown4,
+                    0,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    false,
+                    true)
+                .WithCapturedWeapon(
+                    new CapturedEnemyWeaponDefinition(
+                        evidence,
+                        evidenceSourceIdentity,
+                        0,
+                        11,
+                        (int)WeaponSlots.Righthand,
+                        1000015,
+                        0,
+                        262,
+                        new[]
+                        {
+                            CapturedWeaponStat(CharacterStat.Flags, 4199425),
+                            CapturedWeaponStat(CharacterStat.StaticInstance, 130590),
+                            CapturedWeaponStat(CharacterStat.ACGItemLevel, 1),
+                            CapturedWeaponStat(CharacterStat.ACGItemTemplateID, 130590),
+                            CapturedWeaponStat(CharacterStat.ACGItemTemplateID2, 130590),
+                            CapturedWeaponStat(CharacterStat.MultipleCount, 1),
+                            CapturedWeaponStat(CharacterStat.Energy, 1),
+                            CapturedWeaponStat(CharacterStat.AttackDelay, 175),
+                            CapturedWeaponStat(CharacterStat.RechargeDelay, 175)
+                        },
+                        0))
+                .WithProductionEquippedWeaponValues()
+                .WithProductionActorValuesForPresentationWeapon();
         }
 
         private static CapturedEnemyWeaponDefinition ThiefCapturedWeaponDefinition(

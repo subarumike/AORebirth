@@ -1,5 +1,11 @@
 # Subway Violent Vagabond Combat Evidence Review
 
+> Final 2026-07-28 disposition: all 22 actors are certified through bounded
+> formula `violent-vagabond-saw-bounded-affine-floor-v1` and result domain
+> `equipped-melee-empty-saw-slot6-normal-result-v1`. The earlier fail-closed
+> checkpoint below is historical. See
+> `FINAL_ORDINARY_DUNGEON_COMBAT_COMPLETION_20260728.md`.
+
 Date: 2026-07-26
 
 ## Result

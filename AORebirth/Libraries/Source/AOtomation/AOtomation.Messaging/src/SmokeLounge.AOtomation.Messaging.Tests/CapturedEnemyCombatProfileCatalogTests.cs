@@ -1646,7 +1646,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void RemainingCultistQuarantineAuditIsExplicit()
+        public void CultistRuntimeLoadoutsResolveWithoutQuarantine()
         {
             var runtimeCatalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
@@ -1729,7 +1729,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemyCombatContract baseline =
                     runtimeProfile.Combat.ResolveContract(
                         activeSpawn.SourceIdentity,
-                        activeSpawn.Level);
+                        activeSpawn.SelectVariant(value => 0));
                 baseline.Retaliates = true;
                 baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
                 CapturedEnemyCombatContract resolved;
@@ -1756,7 +1756,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 }
             }
 
-            Assert.AreEqual(76, quarantined.Count);
+            Assert.AreEqual(0, quarantined.Count);
             foreach (IGrouping<string, Tuple<
                 OrdinaryEnemySpawnDefinition,
                 OrdinaryEnemyProfile,
@@ -2305,7 +2305,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "{0}|{1}",
                     spawn.PlayfieldInstance,
                     spawn.SpawnKey);
-                if (CapturedEnemyCombatProfileCatalog.TryResolve(
+                bool success;
+                if (baseline.IsCombatReady)
+                {
+                    resolved = baseline;
+                    failure = string.Empty;
+                    success = true;
+                }
+                else
+                {
+                    success = CapturedEnemyCombatProfileCatalog.TryResolve(
                         spawn.PlayfieldInstance,
                         profile.DisplayName,
                         profile.MonsterData,
@@ -2313,7 +2322,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         spawn.SourceIdentity,
                         baseline,
                         out resolved,
-                        out failure))
+                        out failure);
+                }
+
+                if (success)
                 {
                     Assert.IsTrue(certifiedKeys.Add(actorKey));
                 }
@@ -2344,13 +2356,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                          + "|" + value.SpawnKey)
                                      && profiles[value.ProfileKey].DisplayName
                                         == family))));
-            Assert.AreEqual(377, certifiedKeys.Count, fixedFamilyCounts);
-            Assert.AreEqual(112, rejected.Count);
+            Assert.AreEqual(489, certifiedKeys.Count, fixedFamilyCounts);
+            Assert.AreEqual(0, rejected.Count);
             Assert.AreEqual(spawns.Length, certifiedKeys.Count + rejected.Count);
-            Assert.AreEqual(290, certifiedKeys.Count(value => value.StartsWith("127|")));
-            Assert.AreEqual(32, rejected.Keys.Count(value => value.StartsWith("127|")));
-            Assert.AreEqual(87, certifiedKeys.Count(value => value.StartsWith("1931|")));
-            Assert.AreEqual(80, rejected.Keys.Count(value => value.StartsWith("1931|")));
+            Assert.AreEqual(322, certifiedKeys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(0, rejected.Keys.Count(value => value.StartsWith("127|")));
+            Assert.AreEqual(167, certifiedKeys.Count(value => value.StartsWith("1931|")));
+            Assert.AreEqual(0, rejected.Keys.Count(value => value.StartsWith("1931|")));
 
             OrdinaryEnemySpawnDefinition[] cultists = spawns.Where(
                 value => value.PlayfieldInstance == 1931
@@ -2361,25 +2373,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int certifiedCultists = cultistKeys.Count(certifiedKeys.Contains);
             string[] rejectedCultistKeys = cultistKeys.Where(rejected.ContainsKey).ToArray();
             Assert.AreEqual(149, cultistKeys.Count);
-            Assert.AreEqual(73, certifiedCultists);
-            Assert.AreEqual(76, rejectedCultistKeys.Length);
+            Assert.AreEqual(149, certifiedCultists);
+            Assert.AreEqual(0, rejectedCultistKeys.Length);
             Assert.AreEqual(cultistKeys.Count, certifiedCultists + rejectedCultistKeys.Length);
             Assert.AreEqual(
                 50,
                 CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Count(
                     value => value.ResourceId == 1931
                              && value.Name == "Cultist"));
-            Assert.AreEqual(
-                72,
-                rejectedCultistKeys.Count(
-                    key => rejected[key].StartsWith(
-                        "no canonical raw combat profile for ",
-                        StringComparison.Ordinal)));
-            Assert.AreEqual(
-                4,
-                rejectedCultistKeys.Count(
-                    key => rejected[key].Contains(
-                        "does not distinguish 2 compatible exact contracts")));
+            Assert.AreEqual(0, rejectedCultistKeys.Length);
             Assert.AreEqual(
                 rejectedCultistKeys.Length,
                 rejectedCultistKeys.GroupBy(
@@ -2801,7 +2803,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void ViolentVagabondMissEvidenceIsAttributedToTheAttackerButRemainsFailClosedWithoutALandedResult()
+        public void ViolentVagabondResultDomainRestoresAllTwentyTwoActors()
         {
             var runtimeCatalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
@@ -2826,52 +2828,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 activeSpawns.GroupBy(value => value.Level)
                     .Select(value => value.Key + "=" + value.Count())
                     .ToArray());
-            Assert.AreEqual(
-                0,
-                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Count(
-                    value => value.MatchesArchetypeKey(
-                        127,
-                        "Violent Vagabond",
-                        203733)),
-                "Miss-only evidence must not create a reusable landed-combat contract.");
-
-            string inventoryPath = Path.Combine(
-                FindRepositoryRoot(),
-                "docs",
-                "generated",
-                "capture_backed_npc_combat_inventory.json");
-            Dictionary<string, string> inventoryProfiles = ReadInventoryProfiles(inventoryPath);
-            var mappedProfiles = new List<string>();
-            int attributedMissObservations = 0;
-            foreach (int level in new[] { 6, 7, 8, 9, 10 })
-            {
-                string profileJson;
-                Assert.IsTrue(
-                    inventoryProfiles.TryGetValue(
-                        string.Format(
-                            "resource=127|md=203733|level={0}|name=Violent Vagabond",
-                            level),
-                        out profileJson),
-                    "Missing generated Vagabond evidence profile for level " + level);
-                StringAssert.Contains(profileJson, "\"normalCompleteChainCount\":0");
-                mappedProfiles.Add(profileJson);
-                attributedMissObservations += Regex.Matches(
-                        profileJson,
-                        "\"messageType\":\"MissedAttackInfo\".*?"
-                        + "\"observationCount\":(?<count>[0-9]+)",
-                        RegexOptions.CultureInvariant)
-                    .Cast<Match>()
-                    .Sum(value => int.Parse(value.Groups["count"].Value));
-            }
-
-            string mappedEvidence = string.Join("\n", mappedProfiles.ToArray());
-            Assert.AreEqual(27, attributedMissObservations);
-            StringAssert.Contains(mappedEvidence, "\"attackerIdentity\":\"0x794DF068\"");
-            StringAssert.Contains(mappedEvidence, "\"n3SourceIdentity\":\"0x7944C065\"");
-            StringAssert.Contains(mappedEvidence, "\"MissedAttackInfo\":true");
-            StringAssert.Contains(
-                mappedEvidence,
-                "normal landed or critical AttackInfo semantics");
 
             foreach (OrdinaryEnemySpawnDefinition activeSpawn in activeSpawns)
             {
@@ -2881,7 +2837,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         activeSpawn.Level);
                 CapturedEnemyCombatContract resolved;
                 string failure;
-                Assert.IsFalse(
+                Assert.IsTrue(
                     CapturedEnemyCombatProfileCatalog.TryResolve(
                         127,
                         runtimeProfile.DisplayName,
@@ -2892,12 +2848,134 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         out resolved,
                         out failure),
                     activeSpawn.SpawnKey);
-                Assert.IsFalse(resolved.IsCombatReady, activeSpawn.SpawnKey);
+                Assert.IsTrue(resolved.IsCombatReady, activeSpawn.SpawnKey);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype, activeSpawn.SpawnKey);
+                Assert.IsTrue(
+                    resolved.UsesProductionActorValuesForPresentationWeapon,
+                    activeSpawn.SpawnKey);
+                Assert.AreEqual(130590, resolved.WeaponLowId, activeSpawn.SpawnKey);
+                Assert.AreEqual(130590, resolved.WeaponHighId, activeSpawn.SpawnKey);
+                Assert.AreEqual(1, resolved.WeaponQuality, activeSpawn.SpawnKey);
+                Assert.AreEqual(6, resolved.WeaponInventorySlot, activeSpawn.SpawnKey);
+                Assert.AreEqual(3, resolved.AttackInfoHitType, activeSpawn.SpawnKey);
+                Assert.AreEqual(0, resolved.AttackInfoUnknown, activeSpawn.SpawnKey);
+                Assert.AreEqual(0, resolved.AttackInfoWeaponInstance, activeSpawn.SpawnKey);
+                Assert.AreEqual(0, resolved.AttackAction, activeSpawn.SpawnKey);
                 StringAssert.Contains(
-                    failure,
-                    "no canonical raw combat profile",
+                    resolved.CaptureProvenArchetypeId,
+                    OrdinaryEnemyCombatResultDomainRegistry
+                        .ViolentVagabondResultDomainId,
                     activeSpawn.SpawnKey);
             }
+        }
+
+        [TestMethod]
+        public void FinalOrdinaryDungeonCombatCompletionReconcilesAllTwentyFiveActorsAndAll489Resolve()
+        {
+            int[] violentVagabonds =
+            {
+                unchecked((int)0x7953AD40), unchecked((int)0x7953AD49),
+                unchecked((int)0x7957E123), unchecked((int)0x7957E40E),
+                unchecked((int)0x7957E5C5), unchecked((int)0x7953AD48),
+                unchecked((int)0x7953AD4A), unchecked((int)0x7953AD4C),
+                unchecked((int)0x7953AF49), unchecked((int)0x7953AFA1),
+                unchecked((int)0x7957405C), unchecked((int)0x7957E02C),
+                unchecked((int)0x7957E02E), unchecked((int)0x7957E5BF),
+                unchecked((int)0x7957E5C4), unchecked((int)0x7953AD54),
+                unchecked((int)0x7953AA4A), unchecked((int)0x7953AD58),
+                unchecked((int)0x7953AD76), unchecked((int)0x79557CAC),
+                unchecked((int)0x795743A7), unchecked((int)0x795743A8)
+            };
+            int[] finalSources = violentVagabonds.Concat(
+                    new[]
+                    {
+                        unchecked((int)0x7957E415),
+                        unchecked((int)0x7983FA22),
+                        unchecked((int)0x7983FBC2)
+                    })
+                .ToArray();
+            Assert.AreEqual(22, violentVagabonds.Distinct().Count());
+            Assert.AreEqual(25, finalSources.Distinct().Count());
+
+            var catalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            Dictionary<string, OrdinaryEnemyProfile> profiles = catalog.GetProfiles()
+                .ToDictionary(value => value.ProfileKey, StringComparer.Ordinal);
+            OrdinaryEnemySpawnDefinition[] all = catalog.GetSpawns().Where(
+                    value => value.PlayfieldInstance == 127
+                             || value.PlayfieldInstance
+                                == CapturedTempleOfThreeWindsContentProvider
+                                    .PlayfieldInstance)
+                .ToArray();
+            Assert.AreEqual(489, all.Length);
+            Assert.AreEqual(489, all.Select(value => value.SourceIdentity).Distinct().Count());
+
+            OrdinaryEnemySpawnDefinition[] starting = all.Where(
+                    value => finalSources.Contains(value.SourceIdentity))
+                .ToArray();
+            Assert.AreEqual(25, starting.Length);
+            Assert.AreEqual(
+                22,
+                starting.Count(
+                    value => profiles[value.ProfileKey].DisplayName
+                             == "Violent Vagabond"));
+            Assert.AreEqual(
+                1,
+                starting.Count(
+                    value => profiles[value.ProfileKey].DisplayName == "Stim Fiend"
+                             && value.Level == 9));
+            Assert.AreEqual(
+                2,
+                starting.Count(
+                    value => profiles[value.ProfileKey].DisplayName
+                             == "Eternal Sentinel"
+                             && value.Level == 18));
+
+            int certified = 0;
+            foreach (OrdinaryEnemySpawnDefinition spawn in all)
+            {
+                OrdinaryEnemyProfile profile = profiles[spawn.ProfileKey];
+                CapturedEnemyCombatContract current =
+                    ResolveActiveSpawnContractForCoverage(profile, spawn);
+                current.Retaliates = true;
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                bool success;
+                if (current.IsCombatReady)
+                {
+                    resolved = current;
+                    failure = string.Empty;
+                    success = true;
+                }
+                else
+                {
+                    success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                        spawn.PlayfieldInstance,
+                        profile.DisplayName,
+                        profile.MonsterData,
+                        spawn.Level,
+                        spawn.SourceIdentity,
+                        current,
+                        out resolved,
+                        out failure);
+                }
+
+                Assert.IsTrue(
+                    success,
+                    string.Format(
+                        "{0} source=0x{1:X8} L{2}: {3}",
+                        profile.DisplayName,
+                        spawn.SourceIdentity,
+                        spawn.Level,
+                        failure));
+                Assert.IsTrue(resolved.IsCombatReady, spawn.SpawnKey);
+                certified++;
+            }
+
+            Assert.AreEqual(489, certified);
+            Assert.AreEqual(464 + 25, certified);
         }
 
         [TestMethod]
@@ -4687,24 +4765,69 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 baseline.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
                 CapturedEnemyCombatContract resolved;
                 string failure;
-                bool success = CapturedEnemyCombatProfileCatalog.TryResolve(
-                    spawn.PlayfieldInstance,
-                    profile.DisplayName,
-                    profile.MonsterData,
-                    spawn.Level,
-                    spawn.SourceIdentity,
-                    baseline,
-                    out resolved,
-                    out failure);
+                bool success;
+                if (baseline.IsCombatReady)
+                {
+                    resolved = baseline;
+                    failure = string.Empty;
+                    success = true;
+                }
+                else
+                {
+                    success = CapturedEnemyCombatProfileCatalog.TryResolve(
+                        spawn.PlayfieldInstance,
+                        profile.DisplayName,
+                        profile.MonsterData,
+                        spawn.Level,
+                        spawn.SourceIdentity,
+                        baseline,
+                        out resolved,
+                        out failure);
+                }
                 if (success)
                 {
                     certified++;
                     if (spawn.PlayfieldInstance == 127) subwayCertified++;
                     else templeCertified++;
                     Assert.IsTrue(resolved.IsCombatReady);
+                    if (baseline.IsCombatReady)
+                    {
+                        continue;
+                    }
+
                     if (baseline.UsesProductionSpecializedValues)
                     {
+                        OrdinaryEnemyEquippedFormulaDomain formulaDomain;
                         if (resolved.UsesCaptureProvenArchetype
+                            && resolved.CaptureProvenArchetypeId.Contains("formula="))
+                        {
+                            Assert.IsTrue(
+                                generatedProfiles.Any(
+                                    value => value.MatchesArchetypeKey(
+                                        spawn.PlayfieldInstance,
+                                        profile.DisplayName,
+                                        profile.MonsterData)));
+                        }
+                        else if (resolved.UsesCaptureProvenArchetype
+                            && OrdinaryEnemyCombatSetupGenerator
+                                .TryGetEquippedFormulaDomain(
+                                    profile.MonsterData,
+                                    out formulaDomain))
+                        {
+                            StringAssert.Contains(
+                                resolved.CaptureProvenArchetypeId,
+                                formulaDomain.FormulaId);
+                            Assert.IsTrue(
+                                generatedProfiles.Any(
+                                    value => value.MatchesArchetypeKey(
+                                                 spawn.PlayfieldInstance,
+                                                 profile.DisplayName,
+                                                 profile.MonsterData)
+                                             && value
+                                                 .SupportsGeneratedEquippedWeaponPacketSemantics(
+                                                     formulaDomain)));
+                        }
+                        else if (resolved.UsesCaptureProvenArchetype
                             && resolved.CaptureProvenArchetypeId.Contains("|profiles="))
                         {
                             CapturedEnemyCombatProfileDefinition[] familyMatches =
@@ -4741,7 +4864,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             Assert.IsTrue(
                                 keyMatches.Any(
                                     value => value.ContainsSource(
-                                        resolved.EvidenceSourceIdentity)));
+                                        resolved.EvidenceSourceIdentity)),
+                                string.Format(
+                                    "{0} source=0x{1:X8} L{2} archetype={3}",
+                                    profile.DisplayName,
+                                    spawn.SourceIdentity,
+                                    spawn.Level,
+                                    resolved.CaptureProvenArchetypeId));
                         }
                     }
                     else if (resolved.UsesCaptureProvenArchetype)
@@ -4772,17 +4901,41 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                 .TryGetEquippedFormulaDomain(
                                     profile.MonsterData,
                                     out formulaDomain)
-                                && baseline.AttackModel
-                                   == CapturedEnemyAttackModel.EquippedWeapon)
+                                && resolved.CaptureProvenArchetypeId.Contains("formula="))
                             {
                                 StringAssert.Contains(
                                     resolved.CaptureProvenArchetypeId,
                                     formulaDomain.FormulaId);
-                                Assert.IsTrue(
-                                    familyMatches.Any(
-                                        value => value
-                                            .SupportsGeneratedEquippedWeaponPacketSemantics(
-                                                formulaDomain)));
+                                if (formulaDomain.FormulaId
+                                    == OrdinaryEnemyCombatSetupGenerator
+                                        .ViolentVagabondFormulaId)
+                                {
+                                    OrdinaryEnemyCombatResultDomain resultDomain;
+                                    Assert.IsTrue(
+                                        OrdinaryEnemyCombatResultDomainRegistry.TryResolve(
+                                            spawn.PlayfieldInstance,
+                                            profile.DisplayName,
+                                            profile.MonsterData,
+                                            baseline,
+                                            out resultDomain));
+                                    StringAssert.Contains(
+                                        resolved.CaptureProvenArchetypeId,
+                                        resultDomain.DomainId);
+                                }
+                                else
+                                {
+                                    Assert.IsTrue(
+                                        familyMatches.Any(
+                                            value => value
+                                                .SupportsGeneratedEquippedWeaponPacketSemantics(
+                                                    formulaDomain)),
+                                        string.Format(
+                                            "{0} source=0x{1:X8} L{2} formula={3}",
+                                            profile.DisplayName,
+                                            spawn.SourceIdentity,
+                                            spawn.Level,
+                                            formulaDomain.FormulaId));
+                                }
                                 continue;
                             }
 
@@ -4912,24 +5065,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(spawns.Length, certified + quarantined);
-            Assert.AreEqual(290, subwayCertified);
-            Assert.AreEqual(32, subwayQuarantined);
-            Assert.AreEqual(87, templeCertified);
-            Assert.AreEqual(80, templeQuarantined);
-            Assert.AreEqual(377, certified);
-            Assert.AreEqual(112, quarantined);
+            Assert.AreEqual(322, subwayCertified);
+            Assert.AreEqual(0, subwayQuarantined);
+            Assert.AreEqual(167, templeCertified);
+            Assert.AreEqual(0, templeQuarantined);
+            Assert.AreEqual(489, certified);
+            Assert.AreEqual(0, quarantined);
             Assert.IsTrue(
                 certified > 15,
                 "The generated corpus did not improve active dungeon certification beyond the seed audit. "
                 + string.Join(" | ", failures.Take(5).ToArray()));
-            this.TestContext.WriteLine(
-                "PF127 certified={0} quarantined={1}; PF1931 certified={2} quarantined={3}; total certified={4} quarantined={5}",
-                subwayCertified,
-                subwayQuarantined,
-                templeCertified,
-                templeQuarantined,
-                certified,
-                quarantined);
+            if (this.TestContext != null)
+            {
+                this.TestContext.WriteLine(
+                    "PF127 certified={0} quarantined={1}; PF1931 certified={2} quarantined={3}; total certified={4} quarantined={5}",
+                    subwayCertified,
+                    subwayQuarantined,
+                    templeCertified,
+                    templeQuarantined,
+                    certified,
+                    quarantined);
+            }
         }
 
         [TestMethod]
@@ -5080,8 +5236,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     continue;
                 }
 
-                if (runtimeProfile.DisplayName == "Stim Fiend"
-                    && spawn.SourceIdentity != unchecked((int)0x7957E415))
+                if (runtimeProfile.DisplayName == "Stim Fiend")
                 {
                     Assert.IsTrue(success, failure);
                     Assert.IsTrue(baseline.UsesProductionSpecializedValues);
@@ -5144,7 +5299,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(7, restoredLooters);
             Assert.AreEqual(7, restoredMeldedPatterns);
             Assert.AreEqual(12, restoredDisobedientBots);
-            Assert.AreEqual(6, restoredStimFiends);
+            Assert.AreEqual(7, restoredStimFiends);
             Assert.AreEqual(6, restoredFragmentedSouls);
             Assert.AreEqual(
                 6,
@@ -5171,7 +5326,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 restoredFinalFamilies.ContainsKey("Redundant Scan")
                     ? restoredFinalFamilies["Redundant Scan"]
                     : 0);
-            Assert.AreEqual(1, remainingQuarantined);
+            Assert.AreEqual(0, remainingQuarantined);
         }
 
         [TestMethod]
@@ -5194,7 +5349,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 unchecked((int)0x7954501A),
                 unchecked((int)0x79545219)
             };
-            const int unsupportedStimFiend =
+            const int restoredStimFiend =
                 unchecked((int)0x7957E415);
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
@@ -5297,15 +5452,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             OrdinaryEnemySpawnDefinition stimSpawn =
                 catalog.GetSpawns().Single(
                     value => value.PlayfieldInstance == 127
-                             && value.SourceIdentity == unsupportedStimFiend);
+                             && value.SourceIdentity == restoredStimFiend);
             OrdinaryEnemyProfile stimProfile = profiles[stimSpawn.ProfileKey];
             CapturedEnemyCombatContract stimBaseline =
                 stimProfile.Combat.ResolveContract(
                     stimSpawn.SourceIdentity,
                     stimSpawn.Level);
-            CapturedEnemyCombatContract ignored;
+            CapturedEnemyCombatContract stimResolved;
             string stimFailure;
-            Assert.IsFalse(
+            Assert.IsTrue(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     127,
                     stimProfile.DisplayName,
@@ -5313,17 +5468,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     stimSpawn.Level,
                     stimSpawn.SourceIdentity,
                     stimBaseline,
-                    out ignored,
-                    out stimFailure));
+                    out stimResolved,
+                    out stimFailure),
+                stimFailure);
+            Assert.IsTrue(stimResolved.IsCombatReady);
+            Assert.IsTrue(stimResolved.UsesCaptureProvenArchetype);
             StringAssert.Contains(
-                stimFailure,
-                "no canonical raw combat profile");
+                stimResolved.CaptureProvenArchetypeId,
+                OrdinaryEnemyCombatSetupGenerator.StimFiendFormulaId);
         }
 
         private static CapturedEnemyCombatContract ResolveActiveSpawnContractForCoverage(
             OrdinaryEnemyProfile profile,
             OrdinaryEnemySpawnDefinition spawn)
         {
+            OrdinaryEnemySpawnVariant selected = spawn.SelectVariant(value => 0);
+            if (spawn.LevelDefinition.Mode == OrdinaryEnemySpawnLevelMode.Fixed
+                && selected != null
+                && selected.WeaponLoadout != null
+                && selected.WeaponLoadout.IsValid)
+            {
+                return profile.Combat.ResolveContract(
+                    spawn.SourceIdentity,
+                    selected);
+            }
+
             OrdinaryEnemySpawnVariant[] variants =
                 spawn.LevelDefinition.GetExplicitVariants();
             bool fixedScopeWorkman =

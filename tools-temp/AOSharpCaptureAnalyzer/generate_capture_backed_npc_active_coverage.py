@@ -1992,6 +1992,7 @@ def build_inventory(
             formula_dataset.get("molestedMoleculesFormula", {}),
             formula_dataset.get("fixedScopeSelectorBindings", {}),
             formula_dataset.get("templeOrdinaryCombatCompletion", {}),
+            formula_dataset.get("finalOrdinaryDungeonCombatCompletion", {}),
         ]
         for formula in formulas:
             capture_sessions = sorted_unique(

@@ -1603,8 +1603,15 @@ namespace AORebirth.Core.Playfields
                                                   && capturedContract.HasCapturedEquippedAttackInfo;
             bool usesCapturedDamageOverride = hasCapturedEquippedAttackInfo
                                                   && !capturedContract.UsesEquippedWeaponDamage;
+            bool usesActorValuesForPresentationWeapon =
+                hasCapturedEquippedAttackInfo
+                && capturedContract.UsesProductionActorValuesForPresentationWeapon;
             double equippedAttackRange;
-            if (hasCapturedEquippedAttackInfo
+            if (usesActorValuesForPresentationWeapon)
+            {
+                equippedAttackRange = NpcCombatAttackRules.MaxMeleeCombatDistance;
+            }
+            else if (hasCapturedEquippedAttackInfo
                 && capturedContract.CapturedAttackRange.HasValue)
             {
                 equippedAttackRange = capturedContract.CapturedAttackRange.Value;
@@ -1630,17 +1637,33 @@ namespace AORebirth.Core.Playfields
                 return null;
             }
 
-            int minDamage = usesCapturedDamageOverride
-                                ? capturedContract.MinDamage
-                                : NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.mindamage), 0);
-            int maxDamage = usesCapturedDamageOverride
-                                ? capturedContract.MaxDamage
-                                : NormalizeCombatItemStat(weapon.GetAttribute((int)StatIds.maxdamage), 0);
-            int damageBonus = usesCapturedDamageOverride
-                                  ? capturedContract.CapturedDamageBonus
-                                  : NormalizeCombatItemStat(
-                                      weapon.GetAttribute((int)StatIds.damagebonus),
-                                      0);
+            int minDamage = usesActorValuesForPresentationWeapon
+                                ? NormalizeCombatItemStat(
+                                    attacker.Stats[StatIds.mindamage].Value,
+                                    0)
+                                : usesCapturedDamageOverride
+                                    ? capturedContract.MinDamage
+                                    : NormalizeCombatItemStat(
+                                        weapon.GetAttribute((int)StatIds.mindamage),
+                                        0);
+            int maxDamage = usesActorValuesForPresentationWeapon
+                                ? NormalizeCombatItemStat(
+                                    attacker.Stats[StatIds.maxdamage].Value,
+                                    minDamage)
+                                : usesCapturedDamageOverride
+                                    ? capturedContract.MaxDamage
+                                    : NormalizeCombatItemStat(
+                                        weapon.GetAttribute((int)StatIds.maxdamage),
+                                        0);
+            int damageBonus = usesActorValuesForPresentationWeapon
+                                  ? NormalizeCombatItemStat(
+                                      attacker.Stats[StatIds.damagebonus].Value,
+                                      0)
+                                  : usesCapturedDamageOverride
+                                      ? capturedContract.CapturedDamageBonus
+                                      : NormalizeCombatItemStat(
+                                          weapon.GetAttribute((int)StatIds.damagebonus),
+                                          0);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,

@@ -845,6 +845,8 @@ namespace AORebirth.Core.Playfields
 
         internal bool UsesProductionEquippedWeaponValues { get; set; }
 
+        internal bool UsesProductionActorValuesForPresentationWeapon { get; set; }
+
         internal bool UsesCaptureProvenArchetype { get; set; }
 
         internal string CaptureProvenArchetypeId { get; set; }
@@ -1133,6 +1135,13 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionEquippedWeaponValues = true;
+            return clone;
+        }
+
+        internal CapturedEnemyCombatContract WithProductionActorValuesForPresentationWeapon()
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.UsesProductionActorValuesForPresentationWeapon = true;
             return clone;
         }
 
@@ -1978,6 +1987,85 @@ namespace AORebirth.Core.Playfields
                                 TestWeaponStat(CharacterStat.RechargeDelay, 235)
                             },
                             0));
+            }
+
+            if (monsterData == 203733 && level.HasValue)
+            {
+                OrdinaryEnemyCombatNumericSetup generated;
+                if (!OrdinaryEnemyCombatSetupGenerator.TryGenerateEquipped(
+                        new OrdinaryEnemyEquippedCombatSetupInput(
+                            monsterData,
+                            level.Value,
+                            130590,
+                            130590,
+                            1,
+                            6),
+                        out generated))
+                {
+                    return CapturedEnemyCombatContract.Unresolved(
+                        "Violent Vagabond mathematical combat setup is unsupported.",
+                        true);
+                }
+
+                const int evidenceSourceIdentity = unchecked((int)0x794CD4CCu);
+                return CapturedEnemyCombatContract
+                    .EquippedWeaponWithCapturedPacketSequence(
+                        "Violent Vagabond captured setup and categorical result domain",
+                        evidenceSourceIdentity,
+                        130590,
+                        130590,
+                        1,
+                        6,
+                        true,
+                        0,
+                        0,
+                        0,
+                        null,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        false,
+                        false,
+                        0,
+                        0,
+                        generated.SpecialAttackWeaponUnknown1,
+                        generated.SpecialAttackWeaponUnknown2,
+                        generated.SpecialAttackWeaponUnknown3,
+                        generated.SpecialAttackWeaponUnknown4,
+                        0,
+                        NpcCombatAttackRules.NormalAttackInfoHitType,
+                        0,
+                        0,
+                        0,
+                        0,
+                        false,
+                        true)
+                    .WithCapturedWeapon(
+                        new CapturedEnemyWeaponDefinition(
+                            "Violent Vagabond WIFU",
+                            evidenceSourceIdentity,
+                            0,
+                            11,
+                            6,
+                            1000015,
+                            0,
+                            262,
+                            new[]
+                            {
+                                TestWeaponStat(CharacterStat.Flags, 4199425),
+                                TestWeaponStat(CharacterStat.StaticInstance, 130590),
+                                TestWeaponStat(CharacterStat.ACGItemLevel, 1),
+                                TestWeaponStat(CharacterStat.ACGItemTemplateID, 130590),
+                                TestWeaponStat(CharacterStat.ACGItemTemplateID2, 130590),
+                                TestWeaponStat(CharacterStat.MultipleCount, 1),
+                                TestWeaponStat(CharacterStat.Energy, 1),
+                                TestWeaponStat(CharacterStat.AttackDelay, 175),
+                                TestWeaponStat(CharacterStat.RechargeDelay, 175)
+                            },
+                            0))
+                    .WithProductionEquippedWeaponValues()
+                    .WithProductionActorValuesForPresentationWeapon();
             }
 
             return For(name, monsterData);

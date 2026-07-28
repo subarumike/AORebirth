@@ -22,24 +22,22 @@ Evidence and architecture:
 
 ### PF127 Subway combat completion
 
-All `51` PF127 Filth Fleas now resolve capture-backed combat. The final nine
-L7, L8, L14, and L15 actors use the bounded
-`filth-flea-saw-bounded-level-piecewise-v1` numeric setup while retaining the
-exact natural EPAH/AZUS special sequence, slots, instances, hit/damage wires,
-terminal outcome, and shared packet path from semantic profile
-`218eb3509f2be66b-12f99a4c2f732061`.
+The cross-dungeon ordinary-combat checkpoint is complete: `489/0`.
+PF127 is `322/0`; PF1931 is `167/0`.
 
-The formula is exact over the available stable L4..L21 observations:
-`floor((21*L+28)/4)` for L4..L10 and `6*L-1` for L11..L21. Production retains
-level, damage, range, cadence, Energy/ammunition, and ordered mutable SAW
-state. The independent L19 `Unknown2=141` observation remains mutable
-generation-local state rather than reusable identity.
-
-The fixed PF127/PF1931 checkpoint is now `464/25` of `489`: PF127 improves
-from `290/32` to `299/23`; PF1931 remains `165/2`.
+The final 25 actors were 22 Violent Vagabonds, the L9 Stim Fiend
+`0x7957E415`, and L18 Eternal Sentinels `0x7983FA22` and `0x7983FBC2`.
+Vagabond setup uses bounded exact affine-floor equations over L6..L10 and the
+capture-proven equipped-melee result domain. Stim Fiend extends its exact SIW1
+formula only to the runtime-selected L9..L17 domain. Eternal Sentinel uses the
+exact 123381..123384 loadout partitions and bounded L18..L20 setup formula.
+Production still owns damage, range, cadence, QL, ammunition/Energy, and
+mutable ordered state. Categorical weapon, mode, slot, instance, action,
+hit/damage wires, stream identity, and packet order remain exact and
+fail-closed.
 
 Evidence:
 
-- `docs/evidence/SUBWAY_FILTH_FLEA_COMBAT_RESTORATION_20260726.md`
+- `docs/evidence/FINAL_ORDINARY_DUNGEON_COMBAT_COMPLETION_20260728.md`
 - `docs/generated/enemy_combat_setup_formula_dataset.json`
 - `docs/generated/capture_backed_npc_combat_active_coverage.json`
