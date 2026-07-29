@@ -328,7 +328,16 @@ namespace AORebirth.Core.Playfields
             }
 
             HoloDeckSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
-            MissionInstanceSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
+            if (!ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TrySpawnForPlayfield(
+                this.playfield,
+                playfieldIdentity,
+                this.ActivateNpc))
+            {
+                MissionInstanceSpawn.SpawnForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
             this.worldPopulation.ActivatePlayfield(playfieldIdentity);
             this.capturedSubwayEncounters.ActivatePlayfield(playfieldIdentity);
             this.capturedTempleEncounters.ActivatePlayfield(playfieldIdentity);
@@ -390,7 +399,14 @@ namespace AORebirth.Core.Playfields
             DateTime diedAtUtc = DateTime.UtcNow;
             this.ordinaryEnemies.NotifyCharacterDied(target);
             Identity corpseIdentity = Identity.None;
-            if (this.playfield.CanBuildKnownCorpseVisual(target))
+            bool isOperationalNpc;
+            bool operationalDeathPersisted =
+                ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TryPrepareNpcDeath(
+                    target,
+                    this.playfield.CanBuildKnownCorpseVisual(target),
+                    out corpseIdentity,
+                    out isOperationalNpc);
+            if (!isOperationalNpc && this.playfield.CanBuildKnownCorpseVisual(target))
             {
                 corpseIdentity = this.playfield.AllocateCorpseIdentity();
             }
@@ -402,8 +418,18 @@ namespace AORebirth.Core.Playfields
             this.playfield.StopFightingDeadTarget(target.Identity);
             this.playfield.StopDyingNpcCombatState(target);
             this.playfield.SendNpcDeathAnimation(target);
-            this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
-            this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
+            if (!isOperationalNpc || operationalDeathPersisted)
+            {
+                this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
+                this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
+            }
+            else
+            {
+                ZoneEngine.Core.Missions.MissionDiagnostics.Log(
+                    "ACG-OPERATIONAL-DEATH-BLOCK runtime={0} livePf2={1} reason=durable-death-persist-failed",
+                    target.Identity.Instance,
+                    this.playfield.Identity.Instance);
+            }
             this.worldPopulation.NotifyDeath(target, corpseIdentity, diedAtUtc);
             this.nascenceCoreHecklers.NotifyDeath(target, diedAtUtc);
 

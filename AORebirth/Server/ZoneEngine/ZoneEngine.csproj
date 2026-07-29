@@ -366,6 +366,9 @@
     <Compile Include="Core\Missions\MissionAcgRuntimeStateStore.cs" />
     <Compile Include="Core\Missions\MissionAcgRuntimeManager.cs" />
     <Compile Include="Core\Missions\MissionAcgRuntimeInteractionService.cs" />
+    <Compile Include="Core\Missions\MissionAcgOperationalState.cs" />
+    <Compile Include="Core\Missions\MissionAcgOperationalStateStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgOperationalRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveBinding.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveStore.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveContracts.cs" />

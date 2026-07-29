@@ -86,6 +86,7 @@
     <Compile Include="MissionAcgBindingPersistenceTests.cs" />
     <Compile Include="MissionAcgRuntimeMaterializationTests.cs" />
     <Compile Include="MissionAcgObjectiveCompletionTests.cs" />
+    <Compile Include="MissionAcgOperationalRuntimeTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
@@ -118,6 +119,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgRuntimeStateStore.cs">
       <Link>MissionAcgRuntimeStateStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgOperationalState.cs">
+      <Link>MissionAcgOperationalState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgOperationalStateStore.cs">
+      <Link>MissionAcgOperationalStateStore.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveBinding.cs">
       <Link>MissionAcgObjectiveBinding.cs</Link>

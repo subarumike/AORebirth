@@ -96,6 +96,18 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            string missionIsolationFailure;
+            if (!ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TryValidateCombatTarget(
+                character,
+                target,
+                out missionIsolationFailure))
+            {
+                this.CancelPlayerAttack(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored: mission instance ownership mismatch.");
+                return;
+            }
+
             if (ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
             {
                 this.CancelPlayerAttack(character);

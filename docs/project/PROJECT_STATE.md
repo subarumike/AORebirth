@@ -84,13 +84,13 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
   `20260727-223041` replay with zero decoder/extractor errors.
 
-- Generated RK mission interiors now have capture-backed Stage 4 objective
-  ownership and durable completion.
+- Generated RK mission interiors now have capture-backed Stage 5 operational
+  combat-space ownership.
   The five immutable selectable bundles and their payload hashes are unchanged;
   eight legacy shapes remain nonselectable and PF2 `1441804` remains excluded.
   An accepted binding enters its persisted isolated PF2 with the exact bundle
   payload, building, spawn, exit, captured structural dynels, objective objects,
-  and NPC placeholders. Runtime identities are deterministic, reversible, and
+  and mission NPCs. Runtime identities are deterministic, reversible, and
   isolated by live PF2; version-1 mutable sidecars preserve identity maps plus
   door/chest state across restart. Every interaction lookup requires owner,
   allocated PF2, and runtime identity, and bound missions cannot reach shared
@@ -102,9 +102,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   packet-send state, and exact artifact cleanup survive restart; already
   granted rewards are not repeated. A legacy reward grant left `Pending` fails
   closed because character persistence and the sidecar are not one atomic
-  transaction. Stage 2 still owns PF release. Generic loot, broad NPC combat,
-  collision, navigation, procedural generation, durable team rewards, and
-  private-client validation remain deferred. No schema changed.
+  transaction. Version-1 operational sidecars add exact accepted-mission/PF2
+  ownership for captured NPC slots, health, death/corpse state, explicit
+  unresolved-empty chest inventory, and restart-resumable cleanup. Real
+  mission NPCs use captured appearance and attributes plus the existing
+  production mission-combat policy; Kill deaths route through the exact Stage 4
+  target while Find Person remains interaction-only. Combat, interaction,
+  corpse, and chest access require the bound PF2 and bounded finite
+  coordinates. Client ACG geometry remains authoritative: server line of sight,
+  collision meshes, room reachability, navigation, fabricated loot, and
+  procedural generation remain deferred. Stage 2 still owns PF release. No
+  schema changed.
   Evidence:
   `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
 

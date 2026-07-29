@@ -1345,6 +1345,7 @@ namespace AORebirth.Core.Playfields
             bool killingHit = newHealth == 0;
 
             target.Stats[StatIds.health].Value = newHealth;
+            MissionAcgOperationalRuntime.NotifyHealthChanged(target, newHealth);
             this.runtimeSystems.SendChangedStats(target, SendChangedStats);
 
             LogUtil.Debug(
@@ -1659,6 +1660,7 @@ namespace AORebirth.Core.Playfields
                     ? CombatDamageSource.WeaponAutoAttack
                     : CombatDamageSource.UnarmedAutoAttack);
             target.Stats[StatIds.health].Value = newHealth;
+            MissionAcgOperationalRuntime.NotifyHealthChanged(target, newHealth);
             this.runtimeSystems.SendChangedStats(target, SendChangedStats);
             LogUtil.Debug(
                 DebugInfoDetail.Network,
@@ -2394,6 +2396,18 @@ namespace AORebirth.Core.Playfields
             {
                 itemLootLifetime = selectedCorpse.ItemLootLifetime;
                 emptyCleanupDelay = selectedCorpse.EmptyCleanupDelay;
+                if (MissionAcgOperationalRuntime.IsOperationalNpc(
+                        this.Identity.Instance,
+                        selectedCorpse.DeadNpcIdentity)
+                    && (selectedCorpse.VisualSource == null
+                        || looter == null
+                        || looter.Playfield == null
+                        || looter.Playfield.Identity.Instance != this.Identity.Instance
+                        || GetCombatDistance(looter, selectedCorpse.VisualSource)
+                           > NpcCombatAttackRules.MaxMeleeCombatDistance))
+                {
+                    return false;
+                }
             }
 
             return this.runtimeSystems.TryUseCorpse(
@@ -2444,6 +2458,20 @@ namespace AORebirth.Core.Playfields
             TimeSpan emptyCleanupDelay = selectedCorpse == null
                 ? CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay
                 : selectedCorpse.EmptyCleanupDelay;
+            if (selectedCorpse != null
+                && MissionAcgOperationalRuntime.IsOperationalNpc(
+                    this.Identity.Instance,
+                    selectedCorpse.DeadNpcIdentity)
+                && (selectedCorpse.VisualSource == null
+                    || looter == null
+                    || looter.Playfield == null
+                    || looter.Playfield.Identity.Instance != this.Identity.Instance
+                    || GetCombatDistance(looter, selectedCorpse.VisualSource)
+                       > NpcCombatAttackRules.MaxMeleeCombatDistance))
+            {
+                return false;
+            }
+
             return this.runtimeSystems.TryLootCorpseItem(
                 looter,
                 sourceContainer,
@@ -3362,9 +3390,21 @@ namespace AORebirth.Core.Playfields
                     LootIdentity = this.AllocateCorpseLootItemIdentity()
                 })
                 .ToList();
+            bool operationalMissionNpc =
+                target != null
+                && MissionAcgOperationalRuntime.IsOperationalNpc(
+                    this.Identity.Instance,
+                    target.Identity);
+            if (operationalMissionNpc)
+            {
+                // The finalized mission captures do not prove corpse contents. Stage 5 keeps
+                // these outcomes explicitly unresolved-empty instead of invoking generic drops.
+                lootItems.Clear();
+            }
 
             // Capture-backed mission interior drops (20260719-5-different-shape-fo-mish).
-            if (ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(this.Identity.Instance)
+            if (!operationalMissionNpc
+                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(this.Identity.Instance)
                 && target != null)
             {
                 if (ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsFindItemHost(target.Identity))
@@ -3500,9 +3540,10 @@ namespace AORebirth.Core.Playfields
                     }
                 }
             }
-            int credits = generatedLoot.Credits;
+            int credits = operationalMissionNpc ? 0 : generatedLoot.Credits;
             // Capture 20260725-185432 mission trash corpses: credits 21–87 even when Items empty.
-            if (credits <= 0
+            if (!operationalMissionNpc
+                && credits <= 0
                 && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
                     this.Identity.Instance)
                 && target != null)
@@ -3558,7 +3599,10 @@ namespace AORebirth.Core.Playfields
                 LootItems = lootItems,
                 Credits = credits,
                 GenerationResult = generatedLoot,
-                LootUnresolved = generatedLoot.LootUnresolved || generatedLoot.CreditsUnresolved,
+                LootUnresolved =
+                    operationalMissionNpc
+                    || generatedLoot.LootUnresolved
+                    || generatedLoot.CreditsUnresolved,
                 RightsPolicy = CorpseLootRightsPolicy.Public,
                 InventoryHandle = this.AllocateCorpseInventoryHandle(),
                 ItemLootLifetime = itemLootLifetime,
@@ -3568,6 +3612,7 @@ namespace AORebirth.Core.Playfields
 
             this.corpseInventoryService.Create(state);
             this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
+            MissionAcgOperationalRuntime.NotifyCorpseAvailable(target, corpseIdentity);
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3596,6 +3641,9 @@ namespace AORebirth.Core.Playfields
             if (this.corpses.TryGetValue(corpseInstance, out corpse))
             {
                 this.runtimeSystems.NotifyPopulationCorpseRemoved(corpse.CorpseIdentity);
+                MissionAcgOperationalRuntime.NotifyCorpseRemoved(
+                    this.Identity.Instance,
+                    corpse.CorpseIdentity);
             }
 
             this.runtimeSystems.DespawnCorpse(

@@ -551,6 +551,21 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
+                MissionAcgOperationalState operational;
+                if (!MissionAcgOperationalRuntime.TryEnsureState(
+                    exact,
+                    out operational,
+                    out materializeFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-REJECT char={0} accepted={1}:{2} reason=operational-materialization-failed detail={3}",
+                        character.Identity.Instance,
+                        exact.Binding.AcceptedQuestIdentity.Type,
+                        exact.Binding.AcceptedQuestIdentity.Instance,
+                        materializeFailure);
+                    return false;
+                }
+
                 if (exact.State.LifecycleState == MissionAcgLifecycleState.Accepted)
                 {
                     MissionAcgBindingRecord active;
