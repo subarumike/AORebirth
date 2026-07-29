@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Daily Login Rewards</title>
+  <style type="text/css">
+    body { margin:0; font-family:Verdana,Geneva,Tahoma,sans-serif; font-size:11px; color:#d4d8dc; background:#1a1c1e; }
+    .banner { background:#163820; color:#7dff9a; padding:8px 10px; font-weight:bold; border-bottom:1px solid #2a5a38; }
+    .panel { padding:12px 14px; }
+    h1 { margin:0 0 6px 0; font-size:16px; color:#fff; }
+    .sub { color:#9eb4c8; margin:0 0 12px 0; }
+    .card {
+      display:inline-block; width:70px; height:70px; margin:3px; vertical-align:top;
+      background:#22262a; border:1px solid #3a4048; text-align:center; padding-top:18px;
+    }
+    .card.today { border-color:#7dff9a; color:#7dff9a; font-weight:bold; }
+    .card.claimed { color:#6a7078; }
+    a.btn {
+      display:inline-block; border:1px solid #1a1c1e; background:#c8d0d8; color:#111;
+      padding:4px 12px; cursor:pointer; text-decoration:none; font-weight:bold; margin-top:10px;
+    }
+    .status { margin-top:8px; color:#9eb4c8; }
+  </style>
+</head>
+<body>
+  <div class="banner">LOCAL AORebirth Daily Rewards — dailyrewards.anarchy-online.com</div>
+  <div class="panel">
+    <h1>Daily Login Rewards</h1>
+    <p class="sub">Local stub — claim is display-only until wired to Zone.</p>
+    <div id="rewardGrid">
+      <div class="card claimed">Day 1</div>
+      <div class="card claimed">Day 2</div>
+      <div class="card claimed">Day 3</div>
+      <div class="card today">Today</div>
+      <div class="card">Day 5</div>
+      <div class="card">Day 6</div>
+      <div class="card">Day 7</div>
+    </div>
+    <div>
+      <a class="btn" href="#" id="claimBtn">Claim Today</a>
+    </div>
+    <div class="status" id="claimStatus"></div>
+  </div>
+  <script src="js/daily.js"></script>
+</body>
+</html>

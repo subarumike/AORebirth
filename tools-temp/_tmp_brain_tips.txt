@@ -1,0 +1,8 @@
+3485: 2026-07-20T17:06:46.7169818Z [IN-N3] #1721 type=QuestFullUpdate identity=(SimpleChar:797E3029)
+3486: 2026-07-20T17:06:46.7169818Z [IN-N3-DETAIL] QuestFullUpdateMessage { Quests=count=1[SmokeLounge.AOtomation.Messaging.GameData.Quest] N3MessageType=QuestFullUpdate Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+5062: 2026-07-20T17:07:35.8951580Z [IN-N3] #2404 type=QuestFullUpdate identity=(SimpleChar:797E3029)
+5063: 2026-07-20T17:07:35.8951580Z [IN-N3-DETAIL] QuestFullUpdateMessage { Quests=count=1[SmokeLounge.AOtomation.Messaging.GameData.Quest] N3MessageType=QuestFullUpdate Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+5747: 2026-07-20T17:07:50.1833457Z [IN-N3] #2670 type=QuestFullUpdate identity=(SimpleChar:797E3029)
+5748: 2026-07-20T17:07:50.1833457Z [IN-N3-DETAIL] QuestFullUpdateMessage { Quests=count=1[SmokeLounge.AOtomation.Messaging.GameData.Quest] N3MessageType=QuestFullUpdate Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+6089: 2026-07-20T17:08:00.2861151Z [IN-N3] #2841 type=QuestFullUpdate identity=(SimpleChar:797E3029)
+6090: 2026-07-20T17:08:00.2861151Z [IN-N3-DETAIL] QuestFullUpdateMessage { Quests=count=1[SmokeLounge.AOtomation.Messaging.GameData.Quest] N3MessageType=QuestFullUpdate Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }

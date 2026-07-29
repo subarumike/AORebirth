@@ -1,0 +1,37 @@
+=== capture_info ===
+pf 1441800 char Getkeep
+counts {'inboundRaw': 156, 'outboundRaw': 94, 'decodedInboundN3': 148, 'decodedOutboundN3': 91, 'decodedN3EventRows': 239, 'decodedN3StageErrors': 0, 'rawCombatPackets': 1, 'rawSimpleCharFullUpdatePackets': 14, 'rawPacketLogRows': 250, 'rawPacketIndexRows': 250, 'rawPacketPreserved': 250, 'rawPacketWriteErrors': 0, 'rawPacketCallbackDrainTimeouts': 0, 'rawPacketProjectionErrors': 13, 'rawSimpleCharFullUpdateDecoded': 14, 'rawSimpleCharFullUpdateDecodeErrors': 0, 'rawSimpleCharFullUpdateIncompleteDecodes': 0, 'rawNpcSimpleCharFullUpdates': 13, 'scfuAppearanceRows': 14}
+=== PAF ===
+utc 2026-07-25T06:05:57.8392432Z len 193
+head 0002000A000100C100000DB8797E30D75F4B1A3900009C500016000800000000044395197940A051EC436B028F610000C79F00D7417D000000000000000000009C50001600080000C79F00D7417D0000
+9C50 hex offs [40, 124]
+PlayfieldId2 1441800 0x160008
+genLen 123 genHead 0000c79f00d7417d000000020003001e001e0040000001406464640000000e00
+buildingInst 0xd7417d
+=== DoorFullUpdate count 9
+first 20 door utcs:
+  06:05:57.839 len 199 xyz (299.9989929199219, 5.0, 235.0)
+  06:05:57.840 len 199 xyz (289.9989929199219, 5.0, 235.0)
+  06:05:57.842 len 199 xyz (259.9989929199219, 5.0, 235.0)
+  06:05:57.842 len 199 xyz (255.0, 5.0, 249.99899291992188)
+  06:05:57.843 len 199 xyz (259.9989929199219, 5.0007524490356445, 215.0)
+  06:05:57.843 len 199 xyz (255.0, 5.0007524490356445, 219.99900817871094)
+  06:05:57.844 len 199 xyz (270.0010070800781, 5.0, 215.0)
+  06:05:57.845 len 199 xyz (249.99899291992188, 5.0, 255.0)
+  06:05:57.845 len 199 xyz (270.0010070800781, 5.0, 255.0)
+spawnGuess (298.1990051269531, 5.010000228881836, 235.00999450683594, 33)
+=== door distances from spawn (all doors in order) ===
+  0 06:05:57.839 dist=  1.8m xyz=(300.0,5.00,235.0)
+  1 06:05:57.840 dist=  8.2m xyz=(290.0,5.00,235.0)
+  2 06:05:57.842 dist= 38.2m xyz=(260.0,5.00,235.0)
+  3 06:05:57.842 dist= 45.7m xyz=(255.0,5.00,250.0)
+  4 06:05:57.843 dist= 43.1m xyz=(260.0,5.00,215.0)
+  5 06:05:57.843 dist= 45.7m xyz=(255.0,5.00,220.0)
+  6 06:05:57.844 dist= 34.6m xyz=(270.0,5.00,215.0)
+  7 06:05:57.845 dist= 52.2m xyz=(250.0,5.00,255.0)
+  8 06:05:57.845 dist= 34.6m xyz=(270.0,5.00,255.0)
+=== Chest count 2 first5 utcs ['06:05:57.841', '06:05:57.845']
+=== SCFU count after PAF 11
+=== SIFU count after PAF 1
+=== mission-flow.log head ===
+﻿2026-07-25T06:04:25.7280561Z [MISSION-FLOW] session bound path=C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260725-080425\mission-flow.log (roll/accept/key/teleport/playfield-

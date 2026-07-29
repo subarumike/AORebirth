@@ -98,7 +98,7 @@ namespace AOSharpLiveInjector
         private static int RunSelfTest()
         {
             string safeChannel = "1234" + AOSharp.Bootstrap.Main.CaptureSafeChannelSuffix;
-            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 3
+            if (AOSharp.Bootstrap.Main.CaptureSafeContractVersion != 5
                 || !AOSharp.Bootstrap.Main.IsCaptureSafeChannel(safeChannel)
                 || AOSharp.Bootstrap.Main.IsCaptureSafeChannel("1234")
                 || !AOSharp.Bootstrap.Main.ShouldInstallCaptureCommandHook(true, true)
@@ -116,6 +116,14 @@ namespace AOSharpLiveInjector
                 || AOSharp.Bootstrap.Main.IsCaptureChatCommand("/aocap\tstop")
                 || AOSharp.Bootstrap.Main.IsCaptureChatCommand("/assist")
                 || AOSharp.Bootstrap.Main.IsCaptureChatCommand("aocap start")
+                || !string.Equals(
+                    AOSharp.Bootstrap.Main.TypedChatLogFileName,
+                    "AOSharpLiveCapture.typed-chat.log",
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    AOSharp.Bootstrap.Main.ChatSocketLogFileName,
+                    "AOSharpLiveCapture.chat-socket.log",
+                    StringComparison.Ordinal)
                 || !string.Equals(
                     AOSharp.Bootstrap.Main.GetCaptureSafeSingletonName(safeChannel),
                     AOSharp.Bootstrap.Main.CaptureSafeSingletonNamePrefix + safeChannel,

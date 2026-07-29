@@ -1,0 +1,3 @@
+@echo off
+powershell -NoProfile -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; $pf='AORebirth\Built\Debug'; if (Test-Path 'AORebirth\Server\ZoneEngine\XML Data') { Get-ChildItem 'AORebirth\Server\ZoneEngine' -Recurse -Filter '*4680*' -ErrorAction SilentlyContinue | Select-Object -First 10 FullName }; Select-String -Path 'AORebirth\Built\Debug\ZoneEngineLog.txt' -Pattern 'playfield=4680|pf=4680|Playfield 4680|Omni' | Select-Object -Last 15 | ForEach-Object { $_.Line }"
+C:\xampp\mysql\bin\mysql.exe -uroot cellao_codex_clean -e "SELECT * FROM playfields WHERE id=4680 OR playfield=4680 LIMIT 5; SHOW TABLES LIKE '%%play%%';"

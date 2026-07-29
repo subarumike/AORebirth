@@ -1,0 +1,34 @@
+ 
+=== all AOSharp.Bootstrap.dll ===
+C:\Users\nermi\source\repos\AOSharp\AOSharp\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\AOSharp\AOSharp.Bootstrap\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\AOSharp\AOSharp.Bootstrap\obj\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\AOSharp\AOSharp.Core\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\AOSharp\TestPlugin\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\aosharp\AOSharp\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\aosharp\AOSharp.Bootstrap\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\aosharp\AOSharp.Bootstrap\obj\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\aosharp\AOSharp.Core\bin\Debug\AOSharp.Bootstrap.dll
+C:\Users\nermi\source\repos\aosharp\TestPlugin\bin\Debug\AOSharp.Bootstrap.dll
+
+=== hashes ===
+C:\Users\nermi\source\repos\AOSharp\AOSharp\bin\Debug\AOSharp.Bootstrap.dll
+MD5 hash of C:\Users\nermi\source\repos\AOSharp\AOSharp\bin\Debug\AOSharp.Bootstrap.dll:
+fe57863ce5a138c0130cfb51b3b816db
+
+C:\Users\nermi\source\repos\AOSharp\AOSharp.Bootstrap\bin\Debug\AOSharp.Bootstrap.dll
+MD5 hash of C:\Users\nermi\source\repos\AOSharp\AOSharp.Bootstrap\bin\Debug\AOSharp.Bootstrap.dll:
+fe57863ce5a138c0130cfb51b3b816db
+
+C:\Users\nermi\source\repos\AOSharp\AOSharp.Bootstrap\obj\Debug\AOSharp.Bootstrap.dll
+MD5 hash of C:\Users\nermi\source\repos\AOSharp\AOSharp.Bootstrap\obj\Debug\AOSharp.Bootstrap.dll:
+fe57863ce5a138c0130cfb51b3b816db
+
+C:\Users\nermi\source\repos\AOSharp\AOSharp.Core\bin\Debug\AOSharp.Bootstrap.dll
+MD5 hash of C:\Users\nermi\source\repos\AOSharp\AOSharp.Core\bin\Debug\AOSharp.Bootstrap.dll:
+fe57863ce5a138c0130cfb51b3b816db
+
+C:\Users\nermi\source\repos\AOSharp\TestPlugin\bin\Debug\AOSharp.Bootstrap.dll
+MD5 hash of C:\Users\nermi\source\repos\AOSharp\TestPlugin\bin\Debug\AOSharp.Bootstrap.dll:
+4fd6ce6fe3aaac5535d147e15e554e01
+

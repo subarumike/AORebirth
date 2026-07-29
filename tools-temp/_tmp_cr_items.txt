@@ -1,0 +1,218 @@
+Loading C:\Users\nermi\source\repos\AORebirth\AORebirth\Built\Debug\items.dat
+Loading data for client version 18.8.62_EP1
+Loaded 120842 items - 00:08.29
+
+actionTemplates=310 withOnUseOrFailure=310
+=== Function frequency on perk action OnUse/OnFailure ===
+53051 CastNano count=734
+53187 LockPerk count=516
+53044 SystemText count=313
+53196 SpecialHit count=254
+53002 Hit count=102
+53066 TeamCastNano count=85
+53177 ReduceNanoStrainDuration count=58
+53185 DrainHit count=49
+53087 AreaCastNano count=36
+53117 TauntNpc count=20
+53240 Undefined count=14
+53105 RemoveNanoEffects count=8
+53016 Teleport count=6
+53236 RemoveNanoStrain count=4
+53030 GfxEffect count=2
+53045 Modify count=1
+53089 CastStunNano count=1
+53057 HeadText count=1
+
+=== Sample item 227683 (Channel Rage tier buff?) ===
+MISSING 227683
+=== Sample item 241086 (Spirit of Blessing CastNano) ===
+MISSING 241086
+=== Sample nano if in items ===
+=== Full OnUse dump Channel Rage action 227693 ===
+--- 227693 type=0 flags=0
+  Stat 0=0
+  Stat 2=1
+  Stat 12=9013
+  Stat 30=8388617
+  Stat 74=1
+  Stat 76=2
+  Stat 79=239205
+  Stat 88=0
+  Stat 287=30
+  Stat 294=100
+  Stat 298=0
+  Stat 588=1
+  OnUse Fn 53187 target=2 [3,250,1] reqs=0
+  OnUse Fn 53240 target=2 [227683] reqs=2
+    Req target=100 stat=0 op=HasPerk val=250 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227684] reqs=2
+    Req target=100 stat=0 op=HasPerk val=251 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227685] reqs=2
+    Req target=100 stat=0 op=HasPerk val=252 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227686] reqs=2
+    Req target=100 stat=0 op=HasPerk val=253 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227687] reqs=2
+    Req target=100 stat=0 op=HasPerk val=254 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227688] reqs=2
+    Req target=100 stat=0 op=HasPerk val=255 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227689] reqs=2
+    Req target=100 stat=0 op=HasPerk val=256 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227690] reqs=2
+    Req target=100 stat=0 op=HasPerk val=257 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227691] reqs=2
+    Req target=100 stat=0 op=HasPerk val=258 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227692] reqs=1
+    Req target=100 stat=0 op=HasPerk val=259 child=Or
+  OnUse Fn 53044 target=2 [You successfully perform Channel Rage.] reqs=0
+=== Full OnUse dump Quick Bash / Blunt Mastery 2 action 226519 ===
+--- 226519 type=0 flags=0
+  Stat 0=0
+  Stat 2=1
+  Stat 12=9013
+  Stat 30=-2147483640
+  Stat 74=1
+  Stat 76=2
+  Stat 79=239067
+  Stat 88=0
+  Stat 287=5
+  Stat 294=100
+  Stat 298=0
+  Stat 436=91
+  Stat 588=1
+  OnUse Fn 53051 target=2 [209811] reqs=0
+  OnUse Fn 53187 target=2 [3,201,25] reqs=0
+  OnUse Fn 53196 target=3 [27,-91,-177,0] reqs=0
+  OnUse Fn 53044 target=2 [You successfully perform a Quick Bash attack.] reqs=0
+  OnFailure Fn 53187 target=2 [3,201,10] reqs=0
+=== Soothing Spirits 2 action 241166 ===
+--- 241166 type=0 flags=0
+  Stat 0=16384
+  Stat 2=1
+  Stat 12=9013
+  Stat 30=8388616
+  Stat 74=1
+  Stat 76=2
+  Stat 79=239149
+  Stat 88=0
+  Stat 287=1
+  Stat 294=100
+  Stat 298=0
+  Stat 588=1
+  OnUse Fn 53051 target=2 [241086] reqs=0
+  OnUse Fn 53187 target=2 [3,721,20] reqs=0
+  OnUse Fn 53066 target=2 [241106] reqs=2
+    Req target=100 stat=0 op=HasPerk val=721 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241107] reqs=2
+    Req target=100 stat=0 op=HasPerk val=722 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241108] reqs=2
+    Req target=100 stat=0 op=HasPerk val=723 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241109] reqs=2
+    Req target=100 stat=0 op=HasPerk val=724 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241111] reqs=2
+    Req target=100 stat=0 op=HasPerk val=725 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241112] reqs=2
+    Req target=100 stat=0 op=HasPerk val=726 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241133] reqs=2
+    Req target=100 stat=0 op=HasPerk val=727 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53066 target=2 [241146] reqs=2
+    Req target=100 stat=0 op=HasPerk val=728 child=Unknown
+    Req target=Self stat=0 op=And val=0 child=Unknown
+  OnUse Fn 53066 target=2 [241147] reqs=1
+    Req target=100 stat=0 op=HasPerk val=729 child=Or
+  OnUse Fn 53044 target=2 [You successfully perform Spirit of Blessing] reqs=0
+=== Spirit Phylactery 1 action 225439 ===
+--- 225439 type=0 flags=0
+  Stat 0=0
+  Stat 2=1
+  Stat 12=9013
+  Stat 30=-2147483640
+  Stat 74=1
+  Stat 76=2
+  Stat 79=239027
+  Stat 88=0
+  Stat 287=3
+  Stat 294=100
+  Stat 298=0
+  Stat 588=1
+  OnUse Fn 53051 target=3 [209960] reqs=0
+  OnUse Fn 53187 target=2 [3,630,25] reqs=0
+  OnUse Fn 53051 target=2 [234027] reqs=0
+  OnUse Fn 53051 target=3 [225435] reqs=0
+  OnUse Fn 53051 target=2 [225431] reqs=0
+  OnUse Fn 53117 target=3 [-220] reqs=0
+  OnUse Fn 53044 target=2 [You successfully perfom a Capture Vigor attack.] reqs=0
+  OnFailure Fn 53187 target=2 [3,630,13] reqs=0
+=== Channel Rage action 227693 ===
+--- 227693 type=0 flags=0
+  Stat 0=0
+  Stat 2=1
+  Stat 12=9013
+  Stat 30=8388617
+  Stat 74=1
+  Stat 76=2
+  Stat 79=239205
+  Stat 88=0
+  Stat 287=30
+  Stat 294=100
+  Stat 298=0
+  Stat 588=1
+  OnUse Fn 53187 target=2 [3,250,1] reqs=0
+  OnUse Fn 53240 target=2 [227683] reqs=2
+    Req target=100 stat=0 op=HasPerk val=250 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227684] reqs=2
+    Req target=100 stat=0 op=HasPerk val=251 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227685] reqs=2
+    Req target=100 stat=0 op=HasPerk val=252 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227686] reqs=2
+    Req target=100 stat=0 op=HasPerk val=253 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227687] reqs=2
+    Req target=100 stat=0 op=HasPerk val=254 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227688] reqs=2
+    Req target=100 stat=0 op=HasPerk val=255 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227689] reqs=2
+    Req target=100 stat=0 op=HasPerk val=256 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227690] reqs=2
+    Req target=100 stat=0 op=HasPerk val=257 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227691] reqs=2
+    Req target=100 stat=0 op=HasPerk val=258 child=And
+    Req target=Self stat=0 op=Not val=0 child=And
+  OnUse Fn 53240 target=2 [227692] reqs=1
+    Req target=100 stat=0 op=HasPerk val=259 child=Or
+  OnUse Fn 53044 target=2 [You successfully perform Channel Rage.] reqs=0
+=== Channel Rage tier wrappers 227683-227692 ===
+MISSING 227683
+MISSING 227684
+MISSING 227685
+MISSING 227686
+MISSING 227687
+MISSING 227688
+MISSING 227689
+MISSING 227690
+MISSING 227691
+MISSING 227692
+
+Wrote C:\Users\nermi\source\repos\AORebirth\tools-temp\perk-action-onuse-scan.txt

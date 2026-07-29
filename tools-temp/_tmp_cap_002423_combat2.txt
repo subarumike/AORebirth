@@ -1,0 +1,72 @@
+player_pos samples=1 mobs=33
+
+=== Mob SAW packets (17) ===
+mob=799361E7 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361E3 specials=1 unk=('30', '30', '30', '30', '0') tgt=797E30D7
+mob=799361F4 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361EA specials=1 unk=('30', '30', '30', '30', '0') tgt=797E30D7
+mob=799361EC specials=1 unk=('30', '30', '30', '30', '0') tgt=797E30D7
+mob=799361E5 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361EE specials=1 unk=('25', '25', '25', '25', '0') tgt=797E30D7
+mob=799361F0 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361F1 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361EF specials=1 unk=('30', '30', '30', '30', '0') tgt=797E30D7
+mob=799361ED specials=1 unk=('30', '30', '30', '30', '0') tgt=797E30D7
+mob=799361EB specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361F2 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361F3 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361E4 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=799361E9 specials=1 unk=('20', '20', '20', '20', '0') tgt=797E30D7
+mob=7990F375 specials=1 unk=('25', '25', '25', '25', '0') tgt=797E30D7
+
+unk histogram: {('20', '20', '20', '20', '0'): 10, ('30', '30', '30', '30', '0'): 5, ('25', '25', '25', '25', '0'): 2}
+
+=== Mob-first aggro (SAW before player Attack on that mob) ===
+SIGHT-AGGRO mob=799361E3 name=Sid Basso dist=43.66 player=(298.2,225.0) mob=(254.5,225.1) ts=2026-07-24 22:27:38.584195
+SIGHT-AGGRO mob=799361E5 name=Carina Markarian dist=76.42 player=(298.2,225.0) mob=(227.9,254.9) ts=2026-07-24 22:29:28.348413
+SIGHT-AGGRO mob=799361EE name=Malcom Thompon dist=53.44 player=(298.2,225.0) mob=(251.9,251.7) ts=2026-07-24 22:30:04.625099
+SIGHT-AGGRO mob=799361F3 name=Antoine Waldram dist=75.89 player=(298.2,225.0) mob=(229.3,193.2) ts=2026-07-24 22:33:37.693100
+SIGHT-AGGRO mob=799361E9 name=Kirk Danczak dist=80.46 player=(298.2,225.0) mob=(235.0,175.2) ts=2026-07-24 22:34:16.700185
+SIGHT-AGGRO mob=7990F375 name=Malcom Thompon dist=69.78 player=(298.2,225.0) mob=(236.4,192.6) ts=2026-07-24 22:34:42.869293
+
+=== Death Action Parameter2 + corpse delay ===
+DEATH mob=799361E7 p2=501 delay_ms=71 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361E7) Unknown=0 Pa
+DEATH mob=799361E3 p2=501 delay_ms=30 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361E3) Unknown=0 Pa
+DEATH mob=799361F4 p2=501 delay_ms=59 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361F4) Unknown=0 Pa
+DEATH mob=799361EA p2=501 delay_ms=765 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361EA) Unknown=0 Pa
+DEATH mob=799361EC p2=501 delay_ms=884 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361EC) Unknown=0 Pa
+DEATH mob=799361E5 p2=501 delay_ms=11 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361E5) Unknown=0 Pa
+DEATH mob=799361EE p2=501 delay_ms=545 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361EE) Unknown=0 Pa
+DEATH mob=799361F0 p2=501 delay_ms=974 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361F0) Unknown=0 Pa
+DEATH mob=799361F1 p2=501 delay_ms=0 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361F1) Unknown=0 Pa
+DEATH mob=799361EF p2=501 delay_ms=51 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361EF) Unknown=0 Pa
+DEATH mob=799361ED p2=501 delay_ms=408 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361ED) Unknown=0 Pa
+DEATH mob=799361EB p2=501 delay_ms=18 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361EB) Unknown=0 Pa
+DEATH mob=799361F2 p2=501 delay_ms=139 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361F2) Unknown=0 Pa
+DEATH mob=799361F3 p2=501 delay_ms=0 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361F3) Unknown=0 Pa
+DEATH mob=799361E4 p2=501 delay_ms=14 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361E4) Unknown=0 Pa
+DEATH mob=799361E9 p2=501 delay_ms=508 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799361E9) Unknown=0 Pa
+DEATH mob=7990F375 p2=501 delay_ms=555 detail=CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7990F375) Unknown=0 Pa
+deaths=17
+
+=== enemy-combat.csv head ===
+cols=['CapturedUtc', 'Direction', 'Sequence', 'MessageType', 'SourceRole', 'SourceIdentity', 'TargetRole', 'TargetIdentity', 'AuxRole1', 'AuxIdentity1', 'AuxRole2', 'AuxIdentity2', 'Action', 'Amount', 'TargetHp', 'Unknown1', 'Unknown2', 'Unknown3', 'Unknown4', 'Unknown5', 'Unknown6', 'Detail']
+{'CapturedUtc': '2026-07-24T22:24:42.7621961Z', 'Direction': 'IN-N3', 'Sequence': '45', 'MessageType': 'Despawn', 'SourceRole': 'enemy', 'SourceIdentity': '(SimpleChar:79760EE3)', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:43.2998584Z', 'Direction': 'IN-N3', 'Sequence': '47', 'MessageType': 'Despawn', 'SourceRole': 'enemy', 'SourceIdentity': '(SimpleChar:79760EDB)', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:43.3008575Z', 'Direction': 'IN-N3', 'Sequence': '48', 'MessageType': 'Despawn', 'SourceRole': 'SimpleChar', 'SourceIdentity': '(SimpleChar:4C62C3A1)', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:44.3091560Z', 'Direction': 'OUT-N3', 'Sequence': '23', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.1565471Z', 'Direction': 'IN-N3', 'Sequence': '70', 'MessageType': 'HealthDamage', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.1575466Z', 'Direction': 'IN-N3', 'Sequence': '71', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.1615441Z', 'Direction': 'IN-N3', 'Sequence': '74', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.1615441Z', 'Direction': 'IN-N3', 'Sequence': '75', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.1625434Z', 'Direction': 'IN-N3', 'Sequence': '76', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:47109)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.5843713Z', 'Direction': 'OUT-N3', 'Sequence': '29', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:50.7662614Z', 'Direction': 'IN-N3', 'Sequence': '80', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:52.1561552Z', 'Direction': 'IN-N3', 'Sequence': '82', 'MessageType': 'Buff', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:54.3548024Z', 'Direction': 'IN-N3', 'Sequence': '88', 'MessageType': 'Despawn', 'SourceRole': 'enemy', 'SourceIdentity': '(SimpleChar:79760EF0)', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:56.5910009Z', 'Direction': 'IN-N3', 'Sequence': '94', 'MessageType': 'Despawn', 'SourceRole': 'enemy', 'SourceIdentity': '(SimpleChar:79760EE1)', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+{'CapturedUtc': '2026-07-24T22:24:56.5910009Z', 'Direction': 'IN-N3', 'Sequence': '95', 'MessageType': 'Despawn', 'SourceRole': 'enemy', 'SourceIdentity': '(SimpleChar:79760EF3)', 'TargetRole': '', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': ''}
+rows=858
+
+=== FollowTarget Type=Target Unknown1 ===
+{'25': 6, '21': 2}

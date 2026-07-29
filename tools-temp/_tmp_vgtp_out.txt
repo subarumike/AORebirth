@@ -1,0 +1,3 @@
+exists True files ['capture-health.json', 'capture-session.json', 'capture_info.json', 'chat-dialogue.log', 'corpse-full-updates.csv', 'corpse-loot-observations.csv', 'enemy-combat.csv', 'enemy-dossier.json', 'enemy-fight-events.log', 'enemy-full-updates.csv', 'enemy-movement.csv', 'enemy-respawns.csv', 'enemy-stat-updates.csv', 'enemy-state.csv', 'enemy-state.json', 'events.log', 'inventory-updates.csv', 'mission-flow.log', 'movement-packets.csv', 'movement-summary.json', 'npc-interactions.log', 'npc-lifecycle.csv', 'packets.hex.log', 'pf127-door-state.csv', 'pf127-line-of-sight.csv', 'raw-packets.csv', 'scfu-appearance.csv', 'shop-updates.csv', 'system-messages.log', 'vendor-full-updates.csv']
+==== raw-packets vgtp
+raw hits 0

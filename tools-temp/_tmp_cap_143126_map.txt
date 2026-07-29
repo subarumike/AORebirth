@@ -1,0 +1,37 @@
+=== capture_info ===
+pf (Playfield2:160008) char Getkeep
+counts {'inboundRaw': 23, 'outboundRaw': 4, 'decodedInboundN3': 18, 'decodedOutboundN3': 4, 'decodedN3EventRows': 22, 'decodedN3StageErrors': 0, 'rawCombatPackets': 0, 'rawSimpleCharFullUpdatePackets': 7, 'rawPacketLogRows': 27, 'rawPacketIndexRows': 27, 'rawPacketPreserved': 27, 'rawPacketWriteErrors': 0, 'rawPacketCallbackDrainTimeouts': 0, 'rawPacketProjectionErrors': 7, 'rawSimpleCharFullUpdateDecoded': 7, 'rawSimpleCharFullUpdateDecodeErrors': 0, 'rawSimpleCharFullUpdateIncompleteDecodes': 0, 'rawNpcSimpleCharFullUpdates': 7, 'scfuAppearanceRows': 7}
+=== all packets 27
+  IN CharDCMove 4
+  IN ChestFullUpdate 5
+  IN DoorFullUpdate 7
+  IN SimpleCharFullUpdate 7
+  OUT CharDCMove 4
+=== timeline ===
+12:32:11.232954 OUT CharDCMove len 70  move=(298.2,5.01,235.0)
+12:32:11.406849 IN CharDCMove len 70  move=(298.2,5.01,235.0)
+12:32:13.019852 OUT CharDCMove len 70  move=(290.3,5.01,235.0)
+12:32:13.199741 IN CharDCMove len 70  move=(290.3,5.01,235.0)
+12:32:13.674448 OUT CharDCMove len 70  move=(290.3,5.01,235.0)
+12:32:13.834350 IN CharDCMove len 70  move=(290.3,5.01,235.0)
+12:32:14.073203 IN DoorFullUpdate len 199  xyz=(235.0, 5.0, 220.00100708007812)
+12:32:14.073203 IN SimpleCharFullUpdate len 233 
+12:32:14.094190 IN ChestFullUpdate len 155 
+12:32:14.094190 IN ChestFullUpdate len 155 
+12:32:14.094190 IN DoorFullUpdate len 199  xyz=(245.0, 5.0, 189.99899291992188)
+12:32:14.094190 IN SimpleCharFullUpdate len 234 
+12:32:14.096189 IN ChestFullUpdate len 155 
+12:32:14.096189 IN DoorFullUpdate len 199  xyz=(245.0, 5.0, 220.00100708007812)
+12:32:14.096189 IN SimpleCharFullUpdate len 231 
+12:32:14.097189 IN DoorFullUpdate len 199  xyz=(255.0, 5.0, 189.99899291992188)
+12:32:14.097189 IN SimpleCharFullUpdate len 238 
+12:32:14.105183 IN ChestFullUpdate len 155 
+12:32:14.106184 IN DoorFullUpdate len 199  xyz=(260.0010070800781, 5.0, 195.0)
+12:32:14.107182 IN SimpleCharFullUpdate len 235 
+12:32:14.107182 IN ChestFullUpdate len 155 
+12:32:14.108182 IN DoorFullUpdate len 199  xyz=(229.99899291992188, 5.0, 205.0)
+12:32:14.108182 IN SimpleCharFullUpdate len 232 
+12:32:14.109183 IN DoorFullUpdate len 199  xyz=(260.0010070800781, 5.0, 205.0)
+12:32:14.109183 IN SimpleCharFullUpdate len 234 
+12:32:14.112179 OUT CharDCMove len 70  move=(289.6,5.01,235.0)
+12:32:14.234104 IN CharDCMove len 70  move=(289.6,5.01,235.0)

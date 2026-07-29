@@ -1,0 +1,76 @@
+INV COLS: ['CapturedUtc', 'Direction', 'Sequence', 'InventoryIdentity', 'Handle', 'Slot', 'Placement', 'Flags', 'Count', 'ItemIdentity', 'LowId', 'HighId', 'Quality', 'Unknown']
+COMBINE: You combined "Screwdriver" with "Robot Junk" and the result is a quality level 3 "Nano Sensor".
+COMBINE: You combined "Bio Analyzing Computer" with "Nano Sensor" and the result is a quality level 3 "Basic Robot Brain".
+COMBINE: You combined "MasterComm - Personalization Device" with "Basic Robot Brain" and the result is a quality level 3 "Personalized Basic Robot Brain".
+events 'Screwdriver' count=2
+  E5038: 2026-07-20T17:07:35.7102721Z [IN-N3] #2396 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E5039: 2026-07-20T17:07:35.7112720Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@s
+  E5040: Screwdrivers
+  E5041: Robot Junki!!!!$s
+  E5042: Nano Sensor~" Unknown2=0 FormattedMessage="You combined "Screwdriver" with "Robot Junk" and the result is a quality level 3 "Nano Sensor"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+  E5040: Screwdrivers
+  E5041: Robot Junki!!!!$s
+  E5042: Nano Sensor~" Unknown2=0 FormattedMessage="You combined "Screwdriver" with "Robot Junk" and the result is a quality level 3 "Nano Sensor"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+  E5043: 2026-07-20T17:07:35.7122707Z [IN-N3] #2397 type=TemplateAction identity=(SimpleChar:797E3029)
+  E5044: 2026-07-20T17:07:35.7122707Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=150923 ItemHighId=150924 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+events 'Robot Junk' count=4
+  E3101: 2026-07-20T17:06:30.0917264Z [CHAR-GONE] (SimpleChar:79824B75)
+  E3102: 2026-07-20T17:06:30.3185903Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[JsNidiii!!&mDi!!&mCi!!!!$s
+  E3103: Robot JunksRemains of 32-V Docker~" Unk2=1 }
+  E3104: 2026-07-20T17:06:30.4794871Z [IN-N3] #1526 type=FollowTarget identity=(SimpleChar:79824A0D)
+  E3105: 2026-07-20T17:06:30.4794871Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:79824A0D) Unknown=0 Pack
+  E4959: 2026-07-20T17:07:32.2304179Z [IN-N3-DETAIL] ContainerAddItem { Source=(Backpack:720001) Target=(SimpleChar:797E3029) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:797E3029) Unknown=0 PacketType=N3Message }
+  E4960: 2026-07-20T17:07:32.3303570Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[JsMrhellai!!&mDi!!&mCi!!!!$s
+  E4961: Robot JunksRemains of 32-V Docker~" Unk2=1 }
+  E4962: 2026-07-20T17:07:32.5142434Z [IN-N3] #2361 type=Stat identity=(SimpleChar:797E3029)
+  E4963: 2026-07-20T17:07:32.5152430Z [IN-N3-DETAIL] StatMessage { Stats=count=1[SocialStatus=0] N3MessageType=Stat Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+  E5039: 2026-07-20T17:07:35.7112720Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@s
+  E5040: Screwdrivers
+  E5041: Robot Junki!!!!$s
+  E5042: Nano Sensor~" Unknown2=0 FormattedMessage="You combined "Screwdriver" with "Robot Junk" and the result is a quality level 3 "Nano Sensor"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+  E5043: 2026-07-20T17:07:35.7122707Z [IN-N3] #2397 type=TemplateAction identity=(SimpleChar:797E3029)
+events 'Nano Sensor' count=2
+  E5040: Screwdrivers
+  E5041: Robot Junki!!!!$s
+  E5042: Nano Sensor~" Unknown2=0 FormattedMessage="You combined "Screwdriver" with "Robot Junk" and the result is a quality level 3 "Nano Sensor"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown=1 PacketType=N3Message }
+  E5043: 2026-07-20T17:07:35.7122707Z [IN-N3] #2397 type=TemplateAction identity=(SimpleChar:797E3029)
+  E5044: 2026-07-20T17:07:35.7122707Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=150923 ItemHighId=150924 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+  E5726: 2026-07-20T17:07:50.1823464Z [IN-N3] #2662 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E5727: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@sBio Analyzing Computers
+  E5728: Nano Sensori!!!!$sBasic Robot Brain~" Unknown2=0 FormattedMessage="You combined "Bio Analyzing Computer" with "Nano Sensor" and the result is a quality level 3 "Basic Robot Brain"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown
+  E5729: 2026-07-20T17:07:50.1823464Z [IN-N3] #2663 type=TemplateAction identity=(SimpleChar:797E3029)
+  E5730: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=156022 ItemHighId=156023 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+events 'Bio Analyzing' count=2
+  E5725: 2026-07-20T17:07:49.8985217Z [CORPSE-GONE] (Corpse:F5F807)
+  E5726: 2026-07-20T17:07:50.1823464Z [IN-N3] #2662 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E5727: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@sBio Analyzing Computers
+  E5728: Nano Sensori!!!!$sBasic Robot Brain~" Unknown2=0 FormattedMessage="You combined "Bio Analyzing Computer" with "Nano Sensor" and the result is a quality level 3 "Basic Robot Brain"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown
+  E5729: 2026-07-20T17:07:50.1823464Z [IN-N3] #2663 type=TemplateAction identity=(SimpleChar:797E3029)
+  E5726: 2026-07-20T17:07:50.1823464Z [IN-N3] #2662 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E5727: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@sBio Analyzing Computers
+  E5728: Nano Sensori!!!!$sBasic Robot Brain~" Unknown2=0 FormattedMessage="You combined "Bio Analyzing Computer" with "Nano Sensor" and the result is a quality level 3 "Basic Robot Brain"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown
+  E5729: 2026-07-20T17:07:50.1823464Z [IN-N3] #2663 type=TemplateAction identity=(SimpleChar:797E3029)
+  E5730: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=156022 ItemHighId=156023 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+events 'Basic Robot Brain' count=2
+  E5726: 2026-07-20T17:07:50.1823464Z [IN-N3] #2662 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E5727: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@sBio Analyzing Computers
+  E5728: Nano Sensori!!!!$sBasic Robot Brain~" Unknown2=0 FormattedMessage="You combined "Bio Analyzing Computer" with "Nano Sensor" and the result is a quality level 3 "Basic Robot Brain"." N3MessageType=FormatFeedback Identity=(SimpleChar:797E3029) Unknown
+  E5729: 2026-07-20T17:07:50.1823464Z [IN-N3] #2663 type=TemplateAction identity=(SimpleChar:797E3029)
+  E5730: 2026-07-20T17:07:50.1823464Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=156022 ItemHighId=156023 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+  E6068: 2026-07-20T17:08:00.2841187Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:79824B8B) Unknown=0 Pack
+  E6069: 2026-07-20T17:08:00.2851182Z [IN-N3] #2833 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E6070: 2026-07-20T17:08:00.2851182Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@s$MasterComm - Personalization DevicesBasic Robot Braini!!!!$sPersonalized Basic Robot Brain~" Unknown2=0 FormattedMessage="You combined "MasterComm
+  E6071: 2026-07-20T17:08:00.2851182Z [IN-N3] #2834 type=TemplateAction identity=(SimpleChar:797E3029)
+  E6072: 2026-07-20T17:08:00.2851182Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=156026 ItemHighId=156027 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+events 'MasterComm' count=1
+  E6068: 2026-07-20T17:08:00.2841187Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:79824B8B) Unknown=0 Pack
+  E6069: 2026-07-20T17:08:00.2851182Z [IN-N3] #2833 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E6070: 2026-07-20T17:08:00.2851182Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@s$MasterComm - Personalization DevicesBasic Robot Braini!!!!$sPersonalized Basic Robot Brain~" Unknown2=0 FormattedMessage="You combined "MasterComm
+  E6071: 2026-07-20T17:08:00.2851182Z [IN-N3] #2834 type=TemplateAction identity=(SimpleChar:797E3029)
+  E6072: 2026-07-20T17:08:00.2851182Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=156026 ItemHighId=156027 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 
+events 'Personalized Basic' count=1
+  E6068: 2026-07-20T17:08:00.2841187Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:79824B8B) Unknown=0 Pack
+  E6069: 2026-07-20T17:08:00.2851182Z [IN-N3] #2833 type=FormatFeedback identity=(SimpleChar:797E3029)
+  E6070: 2026-07-20T17:08:00.2851182Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@s$MasterComm - Personalization DevicesBasic Robot Braini!!!!$sPersonalized Basic Robot Brain~" Unknown2=0 FormattedMessage="You combined "MasterComm
+  E6071: 2026-07-20T17:08:00.2851182Z [IN-N3] #2834 type=TemplateAction identity=(SimpleChar:797E3029)
+  E6072: 2026-07-20T17:08:00.2851182Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=156026 ItemHighId=156027 Quality=3 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:797E3029) 

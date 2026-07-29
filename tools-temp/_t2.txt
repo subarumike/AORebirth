@@ -1,0 +1,111 @@
+cFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=5 MonsterData=208922 HeadMesh= FlagsNumeric=36391491 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798894FB) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=8 MonsterData=208922 HeadMesh= FlagsNumeric=36391491 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798894FC) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=7 MonsterData=208922 HeadMesh= FlagsNumeric=36391491 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798894FD) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=7 MonsterData=208922 HeadMesh= FlagsNumeric=36325955 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798894FF) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=7 MonsterData=208922 HeadMesh= FlagsNumeric=36391491 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798A3568) names=['Dreaming Silvertail']
+    CharacterFlags unique: ['277352961']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet']
+    VisualFlags unique: ['31']
+    last: Level=15 MonsterData=208922 HeadMesh= FlagsNumeric=170543683 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F52) names=['Dreaming Silvertail']
+    CharacterFlags unique: ['277352961']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet']
+    VisualFlags unique: ['31']
+    last: Level=15 MonsterData=208922 HeadMesh= FlagsNumeric=170543683 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F82) names=['Dreaming Silvertail']
+    CharacterFlags unique: ['277352961']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet']
+    VisualFlags unique: ['31']
+    last: Level=15 MonsterData=208922 HeadMesh= FlagsNumeric=170543683 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F83) names=['Dreaming Silvertail']
+    CharacterFlags unique: ['277352961']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet']
+    VisualFlags unique: ['31']
+    last: Level=15 MonsterData=208922 HeadMesh= FlagsNumeric=170543683 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F84) names=['Dreaming Silvertail']
+    CharacterFlags unique: ['277352961']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet']
+    VisualFlags unique: ['31']
+    last: Level=15 MonsterData=208922 HeadMesh= FlagsNumeric=170543683 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F89) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=6 MonsterData=208922 HeadMesh= FlagsNumeric=36325955 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F8B) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=5 MonsterData=208922 HeadMesh= FlagsNumeric=36325955 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798C1F8C) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=5 MonsterData=208922 HeadMesh= FlagsNumeric=36325955 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+--- enemy-full-updates.csv CharacterFlags for Silvertail ---
+matching efu rows: 18
+  (SimpleChar:79841864) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:7988911E) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798894DB) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798894DE) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798894FB) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798894FC) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798894FD) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798894FF) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798A3568) names=['Dreaming Silvertail'] CharacterFlags=['277352961']
+  (SimpleChar:798C1F52) names=['Dreaming Silvertail'] CharacterFlags=['277352961']
+  (SimpleChar:798C1F82) names=['Dreaming Silvertail'] CharacterFlags=['277352961']
+  (SimpleChar:798C1F83) names=['Dreaming Silvertail'] CharacterFlags=['277352961']
+  (SimpleChar:798C1F84) names=['Dreaming Silvertail'] CharacterFlags=['277352961']
+  (SimpleChar:798C1F89) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798C1F8B) names=['Swift Silvertail'] CharacterFlags=['268964353']
+  (SimpleChar:798C1F8C) names=['Swift Silvertail'] CharacterFlags=['268964353']
+--- events.log / enemy-fight-events.log blue-name / HasBlueName hits ---
+events.log: blue-name pattern lines=0
+  L904: 2026-07-23T20:14:59.6292911Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F89) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=270/270 pct=100.0 level=6 computerLiteracy=6 pos=(825.5432, 31.09682, 1118.967) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L942: 2026-07-23T20:14:59.9076397Z [CHAR-SEEN] identity=(SimpleChar:798C1F89) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=270/270 pct=100.0 level=6 computerLiteracy=6 pos=(825.5432, 31.09682, 1118.967) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L991: 2026-07-23T20:15:07.9740584Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F8B) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(825.7564, 31.81, 1134.346) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTy
+  L1030: 2026-07-23T20:15:08.0040398Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F8C) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(824.114, 31.81, 1132.906) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L1037: 2026-07-23T20:15:08.0050392Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F82) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(847.9584, 32.41, 1156.498) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corp
+  L1047: 2026-07-23T20:15:08.9740650Z [CHAR-SEEN] identity=(SimpleChar:798C1F8B) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(825.7564, 31.81, 1134.346) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1
+  L1049: 2026-07-23T20:15:08.9740650Z [CHAR-SEEN] identity=(SimpleChar:798C1F8C) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(824.114, 31.81, 1132.906) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=12
+  L1056: 2026-07-23T20:15:08.9750645Z [CHAR-SEEN] identity=(SimpleChar:798C1F82) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(847.9584, 32.41, 1156.498) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTy
+  L1094: 2026-07-23T20:15:22.0816172Z [DYNEL-SPAWNED] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(834.5659, 32.20087, 1159.982) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L1108: 2026-07-23T20:15:23.0630015Z [CHAR-SEEN] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(835.2646, 32.30568, 1159.211) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L1783: 2026-07-23T20:16:24.9615629Z [DYNEL-SPAWNED] identity=(SimpleChar:798894DB) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(799.1443, 30.28355, 1191.089) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L1803: 2026-07-23T20:16:25.4052871Z [CHAR-SEEN] identity=(SimpleChar:798894DB) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(799.1443, 30.28355, 1191.089) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L3216: 2026-07-23T20:18:39.9842854Z [DYNEL-SPAWNED] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(812.9963, 29.56544, 1199.953) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L3220: 2026-07-23T20:18:40.2900977Z [CHAR-SEEN] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(813.0331, 29.57097, 1199.798) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L3446: 2026-07-23T20:19:02.4746079Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeig
+  L3448: 2026-07-23T20:19:02.4746079Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeig
+  L3459: 2026-07-23T20:19:02.4915974Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F83) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 cor
+  L3460: 2026-07-23T20:19:02.5045893Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F84) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 c
+  L3463: 2026-07-23T20:19:03.4530576Z [CHAR-SEEN] identity=(SimpleChar:798C1F83) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseT
+  L3475: 2026-07-23T20:19:03.4550565Z [CHAR-SEEN] identity=(SimpleChar:798C1F84) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L3493: 2026-07-23T20:19:05.4937991Z [DYNEL-SPAWNED] identity=(SimpleChar:79841864) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=270/270 pct=100.0 level=6 computerLiteracy=6 pos=(774.5911, 30.44653, 1239.993) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L3498: 2026-07-23T20:19:05.4947985Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=93 VisualFlags=31 HeadMesh=null RunSpeedBase=22 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmal
+  L3515: 2026-07-23T20:19:06.4623497Z [CHAR-SEEN] identity=(SimpleChar:79841864) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=270/270 pct=100.0 level=6 computerLiteracy=6 pos=(775.4027, 30.3738, 1238.854) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType
+  L3960: 2026-07-23T20:19:58.6892634Z [DYNEL-SPAWNED] identity=(SimpleChar:798894FC) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=315/315 pct=100.0 level=7 computerLiteracy=6 pos=(799.9115, 30.00357, 1252.006) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L4021: 2026-07-23T20:19:58.6942602Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=94 VisualFlags=31 HeadMesh=null RunSpeedBase=28 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmal
+enemy-fight-events.log: blue-name pattern lines=0
+  L937: 2026-07-23T20:19:02.4746079Z IN-N3 #1259 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F83) SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSm
+  L938: 2026-07-23T20:19:02.4746079Z IN-N3 #1260

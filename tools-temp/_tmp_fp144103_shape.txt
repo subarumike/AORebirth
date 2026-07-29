@@ -1,0 +1,13 @@
+2026-07-24T13:03:10.6355858Z CorpseFullUpdate | emains of Willis Waddles........2...............'9.................................................e
+
+=== teleports / anarchy ===
+
+=== SCFU name scan ===
+names found: []
+
+=== Door/Chest/Container counts ===
+ContainerAddItem 1
+DoorFullUpdate 12
+Feedback 9
+FormatFeedback 10
+Quest 1

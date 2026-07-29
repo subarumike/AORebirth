@@ -1,0 +1,347 @@
+[2026-07-18T16:53:13.5837908Z] APPEND Scientist Veronica Escobar (787B54B2): 'The young woman wrinkles her forehead.'
+[2026-07-18T16:53:15.5922445Z] APPEND Scientist Veronica Escobar (787B54B2): "They can't be serious..."
+[2026-07-18T16:53:17.7639063Z] APPEND Scientist Veronica Escobar (787B54B2): "You take a quick look around. Yep, she's talking to you."
+[2026-07-18T16:53:18.6803408Z] APPEND Scientist Veronica Escobar (787B54B2): 'I ask for an assistant... '
+[2026-07-18T16:53:21.6735382Z] APPEND Scientist Veronica Escobar (787B54B2): 'and they send me...'
+[2026-07-18T16:53:23.7202759Z] APPEND Scientist Veronica Escobar (787B54B2): 'Veronica looks at you with disbelief.'
+[2026-07-18T16:53:25.7320364Z] APPEND Scientist Veronica Escobar (787B54B2): '...something looking like a science experiment sent here from Rubi-Ka!'
+[2026-07-18T16:53:31.1619003Z] APPEND Scientist Veronica Escobar (787B54B2): 'Ohh.'
+[2026-07-18T16:53:33.1593984Z] APPEND Scientist Veronica Escobar (787B54B2): '\nDid I hurt your feelings, dear?'
+[2026-07-18T16:53:35.2614981Z] APPEND Scientist Veronica Escobar (787B54B2): "You can tell by the sound of her voice that she really doesn't care."
+[2026-07-18T16:53:37.0783770Z] APPEND Scientist Veronica Escobar (787B54B2): "I suspect you have the bracer Drake gave you? Let's have a look."
+[2026-07-18T16:53:39.1412799Z] APPEND Scientist Veronica Escobar (787B54B2): "Veronica seems to have conducted these readings for quite a while. As she quickly programs her wrist-attached DNA-Recompiler to receive the information from your bracer, you can't help wondering what they aim to accomplish with these experiments."
+[2026-07-18T16:53:47.6357773Z] APPEND Scientist Veronica Escobar (787B54B2): 'Veronica taps her foot impatiently as she waits for the DNA-Recompiler to reset.'
+[2026-07-18T16:53:48.5391401Z] APPEND Scientist Veronica Escobar (787B54B2): "I don't have time for this..."
+[2026-07-18T16:53:52.1570260Z] APPEND Scientist Veronica Escobar (787B54B2): 'I found a strange and ancient-looking object today.'
+[2026-07-18T16:53:54.2007654Z] APPEND Scientist Veronica Escobar (787B54B2): '\nI am not sure what it might have been used for, nor am I particularly interested in finding out.'
+[2026-07-18T16:53:56.0236418Z] APPEND Scientist Veronica Escobar (787B54B2): 'She proudly lifts her head up and pulls her shoulders back in a well rehearsed pose to look important.'
+[2026-07-18T16:53:58.0573866Z] APPEND Scientist Veronica Escobar (787B54B2): "I'm much too valuable for the project to be jeopardized as a consequence of sheer immature curiosity."
+[2026-07-18T16:53:59.1786948Z] APPEND Scientist Veronica Escobar (787B54B2): '\nYou on the other hand... are expendable.'
+[2026-07-18T16:54:01.1774633Z] APPEND Scientist Veronica Escobar (787B54B2): "\nAnd since it doesn't look like I'm getting a new assistant anytime soon, you will just have to do."
+[2026-07-18T16:54:03.2002158Z] APPEND Scientist Veronica Escobar (787B54B2): 'With that, she starts rummaging around her backpack and digs up a strange item. You wonder whether you should take the job?'
+[2026-07-18T16:54:08.8074936Z] APPEND Scientist Veronica Escobar (787B54B2): 'You do that, and make sure to keep any information you find to yourself.'
+[2026-07-18T16:54:11.6743659Z] APPEND Scientist Veronica Escobar (787B54B2): '\nI would suggest you search West of here. I have heard rumors of a settlement there. Find out anyone there shows interest in this Ancient Device and give it to him for inspection.'
+[2026-07-18T16:54:14.1448279Z] APPEND Scientist Veronica Escobar (787B54B2): '\nReturn to me if you find something important enough to occupy my precious time.'
+[2026-07-18T16:54:20.6318192Z] APPEND Scientist Veronica Escobar (787B54B2): 'I have heard that a settlement has been found west of here.'
+[2026-07-18T16:54:21.2014669Z] APPEND Scientist Veronica Escobar (787B54B2): '\nAnd that the settlement was supposed to be inhabited by powerful creatures, searching for a way to harvest the energies of nature.'
+[2026-07-18T16:54:23.2032348Z] APPEND Scientist Veronica Escobar (787B54B2): "\nBut I haven't had time to explore that part of Nascence. I am sure you will."
+[2026-07-18T16:55:15.1306952Z] APPEND Scientist Veronica Escobar (787B54B2): 'They refer to someone well versed in the past. His title would be, directly translated, Hypnagogic.'
+[2026-07-18T16:55:17.1348367Z] APPEND Scientist Veronica Escobar (787B54B2): '\nThe one close in touch with the Divine entity is referred to as a Prophet.'
+[2026-07-18T16:55:19.1535949Z] APPEND Scientist Veronica Escobar (787B54B2): '\nThese are all directly translated titles and my knowledge of the ancient alphabet is limited. Even though it is highly unlikely, keep in mind that there is a slight chance of error due to some phonetic variations that might have been lost in the translation.'
+[2026-07-18T16:55:22.7114030Z] APPEND Scientist Veronica Escobar (787B54B2): 'The Brink can be found North of here.'
+[2026-07-18T16:55:23.5858628Z] APPEND Scientist Veronica Escobar (787B54B2): '\nBut since seismic readings from that area are not reliable, you would be wise to keep away.'
+[2026-07-18T16:55:25.5967489Z] APPEND Scientist Veronica Escobar (787B54B2): '\nThe Brink is the very edge of these lands, but I have reached the conclusion that something is causing the edge to dissolve.'
+[2026-07-18T16:55:28.5079511Z] APPEND Scientist Veronica Escobar (787B54B2): '\nI hope Drake can find a solution to this problem soon or we will be in serious danger out here.'
+[2026-07-18T16:56:31.7395945Z] APPEND Prophet Yutt Thrak (78D280F6): 'Greetings, child of Thrak.'
+[2026-07-18T16:56:33.4565357Z] APPEND Prophet Yutt Thrak (78D280F6): "You see a gleam of interest in the Prophet's eyes as he notices the ancient device you are carrying."
+[2026-07-18T16:56:36.6545642Z] APPEND Prophet Yutt Thrak (78D280F6): 'Let me have a look.'
+[2026-07-18T16:56:42.0806009Z] APPEND Prophet Yutt Thrak (78D280F6): 'Yes. I have seen these before.'
+[2026-07-18T16:56:48.9677389Z] APPEND Prophet Yutt Thrak (78D280F6): 'We all have needs, Thenera.'
+[2026-07-18T16:56:50.9325280Z] APPEND Prophet Yutt Thrak (78D280F6): '\nThe question is how much you are willing to sacrifice to have them satisfied.'
+[2026-07-18T16:56:58.0110968Z] APPEND Prophet Yutt Thrak (78D280F6): 'Nothing to lose?'
+[2026-07-18T16:56:58.9745018Z] APPEND Prophet Yutt Thrak (78D280F6): 'Yutt Thrak lowers his voice.'
+[2026-07-18T16:56:58.9745018Z] APPEND Prophet Yutt Thrak (78D280F6): 'We will see about that.'
+[2026-07-18T16:57:02.0566032Z] APPEND Prophet Yutt Thrak (78D280F6): '\nLook around you...'
+[2026-07-18T16:57:05.1217115Z] APPEND Prophet Yutt Thrak (78D280F6): '\nWe were all chosen by the Sacred One. We now devote our lives to the cause and carry out His hallowed commands - whatever they may be.'
+[2026-07-18T16:57:08.0936341Z] APPEND Prophet Yutt Thrak (78D280F6): '\n'
+[2026-07-18T16:57:08.1046275Z] APPEND Prophet Yutt Thrak (78D280F6): 'We are the only ones who can show you the path to grandness. Those most dedicated of His followers may be granted entrance to His Garden and Sanctuary.'
+[2026-07-18T16:57:10.9949734Z] APPEND Prophet Yutt Thrak (78D280F6): '\nOne may recieve incredible powers.'
+[2026-07-18T16:57:12.9487700Z] APPEND Prophet Yutt Thrak (78D280F6): '\nOne may even evolve beyond human comprehension.'
+[2026-07-18T16:57:15.1144321Z] APPEND Prophet Yutt Thrak (78D280F6): '\nBut one may also be destroyed in the blink of an eye, should the Divine decide you are not worthy.'
+[2026-07-18T16:57:25.5897639Z] APPEND Prophet Yutt Thrak (78D280F6): 'Words, nothing but words.'
+[2026-07-18T16:57:27.5828958Z] APPEND Prophet Yutt Thrak (78D280F6): '\nShow us proof of your devotion - commit yourself to the Sacred One!'
+[2026-07-18T16:57:28.6407181Z] APPEND Prophet Yutt Thrak (78D280F6): '\nBring before me the mark revealing His existence here in Nascence.'
+[2026-07-18T16:57:29.6780786Z] APPEND Prophet Yutt Thrak (78D280F6): '\nNow leave!'
+[2026-07-18T16:57:37.6511610Z] APPEND Prophet Yutt Thrak (78D280F6): 'Really?'
+[2026-07-18T16:57:42.9349041Z] APPEND Prophet Yutt Thrak (78D280F6): 'Well done, Thenera. But you have much to prove before Thrak turns his attention your way.'
+[2026-07-18T16:57:45.9650354Z] APPEND Prophet Yutt Thrak (78D280F6): '\nTravel to the statue raised in His glory and place the Insignia by its feet.'
+[2026-07-18T16:57:46.9344363Z] APPEND Prophet Yutt Thrak (78D280F6): '\nYou will be granted passage to His Garden.'
+[2026-07-18T16:57:48.9651844Z] APPEND Prophet Yutt Thrak (78D280F6): '\nThis is where you must continue your journey.'
+[2026-07-18T16:57:50.9559570Z] APPEND Prophet Yutt Thrak (78D280F6): '\nSomeone versed in what has once been, may be able to tell you more about the Ancient Device.'
+[2026-07-18T16:57:54.1519859Z] APPEND Prophet Yutt Thrak (78D280F6): '\nNow leave.'
+[2026-07-18T16:57:59.6195295Z] APPEND Prophet Yutt Thrak (78D280F6): 'Stay in the shadows, Thenera and may Thrak keep prying eyes away from your path to glory.'
+[2026-07-18T16:58:23.2431312Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'At first the Hypnagogic pretends not to see you, but then he notices the artifact.'
+[2026-07-18T16:58:26.3502147Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'You there!'
+[2026-07-18T16:58:28.2999560Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'As you approach him, he points at the ancient device.'
+[2026-07-18T16:58:30.2447568Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'How did you acquire that artifact?'
+[2026-07-18T16:58:34.2088934Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'How dare you?!'
+[2026-07-18T16:58:37.2640083Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nYou will tell me right now or I will have you regret ever talking to me!'
+[2026-07-18T16:58:40.7768409Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'So it is true!'
+[2026-07-18T16:58:42.7305917Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nAs it has been foretold, ancient Xan technology has been recovered and once again returned to the Devoted ones.'
+[2026-07-18T16:58:48.7408879Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nGive me the artifact.'
+[2026-07-18T16:58:54.7904118Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'Yes, this is a powerful artifact indeed.'
+[2026-07-18T16:58:56.8061690Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nIt claims the soul of feeble creatures, if one knows how to release its dormant powers.'
+[2026-07-18T16:58:58.2646080Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nFind out how utilize this Ancient Artifact and claim three souls in the name of Thrak.'
+[2026-07-18T16:58:59.2280116Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'The Hypnagogic unconsciously waves you away, whispering to himself.'
+[2026-07-18T16:59:01.1888044Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'I must hurry! All the signs are in place. It is time.'
+[2026-07-18T16:59:02.3191076Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nTime for us to act! Yes, I must let them know now.'
+[2026-07-18T16:59:04.3248722Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'He suddenly notices you still standing here.'
+[2026-07-18T16:59:05.2111287Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'What are you waiting for, chosen one? Leave at once!'
+[2026-07-18T16:59:06.3104517Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): ' Take this insignia of Thrak, it will aid us in our journey to glory.'
+[2026-07-18T16:59:13.7302481Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'The signs are all over.'
+[2026-07-18T16:59:15.6930405Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nThey are showing us that the time has come. The time to set our grand plan in motion. Staged for centuries upon centuries by the Sacred Ones.'
+[2026-07-18T16:59:21.7030567Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nAnd there will be no mercy if we fail them. But the rewards when we succeed will be beyond comprehension!'
+[2026-07-18T16:59:26.7799276Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'The Hypnagogic turns around, busy preparing for the important events to follow.'
+[2026-07-18T16:59:52.6915983Z] APPEND Dreaming Silvertail (797652A0): 'The creature looks at you with wide eyes.'
+[2026-07-18T16:59:54.5661820Z] APPEND Dreaming Silvertail (797652A0): 'The creature stops and studies you for a couple of seconds as you look through your backpack. You reach out to cover her eyes with the device.'
+[2026-07-18T17:00:00.5245059Z] APPEND Dreaming Silvertail (797652A0): 'The Silvertail starts to change shape as soon as you place the device close to her eyes.'
+[2026-07-18T17:00:08.6272162Z] APPEND Dreaming Silvertail (797652F5): 'The creature looks at you with wide eyes.'
+[2026-07-18T17:00:10.2232316Z] APPEND Dreaming Silvertail (797652F5): 'The creature stops and studies you for a couple of seconds as you look through your backpack. You reach out to cover her eyes with the device.'
+[2026-07-18T17:00:14.6095275Z] APPEND Dreaming Silvertail (797652F5): 'The Silvertail starts to change shape as soon as you place the device close to her eyes.'
+[2026-07-18T17:00:24.5494755Z] APPEND Dreaming Silvertail (797652A7): 'The creature looks at you with wide eyes.'
+[2026-07-18T17:00:26.6026868Z] APPEND Dreaming Silvertail (797652A7): 'The creature stops and studies you for a couple of seconds as you look through your backpack. You reach out to cover her eyes with the device.'
+[2026-07-18T17:00:30.1282696Z] APPEND Dreaming Silvertail (797652A7): 'The Silvertail starts to change shape as soon as you place the device close to her eyes.'
+[2026-07-18T17:01:11.3051816Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'At first the Hypnagogic pretends not to see you, but then he notices the artifact.'
+[2026-07-18T17:01:14.1639143Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'You there!'
+[2026-07-18T17:01:16.3435578Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'As you approach him, he points at the ancient device.'
+[2026-07-18T17:01:18.3493167Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'How did you acquire that artifact?'
+[2026-07-18T17:01:21.4075110Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'The Hypnagogic gives you a sharp look.'
+[2026-07-18T17:01:24.0818558Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'Is that so?'
+[2026-07-18T17:01:25.4170322Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nI did feel a massive surge of power, but I must inspect the Artifact before I can decide whether you deserve a reward or not...'
+[2026-07-18T17:01:31.3140136Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'Very well, Thenera. The Artifact seems to be in perfect order.'
+[2026-07-18T17:01:34.2510195Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nWe entrust you to keep it safe and out of reach from Aban, cursed be her name and her treacherous followers.'
+[2026-07-18T17:01:36.2344401Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nYour reward, sanctified by Thrak, will be this sacred key. Use it to gain safe passage to this place, but use it with caution.'
+[2026-07-18T17:01:39.3495167Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): '\nThrak will not look lightly upon misuse of such a powerful gift...'
+[2026-07-18T17:01:44.2310905Z] APPEND Hypnagogic Urga-Lum Thrak (79758F3A): 'The Hypnagogic is muttering to himself, not paying you any attention.'
+OPTIONS Scientist Veronica Escobar (787B54B2): I am one of those science experiments. | I'm not anyone's assistant. Get lost. | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 0
+OPTIONS Scientist Veronica Escobar (787B54B2): Here is the Bracer. | I don't have the Bracer. | I am not interested. | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 1
+OPTIONS Scientist Veronica Escobar (787B54B2): What's the rush? | I have all the time in the world. | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 0
+OPTIONS Scientist Veronica Escobar (787B54B2): I'll see what I can do. | I am not interested. | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 0
+OPTIONS Scientist Veronica Escobar (787B54B2): What kind of rumors have you heard? | What can you tell me of the symbols you seem to be researching here? | What can you tell me about the Brink? | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 0
+OPTIONS Scientist Veronica Escobar (787B54B2): What can you tell me of the symbols you seem to be researching here? | What can you tell me about the Brink? | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 0
+OPTIONS Scientist Veronica Escobar (787B54B2): What can you tell me about the Brink? | Goodbye
+ANSWER Scientist Veronica Escobar (787B54B2): 0
+OPTIONS Scientist Veronica Escobar (787B54B2): Goodbye
+OPTIONS Prophet Yutt Thrak (78D280F6): I found this ancient device... | I don't need any help from you. | Goodbye
+ANSWER Prophet Yutt Thrak (78D280F6): 0
+TRADE_START Prophet Yutt Thrak (78D280F6): Drag and drop the item(s) you want to give to Prophet Yutt Thrak into one of the slots available and press 
+TRADE_ITEM Prophet Yutt Thrak (78D280F6): Inventory:0054
+OPTIONS Prophet Yutt Thrak (78D280F6): I need to know more about this ancient item. Can you help me? | I don't need any help from you. | Goodbye
+ANSWER Prophet Yutt Thrak (78D280F6): 0
+OPTIONS Prophet Yutt Thrak (78D280F6): I have nothing to lose, what do you require? | I don't like the sound of this. | Goodbye
+ANSWER Prophet Yutt Thrak (78D280F6): 0
+OPTIONS Prophet Yutt Thrak (78D280F6): I am prepared to follow every command and reap the benefits of my hard work. | No, thanks. I think I should be leaving now. | Tell me more about that Garden. | Goodbye
+ANSWER Prophet Yutt Thrak (78D280F6): 0
+OPTIONS Prophet Yutt Thrak (78D280F6): I have proof of Thraks Divine presence here in Nascence. | Goodbye
+ANSWER Prophet Yutt Thrak (78D280F6): 0
+TRADE_START Prophet Yutt Thrak (78D280F6): Drag and drop the item(s) you want to give to Prophet Yutt Thrak into one of the slots available and press 
+TRADE_ITEM Prophet Yutt Thrak (78D280F6): Inventory:0059
+OPTIONS Prophet Yutt Thrak (78D280F6): Goodbye
+ANSWER Prophet Yutt Thrak (78D280F6): 0
+OPTIONS Hypnagogic Urga-Lum Thrak (79758F3A): That's really none of your business, but make it worth my while and I might tell you. | It was found by a scientist close to Jobe research area. | Goodbye
+ANSWER Hypnagogic Urga-Lum Thrak (79758F3A): 0
+OPTIONS Hypnagogic Urga-Lum Thrak (79758F3A): It was found by a scientist close to Jobe research area. | Goodbye
+ANSWER Hypnagogic Urga-Lum Thrak (79758F3A): 0
+TRADE_START Hypnagogic Urga-Lum Thrak (79758F3A): Drag and drop the item(s) you want to give to Hypnagogic Urga-Lum Thrak into one of the slots available and press 
+TRADE_ITEM Hypnagogic Urga-Lum Thrak (79758F3A): Inventory:0054
+OPTIONS Hypnagogic Urga-Lum Thrak (79758F3A): What signs are you talking about? | Goodbye
+ANSWER Hypnagogic Urga-Lum Thrak (79758F3A): 0
+OPTIONS Hypnagogic Urga-Lum Thrak (79758F3A): Goodbye
+ANSWER Hypnagogic Urga-Lum Thrak (79758F3A): 0
+OPTIONS Dreaming Silvertail (797652A0): 'Cover her eyes with the ancient device' | Goodbye
+ANSWER Dreaming Silvertail (797652A0): 0
+TRADE_START Dreaming Silvertail (797652A0): Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press 
+TRADE_ITEM Dreaming Silvertail (797652A0): Inventory:005B
+OPTIONS Dreaming Silvertail (797652A0): Goodbye
+OPTIONS Dreaming Silvertail (797652F5): 'Cover her eyes with the ancient device' | Goodbye
+ANSWER Dreaming Silvertail (797652F5): 0
+TRADE_START Dreaming Silvertail (797652F5): Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press 
+TRADE_ITEM Dreaming Silvertail (797652F5): Inventory:0054
+OPTIONS Dreaming Silvertail (797652F5): Goodbye
+OPTIONS Dreaming Silvertail (797652A7): 'Cover her eyes with the ancient device' | Goodbye
+ANSWER Dreaming Silvertail (797652A7): 0
+TRADE_START Dreaming Silvertail (797652A7): Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press 
+TRADE_ITEM Dreaming Silvertail (797652A7): Inventory:0054
+OPTIONS Dreaming Silvertail (797652A7): Goodbye
+OPTIONS Hypnagogic Urga-Lum Thrak (79758F3A): I claimed the three souls as you commanded. | Goodbye
+ANSWER Hypnagogic Urga-Lum Thrak (79758F3A): 0
+TRADE_START Hypnagogic Urga-Lum Thrak (79758F3A): Drag and drop the item(s) you want to give to Hypnagogic Urga-Lum Thrak into one of the slots available and press 
+TRADE_ITEM Hypnagogic Urga-Lum Thrak (79758F3A): Inventory:0054
+OPTIONS Hypnagogic Urga-Lum Thrak (79758F3A): Goodbye
+ANSWER Hypnagogic Urga-Lum Thrak (79758F3A): 0
+
+=== MISSION FLOW ===
+﻿2026-07-18T16:53:06.9992693Z [MISSION-FLOW] session bound path=C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260718-185306\mission-flow.log (roll/accept/key/teleport/playfield-init for mission instance reconstruction)
+2026-07-18T16:54:10.2406098Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893A) icon=244818 short=You agreed to find informati... pf=(Playfield2:10D7)
+2026-07-18T16:56:03.8943631Z [IN-N3-TELEPORT] identity=(SimpleChar:765A690A) destPf=(PlayfieldProxy:1245) changePf=(Playfield2:1245) playfield2=(None:0) gameServerId=0 sgId=0 dest=(678.63,29.41,1903.80) likelyMissionInstance=False pendingCreateQuest= detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.N3TeleportMessage
+2026-07-18T16:56:03.9073531Z [TELEPORT] started lastPf= pendingCreateQuest=
+2026-07-18T16:56:04.3313809Z [PLAYFIELD-INIT] pf=4677 hex=0x1245 likelyMissionInstance=False pendingCreateQuest=
+2026-07-18T16:56:04.5053048Z [TELEPORT] ended lastPf=4677 pendingCreateQuest=
+2026-07-18T16:56:04.7202412Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893A) icon=244818 short=You agreed to find informati... pf=(Playfield2:10D7)
+2026-07-18T16:56:21.9858150Z [IN-N3-TELEPORT] identity=(SimpleChar:765A690A) destPf=(PlayfieldProxy:10D7) changePf=(Playfield2:10D7) playfield2=(None:0) gameServerId=0 sgId=0 dest=(425.97,39.99,411.17) likelyMissionInstance=False pendingCreateQuest= detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.N3TeleportMessage
+2026-07-18T16:56:21.9948093Z [TELEPORT] started lastPf=4677 pendingCreateQuest=
+2026-07-18T16:56:22.7401320Z [PLAYFIELD-INIT] pf=4311 hex=0x10D7 likelyMissionInstance=False pendingCreateQuest=
+2026-07-18T16:56:22.9938954Z [TELEPORT] ended lastPf=4311 pendingCreateQuest=
+2026-07-18T16:56:23.1968974Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893A) icon=244818 short=You agreed to find informati... pf=(Playfield2:10D7)
+2026-07-18T16:57:24.6543411Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:55563C16) icon=158429 short=You were assigned the task t... pf=(Playfield2:10D7)
+2026-07-18T16:57:24.9401646Z [IN-QUEST] action=Delete mission=(Mission:5556893A) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T16:57:24.9401646Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:55563C17) icon=158429 short=You agreed to find informati... pf=(Playfield2:10D7)
+2026-07-18T16:57:42.2922992Z [IN-QUEST] action=Delete mission=(Mission:55563C17) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T16:57:42.2922992Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:55563C18) icon=158429 short=You agreed to find informati... pf=(Playfield2:1245)
+2026-07-18T16:57:42.2932983Z [IN-QUEST] action=Delete mission=(Mission:55563C16) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T16:58:05.6882479Z [IN-N3-TELEPORT] identity=(SimpleChar:765A690A) destPf=(PlayfieldProxy:1245) changePf=(Playfield2:1245) playfield2=(None:0) gameServerId=0 sgId=0 dest=(245.12,105.01,1036.77) likelyMissionInstance=False pendingCreateQuest= detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.N3TeleportMessage
+2026-07-18T16:58:05.6982419Z [TELEPORT] started lastPf=4311 pendingCreateQuest=
+2026-07-18T16:58:06.3935921Z [PLAYFIELD-INIT] pf=4677 hex=0x1245 likelyMissionInstance=False pendingCreateQuest=
+2026-07-18T16:58:06.4195774Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:55563C18) icon=158429 short=You agreed to find informati... pf=(Playfield2:1245)
+2026-07-18T16:58:06.5621584Z [TELEPORT] ended lastPf=4677 pendingCreateQuest=
+2026-07-18T16:58:53.4115340Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556591A) icon=158429 short=Release the power of Ancient... pf=(None:0)
+2026-07-18T16:58:53.9549274Z [IN-QUEST] action=Delete mission=(Mission:55563C18) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T16:59:42.2904767Z [IN-N3-TELEPORT] identity=(SimpleChar:765A690A) destPf=(PlayfieldProxy:10D6) changePf=(Playfield2:10D6) playfield2=(None:0) gameServerId=0 sgId=0 dest=(480.92,39.99,440.23) likelyMissionInstance=False pendingCreateQuest= detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.N3TeleportMessage
+2026-07-18T16:59:42.3044672Z [TELEPORT] started lastPf=4677 pendingCreateQuest=
+2026-07-18T16:59:42.8772997Z [PLAYFIELD-INIT] pf=4310 hex=0x10D6 likelyMissionInstance=False pendingCreateQuest=
+2026-07-18T16:59:43.0411971Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556591A) icon=158429 short=Release the power of Ancient... pf=(None:0)
+2026-07-18T16:59:43.2025775Z [TELEPORT] ended lastPf=4310 pendingCreateQuest=
+2026-07-18T16:59:59.9448640Z [IN-QUEST] action=Delete mission=(Mission:5556591A) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T16:59:59.9448640Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893B) icon=158429 short=Release the power of Ancient... pf=(None:0)
+2026-07-18T17:00:13.6731048Z [IN-QUEST] action=Delete mission=(Mission:5556893B) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T17:00:13.6731048Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893C) icon=158429 short=Release the power of Ancient... pf=(None:0)
+2026-07-18T17:00:29.7305129Z [IN-QUEST] action=Delete mission=(Mission:5556893C) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-18T17:00:29.7305129Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893D) icon=158429 short=Release the power of Ancient... pf=(Playfield2:1245)
+2026-07-18T17:00:48.0713828Z [IN-N3-TELEPORT] identity=(SimpleChar:765A690A) destPf=(PlayfieldProxy:1245) changePf=(Playfield2:1245) playfield2=(None:0) gameServerId=0 sgId=0 dest=(795.36,31.81,1150.97) likelyMissionInstance=False pendingCreateQuest= detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.N3TeleportMessage
+2026-07-18T17:00:48.0843746Z [TELEPORT] started lastPf=4310 pendingCreateQuest=
+2026-07-18T17:00:49.0692807Z [PLAYFIELD-INIT] pf=4677 hex=0x1245 likelyMissionInstance=False pendingCreateQuest=
+2026-07-18T17:00:49.0962640Z [IN-QUEST-FULL] identity=(SimpleChar:765A690A) unknown=1 quests=1 pendingCreateQuest= |#0 quest=(Mission:5556893D) icon=158429 short=Release the power of Ancient... pf=(Playfield2:1245)
+2026-07-18T17:00:49.2366741Z [TELEPORT] ended lastPf=4677 pendingCreateQuest=
+2026-07-18T17:01:30.7160278Z [IN-QUEST] action=Delete mission=(Mission:5556893D) identity=(SimpleChar:765A690A) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+
+=== LOOT ===
+CapturedUtc,Direction,Sequence,CorpseIdentity,OpenOrdinal,InitialSnapshot,ItemCount,DeadNpcIdentity,EnemyName,MonsterData,EnemyLevel,CorpseCredits,PlayerIdentity,PlayerLevel,PlayfieldId,Items,CorrelationStatus
+"2026-07-18T16:55:44.9745110Z","IN-N3",199,"(Corpse:F49804)",1,true,1,"SimpleChar:7976525D","Hiathlin","209196","17","0","(SimpleChar:765A690A)","220","4310","214788:214788:1:1","linked"
+"2026-07-18T16:55:47.3710552Z","IN-N3",206,"(Corpse:F49808)",1,true,1,"SimpleChar:79765260","Hiathlin","209196","16","0","(SimpleChar:765A690A)","220","4310","161532:161532:10:1","linked"
+"2026-07-18T16:55:55.2882092Z","IN-N3",248,"(Corpse:F49809)",1,true,1,"SimpleChar:7976521F","Hiathlin","209196","16","0","(SimpleChar:765A690A)","220","4310","214789:214789:1:1","linked"
+
+=== CURSED / DREAMING EVENTS (events.log snippets) ===
+2026-07-18T16:55:56.8172660Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[JsThenerai!!>^pi!!>^pi!!!!"sInsignia of ThraksRemains of Hiathlin~" Unk2=1 }
+2026-07-18T16:57:24.9391653Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:5556893A) Parameter1=56003 Parameter2=1431734586 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T16:57:24.9391653Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:5556893A) Parameter1=56003 Parameter2=1431734586 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:57:24.9401646Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:5556893A) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:57:42.2922992Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:55563C17) Parameter1=56003 Parameter2=1431714839 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T16:57:42.2922992Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:55563C17) Parameter1=56003 Parameter2=1431714839 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:57:42.2922992Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:55563C17) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:57:42.2932983Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:55563C16) Parameter1=56003 Parameter2=1431714838 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T16:57:42.2932983Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:55563C16) Parameter1=56003 Parameter2=1431714838 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:57:42.2932983Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:55563C16) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:58:53.9549274Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:55563C18) Parameter1=56003 Parameter2=1431714840 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T16:58:53.9549274Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:55563C18) Parameter1=56003 Parameter2=1431714840 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:58:53.9549274Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:55563C18) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:06.3214463Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=214789 ItemHighId=214789 Quality=1 Unknown1=1 Unknown2=87 Placement=(OverflowWindow:0000) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:09.2430353Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":"s78@sInsignia of ThraksAncient Pattern Analyzeri!!!!"s3Ancient Pattern Analyzer favored by the Chosen One~" Unknown2=0 FormattedMessage="You combined "Insignia of Thrak" with "Ancient Pattern Analyzer" and the result is a quality level 1 "Ancient Patte...
+2026-07-18T16:59:46.9119707Z [IN-N3] #1413 type=SimpleCharFullUpdate identity=(SimpleChar:797652A0)
+2026-07-18T16:59:46.9119707Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4310 FightingTarget=null Position=(778.1665, 31.48926, 1218.395) Heading=X: 0.05187...
+2026-07-18T16:59:46.9119707Z [IN-N3] #1414 type=SimpleCharFullUpdate identity=(SimpleChar:797652F5)
+2026-07-18T16:59:46.9119707Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4310 FightingTarget=null Position=(789.353, 29.2113, 1223.389) Heading=X: -0.040833...
+2026-07-18T16:59:46.9299600Z [DYNEL-SPAWNED] identity=(SimpleChar:797652A0) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 curr...
+2026-07-18T16:59:46.9299600Z [DYNEL-SPAWNED] identity=(SimpleChar:797652F5) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 curren...
+2026-07-18T16:59:47.0668750Z [CHAR-SEEN] identity=(SimpleChar:797652A0) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentS...
+2026-07-18T16:59:47.0668750Z [CHAR-SEEN] identity=(SimpleChar:797652F5) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentSta...
+2026-07-18T16:59:50.0810175Z [IN-N3] #1461 type=SimpleCharFullUpdate identity=(SimpleChar:797652A7)
+2026-07-18T16:59:50.0810175Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4310 FightingTarget=null Position=(823.9769, 32.41, 1246.445) Heading=X: 0 | Y: -0....
+2026-07-18T16:59:50.0810175Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4310 FightingTarget=null Position=(826.2227, 33.08879, 1277.107) Heading=X: 0.08001...
+2026-07-18T16:59:50.1010050Z [DYNEL-SPAWNED] identity=(SimpleChar:797652A7) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(823.9769, 32.41, 1246.445) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 current...
+2026-07-18T16:59:50.1010050Z [DYNEL-SPAWNED] identity=(SimpleChar:797652A8) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(826.2227, 33.08879, 1277.107) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 curr...
+2026-07-18T16:59:51.0890242Z [CHAR-SEEN] identity=(SimpleChar:797652A7) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(823.9769, 32.41, 1246.445) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentStat...
+2026-07-18T16:59:51.0890242Z [CHAR-SEEN] identity=(SimpleChar:797652A8) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(826.2227, 33.08879, 1277.107) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentS...
+2026-07-18T16:59:51.6692226Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652A0) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:51.6692226Z [ENEMY-FIGHT-AUTO] focused identity=(SimpleChar:797652A0) reason=local-player-target direction=OUT-N3 sequence=293
+2026-07-18T16:59:52.1059534Z [IN-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652A0) Unknown2=1 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:52.6925915Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:797652A0) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:53.4218874Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:797652A0) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:55.7134721Z [IN-N3-DETAIL] KnuBotStartTradeMessage { Unknown1=2 Target=(SimpleChar:797652A0) NumberOfItemSlotsInTradeWindow=1 Message="Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press "accept"" N3MessageType=KnubotStartTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketTy...
+2026-07-18T16:59:58.6446668Z [OUT-N3-DETAIL] KnuBotTradeMessage { Unknown1=2 Target=(SimpleChar:797652A0) Unknown2=0 Unknown3=0 Unknown4=0 Container=(Inventory:005B) N3MessageType=KnubotTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:59.5571016Z [OUT-N3-DETAIL] KnuBotFinishTradeMessage { Unknown1=2 Target=(SimpleChar:797652A0) Decline=0 Amount=0 N3MessageType=KnubotFinishTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:59.9448640Z [IN-N3-DETAIL] KnuBotRejectedItemsMessage { Unknown1=2 Target=(SimpleChar:797652A0) Items=count=0[] Unknown2=1 N3MessageType=KnubotRejectedItems Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:59.9448640Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:5556591A) Parameter1=56003 Parameter2=1431722266 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T16:59:59.9448640Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:5556591A) Parameter1=56003 Parameter2=1431722266 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T16:59:59.9448640Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:5556591A) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:02.7031636Z [IN-N3] #1509 type=SpellList identity=(SimpleChar:797652A0)
+2026-07-18T17:00:03.6901126Z [DYNEL-SPAWNED] identity=(SimpleChar:797654FD) name=Cursed Silvertail player=False npc=True pet=False inPlay=True alive=True hp=720/720 pct=100.0 level=8 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 current...
+2026-07-18T17:00:03.6911122Z [IN-N3] #1511 type=SimpleCharFullUpdate identity=(SimpleChar:797654FD)
+2026-07-18T17:00:03.6911122Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=null Position=(778.1665, 31.48926, 1218.395) Head...
+2026-07-18T17:00:03.6921096Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:797652A0) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:04.1339449Z [SMOKE] IN Despawn identity=(SimpleChar:797652A0) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-18T17:00:04.1339449Z [IN-N3] #1514 type=Despawn identity=(SimpleChar:797652A0)
+2026-07-18T17:00:04.1339449Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:797652A0) Unknown=1 PacketType=N3Message }
+2026-07-18T17:00:04.1339449Z [IN-N3-DETAIL] KnuBotCloseChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652A0) Unknown2=5 Unknown3=60 N3MessageType=KnubotCloseChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:04.1359437Z [CHAR-SEEN] identity=(SimpleChar:797654FD) name=Cursed Silvertail player=False npc=True pet=False inPlay=True alive=True hp=720/720 pct=100.0 level=8 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentStat...
+2026-07-18T17:00:04.9884181Z [IN-N3] #1518 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:04.9884181Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:05.1393267Z [CHAR-GONE] (SimpleChar:797652A0)
+2026-07-18T17:00:06.1918769Z [IN-N3] #1525 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:06.1918769Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:07.4469437Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652F5) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:07.4469437Z [ENEMY-FIGHT-AUTO] focused identity=(SimpleChar:797652F5) reason=local-player-target direction=OUT-N3 sequence=303
+2026-07-18T17:00:07.6708056Z [IN-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652F5) Unknown2=1 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:08.6272162Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:797652F5) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:08.9460192Z [IN-N3] #1537 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:08.9460192Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:09.1718801Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:797652F5) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:11.2306104Z [IN-N3-DETAIL] KnuBotStartTradeMessage { Unknown1=2 Target=(SimpleChar:797652F5) NumberOfItemSlotsInTradeWindow=1 Message="Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press "accept"" N3MessageType=KnubotStartTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketTy...
+2026-07-18T17:00:11.4664658Z [IN-N3] #1544 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:11.4674652Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:12.5567934Z [OUT-N3-DETAIL] KnuBotTradeMessage { Unknown1=2 Target=(SimpleChar:797652F5) Unknown2=0 Unknown3=0 Unknown4=0 Container=(Inventory:0054) N3MessageType=KnubotTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:13.2723512Z [OUT-N3-DETAIL] KnuBotFinishTradeMessage { Unknown1=2 Target=(SimpleChar:797652F5) Decline=0 Amount=0 N3MessageType=KnubotFinishTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:13.4442451Z [IN-N3-DETAIL] KnuBotRejectedItemsMessage { Unknown1=2 Target=(SimpleChar:797652F5) Items=count=0[] Unknown2=1 N3MessageType=KnubotRejectedItems Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:13.6721050Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:5556893B) Parameter1=56003 Parameter2=1431734587 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T17:00:13.6721050Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:5556893B) Parameter1=56003 Parameter2=1431734587 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:13.6731048Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:5556893B) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:13.6731048Z [IN-N3] #1555 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:13.6731048Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:15.3680588Z [IN-N3] #1558 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:15.3680588Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:15.3680588Z [IN-N3] #1559 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:15.3680588Z [IN-N3-DETAIL] FollowTargetMessage { Type=Target Unknown1=25 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+TargetInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:16.6302803Z [IN-N3] #1563 type=SpellList identity=(SimpleChar:797652F5)
+2026-07-18T17:00:17.7046180Z [DYNEL-SPAWNED] identity=(SimpleChar:797654FF) name=Cursed Silvertail player=False npc=True pet=False inPlay=True alive=True hp=720/720 pct=100.0 level=8 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentSt...
+2026-07-18T17:00:17.7066166Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=null Position=(789.353, 29.2113, 1223.389) Headin...
+2026-07-18T17:00:17.7066166Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:797652F5) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:18.2252966Z [CHAR-SEEN] identity=(SimpleChar:797654FF) name=Cursed Silvertail player=False npc=True pet=False inPlay=True alive=True hp=720/720 pct=100.0 level=8 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=...
+2026-07-18T17:00:18.2542787Z [SMOKE] IN Despawn identity=(SimpleChar:797652F5) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-18T17:00:18.2542787Z [IN-N3] #1567 type=Despawn identity=(SimpleChar:797652F5)
+2026-07-18T17:00:18.2542787Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:797652F5) Unknown=1 PacketType=N3Message }
+2026-07-18T17:00:18.2542787Z [IN-N3-DETAIL] KnuBotCloseChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652F5) Unknown2=5 Unknown3=60 N3MessageType=KnubotCloseChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:19.2356343Z [CHAR-GONE] (SimpleChar:797652F5)
+2026-07-18T17:00:23.3741982Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652A7) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:23.3741982Z [ENEMY-FIGHT-AUTO] focused identity=(SimpleChar:797652A7) reason=local-player-target direction=OUT-N3 sequence=317
+2026-07-18T17:00:23.5390960Z [IN-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652A7) Unknown2=1 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:24.5494755Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:797652A7) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:25.3250948Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:797652A7) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:27.3921995Z [IN-N3-DETAIL] KnuBotStartTradeMessage { Unknown1=2 Target=(SimpleChar:797652A7) NumberOfItemSlotsInTradeWindow=1 Message="Drag and drop the item(s) you want to give to Dreaming Silvertail into one of the slots available and press "accept"" N3MessageType=KnubotStartTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketTy...
+2026-07-18T17:00:28.2256875Z [OUT-N3-DETAIL] KnuBotTradeMessage { Unknown1=2 Target=(SimpleChar:797652A7) Unknown2=0 Unknown3=0 Unknown4=0 Container=(Inventory:0054) N3MessageType=KnubotTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:28.9859726Z [OUT-N3-DETAIL] KnuBotFinishTradeMessage { Unknown1=2 Target=(SimpleChar:797652A7) Decline=0 Amount=0 N3MessageType=KnubotFinishTrade Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:29.1788532Z [IN-N3-DETAIL] KnuBotRejectedItemsMessage { Unknown1=2 Target=(SimpleChar:797652A7) Items=count=0[] Unknown2=0 N3MessageType=KnubotRejectedItems Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:29.7295137Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:5556893C) Parameter1=56003 Parameter2=1431734588 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T17:00:29.7295137Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:5556893C) Parameter1=56003 Parameter2=1431734588 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:29.7305129Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:5556893C) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:32.7716374Z [IN-N3] #1664 type=SpellList identity=(SimpleChar:797652A7)
+2026-07-18T17:00:33.1823850Z [DYNEL-SPAWNED] identity=(SimpleChar:79765500) name=Cursed Silvertail player=False npc=True pet=False inPlay=True alive=True hp=720/720 pct=100.0 level=8 computerLiteracy=6 pos=(823.9769, 32.41, 1246.445) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentSta...
+2026-07-18T17:00:33.1833856Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=null Position=(823.9769, 32.41, 1246.445) Heading...
+2026-07-18T17:00:33.1833856Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:797652A7) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:33.3063077Z [CHAR-SEEN] identity=(SimpleChar:79765500) name=Cursed Silvertail player=False npc=True pet=False inPlay=True alive=True hp=720/720 pct=100.0 level=8 computerLiteracy=6 pos=(823.9769, 32.41, 1246.445) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0...
+2026-07-18T17:00:33.3552785Z [SMOKE] IN Despawn identity=(SimpleChar:797652A7) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-18T17:00:33.3552785Z [IN-N3] #1668 type=Despawn identity=(SimpleChar:797652A7)
+2026-07-18T17:00:33.3552785Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:797652A7) Unknown=1 PacketType=N3Message }
+2026-07-18T17:00:33.3562778Z [IN-N3-DETAIL] KnuBotCloseChatWindowMessage { Unknown1=2 Target=(SimpleChar:797652A7) Unknown2=5 Unknown3=60 N3MessageType=KnubotCloseChatWindow Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:34.3136885Z [CHAR-GONE] (SimpleChar:797652A7)
+2026-07-18T17:00:35.7917748Z [IN-N3] #1699 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:35.7917748Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:37.1529354Z [IN-N3] #1706 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:37.1529354Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:38.5604576Z [IN-N3] #1721 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:38.5604576Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:39.8266789Z [IN-N3] #1754 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:39.8266789Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:42.0280219Z [IN-N3] #1760 type=FollowTarget identity=(SimpleChar:797654FD)
+2026-07-18T17:00:42.0280219Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:797654FD) Unknown=0 PacketType=N3Message }
+2026-07-18T17:00:42.5137234Z [SMOKE] IN Despawn identity=(SimpleChar:797654FD) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-18T17:00:42.5137234Z [IN-N3] #1767 type=Despawn identity=(SimpleChar:797654FD)
+2026-07-18T17:00:42.5137234Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:797654FD) Unknown=1 PacketType=N3Message }
+2026-07-18T17:00:43.3632872Z [CHAR-GONE] (SimpleChar:797654FD)
+2026-07-18T17:01:30.7160278Z [SMOKE] IN CharacterAction identity=(SimpleChar:765A690A) Action=59 Unknown1=0 Target=(Mission:5556893D) Parameter1=56003 Parameter2=1431734589 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-18T17:01:30.7160278Z [IN-N3-DETAIL] CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:5556893D) Parameter1=56003 Parameter2=1431734589 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }
+2026-07-18T17:01:30.7160278Z [IN-N3-DETAIL] QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:5556893D) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A690A) Unknown=0 PacketType=N3Message }

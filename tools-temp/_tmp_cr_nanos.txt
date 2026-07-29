@@ -1,0 +1,62 @@
+Loading C:\Users\nermi\source\repos\AORebirth\AORebirth\Built\Debug\items.dat
+Loading data for client version 18.8.62_EP1
+Loaded 120842 items - 00:08.86
+
+Loading C:\Users\nermi\source\repos\AORebirth\AORebirth\Built\Debug\nanos.dat
+Loading data for client version 18.8.62_EP1
+Loaded 10965 items - 00:00.81
+
+nanos=10965
+--- Nano 227683 NCU=676 events=1
+  Attr8(duration)=720000
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53051 target=3 [209827]
+  OnUse Fn 53045 target=3 [276,1]
+  OnUse Fn 53045 target=3 [279,15]
+  OnUse Fn 53045 target=3 [280,15]
+  OnUse Fn 53045 target=3 [278,15]
+  OnUse Fn 53045 target=3 [316,15]
+  OnUse Fn 53045 target=3 [311,15]
+  OnUse Fn 53045 target=3 [281,15]
+  OnUse Fn 53045 target=3 [317,15]
+  OnUse Fn 53045 target=3 [282,15]
+--- Nano 227684 NCU=676 events=1
+  Attr8(duration)=720000
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53051 target=3 [209827]
+  OnUse Fn 53045 target=3 [276,2]
+  OnUse Fn 53045 target=3 [279,30]
+  OnUse Fn 53045 target=3 [280,30]
+  OnUse Fn 53045 target=3 [278,30]
+  OnUse Fn 53045 target=3 [316,30]
+  OnUse Fn 53045 target=3 [311,30]
+  OnUse Fn 53045 target=3 [281,30]
+  OnUse Fn 53045 target=3 [317,30]
+  OnUse Fn 53045 target=3 [282,30]
+--- Nano 227692 NCU=676 events=1
+  Attr8(duration)=720000
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53051 target=3 [209827]
+  OnUse Fn 53045 target=3 [276,30]
+  OnUse Fn 53045 target=3 [279,300]
+  OnUse Fn 53045 target=3 [280,300]
+  OnUse Fn 53045 target=3 [278,300]
+  OnUse Fn 53045 target=3 [316,300]
+  OnUse Fn 53045 target=3 [311,300]
+  OnUse Fn 53045 target=3 [281,300]
+  OnUse Fn 53045 target=3 [317,300]
+  OnUse Fn 53045 target=3 [282,300]
+MISSING nano 227693
+--- Nano 241086 NCU=778 events=0
+  Attr8(duration)=1000
+  Attr88(?)=0
+  Attr287(range)=1
+--- Nano 209811 NCU=321 events=0
+  Attr8(duration)=1000
+  Attr88(?)=0
+  Attr287(range)=1
+
+Wrote C:\Users\nermi\source\repos\AORebirth\tools-temp\perk-action-nanos.txt

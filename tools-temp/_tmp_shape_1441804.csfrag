@@ -1,0 +1,349 @@
+        // Shape playfield 1441804 from capture 20260724-mission-find-item (33 trash)
+        new MissionShape
+        {
+            CapturedPlayfieldId = 1441804,
+            SpawnX = 1.80102539f, SpawnY = 5.01f, SpawnZ = 205.01001f,
+            Npcs = new[]
+            {
+                new MissionNpc
+                {
+                    Name = "Mission Cube",
+                    Role = MissionNpcRole.FindTarget,
+                    Level = 1, Health = 999999, MonsterData = 26092, Scale = 40, HeadMesh = 0,
+                    X = 98.41754f, Y = 5.100035f, Z = 178.7181f,
+                    Hx = 0f, Hy = 0f, Hz = 0f, Hw = 1f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Dealer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 162, Health = 15158, MonsterData = 26123, Scale = 118, HeadMesh = 40214,
+                    X = 14.7782631f, Y = 5.01000166f, Z = 205.239456f,
+                    Hx = 0.0f, Hy = -0.9565039f, Hz = 0.0f, Hw = 0.2917195f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Functionary",
+                    Role = MissionNpcRole.Trash,
+                    Level = 157, Health = 11531, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 45.77344f, Y = 5.01f, Z = 204.18103f,
+                    Hx = 0.0f, Hy = -0.14418751f, Hz = 0.0f, Hw = 0.9895504f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Clan Functionary",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 12842, MonsterData = 26143, Scale = 118, HeadMesh = 40137,
+                    X = 28.99f, Y = 5.01f, Z = 233.1249f,
+                    Hx = 0.0f, Hy = 0.236827686f, Hz = 0.0f, Hw = 0.9715517f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 35.3955574f, Y = 5.010003f, Z = 227.405579f,
+                    Hx = 0.0f, Hy = -0.9742546f, Hz = 0.0f, Hw = 0.2254504f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Dealer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 162, Health = 15158, MonsterData = 26123, Scale = 118, HeadMesh = 40214,
+                    X = 39.0758438f, Y = 5.01000166f, Z = 174.853638f,
+                    Hx = 0.0f, Hy = 0.209602475f, Hz = 0.0f, Hw = 0.9777867f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Rustler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 166, Health = 15754, MonsterData = 26133, Scale = 118, HeadMesh = 40251,
+                    X = 39.2914543f, Y = 5.01000166f, Z = 175.333435f,
+                    Hx = 0.0f, Hy = 0.616593361f, Hz = 0.0f, Hw = 0.787281752f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 55.0371323f, Y = 5.01000166f, Z = 216.1886f,
+                    Hx = 0.0f, Hy = 0.931588f, Hz = 0.0f, Hw = 0.3635159f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Rough Clan Informer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 160, Health = 14860, MonsterData = 26139, Scale = 118, HeadMesh = 40249,
+                    X = 57.66246f, Y = 5.01000166f, Z = 208.092163f,
+                    Hx = 0.0f, Hy = 0.8980559f, Hz = 0.0f, Hw = 0.439881355f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Rustler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 165, Health = 15605, MonsterData = 26133, Scale = 118, HeadMesh = 40251,
+                    X = 58.21275f, Y = 5.01000166f, Z = 152.367966f,
+                    Hx = 0.0f, Hy = 0.996965766f, Hz = 0.0f, Hw = -0.07784045f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 56.96526f, Y = 5.01000166f, Z = 144.427856f,
+                    Hx = 0.0f, Hy = 0.09667658f, Hz = 0.0f, Hw = 0.99531585f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Poacher",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26090, Scale = 118, HeadMesh = 40629,
+                    X = 71.92619f, Y = 5.01000166f, Z = 170.706467f,
+                    Hx = 0.0f, Hy = -0.962225f, Hz = 0.0f, Hw = 0.272255272f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Rough Clan Informer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 163, Health = 15307, MonsterData = 26139, Scale = 118, HeadMesh = 40249,
+                    X = 66.743f, Y = 5.01000166f, Z = 162.280319f,
+                    Hx = 0.0f, Hy = -0.272255272f, Hz = 0.0f, Hw = -0.9622251f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Rough Clan Informer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 151, Health = 13518, MonsterData = 26139, Scale = 117, HeadMesh = 40249,
+                    X = 23.06019f, Y = 5.01f, Z = 178.786621f,
+                    Hx = 0.0f, Hy = -0.3375258f, Hz = 0.0f, Hw = 0.941316247f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Rustler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 165, Health = 15605, MonsterData = 26133, Scale = 118, HeadMesh = 40251,
+                    X = 46.8244934f, Y = 5.01000166f, Z = 193.6612f,
+                    Hx = 0.0f, Hy = -0.307778716f, Hz = 0.0f, Hw = 0.951458f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 57.64913f, Y = 5.01f, Z = 149.955643f,
+                    Hx = 0.0f, Hy = 0.488147259f, Hz = 0.0f, Hw = 0.8727613f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Rough Clan Informer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 151, Health = 13518, MonsterData = 26139, Scale = 117, HeadMesh = 40249,
+                    X = 26.10097f, Y = 5.01000166f, Z = 175.069443f,
+                    Hx = 0.0f, Hy = 0.8433504f, Hz = 0.0f, Hw = 0.537364f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Rustler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 165, Health = 15605, MonsterData = 26133, Scale = 118, HeadMesh = 40251,
+                    X = 47.8670921f, Y = 5.01f, Z = 192.825562f,
+                    Hx = 0.0f, Hy = -0.49789694f, Hz = 0.0f, Hw = 0.8672362f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Dealer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 162, Health = 15158, MonsterData = 26123, Scale = 118, HeadMesh = 40214,
+                    X = 39.91947f, Y = 5.01f, Z = 180.8197f,
+                    Hx = 0.0f, Hy = 0.317358047f, Hz = 0.0f, Hw = 0.9483058f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Rustler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 166, Health = 15754, MonsterData = 26133, Scale = 118, HeadMesh = 40251,
+                    X = 46.16773f, Y = 5.01f, Z = 166.228348f,
+                    Hx = 0.0f, Hy = 0.28407535f, Hz = 0.0f, Hw = 0.958802f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Rustler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 165, Health = 15605, MonsterData = 26133, Scale = 118, HeadMesh = 40251,
+                    X = 47.491375f, Y = 5.01f, Z = 193.045074f,
+                    Hx = 0.0f, Hy = -0.4977043f, Hz = 0.0f, Hw = 0.867346764f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 42.4278641f, Y = 5.01f, Z = 125.299225f,
+                    Hx = 0.0f, Hy = -0.185026631f, Hz = 0.0f, Hw = 0.9827335f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Ruffian",
+                    Role = MissionNpcRole.Trash,
+                    Level = 154, Health = 19551, MonsterData = 26137, Scale = 117, HeadMesh = 40209,
+                    X = 37.93821f, Y = 5.01f, Z = 126.623955f,
+                    Hx = 0.0f, Hy = -0.9990369f, Hz = 0.0f, Hw = 0.043878153f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 26.15962f, Y = 5.01000166f, Z = 125.160065f,
+                    Hx = 0.0f, Hy = 0.94901f, Hz = 0.0f, Hw = 0.3152459f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Rough Clan Informer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 158, Health = 14562, MonsterData = 26139, Scale = 118, HeadMesh = 40249,
+                    X = 14.4653845f, Y = 5.01000166f, Z = 145.616837f,
+                    Hx = 0.0f, Hy = 0.9999993f, Hz = 0.0f, Hw = -0.00116793672f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Virusbuilder",
+                    Role = MissionNpcRole.Trash,
+                    Level = 153, Health = 13816, MonsterData = 26151, Scale = 117, HeadMesh = 40171,
+                    X = 51.6340446f, Y = 5.01f, Z = 125.264458f,
+                    Hx = 0.0f, Hy = 0.5528775f, Hz = 0.0f, Hw = 0.833262563f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Virusbuilder",
+                    Role = MissionNpcRole.Trash,
+                    Level = 162, Health = 15158, MonsterData = 26151, Scale = 118, HeadMesh = 40171,
+                    X = 67.44747f, Y = 5.01000166f, Z = 127.228241f,
+                    Hx = 0.0f, Hy = 0.7474788f, Hz = 0.0f, Hw = 0.6642857f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Clan Functionary",
+                    Role = MissionNpcRole.Trash,
+                    Level = 164, Health = 12365, MonsterData = 26143, Scale = 118, HeadMesh = 40137,
+                    X = 73.72305f, Y = 5.01000166f, Z = 125.30249f,
+                    Hx = 0.0f, Hy = 0.936933f, Hz = 0.0f, Hw = 0.3495091f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Tough Clan Diversionist",
+                    Role = MissionNpcRole.Trash,
+                    Level = 162, Health = 15158, MonsterData = 26125, Scale = 118, HeadMesh = 40215,
+                    X = 88.47811f, Y = 5.01f, Z = 138.101f,
+                    Hx = 0.0f, Hy = 0.009102894f, Hz = 0.0f, Hw = 0.9999586f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Dealer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26123, Scale = 118, HeadMesh = 40214,
+                    X = 82.6614456f, Y = 5.01000166f, Z = 147.599472f,
+                    Hx = 0.0f, Hy = 0.992518842f, Hz = 0.0f, Hw = 0.122091331f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Techno-Architect",
+                    Role = MissionNpcRole.Trash,
+                    Level = 168, Health = 16052, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 15.401803f, Y = 5.01000166f, Z = 163.724609f,
+                    Hx = 0.0f, Hy = 0.870859f, Hz = 0.0f, Hw = 0.491532862f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Poacher",
+                    Role = MissionNpcRole.Trash,
+                    Level = 163, Health = 15307, MonsterData = 26090, Scale = 118, HeadMesh = 40629,
+                    X = 23.1397152f, Y = 5.01000166f, Z = 186.269531f,
+                    Hx = 0.0f, Hy = 0.7436464f, Hz = 0.0f, Hw = 0.668573141f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Virusbuilder",
+                    Role = MissionNpcRole.Trash,
+                    Level = 152, Health = 13667, MonsterData = 26151, Scale = 117, HeadMesh = 40171,
+                    X = 87.04694f, Y = 5.01000166f, Z = 194.508041f,
+                    Hx = 0.0f, Hy = 0.6429453f, Hz = 0.0f, Hw = 0.7659121f,
+                    Textures = null,
+                    Meshes = null,
+                },
+                new MissionNpc
+                {
+                    Name = "Veteran Functionary",
+                    Role = MissionNpcRole.Trash,
+                    Level = 162, Health = 12127, MonsterData = 26155, Scale = 118, HeadMesh = 40138,
+                    X = 94.5845947f, Y = 5.01000166f, Z = 175.303558f,
+                    Hx = 0.0f, Hy = 0.8821801f, Hz = 0.0f, Hw = 0.470912158f,
+                    Textures = null,
+                    Meshes = null,
+                },
+            },
+        },

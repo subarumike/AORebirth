@@ -1,0 +1,269 @@
+C1F4E) (Barking Chimera)
+    actions: {'InfoRequest': 1}
+    messageTypes: {'CharacterAction': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F4E) Parameter1=0 Parameter2=0 Unknown2=0
+  (SimpleChar:798C1F9A) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9A) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F9B) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9B) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F95) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F95) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F98) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F98) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F9D) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9D) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F9F) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9F) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F94) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F94) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD537) (Beebela Andravita)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD537) Unknown=1 PacketType=N3Message }
+  (SimpleChar:7971B96D) (Crippler of Growth)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:7971B96D) Unknown=1 PacketType=N3Message }
+  (SimpleChar:7971B96E) (Crippler of Growth)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:7971B96E) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78D4AAD4) (Crippler of Growth)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78D4AAD4) Unknown=1 PacketType=N3Message }
+  (SimpleChar:79765200) (Crippler of Growth)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79765200) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD532) (Doctor James Monaghan)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD532) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD532) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F83) (Dreaming Silvertail)
+    actions: {'InfoRequest': 2}
+    messageTypes: {'CharacterAction': 2}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F83) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F83) Parameter1=0 Parameter2=0 Unknown2=0
+  (SimpleChar:798C1F82) (Dreaming Silvertail)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F82) Unknown=1 PacketType=N3Message }
+  (SimpleChar:787B53FF) (Emissary of Jobe)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:787B53FF) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:787B53FF) Unknown=1 PacketType=N3Message }
+  (SimpleChar:787B5400) (Guardian of the Weak)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:787B5400) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:787B5400) Unknown=1 PacketType=N3Message }
+  (SimpleChar:7988938F) (Hai-Tempterus)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:7988938F) Unknown=1 PacketType=N3Message }
+  (SimpleChar:79889383) (Hai-Tempterus)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79889383) Unknown=1 PacketType=N3Message }
+  (SimpleChar:79889385) (Hai-Tempterus)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79889385) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD534) (Jane Simmons)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD534) Unknown=1 PacketType=N3Message }
+  (SimpleChar:787B5401) (Joshua Falker)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:787B5401) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:787B5401) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD53A) (Luna Erke)
+    actions: {'InfoRequest': 1}
+    messageTypes: {'CharacterAction': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD53A) Parameter1=0 Parameter2=0 Unknown2=0
+  (SimpleChar:78CCD530) (Magnus Galway)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD530) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD536) (Pedro Gavrillo)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD536) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD536) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD541) (Prince Creehan)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD541) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD541) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD53D) (Roland Penders)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD53D) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD531) (Samuel Caesar)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD531) Unknown=1 PacketType=N3Message }
+  (SimpleChar:7963A853) (Scientist Drake Rodriguez)
+    actions: {'InfoRequest': 1}
+    messageTypes: {'CharacterAction': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7963A853) Parameter1=0 Parameter2=0 Unknown2=0
+  (SimpleChar:78CCD52F) (Sharon Goldman)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD52F) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD52F) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F89) (Swift Silvertail)
+    actions: {'InfoRequest': 1, '': 54, 'FinishNanoCasting': 3, 'SetNanoDuration': 3, 'Death': 1}
+    messageTypes: {'CharacterAction': 8, 'Attack': 3, 'MissedAttackInfo': 7, 'SpecialAttackWeapon': 1, 'AttackInfo': 24, 'CastNanoSpell': 6, 'CharSecSpecAttack': 6, 'SpecialAttackInfo': 2, 'Buff': 3, 'StopFight': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F89) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Attack/ amt= detail=AttackMessage { Target=(SimpleChar:798C1F89) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 Pa
+    sample: Attack/ amt= detail=AttackMessage { Target=(SimpleChar:798C1F89) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 Pa
+  (SimpleChar:798894DE) (Swift Silvertail)
+    actions: {'': 2, 'InfoRequest': 1}
+    messageTypes: {'Despawn': 2, 'CharacterAction': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798894DE) Unknown=1 PacketType=N3Message }
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798894DE) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798894DE) Unknown=1 PacketType=N3Message }
+  (SimpleChar:79841864) (Swift Silvertail)
+    actions: {'': 2}
+    messageTypes: {'Despawn': 2}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79841864) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79841864) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F8B) (Swift Silvertail)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F8B) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F8C) (Swift Silvertail)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F8C) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798894FF) (Swift Silvertail)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798894FF) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD538) (Trond McDougal)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD538) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD538) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798E646B) (Urolok the Rotten)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798E646B) Unknown=1 PacketType=N3Message }
+  (SimpleChar:78CCD535) (Winnie Glowtail)
+    actions: {'InfoRequest': 1}
+    messageTypes: {'CharacterAction': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78CCD535) Parameter1=0 Parameter2=0 Unknown2=0
+  (SimpleChar:798C1F0D) (Yuttos Nascence Geosurvey Dog)
+    actions: {'': 8, 'InfoRequest': 1}
+    messageTypes: {'Despawn': 8, 'CharacterAction': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F0D) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F0D) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F0D) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798A7BB7) (doctorek)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798A7BB7) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798EC84C) (test)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798EC84C) Unknown=1 PacketType=N3Message }
+Combat action tallies by name/id:
+  ?: {'InfoRequest': 24, 'Despawn': 87, '137': 3, 'SpecialAttackWeapon': 4, 'Attack': 6, 'MissedAttackInfo': 17, 'CastNano': 2, 'CastNanoSpell': 62, 'FinishNanoCasting': 1, 'SetNanoDuration': 3, 'AttackInfo': 41, 'HealthDamage': 16, '140': 2, 'SpecialUsed': 6, 'SpecialUnavailable': 2, 'StopFight': 6, 'StandUp': 4, 'Buff': 8, 'SpecialAvailable': 6, 'CharSecSpecAttack': 6, 'SpecialAttackInfo': 2, '110': 1}
+  Barking Chimera: {'Despawn': 38, 'InfoRequest': 6, 'Attack': 3, 'MissedAttackInfo': 4, 'SpecialAttackWeapon': 1, 'CastNano': 2, 'AttackInfo': 17, 'StopFight': 1, 'Death': 1}
+  Swift Silvertail: {'InfoRequest': 2, 'Attack': 3, 'MissedAttackInfo': 7, 'SpecialAttackWeapon': 1, 'AttackInfo': 24, 'CastNanoSpell': 6, 'FinishNanoCasting': 3, 'SetNanoDuration': 3, 'CharSecSpecAttack': 6, 'SpecialAttackInfo': 2, 'Buff': 3, 'StopFight': 1, 'Death': 1, 'Despawn': 8}
+  (None:0000): {'137': 3, 'FinishNanoCasting': 4, 'SpecialUsed': 6, 'SpecialUnavailable': 2, 'Death': 2, 'StandUp': 4, 'SpecialAvailable': 6, '110': 1}
+  Yuttos Nascence Geosurvey Dog: {'Despawn': 8, 'InfoRequest': 1}
+  13: {'SpecialAttackWeapon': 4}
+  Crippler of Growth: {'Despawn': 4}
+  (SimpleChar:85F4472): {'HealthDamage': 2, 'Buff': 1, 'Despawn': 1}
+  Hai-Tempterus: {'Despawn': 3}
+  Dreaming Silvertail: {'InfoRequest': 2, 'Despawn': 1}
+  Prince Creehan: {'InfoRequest': 1, 'Despawn': 1}
+  Trond McDougal: {'InfoRequest': 1, 'Despawn': 1}
+  Pedro Gavrillo: {'InfoRequest': 1, 'Despawn': 1}
+  Sharon Goldman: {'InfoRequest': 1, 'Despawn': 1}
+  Doctor James Monaghan: {'InfoRequest': 1, 'Despawn': 1}
+  Emissary of Jobe: {'InfoRequest': 1, 'Despawn': 1}
+  Guardian of the Weak: {'InfoRequest': 1, 'Despawn': 1}
+  Joshua Falker: {'InfoRequest': 1, 'Despawn': 1}
+  (NanoProgram:47109): {'SetNanoDuration': 2}
+  (NanoProgram:384B6): {'SetNanoDuration': 2}
+  Angus McDuff: {'Despawn': 1}
+  Beebela Andravita: {'Despawn': 1}
+  Samuel Caesar: {'Despawn': 1}
+  Jane Simmons: {'Despawn': 1}
+  Magnus Galway: {'Despawn': 1}
+  Roland Penders: {'Despawn': 1}
+  Luna Erke: {'InfoRequest': 1}
+  Winnie Glowtail: {'InfoRequest': 1}
+  Scientist Drake Rodriguez: {'InfoRequest': 1}
+  (SimpleChar:78CB9877): {'Despawn': 1}
+  Urolok the Rotten: {'Despawn': 1}
+  doctorek: {'Despawn': 1}
+  test: {'Despawn': 1}
+  56: {'SpecialAttackWeapon': 1}
+  (NanoProgram:33660): {'SetNanoDuration': 1}
+  (Terminal:22668643): {'Despawn': 1}
+  63: {'SpecialAttackWeapon': 1}
+  (NanoProgram:384B8): {'SetNanoDuration': 1}
+  (Corpse:F49805): {'Despawn': 1}
+  (Terminal:570442E3): {'Despawn': 1}
+Animation-related detail snippets from enemy-combat.csv:
+  ->13: SpecialAttackWeaponMessage { Specials=count=3[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.G
+  (SimpleChar:798E09BC)->56: SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.G
+  (SimpleChar:798C1F89)->63: SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.G
+  ->(SimpleChar:798C1F89): SpecialAttackInfoMessage { EquipSlot=Weap_RightHand Amount=12 AmmoCount=-1 Target=(SimpleChar:798C1F89) Stat=FastAttack Unk1=0 N3MessageType=SpecialAttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 
+  ->(SimpleChar:798C1F89): SpecialAttackInfoMessage { EquipSlot=Weap_RightHand Amount=44 AmmoCount=-1 Target=(SimpleChar:798C1F89) Stat=FastAttack Unk1=0 N3MessageType=SpecialAttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 
+--- enemy-fight-events.log summary (Fight/Attack/Death for focused/dead/Silvertail) ---
+relevant fight-event lines: 131 (showing up to 40)
+  L15: 2026-07-23T20:13:43.6635429Z IN-N3 #30 type=SimpleCharFullUpdate identity=(SimpleChar:78CCD532) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4531
+  L18: 2026-07-23T20:13:43.9153370Z IN-N3 #34 type=SimpleCharFullUpdate identity=(SimpleChar:78CCD52F) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4531
+  L19: 2026-07-23T20:13:43.9163364Z IN-N3 #35 type=SimpleCharFullUpdate identity=(SimpleChar:78CCD536) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4531
+  L20: 2026-07-23T20:13:43.9163364Z IN-N3 #36 type=SimpleCharFullUpdate identity=(SimpleChar:78CCD538) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4531
+  L21: 2026-07-23T20:13:43.9163364Z IN-N3 #37 type=SimpleCharFullUpdate identity=(SimpleChar:78CCD535) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4531
+  L22: 2026-07-23T20:13:43.9173398Z IN-N3 #38 type=SimpleCharFullUpdate identity=(SimpleChar:78CCD53A) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4531
+  L56: 2026-07-23T20:14:03.6229796Z IN-N3 #104 type=SimpleCharFullUpdate identity=(SimpleChar:7963A853) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldI
+  L107: 2026-07-23T20:14:51.7545951Z IN-N3 #229 type=SimpleCharFullUpdate identity=(SimpleChar:787B53FF) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldI
+  L108: 2026-07-23T20:14:51.7545951Z IN-N3 #230 type=SimpleCharFullUpdate identity=(SimpleChar:787B5400) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasExtendedRunSpeed, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, Is
+  L109: 2026-07-23T20:14:59.6422826Z IN-N3 #237 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F89) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=null Position=(82
+  L110: 2026-07-23T20:14:59.6432816Z IN-N3 #238 type=SimpleCharFullUpdate identity=(SimpleChar:787B5401) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasExtendedRunSpeed, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, 
+  L112: 2026-07-23T20:14:59.6452804Z IN-N3 #240 type=SimpleCharFullUpdate identity=(SimpleChar:798E09BC) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTar
+  L118: 2026-07-23T20:15:00.2674184Z IN-N3 #246 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F9E) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=43
+  L129: 2026-07-23T20:15:07.9810537Z IN-N3 #255 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F8B) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=null Position=(82
+  L130: 2026-07-23T20:15:07.9830526Z IN-N3 #256 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F8C) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=null Position=(82
+  L137: 2026-07-23T20:15:07.9840520Z IN-N3 #263 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F82) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=4310 FightingTarget=null Posit
+  L139: 2026-07-23T20:15:07.9850512Z IN-N3 #265 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F97) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=43
+  L148: 2026-07-23T20:15:13.8131529Z IN-N3 #272 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F96) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=43
+  L158: 2026-07-23T20:15:22.0836076Z IN-N3 #282 type=SimpleCharFullUpdate identity=(SimpleChar:798894DE) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=4310 FightingTarget=nul
+  L164: 2026-07-23T20:15:25.8669330Z IN-N3 #289 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F0D) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=43
+  L184: 2026-07-23T20:15:35.4176181Z OUT-N3 #173 type=Attack identity=(SimpleChar:797E30D7) AttackMessage { Target=(SimpleChar:798E09BC) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L186: 2026-07-23T20:15:35.7126994Z IN-N3 #308 type=Attack identity=(SimpleChar:797E30D7) AttackMessage { Target=(SimpleChar:798E09BC) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L188: 2026-07-23T20:15:37.0931460Z IN-N3 #312 type=MissedAttackInfo identity=(SimpleChar:797E30D7) MissedAttackInfoMessage { Unknown1=-1 Unknown2=6 Attacker=(SimpleChar:797E30D7) Defender=(SimpleChar:798E09BC) Unknown3=0 N3MessageType=MissedAttackInfo Identity=(SimpleChar:797E30D7) Unknown=1 PacketType=N3Message }
+  L190: 2026-07-23T20:15:37.3882777Z IN-N3 #314 type=SpecialAttackWeapon identity=(SimpleChar:798E09BC) SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messa
+  L191: 2026-07-23T20:15:37.3892771Z IN-N3 #315 type=Attack identity=(SimpleChar:798E09BC) AttackMessage { Target=(SimpleChar:797E30D7) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:798E09BC) Unknown=0 PacketType=N3Message }
+  L193: 2026-07-23T20:15:38.0363178Z IN-N3 #319 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F97) SimpleCharFullUpdateMessage { Name="Barking Chimera" MonsterData=209173 MonsterScale=93 VisualFlags=31 HeadMesh=null RunSpeedBase=19 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasE
+  L196: 2026-07-23T20:15:39.7532598Z IN-N3 #322 type=MissedAttackInfo identity=(SimpleChar:797E30D7) MissedAttackInfoMessage { Unknown1=-1 Unknown2=6 Attacker=(SimpleChar:797E30D7) Defender=(SimpleChar:798E09BC) Unknown3=0 N3MessageType=MissedAttackInfo Identity=(SimpleChar:797E30D7) Unknown=1 PacketType=N3Message }
+  L198: 2026-07-23T20:15:39.7652518Z OUT-N3 #177 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:798E09BC) Parameter1=53019 Parameter2=210528 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L199: 2026-07-23T20:15:39.9551344Z OUT-N3 #178 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:798E09BC) Parameter1=53019 Parameter2=210528 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L207: 2026-07-23T20:15:42.0026492Z IN-N3 #336 type=AttackInfo identity=(SimpleChar:798E09BC) AttackInfoMessage { Amount=28 AmmoCount=-1 WeaponSlot=4 Target=(SimpleChar:797E30D7) Unk1=0 HitType=Normal WeaponInstance=1111971416 N3MessageType=AttackInfo Identity=(SimpleChar:798E09BC) Unknown=0 PacketType=N3Message }
+  L208: 2026-07-23T20:15:42.0036486Z IN-N3 #337 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=18 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:798E09BC) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L214: 2026-07-23T20:15:43.7216752Z IN-N3 #345 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=21 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:798E09BC) Unk1=

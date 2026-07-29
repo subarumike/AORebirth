@@ -1,0 +1,62 @@
+Capture: 20260727-182451
+Playfield: 4543 (Elysium)
+Character: Marokanac
+NPCInfo unique mobs: 37
+
+## With ExtTex (TextureOverrides)
+
+- **Arcorash** L57 MD=208904 scale=100 flags=268964353
+  ExtTex: doppel :208911:0:1
+
+- **Deceitful Weaver** L1 MD=209361 scale=36 flags=268964353
+  ExtTex: Material #13 :209290:0:1
+
+- **Devourer of Life** L105 MD=209409 scale=130 flags=268964353
+  ExtTex: bile_swarm_3 :31873:0:0|bile_swarm_1 :234979:0:1
+
+- **Kolaana** L65 MD=209215 scale=100 flags=268964353
+  ExtTex: Soulstealer tpage :214780:0:1|2 shags and rags :208993:0:0
+
+- **Slinking Spirit** L66 MD=217022 scale=100 flags=268964353
+  ExtTex: head_spirit redeemed female :235195:0:0|redeemed body  :235190:0:0
+
+- **Yuttos Elysium Geosurvey Dog** L58 MD=209173 scale=100 flags=268964353
+  ExtTex: low2 :208969:0:1
+
+## MonsterData body only (no ExtTex; place textures all 0)
+
+- **Brisk Hoathlan** L69 MD=209203 scale=100 flags=268964353
+- **Calan-Cur** L62 MD=246185 scale=150 flags=268964353 Meshes=1:233207:0:2
+- **Calan-El** L63 MD=246043 scale=100 flags=268964353 Meshes=1:209521:0:2
+- **Cama-El** L69 MD=246042 scale=100 flags=268964353 Meshes=1:209492:0:2
+- **Coral Rafter** L55 MD=212846 scale=125 flags=268964353
+- **Craig-Or** L63 MD=208640 scale=200 flags=268964353 Meshes=1:209532:0:2
+- **Craig-Or of Gear & Ammo** L61 MD=208640 scale=200 flags=271061505 Meshes=1:209532:0:2
+- **Craig-Or of Preservation** L61 MD=208640 scale=200 flags=271061505 Meshes=1:209541:0:2
+- **Craig-Or of Protection** L63 MD=208640 scale=200 flags=271061505 Meshes=1:209532:0:2
+- **Engineer Slayerdroid II** L200 MD=22821 scale=121 flags=403182081
+- **Follower Yutt-Ixi Shere** L70 MD=208647 scale=140 flags=277352961 Meshes=1:247035:0:2
+- **Fortuitous Hes-Man Shere** L70 MD=208640 scale=200 flags=268964353 Meshes=1:209541:0:2
+- **Gelid Eremite** L54 MD=209158 scale=100 flags=268964353
+- **Guard** L200 MD=26097 scale=100 flags=268964353 Textures=0:215123:0|1:215121:0|2:215122:0|3:215120:0|4:215124:0 Meshes=0:205110:0:2|0:40111:0:4
+- **Guard - Elmo Fitz** L200 MD=26135 scale=100 flags=277352961 Textures=0:215123:0|1:215121:0|2:215122:0|3:215120:0|4:215124:0 Meshes=0:205116:0:2|0:40271:0:4
+- **Heckler of Earth** L166 MD=214982 scale=100 flags=268964353
+- **Heckler of Metals** L174 MD=214982 scale=100 flags=268964353
+- **Heckler of Stones** L161 MD=214982 scale=100 flags=268964353
+- **Hiathlin Lookout** L95 MD=209203 scale=100 flags=268964353
+- **Hoathlan** L65 MD=209203 scale=100 flags=268964353
+- **Hypnagogic Ixi-Bhotaar Shere** L70 MD=208640 scale=200 flags=268964353 Meshes=1:209532:0:2
+- **Malah** L64 MD=209229 scale=100 flags=268964353
+- **Malah-Ana** L67 MD=209229 scale=100 flags=268964353
+- **Malah-Dren** L80 MD=209229 scale=100 flags=268964353
+- **Prime Devourer of Life** L110 MD=223561 scale=100 flags=268964353
+- **Shadowleet** L1 MD=226880 scale=90 flags=268964353
+- **Son-Len** L65 MD=208648 scale=100 flags=268964353 Meshes=1:247035:0:2
+- **Sun-Len** L59 MD=208647 scale=100 flags=268964353 Meshes=1:247035:0:2
+- **Visionist Dom-Xum Shere** L70 MD=208640 scale=200 flags=277352961 Meshes=1:209532:0:2
+- **Voracious Horror** L180 MD=214973 scale=100 flags=268964353
+- **Weaver of Decay** L109 MD=209354 scale=100 flags=268964353
+
+## Guard place-textures (humanoid)
+- **Guard** MD=26097 HeadMesh=40111 Textures=0:215123:0|1:215121:0|2:215122:0|3:215120:0|4:215124:0 Meshes=0:205110:0:2|0:40111:0:4
+- **Guard - Elmo Fitz** MD=26135 HeadMesh=40271 Textures=0:215123:0|1:215121:0|2:215122:0|3:215120:0|4:215124:0 Meshes=0:205116:0:2|0:40271:0:4

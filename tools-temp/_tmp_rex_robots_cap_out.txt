@@ -1,0 +1,123 @@
+=== ROBOTS IN DOSSIER (Cleaning / monsterData 297023) ===
+count=25
+  (SimpleChar:79866560) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3617.228,51.745,785.992) dRex=7.1 death=False
+  (SimpleChar:7986655D) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3622.509,51.745,798.139) dRex=10.5 death=False
+  (SimpleChar:7986657C) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3622.391,51.745,798.218) dRex=10.6 death=False
+  (SimpleChar:7986657D) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3612.935,52.135,787.850) dRex=11.1 death=False
+  (SimpleChar:79866518) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3612.924,52.135,787.641) dRex=11.1 death=False
+  (SimpleChar:79866562) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3612.875,52.135,787.538) dRex=11.2 death=False
+  (SimpleChar:7986653C) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3612.843,52.135,787.514) dRex=11.2 death=False
+  (SimpleChar:79866585) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3621.355,51.745,798.921) dRex=11.5 death=False
+  (SimpleChar:79866590) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3612.793,51.745,795.230) dRex=13.5 death=False
+  (SimpleChar:7986657B) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3608.861,52.265,787.404) dRex=15.2 death=False
+  (SimpleChar:7986655E) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3609.404,52.135,791.897) dRex=15.2 death=False
+  (SimpleChar:79866594) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3610.836,51.745,797.945) dRex=16.7 death=False
+  (SimpleChar:7986659D) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3608.250,51.745,796.428) dRex=18.0 death=False
+  (SimpleChar:79866547) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3602.961,52.135,787.817) dRex=21.1 death=False
+  (SimpleChar:797D36A5) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3596.812,51.745,788.209) dRex=27.3 death=False
+  (SimpleChar:79543CB6) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3596.979,51.745,783.936) dRex=27.4 death=False
+  (SimpleChar:79866586) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3597.933,51.745,772.754) dRex=30.1 death=False
+  (SimpleChar:79866565) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3595.688,51.745,798.922) dRex=30.5 death=False
+  (SimpleChar:79866577) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3597.419,51.745,772.863) dRex=30.5 death=False
+  (SimpleChar:79866553) | Malfunctioning Cleaning Robot | md=297023 | fam= | L1 HP12/12 RS=6 | pos=(3594.546,51.745,799.168) dRex=31.6 death=False
+  (SimpleChar:79866570) | Malfunctioning Cleaning Robot | md=297023 | fam=1019 | L1 HP12/12 RS=6 | pos=(3594.035,51.745,799.702) dRex=32.3 death=False
+  (SimpleChar:79866598) | Burning Cleaning Robot | md=297023 | fam=1018 | L5 HP27/58 RS=20 | pos=(3636.509,40.985,832.771) dRex=47.9 death=False
+  (SimpleChar:79866579) | Burning Cleaning Robot | md=297023 | fam=1018 | L5 HP0/58 RS=20 | pos=(3636.509,40.985,832.771) dRex=47.9 death=True
+  (SimpleChar:79866569) | Burning Cleaning Robot | md=297023 | fam=1018 | L5 HP0/58 RS=20 | pos=(3636.507,40.985,832.773) dRex=47.9 death=True
+  (SimpleChar:79866534) | Cleaning Robot | md=297023 | fam=1019 | L1 HP1/15 RS=9 | pos=(3619.992,39.292,839.023) dRex=52.9 death=False
+name_counts={'Malfunctioning Cleaning Robot': 21, 'Burning Cleaning Robot': 3, 'Cleaning Robot': 1}
+
+=== OTHER ENTITIES WITHIN 80u OF REX (not robots) ===
+  0.0 (SimpleChar:78E0FC63) Rex Larsson md=26074 pos=(3624.1,51.7,787.8)
+  19.0 (SimpleChar:798579B5) Bureaucrat Worker md=96056 pos=(3605.0,52.1,787.9)
+  38.5 (SimpleChar:78E0FC62) Marcus Stone md=258744 pos=(3630.1,41.0,824.2)
+  49.7 (SimpleChar:795B7D25) Dockworker md=26143 pos=(3606.9,6.9,774.9)
+  53.2 (SimpleChar:798663F3) Anger Manifestation md=96195 pos=(3621.3,39.1,839.4)
+  54.8 (SimpleChar:7981A537) Obedience Enforcement md=165196 pos=(3601.8,5.1,806.0)
+  54.9 (SimpleChar:78E0FC6F) Wounded Dockworker md=296008 pos=(3605.4,41.0,838.2)
+  58.2 (SimpleChar:78E0FC76) Bodyguard Logan Fixx md=247041 pos=(3602.8,8.1,819.8)
+  60.4 (SimpleChar:78E0FC6E) Wounded Dockworker md=296008 pos=(3583.5,41.0,831.3)
+  61.6 (SimpleChar:78E0FC77) Desmond Calitri md=295565 pos=(3605.2,8.1,826.9)
+  63.2 (SimpleChar:797FD57C) Dockworker md=26074 pos=(3584.3,6.9,767.9)
+  65.1 (SimpleChar:7985CD05) Protester md=203740 pos=(3592.0,5.1,820.0)
+  65.6 (SimpleChar:797FD583) Dockworker md=26143 pos=(3576.9,6.9,779.6)
+  66.2 (SimpleChar:7982BB9F) Dockworker md=26074 pos=(3579.7,5.1,803.1)
+  67.2 (SimpleChar:7985CD07) Protester md=203740 pos=(3592.0,5.1,824.0)
+  68.1 (SimpleChar:797FD582) Protester md=203740 pos=(3575.5,6.9,771.4)
+  72.7 (SimpleChar:797FD599) Dockworker md=26143 pos=(3571.1,6.9,766.1)
+  75.0 (SimpleChar:79851CCA) Obedience Enforcement md=165196 pos=(3573.5,5.1,817.8)
+  76.9 (SimpleChar:79866491) Kneebreaker Alfonzo Rizzolo md=165196 pos=(3580.1,8.1,833.3)
+  77.2 (SimpleChar:7982BB97) Dockworker md=26143 pos=(3562.9,5.1,794.4)
+  77.3 (SimpleChar:7985CB24) Protester md=203740 pos=(3575.2,5.1,825.5)
+  77.8 (SimpleChar:7985C910) Protester md=203740 pos=(3563.2,5.1,801.0)
+
+=== npc-lifecycle.csv exists=True ===
+
+=== scfu-appearance.csv exists=True ===
+
+=== enemy-full-updates.csv exists=True ===
+
+=== ENEMY-STATE UNIQUE ROBOTS ===
+unique=0
+near_rex_y35-55_d100=0
+far=0 (sample)
+
+=== RESPAWNS ===
+  Burning Cleaning Robot | complete | delay=70.15 | death=(3636.507,40.9849968,832.7731) respawn=(3636.509,40.9849968,832.7712) | Matched later same-name/same-monsterData/same-position spawn.
+  Burning Cleaning Robot | complete | delay=70.084 | death=(3636.509,40.9849968,832.7712) respawn=(3636.50928,40.9849968,832.7711) | Matched later same-name/same-monsterData/same-position spawn.
+  Cleaning Robot | complete | delay=0.141 | death=(3619.99219,39.2918472,839.023254) respawn=(3619.99219,39.29186,839.023254) | Matched later same-name/same-monsterData/same-position spawn.
+
+=== MOVEMENT NpcPath by near-rex robot ===
+
+=== COMBAT sample (robots) ===
+cols=['CapturedUtc', 'Direction', 'Sequence', 'MessageType', 'SourceRole', 'SourceIdentity', 'TargetRole', 'TargetIdentity', 'AuxRole1', 'AuxIdentity1', 'AuxRole2', 'AuxIdentity2', 'Action', 'Amount', 'TargetHp', 'Unknown1', 'Unknown2', 'Unknown3', 'Unknown4', 'Unknown5', 'Unknown6', 'Detail']
+combat_robot_rows_shown=0
+
+=== FIGHT EVENTS (robots) ===
+2026-07-21T19:55:05.6327699Z IN-N3 #43 type=SimpleCharFullUpdate identity=(SimpleChar:79866534) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, 
+2026-07-21T19:55:09.6969752Z IN-N3 #112 type=SimpleCharFullUpdate identity=(SimpleChar:79866569) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=
+2026-07-21T19:55:24.1425395Z IN-N3 #432 type=SimpleCharFullUpdate identity=(SimpleChar:79866534) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7,
+2026-07-21T19:55:34.1543801Z IN-N3 #661 type=SimpleCharFullUpdate identity=(SimpleChar:79866570) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFl
+2026-07-21T19:56:06.0663890Z IN-N3 #1298 type=SimpleCharFullUpdate identity=(SimpleChar:79866534) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7
+2026-07-21T19:56:15.0658400Z IN-N3 #1478 type=SimpleCharFullUpdate identity=(SimpleChar:79866577) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:56:24.7446592Z IN-N3 #1671 type=SimpleCharFullUpdate identity=(SimpleChar:79866534) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7
+2026-07-21T19:56:42.3520821Z IN-N3 #2006 type=SimpleCharFullUpdate identity=(SimpleChar:79866579) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId
+2026-07-21T19:56:45.1513545Z IN-N3 #2062 type=SimpleCharFullUpdate identity=(SimpleChar:7986657B) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:56:51.6093716Z IN-N3 #2198 type=SimpleCharFullUpdate identity=(SimpleChar:7986657C) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:56:52.1950120Z IN-N3 #2215 type=SimpleCharFullUpdate identity=(SimpleChar:7986657D) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:57:06.9471839Z IN-N3 #2567 type=SimpleCharFullUpdate identity=(SimpleChar:79866534) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7
+2026-07-21T19:57:24.8905319Z IN-N3 #2937 type=SimpleCharFullUpdate identity=(SimpleChar:79866585) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:57:25.5151490Z IN-N3 #2954 type=SimpleCharFullUpdate identity=(SimpleChar:79866534) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7
+2026-07-21T19:57:27.0012325Z IN-N3 #2980 type=SimpleCharFullUpdate identity=(SimpleChar:79866586) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:58:05.0400150Z IN-N3 #3796 type=SimpleCharFullUpdate identity=(SimpleChar:79866590) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:58:07.3705787Z IN-N3 #3841 type=SimpleCharFullUpdate identity=(SimpleChar:79866594) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+2026-07-21T19:58:19.4066410Z IN-N3 #4089 type=SimpleCharFullUpdate identity=(SimpleChar:79866598) SimpleCharFullUpdateMessage { Name="Burning Cleaning Robot" MonsterData=297023 MonsterScale=200 VisualFlags=31 HeadMesh=null RunSpeedBase=19 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.Simpl
+2026-07-21T19:58:27.8250690Z IN-N3 #4291 type=SimpleCharFullUpdate identity=(SimpleChar:7986659D) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataF
+
+=== POPULATION: unique near-rex robots as spawn set ===
+dossier_near=25
+  SPAWN (SimpleChar:79866560) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3617.227780,51.745000,785.991800)
+  SPAWN (SimpleChar:7986655D) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3622.508540,51.745000,798.139500)
+  SPAWN (SimpleChar:7986657C) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3622.391000,51.745000,798.218262)
+  SPAWN (SimpleChar:7986657D) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3612.935000,52.135000,787.849600)
+  SPAWN (SimpleChar:79866518) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3612.924000,52.135000,787.641200)
+  SPAWN (SimpleChar:79866562) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3612.874510,52.135000,787.537500)
+  SPAWN (SimpleChar:7986653C) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3612.843260,52.135000,787.514200)
+  SPAWN (SimpleChar:79866585) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3621.355220,51.745000,798.921265)
+  SPAWN (SimpleChar:79866590) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3612.793460,51.745000,795.229800)
+  SPAWN (SimpleChar:7986657B) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3608.860840,52.264996,787.403800)
+  SPAWN (SimpleChar:7986655E) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3609.403810,52.135000,791.897034)
+  SPAWN (SimpleChar:79866594) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3610.836430,51.745000,797.945300)
+  SPAWN (SimpleChar:7986659D) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3608.250240,51.745000,796.428100)
+  SPAWN (SimpleChar:79866547) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3602.961000,52.135000,787.817261)
+  SPAWN (SimpleChar:797D36A5) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3596.811770,51.745000,788.208900)
+  SPAWN (SimpleChar:79543CB6) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3596.979000,51.745000,783.935852)
+  SPAWN (SimpleChar:79866586) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3597.932860,51.745000,772.754100)
+  SPAWN (SimpleChar:79866565) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3595.688480,51.745000,798.922058)
+  SPAWN (SimpleChar:79866577) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3597.419190,51.745000,772.862900)
+  SPAWN (SimpleChar:79866553) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3594.546000,51.745000,799.167700)
+  SPAWN (SimpleChar:79866570) | Malfunctioning Cleaning Robot | md=297023 | L1 HP12 RS=6 | (3594.035000,51.745000,799.702100)
+  SPAWN (SimpleChar:79866598) | Burning Cleaning Robot | md=297023 | L5 HP58 RS=20 | (3636.509280,40.984997,832.771100)
+  SPAWN (SimpleChar:79866579) | Burning Cleaning Robot | md=297023 | L5 HP58 RS=20 | (3636.509000,40.984997,832.771200)
+  SPAWN (SimpleChar:79866569) | Burning Cleaning Robot | md=297023 | L5 HP58 RS=20 | (3636.507000,40.984997,832.773100)
+  SPAWN (SimpleChar:79866534) | Cleaning Robot | md=297023 | L1 HP15 RS=9 | (3619.992190,39.291866,839.023254)

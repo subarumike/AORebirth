@@ -1,0 +1,73 @@
+=== MOVEMENT first/last ===
+cols=['CapturedUtc', 'Direction', 'Sequence', 'MessageType', 'SourceType', 'SourceInstance', 'SourceIdentity', 'SourceName', 'TargetType', 'TargetInstance', 'TargetIdentity', 'TargetName', 'FollowKind', 'CurrentX', 'CurrentY', 'CurrentZ', 'DestinationX', 'DestinationY', 'DestinationZ', 'Speed', 'Animation', 'Flags', 'PathCount', 'RawParams', 'RawTailHex'] rows=303
+{'CapturedUtc': '2026-07-24T09:43:09.3268671Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:43:09.3588473Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:43:10.9995663Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:43:12.5566044Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:43:12.7904619Z', 'MessageType': 'FollowTarget'}
+...
+{'CapturedUtc': '2026-07-24T09:44:54.5930107Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:44:55.7776821Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:44:57.8263408Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:44:57.8263408Z', 'MessageType': 'FollowTarget'}
+{'CapturedUtc': '2026-07-24T09:45:15.6335114Z', 'MessageType': 'SetPos'}
+
+=== SCFU SpecialAttacks / TextureOverrides / FightingTarget ===
+Cyborg Brigadier General id=(SimpleChar:79907F45) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Brigadier General id=(SimpleChar:79907F51) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Brigadier General id=(SimpleChar:79907F40) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Colonel id=(SimpleChar:79907F42) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Colonel id=(SimpleChar:79907F54) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Lieutenant Colonel id=(SimpleChar:79907F47) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Lieutenant Colonel id=(SimpleChar:79907F57) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Lieutenant Colonel id=(SimpleChar:79907F58) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Lieutenant Colonel id=(SimpleChar:79907F41) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Major id=(SimpleChar:79907F44) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Major id=(SimpleChar:79907F5D) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Major id=(SimpleChar:79907F4A) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Major id=(SimpleChar:79907F5B) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Major General id=(SimpleChar:79907F49) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Cyborg Major General id=(SimpleChar:79907F50) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Gary Arnall id=(SimpleChar:798E2358) side=Clan colored=True specials= texov= fight= tex=0:0:0|1:81911:0|2:81913:0|3:81908:0|4:81916:0
+Hellhound id=(SimpleChar:79907F4B) side=Monster colored=False specials= texov=Material #1:95916:0:0 fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Hellhound id=(SimpleChar:79907F4F) side=Monster colored=False specials= texov=Material #1:95916:0:0 fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Hellhound id=(SimpleChar:79907F52) side=Monster colored=False specials= texov=Material #1:95916:0:0 fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Hellhound id=(SimpleChar:79907F59) side=Monster colored=False specials= texov=Material #1:95916:0:0 fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Master Contract Killer id=(SimpleChar:79907F46) side=Neutral colored=True specials= texov= fight= tex=0:9452:0|1:22570:0|2:22594:0|3:9451:0|4:22625:0
+Master Lasersniper id=(SimpleChar:79907F4C) side=Neutral colored=True specials= texov= fight= tex=0:9418:0|1:8729:0|2:9420:0|3:9419:0|4:9421:0
+Master Lasersniper id=(SimpleChar:79907F53) side=Neutral colored=True specials= texov= fight= tex=0:9418:0|1:8729:0|2:9420:0|3:9419:0|4:9421:0
+Master Lasersniper id=(SimpleChar:79907F56) side=Neutral colored=True specials= texov= fight= tex=0:9418:0|1:8729:0|2:9420:0|3:9419:0|4:9421:0
+Master Programthief id=(SimpleChar:79907F5C) side=Neutral colored=True specials= texov= fight= tex=0:8816:0|1:8740:0|2:8814:0|3:42246:0|4:8813:0
+Medusa Entertainer Elder id=(SimpleChar:79907F48) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Medusa Entviner Initiate id=(SimpleChar:79907F43) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+Medusa Entviner Initiate id=(SimpleChar:79907F55) side=Monster colored=False specials= texov= fight= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+
+=== FOUGHT IDENTITIES names from enemy-full / dossier ===
+enemy (SimpleChar:798E2358) name=Gary Arnall lvl=187 md=26151 specials-in-detail?
+enemy (SimpleChar:79907F41) name=Cyborg Lieutenant Colonel lvl=177 md=17645 specials-in-detail?
+enemy (SimpleChar:79907F41) name=Cyborg Lieutenant Colonel lvl=177 md=17645 specials-in-detail?
+
+=== NPC-INTERACTIONS Use/Generic/Gary ===
+﻿2026-07-24T09:43:08.5357992Z [OUT-N3] #1 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12165 Parameter2=1179601236 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:08.5427941Z [OUT-N3] #2 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12167 Parameter2=1465014094 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:13.0743443Z [OUT-N3] #4 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:79907F5A) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.1037105Z [OUT-N3] #15 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10641 Parameter2=1363759944 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.1037105Z [OUT-N3] #17 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10648 Parameter2=1313821517 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.1037105Z [OUT-N3] #18 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.1047086Z [OUT-N3] #20 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10220 Parameter2=1146049605 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.1047086Z [OUT-N3] #24 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.2186369Z [IN-N3] #71 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=148 Parameter2=16 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:14.4083299Z [IN-N3] #85 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:15.4032406Z [OUT-N3] #33 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10644 Parameter2=1145197384 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:20.8972065Z [OUT-N3] #42 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:79907F3F) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:21.6457471Z [OUT-N3] #51 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10223 Parameter2=1430471509 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:21.6457471Z [OUT-N3] #53 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10226 Parameter2=1129207625 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:21.6457471Z [OUT-N3] #54 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798E2367) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:21.6467465Z [OUT-N3] #56 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11100 Parameter2=1347768400 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:21.6467465Z [OUT-N3] #60 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798E2367) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:21.7786640Z [IN-N3] #196 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:22.9265633Z [OUT-N3] #70 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11105 Parameter2=1314146644 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:23.9589258Z [OUT-N3] #73 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11109 Parameter2=1447383634 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:42.6549552Z [OUT-N3] #105 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:79907F44) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:43.3725136Z [OUT-N3] #114 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11184 Parameter2=1313752641 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:43:43.3725136Z [OUT-N3] #116 type=CharacterAction text= detail=CharacterActionMessage { Action=Us

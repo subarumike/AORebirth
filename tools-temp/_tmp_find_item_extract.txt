@@ -1,0 +1,245 @@
+=== SESSION ===
+capture-session.json (404 bytes)
+﻿{
+  "captureStartUtc": "2026-07-24T09:35:59.8333816Z",
+  "captureStartLocal": "2026-07-24T11:35:59.8333816+02:00",
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-113559",
+  "aoClientProcess": {
+    "id": 4968,
+    "processName": "AnarchyOnline",
+    "mainWindowTitle": "Anarchy Online - Cratonera"
+  },
+  "notes": ""
+}
+
+
+capture_info.json (8131 bytes)
+﻿{
+  "timestampUtc": "2026-07-24T09:39:36.8349469Z",
+  "captureStartUtc": "2026-07-24T09:35:59.8333816Z",
+  "captureEndUtc": "2026-07-24T09:39:36.7899748Z",
+  "captureStopRequestedUtc": "2026-07-24T09:39:31.7854881Z",
+  "lastRawPacketUtc": "2026-07-24T09:39:36.3438104Z",
+  "captureFinalizedUtc": "2026-07-24T09:39:36.7899748Z",
+  "quietPeriodPassed": false,
+  "sessionDurationSeconds": 216.957,
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-113559",
+  "rawPacketLogPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-113559\\packets.hex.log",
+  "rawPacketIndexPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-113559\\raw-packets.csv",
+  "scfuAppearancePath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-113559\\scfu-appearance.csv",
+  "characterName": "Cratonera",
+  "playfieldId": "1441804",
+  "packetCounts": {
+    "inboundRaw": 3358,
+    "outboundRaw": 584,
+    "decodedInboundN3": 3266,
+    "decodedOutboundN3": 582,
+    "decodedN3EventRows": 3848,
+    "decodedN3StageErrors": 0,
+    "rawCombatPackets": 218,
+    "rawSimpleCharFullUpdatePackets": 73,
+    "rawPacketLogRows": 3942,
+    "rawPacketIndexRows": 3942,
+    "rawPacketPreserved": 3942,
+    "rawPacketWriteErrors": 0,
+    "rawPacketCallbackDrainTimeouts": 0,
+
+
+capture-health.json (4345 bytes)
+﻿{
+  "timestampUtc": "2026-07-24T09:39:36.8329483Z",
+  "callbackHealth": {
+    "errorLogPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-113559\\capture-callback-errors.log",
+    "totalInvocations": 17801,
+    "totalErrors": 0,
+    "errorLogWriteFailures": 0,
+    "callbacks": [
+      { "name": "Capture.Flush", "invocations": 109, "errors": 0 },
+      { "name": "Chat.Command.aocap", "invocations": 1, "errors": 0 },
+      { "name": "DynelManager.CharInPlay", "invocations": 1, "errors": 0 },
+      { "name": "DynelManager.DynelSpawned", "invocations": 247, "errors": 0 },
+      { "name": "Game.OnUpdate", "invocations": 9618, "errors": 0 },
+      { "name": "Game.PlayfieldInit", "invocations": 1, "errors": 0 },
+      { "name": "Game.TeleportEnded", "invocations": 1, "errors": 0 },
+      { "name": "Game.TeleportStarted", "invocations": 1, "errors": 0 },
+      { "name": "Network.ChatMessageReceived", "invocations": 32, "errors": 0 },
+      { "name": "Network.N3MessageReceived", "invocations": 3266, "errors": 0 },
+      { "name": "Network.N3MessageSent", "invocations": 582, "errors": 0 },
+      { "name": "Network.PacketReceived", "invocations": 3358, "errors": 0 },
+      { "name": "Network.PacketSent", "invocations": 584, "errors": 0 }
+    ]
+  },
+  "pf127GeometryAndLineOfSight": {
+    "pf127Observed": false,
+    "pf127CombatObserved": false,
+    "vergilCombatObserved": false,
+    "vergilSameIdentityClearAndBlockedObserve
+
+=== MISSION-FLOW (all) ===
+﻿2026-07-24T09:35:59.8753548Z [MISSION-FLOW] session bound path=C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260724-113559\mission-flow.log (roll/accept/key/teleport/playfield-init for mission instance reconstruction)
+2026-07-24T09:36:11.9062078Z [IN-N3-TELEPORT] identity=(SimpleChar:762ABC21) destPf=(ACGBuildingGeneratorData:D7414C) changePf=(Playfield2:16000C) playfield2=(100002:1) gameServerId=0 sgId=0 dest=(2871.94,36.87,1927.21) likelyMissionInstance=True pendingCreateQuest= detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.N3TeleportMessage
+2026-07-24T09:36:11.9461837Z [TELEPORT] started lastPf= pendingCreateQuest=
+2026-07-24T09:36:12.6055373Z [PLAYFIELD-INIT] pf=1441804 hex=0x16000C likelyMissionInstance=True pendingCreateQuest=
+2026-07-24T09:36:12.8046955Z [IN-MISSION-KEY] item=(MissionKey:F69993) ownerType=50000 ownerInstance=1982512161 playfield= low=28577 high=28577 ql=1 name= pendingCreateQuest=
+2026-07-24T09:36:12.8056950Z [IN-MISSION-KEY] item=(MissionKey:F69991) ownerType=50000 ownerInstance=1982512161 playfield= low=28577 high=28577 ql=1 name= pendingCreateQuest=
+2026-07-24T09:36:12.8056950Z [IN-MISSION-KEY] item=(MissionKey:F69992) ownerType=50000 ownerInstance=1982512161 playfield= low=28577 high=28577 ql=1 name= pendingCreateQuest=
+2026-07-24T09:36:12.8066941Z [IN-MISSION-KEY] item=(MissionKey:F69990) ownerType=50000 ownerInstance=1982512161 playfield= low=28577 high=28577 ql=1 name= pendingCreateQuest=
+2026-07-24T09:36:13.0614894Z [TELEPORT] ended lastPf=1441804 pendingCreateQuest=
+2026-07-24T09:36:13.2643176Z [IN-QUEST-FULL] identity=(SimpleChar:762ABC21) unknown=1 quests=4 pendingCreateQuest= |#0 quest=(Mission:55631156) icon=11335 short=I have a business proposal f... pf=(Playfield2:235) |#1 quest=(14336853:63112800) icon=11337 short=hank you for choosing this ... pf=(Playfield2:230) |#2 quest=(14336853:63116600) icon=11329 short=ome people consider joining... pf=(Playfield2:23A) |#3 quest=(14336853:63118F00) icon=11330 short=ello. Thanks for taking on ... pf=(Playfield2:23A)
+2026-07-24T09:39:03.0612982Z [IN-QUEST] action=Delete mission=(Mission:55631128) identity=(SimpleChar:762ABC21) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+
+=== PLAYFIELDS (scfu) ===
+scfu cols: ['\ufeffCapturedUtc', 'ElapsedMilliseconds', 'Direction', 'GlobalOrdinal', 'Sequence', 'PacketLength', 'DecodeStatus', 'DecodeError', 'BytesConsumed', 'UndecodedTailHex', 'RawPacketHex', 'RawBodyHex', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'PrePositionFightingTarget', 'FightingTarget', 'Version', 'FlagsNumeric', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NpcFamily', 'NpcLosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'AppearanceValue', 'Side', 'Fatness', 'Breed', 'Gender', 'Race', 'ScfuUnknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanos', 'WaypointOwner', 'Waypoints', 'TextureOverrides', 'Textures', 'Meshes', 'Flags2Numeric', 'Flags2', 'Owner', 'ScfuUnknown2', 'ScfuUnknown4', 'SpecialAttacks', 'ImmuneUnknown', 'UnknownFlag3Data', 'HeaderUnknown', 'TowerUnknown', 'PlayerInfo', 'N3MessageTypeNumeric', 'DecodeFullyConsumed', 'NpcUnknownDataWidth', 'ScfuUnknown3', 'LegacyExtendedRunSpeedAlignment', 'TerminalSpecialAttackSlotOmitted', 'OpaqueExtensionHex']
+pf counts sample: []
+
+=== ENEMY FULL UPDATE NAMES/LEVELS ===
+enemy cols: ['\ufeffCapturedUtc', 'Direction', 'Sequence', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'FightingTargetRole', 'FightingTargetIdentity', 'Version', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NPCFamily', 'LosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'Unknown1Length', 'Unknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanoCount', 'ActiveNanos', 'WaypointCount', 'WaypointOwner', 'Waypoints', 'TextureOverrideCount', 'TextureOverrides', 'TextureCount', 'Textures', 'MeshCount', 'Meshes', 'Flags2', 'Unknown2', 'Unknown4', 'DecodeFullyConsumed', 'UndecodedTailHex', 'RawBodyHex', 'Detail']
+names: [('Master Techno-Architect', 12), ('Rough Clan Informer', 11), ('Veteran Rustler', 10), ('Veteran Poacher', 6), ('Master Virusbuilder', 6), ('Veteran Dealer', 5), ('Veteran Functionary', 3), ('Veteran Clan Functionary', 3), ('Seasoned Martial Artist', 2), ('Seasoned Engineer', 2), ('Veteran Ruffian', 2), ('Tough Clan Diversionist', 2), ('Zoftig Blimp', 1), ('Skilled Contract Killer', 1), ('Seasoned Adventurer', 1), ('Seasoned Trader', 1), ('Seasoned Soldier', 1), ('Carlo Pinnetti', 1), ('CEO Guardian', 1)]
+levels: [('168', 19), ('162', 9), ('165', 8), ('163', 6), ('151', 4), ('166', 2), ('154', 2), ('158', 2), ('153', 2), ('164', 2), ('152', 2), ('90', 1), ('103', 1), ('122', 1), ('139', 1), ('125', 1), ('140', 1), ('144', 1), ('133', 1), ('124', 1)]
+monsterData: [('26155', 15), ('26139', 11), ('26133', 10), ('26090', 6), ('26151', 6), ('26123', 5), ('26137', 3), ('26082', 3), ('26103', 3), ('26143', 3), ('26125', 2), ('205867', 1), ('26074', 1), ('258209', 1), ('227701', 1)]
+
+=== NPC-LIFECYCLE interesting ===
+lifecycle cols: ['\ufeffCapturedUtc', 'Direction', 'Sequence', 'Phase', 'MessageType', 'PrimaryIdentity', 'RelatedIdentity', 'Name', 'Detail']
+interesting rows: 2
+{'\ufeffCapturedUtc': '2026-07-24T09:39:03.0603012Z', 'Direction': 'IN-N3', 'Sequence': '2845', 'Phase': 'loot-move-result', 'MessageType': 'ContainerAddItem', 'PrimaryIdentity': '(SimpleChar:762ABC21)', 'RelatedIdentity': '(OverflowWindow:0000)', 'Name': 'Cratonera', 'Detail': 'ContainerAddItem { Source=(OverflowWindow:0000) Target=(OverflowWindow:762ABC21) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }'}
+{'\ufeffCapturedUtc': '2026-07-24T09:39:09.3136798Z', 'Direction': 'IN-N3', 'Sequence': '2927', 'Phase': 'loot-move-result', 'MessageType': 'ContainerAddItem', 'PrimaryIdentity': '(SimpleChar:762ABC21)', 'RelatedIdentity': '(Terminal:5796D62D)', 'Name': 'Cratonera', 'Detail': 'ContainerAddItem { Source=(Terminal:5796D62D) Target=(None:0000) Slot=0 N3MessageType=ContainerAddItem Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }'}
+
+=== INVENTORY (find/item hints) ===
+inv cols: ['\ufeffCapturedUtc', 'Direction', 'Sequence', 'InventoryIdentity', 'Handle', 'Slot', 'Placement', 'Flags', 'Count', 'ItemIdentity', 'LowId', 'HighId', 'Quality', 'Unknown']
+
+=== NPC-INTERACTIONS ===
+﻿2026-07-24T09:36:00.8211890Z [OUT-N3] #1 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12165 Parameter2=1179601236 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:01.9846162Z [OUT-N3] #2 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12167 Parameter2=1465014094 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:12.8196883Z [OUT-N3] #25 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12165 Parameter2=1179601236 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:12.8196883Z [OUT-N3] #26 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12167 Parameter2=1465014094 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:17.2840869Z [OUT-N3] #42 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10641 Parameter2=1363759944 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:17.2850863Z [OUT-N3] #44 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10648 Parameter2=1313821517 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:17.2850863Z [OUT-N3] #47 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10220 Parameter2=1146049605 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:17.9426806Z [IN-N3] #407 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=148 Parameter2=16 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:18.2335001Z [IN-N3] #420 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:18.4993357Z [OUT-N3] #62 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10644 Parameter2=1145197384 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:22.5029739Z [OUT-N3] #72 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10223 Parameter2=1430471509 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:22.5029739Z [OUT-N3] #74 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10226 Parameter2=1129207625 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:22.5309572Z [OUT-N3] #79 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11100 Parameter2=1347768400 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:23.5383381Z [IN-N3] #518 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:23.7891827Z [OUT-N3] #90 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11105 Parameter2=1314146644 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:31.8485990Z [OUT-N3] #117 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11109 Parameter2=1447383634 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:31.8485990Z [OUT-N3] #119 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11184 Parameter2=1313752641 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:31.8495982Z [OUT-N3] #121 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11189 Parameter2=1497847892 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:32.0104972Z [IN-N3] #660 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:33.9413069Z [IN-N3] #713 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=148 Parameter2=16 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:37.8269105Z [IN-N3] #793 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:46.0037827Z [OUT-N3] #173 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=84 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF56) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:36:46.1836719Z [IN-N3] #887 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=84 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF56) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:47.0381472Z [OUT-N3] #175 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12165 Parameter2=1179601236 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:47.1900514Z [OUT-N3] #176 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=85 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF56) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:36:47.3839317Z [IN-N3] #892 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=85 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF56) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:51.3648660Z [OUT-N3] #189 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=86 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A811) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:36:51.5654846Z [IN-N3] #929 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=86 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A811) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:52.0247006Z [OUT-N3] #190 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=12167 Parameter2=1465014094 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:52.8438050Z [OUT-N3] #191 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=87 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A80F) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:36:53.0909863Z [IN-N3] #947 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=87 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A80F) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:54.8063908Z [OUT-N3] #192 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=88 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A80F) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:36:55.0349394Z [IN-N3] #959 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=88 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A80F) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:36:55.3970292Z [OUT-N3] #193 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=89 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A811) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:36:55.5519342Z [IN-N3] #962 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=89 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A811) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:00.5753493Z [OUT-N3] #211 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=90 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF54) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:00.9181370Z [IN-N3] #1031 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=90 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF54) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:01.9340972Z [OUT-N3] #212 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=91 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF54) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:02.5150323Z [IN-N3] #1043 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=91 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF54) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:09.1364329Z [OUT-N3] #239 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10641 Parameter2=1363759944 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:09.1364329Z [OUT-N3] #241 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11105 Parameter2=1314146644 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:09.2993322Z [IN-N3] #1126 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=148 Parameter2=16 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:09.4852177Z [IN-N3] #1137 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:10.4526232Z [OUT-N3] #252 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10644 Parameter2=1145197384 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:15.6838448Z [IN-N3] #1245 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:18.3223344Z [OUT-N3] #272 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=92 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A818) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:18.5650339Z [IN-N3] #1270 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=92 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A818) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:21.5877536Z [OUT-N3] #275 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=93 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A818) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:21.7483659Z [IN-N3] #1278 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=93 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A818) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:26.2087333Z [OUT-N3] #277 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=94 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A819) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:26.4354091Z [IN-N3] #1283 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=94 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A819) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:28.2881578Z [OUT-N3] #278 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=95 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A819) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:28.4460602Z [IN-N3] #1287 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=95 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Corpse:F6A819) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:36.1912285Z [OUT-N3] #289 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=97 Action=Use Temp4=0 User=(SimpleChar:762ABC21) Source=null Target=(Inventory:0040) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:36.3661197Z [IN-N3] #1322 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=97 Action=Use Temp4=0 User=(SimpleChar:762ABC21) Source=null Target=(Inventory:0040) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:38.8452299Z [OUT-N3] #294 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=98 Action=UseItemOnItem Temp4=0 User=(SimpleChar:762ABC21) Source=(Backpack:760013) Target=(Container:BA0CF57) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:38.9991351Z [IN-N3] #1330 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=98 Action=UseItemOnItem Temp4=0 User=(SimpleChar:762ABC21) Source=(Backpack:760013) Target=(Container:BA0CF57) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:40.5642645Z [OUT-N3] #295 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=99 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF57) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:40.7569978Z [IN-N3] #1335 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=99 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF57) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:45.1589242Z [OUT-N3] #309 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=100 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF58) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:45.3737916Z [IN-N3] #1360 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=100 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF58) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:46.3879051Z [OUT-N3] #314 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=101 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF58) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:46.5816464Z [IN-N3] #1367 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=101 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF58) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:52.6068724Z [OUT-N3] #326 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=102 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF5E) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:52.7617765Z [IN-N3] #1405 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=102 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF5E) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:37:53.7821928Z [OUT-N3] #329 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=103 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF5E) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:37:54.1277026Z [IN-N3] #1409 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=103 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF5E) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:03.4257724Z [OUT-N3] #352 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=106 Action=UseItemOnItem Temp4=0 User=(SimpleChar:762ABC21) Source=(Backpack:760013) Target=(Container:BA0CF53) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:38:03.5846761Z [IN-N3] #1566 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=106 Action=UseItemOnItem Temp4=0 User=(SimpleChar:762ABC21) Source=(Backpack:760013) Target=(Container:BA0CF53) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:04.9388822Z [OUT-N3] #353 type=GenericCmd text= detail=GenericCmdMessage { Temp1=0 Count=107 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF53) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:38:05.0998442Z [IN-N3] #1575 type=GenericCmd text= detail=GenericCmdMessage { Temp1=1 Count=107 Action=Use Temp4=1 User=(SimpleChar:762ABC21) Source=null Target=(Container:BA0CF53) N3MessageType=GenericCmd Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:08.9703490Z [OUT-N3] #377 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10641 Parameter2=1363759944 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:08.9703490Z [OUT-N3] #379 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10648 Parameter2=1313821517 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:08.9713483Z [OUT-N3] #381 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10220 Parameter2=1146049605 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:09.2781598Z [IN-N3] #1735 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=148 Parameter2=16 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:09.8837861Z [IN-N3] #1758 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:10.2693660Z [OUT-N3] #388 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10644 Parameter2=1145197384 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:14.0230853Z [OUT-N3] #408 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11100 Parameter2=1347768400 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:14.4907968Z [OUT-N3] #416 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11105 Parameter2=1314146644 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:15.8119820Z [IN-N3] #1936 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:16.3546473Z [OUT-N3] #427 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11184 Parameter2=1313752641 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:40.7040727Z [OUT-N3] #506 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=10223 Parameter2=1430471509 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:40.7040727Z [OUT-N3] #508 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11105 Parameter2=1314146644 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:40.7040727Z [OUT-N3] #510 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11109 Parameter2=1447383634 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:40.8329927Z [IN-N3] #2408 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=148 Parameter2=16 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:40.9839001Z [IN-N3] #2416 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:42.2863606Z [OUT-N3] #525 type=CharacterAction text= detail=CharacterActionMessage { Action=UsePerk Unknown1=0 Target=(SimpleChar:762ABC21) Parameter1=11189 Parameter2=1497847892 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+2026-07-24T09:38:47.0107738Z [IN-N3] #2579 type=CharacterAction text= detail=CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=150 Parameter2=6 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+
+=== SYSTEM-MESSAGES (mission/token/reward) ===
+2026-07-24T09:39:03.0593021Z [IN-N3] #2842 type=FormatFeedback text=~&!!!":#s$^qi!!!!!i!!-TP~ detail=FormatFeedbackMessage { Unknown1=0 Message="~&!!!":#s$^qi!!!!!i!!-TP~" Unknown2=0 FormattedMessage="Received reward: 0 SK, 91082 credits." N3MessageType=FormatFeedback Identity=(SimpleChar:762ABC21) Unknown=1 PacketType=N3Message }
+2026-07-24T09:39:03.0612982Z [IN-N3] #2848 type=Quest text= detail=QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:55631128) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:762ABC21) Unknown=0 PacketType=N3Message }
+
+=== CORPSE / CHEST CSV counts ===
+corpse-full-updates.csv rows=12 cols=['\ufeffCapturedUtc', 'Direction', 'Sequence', 'ReceiverInstance', 'CorpseType', 'CorpseInstance', 'CorpseIdentity', 'CorpseName', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'MonsterScale', 'Sex', 'Breed', 'Race', 'DeadNpcType', 'DeadNpcInstance', 'DeadNpcIdentity', 'DeadNpcName', 'CorpseCatMesh', 'CorpseCredits', 'CorpseMonsterData', 'TailDeadNpcType', 'TailDeadNpcInstance', 'TailDeadNpcIdentity', 'PacketLength', 'RawHex']
+corpse-loot-observations.csv rows=4 cols=['\ufeffCapturedUtc', 'Direction', 'Sequence', 'CorpseIdentity', 'OpenOrdinal', 'InitialSnapshot', 'ItemCount', 'DeadNpcIdentity', 'EnemyName', 'MonsterData', 'EnemyLevel', 'CorpseCredits', 'PlayerIdentity', 'PlayerLevel', 'PlayfieldId', 'Items', 'CorrelationStatus']
+
+=== EVENTS.log Door/Chest/Container/SCFU mission pf ===
+DoorFullUpdate-ish=226 Chest=1 Container=189
+pf hits: []
+name hits: [('Door pos', 113), ('Treasure pos', 16), ('Barrel pos', 11), ('Small Crate pos', 4), ('Skeleton pos', 2), ('Bottles and Garbage pos', 2), ('A blasted Skeleton pos', 1), ('A Crashed Android pos', 1)]
+
+=== MISSION FLOW / CHAT related ===
+﻿2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=3 ChannelId=2304001 ChannelName="Zeljo1921" Unk2=0 Unk3=-32764 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=12 ChannelId=1000 ChannelName="Tour Announcements" Unk2=0 Unk3=-32634 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=12 ChannelId=2000 ChannelName="IRRK News Wire" Unk2=0 Unk3=-32634 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=134 ChannelId=36700672 ChannelName="OT shopping 11-50" Unk2=0 Unk3=-32412 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=134 ChannelId=36700677 ChannelName="OT shopping 50-100" Unk2=0 Unk3=-32412 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=134 ChannelId=36700681 ChannelName="OT shopping 100+" Unk2=0 Unk3=-32412 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=135 ChannelId=36700688 ChannelName="OT OOC" Unk2=0 Unk3=-32668 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=135 ChannelId=36700689 ChannelName="OT German OOC" Unk2=0 Unk3=-32700 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=10 ChannelId=1 ChannelName="Org Msg" Unk2=0 Unk3=-32762 Unk4=0 }
+2026-07-24T09:36:13.3471004Z [CHAT] #0 type=ChannelList text=chat-protocol detail=ChannelListMessage { PacketType=ChannelList Unk1=10 ChannelId=2 ChannelName="Tower Battle Outcome" Unk2=0 Unk3=-32762 Unk4=0 }
+2026-07-24T09:36:13.5450654Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I'll destroy anyone opposing our initiatives." Unk2=1 }
+2026-07-24T09:36:13.7469411Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Hello master. I'm ready to obey your commands..." Unk2=1 }
+2026-07-24T09:36:18.5493056Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:36:32.5461670Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:36:32.7520402Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I will treat this one as a hostile witness!" Unk2=1 }
+2026-07-24T09:36:36.5417043Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I'll be right behind you.  Don't answer any questions." Unk2=1 }
+2026-07-24T09:36:36.7385829Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: I will follow you wherever you go, master." Unk2=1 }
+2026-07-24T09:36:38.7473442Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:36:38.9506647Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: OK..but you will be invoiced for my dry cleaning." Unk2=1 }
+2026-07-24T09:37:10.7494403Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:37:10.9523139Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: OK..but you will be invoiced for my dry cleaning." Unk2=1 }
+2026-07-24T09:37:14.9520969Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:37:15.1507502Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I will treat this one as a hostile witness!" Unk2=1 }
+2026-07-24T09:38:11.1488575Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:38:11.3587293Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: OK..but you will be invoiced for my dry cleaning." Unk2=1 }
+2026-07-24T09:38:13.3525011Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I'll be right behind you.  Don't answer any questions." Unk2=1 }
+2026-07-24T09:38:15.3502688Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:38:15.5411489Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: OK..but you will be invoiced for my dry cleaning." Unk2=1 }
+2026-07-24T09:38:41.1627910Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:38:41.3556719Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I'll fix his habius corpus!" Unk2=1 }
+2026-07-24T09:38:47.3475656Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, CEO Guardian: Charge!" Unk2=1 }
+2026-07-24T09:38:47.5424471Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Cratonera's pet, Carlo Pinnetti: I'll fix his habius corpus!" Unk2=1 }

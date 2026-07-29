@@ -1,0 +1,129 @@
+=== FOCUSED DOSSIER ===
+787B53FF | Emissary of Jobe | runtimePf=4310 captureObj=10D6 md=215047 hm=40656 flags=? pos=(854.692,30.015,1062.844)
+787B5400 | Guardian of the Weak | runtimePf=4310 captureObj=10D6 md=26097 hm=40111 flags=? pos=(849.204,30.015,1062.434)
+787B5401 | Joshua Falker | runtimePf=4310 captureObj=10D6 md=259896 hm=223820 flags=? pos=(847.668,29.794,1100.858)
+78CCD52F | Sharon Goldman | runtimePf= captureObj=11B3 md=215029 hm=40664 flags=? pos=(177.375,282.006,359.798)
+78CCD532 | Doctor James Monaghan | runtimePf= captureObj=11B3 md=215027 hm=40132 flags=? pos=(199.060,280.005,343.576)
+78CCD535 | Winnie Glowtail | runtimePf= captureObj=11B3 md=215023 hm=40665 flags=? pos=(198.690,280.005,355.650)
+78CCD536 | Pedro Gavrillo | runtimePf= captureObj=11B3 md=215028 hm=40715 flags=? pos=(174.953,282.006,354.526)
+78CCD538 | Trond McDougal | runtimePf= captureObj=11B3 md=215025 hm=40283 flags=? pos=(182.328,280.006,353.113)
+78CCD53A | Luna Erke | runtimePf= captureObj=11B3 md=26143 hm=40137 flags=? pos=(196.280,280.005,355.027)
+78CCD541 | Prince Creehan | runtimePf= captureObj=11B3 md=26103 hm= flags=? pos=(179.270,285.005,311.859)
+7963A853 | Scientist Drake Rodriguez | runtimePf=4001 captureObj=0FA1 md=26092 hm=40694 flags=? pos=(854.512,34.405,958.587)
+798894DE | Swift Silvertail | runtimePf=4310 captureObj=10D6 md=208922 hm= flags=? pos=(857.687,36.184,1123.524)
+798C1F0D | Yuttos Nascence Geosurvey Dog | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(798.969,29.410,1206.336)
+798C1F4C | Barking Chimera | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(838.820,32.239,1164.361)
+798C1F4E | Barking Chimera | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(836.342,31.867,1176.817)
+798C1F83 | Dreaming Silvertail | runtimePf=4310 captureObj=10D6 md=208922 hm= flags=? pos=(789.353,29.211,1223.389)
+798C1F89 | Swift Silvertail | runtimePf=4310 captureObj=10D6 md=208922 hm= flags=? pos=(825.543,31.097,1118.967)
+798C1F96 | Barking Chimera | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(819.427,31.157,1160.204)
+798C1F97 | Barking Chimera | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(847.990,32.410,1134.386)
+798C1F9E | Barking Chimera | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(835.880,32.410,1135.516)
+798E09BC | Barking Chimera | runtimePf=4310 captureObj=10D6 md=209173 hm= flags=? pos=(854.137,28.494,1111.166)
+
+=== SCFU APPEARANCE (focused / named) ===
+78CCD532 | Doctor James Monaghan | pf=4531 hm=40132 flags=268964353 md=215027 tex=0:117653:0|1:55995:0|2:40903:0|3:55994:0|4:56001:0 mesh=0:20007:55996:2|0:40132:0:4
+78CCD52F | Sharon Goldman | pf=4531 hm=40664 flags=268964353 md=215029 tex=0:0:0|1:46219:0|2:45792:0|3:46220:0|4:46221:0 mesh=0:40664:0:4
+78CCD536 | Pedro Gavrillo | pf=4531 hm=40715 flags=268964353 md=215028 tex=0:0:0|1:81912:0|2:81914:0|3:81909:0|4:81917:0 mesh=0:40715:0:4
+78CCD538 | Trond McDougal | pf=4531 hm=40283 flags=268964353 md=215025 tex=0:0:0|1:42249:0|2:42260:0|3:42247:0|4:42248:0 mesh=0:40283:0:4
+78CCD535 | Winnie Glowtail | pf=4531 hm=40665 flags=268964353 md=215023 tex=0:40972:0|1:40942:0|2:40962:0|3:40921:0|4:40982:0 mesh=0:40665:0:4
+78CCD53A | Luna Erke | pf=4531 hm=40137 flags=268964353 md=26143 tex=0:0:0|1:40900:0|2:42235:0|3:40894:0|4:40909:0 mesh=0:40137:0:4
+7963A853 | Scientist Drake Rodriguez | pf=4001 hm=40694 flags=277352961 md=26092 tex=0:213851:0|1:213751:0|2:213807:0|3:213708:0|4:213925:0 mesh=0:20108:215300:2|0:40694:0:4|5:214715:0:0
+787B53FF | Emissary of Jobe | pf=4310 hm=40656 flags=277352961 md=215047 tex=0:215295:0|1:213751:0|2:213807:0|3:215296:0|4:215294:0 mesh=0:40656:0:4
+787B5400 | Guardian of the Weak | pf=4310 hm=40111 flags=268964353 md=26097 tex=0:215295:0|1:213751:0|2:213807:0|3:215296:0|4:213925:0 mesh=0:20007:215300:2|0:40111:0:4
+798C1F89 | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+787B5401 | Joshua Falker | pf=4310 hm=223820 flags=277352961 md=259896 tex=0:248006:0|1:247963:0|2:247978:0|3:247917:0|4:248056:0 mesh=0:234530:0:0|0:223820:0:4
+798C1CEA | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798E09BC | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798E09BD | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798E09BE | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798E09BF | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9E | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F8B | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F8C | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F95 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F98 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9D | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9F | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9C | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F82 | Dreaming Silvertail | pf=4310 hm= flags=277352961 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F94 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F97 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F93 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F96 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894DE | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9C | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F97 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9C | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F96 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9C | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9A | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9B | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1EE2 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1EE3 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F4E | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F4F | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F96 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F4C | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894DB | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1EE4 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F54 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F54 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798E09E9 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F54 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894DE | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F54 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F53 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F54 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798A31CE | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1901 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1942 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F50 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F51 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F83 | Dreaming Silvertail | pf=4310 hm= flags=277352961 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F84 | Dreaming Silvertail | pf=4310 hm= flags=277352961 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+79841864 | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F9E | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894FC | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894FB | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+79841864 | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894FD | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+7988911E | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798A3568 | Dreaming Silvertail | pf=4310 hm= flags=277352961 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F52 | Dreaming Silvertail | pf=4310 hm= flags=277352961 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798894FF | Swift Silvertail | pf=4310 hm= flags=268964353 md=208922 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F96 | Barking Chimera | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+798C1F0D | Yuttos Nascence Geosurvey Dog | pf=4310 hm= flags=268964353 md=209173 tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 mesh=
+
+=== FOLLOWTARGET PATH SAMPLES (Chimera) ===
+798C1F9E ? n=62 sample=[(831.743225, 31.992979, 1115.19653), (831.743225, 31.992979, 1115.19653), (833.159241, 31.3036823, 1111.42834), (833.527832, 32.0391731, 1125.11743)]
+798C1F9C ? n=61 sample=[(797.229858, 31.6197624, 1131.31653), (800.26416, 31.6332035, 1141.80859), (794.983948, 31.6655369, 1135.65271), (794.983948, 31.6655369, 1135.65271)]
+798C1F96 ? n=61 sample=[(820.264526, 31.9078712, 1151.87659), (811.038147, 31.2954693, 1164.37646), (826.927246, 32.2873383, 1153.8905), (821.251404, 31.3181438, 1159.27905)]
+798C1F97 ? n=38 sample=[(818.170715, 32.1356087, 1148.8291), (808.364502, 32.3453293, 1152.93408), (841.76239, 32.4099998, 1142.20605), (841.76239, 32.4099998, 1142.20605)]
+798894DE ? n=21 sample=[(856.749146, 32.4099998, 1139.44775), (874.051697, 31.1812534, 1126.60278), (836.961609, 32.4000015, 1157.34229), (855.724976, 36.7944984, 1123.06018)]
+798C1F0D ? n=110 sample=[(826.591187, 30.8590794, 1164.93066), (826.591187, 30.8590794, 1164.93066), (808.3396, 32.3590584, 1155.0531), (799.833435, 29.0541916, 1210.37207)]
+798C1F4F ? n=37 sample=[(817.076355, 29.0604248, 1188.59314), (830.256531, 31.1545238, 1181.52039), (807.822388, 29.7839031, 1177.86255), (805.997314, 29.4100018, 1193.33667)]
+798C1EE2 ? n=47 sample=[(795.546753, 31.8779888, 1176.49866), (797.117615, 31.6423588, 1183.37976), (797.033752, 32.1842003, 1173.65698), (789.935791, 31.5608673, 1195.7251)]
+798C1F4C ? n=47 sample=[(828.001099, 30.3730621, 1169.58069), (837.792603, 32.0788918, 1166.30579), (822.943787, 30.6363354, 1166.66602), (842.632446, 32.4099998, 1160.42114)]
+798C1EE3 ? n=60 sample=[(793.983826, 32.1124268, 1178.94958), (790.294739, 32.4099998, 1166.51917), (793.983826, 32.1124268, 1178.94958), (792.91333, 32.765377, 1184.52612)]
+798C1F54 ? n=16 sample=[(787.097839, 30.9206486, 1202.83118), (799.375305, 28.8100014, 1218.69116), (787.097839, 30.9206486, 1202.83118), (781.851074, 30.9323406, 1211.99561)]
+798C1F53 ? n=18 sample=[(791.646484, 29.6745892, 1206.5896), (791.568542, 30.8771973, 1198.65015), (795.661987, 29.4006939, 1214.3562), (791.646484, 29.6745892, 1206.5896)]
+
+=== CORPSE FULL UPDATES ===
+{'CapturedUtc': '2026-07-23T20:16:10.9395740Z', 'Direction': 'IN', 'Sequence': '510', 'ReceiverInstance': '2038313175', 'CorpseType': 'Corpse', 'CorpseInstance': '00F49802', 'CorpseIdentity': 'Corpse:00F49802', 'CorpseName': 'Remains of Barking Chimera', 'PlayfieldId': '4310', 'PositionX': '854.136719', 'PositionY': '28.4937325', 'PositionZ': '1111.16589', 'MonsterScale': '94', 'Sex': '0', 'Breed': '6', 'Race': '1', 'DeadNpcType': 'SimpleChar', 'DeadNpcInstance': '798E09BC', 'DeadNpcIdentity': 'SimpleChar:798E09BC', 'DeadNpcName': 'Barking Chimera', 'CorpseCatMesh': '208966', 'CorpseCredits': '0', 'CorpseMonsterData': '209173', 'TailDeadNpcType': 'SimpleChar', 'TailDeadNpcInstance': '798E09BC', 'TailDeadNpcIdentity': 'SimpleChar:798E09BC', 'PacketLength': '462', 'RawHex': '012C000A000101CE00000DB0797E30D74F474E050000C76A00F4980200000000080000000B0000000000000000445588C041E3F32A448AE54F00000000BF781C56000000003E7C41AB000010D60000000000000000006F000046F200000000001818050000001700000000000002BD00000000000002BE00000000000002BF000000000000019C00000001000001680000005E000000DF000000000000003B00000000000000040000000600000059000000010000019F0000C350000001A0798E09BC0000002A000330460000003D000000000000000800004650000000220000003C0000001B52656D61696E73206F66204261726B696E67204368696D657261000000000200000032000003F100000003000007E20000CF27399315470000000400000000000000010000000000000000000000000000000000000000000001F5000000010000000400033115000000000000C350798E09BC000017A600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000001000007E26C6F773200000000000000000000000000000000000000000000000000000000000330490000000000000001'}
+{'CapturedUtc': '2026-07-23T20:17:31.0910281Z', 'Direction': 'IN', 'Sequence': '953', 'ReceiverInstance': '2038313175', 'CorpseType': 'Corpse', 'CorpseInstance': '00F49805', 'CorpseIdentity': 'Corpse:00F49805', 'CorpseName': 'Remains of Swift Silvertail', 'PlayfieldId': '4310', 'PositionX': '825.543152', 'PositionY': '31.0968246', 'PositionZ': '1118.96729', 'MonsterScale': '163', 'Sex': '0', 'Breed': '6', 'Race': '1', 'DeadNpcType': 'SimpleChar', 'DeadNpcInstance': '798C1F89', 'DeadNpcIdentity': 'SimpleChar:798C1F89', 'DeadNpcName': 'Swift Silvertail', 'CorpseCatMesh': '208937', 'CorpseCredits': '0', 'CorpseMonsterData': '208922', 'TailDeadNpcType': 'SimpleChar', 'TailDeadNpcInstance': '798C1F89', 'TailDeadNpcIdentity': 'SimpleChar:798C1F89', 'PacketLength': '415', 'RawHex': '02E7000A0001019F00000DB0797E30D74F474E050000C76A00F4980500000000080000000B0000000000000000444E62C341F8C64C448BDEF4000000003E4062E0000000003F7B70F8000010D60000000000000000006F000046F200000000001818050000001700000000000002BD00000000000002BE00000000000002BF000000000000019C0000000100000168000000A3000000DF000000000000003B00000000000000040000000600000059000000010000019F0000C350000001A0798C1F890000002A000330290000003D000000000000000800004650000000220000003C0000001C52656D61696E73206F662053776966742053696C7665727461696C000000000200000032000003F100000003000007E20000CF273993154A0000000400000000000000010000000000000000000000000000000000000000000001F500000001000000040003301A000000000000C350798C1F89000017A600000000000000000000000000000001000000000000000000000002000000000000000000000003000000000000000000000004000000000000000000000000'}

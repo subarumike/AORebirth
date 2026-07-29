@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Market</title>
+  <link rel="stylesheet" href="css/gmi.css?v=20260715r">
+  <style type="text/css">
+    /* Inline critical: AO Market IE keeps stale linked CSS. No flex. */
+    body { margin:0; font-family:Verdana,Geneva,Tahoma,sans-serif; font-size:11px; color:#d4d8dc; background:#1a1c1e; }
+    #tabs { width:100%; border-collapse:collapse; background:#121416; border-bottom:1px solid #4a5058; }
+    #tabs td { padding:0; vertical-align:bottom; }
+    #tabs a.tab { display:block; color:#b8bcc0; text-decoration:none; padding:6px 12px; background:#2a2e32; border:1px solid #3a4048; border-bottom:none; margin-right:2px; white-space:nowrap; }
+    #tabs a.tab.active { color:#fff; background:#3a424c; border-color:#5a646c; font-weight:bold; }
+    .panel { display:none; }
+    .panel.active { display:block; }
+    #panels { padding:8px 10px 10px; }
+    .inv-top { width:100%; border-collapse:separate; border-spacing:8px 0; margin:0 0 6px 0; }
+    .inv-top td { width:50%; vertical-align:top; background:#22262a; border:1px solid #3a4048; padding:8px 10px; }
+    .two-col { width:100%; border-collapse:separate; border-spacing:10px 0; }
+    .two-col td { width:50%; vertical-align:top; }
+    a.btn, span.btn {
+      display:inline-block; border:1px solid #1a1c1e !important; background:#c8d0d8 !important; color:#111 !important;
+      padding:4px 12px !important; cursor:pointer; min-width:64px; text-align:center; text-decoration:none !important;
+      font-family:Verdana,Geneva,Tahoma,sans-serif !important; font-size:11px !important; font-weight:bold !important;
+      margin-right:4px; margin-bottom:2px;
+    }
+    a.btn.primary, span.btn.primary { background:#9eb4c8 !important; color:#000 !important; }
+    span.btn.disabled { background:#6a7078 !important; color:#222 !important; cursor:default; }
+    .inv-actions { margin:4px 0 6px 0; padding:4px 0; border-top:1px solid #2e343a; border-bottom:1px solid #2e343a; }
+    .table-wrap.inv { height:320px !important; max-height:320px !important; overflow:auto !important; border:1px solid #3a4048; background:#181a1c; }
+    .table-wrap.stats { height:420px !important; max-height:420px !important; overflow:auto !important; border:1px solid #3a4048; background:#181a1c; }
+    .stats-name {
+      overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+      max-width:140px;
+    }
+    .stats-amt { width:52px; white-space:nowrap; }
+    a.info-btn, .info-btn {
+      display:inline-block; width:16px; height:16px; line-height:16px; text-align:center;
+      border:1px solid #6a7078; background:#3a424c; color:#e0e4e8 !important;
+      text-decoration:none !important; font-size:10px; font-weight:bold;
+      font-family:Verdana,Geneva,Tahoma,sans-serif;
+    }
+    .table-wrap.short { height:120px; overflow:auto; border:1px solid #3a4048; background:#181a1c; }
+    .grid { width:100%; border-collapse:collapse; }
+    .grid th, .grid td { border-bottom:1px solid #2a2e32; padding:3px 6px; text-align:left; vertical-align:middle; }
+    .grid th { background:#2a2e32; color:#c8ccd0; font-weight:normal; }
+    .grid tr.selected td { background:#2a3a4a; }
+    .grid .empty-row, .grid .empty-slot { color:#7a8086; font-style:italic; }
+    .page-head h1 { margin:0 0 6px 0; font-size:15px; font-weight:normal; color:#e8ecf0; }
+    .section-title { margin:8px 0 4px; font-size:12px; color:#c8d0d8; font-weight:bold; }
+    .credits { color:#d8d8d8; font-weight:bold; }
+    .help, .hint, .muted, .note { color:#9aa0a6; }
+    .msg { margin:4px 0 0; color:#e0c070; }
+    .msg.err { color:#e07070; }
+    .msg.ok { color:#70c070; }
+    .text { background:#111314; color:#e0e4e8; border:1px solid #6a7078; padding:2px 5px; font:inherit; }
+    .modal { position:absolute; left:0; top:0; width:100%; height:100%; z-index:50; background:transparent !important; filter:none !important; }
+    .modal-bg {
+      position:absolute; left:0; top:0; width:100%; height:100%;
+      background:#000000; filter:alpha(opacity=70); z-index:50;
+    }
+    .modal-box {
+      width:420px; margin:40px auto; background:#1e2226; border:1px solid #5a6068;
+      padding:12px 14px; color:#e0e4e8; position:relative; z-index:51;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <table id="tabs" cellpadding="0" cellspacing="0">
+    <tr>
+      <td><a class="tab active" href="#" data-tab="inventory">Inventory</a></td>
+      <td><a class="tab" href="#" data-tab="orders">My Orders</a></td>
+      <td><a class="tab" href="#" data-tab="log">Log</a></td>
+      <td><a class="tab" href="#" data-tab="search">Search</a></td>
+      <td><a class="tab" href="#" data-tab="deliveries">Deliveries</a></td>
+      <td><a class="tab" href="#" data-tab="statistics">Statistics</a></td>
+      <td style="width:100%">&nbsp;</td>
+    </tr>
+  </table>
+
+  <div id="panels">
+    <!-- Inventory -->
+    <div class="panel active" id="panel-inventory">
+      <div class="page-head">
+        <h1>Inventory</h1>
+        <div id="gmiNotice" class="notice" style="display:none"></div>
+      </div>
+
+      <table class="inv-top" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <div class="inv-card-title">Market Account</div>
+            <div class="balance-line">
+              Account Balance: <span id="vaultCredits" class="credits">0</span> credits.
+            </div>
+            <a href="#" id="btnWithdrawCredits" class="btn">Withdraw</a>
+          </td>
+          <td>
+            <div class="inv-card-title">Deposit</div>
+            <div class="btn-row">
+              <span class="btn disabled" aria-disabled="true">Redeem</span>
+              <a href="#" id="btnDeposit" class="btn primary">Deposit</a>
+              <a href="#" id="btnRefresh" class="btn">Refresh</a>
+            </div>
+            <p class="help">
+              In order to use the market, you have to transfer credits and items from your inventory to your market inventory.
+            </p>
+            <p id="depositMsg" class="msg"></p>
+          </td>
+        </tr>
+      </table>
+
+      <div class="inv-list-head" style="text-align:right;margin:4px 0">
+        <span class="muted">Search inventory</span>
+        <input type="text" id="invFilter" class="text" style="width:160px" placeholder="">
+      </div>
+
+      <!-- Buttons ABOVE list so AO window always shows Sell/Withdraw -->
+      <div class="inv-actions">
+        <a href="#" id="btnSellItem" class="btn">Sell</a>
+        <span class="btn disabled" aria-disabled="true">Details</span>
+        <a href="#" id="btnWithdrawItem" class="btn">Withdraw</a>
+        <span class="btn disabled" aria-disabled="true">Use</span>
+      </div>
+
+      <div class="table-wrap inv" id="vaultItemsWrap" style="height:320px !important;max-height:320px !important;overflow:auto !important;border:1px solid #3a4048;background:#181a1c">
+        <table id="vaultItems" class="grid" style="width:100%">
+          <thead>
+            <tr>
+              <th class="col-sel"></th>
+              <th class="col-icon">Icon</th>
+              <th class="col-ql">QL</th>
+              <th class="col-count">Count</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="slot-meta" style="text-align:right;margin:2px 0 4px;color:#9aa0a6">
+        <span id="slotFree">(21/21 free)</span>
+      </div>
+    </div>
+
+    <!-- My Orders -->
+    <div class="panel" id="panel-orders">
+      <div class="page-head"><h1>My Orders</h1></div>
+
+      <h2 class="section-title">My Sell Orders</h2>
+      <div class="table-wrap short">
+        <table class="grid" id="mySellOrders">
+          <thead>
+            <tr>
+              <th class="col-sel"></th>
+              <th class="col-icon">Icon</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th class="col-ql">QL</th>
+              <th class="col-count">Count</th>
+              <th>Expiration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="empty-row">No sell orders.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer-actions" style="margin:4px 0 8px">
+        <a href="#" id="btnCancelSell" class="btn">Cancel</a>
+        <span class="btn disabled">Modify</span>
+        <span class="btn disabled">Details</span>
+      </div>
+
+      <h2 class="section-title">My Buy Orders</h2>
+      <div class="table-wrap short">
+        <table class="grid" id="myBuyOrders">
+          <thead>
+            <tr>
+              <th class="col-sel"></th>
+              <th class="col-icon">Icon</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th class="col-ql">Min QL</th>
+              <th class="col-ql">Max QL</th>
+              <th class="col-count">Count</th>
+              <th>Expiration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="8" class="empty-row">No buy orders.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer-actions" style="margin:4px 0">
+        <a href="#" id="btnCancelBuy" class="btn">Cancel</a>
+        <span class="btn disabled">Modify</span>
+        <span class="btn disabled">Details</span>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="panel" id="panel-log">
+      <div class="page-head"><h1>Sales Log</h1></div>
+      <h2 class="section-title">Recent Transactions</h2>
+      <div class="table-wrap" style="height:280px;overflow:auto;border:1px solid #3a4048;background:#181a1c">
+        <table class="grid" id="logTable">
+          <thead>
+            <tr>
+              <th style="width:140px">Date</th>
+              <th style="width:50px">Type</th>
+              <th>Message</th>
+              <th style="width:90px">With</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4" class="empty-row">No transactions yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="logMsg" class="msg"></p>
+    </div>
+
+    <!-- Search -->
+    <div class="panel" id="panel-search">
+      <div class="page-head" style="margin:0 0 4px 0"><h1 style="margin:0;font-size:15px">Search</h1></div>
+      <div class="search-form" style="background:#22262a;border:1px solid #3a4048;padding:8px 10px;margin-bottom:6px">
+        <div class="form-row" style="margin-bottom:6px">
+          <label style="display:inline-block;width:70px">Name</label>
+          <input type="text" id="searchName" class="text" style="width:70%" value="">
+        </div>
+        <div class="form-row" style="margin-bottom:6px">
+          <label style="display:inline-block;width:70px">Category</label>
+          <select id="searchCategory" class="text">
+            <option>Armor</option>
+            <option>Weapon</option>
+            <option>Implant</option>
+            <option>Nano</option>
+            <option>Misc</option>
+          </select>
+          <a href="#" id="btnSearch" class="btn primary" style="margin-left:8px">Search</a>
+        </div>
+      </div>
+      <h2 class="section-title" style="margin:4px 0">Sell Orders</h2>
+      <div class="table-wrap" id="searchResultsWrap" style="height:380px !important;max-height:380px !important;overflow:auto !important;border:1px solid #3a4048;background:#181a1c">
+        <table class="grid" id="searchResults" style="width:100%">
+          <thead>
+            <tr>
+              <th class="col-icon">Icon</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th class="col-ql">QL</th>
+              <th class="col-count">Count</th>
+              <th>Seller</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" class="empty-row">Enter a name and click Search.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="searchMsg" class="msg"></p>
+    </div>
+
+    <!-- Deliveries -->
+    <div class="panel" id="panel-deliveries">
+      <div class="page-head"><h1>Outgoing Deliveries</h1></div>
+      <h2 class="section-title">Pending Deliveries</h2>
+      <div class="table-wrap short">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th class="col-icon">Icon</th>
+              <th class="col-ql">QL</th>
+              <th class="col-count">Count</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="4" class="empty-row">
+                No mail is being sent to your character from the market at this time.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tips">
+        <h2 class="section-title">Delivery Service</h2>
+        <p>
+          The Omni-Trade GMI offers delivery of items and credits to any mail terminal on Rubi-Ka.
+          Transactions are screened and verified, which may take several minutes.
+        </p>
+      </div>
+    </div>
+
+    <!-- Statistics: live layout Most Popular | Most Buy Orders -->
+    <div class="panel" id="panel-statistics">
+      <div class="page-head" style="margin:0 0 4px 0"><h1 style="margin:0;font-size:15px">Statistics</h1></div>
+      <table class="two-col stats-layout" cellpadding="0" cellspacing="0" style="width:100%;height:100%;border-collapse:separate;border-spacing:8px 0">
+        <tr>
+          <td style="width:50%;vertical-align:top">
+            <h2 class="section-title" style="margin:2px 0 4px;font-size:12px;font-weight:bold;color:#c8d0d8">Most Popular Items (Sales Per Month)</h2>
+            <div class="table-wrap stats" id="statsSellWrap" style="height:420px !important;max-height:420px !important;overflow:auto !important;border:1px solid #3a4048;background:#181a1c">
+              <table class="grid" id="statsSell" style="width:100%;table-layout:fixed">
+                <thead>
+                  <tr>
+                    <th class="col-icon" style="width:32px">Icon</th>
+                    <th style="width:52px">Sales</th>
+                    <th>Name</th>
+                    <th class="col-info" style="width:28px"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="4" class="empty-row">No sell stats yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
+          <td style="width:50%;vertical-align:top">
+            <h2 class="section-title" style="margin:2px 0 4px;font-size:12px;font-weight:bold;color:#c8d0d8">Most Popular Buys (Per Month)</h2>
+            <div class="table-wrap stats" id="statsBuyWrap" style="height:420px !important;max-height:420px !important;overflow:auto !important;border:1px solid #3a4048;background:#181a1c">
+              <table class="grid" id="statsBuy" style="width:100%;table-layout:fixed">
+                <thead>
+                  <tr>
+                    <th class="col-icon" style="width:32px">Icon</th>
+                    <th style="width:56px">Buys</th>
+                    <th>Name</th>
+                    <th class="col-info" style="width:28px"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="4" class="empty-row">No buy stats yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Item detail: sell orders | buy orders for one item -->
+    <div class="panel" id="panel-itemdetail">
+      <div class="page-head">
+        <h1>Item Orders</h1>
+        <a href="#" id="btnItemDetailBack" class="btn">Back to Statistics</a>
+      </div>
+      <div class="item-head" id="itemDetailHead" style="margin:6px 0;padding:6px;background:#22262a;border:1px solid #3a4048">
+        <span class="title" id="itemDetailTitle">Item</span>
+      </div>
+      <table class="two-col" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <h2 class="section-title">Sell Orders</h2>
+            <div class="table-wrap short">
+              <table class="grid" id="itemSellOrders">
+                <thead>
+                  <tr>
+                    <th class="col-icon">Icon</th>
+                    <th>Price</th>
+                    <th class="col-ql">QL</th>
+                    <th class="col-count">Count</th>
+                    <th>Seller</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="5" class="empty-row">No sell orders.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:6px">
+              <a href="#" id="btnCreateSell" class="btn primary">Create Sell Order</a>
+              <a href="#" id="btnBuyFromItem" class="btn">Buy Selected</a>
+            </div>
+          </td>
+          <td>
+            <h2 class="section-title">Buy Orders</h2>
+            <div class="table-wrap short">
+              <table class="grid" id="itemBuyOrders">
+                <thead>
+                  <tr>
+                    <th class="col-icon">Icon</th>
+                    <th>Price</th>
+                    <th class="col-ql">Min</th>
+                    <th class="col-ql">Max</th>
+                    <th class="col-count">Count</th>
+                    <th>Buyer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="6" class="empty-row">No buy orders.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:6px">
+              <a href="#" id="btnSellToBuy" class="btn primary">Sell Item</a>
+              <a href="#" id="btnCreateBuy" class="btn">Create Buy Order</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <p id="itemDetailMsg" class="msg"></p>
+    </div>
+  </div>
+</div>
+<script src="js/gmi.js?v=20260715r"></script>
+
+<!-- Credit withdraw modal -->
+<div id="modalCredits" class="modal" style="display:none">
+  <div class="modal-bg"></div>
+  <div class="modal-box">
+    <div class="modal-title" style="font-size:15px;margin-bottom:8px;color:#fff">Withdraw</div>
+    <p>How much money do you want to withdraw?</p>
+    <p>Account Balance: <span id="modalCreditsBalance" class="credits">0</span> credits.</p>
+    <div class="form-row">
+      <label>Amount to withdraw:</label>
+      <input type="text" id="withdrawAmount" class="text" value="0">
+      <a href="#" id="btnCreditsSend" class="btn primary">Withdraw</a>
+    </div>
+    <div class="footer-actions" style="margin-top:10px">
+      <a href="#" id="btnCreditsCancel" class="btn">Cancel</a>
+    </div>
+  </div>
+</div>
+
+<!-- Item withdraw modal -->
+<div id="modalItem" class="modal" style="display:none">
+  <div class="modal-bg"></div>
+  <div class="modal-box">
+    <div class="modal-title" style="font-size:15px;margin-bottom:8px;color:#fff">Withdraw</div>
+    <p>Select number of units to send to your character and press send.</p>
+    <table class="grid">
+      <thead><tr><th class="col-icon">Icon</th><th class="col-ql">QL</th><th>Name</th><th class="col-count">Count</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="col-icon" id="modalItemIcon"></td>
+          <td class="col-ql" id="modalItemQl"></td>
+          <td id="modalItemName"></td>
+          <td class="col-count">
+            <input type="text" id="withdrawItemCount" class="text" value="1" style="width:48px">
+            <span id="modalItemMax" class="muted">(max 1)</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="footer-actions" style="margin-top:10px">
+      <a href="#" id="btnItemSend" class="btn primary">Send</a>
+      <a href="#" id="btnItemCancel" class="btn">Cancel</a>
+    </div>
+  </div>
+</div>
+
+<!-- Sell modal -->
+<div id="modalSell" class="modal" style="display:none">
+  <div class="modal-bg"></div>
+  <div class="modal-box">
+    <div class="modal-title" style="font-size:15px;margin-bottom:8px;color:#fff">Sell</div>
+    <p>Set a price for the selected market inventory item.</p>
+    <table class="grid">
+      <thead><tr><th class="col-icon">Icon</th><th class="col-ql">QL</th><th>Name</th><th class="col-count">Count</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="col-icon" id="modalSellIcon"></td>
+          <td class="col-ql" id="modalSellQl"></td>
+          <td id="modalSellName"></td>
+          <td class="col-count">
+            <input type="text" id="sellCount" class="text" value="1" style="width:48px">
+            <span id="modalSellMax" class="muted">(max 1)</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-row" style="margin-top:10px">
+      <label>Price each:</label>
+      <input type="text" id="sellPrice" class="text" value="0">
+      <span class="muted">credits (per unit)</span>
+    </div>
+    <div class="footer-actions" style="margin-top:10px">
+      <a href="#" id="btnSellSend" class="btn primary">List for Sale</a>
+      <a href="#" id="btnSellCancel" class="btn">Cancel</a>
+    </div>
+  </div>
+</div>
+
+<!-- Buy quantity modal (unit price * count) -->
+<div id="modalBuyQty" class="modal" style="display:none">
+  <div class="modal-bg"></div>
+  <div class="modal-box">
+    <div class="modal-title" style="font-size:15px;margin-bottom:8px;color:#fff">Buy</div>
+    <p>How many units do you want to buy?</p>
+    <table class="grid">
+      <thead><tr><th class="col-icon">Icon</th><th class="col-ql">QL</th><th>Name</th><th class="col-count">Available</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="col-icon" id="modalBuyQtyIcon"></td>
+          <td class="col-ql" id="modalBuyQtyQl"></td>
+          <td id="modalBuyQtyName"></td>
+          <td class="col-count" id="modalBuyQtyAvail">1</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-row" style="margin-top:10px">
+      <label>Count:</label>
+      <input type="text" id="buyQtyCount" class="text" value="1" style="width:48px"
+             onkeyup="if(window.gmiUpdateBuyQtyTotal)window.gmiUpdateBuyQtyTotal();"
+             onblur="if(window.gmiUpdateBuyQtyTotal)window.gmiUpdateBuyQtyTotal();">
+      <span id="modalBuyQtyMax" class="muted">(max 1)</span>
+    </div>
+    <div class="form-row" style="margin-top:6px">
+      <label>Price each:</label>
+      <span id="modalBuyQtyUnit" class="credits">0</span> credits
+    </div>
+    <div class="form-row" style="margin-top:4px">
+      <label>Total:</label>
+      <span id="modalBuyQtyTotal" class="credits">0</span> credits
+    </div>
+    <div class="footer-actions" style="margin-top:10px">
+      <a href="javascript:void(0)" id="btnBuyQtySend" class="btn primary"
+         onclick="if(window.gmiConfirmBuyQty){window.gmiConfirmBuyQty();}return false;">Buy</a>
+      <a href="javascript:void(0)" id="btnBuyQtyCancel" class="btn"
+         onclick="if(window.gmiCancelBuyQty){window.gmiCancelBuyQty();}return false;">Cancel</a>
+    </div>
+  </div>
+</div>
+
+<!-- Item info popup (Statistics i button) -->
+<div id="modalItemInfo" class="modal" style="display:none">
+  <div class="modal-bg"></div>
+  <div class="modal-box">
+    <div class="modal-title" style="font-size:15px;margin-bottom:8px;color:#fff">Item Info</div>
+    <table class="grid">
+      <tbody>
+        <tr>
+          <td class="col-icon" id="modalInfoIcon"></td>
+          <td>
+            <div id="modalInfoName" style="font-weight:bold;color:#e8ecf0"></div>
+            <div class="muted" id="modalInfoIds"></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px">
+      <div>Sales this month: <span id="modalInfoMonthSales" class="credits">0</span></div>
+      <div>Listed for sale now: <span id="modalInfoOpenSell" class="credits">0</span></div>
+      <div>Open buy orders now: <span id="modalInfoOpenBuy" class="credits">0</span></div>
+      <div>Bought this month: <span id="modalInfoMonthBuys" class="credits">0</span></div>
+    </div>
+    <div class="footer-actions" style="margin-top:12px">
+      <a href="javascript:void(0)" id="btnInfoViewOrders" class="btn primary"
+         onclick="if(window.gmiInfoViewOrders){window.gmiInfoViewOrders();}return false;">View Orders</a>
+      <a href="javascript:void(0)" id="btnInfoClose" class="btn"
+         onclick="if(window.gmiInfoClose){window.gmiInfoClose();}return false;">Close</a>
+    </div>
+  </div>
+</div>
+
+<!-- Create buy order modal -->
+<div id="modalBuyOrder" class="modal" style="display:none">
+  <div class="modal-bg"></div>
+  <div class="modal-box">
+    <div class="modal-title" style="font-size:15px;margin-bottom:8px;color:#fff">Create Buy Order</div>
+    <p id="modalBuyName">Item</p>
+    <div class="form-row" style="margin-bottom:6px">
+      <label>Unit price:</label>
+      <input type="text" id="buyOrderPrice" class="text" value="0">
+    </div>
+    <div class="form-row" style="margin-bottom:6px">
+      <label>Count:</label>
+      <input type="text" id="buyOrderCount" class="text" value="1" style="width:48px">
+    </div>
+    <div class="form-row" style="margin-bottom:6px">
+      <label>Min QL:</label>
+      <input type="text" id="buyOrderMinQl" class="text" value="1" style="width:48px">
+      <label style="margin-left:8px">Max QL:</label>
+      <input type="text" id="buyOrderMaxQl" class="text" value="200" style="width:48px">
+    </div>
+    <p class="hint">Credits are reserved from your Market Account (price &times; count).</p>
+    <div class="footer-actions" style="margin-top:10px">
+      <a href="#" id="btnBuyOrderSend" class="btn primary">Place Buy Order</a>
+      <a href="#" id="btnBuyOrderCancel" class="btn">Cancel</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

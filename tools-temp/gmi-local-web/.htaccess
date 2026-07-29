@@ -1,0 +1,6 @@
+# Force AO Market browser to re-fetch GMI pages (client disk cache is stubborn).
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  Header set Pragma "no-cache"
+  Header set Expires "0"
+</IfModule>

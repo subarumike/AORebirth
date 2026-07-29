@@ -1,0 +1,12 @@
+1145132106 b'DATJ' DATJ
+1431978573 b'UZBM' UZBM
+1128809286 b'CHCF' CHCF
+1229344584 b'IFOH' IFOH
+SPECIAL SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=480 Unknown2=480 Unknown3=480 Unknown4=480 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 411 AttackInfoMessage { Amount=411 AmmoCount=-1 WeaponSlot=3 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Critical WeaponInstance=1145132106 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 292 AttackInfoMessage { Amount=292 AmmoCount=-1 WeaponSlot=2 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Normal WeaponInstance=1431978573 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 317 AttackInfoMessage { Amount=317 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Normal WeaponInstance=1128809286 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 175 AttackInfoMessage { Amount=175 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Normal WeaponInstance=1229344584 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 164 AttackInfoMessage { Amount=164 AmmoCount=-1 WeaponSlot=3 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Normal WeaponInstance=1145132106 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 106 AttackInfoMessage { Amount=106 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Normal WeaponInstance=1128809286 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }
+HIT 126 AttackInfoMessage { Amount=126 AmmoCount=-1 WeaponSlot=3 Target=(SimpleChar:7966F05B) Unk1=0 HitType=Normal WeaponInstance=1145132106 N3MessageType=AttackInfo Identity=(SimpleChar:796C7244) Unknown=0 PacketType=N3Message }

@@ -1,0 +1,753 @@
+=== capture_info ===
+pf (Playfield2:FF02D) char Bignera
+duration 275.977
+focused ['(SimpleChar:78E0FC62)', '(SimpleChar:78E0FC63)', '(SimpleChar:79543CB6)', '(SimpleChar:797D36A5)', '(SimpleChar:797DD292)', '(SimpleChar:797DD296)', '(SimpleChar:797DD29B)', '(SimpleChar:797DD29C)', '(SimpleChar:797DD2A8)', '(SimpleChar:797DD2AA)', '(SimpleChar:797DD2B3)', '(SimpleChar:797DD2B5)', '(SimpleChar:797DD2BA)', '(SimpleChar:797DD2BB)', '(SimpleChar:797DD2CD)']
+counts {'npcInteractions': 295, 'chatDialogueMessages': 54, 'systemMessages': 1350, 'enemyFullUpdateRows': 64, 'enemyMovementRows': 4059, 'movementPacketRows': 3475, 'enemyCombatRows': 659}
+
+=== chat-dialogue ===
+2026-07-19T16:52:20.3604564Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-19T16:52:41.1407808Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js	Frantonti!!,Wri!!,Wri!!!!"sIQ Rings)Remains of Malfunctioning Cleaning Robot~" Unk2=1 }
+2026-07-19T16:53:05.9425779Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js	Frantonti!!*b.i!!*b.i!!!!"sBattered Low-Tech Armor Helmets)Remains of Malfunctioning Cleaning Robot~" Unk2=1 }
+2026-07-19T16:53:19.3535901Z [OUT-N3] #88 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:19.5444724Z [IN-N3] #2040 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:20.6826642Z [IN-N3] #2053 type=KnubotAnswerList text=I don't really feel like telling you any of my secrets. If you'll excuse me, I need to go now. | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:21.6786724Z [OUT-N3] #89 type=KnubotAnswer text= detail=KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:22.9704993Z [IN-N3] #2097 type=KnubotAnswerList text=Who said I don't have any ID? | Tell me who to talk to. | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:23.3492677Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js	Frantonti!!*b-i!!*b-i!!!!"sBattered Low-Tech Armor Glovess)Remains of Malfunctioning Cleaning Robot~" Unk2=1 }
+2026-07-19T16:53:23.9458980Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js	Frantonti!!&mDi!!&mDi!!!!"sRobot Junks)Remains of Malfunctioning Cleaning Robot~" Unk2=1 }
+2026-07-19T16:53:24.1277855Z [OUT-N3] #90 type=KnubotAnswer text= detail=KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:25.3969958Z [IN-N3] #2141 type=KnubotAnswerList text=Get to the point, Rex. | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:25.9536545Z [OUT-N3] #91 type=KnubotAnswer text= detail=KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:27.2428574Z [IN-N3] #2171 type=KnubotAnswerList text=I'll do it if you promise to tell me who your contact is. | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:27.6807913Z [OUT-N3] #92 type=KnubotAnswer text= detail=KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:28.8380768Z [IN-N3] #2201 type=KnubotAnswerList text=Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:29.3177808Z [OUT-N3] #93 type=KnubotAnswer text= detail=KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:29.4946741Z [IN-N3] #2218 type=KnubotCloseChatWindow text= detail=KnuBotCloseChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Unknown2=5 Unknown3=0 N3MessageType=KnubotCloseChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:45.9479236Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js	Frantonti!!*b0i!!*b0i!!!!"sBattered Low-Tech Armor Shortss)Remains of Malfunctioning Cleaning Robot~" Unk2=1 }
+2026-07-19T16:54:45.3428880Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-19T16:54:52.2205132Z [OUT-N3] #183 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:52.5163309Z [IN-N3] #4098 type=Knubot
+
+=== npc-interactions (first 5k) ===
+lines 295
+2026-07-19T16:51:38.6688313Z [IN-N3] #32 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:39.1174998Z [IN-N3] #41 type=CharacterAction text= detail=CharacterActionMessage { Action=100 Unknown1=0 Target=(None:001F) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC63) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:41.8703084Z [IN-N3] #92 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:43.7732605Z [OUT-N3] #1 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD292) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:44.8066230Z [IN-N3] #151 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:45.8050073Z [OUT-N3] #8 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD296) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:47.8323578Z [IN-N3] #218 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:48.2690883Z [OUT-N3] #13 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD29C) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:50.8285100Z [IN-N3] #273 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:50.9334452Z [OUT-N3] #20 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:79543CB6) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:52.6914106Z [OUT-N3] #27 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797D36A5) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:53.9166556Z [IN-N3] #341 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:54.1365174Z [IN-N3] #353 type=CharacterAction text= detail=CharacterActionMessage { Action=100 Unknown1=0 Target=(None:002F) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC63) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:54.1365174Z [OUT-N3] #30 type=CharacterAction text= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD29B) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:56.9663580Z [IN-N3] #418 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:59.9653294Z [IN-N3] #478 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 PacketType=N3Message }
+2026-07-19T16:52:02.9016033Z [IN-N3] #526 type=CharacterAction text= detail=CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2038288600 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797DD0D8) Unknown=0 
+
+=== scfu-appearance unique ===
+rows 69
+cols ['CapturedUtc', 'ElapsedMilliseconds', 'Direction', 'GlobalOrdinal', 'Sequence', 'PacketLength', 'DecodeStatus', 'DecodeError', 'BytesConsumed', 'UndecodedTailHex', 'RawPacketHex', 'RawBodyHex', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'PrePositionFightingTarget', 'FightingTarget', 'Version', 'FlagsNumeric', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NpcFamily', 'NpcLosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'AppearanceValue', 'Side', 'Fatness', 'Breed', 'Gender', 'Race', 'ScfuUnknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanos', 'WaypointOwner', 'Waypoints', 'TextureOverrides', 'Textures', 'Meshes', 'Flags2Numeric', 'Flags2', 'Owner', 'ScfuUnknown2', 'ScfuUnknown4', 'SpecialAttacks', 'ImmuneUnknown', 'UnknownFlag3Data', 'HeaderUnknown', 'TowerUnknown', 'PlayerInfo', 'N3MessageTypeNumeric', 'DecodeFullyConsumed', 'NpcUnknownDataWidth', 'ScfuUnknown3', 'LegacyExtendedRunSpeedAlignment', 'TerminalSpecialAttackSlotOmitted', 'OpaqueExtensionHex']
+  Burning Cleaning Robot | (SimpleChar:797DD29F) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797D3006) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2A6) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2A8) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Protester | (SimpleChar:7974E756) | md=203740 head=40127 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205110:0:2|0:40127:0:4|1:284183:0:2
+  Protester | (SimpleChar:79785644) | md=203740 head=40127 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205110:0:2|0:40127:0:4|1:284183:0:2
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2AA) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2AD) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2AF) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Laszuka | (SimpleChar:7966F184) | md=0 head=40185 pos=
+    tex=0:0:0|1:9404:0|2:0:0|3:0:0|4:0:0
+    mesh=0:234530:0:0|0:40185:0:4|1:7777:0:2
+  Bureaucrat Worker | (SimpleChar:797DD27A) | md=96056 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Burning Cleaning Robot | (SimpleChar:797DD2B0) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2B3) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2B5) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Bruiser | (SimpleChar:797DD2B7) | md=26088 head=40687 pos=
+    tex=0:0:0|1:81912:0|2:81914:0|3:81909:0|4:81917:0
+    mesh=0:40687:0:4|1:7826:0:2
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2B8) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2BA) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2BB) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Kneebreaker Alfonzo Rizzolo | (SimpleChar:797DD2BC) | md=165196 head=40117 pos=
+    tex=0:0:0|1:284557:0|2:247977:0|3:247887:0|4:248016:0
+    mesh=0:40117:0:4
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2BE) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD2C1) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD2C2) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2C3) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD2C4) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2C8) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Flint Novak | (SimpleChar:78E0FC64) | md=26133 head=40251 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205116:0:2|0:40251:0:4|1:258983:0:2
+  Wounded Dockworker | (SimpleChar:78E0FC72) | md=296008 head=40130 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205110:0:2|0:40130:0:4
+  Dockworker | (SimpleChar:79666CF1) | md=26137 head=40209 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205112:0:2|0:40209:0:4|1:292936:0:2
+  Stenchey | (SimpleChar:7966F134) | md=0 head=40182 pos=
+    tex=0:0:0|1:0:0|2:9407:0|3:9405:0|4:9401:0
+    mesh=0:234530:0:0|0:40182:0:4|1:233252:0:2|5:268606:268223:0
+  Cleaning Robot | (SimpleChar:797D348B) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD09A) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD21B) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD226) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  ? | ? | md= head= pos=
+    tex=
+    mesh=
+  Wounded Dockworker | (SimpleChar:78E0FC70) | md=296008 head=40130 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205110:0:2|0:40130:0:4
+  Wounded Dockworker | (SimpleChar:78E0FC71) | md=296008 head=40130 pos=
+    tex=0:295555:0|1:295553:0|2:295554:0|3:295552:0|4:295556:0
+    mesh=0:205110:0:2|0:40130:0:4
+  Cleaning Robot | (SimpleChar:796DDBFE) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797B9D81) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Burning Cleaning Robot | (SimpleChar:797C7FF4) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797D304B) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD08C) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD090) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2CA) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2CB) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2CC) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Burning Cleaning Robot | (SimpleChar:797DD2CD) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Garbage Flea | (SimpleChar:797DD223) | md=17657 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Cleaning Robot | (SimpleChar:797DD091) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2CF) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2D0) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2D1) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2D6) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2D7) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2D9) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Malfunctioning Cleaning Robot | (SimpleChar:797DD2DC) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+  Burning Cleaning Robot | (SimpleChar:797DD2DE) | md=297023 head= pos=
+    tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0
+    mesh=
+
+=== enemy-dossier names ===
+{'identity': '(SimpleChar:78E0FC62)', 'name': 'Marcus Stone', 'monsterData': '258744', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '53', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 15, 'currentHealth': 117800, 'maxHealth': 117800, 'position': {'x': 3630.13062, 'y': 40.9849968, 'z': 824.1919}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 277}
+{'identity': '(SimpleChar:78E0FC63)', 'name': 'Rex Larsson', 'monsterData': '26074', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '53', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 15, 'currentHealth': 511, 'maxHealth': 511, 'position': {'x': 3624.06128, 'y': 51.745, 'z': 787.764648}, 'firstSeenUtc': '2026-07-19T16:51:38.7237971Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 274}
+{'identity': '(SimpleChar:78E0FC64)', 'name': 'Flint Novak', 'monsterData': '26133', 'monsterScale': '90', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40251', 'runSpeed': '70', 'npcFamily': '137', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 20, 'currentHealth': 559, 'maxHealth': 559, 'position': {'x': 3598.331, 'y': 5.11000061, 'z': 862.9781}, 'firstSeenUtc': '2026-07-19T16:55:09.6932212Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:78E0FC6E)', 'name': 'Wounded Dockworker', 'monsterData': '296008', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '31', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 32, 'position': {'x': 3583.53149, 'y': 40.9649963, 'z': 831.2881}, 'firstSeenUtc': '2026-07-19T16:51:38.1904646Z', 'lastUpdateUtc': '2026-07-19T16:56:13.4553623Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 543}
+{'identity': '(SimpleChar:78E0FC6F)', 'name': 'Wounded Dockworker', 'monsterData': '296008', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '31', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 32, 'position': {'x': 3605.37866, 'y': 40.9649963, 'z': 838.229553}, 'firstSeenUtc': '2026-07-19T16:51:38.1934691Z', 'lastUpdateUtc': '2026-07-19T16:56:13.4563619Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 543}
+{'identity': '(SimpleChar:78E0FC70)', 'name': 'Wounded Dockworker', 'monsterData': '296008', 'monsterScale': '90', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40130', 'runSpeed': '31', 'npcFamily': '137', 'losHeight': '3000', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 32, 'position': {'x': 3621.29224, 'y': 37.565, 'z': 855.1413}, 'firstSeenUtc': '2026-07-19T16:55:09.7311978Z', 'lastUpdateUtc': '2026-07-19T16:56:13.4563619Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 128}
+{'identity': '(SimpleChar:78E0FC71)', 'name': 'Wounded Dockworker', 'monsterData': '296008', 'monsterScale': '90', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40130', 'runSpeed': '31', 'npcFamily': '137', 'losHeight': '3000', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 32, 'position': {'x': 3620.278, 'y': 31.205, 'z': 873.665833}, 'firstSeenUtc': '2026-07-19T16:55:09.7311978Z', 'lastUpdateUtc': '2026-07-19T16:56:13.4563619Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 128}
+{'identity': '(SimpleChar:78E0FC72)', 'name': 'Wounded Dockworker', 'monsterData': '296008', 'monsterScale': '90', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40130', 'runSpeed': '31', 'npcFamily': '137', 'losHeight': '3000', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 32, 'position': {'x': 3599.11182, 'y': 25.585, 'z': 878.1775}, 'firstSeenUtc': '2026-07-19T16:55:09.7012164Z', 'lastUpdateUtc': '2026-07-19T16:56:13.4563619Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 128}
+{'identity': '(SimpleChar:78E0FC76)', 'name': 'Bodyguard Logan Fixx', 'monsterData': '247041', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '347', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 100, 'currentHealth': 13658, 'maxHealth': 13658, 'position': {'x': 3602.789, 'y': 8.145, 'z': 819.8485}, 'firstSeenUtc': '2026-07-19T16:51:38.7297934Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:78E0FC77)', 'name': 'Desmond Calitri', 'monsterData': '295565', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '70', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 20, 'currentHealth': 559, 'maxHealth': 559, 'position': {'x': 3605.20337, 'y': 8.075, 'z': 826.8822}, 'firstSeenUtc': '2026-07-19T16:51:38.7297934Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:78E0FC8A)', 'name': 'Surveillance Droid', 'monsterData': '210238', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '21', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 6, 'currentHealth': 69, 'maxHealth': 69, 'position': {'x': 3567.518, 'y': 5.11000061, 'z': 820.3735}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:79467135)', 'name': 'Obedience Enforcement', 'monsterData': '165196', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 138, 'maxHealth': 138, 'position': {'x': 3613.83618, 'y': 5.11000061, 'z': 820.3293}, 'firstSeenUtc': '2026-07-19T16:51:38.7297934Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:79543CB6)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 12, 'position': {'x': 3596.979, 'y': 51.745, 'z': 783.935852}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 275}
+{'identity': '(SimpleChar:795B7D25)', 'name': 'Dockworker', 'monsterData': '26143', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3606.87549, 'y': 6.91000032, 'z': 774.8848}, 'firstSeenUtc': '2026-07-19T16:51:38.7257959Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:795B7D31)', 'name': 'Dockworker', 'monsterData': '26143', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3568.42627, 'y': 6.085, 'z': 747.965454}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:55:10.1743429Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 211}
+{'identity': '(SimpleChar:79666CF1)', 'name': 'Dockworker', 'monsterData': '26137', 'monsterScale': '92', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40209', 'runSpeed': '14', 'npcFamily': '137', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 3, 'currentHealth': 3495, 'maxHealth': 3495, 'position': {'x': 3586.60522, 'y': 40.9649963, 'z': 844.243}, 'firstSeenUtc': '2026-07-19T16:55:09.7012164Z', 'lastUpdateUtc': '2026-07-19T16:56:13.0296239Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 77}
+{'identity': '(SimpleChar:796DDBFE)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 12, 'position': {'x': 3625.45, 'y': 5.11000061, 'z': 843.185}, 'firstSeenUtc': '2026-07-19T16:55:09.7623096Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:796FCA45)', 'name': 'Protester', 'monsterData': '203740', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '11', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 2, 'currentHealth': 48, 'maxHealth': 48, 'position': {'x': 3620.45459, 'y': 5.74065256, 'z': 812.9711}, 'firstSeenUtc': '2026-07-19T16:51:38.7297934Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:796FCF2D)', 'name': 'Dockworker', 'monsterData': '203740', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3563.45166, 'y': 5.11000061, 'z': 794.2495}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:796FCFED)', 'name': 'Dockworker', 'monsterData': '203740', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3577.45923, 'y': 6.91000032, 'z': 779.729248}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:796FCFFA)', 'name': 'Dockworker', 'monsterData': '26074', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3583.232, 'y': 6.91000032, 'z': 767.5346}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:7974E756)', 'name': 'Protester', 'monsterData': '203740', 'monsterScale': '91', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40127', 'runSpeed': '11', 'npcFamily': '103', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 2, 'currentHealth': 48, 'maxHealth': 48, 'position': {'x': 3561.00562, 'y': 5.11000061, 'z': 801.1627}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:55:33.3659401Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 159}
+{'identity': '(SimpleChar:79757025)', 'name': 'Dockworker', 'monsterData': '26143', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3571.55542, 'y': 6.91000032, 'z': 765.4441}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:7977D7CA)', 'name': 'Dockworker', 'monsterData': '26143', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 115, 'maxHealth': 115, 'position': {'x': 3580.067, 'y': 5.11000061, 'z': 803.329346}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:79785644)', 'name': 'Protester', 'monsterData': '203740', 'monsterScale': '91', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '40127', 'runSpeed': '11', 'npcFamily': '103', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 2, 'currentHealth': 48, 'maxHealth': 48, 'position': {'x': 3560.44263, 'y': 5.11000061, 'z': 799.608643}, 'firstSeenUtc': '2026-07-19T16:52:56.0356757Z', 'lastUpdateUtc': '2026-07-19T16:55:15.2101964Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 54}
+{'identity': '(SimpleChar:797B9C85)', 'name': 'Obedience Enforcement', 'monsterData': '165196', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '20', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 138, 'maxHealth': 138, 'position': {'x': 3572.97461, 'y': 5.11000061, 'z': 817.5661}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6838381Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:797B9D81)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3630.80322, 'y': 40.9849968, 'z': 855.2269}, 'firstSeenUtc': '2026-07-19T16:55:09.7693137Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797C7FF4)', 'name': 'Burning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '14', 'npcFamily': '1018', 'losHeight': '3000', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 3, 'currentHealth': 35, 'maxHealth': 35, 'position': {'x': 3625.18359, 'y': 33.6949959, 'z': 877.387939}, 'firstSeenUtc': '2026-07-19T16:55:09.7703048Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797D3006)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3637.545, 'y': 40.9849968, 'z': 835.8539}, 'firstSeenUtc': '2026-07-19T16:51:38.7297934Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 262}
+{'identity': '(SimpleChar:797D304B)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3621.7373, 'y': 35.38341, 'z': 863.784546}, 'firstSeenUtc': '2026-07-19T16:55:09.7703048Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797D348B)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3561.925, 'y': 5.11000061, 'z': 871.352234}, 'firstSeenUtc': '2026-07-19T16:55:09.7022158Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797D36A5)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 12, 'position': {'x': 3596.81177, 'y': 51.745, 'z': 788.2089}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 275}
+{'identity': '(SimpleChar:797D3722)', 'name': 'Rollerrat', 'monsterData': '17687', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '18', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 5, 'currentHealth': 58, 'maxHealth': 58, 'position': {'x': 3611.87866, 'y': 2.11000013, 'z': 723.8721}, 'firstSeenUtc': '2026-07-19T16:51:38.7277949Z', 'lastUpdateUtc': '2026-07-19T16:55:10.1743429Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 211}
+{'identity': '(SimpleChar:797DD08C)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3610.32227, 'y': 28.5317383, 'z': 877.5537}, 'firstSeenUtc': '2026-07-19T16:55:09.7703048Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797DD090)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3621.28784, 'y': 37.565, 'z': 847.0569}, 'firstSeenUtc': '2026-07-19T16:55:09.7713042Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797DD091)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3591.21021, 'y': 25.585, 'z': 879.1599}, 'firstSeenUtc': '2026-07-19T16:55:33.7976733Z', 'lastUpdateUtc': '2026-07-19T16:56:10.6506131Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 40}
+{'identity': '(SimpleChar:797DD09A)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3578.65259, 'y': 5.11000061, 'z': 862.5471}, 'firstSeenUtc': '2026-07-19T16:55:09.7032151Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797DD0C3)', 'name': 'Protester', 'monsterData': '203740', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '11', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 2, 'currentHealth': 48, 'maxHealth': 48, 'position': {'x': 3592.008, 'y': 5.11000061, 'z': 820.003967}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:797DD0C6)', 'name': 'Protester', 'monsterData': '203740', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '11', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 2, 'currentHealth': 48, 'maxHealth': 48, 'position': {'x': 3575.24121, 'y': 5.11000061, 'z': 825.507935}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 272}
+{'identity': '(SimpleChar:797DD0D8)', 'name': 'Kneebreaker Alfonzo Rizzolo', 'monsterData': '165196', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '17', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 4, 'currentHealth': 0, 'maxHealth': 28, 'position': {'x': 3580.20386, 'y': 8.055, 'z': 832.7812}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:54:24.8354642Z', 'deathObserved': True, 'populationEvidenceObserved': True, 'eventCount': 175}
+{'identity': '(SimpleChar:797DD21B)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3575.21851, 'y': 5.11000061, 'z': 873.4379}, 'firstSeenUtc': '2026-07-19T16:55:09.7032151Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797DD223)', 'name': 'Garbage Flea', 'monsterData': '17657', 'monsterScale': '125', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '25', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 12, 'position': {'x': 3560.69116, 'y': 5.11000061, 'z': 865.117065}, 'firstSeenUtc': '2026-07-19T16:55:19.7319261Z', 'lastUpdateUtc': '2026-07-19T16:55:59.5101310Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 24}
+{'identity': '(SimpleChar:797DD226)', 'name': 'Cleaning Robot', 'monsterData': '297023', 'monsterScale': '200', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '9', 'npcFamily': '1019', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 15, 'maxHealth': 15, 'position': {'x': 3587.44482, 'y': 5.11000061, 'z': 861.711548}, 'firstSeenUtc': '2026-07-19T16:55:09.7032151Z', 'lastUpdateUtc': '2026-07-19T16:56:12.6848376Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 65}
+{'identity': '(SimpleChar:797DD25B)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 0, 'maxHealth': 12, 'position': {'x': 3619.14258, 'y': 51.745, 'z': 785.4952}, 'firstSeenUtc': '2026-07-19T16:51:38.7267953Z', 'lastUpdateUtc': '2026-07-19T16:52:44.6014353Z', 'deathObserved': True, 'populationEvidenceObserved': True, 'eventCount': 70}
+{'identity': '(SimpleChar:797DD27A)', 'name': 'Bureaucrat Worker', 'monsterData': '96056', 'monsterScale': '91', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '13', 'npcFamily': '95', 'losHeight': '0', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 2, 'currentHealth': 38, 'maxHealth': 38, 'position': {'x': 3562.10474, 'y': 5.11000061, 'z': 824.850037}, 'firstSeenUtc': '2026-07-19T16:51:38.7287941Z', 'lastUpdateUtc': '2026-07-19T16:54:41.9909560Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 102}
+{'identity': '(SimpleChar:797DD292)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 12, 'position': {'x': 3612.98242, 'y': 52.135, 'z': 787.9126}, 'firstSeenUtc': '2026-07-19T16:51:38.7267953Z', 'lastUpdateUtc': '2026-07-19T16:52:31.3713840Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 56}
+{'identity': '(SimpleChar:797DD296)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 0, 'maxHealth': 12, 'position': {'x': 3604.92676, 'y': 52.135, 'z': 790.046265}, 'firstSeenUtc': '2026-07-19T16:51:38.7267953Z', 'lastUpdateUtc': '2026-07-19T16:53:27.2438567Z', 'deathObserved': True, 'populationEvidenceObserved': True, 'eventCount': 117}
+{'identity': '(SimpleChar:797DD299)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 12, 'maxHealth': 12, 'position': {'x': 3622.53174, 'y': 51.745, 'z': 798.119934}, 'firstSeenUtc': '2026-07-19T16:51:38.7267953Z', 'lastUpdateUtc': '2026-07-19T16:51:55.8740329Z', 'deathObserved': False, 'populationEvidenceObserved': True, 'eventCount': 19}
+{'identity': '(SimpleChar:797DD29B)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 0, 'maxHealth': 12, 'position': {'x': 3618.22363, 'y': 51.745, 'z': 789.0775}, 'firstSeenUtc': '2026-07-19T16:51:38.7267953Z', 'lastUpdateUtc': '2026-07-19T16:53:10.1331252Z', 'deathObserved': True, 'populationEvidenceObserved': True, 'eventCount': 103}
+{'identity': '(SimpleChar:797DD29C)', 'name': 'Malfunctioning Cleaning Robot', 'monsterData': '297023', 'monsterScale': '', 'catMesh': '1234567890', 'visualFlags': '31', 'headMesh': '', 'runSpeed': '6', 'npcFamily': '', 'losHeight': '', 'minDamage': '1234567890', 'maxDamage': '1234567890', 'defaultAttackType': '1234567890', 'attackDelay': '1234567890', 'rechargeDelay': '1234567890', 'populationEvidenceSource': 'VISIBLE-SURVEY', 'resourcePlayfieldId': '', 'runtimePlayfieldId': '', 'capturePlayfieldIdentity': '(Playfield2:FF02D)', 'capturePlayfieldObjectId': 'FF02D', 'level': 1, 'currentHealth': 0, 'maxHealth': 12, 'position': {'x': 3603.722, 'y': 52.135, 'z': 790.2565}, 'firstSeenUtc': '2026-07-19T16:51:38.7267953Z', 'lastUpdateUtc': '2026-07-19T16:53:39.3495890Z', 'deathObserved': True, 'populationEvidenceObserved': True, 'eventCount': 127}
+
+=== event keyword counts ===
+  Rex: 1
+  Marcus: 3
+  Stone: 3
+  KnuBot: 162
+  CastNano: 93
+  InfoRequest: 16
+  LookAt: 47
+  HealthDamage: 145
+  FollowTarget: 13824
+
+=== CastNano / Mongo / HealthDamage lines ===
+2026-07-19T16:51:38.6661711Z [IN-N3] #31 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:38.6688313Z [IN-N3] #33 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:41.8703084Z [IN-N3] #91 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:41.8703084Z [IN-N3] #93 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:44.8066230Z [IN-N3] #150 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:44.8066230Z [IN-N3] #152 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:44.8076223Z [IN-N3] #153 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:51:44.8076223Z [IN-N3] #154 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:51:46.0868357Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3636.509, 40.98
+2026-07-19T16:51:46.2657254Z [IN-N3] #184 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:51:47.0022688Z [IN-N3] #200 type=SpellList identity=(SimpleChar:797DD299)
+2026-07-19T16:51:47.4399989Z [IN-N3] #208 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:51:47.4399989Z [IN-N3] #209 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:51:47.8323578Z [IN-N3] #217 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:47.8333572Z [IN-N3] #219 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:50.8285100Z [IN-N3] #272 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:50.8285100Z [IN-N3] #274 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:51.0603669Z [IN-N3] #279 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:51:53.9166556Z [IN-N3] #340 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:53.9176548Z [IN-N3] #342 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:53.9176548Z [IN-N3] #345 type=SpellList identity=(SimpleChar:797DD299)
+2026-07-19T16:51:54.9879923Z [IN-N3] #373 type=SpellList identity=(SimpleChar:797DD29C)
+2026-07-19T16:51:54.9879923Z [IN-N3] #374 type=SpellList identity=(SimpleChar:797DD29C)
+2026-07-19T16:51:56.0659145Z [IN-N3] #397 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:51:56.9663580Z [IN-N3] #417 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:56.9673576Z [IN-N3] #419 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:57.4620534Z [IN-N3] #429 type=SpellList identity=(SimpleChar:797DD296)
+2026-07-19T16:51:57.4620534Z [IN-N3] #430 type=SpellList identity=(SimpleChar:797DD296)
+2026-07-19T16:51:59.9643299Z [IN-N3] #477 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:51:59.9653294Z [IN-N3] #479 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:01.1246992Z [IN-N3] #497 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:52:01.3155838Z [IN-N3] #502 type=SpellList identity=(SimpleChar:797DD29C)
+2026-07-19T16:52:01.3165814Z [IN-N3] #503 type=SpellList identity=(SimpleChar:797DD29C)
+2026-07-19T16:52:02.9016033Z [IN-N3] #525 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:02.9016033Z [IN-N3] #527 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:04.4006810Z [IN-N3] #552 type=SpellList identity=(SimpleChar:797DD296)
+2026-07-19T16:52:04.4006810Z [IN-N3] #553 type=SpellList identity=(SimpleChar:797DD296)
+2026-07-19T16:52:05.9827031Z [IN-N3] #579 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:05.9827031Z [IN-N3] #581 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:06.1735877Z [IN-N3] #586 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:52:08.8269514Z [IN-N3] #640 type=SpellList identity=(SimpleChar:797DD25B)
+2026-07-19T16:52:08.8269514Z [IN-N3] #641 type=SpellList identity=(SimpleChar:797DD25B)
+2026-07-19T16:52:09.0508133Z [IN-N3] #643 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:09.0508133Z [IN-N3] #645 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:09.9232741Z [IN-N3] #663 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:52:09.9232741Z [IN-N3] #664 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:52:11.2594501Z [IN-N3] #689 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:52:11.2594501Z [IN-N3] #690 type=SpellList identity=(SimpleChar:797DD25B)
+2026-07-19T16:52:11.2594501Z [IN-N3] #691 type=SpellList identity=(SimpleChar:797DD25B)
+2026-07-19T16:52:11.8950569Z [IN-N3] #702 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:11.8960563Z [IN-N3] #704 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:14.3300947Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:797E3002) Parameter1=53019 Parameter2=287046 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:52:14.5759432Z [IN-N3] #743 type=CastNanoSpell identity=(SimpleChar:797E3002)
+2026-07-19T16:52:14.5759432Z [SMOKE] IN CharacterAction identity=(SimpleChar:797E3002) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=287046 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-19T16:52:14.5759432Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=287046 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:52:15.0396894Z [IN-N3] #758 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:15.0396894Z [IN-N3] #760 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:16.0700548Z [IN-N3] #778 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:52:17.9898777Z [IN-N3] #808 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:17.9908772Z [IN-N3] #810 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:18.4316076Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:52:19.0362326Z [IN-N3] #831 type=SpellList identity=(SimpleChar:797DD29C)
+2026-07-19T16:52:19.0372319Z [IN-N3] #832 type=SpellList identity=(SimpleChar:797DD29C)
+2026-07-19T16:52:21.0030612Z [IN-N3] #864 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:21.0030612Z [IN-N3] #866 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:21.2339189Z [IN-N3] #869 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:52:22.0424200Z [IN-N3] #885 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:52:22.7399886Z [IN-N3] #897 type=SpellList identity=(SimpleChar:797DD296)
+2026-07-19T16:52:22.7399886Z [IN-N3] #898 type=SpellList identity=(SimpleChar:797DD296)
+2026-07-19T16:52:24.0439006Z [IN-N3] #919 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:24.0449000Z [IN-N3] #921 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:25.1562145Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:52:26.0606590Z [IN-N3] #948 type=SpellList identity=(SimpleChar:5ED4027C)
+2026-07-19T16:52:26.0616589Z [IN-N3] #955 type=SpellList identity=(SimpleChar:797DD29F)
+2026-07-19T16:52:27.1429893Z [IN-N3] #970 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:27.1439889Z [IN-N3] #972 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:29.0787960Z [IN-N3] #1014 type=SpellList identity=(SimpleChar:797DD292)
+2026-07-19T16:52:29.5465082Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:52:30.1811158Z [IN-N3] #1036 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:30.1811158Z [IN-N3] #1038 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:30.8267187Z [IN-N3] #1052 type=SpellList identity=(SimpleChar:797DD25B)
+2026-07-19T16:52:30.8267187Z [IN-N3] #1053 type=SpellList identity=(SimpleChar:797DD25B)
+2026-07-19T16:52:33.1211833Z [IN-N3] #1089 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:33.1221909Z [IN-N3] #1091 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:35.0832945Z [IN-N3] #1121 type=SpellList identity=(SimpleChar:794D4000)
+2026-07-19T16:52:35.0832945Z [IN-N3] #1122 type=SpellList identity=(SimpleChar:795AB078)
+2026-07-19T16:52:36.1736217Z [IN-N3] #1144 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:36.1736217Z [IN-N3] #1146 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:37.1050473Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:52:39.0398519Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag PlayfieldId=1044525 Fight
+2026-07-19T16:52:39.2936975Z [IN-N3] #1217 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:39.2936975Z [IN-N3] #1219 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:42.1792977Z [IN-N3] #1262 type=SpellList identity=(SimpleChar:762ABD8A)
+2026-07-19T16:52:42.1792977Z [IN-N3] #1264 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:42.1792977Z [IN-N3] #1266 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:45.1630911Z [IN-N3] #1314 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:45.1630911Z [IN-N3] #1316 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:48.3137859Z [IN-N3] #1366 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:48.3137859Z [IN-N3] #1368 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:51.2592883Z [IN-N3] #1422 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:51.2602877Z [IN-N3] #1424 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:54.3247285Z [IN-N3] #1485 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:54.3247285Z [IN-N3] #1487 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:56.0376745Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag PlayfieldId=1044525 Fight
+2026-07-19T16:52:57.3178827Z [IN-N3] #1547 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:52:57.3188822Z [IN-N3] #1549 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:00.2591882Z [IN-N3] #1615 type=SpellList identity=(SimpleChar:794D4001)
+2026-07-19T16:53:00.2591882Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:53:00.2601870Z [IN-N3] #1623 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:00.2601870Z [IN-N3] #1625 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:00.6564352Z [IN-N3] #1629 type=HealthDamage identity=(SimpleChar:797E3002)
+2026-07-19T16:53:00.6564352Z [IN-N3-DETAIL] HealthDamageMessage { TargetHp=94 Amount=30 Stat=Flags Unk1=0 Target=(SimpleChar:797E3002) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:00.6614322Z [IN-N3] #1634 type=CastNanoSpell identity=(SimpleChar:797E3002)
+2026-07-19T16:53:00.6614322Z [IN-N3] #1636 type=SpellList identity=(SimpleChar:797E3002)
+2026-07-19T16:53:02.7018427Z [IN-N3] #1682 type=SpellList identity=(SimpleChar:797E3002)
+2026-07-19T16:53:03.3032058Z [IN-N3] #1696 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:03.3032058Z [IN-N3] #1698 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:06.5113590Z [IN-N3] #1755 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:06.5113590Z [IN-N3] #1757 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:09.4175680Z [IN-N3] #1821 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:09.4175680Z [IN-N3] #1823 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:12.5414304Z [IN-N3] #1895 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:12.5414304Z [IN-N3] #1897 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:14.5991603Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:53:15.4150193Z [IN-N3] #1950 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:15.4150193Z [IN-N3] #1952 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:16.7422007Z [IN-N3] #1983 type=SpellList identity=(SimpleChar:797DD2AD)
+2026-07-19T16:53:18.4381546Z [IN-N3] #2018 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:18.4391542Z [IN-N3] #2020 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:19.1087402Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:53:21.4142139Z [IN-N3] #2068 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:21.4152123Z [IN-N3] #2070 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:21.8395732Z [IN-N3] #2076 type=SpellList identity=(SimpleChar:79238004)
+2026-07-19T16:53:23.6440862Z [IN-N3] #2109 type=SpellList identity=(SimpleChar:797DD2AD)
+2026-07-19T16:53:24.5475288Z [IN-N3] #2121 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:24.5475288Z [IN-N3] #2123 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:27.4539316Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:53:27.4549310Z [IN-N3] #2176 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:27.4559301Z [IN-N3] #2178 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:30.5403308Z [IN-N3] #2231 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:30.5413304Z [IN-N3] #2233 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:32.2772589Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage PlayfieldId=1044525 FightingTarget=null Position=(3560.191, 5.110001, 805.1211) Heading=X: 0 | Y: 0.3454
+2026-07-19T16:53:33.5653009Z [IN-N3] #2295 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:33.5653009Z [IN-N3] #2297 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:35.3591963Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTar
+2026-07-19T16:53:36.6017359Z [IN-N3] #2354 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:36.6017359Z [IN-N3] #2356 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:37.4672032Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:53:38.3716443Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3636.509, 40.98
+2026-07-19T16:53:38.5995038Z [IN-N3] #2394 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:53:39.7186167Z [IN-N3] #2422 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:39.7196160Z [IN-N3] #2424 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:42.6028369Z [IN-N3] #2495 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:42.6028369Z [IN-N3] #2497 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:43.5314144Z [IN-N3] #2509 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:53:45.6750919Z [IN-N3] #2560 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:45.6750919Z [IN-N3] #2562 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:46.6105161Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage PlayfieldId=1044525 FightingTarget=null Position=(3582.458, 8.055, 839.8119) Heading=X: 0 | Y: -0.814719
+2026-07-19T16:53:48.3384516Z [IN-N3] #2634 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:53:48.8301463Z [IN-N3] #2643 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:48.8311457Z [IN-N3] #2645 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:51.6853864Z [IN-N3] #2700 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:51.6853864Z [IN-N3] #2702 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:53.4912727Z [IN-N3] #2738 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:53:54.5763792Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:53:54.7882508Z [IN-N3] #2771 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:54.7882508Z [IN-N3] #2773 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:56.7510382Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:53:57.8313740Z [IN-N3] #2835 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:57.8313740Z [IN-N3] #2837 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:53:58.2850942Z [IN-N3] #2846 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:53:59.2494994Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(None:0000) Parameter1=53019 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:59.4343834Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(None:0000) Parameter1=53019 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:59.5463142Z [IN-N3] #2867 type=CastNanoSpell identity=(SimpleChar:797E3002)
+2026-07-19T16:53:59.5473136Z [SMOKE] IN CharacterAction identity=(SimpleChar:797E3002) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-19T16:53:59.5473136Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:59.5503117Z [IN-N3] #2888 type=SpellList identity=(SimpleChar:797DD2B5)
+2026-07-19T16:53:59.5513111Z [IN-N3] #2890 type=SpellList identity=(SimpleChar:797DD2B3)
+2026-07-19T16:54:00.4937314Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTar
+2026-07-19T16:54:00.8924861Z [IN-N3] #2932 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:00.8934862Z [IN-N3] #2934 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:01.5760647Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Bureaucrat Worker" MonsterData=96056 MonsterScale=91 VisualFlags=31 HeadMesh=null RunSpeedBase=12 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPla
+2026-07-19T16:54:03.4579040Z [IN-N3] #2988 type=HealthDamage identity=(SimpleChar:797E3002)
+2026-07-19T16:54:03.4579040Z [IN-N3-DETAIL] HealthDamageMessage { TargetHp=94 Amount=6 Stat=Flags Unk1=0 Target=(SimpleChar:797E3002) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:03.6997532Z [IN-N3] #2991 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:54:03.9326114Z [IN-N3] #3001 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:03.9326114Z [IN-N3] #3003 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:06.8253381Z [IN-N3] #3068 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:06.8253381Z [IN-N3] #3070 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:08.4703212Z [IN-N3] #3110 type=SpellList identity=(SimpleChar:797DD2B0)
+2026-07-19T16:54:09.9713976Z [IN-N3] #3167 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:09.9723972Z [IN-N3] #3169 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:12.9813942Z [IN-N3] #3246 type=CastNanoSpell identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:12.9813942Z [IN-N3] #3248 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:13.7499192Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null
+2026-07-19T16:54:14.6993349Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:14.7003343Z [IN-N3] #3294 type=SpellList identity=(SimpleChar:797DD0D8)
+2026-07-19T16:54:16.6865374Z [IN-N3] #3342 type=SpellList identity=(SimpleChar:797DD2B8)
+2026-07-19T16:54:19.7336588Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:54:19.9395291Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:22.2030862Z [IN-N3] #3453 type=SpellList identity=(SimpleChar:7944C021)
+2026-07-19T16:54:23.6841742Z [IN-N3] #3483 type=SpellList identity=(SimpleChar:797DD2B8)
+2026-07-19T16:54:26.4684571Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:26.9621582Z [IN-N3] #3549 type=SpellList identity=(SimpleChar:797DD2B5)
+2026-07-19T16:54:26.9621582Z [IN-N3] #3550 type=SpellList identity=(SimpleChar:797DD2B5)
+2026-07-19T16:54:26.9631499Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag PlayfieldId=1044525 Fight
+2026-07-19T16:54:27.7497520Z [OUT-N3-DETAIL] CharacterActionMessage { Action=CastNano Unknown1=0 Target=(None:0000) Parameter1=53019 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:28.0555655Z [IN-N3] #3570 type=CastNanoSpell identity=(SimpleChar:797E3002)
+2026-07-19T16:54:28.0555655Z [SMOKE] IN CharacterAction identity=(SimpleChar:797E3002) Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-19T16:54:28.0555655Z [IN-N3-DETAIL] CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=100198 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:28.0585637Z [IN-N3] #3592 type=SpellList identity=(SimpleChar:797DD2B5)
+2026-07-19T16:54:28.0585637Z [IN-N3] #3594 type=SpellList identity=(SimpleChar:797DD2BA)
+2026-07-19T16:54:28.0585637Z [IN-N3] #3596 type=SpellList identity=(SimpleChar:797DD2BB)
+2026-07-19T16:54:30.4450897Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage PlayfieldId=1044525 FightingTarget=null Position=(3579.219, 8.055, 839.5257) Heading=X: 0 | Y: 0.5723517
+2026-07-19T16:54:34.1077199Z [IN-N3] #3748 type=HealthDamage identity=(SimpleChar:797E3002)
+2026-07-19T16:54:34.1077199Z [IN-N3-DETAIL] HealthDamageMessage { TargetHp=94 Amount=7 Stat=Flags Unk1=0 Target=(SimpleChar:797E3002) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:34.3495623Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=104452
+2026-07-19T16:54:35.3669353Z [IN-N3] #3780 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:35.3669353Z [IN-N3] #3782 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:37.8683922Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTar
+2026-07-19T16:54:38.3081187Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:54:38.5379793Z [IN-N3] #3847 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:38.5379793Z [IN-N3] #3849 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:39.2275540Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:41.3883268Z [IN-N3] #3907 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:41.3893264Z [IN-N3] #3909 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:44.3774835Z [IN-N3] #3955 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:44.3774835Z [IN-N3] #3957 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:47.3896261Z [IN-N3] #4004 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:47.3896261Z [IN-N3] #4006 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:47.9292931Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:50.5216943Z [IN-N3] #4059 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:50.5216943Z [IN-N3] #4061 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:51.1652953Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag PlayfieldId=1044525 Fight
+2026-07-19T16:54:51.8458777Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:53.4127781Z [IN-N3] #4126 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:53.4137760Z [IN-N3] #4128 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:54.7041435Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:56.0423182Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:54:56.4590602Z [IN-N3] #4181 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:56.4590602Z [IN-N3] #4183 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:56.8668084Z [IN-N3] #4192 type=SpellList identity=(SimpleChar:797DD2C3)
+2026-07-19T16:54:59.4563367Z [IN-N3] #4235 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:54:59.4573359Z [IN-N3] #4237 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:02.5425970Z [IN-N3] #4280 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:02.5435964Z [IN-N3] #4282 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:03.9724408Z [IN-N3] #4303 type=SpellList identity=(SimpleChar:797DD2C3)
+2026-07-19T16:55:05.6903307Z [IN-N3] #4328 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:05.6913303Z [IN-N3] #4330 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:08.6030370Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:08.6040364Z [IN-N3] #4394 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:08.6040364Z [IN-N3] #4396 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:09.6992176Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarg
+2026-07-19T16:55:09.7012164Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null 
+2026-07-19T16:55:09.7012164Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, IsUnderAttack, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag PlayfieldId=1044525 Figh
+2026-07-19T16:55:09.7022158Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage PlayfieldId=1044525 FightingTarget=null Position=(3560.012, 8.055, 840.0486) Heading=X: 0 | Y: -0.690293
+2026-07-19T16:55:09.7022158Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7032151Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7032151Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7032151Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7301984Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null 
+2026-07-19T16:55:09.7311978Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null 
+2026-07-19T16:55:09.7663072Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingT
+2026-07-19T16:55:09.7693137Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7703048Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3625.184, 33.69
+2026-07-19T16:55:09.7703048Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7703048Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:09.7703048Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(
+2026-07-19T16:55:11.6273659Z [IN-N3] #4505 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:11.6273659Z [IN-N3] #4507 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:11.8542273Z [IN-N3] #4514 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:11.8562261Z [IN-N3] #4522 type=SpellList identity=(SimpleChar:5ED40279)
+2026-07-19T16:55:12.0680953Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:14.7254952Z [IN-N3] #4590 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:14.7264925Z [IN-N3] #4592 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:14.7264925Z [IN-N3] #4593 type=SpellList identity=(SimpleChar:797DD2BF)
+2026-07-19T16:55:15.5260015Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:16.8741702Z [IN-N3] #4647 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:17.7385386Z [IN-N3] #4663 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:17.7395351Z [IN-N3] #4665 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:19.0823289Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:19.5230570Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3636.512, 40.98
+2026-07-19T16:55:19.7329255Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=10445
+2026-07-19T16:55:19.7329255Z [IN-N3] #4711 type=SpellList identity=(SimpleChar:797DD2CD)
+2026-07-19T16:55:19.7329255Z [IN-N3] #4713 type=SpellList identity=(SimpleChar:797DD2BF)
+2026-07-19T16:55:20.7403064Z [IN-N3] #4740 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:20.7403064Z [IN-N3] #4742 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:21.8765033Z [IN-N3] #4780 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:23.7373547Z [IN-N3] #4842 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:23.7383540Z [IN-N3] #4844 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:24.5578499Z [IN-N3] #4880 type=SpellList identity=(SimpleChar:797DD2BF)
+2026-07-19T16:55:24.5588499Z [IN-N3] #4884 type=SpellList identity=(SimpleChar:797DD2CD)
+2026-07-19T16:55:26.8820859Z [IN-N3] #4955 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:26.8820859Z [IN-N3] #4957 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:26.8820859Z [IN-N3] #4960 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:28.1852822Z [IN-N3] #5007 type=SpellList identity=(SimpleChar:797DD2CB)
+2026-07-19T16:55:28.1852822Z [IN-N3] #5008 type=SpellList identity=(SimpleChar:797DD2CB)
+2026-07-19T16:55:29.6991681Z [IN-N3] #5051 type=SpellList identity=(SimpleChar:797DD2CD)
+2026-07-19T16:55:29.9050411Z [IN-N3] #5053 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:29.9060407Z [IN-N3] #5055 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:30.5516730Z [IN-N3] #5074 type=SpellList identity=(SimpleChar:797DD2CB)
+2026-07-19T16:55:30.5516730Z [IN-N3] #5075 type=SpellList identity=(SimpleChar:797DD2CB)
+2026-07-19T16:55:31.8198930Z [IN-N3] #5103 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:32.8982264Z [IN-N3] #5127 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:32.8982264Z [IN-N3] #5129 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:33.7986729Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=n
+2026-07-19T16:55:33.9985496Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:34.6150136Z [IN-N3] #5182 type=SpellList identity=(SimpleChar:797DD2CD)
+2026-07-19T16:55:34.8368770Z [IN-N3] #5183 type=SpellList identity=(SimpleChar:794D8050)
+2026-07-19T16:55:34.8368770Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:35.4964700Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:35.9052185Z [IN-N3] #5212 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:35.9052185Z [IN-N3] #5214 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:36.9655641Z [IN-N3] #5241 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:38.9624692Z [IN-N3] #5289 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:38.9634689Z [IN-N3] #5291 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:39.6930166Z [IN-N3] #5311 type=SpellList identity=(SimpleChar:797DD2CD)
+2026-07-19T16:55:41.9337081Z [IN-N3] #5375 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:41.9347075Z [IN-N3] #5377 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:41.9347075Z [IN-N3] #5381 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:42.8171632Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:42.8181639Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:42.8181639Z [IN-N3] #5414 type=SpellList identity=(SimpleChar:797DD2C2)
+2026-07-19T16:55:42.8181639Z [IN-N3] #5415 type=SpellList identity=(SimpleChar:797DD2C4)
+2026-07-19T16:55:44.5381032Z [IN-N3] #5454 type=SpellList identity=(SimpleChar:797DD2CD)
+2026-07-19T16:55:44.9498491Z [IN-N3] #5471 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:44.9508486Z [IN-N3] #5473 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:47.0136050Z [IN-N3] #5517 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:47.9860028Z [IN-N3] #5550 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:47.9870022Z [IN-N3] #5552 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:47.9880017Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:55:48.1838967Z [IN-N3] #5560 type=SpellList identity=(SimpleChar:797DD2C1)
+2026-07-19T16:55:48.4247504Z [IN-N3] #5565 type=SpellList identity=(SimpleChar:797DD2CF)
+2026-07-19T16:55:48.4247504Z [IN-N3] #5566 type=SpellList identity=(SimpleChar:797DD2CF)
+2026-07-19T16:55:50.6182275Z [IN-N3] #5617 type=SpellList identity=(SimpleChar:797DD2CF)
+2026-07-19T16:55:50.6182275Z [IN-N3] #5618 type=SpellList identity=(SimpleChar:797DD2CF)
+2026-07-19T16:55:51.0279750Z [IN-N3] #5630 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:51.0289744Z [IN-N3] #5632 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:51.0289744Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=10445
+2026-07-19T16:55:51.8864433Z [IN-N3] #5658 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:54.0240085Z [IN-N3] #5708 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:54.0250078Z [IN-N3] #5710 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:56.9947366Z [IN-N3] #5813 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:56.9947366Z [IN-N3] #5815 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:55:56.9957360Z [IN-N3] #5823 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:55:57.4554530Z [IN-N3] #5833 type=SpellList identity=(SimpleChar:797DD2CB)
+2026-07-19T16:55:57.4554530Z [IN-N3] #5834 type=SpellList identity=(SimpleChar:797DD2CB)
+2026-07-19T16:56:00.0118209Z [IN-N3] #5891 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:00.0118209Z [IN-N3] #5893 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:01.9256413Z [IN-N3] #5938 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:56:02.9779923Z [IN-N3] #5957 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:02.9779923Z [IN-N3] #5959 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:04.5203942Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Pos
+2026-07-19T16:56:06.1653796Z [IN-N3] #6029 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:06.1653796Z [IN-N3] #6031 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:06.7949897Z [IN-N3] #6055 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:56:07.2806915Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3583.808, 40.96
+2026-07-19T16:56:07.4815662Z [IN-N3] #6074 type=SpellList identity=(SimpleChar:797DD2DE)
+2026-07-19T16:56:08.9746454Z [IN-N3] #6114 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:08.9756449Z [IN-N3] #6116 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:10.0409881Z [IN-N3] #6142 type=SpellList identity=(SimpleChar:797DD2CF)
+2026-07-19T16:56:10.0409881Z [IN-N3] #6143 type=SpellList identity=(SimpleChar:797DD2CF)
+2026-07-19T16:56:11.9964925Z [IN-N3] #6195 type=SpellList identity=(SimpleChar:797C7FF4)
+2026-07-19T16:56:12.1953678Z [IN-N3] #6197 type=CastNanoSpell identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:12.1963670Z [IN-N3] #6199 type=SpellList identity=(SimpleChar:797DD2BC)
+2026-07-19T16:56:12.3877233Z [IN-N3] #6203 type=SpellList identity=(SimpleChar:797DD2DE)
+
+=== LookAt OUT targets ===
+2026-07-19T16:51:43.7732605Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD292) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:43.7742599Z [OUT-N3] #2 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:43.9651419Z [OUT-N3] #3 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:45.8050073Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD296) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:45.8050073Z [OUT-N3] #9 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:46.1348060Z [OUT-N3] #10 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:48.2690883Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD29C) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:48.2690883Z [OUT-N3] #14 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:48.4579719Z [OUT-N3] #15 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:50.9334452Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:79543CB6) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:50.9334452Z [OUT-N3] #21 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:51.3162091Z [OUT-N3] #22 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:52.6914106Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797D36A5) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:52.6914106Z [OUT-N3] #28 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:53.0771736Z [OUT-N3] #29 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:54.1365174Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD29B) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:51:54.1375167Z [OUT-N3] #31 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:51:54.3593798Z [OUT-N3] #32 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:52:13.9213468Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797E3002) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:52:13.9213468Z [OUT-N3] #36 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:52:14.1122312Z [OUT-N3] #37 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:04.5594299Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2AA) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:04.5604291Z [OUT-N3] #54 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:04.7583083Z [OUT-N3] #55 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:07.0200496Z [OUT-N3] #60 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:08.8019457Z [OUT-N3] #63 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:09.7873397Z [OUT-N3] #67 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:11.0515582Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2A8) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:11.0515582Z [OUT-N3] #71 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:11.3723624Z [OUT-N3] #72 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:15.1821607Z [OUT-N3] #79 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:18.3951791Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78E0FC63) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:18.3961785Z [OUT-N3] #86 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:18.6890000Z [OUT-N3] #87 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:19.3535901Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:21.6786724Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:24.1277855Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:25.9536545Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:27.6807913Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:29.3177808Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:53:40.6800249Z [OUT-N3] #99 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:41.7923366Z [OUT-N3] #101 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:53:47.2641130Z [OUT-N3] #107 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:02.9662061Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2B5) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:02.9662061Z [OUT-N3] #121 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:03.2560287Z [OUT-N3] #123 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:17.9917312Z [OUT-N3] #137 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:20.8789506Z [OUT-N3] #143 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:22.9216443Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2B3) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:22.9226438Z [OUT-N3] #149 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:23.1045315Z [OUT-N3] #150 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:26.2096168Z [OUT-N3] #153 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:29.4836830Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2BA) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:29.4846828Z [OUT-N3] #158 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:29.7645116Z [OUT-N3] #159 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:32.7443261Z [OUT-N3] #161 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:33.7067329Z [OUT-N3] #162 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:36.2234053Z [OUT-N3] #164 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:36.9999282Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2BB) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:36.9999282Z [OUT-N3] #166 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:37.1978048Z [OUT-N3] #167 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:39.8352471Z [OUT-N3] #169 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:54:52.2205132Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:53.9554436Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:55.8204529Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:54:58.2249708Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC63) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:14.0459122Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:78E0FC62) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:14.0469115Z [OUT-N3] #212 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:55:14.2697762Z [OUT-N3] #213 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:55:15.0792806Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:17.6796712Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:19.6559738Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:22.3741952Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:38.8935097Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:41.9596920Z [OUT-N3-DETAIL] CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797DD2CD) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:41.9596920Z [OUT-N3] #237 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:55:42.1495843Z [OUT-N3] #238 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:55:46.7017970Z [OUT-N3-DETAIL] KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:49.1463030Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:52.3931318Z [OUT-N3-DETAIL] KnuBotTradeMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Unknown2=0 Unknown3=0 Unknown4=0 Container=(Inventory:0042) N3MessageType=KnubotTrade Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:54.4842799Z [OUT-N3-DETAIL] KnuBotFinishTradeMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Decline=0 Amount=0 N3MessageType=KnubotFinishTrade Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:55:54.9130209Z [OUT-N3] #245 type=LookAt identity=(SimpleChar:797E3002)
+2026-07-19T16:55:57.7502157Z [OUT-N3-DETAIL] KnuBotAnswerMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Answer=0 N3MessageType=KnubotAnswer Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+2026-07-19T16:56:02.8580663Z [OUT-N3-DETAIL] KnuBotCloseChatWindowMessage { Unknown1=2 Target=(SimpleChar:78E0FC62) Unknown2=0 Unknown3=0 N3MessageType=KnubotCloseChatWindow Identity=(SimpleChar:797E3002) Unknown=0 PacketType=N3Message }
+
+=== movement-summary ===
+{
+  "generatedUtc": "2026-07-19T16:56:13.7363843Z",
+  "movementPacketsCsv": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260719-185137\\movement-packets.csv",
+  "followTargetDecodedWithUsablePath": true,
+  "counts": {
+    "movementPacketRows": 3475,
+    "followTargetPackets": 3456,
+    "usableFollowTargetPackets": 3297,
+    "setPosPackets": 12,
+    "stopMovingCmdPackets": 7,
+    "decodeErrors": 0
+  }
+}

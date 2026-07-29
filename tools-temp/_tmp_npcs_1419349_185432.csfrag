@@ -1,0 +1,124 @@
+            Npcs = new[]
+            {
+                new MissionNpc
+                {
+                    Name = "Levi McDannold",
+                    Role = MissionNpcRole.FindTarget,
+                    Level = 5, Health = 115, MonsterData = 26097, Scale = 93, HeadMesh = 40111,
+                    X = 81.300000f, Y = 5.115000f, Z = 130.900000f,
+                    Hx = 0.000000000f, Hy = 0.000000000f, Hz = 0.000000000f, Hw = 1.000000000f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 81911 }, new[] { 2, 81913 }, new[] { 3, 81908 }, new[] { 4, 81916 } },
+                    Meshes = new[] { new[] { 0, 40111, 0, 4 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Clan Gridcourier",
+                    Role = MissionNpcRole.Trash,
+                    Level = 6, Health = 138, MonsterData = 26135, Scale = 93, HeadMesh = 40271,
+                    X = 44.156273f, Y = 5.010000f, Z = 127.933655f,
+                    Hx = 0.000000000f, Hy = 0.953698456f, Hz = 0.000000000f, Hw = 0.300764471f,
+                    Textures = new[] { new[] { 0, 40975 }, new[] { 1, 8732 }, new[] { 2, 40903 }, new[] { 3, 40892 }, new[] { 4, 40907 } },
+                    Meshes = new[] { new[] { 0, 40271, 0, 4 }, new[] { 1, 35542, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Clan Hired Killer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 4, Health = 93, MonsterData = 26092, Scale = 92, HeadMesh = 40694,
+                    X = 56.905980f, Y = 5.010000f, Z = 102.572029f,
+                    Hx = 0.000000000f, Hy = 0.560572500f, Hz = 0.000000000f, Hw = 0.828105330f,
+                    Textures = new[] { new[] { 0, 40975 }, new[] { 1, 21824 }, new[] { 2, 9615 }, new[] { 3, 21819 }, new[] { 4, 21831 } },
+                    Meshes = new[] { new[] { 0, 20108, 17998, 2 }, new[] { 0, 40694, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Clan Lookout",
+                    Role = MissionNpcRole.Trash,
+                    Level = 5, Health = 115, MonsterData = 26074, Scale = 93, HeadMesh = 40691,
+                    X = 85.850720f, Y = 5.010000f, Z = 114.010000f,
+                    Hx = 0.000000000f, Hy = 0.410778100f, Hz = 0.000000000f, Hw = 0.911735356f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 22571 }, new[] { 2, 45792 }, new[] { 3, 42254 }, new[] { 4, 42251 } },
+                    Meshes = new[] { new[] { 0, 40691, 0, 4 }, new[] { 1, 7777, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Exterminator",
+                    Role = MissionNpcRole.Trash,
+                    Level = 6, Health = 110, MonsterData = 26137, Scale = 93, HeadMesh = 40209,
+                    X = 76.719040f, Y = 5.010000f, Z = 113.576485f,
+                    Hx = 0.000000000f, Hy = -0.065047555f, Hz = 0.000000000f, Hw = 0.997882100f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 42249 }, new[] { 2, 42260 }, new[] { 3, 42252 }, new[] { 4, 42248 } },
+                    Meshes = new[] { new[] { 0, 40209, 0, 4 }, new[] { 1, 7777, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Hired Killer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 5, Health = 115, MonsterData = 26123, Scale = 93, HeadMesh = 40214,
+                    X = 63.818893f, Y = 5.010000f, Z = 105.868000f,
+                    Hx = 0.000000000f, Hy = 0.181935459f, Hz = 0.000000000f, Hw = 0.983310461f,
+                    Textures = new[] { new[] { 0, 40975 }, new[] { 1, 21824 }, new[] { 2, 9615 }, new[] { 3, 21819 }, new[] { 4, 21831 } },
+                    Meshes = new[] { new[] { 0, 20057, 17998, 2 }, new[] { 0, 40214, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Lookout",
+                    Role = MissionNpcRole.Trash,
+                    Level = 6, Health = 138, MonsterData = 26074, Scale = 93, HeadMesh = 40691,
+                    X = 75.680984f, Y = 5.010000f, Z = 121.504959f,
+                    Hx = 0.000000000f, Hy = 0.988147438f, Hz = 0.000000000f, Hw = 0.153507754f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 22571 }, new[] { 2, 45792 }, new[] { 3, 42254 }, new[] { 4, 42251 } },
+                    Meshes = new[] { new[] { 0, 40691, 0, 4 }, new[] { 1, 7777, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Marauder",
+                    Role = MissionNpcRole.Trash,
+                    Level = 5, Health = 161, MonsterData = 26101, Scale = 93, HeadMesh = 40105,
+                    X = 75.247200f, Y = 5.010000f, Z = 134.207840f,
+                    Hx = 0.000000000f, Hy = 0.671994900f, Hz = 0.000000000f, Hw = 0.740555763f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 22586 }, new[] { 2, 9619 }, new[] { 3, 22557 }, new[] { 4, 22645 } },
+                    Meshes = new[] { new[] { 0, 40105, 0, 4 }, new[] { 1, 7826, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Marksman",
+                    Role = MissionNpcRole.Trash,
+                    Level = 5, Health = 115, MonsterData = 26103, Scale = 93, HeadMesh = 40103,
+                    X = 85.481224f, Y = 5.010000f, Z = 95.302590f,
+                    Hx = 0.000000000f, Hy = 0.126859400f, Hz = 0.000000000f, Hw = 0.991920700f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 9404 }, new[] { 2, 40903 }, new[] { 3, 42241 }, new[] { 4, 42242 } },
+                    Meshes = new[] { new[] { 0, 40103, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Nanorobber",
+                    Role = MissionNpcRole.Trash,
+                    Level = 4, Health = 93, MonsterData = 26090, Scale = 92, HeadMesh = 40629,
+                    X = 84.989006f, Y = 5.010000f, Z = 147.131226f,
+                    Hx = 0.000000000f, Hy = -0.997125500f, Hz = 0.000000000f, Hw = 0.075767204f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 42243 }, new[] { 2, 45792 }, new[] { 3, 42241 }, new[] { 4, 42245 } },
+                    Meshes = new[] { new[] { 0, 40629, 0, 4 }, new[] { 1, 99154, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Fresh Swindler",
+                    Role = MissionNpcRole.Trash,
+                    Level = 4, Health = 93, MonsterData = 26137, Scale = 92, HeadMesh = 40209,
+                    X = 36.419743f, Y = 5.010000f, Z = 72.798780f,
+                    Hx = 0.000000000f, Hy = -0.986643255f, Hz = 0.000000000f, Hw = 0.162895769f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 42244 }, new[] { 2, 45792 }, new[] { 3, 42241 }, new[] { 4, 42245 } },
+                    Meshes = new[] { new[] { 0, 40209, 0, 4 }, new[] { 1, 99154, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Garbage Flea",
+                    Role = MissionNpcRole.Trash,
+                    Level = 6, Health = 67, MonsterData = 17657, Scale = 38, HeadMesh = 0,
+                    X = 73.947075f, Y = 5.010000f, Z = 134.615845f,
+                    Hx = 0.000000000f, Hy = -0.839266700f, Hz = 0.000000000f, Hw = 0.543719947f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                    Meshes = null,
+                    IsGrey = true,
+                }
+            },

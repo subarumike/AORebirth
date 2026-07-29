@@ -1,0 +1,33 @@
+seq=52 dir=IN n3=CharacterAction len=55
+runs: y~0j^Gwp | Py~0j
+  mission@41: 555cf538 window=b'U\\\xf58\x00\x00\xda\xc3U\\\xf58\x00\x00'
+seq=53 dir=IN n3=Quest len=53
+runs: y~0j!,Hz | Py~0j
+  mission@41: 555cf538 window=b'U\\\xf58\x00\x00\x00\x00\x00\x00\x00\x00'
+seq=54 dir=IN n3=QuestFullUpdate len=639
+runs: y~0jFZ@a | Py~0j | Find the thief | Find the thief<BR><BR>Sarah recently had one of her custom-built suits of armor stolen from her. The thief was last seen in the underground.<BR><BR><font color="#FF0000">Mission Objective:<BR>Locate the thief and recover the DNA-Locked Armor.</font> | V6DC | Py~0j | Py~0j | Py~0j
+  mission@37: 555cf53c window=b'U\\\xf5<\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02Find the thief\x00\x00\x00\x00\xfaFind the thief<BR><BR>Sarah recently had one of her custom-built suits of armor stolen from her. The thief was last seen in the underground.<BR><BR><font color="'
+seq=661 dir=IN n3=CharacterAction len=55
+runs: y~0j^Gwp | Py~0j
+  mission@41: 555cf53c window=b'U\\\xf5<\x00\x00\xda\xc3U\\\xf5<\x00\x00'
+seq=662 dir=IN n3=Quest len=53
+runs: y~0j!,Hz | Py~0j
+  mission@41: 555cf53c window=b'U\\\xf5<\x00\x00\x00\x00\x00\x00\x00\x00'
+seq=663 dir=IN n3=QuestFullUpdate len=660
+runs: y~0jFZ@a | Py~0j | Deliver DNA-Locked Armor to ... | Deliver DNA-Locked Armor to Sarah Greene<BR><BR>You have found the stolen suit of armor. <BR><BR><a href='itemref://295618/295618/1'><img src="rdb://88053"></a><BR><font color="#FFFFFF">Return the DNA-Locked Armor to Sarah Greene.</font> | 601J | E7AC | Py~0j | DLPT | SAGE | Py~0j | Py~0j
+  mission@37: 555cf53f window=b'U\\\xf5?\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02Deliver DNA-Locked Armor to ...\x00\x00\x00\x00\xeeDeliver DNA-Locked Armor to Sarah Greene<BR><BR>You have found the stolen suit of armor. <BR><BR><a href=\'itemref://295618/295618/1\'><img src="r'
+seq=1355 dir=IN n3=CharacterAction len=55
+runs: y~0j^Gwp | Py~0j
+  mission@41: 555cf53f window=b'U\\\xf5?\x00\x00\xda\xc3U\\\xf5?\x00\x00'
+seq=1356 dir=IN n3=Quest len=53
+runs: y~0j!,Hz | Py~0j
+  mission@41: 555cf53f window=b'U\\\xf5?\x00\x00\x00\x00\x00\x00\x00\x00'
+seq=1357 dir=IN n3=QuestFullUpdate len=861
+runs: y~0jFZ@a | Py~0j | Speak to Vernon Godfray | Speak to Vernon Godfray<BR><BR><font color="#63ad63">Identity Crisis:</font><BR>In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. Your mission is to create a fake ID Card to you can leave this place..<BR><BR>Sarah told you to speak to Vernon Godfray, a local hacker, who should be able to help with aquiring more parts needed for your ID card.<BR><BR><font color="#FF0000">Mission Objective:<BR>Talk to Vernon Godfray.</font> | N6N9 | Py~0j | Py~0j | Py~0j
+  mission@37: 555cf540 window=b'U\\\xf5@\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02Speak to Vernon Godfray\x00\x00\x00\x01\xcfSpeak to Vernon Godfray<BR><BR><font color="#63ad63">Identity Crisis:</font><BR>In order to leave Arete Landing and become a citizen of Rubi-Ka, you nee'
+TEMPLATE seq=657 runs=['y~0j5PVD', 'Py~0j']
+0E72000A0001004100000DC1797E306A355056440000C350797E306A00000482C2000482C2000000C800000001000000570000006E000000000000000000000000
+TEMPLATE seq=663 runs=['y~0jFZ@a', 'Py~0j', 'Deliver DNA-Locked Armor to ...', 'Deliver DNA-Locked Armor to Sarah Greene<BR><BR>You have found the stolen suit of armor. <BR><BR><a href=\'itemref://295618/295618/1\'><img src="rdb://88053"></a><BR><font color="#FFFFFF">Return the DNA-Locked Armor to Sarah Greene.</font>', '601J', 'E7AC', 'Py~0j', 'DLPT', 'SAGE', 'Py~0j']
+0E78000A0001029400000DC1797E306A465A40610000C350797E306A01000007E20000DAC3555CF53F0000000F00000000000000000000000244656C6976657220444E412D4C6F636B65642041726D6F7220746F202E2E2E00000000EE44656C69766572
+TEMPLATE seq=1352 runs=['y~0j5PVD', 'Py~0j']
+1129000A0001004100000DC1797E306A355056440000C350797E306A000004867E0004867E0000000100000001000000570000006E000000000000000000000000

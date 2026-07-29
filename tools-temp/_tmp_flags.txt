@@ -1,0 +1,2 @@
+hex=0xa0a42cb
+IsNpc,UnknownFlag,UnknownFlag6,HasPlayfieldId,HasHeadMesh,HasHeading,HasSmallHealthDamage,HasSmallNpcFamily,HasSmallNpcLosHeight,UnknownDataFlag,IsPet

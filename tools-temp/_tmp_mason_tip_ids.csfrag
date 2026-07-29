@@ -1,0 +1,20 @@
+        // live Mission:555CF6A7 -> fixed 0x555BE9FD
+        private const int AssembleImplant1Instance = unchecked((int)0x555BE9FD);
+
+        // live Mission:555CF6AD -> fixed 0x555BE9FE
+        private const int AssembleImplant2Instance = unchecked((int)0x555BE9FE);
+
+        // live Mission:555CF6AE -> fixed 0x555BE9FF
+        private const int AssembleImplant3Instance = unchecked((int)0x555BE9FF);
+
+        // live Mission:555CF6AF -> fixed 0x555BEA00
+        private const int ShowDrMasonImplantInstance = unchecked((int)0x555BEA00);
+
+        // live Mission:555CF6B1 -> fixed 0x555BEA01
+        private const int InstallTheImplantInstance = unchecked((int)0x555BEA01);
+
+        // live Mission:555CF6B5 -> fixed 0x555BEA02
+        private const int TalkToDoctorMasonAfterInstallInstance = unchecked((int)0x555BEA02);
+
+        // live Mission:555CF6B6 -> fixed 0x555BEA03
+        private const int TalkToLoreleiInstance = unchecked((int)0x555BEA03);

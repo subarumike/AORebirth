@@ -1,0 +1,486 @@
+max concurrent malf with pos y>=50 from state: 12 at 2026-07-21 19:56:52
+  (SimpleChar:79543CB6) (3596.98,51.74,783.94)
+  (SimpleChar:797D36A5) (3596.81,51.74,788.21)
+  (SimpleChar:79866547) (3602.96,52.13,787.82)
+  (SimpleChar:7986655D) (3622.51,51.74,798.14)
+  (SimpleChar:7986655E) (3609.40,52.13,791.90)
+  (SimpleChar:79866560) (3617.23,51.74,785.99)
+  (SimpleChar:79866565) (3595.69,51.74,798.92)
+  (SimpleChar:79866570) (3594.03,51.74,799.70)
+  (SimpleChar:79866577) (3597.42,51.74,772.86)
+  (SimpleChar:7986657B) (3608.86,52.26,787.40)
+  (SimpleChar:7986657C) (3622.39,51.74,798.22)
+  (SimpleChar:7986657D) (3612.93,52.13,787.85)
+
+=== INITIAL WAVE firstSeen < start+2s y>=50 ===
+initial_count=11
+  (SimpleChar:79866553) L1 HP12 RS=6 (3594.546000,51.745000,799.167700)
+  (SimpleChar:79866565) L1 HP12 RS=6 (3595.688480,51.745000,798.922058)
+  (SimpleChar:797D36A5) L1 HP12 RS=6 (3596.811770,51.745000,788.208900)
+  (SimpleChar:79543CB6) L1 HP12 RS=6 (3596.979000,51.745000,783.935852)
+  (SimpleChar:79866547) L1 HP12 RS=6 (3602.961000,52.135000,787.817261)
+  (SimpleChar:7986655E) L1 HP12 RS=6 (3609.403810,52.135000,791.897034)
+  (SimpleChar:7986653C) L1 HP12 RS=6 (3612.843260,52.135000,787.514200)
+  (SimpleChar:79866562) L1 HP12 RS=6 (3612.874510,52.135000,787.537500)
+  (SimpleChar:79866518) L1 HP12 RS=6 (3612.924000,52.135000,787.641200)
+  (SimpleChar:79866560) L1 HP12 RS=6 (3617.227780,51.745000,785.991800)
+  (SimpleChar:7986655D) L1 HP12 RS=6 (3622.508540,51.745000,798.139500)
+
+=== MOVEMENT SourceName Malfunctioning ===
+movers=17
+SimpleChar:797D36A5 segs=1001 anims=['25']
+  dest_unique_seq=638 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=25 pathCount=2
+    wp00 (3596.060,52.240,788.680)
+    wp01 (3596.060,51.740,788.480)
+    wp02 (3596.070,52.240,788.580)
+    wp03 (3596.060,51.740,788.480)
+    wp04 (3596.010,52.240,788.760)
+    wp05 (3596.050,52.240,788.470)
+    wp06 (3596.020,52.240,788.410)
+    wp07 (3596.070,52.240,788.600)
+    wp08 (3596.050,52.240,788.480)
+    wp09 (3596.030,52.240,788.430)
+    wp10 (3596.060,51.740,788.480)
+    wp11 (3596.070,52.240,788.560)
+    wp12 (3596.070,52.240,788.650)
+    wp13 (3596.020,52.240,788.410)
+    wp14 (3596.030,52.240,788.740)
+    wp15 (3596.060,51.740,788.480)
+    wp16 (3596.060,52.240,788.480)
+    wp17 (3596.030,52.240,788.430)
+    wp18 (3596.060,51.740,788.480)
+    wp19 (3596.070,52.240,788.610)
+    wp20 (3596.060,51.740,788.480)
+    wp21 (3596.070,52.240,788.550)
+    wp22 (3596.040,52.240,788.460)
+    wp23 (3596.060,51.740,788.480)
+    wp24 (3596.040,52.240,788.710)
+    ... +613
+SimpleChar:79543CB6 segs=1001 anims=['25']
+  dest_unique_seq=784 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=25 pathCount=2
+    wp00 (3596.110,51.740,783.920)
+    wp01 (3596.050,52.240,783.750)
+    wp02 (3596.100,52.240,783.980)
+    wp03 (3596.080,52.240,784.030)
+    wp04 (3596.110,51.740,783.920)
+    wp05 (3596.030,52.240,784.120)
+    wp06 (3596.110,51.740,783.920)
+    wp07 (3596.060,52.240,783.760)
+    wp08 (3596.030,52.240,783.720)
+    wp09 (3596.110,51.740,783.920)
+    wp10 (3596.090,52.240,784.010)
+    wp11 (3596.050,52.240,783.750)
+    wp12 (3596.110,51.740,783.920)
+    wp13 (3596.010,52.240,783.700)
+    wp14 (3596.070,52.240,783.780)
+    wp15 (3596.010,52.240,784.140)
+    wp16 (3596.110,51.740,783.920)
+    wp17 (3596.020,52.240,784.130)
+    wp18 (3596.110,51.740,783.920)
+    wp19 (3596.100,52.240,783.890)
+    wp20 (3596.100,52.240,783.960)
+    wp21 (3596.110,51.740,783.920)
+    wp22 (3596.090,52.240,783.830)
+    wp23 (3596.100,52.240,783.990)
+    wp24 (3596.110,51.740,783.920)
+    ... +759
+SimpleChar:79866560 segs=141 anims=['24', '25']
+  dest_unique_seq=141 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3599.250,52.500,786.830)
+    wp01 (3599.260,52.500,786.860)
+    wp02 (3599.150,52.500,786.740)
+    wp03 (3622.740,52.500,799.140)
+    wp04 (3622.700,52.500,798.980)
+    wp05 (3622.990,52.500,798.700)
+    wp06 (3622.830,52.500,799.240)
+    wp07 (3622.870,52.500,799.270)
+    wp08 (3610.890,52.500,778.280)
+    wp09 (3610.730,52.500,778.130)
+    wp10 (3610.760,52.500,778.180)
+    wp11 (3610.780,52.500,778.200)
+    wp12 (3610.950,52.500,778.300)
+    wp13 (3610.830,52.500,778.250)
+    wp14 (3611.270,52.500,778.130)
+    wp15 (3610.720,52.500,778.100)
+    wp16 (3620.730,52.500,783.870)
+    wp17 (3620.700,52.500,783.980)
+    wp18 (3620.800,52.500,783.770)
+    wp19 (3612.060,52.500,787.710)
+    wp20 (3611.930,52.500,787.710)
+    wp21 (3612.190,52.500,787.770)
+    wp22 (3612.260,52.500,787.850)
+    wp23 (3611.880,52.500,787.720)
+    wp24 (3612.250,52.500,788.170)
+    ... +116
+SimpleChar:7986655E segs=120 anims=['24', '25']
+  dest_unique_seq=120 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3622.770,52.500,798.810)
+    wp01 (3622.870,52.500,798.730)
+    wp02 (3623.050,52.500,798.700)
+    wp03 (3622.830,52.500,799.250)
+    wp04 (3594.210,52.500,799.780)
+    wp05 (3593.990,52.500,799.700)
+    wp06 (3594.020,52.500,799.700)
+    wp07 (3594.230,52.500,800.190)
+    wp08 (3594.300,52.500,800.030)
+    wp09 (3594.290,52.500,800.090)
+    wp10 (3594.220,52.500,800.210)
+    wp11 (3594.280,52.500,799.900)
+    wp12 (3594.290,52.500,799.910)
+    wp13 (3594.190,52.500,800.230)
+    wp14 (3594.180,52.500,800.240)
+    wp15 (3594.200,52.500,799.770)
+    wp16 (3594.270,52.500,800.140)
+    wp17 (3594.160,52.500,800.250)
+    wp18 (3594.090,52.500,799.710)
+    wp19 (3594.220,52.500,800.210)
+    wp20 (3594.210,52.500,800.210)
+    wp21 (3594.100,52.500,799.720)
+    wp22 (3594.080,52.500,800.290)
+    wp23 (3610.700,52.500,777.950)
+    wp24 (3610.700,52.500,777.970)
+    ... +95
+SimpleChar:7986655D segs=97 anims=['24', '25']
+  dest_unique_seq=96 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3612.190,52.500,787.770)
+    wp01 (3612.080,52.500,787.710)
+    wp02 (3611.890,52.500,787.720)
+    wp03 (3596.860,52.500,772.270)
+    wp04 (3597.270,52.500,772.140)
+    wp05 (3597.040,52.500,772.300)
+    wp06 (3597.120,52.500,772.280)
+    wp07 (3596.750,52.500,772.160)
+    wp08 (3598.800,52.500,786.780)
+    wp09 (3598.850,52.500,786.740)
+    wp10 (3598.730,52.500,786.870)
+    wp11 (3598.700,52.500,786.980)
+    wp12 (3598.950,52.500,786.700)
+    wp13 (3598.700,52.500,786.970)
+    wp14 (3599.180,52.500,786.760)
+    wp15 (3599.280,52.500,786.880)
+    wp16 (3622.750,52.500,798.840)
+    wp17 (3622.820,52.500,799.240)
+    wp18 (3597.300,52.500,771.950)
+    wp19 (3597.270,52.500,771.870)
+    wp20 (3597.220,52.500,771.800)
+    wp21 (3597.130,52.500,772.270)
+    wp22 (3597.260,52.500,772.150)
+    wp23 (3597.200,52.500,772.230)
+    wp24 (3597.210,52.500,771.790)
+    ... +71
+SimpleChar:79866565 segs=76 anims=['24', '25']
+  dest_unique_seq=75 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3594.190,52.500,799.770)
+    wp01 (3594.180,52.500,799.760)
+    wp02 (3594.300,52.500,800.040)
+    wp03 (3601.700,52.500,787.980)
+    wp04 (3602.080,52.500,788.290)
+    wp05 (3601.870,52.500,788.270)
+    wp06 (3601.720,52.500,788.100)
+    wp07 (3601.740,52.500,787.850)
+    wp08 (3601.840,52.500,788.250)
+    wp09 (3601.710,52.500,788.080)
+    wp10 (3601.780,52.500,788.200)
+    wp11 (3601.700,52.500,787.990)
+    wp12 (3601.720,52.500,787.880)
+    wp13 (3602.080,52.500,788.290)
+    wp14 (3601.770,52.500,788.190)
+    wp15 (3601.790,52.500,787.780)
+    wp16 (3623.000,52.500,798.700)
+    wp17 (3622.780,52.500,799.210)
+    wp18 (3599.070,52.500,787.290)
+    wp19 (3599.240,52.500,786.820)
+    wp20 (3599.200,52.500,786.780)
+    wp21 (3596.750,52.500,772.170)
+    wp22 (3596.740,52.500,772.150)
+    wp23 (3596.850,52.500,772.260)
+    wp24 (3596.810,52.500,772.230)
+    ... +50
+SimpleChar:7986657D segs=64 anims=['24', '25']
+  dest_unique_seq=62 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3598.880,52.500,786.730)
+    wp01 (3599.230,52.500,787.200)
+    wp02 (3601.720,52.500,787.890)
+    wp03 (3601.700,52.500,788.040)
+    wp04 (3601.900,52.500,787.720)
+    wp05 (3601.910,52.500,787.710)
+    wp06 (3601.770,52.500,788.190)
+    wp07 (3601.890,52.500,787.720)
+    wp08 (3601.800,52.500,788.230)
+    wp09 (3610.720,52.500,777.890)
+    wp10 (3610.700,52.500,778.020)
+    wp11 (3610.700,52.500,778.050)
+    wp12 (3610.720,52.500,777.900)
+    wp13 (3610.760,52.500,778.170)
+    wp14 (3610.700,52.500,777.960)
+    wp15 (3610.740,51.980,778.160)
+    wp16 (3610.700,52.500,777.960)
+    wp17 (3611.100,52.500,778.280)
+    wp18 (3610.730,52.500,777.870)
+    wp19 (3610.730,52.500,778.140)
+    wp20 (3610.900,52.500,778.280)
+    wp21 (3611.070,52.500,778.290)
+    wp22 (3611.020,52.500,778.300)
+    wp23 (3610.970,52.500,778.300)
+    wp24 (3610.720,52.500,777.900)
+    ... +37
+SimpleChar:79866547 segs=59 anims=['21', '24', '25']
+  dest_unique_seq=59 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3596.980,52.500,772.300)
+    wp01 (3597.180,52.500,772.240)
+    wp02 (3597.280,52.500,771.890)
+    wp03 (3596.830,52.500,772.250)
+    wp04 (3597.040,52.500,772.300)
+    wp05 (3597.240,52.500,771.820)
+    wp06 (3622.790,52.500,798.780)
+    wp07 (3622.730,52.500,799.130)
+    wp08 (3622.710,52.500,799.050)
+    wp09 (3622.860,52.500,798.740)
+    wp10 (3622.740,52.500,798.840)
+    wp11 (3622.830,52.500,798.750)
+    wp12 (3622.720,52.500,799.100)
+    wp13 (3623.170,52.500,798.760)
+    wp14 (3599.150,52.500,786.740)
+    wp15 (3599.210,52.500,786.780)
+    wp16 (3599.220,52.500,787.200)
+    wp17 (3599.260,52.500,786.850)
+    wp18 (3599.100,52.500,786.720)
+    wp19 (3597.220,52.500,772.200)
+    wp20 (3597.190,52.500,772.240)
+    wp21 (3596.920,52.500,772.290)
+    wp22 (3597.290,52.500,771.910)
+    wp23 (3610.700,51.990,777.970)
+    wp24 (3610.830,52.500,778.250)
+    ... +34
+SimpleChar:7986657B segs=48 anims=['24', '25']
+  dest_unique_seq=48 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3602.260,52.500,787.850)
+    wp01 (3601.740,52.500,787.860)
+    wp02 (3596.750,52.500,772.170)
+    wp03 (3596.890,52.500,772.280)
+    wp04 (3597.190,52.500,772.230)
+    wp05 (3596.770,52.500,772.200)
+    wp06 (3597.110,52.500,772.280)
+    wp07 (3596.960,52.500,772.300)
+    wp08 (3596.890,52.500,772.280)
+    wp09 (3597.300,52.500,772.040)
+    wp10 (3597.210,52.500,772.210)
+    wp11 (3596.780,52.500,772.200)
+    wp12 (3597.300,52.500,772.040)
+    wp13 (3597.110,52.500,772.280)
+    wp14 (3597.040,52.500,772.300)
+    wp15 (3597.200,52.500,772.220)
+    wp16 (3597.040,52.500,772.300)
+    wp17 (3597.300,52.500,771.990)
+    wp18 (3599.030,52.500,786.700)
+    wp19 (3598.730,52.500,786.870)
+    wp20 (3599.260,52.500,786.860)
+    wp21 (3599.130,52.500,786.730)
+    wp22 (3598.790,52.500,786.780)
+    wp23 (3599.280,52.500,786.890)
+    wp24 (3598.840,52.500,786.750)
+    ... +23
+SimpleChar:79866562 segs=44 anims=['24', '25']
+  dest_unique_seq=44 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3611.220,52.500,778.200)
+    wp01 (3610.920,52.500,778.290)
+    wp02 (3610.700,52.500,778.030)
+    wp03 (3610.750,52.500,778.160)
+    wp04 (3611.180,52.500,778.240)
+    wp05 (3610.710,52.500,777.910)
+    wp06 (3620.970,52.500,784.300)
+    wp07 (3620.930,52.500,784.290)
+    wp08 (3620.970,52.500,784.300)
+    wp09 (3620.800,52.500,784.220)
+    wp10 (3620.730,52.500,784.140)
+    wp11 (3621.240,52.500,784.180)
+    wp12 (3620.770,52.500,784.200)
+    wp13 (3620.710,52.500,783.920)
+    wp14 (3620.850,52.500,784.260)
+    wp15 (3620.820,52.500,784.240)
+    wp16 (3620.740,52.500,784.140)
+    wp17 (3621.080,52.500,784.290)
+    wp18 (3621.100,52.500,784.280)
+    wp19 (3620.750,52.500,784.160)
+    wp20 (3620.730,52.500,784.140)
+    wp21 (3620.800,52.500,784.220)
+    wp22 (3620.830,52.500,784.240)
+    wp23 (3621.240,52.500,784.180)
+    wp24 (3620.750,52.500,784.170)
+    ... +19
+SimpleChar:79866553 segs=39 anims=['24', '25']
+  dest_unique_seq=38 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3621.260,52.500,784.150)
+    wp01 (3612.130,52.500,787.730)
+    wp02 (3612.220,52.500,787.800)
+    wp03 (3612.260,52.500,788.140)
+    wp04 (3612.300,52.500,787.950)
+    wp05 (3612.250,52.500,788.160)
+    wp06 (3612.160,52.500,788.250)
+    wp07 (3622.730,52.500,798.870)
+    wp08 (3622.740,52.500,798.850)
+    wp09 (3622.830,52.500,798.750)
+    wp10 (3623.060,52.500,798.710)
+    wp11 (3622.810,52.500,798.770)
+    wp12 (3622.730,52.500,798.870)
+    wp13 (3622.700,52.500,798.950)
+    wp14 (3622.750,52.500,799.170)
+    wp15 (3622.780,52.500,799.200)
+    wp16 (3599.180,52.500,786.760)
+    wp17 (3599.290,52.500,786.920)
+    wp18 (3599.090,52.500,787.290)
+    wp19 (3599.150,52.500,786.740)
+    wp20 (3599.090,52.500,787.290)
+    wp21 (3599.120,52.500,786.730)
+    wp22 (3599.130,52.500,786.730)
+    wp23 (3599.290,52.500,787.090)
+    wp24 (3599.290,52.500,787.080)
+    ... +13
+SimpleChar:79866518 segs=34 anims=['24', '25']
+  dest_unique_seq=33 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3598.850,52.500,787.260)
+    wp01 (3610.800,52.500,778.220)
+    wp02 (3610.740,52.500,777.850)
+    wp03 (3610.940,52.500,778.290)
+    wp04 (3610.780,52.500,778.210)
+    wp05 (3611.160,52.500,778.250)
+    wp06 (3621.200,52.500,784.220)
+    wp07 (3620.880,52.500,784.270)
+    wp08 (3621.260,52.500,784.140)
+    wp09 (3612.240,52.500,787.820)
+    wp10 (3612.180,52.500,788.240)
+    wp11 (3612.220,52.500,787.790)
+    wp12 (3612.290,52.500,787.910)
+    wp13 (3612.300,52.500,787.960)
+    wp14 (3612.200,52.500,788.230)
+    wp15 (3612.300,52.500,788.010)
+    wp16 (3612.290,52.500,787.950)
+    wp17 (3612.090,52.500,787.710)
+    wp18 (3612.300,52.500,787.970)
+    wp19 (3612.230,52.500,787.810)
+    wp20 (3612.260,52.500,788.140)
+    wp21 (3612.190,52.500,788.230)
+    wp22 (3612.110,52.500,787.720)
+    wp23 (3612.210,52.500,788.220)
+    wp24 (3612.050,52.500,787.700)
+    ... +8
+SimpleChar:79866570 segs=24 anims=['24', '25']
+  dest_unique_seq=24 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3598.700,52.500,787.010)
+    wp01 (3599.280,52.500,786.880)
+    wp02 (3597.210,52.500,772.210)
+    wp03 (3597.230,52.500,772.200)
+    wp04 (3597.110,52.500,772.280)
+    wp05 (3596.840,52.500,772.250)
+    wp06 (3597.020,52.500,772.300)
+    wp07 (3597.300,52.500,771.980)
+    wp08 (3599.290,52.500,786.920)
+    wp09 (3598.760,52.500,786.830)
+    wp10 (3599.290,52.500,786.940)
+    wp11 (3599.130,52.500,786.730)
+    wp12 (3598.850,52.500,786.740)
+    wp13 (3599.140,52.500,786.740)
+    wp14 (3599.070,52.500,786.710)
+    wp15 (3598.710,52.500,786.910)
+    wp16 (3597.080,52.500,772.290)
+    wp17 (3597.160,52.500,772.260)
+    wp18 (3597.290,52.500,772.090)
+    wp19 (3596.730,52.500,772.140)
+    wp20 (3596.930,52.500,772.290)
+    wp21 (3596.740,52.500,772.140)
+    wp22 (3597.260,52.500,772.150)
+    wp23 (3596.710,52.500,772.090)
+SimpleChar:79866594 segs=13 anims=['21', '24', '25']
+  dest_unique_seq=13 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3610.700,51.990,777.980)
+    wp01 (3610.890,52.500,778.280)
+    wp02 (3610.710,51.980,778.060)
+    wp03 (3610.860,52.500,778.260)
+    wp04 (3610.700,52.500,778.020)
+    wp05 (3610.820,52.500,778.240)
+    wp06 (3610.730,52.500,777.860)
+    wp07 (3610.920,52.500,778.290)
+    wp08 (3610.740,52.500,778.150)
+    wp09 (3610.750,52.500,777.830)
+    wp10 (3611.010,52.500,778.300)
+    wp11 (3611.060,52.500,778.290)
+    wp12 (3621.060,52.500,784.290)
+SimpleChar:79866590 segs=9 anims=['24', '25']
+  dest_unique_seq=9 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3610.830,52.500,778.250)
+    wp01 (3610.740,52.500,778.150)
+    wp02 (3611.230,52.500,778.200)
+    wp03 (3611.270,52.500,778.140)
+    wp04 (3611.020,52.500,778.300)
+    wp05 (3611.100,52.500,778.280)
+    wp06 (3610.910,52.500,778.290)
+    wp07 (3611.300,52.500,777.960)
+    wp08 (3620.850,52.500,784.260)
+SimpleChar:7986657C segs=7 anims=['24', '25']
+  dest_unique_seq=7 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3596.760,52.500,772.190)
+    wp01 (3596.930,52.500,772.290)
+    wp02 (3596.750,52.500,772.170)
+    wp03 (3597.300,52.500,772.020)
+    wp04 (3622.840,52.500,798.750)
+    wp05 (3622.730,52.500,798.860)
+    wp06 (3623.180,52.500,798.760)
+SimpleChar:79866577 segs=2 anims=['24', '25']
+  dest_unique_seq=2 speed_sample= flags=base_unknown=0;follow_type=1;follow_unknown=24 pathCount=2
+    wp00 (3596.780,52.500,772.200)
+    wp01 (3597.280,52.500,771.890)
+
+=== FollowKind / Animation for Malfunctioning ===
+FollowKind={'NpcPath': 2779, 'Target': 80}
+Animation={'25': 2060, '24': 797, '21': 2}
+
+=== lifecycle Phase/MessageType for malf ===
+  2026-07-21T19:55:04.3405741Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866562) | Rel= | Detail=identity=(SimpleChar:79866562) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3405741Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866560) | Rel= | Detail=identity=(SimpleChar:79866560) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866553) | Rel= | Detail=identity=(SimpleChar:79866553) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866518) | Rel= | Detail=identity=(SimpleChar:79866518) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866565) | Rel= | Detail=identity=(SimpleChar:79866565) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866547) | Rel= | Detail=identity=(SimpleChar:79866547) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986653C) | Rel= | Detail=identity=(SimpleChar:7986653C) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986655D) | Rel= | Detail=identity=(SimpleChar:7986655D) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79543CB6) | Rel= | Detail=identity=(SimpleChar:79543CB6) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3415735Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:797D36A5) | Rel= | Detail=identity=(SimpleChar:797D36A5) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:04.3425727Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986655E) | Rel= | Detail=identity=(SimpleChar:7986655E) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:55:34.5211528Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866570) | Rel= | Detail=identity=(SimpleChar:79866570) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:56:16.0757406Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866577) | Rel= | Detail=identity=(SimpleChar:79866577) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:56:21.9134052Z | Phase=enemy-despawn | Msg=Despawn | Prim=(SimpleChar:79866518) | Rel= | Detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79866518) Unknown=1 PacketType=N3Message }
+  2026-07-21T19:56:45.3452355Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986657B) | Rel= | Detail=identity=(SimpleChar:7986657B) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:56:52.4328646Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986657C) | Rel= | Detail=identity=(SimpleChar:7986657C) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:56:52.4328646Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986657D) | Rel= | Detail=identity=(SimpleChar:7986657D) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:56:54.9423165Z | Phase=enemy-despawn | Msg=Despawn | Prim=(SimpleChar:79866577) | Rel= | Detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79866577) Unknown=1 PacketType=N3Message }
+  2026-07-21T19:57:25.7589972Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866585) | Rel= | Detail=identity=(SimpleChar:79866585) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:57:27.7877461Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866586) | Rel= | Detail=identity=(SimpleChar:79866586) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:58:06.0294046Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866590) | Rel= | Detail=identity=(SimpleChar:79866590) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:58:08.0331726Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:79866594) | Rel= | Detail=identity=(SimpleChar:79866594) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+  2026-07-21T19:58:22.8065444Z | Phase=enemy-despawn | Msg=Despawn | Prim=(SimpleChar:7986657C) | Rel= | Detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:7986657C) Unknown=1 PacketType=N3Message }
+  2026-07-21T19:58:25.9612368Z | Phase=enemy-despawn | Msg=Despawn | Prim=(SimpleChar:7986657D) | Rel= | Detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:7986657D) Unknown=1 PacketType=N3Message }
+  2026-07-21T19:58:28.1728544Z | Phase=character-seen | Msg=DynelSnapshot | Prim=(SimpleChar:7986659D) | Rel= | Detail=identity=(SimpleChar:7986659D) name=Malfunctioning Cleaning Robot player=False npc=True pet=False inPlay=True alive=True
+
+=== SCFU Malfunctioning IsPet / Waypoints ===
+  (SimpleChar:79866570) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3598.013,51.745,773.6734) isPet=True
+  (SimpleChar:79866577) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3621.622,51.745,799.801) isPet=True
+  (SimpleChar:7986657B) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3605.53418,51.745,773.7369) isPet=True
+  (SimpleChar:7986657C) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3606.69629,53.245,801.467041) isPet=True
+  (SimpleChar:7986657D) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3608.146,52.135,782.711731) isPet=True
+  (SimpleChar:79866585) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3621.35522,51.745,798.921265) isPet=True
+  (SimpleChar:79866586) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3597.93286,51.745,772.7541) isPet=True
+  (SimpleChar:79866590) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3621.17944,51.745,799.868958) isPet=True
+  (SimpleChar:79866594) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3597.41382,51.745,774.1647) isPet=True
+  (SimpleChar:7986659D) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= wpOwner= fam=1019 scale=200 run=5 pos=(3608.25024,51.745,796.4281) isPet=True
+
+=== EFU waypoints for Malfunctioning ===
+  (SimpleChar:79866570) wpCount=0 wp= pos=(3598.013,51.745,773.6734) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:79866577) wpCount=0 wp= pos=(3621.622,51.745,799.801) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:7986657B) wpCount=0 wp= pos=(3605.53418,51.745,773.7369) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:7986657C) wpCount=0 wp= pos=(3606.69629,53.245,801.467041) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:7986657D) wpCount=0 wp= pos=(3608.146,52.135,782.711731) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:79866585) wpCount=0 wp= pos=(3621.35522,51.745,798.921265) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:79866586) wpCount=0 wp= pos=(3597.93286,51.745,772.7541) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:79866590) wpCount=0 wp= pos=(3621.17944,51.745,799.868958) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:79866594) wpCount=0 wp= pos=(3597.41382,51.745,774.1647) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019
+  (SimpleChar:7986659D) wpCount=0 wp= pos=(3608.25024,51.745,796.4281) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet run=5 fam=1019

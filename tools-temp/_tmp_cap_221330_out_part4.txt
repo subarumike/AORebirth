@@ -1,0 +1,451 @@
+0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L218: 2026-07-23T20:15:45.3815767Z IN-N3 #351 type=MissedAttackInfo identity=(SimpleChar:797E30D7) MissedAttackInfoMessage { Unknown1=-1 Unknown2=3 Attacker=(SimpleChar:798E09BC) Defender=(SimpleChar:797E30D7) Unknown3=0 N3MessageType=MissedAttackInfo Identity=(SimpleChar:797E30D7) Unknown=1 PacketType=N3Message }
+  L219: 2026-07-23T20:15:45.8992584Z IN-N3 #352 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=20 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:798E09BC) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L224: 2026-07-23T20:15:48.0759173Z IN-N3 #359 type=MissedAttackInfo identity=(SimpleChar:797E30D7) MissedAttackInfoMessage { Unknown1=-1 Unknown2=6 Attacker=(SimpleChar:797E30D7) Defender=(SimpleChar:798E09BC) Unknown3=0 N3MessageType=MissedAttackInfo Identity=(SimpleChar:797E30D7) Unknown=1 PacketType=N3Message }
+  L227: 2026-07-23T20:15:49.0296677Z IN-N3 #363 type=AttackInfo identity=(SimpleChar:798E09BC) AttackInfoMessage { Amount=31 AmmoCount=-1 WeaponSlot=2 Target=(SimpleChar:797E30D7) Unk1=0 HitType=Normal WeaponInstance=1280787787 N3MessageType=AttackInfo Identity=(SimpleChar:798E09BC) Unknown=0 PacketType=N3Message }
+  L231: 2026-07-23T20:15:50.2469179Z IN-N3 #369 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=22 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:798E09BC) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+  L234: 2026-07-23T20:15:51.3694603Z IN-N3 #373 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F96) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=43
+  L236: 2026-07-23T20:15:51.6063157Z IN-N3 #375 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F0D) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=43
+  L240: 2026-07-23T20:15:52.5947060Z IN-N3 #380 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=12 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:798E09BC) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+
+==============================================================================
+6) FollowTarget path samples (focused / dead / fought / Silvertail)
+==============================================================================
+movement-summary: {"movementPacketRows": 595, "followTargetPackets": 589, "usableFollowTargetPackets": 589, "setPosPackets": 6, "stopMovingCmdPackets": 0, "decodeErrors": 0}
+followTargetDecodedWithUsablePath=True
+movement-packets Follow-ish rows scanned: 589
+identities with FollowTarget path samples: 0
+--- enemy-movement.csv FollowTarget ---
+  (no Follow matches for focused set); unique msg/move types: [('CharDCMove', 'ForwardStart'), ('CharDCMove', 'ForwardStop'), ('CharDCMove', 'FullStop'), ('CharDCMove', 'JumpStart'), ('CharDCMove', 'StrafeLeftStart'), ('CharDCMove', 'StrafeLeftStop'), ('CharDCMove', 'StrafeRightStart'), ('CharDCMove', 'StrafeRightStop'), ('CharDCMove', 'SwitchToSit'), ('CharDCMove', 'TurnLeftMouse'), ('CharDCMove', 'TurnLeftStart'), ('CharDCMove', 'TurnLeftStop'), ('CharDCMove', 'TurnRightMouse'), ('CharDCMove', 'TurnRightStart'), ('CharDCMove', 'TurnRightStop'), ('CharDCMove', 'Update'), ('Despawn', 'despawn'), ('FollowTarget', 'follow-target'), ('SetPos', '')]
+
+==============================================================================
+7) scfu-appearance Texture/ExtTex/mesh for focused + interacted names
+==============================================================================
+interact identity count: 67
+interact unique names: ['Angus McDuff', 'Barking Chimera', 'Beebela Andravita', 'Crippler of Growth', 'Doctor James Monaghan', 'Dreaming Silvertail', 'Emissary of Jobe', 'Guardian of the Weak', 'Hai-Tempterus', 'Jane Simmons', 'Joshua Falker', 'Luna Erke', 'Magnus Galway', 'Pedro Gavrillo', 'Prince Creehan', 'Roland Penders', 'Samuel Caesar', 'Scientist Drake Rodriguez', 'Sharon Goldman', 'Swift Silvertail', 'Trond McDougal', 'Urolok the Rotten', 'Winnie Glowtail', 'Yuttos Nascence Geosurvey Dog', 'doctorek', 'test']
+scfu texture/mesh-related columns: ['HeadMesh', 'TextureOverrides', 'Textures', 'Meshes', 'LegacyExtendedRunSpeedAlignment', 'OpaqueExtensionHex']
+  (SimpleChar:787B53FF) (Emissary of Jobe)
+    MonsterData=['215047'] HeadMesh=['40656']
+    Textures=['0:215295:0|1:213751:0|2:213807:0|3:215296:0|4:215294:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40656:0:4']
+  (SimpleChar:787B5400) (Guardian of the Weak)
+    MonsterData=['26097'] HeadMesh=['40111']
+    Textures=['0:215295:0|1:213751:0|2:213807:0|3:215296:0|4:213925:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:20007:215300:2|0:40111:0:4']
+  (SimpleChar:787B5401) (Joshua Falker)
+    MonsterData=['259896'] HeadMesh=['223820']
+    Textures=['0:248006:0|1:247963:0|2:247978:0|3:247917:0|4:248056:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:234530:0:0|0:223820:0:4']
+  (SimpleChar:78CCD52F) (Sharon Goldman)
+    MonsterData=['215029'] HeadMesh=['40664']
+    Textures=['0:0:0|1:46219:0|2:45792:0|3:46220:0|4:46221:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40664:0:4']
+  (SimpleChar:78CCD530) (Magnus Galway)
+    MonsterData=['215024'] HeadMesh=['40716']
+    Textures=['0:0:0|1:42249:0|2:42260:0|3:42247:0|4:42248:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40716:0:4']
+  (SimpleChar:78CCD531) (Samuel Caesar)
+    MonsterData=['215031'] HeadMesh=['40206']
+    Textures=['0:0:0|1:42244:0|2:42260:0|3:42246:0|4:42234:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40206:0:4']
+  (SimpleChar:78CCD532) (Doctor James Monaghan)
+    MonsterData=['215027'] HeadMesh=['40132']
+    Textures=['0:117653:0|1:55995:0|2:40903:0|3:55994:0|4:56001:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:20007:55996:2|0:40132:0:4']
+  (SimpleChar:78CCD534) (Jane Simmons)
+    MonsterData=['215026'] HeadMesh=['40169']
+    Textures=['0:0:0|1:42244:0|2:42260:0|3:42246:0|4:42245:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40169:0:4']
+  (SimpleChar:78CCD535) (Winnie Glowtail)
+    MonsterData=['215023'] HeadMesh=['40665']
+    Textures=['0:40972:0|1:40942:0|2:40962:0|3:40921:0|4:40982:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40665:0:4']
+  (SimpleChar:78CCD536) (Pedro Gavrillo)
+    MonsterData=['215028'] HeadMesh=['40715']
+    Textures=['0:0:0|1:81912:0|2:81914:0|3:81909:0|4:81917:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40715:0:4']
+  (SimpleChar:78CCD537) (Beebela Andravita)
+    MonsterData=['215030'] HeadMesh=['40663']
+    Textures=['0:0:0|1:42243:0|2:42260:0|3:42241:0|4:42233:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40663:0:4']
+  (SimpleChar:78CCD538) (Trond McDougal)
+    MonsterData=['215025'] HeadMesh=['40283']
+    Textures=['0:0:0|1:42249:0|2:42260:0|3:42247:0|4:42248:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40283:0:4']
+  (SimpleChar:78CCD539) (Angus McDuff)
+    MonsterData=['215022'] HeadMesh=['40284']
+    Textures=['0:0:0|1:42244:0|2:42260:0|3:42246:0|4:42234:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40284:0:4']
+  (SimpleChar:78CCD53A) (Luna Erke)
+    MonsterData=['26143'] HeadMesh=['40137']
+    Textures=['0:0:0|1:40900:0|2:42235:0|3:40894:0|4:40909:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40137:0:4']
+  (SimpleChar:78CCD53D) (Roland Penders)
+    MonsterData=['26133'] HeadMesh=['40251']
+    Textures=['0:0:0|1:40900:0|2:42236:0|3:40894:0|4:40909:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40251:0:4']
+  (SimpleChar:78D4AAD4) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:7963A853) (Scientist Drake Rodriguez)
+    MonsterData=['26092'] HeadMesh=['40694']
+    Textures=['0:213851:0|1:213751:0|2:213807:0|3:213708:0|4:213925:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:20108:215300:2|0:40694:0:4|5:214715:0:0']
+  (SimpleChar:796D182A) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:796D182B) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:796D1836) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:796D1837) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:796D183C) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:7971B96D) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:7971B96E) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:797651FC) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:797651FD) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:79765200) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:797BDF97) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:797E30D7) (Getkeep)
+    MonsterData=['0'] HeadMesh=['40111']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['0:40111:0:4|1:96309:0:2']
+  (SimpleChar:797FA090) (Crippler of Growth)
+    MonsterData=['209333'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['anun self\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1|Material #7\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209280:0:1']
+    Meshes=['']
+  (SimpleChar:79841864) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:7988911E) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:79889383) (Hai-Tempterus)
+    MonsterData=['209182'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:79889385) (Hai-Tempterus)
+    MonsterData=['209182'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:7988938F) (Hai-Tempterus)
+    MonsterData=['209182'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798894DB) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798894DE) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798894FB) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798894FC) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798894FD) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798894FF) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798A31CE) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798A3568) (Dreaming Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798A7BB7) (doctorek)
+    MonsterData=['96193'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['metapet_healing\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:288732:0:1']
+    Meshes=['']
+  (SimpleChar:798C1901) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1942) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1CEA) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1EE2) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1EE3) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1EE4) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F0D) (Yuttos Nascence Geosurvey Dog)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F4C) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F4E) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F4F) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F50) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F51) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F52) (Dreaming Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F53) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F54) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F82) (Dreaming Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F83) (Dreaming Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F84) (Dreaming Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F89) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F8B) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F8C) (Swift Silvertail)
+    MonsterData=['208922'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+  (SimpleChar:798C1F93) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F94) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F95) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F96) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F97) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F98) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F9A) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F9B) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F9C) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F9D) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F9E) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798C1F9F) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798E09BC) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798E09BD) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798E09BE) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798E09BF) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798E09E9) (Barking Chimera)
+    MonsterData=['209173'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['low2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:208969:0:1']
+    Meshes=['']
+  (SimpleChar:798E646B) (Urolok the Rotten)
+    MonsterData=['209441'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['Swampy_tpage\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00:209433:0:1']
+    Meshes=['']
+  (SimpleChar:798EC84C) (test)
+    MonsterData=['96194'] HeadMesh=['']
+    Textures=['0:0:0|1:0:0|2:0:0|3:0:0|4:0:0']
+    TextureOverrides(ExtTex?)=['']
+    Meshes=['']
+Interact names with no scfu rows by name match: ['Prince Creehan']
+
+==============================================================================
+END
+==============================================================================

@@ -1,0 +1,60 @@
+=== 20260726-Antonio-1 ===
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+TA: low=248312 high=248312 ql=1 place=OverflowWindow:0000
+TA: low=248344 high=248344 ql=1 place=OverflowWindow:0000
+TA: low=248331 high=248331 ql=1 place=OverflowWindow:0000
+TA: low=248353 high=248353 ql=1 place=OverflowWindow:0000
+TIP-DONE: Mission:5569CDF9
+TIP-DONE: Mission:5569CDF1
+QUEST-DEL: Mission:5569CDF9
+QUEST-DEL: Mission:5569CDF1
+
+=== 20260726-antonio-2 ===
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+FB: You combined 
+TA: low=248316 high=248316 ql=1 place=OverflowWindow:0000
+TA: low=248347 high=248347 ql=1 place=OverflowWindow:0000
+TA: low=248308 high=248308 ql=1 place=OverflowWindow:0000
+TA: low=248317 high=248317 ql=1 place=OverflowWindow:0000
+TA: low=248374 high=248374 ql=1 place=OverflowWindow:0000
+TA: low=248317 high=248317 ql=1 place=OverflowWindow:0000
+TA: low=248348 high=248348 ql=1 place=OverflowWindow:0000
+TA: low=248308 high=248308 ql=1 place=OverflowWindow:0000
+TA: low=248355 high=248355 ql=1 place=OverflowWindow:0000
+TA: low=248335 high=248335 ql=1 place=OverflowWindow:0000
+TA: low=248346 high=248346 ql=1 place=OverflowWindow:0000
+TA: low=248308 high=248308 ql=1 place=OverflowWindow:0000
+TA: low=248343 high=248343 ql=1 place=OverflowWindow:0000
+TA: low=248320 high=248320 ql=1 place=OverflowWindow:0000
+TA: low=248349 high=248349 ql=1 place=OverflowWindow:0000
+TA: low=291082 high=291082 ql=1 place=Inventory:0040
+TIP-DONE: Mission:5569CDBF
+TIP-DONE: Mission:5569CDC3
+TIP-DONE: Mission:5569CDF7
+TIP-DONE: Mission:5569CE11
+TIP-DONE: Mission:5569CDE4
+TIP-DONE: Mission:5569CDCD
+TIP-DONE: Mission:5569CDD9
+QUEST-DEL: Mission:5569CDBF
+QUEST-DEL: Mission:5569CDC3
+QUEST-DEL: Mission:5569CDF7
+QUEST-DEL: Mission:5569CE11
+QUEST-DEL: Mission:5569CDE4
+QUEST-DEL: Mission:5569CDCD
+QUEST-DEL: Mission:5569CDD9

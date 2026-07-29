@@ -1,0 +1,148 @@
+=== scfu-appearance (Marcus / Stone) ===
+cols: CapturedUtc,ElapsedMilliseconds,Direction,GlobalOrdinal,Sequence,PacketLength,DecodeStatus,DecodeError,BytesConsumed,UndecodedTailHex,RawPacketHex,RawBodyHex,Identity,Name,PlayfieldId,PositionX,PositionY,PositionZ,HeadingX,HeadingY,HeadingZ,HeadingW,PrePositionFightingTarget,FightingTarget,Version,FlagsNumeric,Flags,CharacterFlags,AccountFlags,Expansions,CharacterInfoType,NpcFamily,NpcLosHeight,NpcUnknownData,NpcUnknownData2,NpcUnknownData3,Level,Health,HealthDamage,MonsterData,MonsterScale,VisualFlags,VisibleTitle,AppearanceValue,Side,Fatness,Breed,Gender,Race,ScfuUnknown1Hex
+
+=== enemy-full-updates Marcus ===
+
+=== enemy-combat (Marcus / Attack / CharacterAction / Special) ===
+cols: CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail
+message type counts: [('CharacterAction', 23), ('Buff', 15), ('CastNanoSpell', 15), ('Despawn', 13), ('AttackInfo', 9), ('SpecialAttackWeapon', 8), ('Attack', 8), ('StopFight', 6), ('HealthDamage', 2)]
+Marcus-related combat rows: 0
+
+=== all enemy-combat sample (first 40) ===
+  mt=Buff src=enemy/(SimpleChar:799F01F6) tgt=/ aux=None/None
+  mt=CastNanoSpell src=enemy/(SimpleChar:799F01F6) tgt=enemy/(SimpleChar:799F01F6) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F01F6) tgt=NanoProgram/(NanoProgram:48329) aux=None/None
+  mt=AttackInfo src=enemy/(SimpleChar:78E0FC62) tgt=enemy/(SimpleChar:799F06DF) aux=None/None
+  mt=Buff src=enemy/(SimpleChar:799F01F6) tgt=/ aux=None/None
+  mt=CastNanoSpell src=enemy/(SimpleChar:799F01F6) tgt=enemy/(SimpleChar:799F01F6) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F01F6) tgt=NanoProgram/(NanoProgram:48329) aux=None/None
+  mt=Despawn src=enemy/(SimpleChar:799F06DC) tgt=/ aux=None/None
+  mt=Buff src=enemy/(SimpleChar:799F01F6) tgt=/ aux=None/None
+  mt=CastNanoSpell src=enemy/(SimpleChar:799F01F6) tgt=enemy/(SimpleChar:799F01F6) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F01F6) tgt=NanoProgram/(NanoProgram:48329) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:78E0FC63) tgt=None/(None:002F) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:78E0FC6F) tgt=None/(None:0000) aux=None/None
+  mt=HealthDamage src=enemy/(SimpleChar:78E0FC6F) tgt=enemy/(SimpleChar:78E0FC6F) aux=None/None
+  mt=SpecialAttackWeapon src=enemy/(SimpleChar:799F3D2B) tgt=/25 aux=None/None
+  mt=Attack src=enemy/(SimpleChar:799F3D2B) tgt=enemy/(SimpleChar:799F049E) aux=None/None
+  mt=SpecialAttackWeapon src=SimpleChar/(SimpleChar:7996C261) tgt=/9 aux=None/None
+  mt=Attack src=SimpleChar/(SimpleChar:7996C261) tgt=enemy/(SimpleChar:799F049E) aux=None/None
+  mt=AttackInfo src=SimpleChar/(SimpleChar:7996C261) tgt=enemy/(SimpleChar:799F049E) aux=None/None
+  mt=SpecialAttackWeapon src=enemy/(SimpleChar:799F049E) tgt=/10 aux=None/None
+  mt=Attack src=enemy/(SimpleChar:799F049E) tgt=SimpleChar/(SimpleChar:7996C261) aux=None/None
+  mt=AttackInfo src=enemy/(SimpleChar:78E0FC62) tgt=enemy/(SimpleChar:799F06DF) aux=None/None
+  mt=Buff src=enemy/(SimpleChar:799F01F6) tgt=/ aux=None/None
+  mt=CastNanoSpell src=enemy/(SimpleChar:799F01F6) tgt=enemy/(SimpleChar:799F01F6) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F01F6) tgt=NanoProgram/(NanoProgram:48329) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:78E0FC6F) tgt=None/(None:0009) aux=None/None
+  mt=AttackInfo src=enemy/(SimpleChar:799F3D2B) tgt=enemy/(SimpleChar:799F049E) aux=None/None
+  mt=StopFight src=enemy/(SimpleChar:799F3D2B) tgt=/ aux=None/None
+  mt=StopFight src=enemy/(SimpleChar:799F049E) tgt=/ aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F049E) tgt=None/(None:0000) aux=None/None
+  mt=StopFight src=SimpleChar/(SimpleChar:7996C261) tgt=/ aux=None/None
+  mt=Buff src=enemy/(SimpleChar:799F01F6) tgt=/ aux=None/None
+  mt=CastNanoSpell src=enemy/(SimpleChar:799F01F6) tgt=enemy/(SimpleChar:799F01F6) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F01F6) tgt=NanoProgram/(NanoProgram:48329) aux=None/None
+  mt=SpecialAttackWeapon src=enemy/(SimpleChar:799F3D2B) tgt=/25 aux=None/None
+  mt=Attack src=enemy/(SimpleChar:799F3D2B) tgt=enemy/(SimpleChar:799F06DF) aux=None/None
+  mt=Despawn src=enemy/(SimpleChar:799F06D7) tgt=/ aux=None/None
+  mt=Buff src=enemy/(SimpleChar:799F01F6) tgt=/ aux=None/None
+  mt=CastNanoSpell src=enemy/(SimpleChar:799F01F6) tgt=enemy/(SimpleChar:799F01F6) aux=None/None
+  mt=CharacterAction src=enemy/(SimpleChar:799F01F6) tgt=NanoProgram/(NanoProgram:48329) aux=None/None
+
+=== enemy-fight-events (Marcus / Attack / Action) ===
+2026-07-27T16:35:39.6477179Z IN-N3 #4 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:41.9039012Z IN-N3 #84 type=AttackInfo identity=(SimpleChar:78E0FC62) AttackInfoMessage { Amount=17 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06DF) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:42.1417522Z IN-N3 #95 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:42.6264536Z IN-N3 #108 type=SimpleCharFullUpdate identity=(SimpleChar:799F06E0) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3617.481, 51.745, 783.7565) Heading=X: 0 | Y: 0.7387605 | Z: 0 | W: 0.6739681 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearanc
+2026-07-27T16:35:45.1782896Z IN-N3 #189 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:45.3921567Z IN-N3 #201 type=CharacterAction identity=(SimpleChar:78E0FC63) CharacterActionMessage { Action=100 Unknown1=0 Target=(None:002F) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC63) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:45.5570556Z IN-N3 #202 type=CharacterAction identity=(SimpleChar:78E0FC6F) CharacterActionMessage { Action=StandUp Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC6F) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:45.8278879Z IN-N3 #203 type=HealthDamage identity=(SimpleChar:78E0FC6F) HealthDamageMessage { TargetHp=32 Amount=20 Stat=Flags Unk1=0 Target=(SimpleChar:78E0FC6F) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:78E0FC6F) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:46.2426322Z IN-N3 #221 type=SpecialAttackWeapon identity=(SimpleChar:799F3D2B) SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=25 Unknown2=25 Unknown3=25 Unknown4=25 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F3D2B) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:46.2436328Z IN-N3 #222 type=Attack identity=(SimpleChar:799F3D2B) AttackMessage { Target=(SimpleChar:799F049E) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799F3D2B) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:46.6743658Z IN-N3 #231 type=SpecialAttackWeapon identity=(SimpleChar:7996C261) SpecialAttackWeaponMessage { Specials=count=3[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=10 Unknown2=10 Unknown3=10 Unknown4=9 Unknown5=100 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:7996C261) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:46.6743658Z IN-N3 #232 type=Attack identity=(SimpleChar:7996C261) AttackMessage { Target=(SimpleChar:799F049E) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:7996C261) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:47.6027930Z IN-N3 #263 type=AttackInfo identity=(SimpleChar:7996C261) AttackInfoMessage { Amount=11 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:799F049E) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:7996C261) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:47.8006713Z IN-N3 #264 type=SpecialAttackWeapon identity=(SimpleChar:799F049E) SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=10 Unknown2=10 Unknown3=10 Unknown4=10 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F049E) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:47.8006713Z IN-N3 #265 type=Attack identity=(SimpleChar:799F049E) AttackMessage { Target=(SimpleChar:7996C261) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799F049E) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:48.2354035Z IN-N3 #274 type=AttackInfo identity=(SimpleChar:78E0FC62) AttackInfoMessage { Amount=16 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06DF) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:48.2364026Z IN-N3 #277 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:48.7211040Z IN-N3 #294 type=CharacterAction identity=(SimpleChar:78E0FC6F) CharacterActionMessage { Action=100 Unknown1=0 Target=(None:0009) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC6F) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:48.9159833Z IN-N3 #295 type=AttackInfo identity=(SimpleChar:799F3D2B) AttackInfoMessage { Amount=17 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:799F049E) Unk1=4 HitType=Normal WeaponInstance=1296389938 N3MessageType=AttackInfo Identity=(SimpleChar:799F3D2B) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:48.9159833Z IN-N3 #298 type=CharacterAction identity=(SimpleChar:799F049E) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=500 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F049E) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:49.3996873Z IN-N3 #311 type=SimpleCharFullUpdate identity=(SimpleChar:799F04E2) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(3560.064, 5.110001, 865.6693) Heading=X: 0 | Y: 0.7640172 | Z: 0 | W: 0.645196 Appearance=SmokeLounge.AOtomation.M
+2026-07-27T16:35:51.4184402Z IN-N3 #372 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:51.8651647Z IN-N3 #393 type=SpecialAttackWeapon identity=(SimpleChar:799F3D2B) SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=25 Unknown2=25 Unknown3=25 Unknown4=25 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F3D2B) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:51.8651647Z IN-N3 #394 type=Attack identity=(SimpleChar:799F3D2B) AttackMessage { Target=(SimpleChar:799F06DF) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799F3D2B) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:54.2816746Z IN-N3 #473 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:54.5295215Z IN-N3 #477 type=AttackInfo identity=(SimpleChar:78E0FC62) AttackInfoMessage { Amount=15 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06DF) Unk1=4 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:54.5295215Z IN-N3 #481 type=CharacterAction identity=(SimpleChar:799F06DF) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=503 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F06DF) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:57.2556652Z IN-N3 #550 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:00.4257096Z IN-N3 #630 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:00.4267090Z IN-N3 #636 type=CharacterAction identity=(SimpleChar:78E0FC63) CharacterActionMessage { Action=100 Unknown1=0 Target=(None:001F) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC63) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:01.2863955Z IN-N3 #654 type=SimpleCharFullUpdate identity=(SimpleChar:799F06E4) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3625.183, 33.695, 877.3866) Heading=X: 0 | Y: -0.8100735 | Z: 0 | W: 0.5863284 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Burning Clean
+2026-07-27T16:36:02.3227558Z IN-N3 #690 type=SpecialAttackWeapon identity=(SimpleChar:797DD44C) SpecialAttackWeaponMessage { Specials=count=0[] Unknown1=60 Unknown2=60 Unknown3=60 Unknown4=21 Unknown5=20 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:797DD44C) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:02.3227558Z IN-N3 #691 type=Attack identity=(SimpleChar:797DD44C) AttackMessage { Target=(SimpleChar:799F06E4) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797DD44C) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:03.4780430Z IN-N3 #726 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:05.6648012Z IN-N3 #787 type=AttackInfo identity=(SimpleChar:797DD44C) AttackInfoMessage { Amount=4 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06E4) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797DD44C) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:05.8676739Z IN-N3 #788 type=SpecialAttackWeapon identity=(SimpleChar:799F06E4) SpecialAttackWeaponMessage { Specials=count=1[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=42 Unknown2=42 Unknown3=42 Unknown4=2 Unknown5=26 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F06E4) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:05.8676739Z IN-N3 #789 type=Attack identity=(SimpleChar:799F06E4) AttackMessage { Target=(SimpleChar:797DD44C) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799F06E4) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:06.3104007Z IN-N3 #805 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:08.5240357Z IN-N3 #851 type=CharacterAction identity=(SimpleChar:78E0FC6F) CharacterActionMessage { Action=86 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC6F) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:08.8248524Z IN-N3 #853 type=HealthDamage identity=(SimpleChar:78E0FC6F) HealthDamageMessage { TargetHp=12 Amount=-20 Stat=MeleeAC Unk1=0 Target=(SimpleChar:78E0FC6F) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:78E0FC6F) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:09.4804458Z IN-N3 #877 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:12.3386840Z IN-N3 #954 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:12.9992762Z IN-N3 #971 type=AttackInfo identity=(SimpleChar:797DD44C) AttackInfoMessage { Amount=7 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06E4) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797DD44C) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:13.8894235Z IN-N3 #998 type=SimpleCharFullUpdate identity=(SimpleChar:799F06E7) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet PlayfieldId=1044525 FightingTarget=null Position=(3583.81, 40.965, 843.5263) Heading=X: 0 | Y: 0.5949025 | Z: 0 | W: 0.8037978 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Burning Cleanin
+2026-07-27T16:36:15.4344699Z IN-N3 #1037 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:15.4354683Z IN-N3 #1042 type=CharacterAction identity=(SimpleChar:78E0FC63) CharacterActionMessage { Action=100 Unknown1=0 Target=(None:002F) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:78E0FC63) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:18.3376791Z IN-N3 #1101 type=SpecialAttackWeapon identity=(SimpleChar:79666CF1) SpecialAttackWeaponMessage { Specials=count=0[] Unknown1=60 Unknown2=60 Unknown3=60 Unknown4=21 Unknown5=20 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:79666CF1) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:18.3376791Z IN-N3 #1102 type=Attack identity=(SimpleChar:79666CF1) AttackMessage { Target=(SimpleChar:799F06E7) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:79666CF1) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:18.6125090Z IN-N3 #1107 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:20.1485617Z IN-N3 #1138 type=AttackInfo identity=(SimpleChar:797DD44C) AttackInfoMessage { Amount=8 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06E4) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:797DD44C) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:20.9410730Z IN-N3 #1157 type=SimpleCharFullUpdate identity=(SimpleChar:799F04E2) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag PlayfieldId=1044525 FightingTarget=null Position=(3560.032, 5.110001, 865.6426) Heading=X: 0 | Y: 0.7587205 | Z: 0 | W: 0.6514164 Appearance=SmokeLounge.AOtomation
+2026-07-27T16:36:21.5956696Z IN-N3 #1178 type=CharacterAction identity=(SimpleChar:799F01F6) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:48329) Parameter1=2040463862 Parameter2=300 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:799F01F6) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:22.2632265Z IN-N3 #1191 type=AttackInfo identity=(SimpleChar:79666CF1) AttackInfoMessage { Amount=2 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F06E7) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:79666CF1) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:22.5130719Z IN-N3 #1203 type=SpecialAttackWeapon identity=(SimpleChar:799F06E7) SpecialAttackWeaponMessage { Specials=count=1[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=42 Unknown2=42 Unknown3=42 Unknown4=2 Unknown5=20 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F06E7) Unknown=0 PacketType=N3Message }
+2026-07-27T16:36:22.5130719Z IN-N3 #1204 type=Attack identity=(SimpleChar:799F06E7) AttackMessage { Target=(SimpleChar:79666CF1) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799F06E7) Unknown=0 PacketType=N3Message }
+
+=== enemy-state Marcus events ===
+Marcus event counts: {}
+
+=== system-messages (XP / damage / Marcus) ===
+2026-07-27T16:35:49.6475325Z [IN-N3] #316 type=Stat text= detail=StatMessage { Stats=count=1[XP=12392] N3MessageType=Stat Identity=(SimpleChar:7996C261) Unknown=0 PacketType=N3Message }
+2026-07-27T16:35:58.1291254Z [IN-N3] #570 type=Stat text= detail=StatMessage { Stats=count=1[XP=13292] N3MessageType=Stat Identity=(SimpleChar:7996C261) Unknown=0 PacketType=N3Message }
+
+=== enemy-dossier Marcus ===
+{
+  "identity": "(SimpleChar:78E0FC62)",
+  "name": "Marcus Stone",
+  "monsterData": "258744",
+  "monsterScale": "",
+  "catMesh": "1234567890",
+  "visualFlags": "31",
+  "headMesh": "",
+  "runSpeed": "53",
+  "npcFamily": "",
+  "losHeight": "",
+  "minDamage": "1234567890",
+  "maxDamage": "1234567890",
+  "defaultAttackType": "1234567890",
+  "attackDelay": "1234567890",
+  "rechargeDelay": "1234567890",
+  "populationEvidenceSource": "VISIBLE-SURVEY",
+  "resourcePlayfieldId": "",
+  "runtimePlayfieldId": "",
+  "capturePlayfieldIdentity": "(Playfield2:FF02D)",
+  "capturePlayfieldObjectId": "FF02D",
+  "level": 15,
+  "currentHealth": 117800,
+  "maxHealth": 117800,
+  "position": {
+    "x": 3629.3584,
+    "y": 40.9849968,
+    "z": 823.6023
+  },
+  "firstSeenUtc": "2026-07-27T16:35:40.6101231Z",
+  "lastU
