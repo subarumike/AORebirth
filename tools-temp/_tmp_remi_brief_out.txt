@@ -1,0 +1,33 @@
+files ['capture-health.json', 'capture-session.json', 'capture_info.json', 'chat-dialogue.log', 'corpse-full-updates.csv', 'corpse-loot-observations.csv', 'enemy-combat.csv', 'enemy-dossier.json', 'enemy-fight-events.log', 'enemy-full-updates.csv', 'enemy-movement.csv', 'enemy-respawns.csv', 'enemy-stat-updates.csv', 'enemy-state.csv', 'enemy-state.json', 'events.log', 'inventory-updates.csv', 'mission-flow.log', 'movement-packets.csv', 'movement-summary.json', 'npc-interactions.log', 'npc-lifecycle.csv', 'packets.hex.log', 'raw-packets.csv', 'scfu-appearance.csv', 'shop-updates.csv', 'system-messages.log', 'vendor-full-updates.csv']
+capture-session.json {
+  "captureStartUtc": "2026-07-27T18:49:02.1376409Z",
+  "captureStartLocal": "2026-07-27T20:49:02.1376409+02:00",
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-204902",
+  "aoClientProcess": {
+    "id": 10604,
+    "processName": "AnarchyOnline",
+    "mainWindowTitle": "Anarchy Online - Mrengyner"
+  },
+  "notes": ""
+}
+
+capture_info.json {
+  "timestampUtc": "2026-07-27T18:55:08.6681441Z",
+  "captureStartUtc": "2026-07-27T18:49:02.1376409Z",
+  "captureEndUtc": "2026-07-27T18:55:08.5112404Z",
+  "captureStopRequestedUtc": "2026-07-27T18:55:03.5013295Z",
+  "lastRawPacketUtc": "2026-07-27T18:55:08.2943762Z",
+  "captureFinalizedUtc": "2026-07-27T18:55:08.5112404Z",
+  "quietPeriodPassed": false,
+  "sessionDurationSeconds": 366.374,
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-204902",
+  "rawPacketLogPath": "C:\\Users\\nermi\\source\\repos\\AORebirth
+
+==== chat-dialogue.log len 9305 ====
+Traceback (most recent call last):
+  File "C:\Users\nermi\source\repos\AORebirth\tools-temp\_tmp_remi_brief.py", line 24, in <module>
+    print(data[:8000] if len(data) < 20000 else data[:8000] + "\n...[trunc]...")
+  File "C:\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\ufeff' in position 0: character maps to <undefined>

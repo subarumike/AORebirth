@@ -1,0 +1,106 @@
+=== (SimpleChar:798C1F4F) ===
+  SAW t=2026-07-23T20:50:45.6576340Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:50:45.6576340Z
+  HIT amt=25 slot=4 inst=1111971416 dt_saw=5.085
+  HIT amt=26 slot=3 inst=1497452619 dt_saw=8.117
+  HIT amt=29 slot=1 inst=1297632336 dt_saw=16.348
+  HIT amt=34 slot=4 inst=1111971416 dt_saw=26.201
+=== (SimpleChar:798C1F93) ===
+  SAW t=2026-07-23T20:56:54.9770490Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:56:54.9770490Z
+  HIT amt=27 slot=3 inst=1497452619 dt_saw=9.096
+  HIT amt=30 slot=2 inst=1280787787 dt_saw=13.827
+  HIT amt=22 slot=1 inst=1297632336 dt_saw=16.706
+=== (SimpleChar:798C1F94) ===
+  SAW t=2026-07-23T20:53:29.4074742Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:53:29.4074742Z
+  HIT amt=27 slot=3 inst=1497452619 dt_saw=9.546
+=== (SimpleChar:798C1F96) ===
+  SAW t=2026-07-23T20:51:31.5472112Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:51:31.5472112Z
+  HIT amt=28 slot=3 inst=1497452619 dt_saw=9.831
+  HIT amt=20 slot=2 inst=1280787787 dt_saw=14.363
+  HIT amt=30 slot=1 inst=1297632336 dt_saw=17.371
+=== (SimpleChar:798E09BD) ===
+  SAW t=2026-07-23T20:54:49.4560104Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:54:49.4560104Z
+  HIT amt=21 slot=4 inst=1111971416 dt_saw=3.352
+  HIT amt=35 slot=3 inst=1497452619 dt_saw=6.873
+  HIT amt=26 slot=2 inst=1280787787 dt_saw=11.104
+  HIT amt=31 slot=1 inst=1297632336 dt_saw=15.840
+  HIT amt=35 slot=0 inst=1414222417 dt_saw=23.012
+  HIT amt=36 slot=3 inst=1497452619 dt_saw=30.944
+=== (SimpleChar:798E09BE) ===
+  SAW t=2026-07-23T20:55:41.0759749Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:55:41.0759749Z
+  HIT amt=16 slot=3 inst=1497452619 dt_saw=7.903
+=== (SimpleChar:798E09BF) ===
+  SAW t=2026-07-23T20:56:11.7430043Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:56:11.7430043Z
+  HIT amt=37 slot=4 inst=1111971416 dt_saw=3.997
+  HIT amt=22 slot=3 inst=1497452619 dt_saw=6.940
+  HIT amt=19 slot=2 inst=1280787787 dt_saw=11.330
+  HIT amt=36 slot=4 inst=1111971416 dt_saw=26.567
+=== (SimpleChar:798E0A06) ===
+  SAW t=2026-07-23T20:54:06.3656419Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:54:06.3656419Z
+  HIT amt=27 slot=3 inst=1497452619 dt_saw=6.451
+  HIT amt=32 slot=2 inst=1280787787 dt_saw=10.891
+  HIT amt=30 slot=0 inst=1414222417 dt_saw=18.978
+  HIT amt=32 slot=4 inst=1111971416 dt_saw=24.409
+=== (SimpleChar:798E0A08) ===
+  SAW t=2026-07-23T21:00:18.5601174Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T21:00:18.5601174Z
+  HIT amt=37 slot=4 inst=1111971416 dt_saw=4.097
+  HIT amt=25 slot=3 inst=1497452619 dt_saw=8.800
+  HIT amt=31 slot=2 inst=1280787787 dt_saw=13.454
+  HIT amt=22 slot=1 inst=1297632336 dt_saw=17.775
+  HIT amt=29 slot=0 inst=1414222417 dt_saw=21.656
+  HIT amt=36 slot=4 inst=1111971416 dt_saw=27.484
+=== (SimpleChar:798E0A09) ===
+  SAW t=2026-07-23T20:52:49.1913156Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:52:49.1913156Z
+  HIT amt=27 slot=3 inst=1497452619 dt_saw=9.009
+  HIT amt=32 slot=1 inst=1297632336 dt_saw=17.610
+  HIT amt=24 slot=0 inst=1414222417 dt_saw=22.013
+=== (SimpleChar:798E0A0A) ===
+  SAW t=2026-07-23T20:52:11.8370084Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:52:11.8380075Z
+  HIT amt=21 slot=2 inst=1280787787 dt_saw=9.791
+  HIT amt=32 slot=0 inst=1414222417 dt_saw=17.733
+  HIT amt=26 slot=4 inst=1111971416 dt_saw=23.878
+=== (SimpleChar:798E0A31) ===
+  SAW t=2026-07-23T20:58:55.9174608Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:58:55.9174608Z
+  HIT amt=27 slot=4 inst=1111971416 dt_saw=5.015
+=== (SimpleChar:798E0A32) ===
+  SAW t=2026-07-23T20:58:13.0211761Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:58:13.0211761Z
+  HIT amt=33 slot=4 inst=1111971416 dt_saw=3.004
+  HIT amt=24 slot=3 inst=1497452619 dt_saw=6.741
+  HIT amt=37 slot=2 inst=1280787787 dt_saw=11.758
+  HIT amt=19 slot=0 inst=1414222417 dt_saw=18.878
+  HIT amt=26 slot=4 inst=1111971416 dt_saw=24.601
+  HIT amt=31 slot=3 inst=1497452619 dt_saw=29.180
+=== (SimpleChar:798E0A33) ===
+  SAW t=2026-07-23T20:57:24.9415173Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:57:24.9425170Z
+  HIT amt=21 slot=4 inst=1111971416 dt_saw=4.133
+  HIT amt=34 slot=3 inst=1497452619 dt_saw=6.752
+  HIT amt=25 slot=0 inst=1414222417 dt_saw=19.835
+  HIT amt=29 slot=4 inst=1111971416 dt_saw=25.618
+  HIT amt=30 slot=3 inst=1497452619 dt_saw=30.516
+  HIT amt=28 slot=2 inst=1280787787 dt_saw=34.906
+=== (SimpleChar:798E0A36) ===
+  SAW t=2026-07-23T20:59:24.2881381Z amount= detail=SpecialAttackWeaponMessage { Specials=count=5[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttac
+  ATK t=2026-07-23T20:59:24.2881381Z
+  HIT amt=38 slot=3 inst=1497452619 dt_saw=6.609
+  HIT amt=30 slot=2 inst=1280787787 dt_saw=10.315
+
+=== SUMMARY ===
+damage min=16 max=38 n=53
+first_hit_after_SAW mean=6.461 min=3.004 max=9.831 n=15
+hit_interval mean=5.672 min=2.618 max=15.237 n=38
+weapon_slots Counter({3: 16, 4: 14, 2: 10, 0: 7, 1: 6})
+weapon_insts Counter({1497452619: 16, 1111971416: 14, 1280787787: 10, 1414222417: 7, 1297632336: 6})
+saw_amount_field Counter({'56': 6, '48': 4, '52': 3, '60': 2})

@@ -1,0 +1,3 @@
+89dbb9b3-2dc5-4390-a692-7ea6348a5b86.jsonl:1010:ExtendedField64: {"role":"assistant","message":{"content":[{"type":"text","text":"ExtendedField64 (`MailMessage+0x64` / window `+0x11c`) holds the signed money amount for UI and Take All — we were always writing 0. Fixing that and implementing COD payment."}]}}
+
+89dbb9b3-2dc5-4390-a692-7ea6348a5b86.jsonl:1011:ExtendedField64: nt into the wrong MailMessage field.\n\n**Root cause:** The client fills **Credits** / **C.O.D.** and ConfirmTake from `ExtendedField64` (`MailMessage+0x64` → window `+0x11c`), not from CreditsField/CodField alone. Positive = gift credits; negative = COD to pay. We always sent `ExtendedField64=0`.\n\n**Fixed**\n1. `Ext

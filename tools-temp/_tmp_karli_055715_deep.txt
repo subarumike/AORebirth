@@ -1,0 +1,279 @@
+=== Karli SCFU / waypoints ===
+2026-07-27T04:06:47.2411348Z [IN-N3] #6023 type=SimpleCharFullUpdate identity=(SimpleChar:799AD394)
+2026-07-27T04:06:47.2411348Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownDataFlag, IsPet PlayfieldId=8009 FightingTarget=null Position=(36.14677, 0.435, 45.91928) Heading=X: 0 | Y: 0.6452817 | Z: 0 | W: 0.7639447 Appearance=SmokeLounge.AOtomation.Messaging.GameData.Appearance Name="Karli Cappelleri" CharacterFlags=277352961 AccountFlags=0 Expansions=0 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Level=15 Health=393 HealthDamage=0 MonsterData=26125 MonsterScale=100 VisualFlags=31 VisibleTitle=0 ScfuUnk1=byte[28]:3FBCA457BDF1EE873E7FF76502020101000100010001000000020000 HeadMesh=40215 RunSpeedBase=52 ActiveNanos=count=0[] Textures=count=5[SmokeLounge.AOtomation.Messag
+2026-07-27T04:06:47.2411348Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:799AD394) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=75498529,StaticInstance=268365,ACGItemLevel=200,ACGItemTemplateID=268365,ACGItemTemplateID2=268365,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:2584CE91) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2411348Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:799AD394) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=264 Stats=count=7[Flags=75498529,StaticInstance=268792,ACGItemLevel=200,ACGItemTemplateID=268792,ACGItemTemplateID2=268792,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:2584CE92) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2481309Z [CHAR-SEEN] identity=(SimpleChar:799AD394) name=Karli Cappelleri player=False npc=True pet=False inPlay=True alive=True hp=393/393 pct=100.0 level=15 computerLiteracy=6 pos=(36.14713, 0.435, 45.91934) attacking=False fightingTarget=null monsterData=26125 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-07-27T04:06:49.6876259Z [IN-N3] #6106 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:06:49.6876259Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:55.4701310Z [IN-N3] #6145 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:06:55.4701310Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:00.1992150Z [IN-N3] #6180 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:00.1992150Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:06.7561708Z [IN-N3] #6211 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:06.7561708Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:09.4545079Z [IN-N3] #6227 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:09.4545079Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:14.4334361Z [IN-N3] #6253 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:14.4334361Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:21.8198829Z [IN-N3] #6289 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:21.8198829Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:25.8683848Z [IN-N3] #6310 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:25.8683848Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:29.9808481Z [IN-N3] #6331 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:29.9808481Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:35.3155585Z [IN-N3] #6357 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:35.3155585Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:40.0003759Z [IN-N3] #6383 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:40.0003759Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:46.8451540Z [IN-N3] #6414 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:46.8451540Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:49.1967047Z [IN-N3] #6430 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:49.1967047Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+2026-07-27T04:07:54.1796317Z [IN-N3] #6456 type=FollowTarget identity=(SimpleChar:799AD394)
+2026-07-27T04:07:54.1796317Z [IN-N3-DETAIL] FollowTargetMessage { Type=NpcPath Unknown1=24 Info=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.FollowTargetMessage+PathInfo N3MessageType=FollowTarget Identity=(SimpleChar:799AD394) Unknown=0 PacketType=N3Message }
+
+=== packets.hex Karli SCFU bodies ===
+pkt#1 len=314 n3=n3=SimpleCharFullUpdate hex=000F000A0001
+  after_name=4B61726C692043617070656C6C65726900108812010000000089000000000F0189000000660D0064001F000000001C3FBCA457BDF1EE873E7FF7650202010100010001000100000002000000009D1734000003F10000C350799AD394000000024210964C3EDEB8514237AD584224F525350E0000423B1CA5000017A6000000000000000000000000000000010004184E00000000000000020003C8B500000000000000030004185100000000000000040004185000000000000017A600000418480003C4A0020000
+scfu_pkts=1
+
+=== Knubot / Append / Answer after ship entry ===
+[events.log] 2026-07-27T04:06:47.2471312Z [IN-N3] #6035 type=QuestFullUpdate identity=(SimpleChar:7996C028)
+[events.log] 2026-07-27T04:06:47.2471312Z [IN-N3-DETAIL] QuestFullUpdateMessage { Quests=count=5[SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest] N3MessageType=QuestFullUpdate Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+
+=== movement-packets / enemy-movement Karli coords ===
+enemy-movement.csv 2026-07-27T04:06:49.6876259Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:06:55.4701310Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:00.1992150Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:06.7561708Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:09.4545079Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:14.4334361Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:21.8198829Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:25.8683848Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:29.9808481Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:35.3165582Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:40.0003759Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:46.8451540Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:49.1967047Z None,None,None type=FollowTarget
+enemy-movement.csv 2026-07-27T04:07:54.1796317Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:06:49.6866271Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:06:55.4701310Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:00.1992150Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:06.7561708Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:09.4545079Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:14.4334361Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:21.8198829Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:25.8683848Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:29.9808481Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:35.3155585Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:40.0003759Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:46.8411572Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:49.1967047Z None,None,None type=FollowTarget
+movement-packets.csv 2026-07-27T04:07:54.1796317Z None,None,None type=FollowTarget
+unique_pts=0
+path_sample=[]
+
+=== AlienXP / XP kill correlation ===
+2026-07-27T03:57:55.0467258Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=50882] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T03:57:55.0487249Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=750] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T03:59:45.5257467Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=50944] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T03:59:45.5257467Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=900] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:03:24.2859615Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=50999] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:24.2859615Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=1050] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:03:47.0936959Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=51047] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:47.0936959Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=1200] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:04:04.9017887Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=51095] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:04:04.9017887Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=1350] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:04:37.1806757Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=51150] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:04:37.1806757Z [IN-N3-DETAIL] StatMessage { Stats=count=3[AlienXP=0,AlienLevel=1,AlienNextXP=9000] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:04:37.1806757Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=0] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:05:11.8103521Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=51205] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:11.8103521Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=485] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:05:41.8913062Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=51246] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:41.8913062Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=843] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+2026-07-27T04:06:24.8957184Z [IN-N3-DETAIL] StatMessage { Stats=count=1[XP=51308] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:24.8957184Z [IN-N3-DETAIL] StatMessage { Stats=count=1[AlienXP=1399] N3MessageType=Stat Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+deaths:
+  2026-07-27T03:57:55.0397310Z [DYNEL-SPAWNED] identity=(Corpse:F5F80F) name=Remains of Specialist - Cha'Heru pos=(3883.222, 8.443816, 266.963) open=False
+  2026-07-27T03:57:55.0507231Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:00:55 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3883.222, 8.443816, 266.963) Heading=X: 0 | Y: 0.5509512 | Z: 0 | W: 0.8345375 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count
+  2026-07-27T03:57:55.1396695Z [CORPSE-SEEN] identity=(Corpse:F5F80F) name=Remains of Specialist - Cha'Heru pos=(3883.222, 8.443816, 266.963) open=False
+  2026-07-27T03:58:03.5319170Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D5ii!!D5ji!!!!+sKyr'Ozch Machine Pistols!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T03:58:03.7287959Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D5ii!!D5ji!!!!+sKyr'Ozch Machine Pistols!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T03:59:45.5237480Z [DYNEL-SPAWNED] identity=(Corpse:F5F802) name=Remains of Specialist - Cha'Heru pos=(3881.484, 7.905683, 265.1137) open=False
+  2026-07-27T03:59:45.5257467Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:02:45 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3881.484, 7.905683, 265.1137) Heading=X: 0 | Y: -0.9744309 | Z: 0 | W: 0.2246875 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=cou
+  2026-07-27T03:59:45.7865871Z [CORPSE-SEEN] identity=(Corpse:F5F802) name=Remains of Specialist - Cha'Heru pos=(3881.484, 7.905683, 265.1137) open=False
+  2026-07-27T03:59:51.5410378Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!Hqti!!Hqui!!!!+sKyr'Ozch Nunchackos!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T03:59:51.7279217Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!Hqti!!Hqui!!!!+sKyr'Ozch Nunchackos!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:03:24.2849621Z [DYNEL-SPAWNED] identity=(Corpse:F5F81E) name=Remains of Scout - Jaax'Sinuh pos=(3893.291, 4.615957, 231.3751) open=False
+  2026-07-27T04:03:24.2859615Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:06:24 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3893.291, 4.615957, 231.3751) Heading=X: 0 | Y: -0.5779172 | Z: 0 | W: 0.8160954 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=cou
+  2026-07-27T04:03:25.0225075Z [CORPSE-SEEN] identity=(Corpse:F5F81E) name=Remains of Scout - Jaax'Sinuh pos=(3893.291, 4.615957, 231.3751) open=False
+  Remains of Scout - Jaax'Sinuh~" Unk2=1 }
+  Remains of Scout - Jaax'Sinuh~" Unk2=1 }
+  2026-07-27T04:03:47.0926966Z [DYNEL-SPAWNED] identity=(Corpse:F5F80E) name=Remains of Scout - Jaax'Sinuh pos=(3865.781, 7.338142, 246.5787) open=False
+  2026-07-27T04:03:47.0936959Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:06:47 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3865.781, 7.338142, 246.5787) Heading=X: 0 | Y: -0.03487153 | Z: 0 | W: 0.9993918 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=co
+  2026-07-27T04:03:47.1416667Z [CORPSE-SEEN] identity=(Corpse:F5F80E) name=Remains of Scout - Jaax'Sinuh pos=(3865.781, 7.338142, 246.5787) open=False
+  2026-07-27T04:04:04.9007894Z [DYNEL-SPAWNED] identity=(Corpse:F5F81F) name=Remains of Scout - Jaax'Sinuh pos=(3880.812, 7.936897, 272.42) open=False
+  2026-07-27T04:04:04.9017887Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:07:04 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3880.812, 7.936897, 272.42) Heading=X: 0 | Y: 0.6711727 | Z: 0 | W: 0.741301 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=1
+  2026-07-27T04:04:05.2735670Z [CORPSE-SEEN] identity=(Corpse:F5F81F) name=Remains of Scout - Jaax'Sinuh pos=(3880.812, 7.936897, 272.42) open=False
+  2026-07-27T04:04:37.1796752Z [DYNEL-SPAWNED] identity=(Corpse:F5F804) name=Remains of Specialist - Cha'Heru pos=(3890.69, 5.253569, 241.886) open=False
+  2026-07-27T04:04:37.1806757Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:07:37 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3890.69, 5.253569, 241.886) Heading=X: 0 | Y: -0.8805404 | Z: 0 | W: 0.473971 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=
+  2026-07-27T04:04:37.4804901Z [CORPSE-SEEN] identity=(Corpse:F5F804) name=Remains of Specialist - Cha'Heru pos=(3890.69, 5.253569, 241.886) open=False
+  2026-07-27T04:04:45.0658122Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!Hqti!!Hqui!!!!.sKyr'Ozch Nunchackos!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:04:45.2696868Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!Hqti!!Hqui!!!!.sKyr'Ozch Nunchackos!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:05:11.8093528Z [DYNEL-SPAWNED] identity=(Corpse:F5F804) name=Remains of Specialist - Cha'Heru pos=(3868.931, 7.146268, 247.9981) open=False
+  2026-07-27T04:05:11.8103521Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:08:11 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3868.931, 7.146268, 247.9981) Heading=X: 0 | Y: -0.9005648 | Z: 0 | W: 0.4347219 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=cou
+  2026-07-27T04:05:12.7877487Z [CORPSE-SEEN] identity=(Corpse:F5F804) name=Remains of Specialist - Cha'Heru pos=(3868.931, 7.146268, 247.9981) open=False
+  2026-07-27T04:05:19.4796217Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D6Ei!!D6Fi!!!!.sKyr'Ozch Energy Hammers!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:05:19.6824976Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D6Ei!!D6Fi!!!!.sKyr'Ozch Energy Hammers!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:05:41.8903080Z [DYNEL-SPAWNED] identity=(Corpse:F5F823) name=Remains of Specialist - Cha'Heru pos=(3883.58, 8.46545, 266.7498) open=False
+  2026-07-27T04:05:41.8913062Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:08:41 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3883.58, 8.46545, 266.7498) Heading=X: 0 | Y: -0.7586626 | Z: 0 | W: 0.6514838 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count
+  2026-07-27T04:05:42.0701955Z [CORPSE-SEEN] identity=(Corpse:F5F823) name=Remains of Specialist - Cha'Heru pos=(3883.58, 8.46545, 266.7498) open=False
+  2026-07-27T04:05:48.8620071Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D6)i!!D6*i!!!!)sKyr'Ozch Hammers!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:05:49.2707558Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D6)i!!D6*i!!!!)sKyr'Ozch Hammers!Remains of Specialist - Cha'Heru~" Unk2=1 }
+  2026-07-27T04:06:24.8947185Z [DYNEL-SPAWNED] identity=(Corpse:F5F802) name=Remains of Specialist - Cha'Heru pos=(3861.32, 7.511366, 249.2975) open=False
+  2026-07-27T04:06:24.8967175Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:09:24 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3861.32, 7.511366, 249.2975) Heading=X: 0 | Y: 0.3771883 | Z: 0 | W: 0.9261366 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count
+  2026-07-27T04:06:25.5053415Z [CORPSE-SEEN] identity=(Corpse:F5F802) name=Remains of Specialist - Cha'Heru pos=(3861.32, 7.511366, 249.2975) open=False
+  2026-07-27T04:06:34.4698131Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="~&!!!":".A[Js\nMrengyneri!!D5#i!!D5$i!!!!/sKyr'Ozch Shotguns!Remains of Specialist - Cha'Heru~" Unk2=1 }
+
+=== AlienXP timeline ===
+2026-07-27T03:57:55.0467258Z XP=50882
+2026-07-27T03:57:55.0487249Z AlienXP=750
+2026-07-27T03:59:45.5257467Z XP=50944
+2026-07-27T03:59:45.5257467Z AlienXP=900
+2026-07-27T04:03:24.2859615Z XP=50999
+2026-07-27T04:03:24.2859615Z AlienXP=1050
+2026-07-27T04:03:47.0936959Z XP=51047
+2026-07-27T04:03:47.0936959Z AlienXP=1200
+2026-07-27T04:04:04.9017887Z XP=51095
+2026-07-27T04:04:04.9017887Z AlienXP=1350
+2026-07-27T04:04:37.1806757Z XP=51150
+2026-07-27T04:04:37.1806757Z AlienXP=0
+2026-07-27T04:04:37.1806757Z AlienXP=0
+2026-07-27T04:05:11.8103521Z XP=51205
+2026-07-27T04:05:11.8103521Z AlienXP=485
+2026-07-27T04:05:41.8913062Z XP=51246
+2026-07-27T04:05:41.8913062Z AlienXP=843
+2026-07-27T04:06:24.8957184Z XP=51308
+2026-07-27T04:06:24.8957184Z AlienXP=1399
+delta 750 -> 900 = +150
+delta 900 -> 1050 = +150
+delta 1050 -> 1200 = +150
+delta 1200 -> 1350 = +150
+delta 1350 -> 0 = -1350
+delta 0 -> 0 = +0
+delta 0 -> 485 = +485
+delta 485 -> 843 = +358
+delta 843 -> 1399 = +556
+
+=== all corpse loot ===
+Specialist - Cha'Heru md=251772 lvl=12 cred=216 items=254647:254648:10:1 dead=SimpleChar:799D38DE
+Specialist - Cha'Heru md=251772 lvl=13 cred=236 items=288658:288659:10:1 dead=SimpleChar:799D3B85
+Scout - Jaax'Sinuh md=251782 lvl=12 cred=108 items=254577:254578:11:1 dead=SimpleChar:799D387A
+Scout - Jaax'Sinuh md=251782 lvl=11 cred=98 items= dead=SimpleChar:799D3967
+Scout - Jaax'Sinuh md=251782 lvl=11 cred=98 items= dead=SimpleChar:799D3B9C
+Specialist - Cha'Heru md=251772 lvl=12 cred=216 items=288658:288659:13:1 dead=SimpleChar:799D3BBD
+Specialist - Cha'Heru md=251772 lvl=12 cred=216 items=254696:254697:13:1 dead=SimpleChar:799D3BC4
+Specialist - Cha'Heru md=251772 lvl=10 cred=177 items=254668:254669:8:1 dead=SimpleChar:799D3BCD
+Specialist - Cha'Heru md=251772 lvl=13 cred=236 items=254577:254578:14:1 dead=SimpleChar:799D3BD5
+
+=== FormatFeedback all ===
+2026-07-27T03:57:55.0477262Z [ | 1 xp was gained as a side bonus!
+2026-07-27T03:59:45.5257467Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:00:00.5641673Z [ | ~&!!!
+2026-07-27T04:03:24.2859615Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:03:47.0936959Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:04:04.9017887Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:04:37.1806757Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:04:37.1806757Z [ | ~&!!!
+2026-07-27T04:05:11.8103521Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:05:41.8913062Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:06:24.8957184Z [ | 1 xp was gained as a side bonus!
+2026-07-27T04:06:27.4481434Z [ | ~&!!!
+
+=== item grants after 04:06 ===
+2026-07-27T04:00:00.5651663Z [IN-N3] #1915 type=TemplateAction identity=(SimpleChar:7996C028)
+2026-07-27T04:00:00.5651663Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=291082 ItemHighId=291082 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0040) Unknown3=50000 Unknown4=2039922728 N3MessageType=TemplateAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:00:00.5661660Z [IN-N3] #1920 type=TemplateAction identity=(SimpleChar:641D0C3C)
+2026-07-27T04:00:00.5661660Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=297274 ItemHighId=297274 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0040) Unknown3=50000 Unknown4=1679625276 N3MessageType=TemplateAction Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-27T04:00:54.8788064Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Inventory:0057) Target=(SimpleChar:7996C028) Slot=9 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:00:54.8788064Z [IN-N3] #2257 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:00:54.8788064Z [IN-N3-DETAIL] ContainerAddItem { Source=(Inventory:0057) Target=(SimpleChar:7996C028) Slot=9 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:00:54.8788064Z [IN-N3] #2258 type=TemplateAction identity=(SimpleChar:7996C028)
+2026-07-27T04:00:54.8788064Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=36778 ItemHighId=36786 Quality=38 Unknown1=1 Unknown2=6 Placement=(WeaponPage:0009) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:01:00.8209163Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Inventory:0058) Target=(SimpleChar:7996C028) Slot=10 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:01:00.8209163Z [IN-N3] #2300 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:01:00.8209163Z [IN-N3-DETAIL] ContainerAddItem { Source=(Inventory:0058) Target=(SimpleChar:7996C028) Slot=10 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:01:00.8209163Z [IN-N3] #2301 type=TemplateAction identity=(SimpleChar:7996C028)
+2026-07-27T04:01:00.8209163Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=36778 ItemHighId=36786 Quality=38 Unknown1=1 Unknown2=6 Placement=(WeaponPage:000A) Unknown3=0 Unknown4=0 N3MessageType=TemplateAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:24.2859615Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:06:24 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3893.291, 4.615957, 231.3751) Heading=X: 0 | Y: -0.5779172 | Z: 0 | W: 0.8160954 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Scout - Jaax'Sinuh" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D387A) Textures=count=5[SmokeLo
+2026-07-27T04:03:30.6896538Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Backpack:720000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:03:30.6896538Z [IN-N3] #3788 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:03:30.6896538Z [IN-N3-DETAIL] ContainerAddItem { Source=(Backpack:720000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:33.4269662Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0057) Parameter1=254577 Parameter2=254578 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:33.5898653Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:0057) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:03:33.5898653Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0057) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:36.0399861Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0053) Parameter1=288658 Parameter2=288659 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:36.1928917Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:0053) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:03:36.1928917Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0053) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:03:47.0936959Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:06:47 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3865.781, 7.338142, 246.5787) Heading=X: 0 | Y: -0.03487153 | Z: 0 | W: 0.9993918 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Scout - Jaax'Sinuh" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D3967) Textures=count=5[SmokeL
+2026-07-27T04:04:04.9017887Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:07:04 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3880.812, 7.936897, 272.42) Heading=X: 0 | Y: 0.6711727 | Z: 0 | W: 0.741301 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Scout - Jaax'Sinuh" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D3B9C) Textures=count=5[SmokeLounge
+2026-07-27T04:04:37.1307072Z [IN-N3] #4562 type=TemplateAction identity=(SimpleChar:641D0C3C)
+2026-07-27T04:04:37.1307072Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=291043 ItemHighId=291043 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0041) Unknown3=50000 Unknown4=1679625276 N3MessageType=TemplateAction Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-27T04:04:37.1806757Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:07:37 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3890.69, 5.253569, 241.886) Heading=X: 0 | Y: -0.8805404 | Z: 0 | W: 0.473971 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Specialist - Cha'Heru" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D3BBD) Textures=count=5[SmokeLo
+2026-07-27T04:04:44.9019126Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Backpack:750000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:04:44.9019126Z [IN-N3] #4649 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:04:44.9019126Z [IN-N3-DETAIL] ContainerAddItem { Source=(Backpack:750000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:02.9598103Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0053) Parameter1=288658 Parameter2=288659 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:03.1217096Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:0053) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:05:03.1217096Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0053) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:06.8264248Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0043) Parameter1=248352 Parameter2=248352 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:07.5519776Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:0043) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:05:07.5519776Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0043) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:09.7995913Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:005B) Parameter1=248334 Parameter2=248334 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:10.0994072Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:005B) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:05:10.0994072Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:005B) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:11.8103521Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:08:11 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3868.931, 7.146268, 247.9981) Heading=X: 0 | Y: -0.9005648 | Z: 0 | W: 0.4347219 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Specialist - Cha'Heru" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D3BC4) Textures=count=5[Smok
+2026-07-27T04:05:14.0569682Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:004A) Parameter1=248330 Parameter2=248330 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:14.9184343Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:004A) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:05:14.9184343Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:004A) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:17.8566231Z [IN-N3] #5048 type=TemplateAction identity=(SimpleChar:641D0C3C)
+2026-07-27T04:05:17.8566231Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=291043 ItemHighId=291043 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0041) Unknown3=50000 Unknown4=1679625276 N3MessageType=TemplateAction Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:19.6814987Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Backpack:760000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:05:19.6814987Z [IN-N3] #5062 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:05:19.6814987Z [IN-N3-DETAIL] ContainerAddItem { Source=(Backpack:760000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:24.0677918Z [OUT-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0043) Parameter1=254696 Parameter2=254697 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:24.2426841Z [SMOKE] IN CharacterAction identity=(SimpleChar:7996C028) Action=DeleteItem Unknown1=0 Target=(Inventory:0043) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+2026-07-27T04:05:24.2426841Z [IN-N3-DETAIL] CharacterActionMessage { Action=DeleteItem Unknown1=0 Target=(Inventory:0043) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:41.8913062Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:08:41 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3883.58, 8.46545, 266.7498) Heading=X: 0 | Y: -0.7586626 | Z: 0 | W: 0.6514838 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Specialist - Cha'Heru" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D3BCD) Textures=count=5[SmokeL
+2026-07-27T04:05:49.2037967Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Backpack:770000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:05:49.2037967Z [IN-N3] #5362 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:05:49.2037967Z [IN-N3-DETAIL] ContainerAddItem { Source=(Backpack:770000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:05:58.0133630Z [IN-N3] #5500 type=TemplateAction identity=(SimpleChar:641D0C3C)
+2026-07-27T04:05:58.0133630Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=291043 ItemHighId=291043 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0041) Unknown3=50000 Unknown4=1679625276 N3MessageType=TemplateAction Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:24.8967175Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=27-Jul-26 6:09:24 AM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(3861.32, 7.511366, 249.2975) Heading=X: 0 | Y: 0.3771883 | Z: 0 | W: 0.9261366 PlayfieldId=1044525 StateMachine=(None:0000) Unknown3=111 Stats=count=17[Flags=1579013,StaticInstance=0,ACGItemLevel=0,ACGItemTemplateID=0,ACGItemTemplateID2=0,MultipleCount=1] Name="Remains of Specialist - Cha'Heru" Unknown4=2 Unknown5=50 UnknownArray=count=0[] Unknown6=3 AnimationEffects=count=1[SmokeLounge.AOtomation.Messaging.GameData.AnimationEffect] UnknownIdentity=(SimpleChar:799D3BD5) Textures=count=5[SmokeL
+2026-07-27T04:06:27.1093522Z [IN-N3] #5807 type=TemplateAction identity=(SimpleChar:641D0C3C)
+2026-07-27T04:06:27.1093522Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=297274 ItemHighId=297274 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0040) Unknown3=50000 Unknown4=1679625276 N3MessageType=TemplateAction Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:27.4491425Z [IN-N3] #5818 type=TemplateAction identity=(SimpleChar:7996C028)
+2026-07-27T04:06:27.4491425Z [IN-N3-DETAIL] TemplateActionMessage { ItemLowId=291082 ItemHighId=291082 Quality=1 Unknown1=1 Unknown2=3 Placement=(Inventory:0040) Unknown3=50000 Unknown4=2039922728 N3MessageType=TemplateAction Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:34.4108506Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:7996C028) Source=(Backpack:780000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-27T04:06:34.4108506Z [IN-N3] #5876 type=ContainerAddItem identity=(SimpleChar:7996C028)
+2026-07-27T04:06:34.4108506Z [IN-N3-DETAIL] ContainerAddItem { Source=(Backpack:780000) Target=(SimpleChar:7996C028) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:7996C028) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2341391Z [IN-N3] #6012 type=WeaponItemFullUpdate identity=(WeaponInstance:2583B720)
+2026-07-27T04:06:47.2351384Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7996C028) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=262 Stats=count=7[Flags=67109889,StaticInstance=248346,ACGItemLevel=1,ACGItemTemplateID=248346,ACGItemTemplateID2=248346,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:2583B720) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2381367Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=2039922728 Position=null Rotation=null PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=336 Stats=count=7[Flags=-2147483131,StaticInstance=28577,ACGItemLevel=1,ACGItemTemplateID=28577,ACGItemTemplateID2=28577,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(MissionKey:F73009) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2391361Z [IN-N3] #6015 type=WeaponItemFullUpdate identity=(WeaponInstance:1FE09C43)
+2026-07-27T04:06:47.2391361Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:641D0C3C) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=262 Stats=count=7[Flags=67109889,StaticInstance=248341,ACGItemLevel=1,ACGItemTemplateID=248341,ACGItemTemplateID2=248341,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:1FE09C43) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2391361Z [IN-N3] #6016 type=WeaponItemFullUpdate identity=(WeaponInstance:1FE09C42)
+2026-07-27T04:06:47.2391361Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:641D0C3C) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=264 Stats=count=7[Flags=67109889,StaticInstance=248341,ACGItemLevel=1,ACGItemTemplateID=248341,ACGItemTemplateID2=248341,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:1FE09C42) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2391361Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=1679625276 Position=null Rotation=null PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=337 Stats=count=7[Flags=-2147483131,StaticInstance=28577,ACGItemLevel=1,ACGItemTemplateID=28577,ACGItemTemplateID2=28577,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(MissionKey:F7300A) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2411348Z [IN-N3] #6024 type=WeaponItemFullUpdate identity=(WeaponInstance:2584CE91)
+2026-07-27T04:06:47.2411348Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:799AD394) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=75498529,StaticInstance=268365,ACGItemLevel=200,ACGItemTemplateID=268365,ACGItemTemplateID2=268365,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:2584CE91) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2411348Z [IN-N3] #6025 type=WeaponItemFullUpdate identity=(WeaponInstance:2584CE92)
+2026-07-27T04:06:47.2411348Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:799AD394) PlayfieldId=8009 StateMachine=(1000015:0000) Unknown2=264 Stats=count=7[Flags=75498529,StaticInstance=268792,ACGItemLevel=200,ACGItemTemplateID=268792,ACGItemTemplateID2=268792,MultipleCount=1] Unknown3=0 N3MessageType=WeaponItemFullUpdate Identity=(WeaponInstance:2584CE92) Unknown=0 PacketType=N3Message }
+2026-07-27T04:06:47.2471312Z [IN-N3] #6035 type=QuestFullUpdate identity=(SimpleChar:7996C028)
+2026-07-27T04:06:47.2471312Z [IN-N3-DETAIL] QuestFullUpdateMessage { Quests=count=5[SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest,SmokeLounge.AOtomation.Messaging.GameData.Quest] N3MessageType=QuestFullUpdate Identity=(SimpleChar:7996C028) Unknown=1 PacketType=N3Message }
+
+=== scfu-appearance Karli ===
+utc=2026-07-27T04:06:47.2281433Z len=314
+floats_sample=[]

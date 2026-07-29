@@ -1,0 +1,22 @@
+        // Capture 20260724-mission-find-item PF 1441804 containers
+        internal static readonly LootProp[] Props_1441804 =
+        {
+            new LootProp { Name = "Treasure", X = 31.60001f, Y = 5.1f, Z = 193.2f, Locked = true },
+            new LootProp { Name = "Broken Machine", X = 38.60001f, Y = 5.1f, Z = 216.4f, Locked = false },
+            new LootProp { Name = "Treasure", X = 46.60001f, Y = 5.1f, Z = 208.4f, Locked = false },
+            new LootProp { Name = "A blasted Skeleton", X = 29.5f, Y = 5.1f, Z = 238.4f, Locked = false },
+            new LootProp { Name = "Barrel", X = 57.70001f, Y = 5.1f, Z = 227.5f, Locked = true },
+            new LootProp { Name = "A Crashed Android", X = 53.29999f, Y = 5.1f, Z = 201.6f, Locked = false },
+            new LootProp { Name = "Broken Machine", X = 76.59999f, Y = 5.1f, Z = 150.3f, Locked = false },
+            new LootProp { Name = "Barrel", X = 59.2f, Y = 5.1f, Z = 198.9f, Locked = false },
+            new LootProp { Name = "Small Crate", X = 79.5f, Y = 5.1f, Z = 188.1f, Locked = false },
+            new LootProp { Name = "Treasure", X = 81.10001f, Y = 5.1f, Z = 167.7f, Locked = false },
+            new LootProp { Name = "Treasure", X = 21.1933f, Y = 5.1f, Z = 178.8232f, Locked = false },
+            new LootProp { Name = "Skeleton", X = 68.39999f, Y = 5.1f, Z = 208.01f, Locked = false },
+            new LootProp { Name = "Treasure", X = 48.2f, Y = 5.1f, Z = 124.4f, Locked = false },
+            new LootProp { Name = "Barrel", X = 65.01f, Y = 5.1f, Z = 125.4f, Locked = false },
+            new LootProp { Name = "Bottles and Garbage", X = 88.10001f, Y = 5.1f, Z = 158.3f, Locked = false },
+            new LootProp { Name = "Barrel", X = 78.60001f, Y = 5.1f, Z = 194.8f, Locked = false },
+            new LootProp { Name = "Treasure", X = 71.70001f, Y = 5.1f, Z = 191.5f, Locked = false },
+            new LootProp { Name = "A bag", X = 98.41754f, Y = 5.100035f, Z = 178.7181f, Locked = false },
+        };

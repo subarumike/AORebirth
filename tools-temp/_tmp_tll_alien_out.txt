@@ -1,0 +1,186 @@
+=== UNIQUE NAME/MD ===
+Alien Spider - Zix | md=247728 | n=11 deaths=0 lvl=[7, 8, 9, 10] hp=[60, 67, 74, 80] fam=['220'] scale=['121', '122', '123'] run=['61', '68', '75', '81'] [other]
+Angry Minibull | md=30360 | n=27 deaths=9 lvl=[8, 9, 10, 11, 12, 13] hp=[92, 103, 114, 131, 148, 164] fam=['42'] scale=['105'] run=['27', '30', '32', '36', '39', '42'] [WILDLIFE]
+Desert Reet | md=30365 | n=25 deaths=2 lvl=[5, 6] hp=[58, 69] fam=['53'] scale=['93'] run=['20', '23'] [WILDLIFE]
+Gnarl the Roller | md=17687 | n=1 deaths=1 lvl=[7] hp=[607] fam=['55'] scale=['200'] run=['26'] [WILDLIFE]
+Greedy Desert Reet | md=30365 | n=1 deaths=0 lvl=[7] hp=[80] fam=['53'] scale=['130'] run=['26'] [WILDLIFE]
+Harvey the Bully | md=30360 | n=1 deaths=1 lvl=[10] hp=[682] fam=['3'] scale=['100'] run=['32'] [WILDLIFE]
+Lolly the Reet | md=30365 | n=1 deaths=0 lvl=[10] hp=[114] fam=['137'] scale=['95'] run=['18'] [other]
+Rollerrat | md=17687 | n=28 deaths=3 lvl=[5, 6] hp=[58, 69] fam=['55'] scale=['125'] run=['18', '21'] [WILDLIFE]
+Saltworm | md=17712 | n=1 deaths=1 lvl=[13] hp=[1044] fam=['58'] scale=['75'] run=['42'] [WILDLIFE]
+
+=== SPAWN POSITIONS (wildlife, firstSeen positions clustered) ===
+-- Angry Minibull count=27 --
+  lvl=11 hp=131 scale=105 md=30360 xyz=(3536.126, 0.010, 339.404) death=False id=(SimpleChar:7999151C)
+  lvl=11 hp=131 scale=105 md=30360 xyz=(3552.088, 0.010, 408.943) death=True id=(SimpleChar:79991537)
+  lvl=11 hp=131 scale=105 md=30360 xyz=(3553.019, 0.010, 403.762) death=False id=(SimpleChar:7999158A)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3558.688, 3.924, 584.517) death=False id=(SimpleChar:7999110A)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3559.891, 1.664, 528.942) death=True id=(SimpleChar:7999110D)
+  lvl=13 hp=164 scale=105 md=30360 xyz=(3575.381, 0.010, 399.720) death=True id=(SimpleChar:7998A6B1)
+  lvl=13 hp=164 scale=105 md=30360 xyz=(3579.301, 0.010, 328.001) death=False id=(SimpleChar:79978CAF)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3582.177, 0.010, 396.855) death=False id=(SimpleChar:7999158D)
+  lvl=13 hp=164 scale=105 md=30360 xyz=(3589.763, 0.010, 454.320) death=False id=(SimpleChar:7998A7D7)
+  lvl=9 hp=103 scale=105 md=30360 xyz=(3614.056, 0.010, 395.344) death=True id=(SimpleChar:7998A7D9)
+  lvl=12 hp=148 scale=105 md=30360 xyz=(3615.125, 2.178, 281.662) death=False id=(SimpleChar:799914FB)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3617.207, 0.010, 430.436) death=False id=(SimpleChar:7998A76B)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3619.367, 0.010, 395.553) death=True id=(SimpleChar:79991595)
+  lvl=9 hp=103 scale=105 md=30360 xyz=(3621.853, 0.010, 350.504) death=False id=(SimpleChar:7998A6DA)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3644.612, 0.010, 397.724) death=True id=(SimpleChar:79978CE1)
+  lvl=13 hp=164 scale=105 md=30360 xyz=(3651.043, 0.010, 398.197) death=False id=(SimpleChar:79991599)
+  lvl=10 hp=114 scale=105 md=30360 xyz=(3662.097, 3.204, 331.812) death=False id=(SimpleChar:7998A6DE)
+  lvl=12 hp=148 scale=105 md=30360 xyz=(3675.634, 8.384, 456.476) death=False id=(SimpleChar:79991119)
+  lvl=10 hp=114 scale=105 md=30360 xyz=(3722.297, 0.010, 331.565) death=True id=(SimpleChar:7998A712)
+  lvl=13 hp=164 scale=105 md=30360 xyz=(3728.818, 0.010, 394.514) death=False id=(SimpleChar:7998139E)
+  lvl=12 hp=148 scale=105 md=30360 xyz=(3737.575, 0.010, 340.804) death=False id=(SimpleChar:799915A4)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3767.514, 0.277, 413.558) death=False id=(SimpleChar:79964E7A)
+  lvl=11 hp=131 scale=105 md=30360 xyz=(3783.050, 0.394, 304.045) death=False id=(SimpleChar:7998A70D)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3833.219, 0.104, 412.938) death=True id=(SimpleChar:79964CD0)
+  lvl=9 hp=103 scale=105 md=30360 xyz=(3835.416, 0.569, 398.076) death=False id=(SimpleChar:799915DD)
+  lvl=8 hp=92 scale=105 md=30360 xyz=(3848.715, 1.310, 439.811) death=True id=(SimpleChar:79964CD6)
+  lvl=10 hp=114 scale=105 md=30360 xyz=(3857.483, 2.638, 426.471) death=False id=(SimpleChar:799915D4)
+-- Desert Reet count=25 --
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3285.679, 4.930, 689.828) death=False id=(SimpleChar:798F8E61)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3301.309, 0.290, 694.265) death=False id=(SimpleChar:799706C3)
+  lvl=6 hp=69 scale=93 md=30365 xyz=(3313.072, 0.010, 665.688) death=False id=(SimpleChar:79978D7F)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3314.006, 0.010, 708.591) death=False id=(SimpleChar:799706C6)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3321.178, 0.010, 650.744) death=False id=(SimpleChar:79978D80)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3321.491, 0.010, 676.922) death=False id=(SimpleChar:79978D83)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3341.608, 3.800, 664.027) death=False id=(SimpleChar:7998129B)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3344.135, 3.936, 644.244) death=False id=(SimpleChar:799702F8)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3348.061, 2.257, 694.469) death=False id=(SimpleChar:79981296)
+  lvl=6 hp=69 scale=93 md=30365 xyz=(3350.720, 3.706, 598.032) death=False id=(SimpleChar:799812C2)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3350.794, 4.213, 626.366) death=False id=(SimpleChar:7994AA9B)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3351.924, 4.241, 658.157) death=False id=(SimpleChar:79970300)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3356.307, 2.955, 604.359) death=False id=(SimpleChar:7994AA9D)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3360.016, 3.012, 699.918) death=False id=(SimpleChar:799812BE)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3362.619, 5.936, 565.119) death=False id=(SimpleChar:7992E471)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3364.048, 2.110, 610.835) death=False id=(SimpleChar:7994AA9E)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3365.991, 2.110, 593.825) death=False id=(SimpleChar:7994AAA3)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3369.469, 2.407, 672.064) death=True id=(SimpleChar:79978F84)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3375.665, 2.110, 585.989) death=False id=(SimpleChar:799703BF)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3386.298, 2.110, 552.010) death=False id=(SimpleChar:7995DC2D)
+  lvl=6 hp=69 scale=93 md=30365 xyz=(3389.770, 2.110, 593.957) death=False id=(SimpleChar:79991532)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3391.119, 2.110, 591.719) death=True id=(SimpleChar:79991484)
+  lvl=5 hp=58 scale=93 md=30365 xyz=(3397.167, 2.110, 575.066) death=False id=(SimpleChar:7998A68A)
+  lvl=6 hp=69 scale=93 md=30365 xyz=(3399.073, 2.110, 560.693) death=False id=(SimpleChar:7998A692)
+-- Gnarl the Roller count=1 --
+  lvl=7 hp=607 scale=200 md=17687 xyz=(3483.532, 2.110, 719.103) death=True id=(SimpleChar:7999123D)
+-- Greedy Desert Reet count=1 --
+  lvl=7 hp=80 scale=130 md=30365 xyz=(3377.232, 2.110, 570.397) death=False id=(SimpleChar:799910B6)
+-- Harvey the Bully count=1 --
+  lvl=10 hp=682 scale=100 md=30360 xyz=(3849.048, 1.402, 439.513) death=True id=(SimpleChar:799911A3)
+-- Rollerrat count=28 --
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3379.721, 2.133, 662.768) death=False id=(SimpleChar:7998A601)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3384.583, 1.819, 639.356) death=False id=(SimpleChar:7998A5FC)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3386.527, 3.010, 741.985) death=False id=(SimpleChar:7998A632)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3392.264, 2.110, 680.181) death=False id=(SimpleChar:7998A5E2)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3417.965, 2.110, 718.360) death=False id=(SimpleChar:79991529)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3419.092, 2.110, 719.458) death=True id=(SimpleChar:7998A5A0)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3422.605, 2.110, 691.621) death=False id=(SimpleChar:799815B8)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3432.039, 2.110, 664.565) death=False id=(SimpleChar:7999154C)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3432.913, 2.110, 664.835) death=True id=(SimpleChar:79981267)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3456.751, 4.284, 747.043) death=False id=(SimpleChar:7998A755)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3458.478, 2.346, 568.022) death=False id=(SimpleChar:7999104E)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3464.815, 2.110, 698.560) death=True id=(SimpleChar:7998A723)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3466.771, 2.110, 698.377) death=False id=(SimpleChar:79991555)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3492.766, 2.662, 544.020) death=False id=(SimpleChar:7998A60A)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3495.094, 2.110, 693.141) death=False id=(SimpleChar:7998A7CA)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3507.762, 2.359, 576.707) death=False id=(SimpleChar:7992E50C)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3514.796, 2.110, 692.689) death=False id=(SimpleChar:7998A7CC)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3524.854, 2.110, 527.842) death=False id=(SimpleChar:799910AA)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3525.883, 0.010, 468.636) death=False id=(SimpleChar:7998A666)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3527.167, 0.286, 504.498) death=False id=(SimpleChar:7998A6A4)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3533.234, 3.084, 673.433) death=False id=(SimpleChar:7998A66D)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3556.184, 0.010, 485.107) death=False id=(SimpleChar:7998A622)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3572.904, 0.310, 500.685) death=False id=(SimpleChar:7998A64E)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3577.877, 0.010, 371.673) death=False id=(SimpleChar:7992E265)
+  lvl=6 hp=69 scale=125 md=17687 xyz=(3608.443, 10.463, 533.241) death=False id=(SimpleChar:7992E4E2)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3736.135, 0.010, 383.117) death=False id=(SimpleChar:7998A71B)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3815.560, 0.010, 367.723) death=False id=(SimpleChar:79964C7A)
+  lvl=5 hp=58 scale=125 md=17687 xyz=(3869.587, 0.010, 474.544) death=False id=(SimpleChar:79964C82)
+-- Saltworm count=1 --
+  lvl=13 hp=1044 scale=75 md=17712 xyz=(3434.092, 0.010, 629.830) death=True id=(SimpleChar:7999124A)
+
+=== RESPAWNS ===
+complete | Rollerrat | delay=152.306 afterGone=0 delta=1.573 death=(3419.0918,2.11000013,719.458069) respawn=(3417.965,2.11000013,718.360046)
+complete | Desert Reet | delay=51.337 afterGone=0 delta=0.005 death=(3369.46924,2.40733123,672.063843) respawn=(3369.47119,2.40697885,672.068542)
+incomplete | Desert Reet | delay= afterGone= delta= death=(3391.11938,2.11000013,591.7194) respawn=(,,)
+incomplete | Saltworm | delay= afterGone= delta= death=(3434.09155,0.01,629.8295) respawn=(,,)
+complete | Rollerrat | delay=90.245 afterGone=82.144 delta=0.915 death=(3432.913,2.11000013,664.8353) respawn=(3432.03882,2.11000013,664.5651)
+complete | Rollerrat | delay=40.023 afterGone=0 delta=1.965 death=(3464.81519,2.11000013,698.5602) respawn=(3466.77124,2.11000013,698.3773)
+incomplete | Gnarl the Roller | delay= afterGone= delta= death=(3483.532,2.11000013,719.1031) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3559.89087,1.66357982,528.9416) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3552.08838,0.01,408.942566) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3575.38086,0.01,399.71994) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3614.056,0.01,395.343964) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3644.6123,0.01,397.724457) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3722.29688,0.01,331.564728) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3619.36719,0.01,395.5527) respawn=(,,)
+incomplete | Harvey the Bully | delay= afterGone= delta= death=(3849.04785,1.40237069,439.513153) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3848.71484,1.31037843,439.811) respawn=(,,)
+incomplete | Angry Minibull | delay= afterGone= delta= death=(3833.21948,0.104464121,412.938263) respawn=(,,)
+
+=== LOOT ===
+Saltworm md=17712 lvl=13 credits=118 items=85600:85599:12:1;149908:149907:12:1;121836:121837:12:1;150193:150194:12:1;160202:160203:12:1;162602:162602:14:1;201045:201046:12:1
+Rollerrat md=17687 lvl=5 credits=29 items=
+Rollerrat md=17687 lvl=5 credits=29 items=70560:85688:4:1
+Gnarl the Roller md=17687 lvl=7 credits=62 items=85636:85635:7:1;70563:85558:7:1;152122:152123:7:1;130051:130052:7:1;161541:161542:7:1;160900:160900:17:1;201093:201094:7:1
+Angry Minibull md=30360 lvl=8 credits=47 items=248310:248310:1:1
+Angry Minibull md=30360 lvl=11 credits=66 items=248310:248310:1:1
+Angry Minibull md=30360 lvl=13 credits=79 items=248330:248330:1:1
+Angry Minibull md=30360 lvl=9 credits=53 items=70565:85514:8:1;248330:248330:1:1
+Angry Minibull md=30360 lvl=8 credits=47 items=
+Angry Minibull md=30360 lvl=10 credits=59 items=
+Angry Minibull md=30360 lvl=8 credits=47 items=
+Harvey the Bully md=30360 lvl=10 credits=88 items=85702:22018:10:1;85630:27392:10:1;122981:122982:10:1;122102:122103:10:1;147007:147007:4:1;160422:160422:100:1;160704:160704:24:1;201156:201157:10:1
+
+=== XP / SYSTEM REWARDS ===
+2026-07-26T05:43:35.4923414Z [IN-N3] #293 type=Stat text= detail=StatMessage { Stats=count=1[XP=58126] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:43:57.7246841Z [IN-N3] #442 type=Stat text= detail=StatMessage { Stats=count=1[XP=58127] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:45:51.8740876Z [IN-N3] #1204 type=Stat text= detail=StatMessage { Stats=count=1[XP=58957] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:46:17.1078572Z [IN-N3] #1357 type=Stat text= detail=StatMessage { Stats=count=1[XP=58958] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:46:37.6712275Z [IN-N3] #1513 type=Stat text= detail=StatMessage { Stats=count=1[XP=58959] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:47:32.8976947Z [IN-N3] #1935 type=Stat text= detail=StatMessage { Stats=count=1[XP=59712] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:47:32.8986941Z [IN-N3] #1936 type=FormatFeedback text=~&!!!":%>4`qi!!!!B~ detail=FormatFeedbackMessage { Unknown1=0 Message="~&!!!":%>4`qi!!!!B~" Unknown2=0 FormattedMessage="33 xp was gained as a side bonus!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 Packet
+2026-07-26T05:48:38.0025120Z [IN-N3] #2386 type=Stat text= detail=StatMessage { Stats=count=1[XP=60542] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:49:22.1957948Z [IN-N3] #2673 type=Stat text= detail=StatMessage { Stats=count=1[XP=61372] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:49:44.8377200Z [IN-N3] #2860 type=Stat text= detail=StatMessage { Stats=count=1[LastSaveXP=62202] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-26T05:49:44.8377200Z [IN-N3] #2862 type=Stat text= detail=StatMessage { Stats=count=1[XP=62202] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:50:21.8665910Z [IN-N3] #3076 type=Stat text= detail=StatMessage { Stats=count=1[XP=63092] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:50:38.7780010Z [IN-N3] #3201 type=Stat text= detail=StatMessage { Stats=count=1[XP=63913] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:50:38.7780010Z [IN-N3] #3202 type=FormatFeedback text=~&!!!":%>4`qi!!!!E~ detail=FormatFeedbackMessage { Unknown1=0 Message="~&!!!":%>4`qi!!!!E~" Unknown2=0 FormattedMessage="36 xp was gained as a side bonus!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 Packet
+2026-07-26T05:51:24.1662259Z [IN-N3] #3543 type=Stat text= detail=StatMessage { Stats=count=1[XP=64803] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:52:13.9047908Z [IN-N3] #3925 type=Stat text= detail=StatMessage { Stats=count=1[XP=65624] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:52:13.9057915Z [IN-N3] #3926 type=FormatFeedback text=~&!!!":%>4`qi!!!!E~ detail=FormatFeedbackMessage { Unknown1=0 Message="~&!!!":%>4`qi!!!!E~" Unknown2=0 FormattedMessage="36 xp was gained as a side bonus!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 Packet
+2026-07-26T05:54:09.1204677Z [IN-N3] #4782 type=Stat text= detail=StatMessage { Stats=count=1[XP=66514] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:54:22.1539452Z [IN-N3] #4895 type=Stat text= detail=StatMessage { Stats=count=1[XP=67335] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:54:22.1539452Z [IN-N3] #4896 type=FormatFeedback text=~&!!!":%>4`qi!!!!E~ detail=FormatFeedbackMessage { Unknown1=0 Message="~&!!!":%>4`qi!!!!E~" Unknown2=0 FormattedMessage="36 xp was gained as a side bonus!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 Packet
+2026-07-26T05:54:55.6681613Z [IN-N3] #5163 type=Stat text= detail=StatMessage { Stats=count=1[XP=68156] N3MessageType=Stat Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3Message }
+2026-07-26T05:54:55.6681613Z [IN-N3] #5164 type=FormatFeedback text=~&!!!":%>4`qi!!!!E~ detail=FormatFeedbackMessage { Unknown1=0 Message="~&!!!":%>4`qi!!!!E~" Unknown2=0 FormattedMessage="36 xp was gained as a side bonus!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 Packet
+
+=== DAMAGE STATS (AttackInfo by enemy name via fight log + combat csv) ===
+Angry Minibull HIT_PLAYER: n=22 min=5 max=12 avg=5.8 vals=[(5, 18), (7, 2), (12, 2)]
+Angry Minibull HIT_BY_PLAYER: n=36 min=7 max=65 avg=20.3 vals=[(7, 2), (8, 2), (9, 1), (10, 1), (11, 1), (13, 2), (14, 1), (15, 1), (16, 1), (17, 4), (18, 3), (20, 4), (21, 1), (23, 1), (24, 4), (25, 2), (26, 2), (27, 1), (65, 2)]
+Desert Reet HIT_PLAYER: n/a
+Desert Reet HIT_BY_PLAYER: n=2 min=18 max=28 avg=23.0 vals=[(18, 1), (28, 1)]
+Gnarl the Roller HIT_PLAYER: n=6 min=7 max=18 avg=12.8 vals=[(7, 1), (13, 4), (18, 1)]
+Gnarl the Roller HIT_BY_PLAYER: n=21 min=8 max=65 avg=21.9 vals=[(8, 1), (9, 1), (10, 1), (12, 3), (14, 1), (15, 2), (17, 1), (19, 1), (20, 1), (22, 1), (23, 3), (24, 1), (25, 1), (26, 1), (65, 2)]
+Harvey the Bully HIT_PLAYER: n=19 min=5 max=12 avg=7.2 vals=[(5, 13), (12, 6)]
+Harvey the Bully HIT_BY_PLAYER: n=27 min=7 max=65 avg=20.8 vals=[(7, 1), (8, 2), (10, 2), (12, 1), (13, 3), (14, 1), (15, 1), (16, 2), (17, 1), (18, 1), (19, 1), (20, 1), (23, 1), (24, 3), (25, 1), (27, 2), (28, 1), (65, 2)]
+Rollerrat HIT_PLAYER: n=4 min=5 max=10 avg=6.2 vals=[(5, 3), (10, 1)]
+Rollerrat HIT_BY_PLAYER: n=10 min=8 max=27 avg=17.4 vals=[(8, 1), (9, 1), (13, 1), (14, 1), (16, 1), (19, 1), (20, 1), (22, 1), (26, 1), (27, 1)]
+Saltworm HIT_PLAYER: n=26 min=12 max=21 avg=13.5 vals=[(12, 4), (13, 20), (21, 2)]
+Saltworm HIT_BY_PLAYER: n=40 min=7 max=65 avg=19.2 vals=[(7, 1), (8, 1), (9, 1), (10, 5), (12, 1), (13, 4), (14, 4), (15, 1), (16, 1), (17, 2), (18, 3), (19, 1), (20, 1), (21, 3), (22, 1), (23, 1), (24, 1), (25, 2), (26, 4), (65, 2)]
+
+=== SPECIAL ATTACK / ANIM (Unique SpecialAttackWeapon Unknowns for wildlife) ===
+Angry Minibull SAW unknowns: [('45', '45', '45', '45', '0'), ('45', '45', '45', '45', '22'), ('45', '45', '45', '45', '25'), ('49', '49', '49', '49', '0'), ('54', '54', '54', '54', '0'), ('59', '59', '59', '59', '0'), ('70', '70', '70', '70', '0'), ('70', '70', '70', '70', '40')]
+Desert Reet SAW unknowns: [('30', '30', '30', '30', '0')]
+Gnarl the Roller SAW unknowns: [('78', '78', '78', '39', '0'), ('78', '78', '78', '39', '51')]
+Harvey the Bully SAW unknowns: [('23', '23', '23', '6', '20')]
+Rollerrat SAW unknowns: [('30', '30', '30', '30', '0')]
+Saltworm SAW unknowns: [('109', '109', '109', '70', '44')]
+Angry Minibull WeaponSlots: [0, 1]
+Gnarl the Roller WeaponSlots: [0, 1]
+Harvey the Bully WeaponSlots: [0, 1]
+Rollerrat WeaponSlots: [0, 1]
+Saltworm WeaponSlots: [0, 1]

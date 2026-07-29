@@ -1,0 +1,126 @@
+=== enemy AttackInfo / MissedAttackInfo ===
+2026-07-25T13:10:32.6728007Z SpecialAttackWeapon src=(SimpleChar:79944F75) tgt=20 amt= u1=20 u2=20 u3=20 u4=20 u5=0 action=
+2026-07-25T13:10:32.6737996Z Attack src=(SimpleChar:79944F75) tgt= amt= u1=0 u2= u3= u4= u5= action=
+2026-07-25T13:11:00.6803688Z SpecialAttackWeapon src=(SimpleChar:79944F68) tgt=20 amt= u1=20 u2=20 u3=20 u4=20 u5=0 action=
+2026-07-25T13:11:00.6813679Z Attack src=(SimpleChar:79944F68) tgt= amt= u1=0 u2= u3= u4= u5= action=
+2026-07-25T13:11:02.2843800Z SpecialAttackWeapon src=(SimpleChar:79944F6D) tgt=33 amt= u1=33 u2=33 u3=33 u4=33 u5=0 action=
+2026-07-25T13:11:02.2843800Z Attack src=(SimpleChar:79944F6D) tgt= amt= u1=0 u2= u3= u4= u5= action=
+2026-07-25T13:11:07.6440742Z AttackInfo src=(SimpleChar:79944F6D) tgt= amt=12 u1= u2= u3= u4= u5= action=
+2026-07-25T13:11:09.6718234Z AttackInfo src=(SimpleChar:79944F68) tgt= amt=10 u1= u2= u3= u4= u5= action=
+2026-07-25T13:11:12.2472360Z AttackInfo src=(SimpleChar:79944F6D) tgt= amt=6 u1= u2= u3= u4= u5= action=
+2026-07-25T13:11:36.1926187Z SpecialAttackWeapon src=(SimpleChar:79944F6C) tgt=33 amt= u1=33 u2=33 u3=33 u4=33 u5=0 action=
+2026-07-25T13:11:36.1926187Z Attack src=(SimpleChar:79944F6C) tgt= amt= u1=0 u2= u3= u4= u5= action=
+2026-07-25T13:11:44.9092804Z AttackInfo src=(SimpleChar:79944F6C) tgt= amt=16 u1= u2= u3= u4= u5= action=
+2026-07-25T13:12:12.2186200Z SpecialAttackWeapon src=(SimpleChar:79944F76) tgt=30 amt= u1=30 u2=30 u3=30 u4=30 u5=0 action=
+2026-07-25T13:12:12.2186200Z Attack src=(SimpleChar:79944F76) tgt= amt= u1=0 u2= u3= u4= u5= action=
+2026-07-25T13:12:14.5381885Z SpecialAttackWeapon src=(SimpleChar:79944F69) tgt=20 amt= u1=20 u2=20 u3=20 u4=20 u5=0 action=
+2026-07-25T13:12:14.5381885Z Attack src=(SimpleChar:79944F69) tgt= amt= u1=0 u2= u3= u4= u5= action=
+2026-07-25T13:12:16.4110356Z AttackInfo src=(SimpleChar:79944F69) tgt= amt=8 u1= u2= u3= u4= u5= action=
+2026-07-25T13:12:20.9132163Z AttackInfo src=(SimpleChar:79944F76) tgt= amt=9 u1= u2= u3= u4= u5= action=
+2026-07-25T13:12:26.3562057Z AttackInfo src=(SimpleChar:79944F76) tgt= amt=18 u1= u2= u3= u4= u5= action=
+2026-07-25T13:12:51.7471716Z SpecialAttackWeapon src=(SimpleChar:79944F6A) tgt=20 amt= u1=20 u2=20 u3=20 u4=20 u5=0 action=
+2026-07-25T13:12:51.7481708Z Attack src=(SimpleChar:79944F6A) tgt= amt= u1=0 u2= u3= u4= u5= action=
+
+=== SAW enemy hex decode ===
+
+=== raw AttackInfo with enemy identity 79944F ===
+None hxiden attacker? detail= hx=0057000A0001003D00000DB8797E30D746002F160000C350797E30D7000000001AFFFFFFFF000000060000C35079944F75000000000000000300000000
+None hxiden attacker? detail= hx=005E000A0001003D00000DB8797E30D746002F160000C350797E30D70000000009FFFFFFFF000000060000C35079944F75000000000000000300000000
+None hxiden attacker? detail= hx=0061000A0001003D00000DB8797E30D746002F160000C350797E30D70000000011FFFFFFFF000000060000C35079944F75000000040000000300000000
+None hxiden attacker? detail= hx=00DF000A0001003D00000DB8797E30D746002F160000C350797E30D7000000002FFFFFFFFF000000060000C35079944F6D000000000000000400000000
+None hxiden attacker? detail= hx=00E4000A0001003D00000DB8797E30D746002F160000C350797E30D70000000008FFFFFFFF000000060000C35079944F6D000000000000000300000000
+None hxiden attacker? detail= hx=00EA000A0001003D00000DB8797E30D746002F160000C35079944F6D000000000CFFFFFFFF000000000000C350797E30D7000000000000000348565731
+None hxiden attacker? detail= hx=00EB000A0001003D00000DB8797E30D746002F160000C350797E30D70000000009FFFFFFFF000000060000C35079944F6D000000000000000300000000
+None hxiden attacker? detail= hx=00F0000A0001003D00000DB8797E30D746002F160000C35079944F68000000000AFFFFFFFF000000000000C350797E30D7000000000000000353495731
+None hxiden attacker? detail= hx=00F2000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000AFFFFFFFF000000060000C35079944F6D000000000000000300000000
+None hxiden attacker? detail= hx=00F6000A0001003D00000DB8797E30D746002F160000C35079944F6D0000000006FFFFFFFF000000010000C350797E30D7000000000000000348565732
+None hxiden attacker? detail= hx=00F9000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000DFFFFFFFF000000060000C35079944F6D000000040000000300000000
+None hxiden attacker? detail= hx=010E000A0001003D00000DB8797E30D746002F160000C350797E30D70000000012FFFFFFFF000000060000C35079944F68000000000000000300000000
+None hxiden attacker? detail= hx=0114000A0001003D00000DB8797E30D746002F160000C350797E30D7000000002EFFFFFFFF000000060000C35079944F68000000000000000400000000
+None hxiden attacker? detail= hx=0119000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000DFFFFFFFF000000060000C35079944F68000000040000000300000000
+None hxiden attacker? detail= hx=0193000A0001003D00000DB8797E30D746002F160000C350797E30D70000000015FFFFFFFF000000060000C35079944F6C000000000000000300000000
+None hxiden attacker? detail= hx=019C000A0001003D00000DB8797E30D746002F160000C350797E30D70000000009FFFFFFFF000000060000C35079944F6C000000000000000300000000
+None hxiden attacker? detail= hx=01A2000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000DFFFFFFFF000000060000C35079944F6C000000000000000300000000
+None hxiden attacker? detail= hx=01A7000A0001003D00000DB8797E30D746002F160000C350797E30D70000000011FFFFFFFF000000060000C35079944F6C000000000000000300000000
+None hxiden attacker? detail= hx=01A8000A0001003D00000DB8797E30D746002F160000C35079944F6C0000000010FFFFFFFF000000010000C350797E30D7000000000000000348565732
+None hxiden attacker? detail= hx=01AD000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000CFFFFFFFF000000060000C35079944F6C000000000000000300000000
+None hxiden attacker? detail= hx=01B3000A0001003D00000DB8797E30D746002F160000C350797E30D70000000013FFFFFFFF000000060000C35079944F6C000000040000000300000000
+None hxiden attacker? detail= hx=0223000A0001003D00000DB8797E30D746002F160000C350797E30D70000000007FFFFFFFF000000060000C35079944F69000000000000000300000000
+None hxiden attacker? detail= hx=022E000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000FFFFFFFFF000000060000C35079944F69000000000000000300000000
+None hxiden attacker? detail= hx=022F000A0001003D00000DB8797E30D746002F160000C35079944F690000000008FFFFFFFF000000000000C350797E30D7000000000000000353495731
+None hxiden attacker? detail= hx=0238000A0001003D00000DB8797E30D746002F160000C350797E30D70000000012FFFFFFFF000000060000C35079944F69000000040000000300000000
+None hxiden attacker? detail= hx=0246000A0001003D00000DB8797E30D746002F160000C350797E30D70000000008FFFFFFFF000000060000C35079944F76000000000000000300000000
+None hxiden attacker? detail= hx=0247000A0001003D00000DB8797E30D746002F160000C35079944F760000000009FFFFFFFF000000000000C350797E30D7000000000000000353495731
+None hxiden attacker? detail= hx=024C000A0001003D00000DB8797E30D746002F160000C350797E30D70000000007FFFFFFFF000000060000C35079944F76000000000000000300000000
+None hxiden attacker? detail= hx=0252000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000BFFFFFFFF000000060000C35079944F76000000000000000300000000
+None hxiden attacker? detail= hx=025C000A0001003D00000DB8797E30D746002F160000C35079944F760000000012FFFFFFFF000000000000C350797E30D7000000000000000353495731
+None hxiden attacker? detail= hx=025D000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000EFFFFFFFF000000060000C35079944F76000000000000000300000000
+None hxiden attacker? detail= hx=0263000A0001003D00000DB8797E30D746002F160000C350797E30D70000000007FFFFFFFF000000060000C35079944F76000000000000000300000000
+None hxiden attacker? detail= hx=026A000A0001003D00000DB8797E30D746002F160000C350797E30D70000000012FFFFFFFF000000060000C35079944F76000000000000000300000000
+None hxiden attacker? detail= hx=0271000A0001003D00000DB8797E30D746002F160000C350797E30D7000000002EFFFFFFFF000000060000C35079944F76000000000000000400000000
+None hxiden attacker? detail= hx=02D5000A0001003D00000DB8797E30D746002F160000C350797E30D70000000006FFFFFFFF000000060000C35079944F6A000000000000000300000000
+None hxiden attacker? detail= hx=02DD000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000CFFFFFFFF000000060000C35079944F6A000000000000000300000000
+None hxiden attacker? detail= hx=02E3000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000DFFFFFFFF000000060000C35079944F6A000000000000000300000000
+None hxiden attacker? detail= hx=02E8000A0001003D00000DB8797E30D746002F160000C350797E30D7000000001AFFFFFFFF000000060000C35079944F6A000000000000000300000000
+None hxiden attacker? detail= hx=02ED000A0001003D00000DB8797E30D746002F160000C350797E30D7000000000AFFFFFFFF000000060000C35079944F6A000000040000000300000000
+
+=== finish packets chronological ===
+
+=== ALL FormatFeedback / CreateItem / Quest Delete ===
+None FormatFeedback 
+None Feedback 
+None FormatFeedback 
+None Feedback 
+None Feedback 
+None FormatFeedback 
+None Feedback 
+None Feedback 
+None Feedback 
+None FormatFeedback 
+None TemplateAction 
+None FormatFeedback 
+None Feedback 
+None Feedback 
+None FormatFeedback 
+None TemplateAction 
+None Feedback 
+None Quest 
+
+=== zone-in SCFU positions from enemy-full-updates ===
+cols=['CapturedUtc', 'Direction', 'Sequence', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'FightingTargetRole', 'FightingTargetIdentity', 'Version', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NPCFamily', 'LosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'Unknown1Length', 'Unknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanoCount', 'ActiveNanos', 'WaypointCount', 'WaypointOwner', 'Waypoints', 'TextureOverrideCount', 'TextureOverrides', 'TextureCount', 'Textures', 'MeshCount', 'Meshes', 'Flags2', 'Unknown2', 'Unknown4', 'DecodeFullyConsumed', 'UndecodedTailHex', 'RawBodyHex', 'Detail']
+  {'CapturedUtc': '2026-07-25T13:10:14.1254083Z', 'Direction': 'IN', 'Sequence': '19', 'Identity': '(SimpleChar:79944F68)', 'Name': 'Mara Sotto', 'PlayfieldId': '1441800', 'PositionX': '255.985489', 'PositionY': '5.01', 'PositionZ': '255.0519', 'HeadingX': '0', 'HeadingY': '-0.303637028', 'HeadingZ': '0', 'HeadingW': '0.952787757', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1254083Z', 'Direction': 'IN', 'Sequence': '21', 'Identity': '(SimpleChar:79944F75)', 'Name': 'Love Locknane', 'PlayfieldId': '1441800', 'PositionX': '264.90683', 'PositionY': '5.01', 'PositionZ': '234.584885', 'HeadingX': '0', 'HeadingY': '-0.552094', 'HeadingZ': '0', 'HeadingW': '0.8337819', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1264078Z', 'Direction': 'IN', 'Sequence': '24', 'Identity': '(SimpleChar:79944F69)', 'Name': 'Sina Sosnowski', 'PlayfieldId': '1441800', 'PositionX': '257.2889', 'PositionY': '5.01', 'PositionZ': '229.18811', 'HeadingX': '0', 'HeadingY': '-0.232268021', 'HeadingZ': '0', 'HeadingW': '0.9726518', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1284079Z', 'Direction': 'IN', 'Sequence': '25', 'Identity': '(SimpleChar:79944F76)', 'Name': 'Felix Swicord', 'PlayfieldId': '1441800', 'PositionX': '256.7495', 'PositionY': '5.01', 'PositionZ': '228.576187', 'HeadingX': '0', 'HeadingY': '0.972651839', 'HeadingZ': '0', 'HeadingW': '0.232267931', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1294067Z', 'Direction': 'IN', 'Sequence': '28', 'Identity': '(SimpleChar:7990F76B)', 'Name': 'Donald Sosnowski', 'PlayfieldId': '1441800', 'PositionX': '243.01', 'PositionY': '5.010754', 'PositionZ': '207.01', 'HeadingX': '0', 'HeadingY': '-0.970804036', 'HeadingZ': '0', 'HeadingW': '0.239873722', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1294067Z', 'Direction': 'IN', 'Sequence': '29', 'Identity': '(SimpleChar:79944F6A)', 'Name': 'Byron Lene', 'PlayfieldId': '1441800', 'PositionX': '248.987946', 'PositionY': '5.01075268', 'PositionZ': '195.755539', 'HeadingX': '0', 'HeadingY': '0.9192131', 'HeadingZ': '0', 'HeadingW': '0.393760443', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1304049Z', 'Direction': 'IN', 'Sequence': '30', 'Identity': '(SimpleChar:79944F77)', 'Name': 'Probe 2000-2', 'PlayfieldId': '1441800', 'PositionX': '240.112076', 'PositionY': '5.01075268', 'PositionZ': '194.430191', 'HeadingX': '0', 'HeadingY': '-0.393760324', 'HeadingZ': '0', 'HeadingW': '0.919213057', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1304049Z', 'Direction': 'IN', 'Sequence': '32', 'Identity': '(SimpleChar:79944F6B)', 'Name': 'Herb Lindner', 'PlayfieldId': '1441800', 'PositionX': '272.844147', 'PositionY': '5.01', 'PositionZ': '213.937927', 'HeadingX': '0', 'HeadingY': '-0.6289156', 'HeadingZ': '0', 'HeadingW': '0.777473569', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1314046Z', 'Direction': 'IN', 'Sequence': '34', 'Identity': '(SimpleChar:79944F6C)', 'Name': 'Probe 2000-3', 'PlayfieldId': '1441800', 'PositionX': '242.692978', 'PositionY': '5.01', 'PositionZ': '252.607651', 'HeadingX': '0', 'HeadingY': '-0.0603482127', 'HeadingZ': '0', 'HeadingW': '0.9981774', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:14.1314046Z', 'Direction': 'IN', 'Sequence': '37', 'Identity': '(SimpleChar:79944F6D)', 'Name': 'Probe 2000-1', 'PlayfieldId': '1441800', 'PositionX': '271.3167', 'PositionY': '5.01', 'PositionZ': '252.364853', 'HeadingX': '0', 'HeadingY': '-0.970388234', 'HeadingZ': '0', 'HeadingW': '0.241550624', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:29.9744628Z', 'Direction': 'IN', 'Sequence': '63', 'Identity': '(SimpleChar:79944F6E)', 'Name': 'Janis Wyles', 'PlayfieldId': '1441800', 'PositionX': '234.180618', 'PositionY': '5.01', 'PositionZ': '227.1457', 'HeadingX': '0', 'HeadingY': '0.465536058', 'HeadingZ': '0', 'HeadingW': '0.8850289', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:30.0064450Z', 'Direction': 'IN', 'Sequence': '67', 'Identity': '(SimpleChar:79944F6F)', 'Name': 'Nida Croteau', 'PlayfieldId': '1441800', 'PositionX': '243.4299', 'PositionY': '5.01', 'PositionZ': '183.010147', 'HeadingX': '0', 'HeadingY': '0.45706585', 'HeadingZ': '0', 'HeadingW': '0.889432847', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:30.0074443Z', 'Direction': 'IN', 'Sequence': '70', 'Identity': '(SimpleChar:79944F70)', 'Name': 'Len Fuchs', 'PlayfieldId': '1441800', 'PositionX': '242.644928', 'PositionY': '5.01', 'PositionZ': '226.583328', 'HeadingX': '0', 'HeadingY': '-0.645252347', 'HeadingZ': '0', 'HeadingW': '0.7639695', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:30.0084428Z', 'Direction': 'IN', 'Sequence': '72', 'Identity': '(SimpleChar:79944F71)', 'Name': 'Laquanda Gabriel', 'PlayfieldId': '1441800', 'PositionX': '256.1056', 'PositionY': '5.01', 'PositionZ': '188.158157', 'HeadingX': '0', 'HeadingY': '0.707103133', 'HeadingZ': '0', 'HeadingW': '0.7071104', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:30.0094426Z', 'Direction': 'IN', 'Sequence': '75', 'Identity': '(SimpleChar:79944F72)', 'Name': 'Cinda Harrist', 'PlayfieldId': '1441800', 'PositionX': '262.6716', 'PositionY': '5.01', 'PositionZ': '192.309738', 'HeadingX': '0', 'HeadingY': '-0.144262537', 'HeadingZ': '0', 'HeadingW': '0.989539444', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:30.0104419Z', 'Direction': 'IN', 'Sequence': '78', 'Identity': '(SimpleChar:79944F73)', 'Name': 'Ma Vallone', 'PlayfieldId': '1441800', 'PositionX': '228.49527', 'PositionY': '5.01', 'PositionZ': '208.1483', 'HeadingX': '0', 'HeadingY': '-0.997032344', 'HeadingZ': '0', 'HeadingW': '0.07698384', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:10:30.0104419Z', 'Direction': 'IN', 'Sequence': '80', 'Identity': '(SimpleChar:79944F74)', 'Name': 'Lashon Timas', 'PlayfieldId': '1441800', 'PositionX': '267.651367', 'PositionY': '5.01', 'PositionZ': '205.031754', 'HeadingX': '0', 'HeadingY': '-0.666808665', 'HeadingZ': '0', 'HeadingW': '0.745228946', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5548295Z', 'Direction': 'IN', 'Sequence': '184', 'Identity': '(SimpleChar:79944F6E)', 'Name': 'Janis Wyles', 'PlayfieldId': '1441800', 'PositionX': '234.180618', 'PositionY': '5.01', 'PositionZ': '227.1457', 'HeadingX': '0', 'HeadingY': '0.465536058', 'HeadingZ': '0', 'HeadingW': '0.8850289', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5558292Z', 'Direction': 'IN', 'Sequence': '188', 'Identity': '(SimpleChar:79944F6F)', 'Name': 'Nida Croteau', 'PlayfieldId': '1441800', 'PositionX': '243.4299', 'PositionY': '5.01', 'PositionZ': '183.010147', 'HeadingX': '0', 'HeadingY': '0.45706585', 'HeadingZ': '0', 'HeadingW': '0.889432847', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5568296Z', 'Direction': 'IN', 'Sequence': '191', 'Identity': '(SimpleChar:79944F70)', 'Name': 'Len Fuchs', 'PlayfieldId': '1441800', 'PositionX': '242.644928', 'PositionY': '5.01', 'PositionZ': '226.583328', 'HeadingX': '0', 'HeadingY': '-0.645252347', 'HeadingZ': '0', 'HeadingW': '0.7639695', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5578296Z', 'Direction': 'IN', 'Sequence': '193', 'Identity': '(SimpleChar:79944F71)', 'Name': 'Laquanda Gabriel', 'PlayfieldId': '1441800', 'PositionX': '256.1056', 'PositionY': '5.01', 'PositionZ': '188.158157', 'HeadingX': '0', 'HeadingY': '0.707103133', 'HeadingZ': '0', 'HeadingW': '0.7071104', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5588285Z', 'Direction': 'IN', 'Sequence': '196', 'Identity': '(SimpleChar:79944F72)', 'Name': 'Cinda Harrist', 'PlayfieldId': '1441800', 'PositionX': '262.6716', 'PositionY': '5.01', 'PositionZ': '192.309738', 'HeadingX': '0', 'HeadingY': '-0.144262537', 'HeadingZ': '0', 'HeadingW': '0.989539444', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5598268Z', 'Direction': 'IN', 'Sequence': '199', 'Identity': '(SimpleChar:79944F73)', 'Name': 'Ma Vallone', 'PlayfieldId': '1441800', 'PositionX': '228.49527', 'PositionY': '5.01', 'PositionZ': '208.1483', 'HeadingX': '0', 'HeadingY': '-0.997032344', 'HeadingZ': '0', 'HeadingW': '0.07698384', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:01.5608262Z', 'Direction': 'IN', 'Sequence': '201', 'Identity': '(SimpleChar:79944F74)', 'Name': 'Lashon Timas', 'PlayfieldId': '1441800', 'PositionX': '267.651367', 'PositionY': '5.01', 'PositionZ': '205.031754', 'HeadingX': '0', 'HeadingY': '-0.666808665', 'HeadingZ': '0', 'HeadingW': '0.745228946', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:31.5434751Z', 'Direction': 'IN', 'Sequence': '347', 'Identity': '(SimpleChar:79944F6E)', 'Name': 'Janis Wyles', 'PlayfieldId': '1441800', 'PositionX': '234.180618', 'PositionY': '5.01', 'PositionZ': '227.1457', 'HeadingX': '0', 'HeadingY': '0.465536058', 'HeadingZ': '0', 'HeadingW': '0.8850289', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:31.5444746Z', 'Direction': 'IN', 'Sequence': '351', 'Identity': '(SimpleChar:79944F6F)', 'Name': 'Nida Croteau', 'PlayfieldId': '1441800', 'PositionX': '243.4299', 'PositionY': '5.01', 'PositionZ': '183.010147', 'HeadingX': '0', 'HeadingY': '0.45706585', 'HeadingZ': '0', 'HeadingW': '0.889432847', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:31.5454741Z', 'Direction': 'IN', 'Sequence': '354', 'Identity': '(SimpleChar:79944F70)', 'Name': 'Len Fuchs', 'PlayfieldId': '1441800', 'PositionX': '242.644928', 'PositionY': '5.01', 'PositionZ': '226.583328', 'HeadingX': '0', 'HeadingY': '-0.645252347', 'HeadingZ': '0', 'HeadingW': '0.7639695', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:31.5454741Z', 'Direction': 'IN', 'Sequence': '356', 'Identity': '(SimpleChar:79944F71)', 'Name': 'Laquanda Gabriel', 'PlayfieldId': '1441800', 'PositionX': '256.1056', 'PositionY': '5.01', 'PositionZ': '188.158157', 'HeadingX': '0', 'HeadingY': '0.707103133', 'HeadingZ': '0', 'HeadingW': '0.7071104', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:31.5464734Z', 'Direction': 'IN', 'Sequence': '359', 'Identity': '(SimpleChar:79944F72)', 'Name': 'Cinda Harrist', 'PlayfieldId': '1441800', 'PositionX': '262.6716', 'PositionY': '5.01', 'PositionZ': '192.309738', 'HeadingX': '0', 'HeadingY': '-0.144262537', 'HeadingZ': '0', 'HeadingW': '0.989539444', 'FightingTargetRole': ''}
+  {'CapturedUtc': '2026-07-25T13:11:31.5474705Z', 'Direction': 'IN', 'Sequence': '362', 'Identity': '(SimpleChar:79944F73)', 'Name': 'Ma Vallone', 'PlayfieldId': '1441800', 'PositionX': '228.49527', 'PositionY': '5.01', 'PositionZ': '208.1483', 'HeadingX': '0', 'HeadingY': '-0.997032344', 'HeadingZ': '0', 'HeadingW': '0.07698384', 'FightingTargetRole': ''}
+
+=== WeaponItemFullUpdate ===
+None IN 
+  hxlen=119 head=0005000A0001007700000DB8797E30D73B1D22680000C74A257F006D000000000B0000C350797E30D700160008000F424F00000000010600001F8800
+None IN 
+  hxlen=119 head=0004000A0001007700000DAF797E30D73B1D22680000C74A257F006D000000000B0000C350797E30D7000002C6000F424F00000000010600001F8800

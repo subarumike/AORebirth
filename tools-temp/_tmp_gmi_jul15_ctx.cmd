@@ -1,0 +1,2 @@
+@echo off
+powershell -NoProfile -Command "Select-String -Path 'AORebirth\Built\Debug\ZoneEngineLog.txt' -Pattern 'Function .* not found|OpenSystemDialog|53168|Called open' | Select-Object -Last 40 | ForEach-Object { $_.Line }; Write-Host '--- Jul15 use context ---'; $lines=Get-Content 'AORebirth\Built\Debug\ZoneEngineLog.txt'; for($i=0;$i -lt $lines.Count;$i++){ if($lines[$i] -match '2026-07-15 19:08:12' -and $lines[$i] -match '1073282272'){ for($j=[Math]::Max(0,$i-1);$j -le [Math]::Min($lines.Count-1,$i+40);$j++){ Write-Host $lines[$j] }; break } }"

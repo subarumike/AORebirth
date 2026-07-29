@@ -1,21 +1,25 @@
 diff --git a/AOSharp.Bootstrap/Main.cs b/AOSharp.Bootstrap/Main.cs
-index 639dde5..ccb222a 100644
+index 639dde5..3c1b9be 100644
 --- a/AOSharp.Bootstrap/Main.cs
 +++ b/AOSharp.Bootstrap/Main.cs
-@@ -15,6 +15,10 @@ namespace AOSharp.Bootstrap
+@@ -15,6 +15,12 @@ namespace AOSharp.Bootstrap
      [Serializable]
      public class Main : IEntryPoint
      {
 +        public const string CaptureSafeChannelSuffix = "_capture_safe";
-+        public const int CaptureSafeContractVersion = 3;
++        public const int CaptureSafeContractVersion = 5;
 +        public const string CaptureSafeSingletonNamePrefix = @"Local\AOSharpCaptureBootstrap_";
++        public const string TypedChatLogFileName = "AOSharpLiveCapture.typed-chat.log";
++        public const string ChatSocketLogFileName = "AOSharpLiveCapture.chat-socket.log";
 +
          private IPCServer _ipcPipe;
          private AppDomain _pluginAppDomain;
          private ManualResetEvent _connectEvent;
-@@ -23,36 +27,117 @@ namespace AOSharp.Bootstrap
+@@ -22,37 +28,120 @@ namespace AOSharp.Bootstrap
+         private static List<LocalHook> _hooks = new List<LocalHook>();
          private PluginProxy _pluginProxy;
          private ChatSocketListener _chatSocketListener;
++        private ChatSocketListener _chatSocketOutboundListener;
          private bool _exiting = false;
 +        private readonly bool _captureSafeMode;
 +        private readonly EventWaitHandle _captureSafeSingleton;
@@ -45,10 +49,7 @@ index 639dde5..ccb222a 100644
 +                        "A capture-safe AOSharp bootstrap is already active in this client process.");
 +                }
 +            }
- 
--            _connectEvent = new ManualResetEvent(false);
--            _unloadEvent = new ManualResetEvent(false);
--            _chatSocketListener = new ChatSocketListener();
++
 +            try
 +            {
 +                Log.Logger = new LoggerConfiguration()
@@ -60,6 +61,7 @@ index 639dde5..ccb222a 100644
 +                _connectEvent = new ManualResetEvent(false);
 +                _unloadEvent = new ManualResetEvent(false);
 +                _chatSocketListener = new ChatSocketListener();
++                _chatSocketOutboundListener = new ChatSocketListener();
 +
 +                //Setup IPC server that will be used for handling API requests and events.
 +                _ipcPipe = new IPCServer(inChannelName);
@@ -74,13 +76,7 @@ index 639dde5..ccb222a 100644
 +                throw;
 +            }
 +        }
- 
--            //Setup IPC server that will be used for handling API requests and events.
--            _ipcPipe = new IPCServer(inChannelName);
--            _ipcPipe.OnConnected = OnIPCClientConnected;
--            _ipcPipe.OnDisconnected = OnIPCClientDisconnected;
--            _ipcPipe.RegisterCallback((byte)HookOpCode.LoadAssembly, typeof(LoadAssemblyMessage), OnAssembliesChanged);
--            _ipcPipe.Start();
++
 +        public static bool IsCaptureSafeChannel(string channelName)
 +        {
 +            return !string.IsNullOrEmpty(channelName)
@@ -91,7 +87,10 @@ index 639dde5..ccb222a 100644
 +        {
 +            return captureSafeMode && captureSafeSingletonHeld;
 +        }
-+
+ 
+-            _connectEvent = new ManualResetEvent(false);
+-            _unloadEvent = new ManualResetEvent(false);
+-            _chatSocketListener = new ChatSocketListener();
 +        public static bool IsCaptureChatCommand(string input)
 +        {
 +            return NormalizeCaptureChatCommand(input) != null;
@@ -101,7 +100,13 @@ index 639dde5..ccb222a 100644
 +        {
 +            if (string.IsNullOrWhiteSpace(input))
 +                return null;
-+
+ 
+-            //Setup IPC server that will be used for handling API requests and events.
+-            _ipcPipe = new IPCServer(inChannelName);
+-            _ipcPipe.OnConnected = OnIPCClientConnected;
+-            _ipcPipe.OnDisconnected = OnIPCClientDisconnected;
+-            _ipcPipe.RegisterCallback((byte)HookOpCode.LoadAssembly, typeof(LoadAssemblyMessage), OnAssembliesChanged);
+-            _ipcPipe.Start();
 +            string trimmed = input.TrimStart();
 +            if (HasCommandPrefix(trimmed, "/aocap"))
 +                return "/aocap" + trimmed.Substring(6);
@@ -148,7 +153,8 @@ index 639dde5..ccb222a 100644
          }
  
          private void OnIPCClientConnected(IPCServer pipe)
-@@ -65,13 +150,33 @@ namespace AOSharp.Bootstrap
+@@ -65,14 +154,34 @@ namespace AOSharp.Bootstrap
+ 
          private void OnIPCClientDisconnected(IPCServer pipe)
          {
 +            if (_pluginProxy != null && IsCaptureReadySignaled())
@@ -182,7 +188,7 @@ index 639dde5..ccb222a 100644
                  LoadAssemblyMessage msg = message as LoadAssemblyMessage;
  
                  if (_pluginAppDomain != null)
-@@ -101,6 +197,8 @@ namespace AOSharp.Bootstrap
+@@ -101,6 +210,8 @@ namespace AOSharp.Bootstrap
                  {
                      _pluginProxy.LoadPlugin(assembly);
                  }
@@ -191,11 +197,15 @@ index 639dde5..ccb222a 100644
              }
              catch (Exception e)
              {
-@@ -204,7 +299,12 @@ namespace AOSharp.Bootstrap
+@@ -204,7 +315,16 @@ namespace AOSharp.Bootstrap
                          "recv",
                          new Ws2_32.RecvDelegate(WsRecv_Hook));
  
 -            if (ProcessChatInputPatcher.Patch(out IntPtr pProcessCommand, out IntPtr pGetCommand))
++            CreateHook("ws2_32.dll",
++                        "send",
++                        new Ws2_32.SendDelegate(WsSend_Hook));
++
 +            if (ShouldInstallCaptureCommandHook(_captureSafeMode, _captureSafeSingleton != null))
 +            {
 +                _captureCommandHookReady = TryInstallCaptureCommandHook();
@@ -205,9 +215,7 @@ index 639dde5..ccb222a 100644
              {
                  CommandInterpreter_c.ProcessChatInput = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DProcessChatInput>(pProcessCommand);
                  CommandInterpreter_c.GetCommand = Marshal.GetDelegateForFunctionPointer<CommandInterpreter_c.DGetCommand>(pGetCommand);
-@@ -213,6 +313,53 @@ namespace AOSharp.Bootstrap
-                 CreateHook(pProcessCommand, new CommandInterpreter_c.DProcessChatInput(ProcessChatInput_Hook));
-                 CreateHook(pGetCommand, new CommandInterpreter_c.DGetCommand(GetCommand_Hook));
+@@ -213,6 +333,113 @@ namespace AOSharp.Bootstrap
              }
          }
  
@@ -258,9 +266,122 @@ index 639dde5..ccb222a 100644
 +            }
 +        }
 +
++        private static void TryLogTypedChatInput(string chatInput)
++        {
++            try
++            {
++                if (string.IsNullOrWhiteSpace(chatInput))
++                    return;
++
++                string sanitized = chatInput.Replace('\r', ' ').Replace('\n', ' ');
++                string line = DateTime.UtcNow.ToString("o") + "\t" + sanitized + Environment.NewLine;
++                string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), TypedChatLogFileName);
++                System.IO.File.AppendAllText(tempPath, line);
++                try
++                {
++                    string cwdPath = System.IO.Path.Combine(Environment.CurrentDirectory, TypedChatLogFileName);
++                    if (!string.Equals(tempPath, cwdPath, StringComparison.OrdinalIgnoreCase))
++                        System.IO.File.AppendAllText(cwdPath, line);
++                }
++                catch
++                {
++                }
++
++                Log.Information("TYPED-CHAT {ChatInput}", sanitized);
++            }
++            catch
++            {
++            }
++        }
++
++        private static void TryLogChatSocket(string direction, byte[] payload)
++        {
++            try
++            {
++                if (payload == null || payload.Length == 0)
++                    return;
++
++                string hex = BitConverter.ToString(payload).Replace("-", string.Empty);
++                string line = DateTime.UtcNow.ToString("o")
++                    + "\t" + direction
++                    + "\t" + payload.Length.ToString(System.Globalization.CultureInfo.InvariantCulture)
++                    + "\t" + hex
++                    + Environment.NewLine;
++                string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), ChatSocketLogFileName);
++                System.IO.File.AppendAllText(tempPath, line);
++                try
++                {
++                    string cwdPath = System.IO.Path.Combine(Environment.CurrentDirectory, ChatSocketLogFileName);
++                    if (!string.Equals(tempPath, cwdPath, StringComparison.OrdinalIgnoreCase))
++                        System.IO.File.AppendAllText(cwdPath, line);
++                }
++                catch
++                {
++                }
++
++                Log.Information("CHAT-SOCKET {Direction} len={Length}", direction, payload.Length);
++            }
++            catch
++            {
++            }
++        }
++
          private void CreateHook(string module, string funcName, Delegate newFunc)
-@@ -285,10 +446,27 @@ namespace AOSharp.Bootstrap
+         {
+             CreateHook(LocalHook.GetProcAddress(module, funcName), newFunc);
+@@ -240,15 +467,51 @@ namespace AOSharp.Bootstrap
+                 byte[] trimmedBuffer = new byte[bytesRead];
+                 Marshal.Copy(buffer, trimmedBuffer, 0, bytesRead);
+ 
++                if (_captureSafeMode && bytesRead > 0)
++                    TryLogChatSocket("IN-RAW", trimmedBuffer);
++
+                 List<byte[]> packets = _chatSocketListener.ProcessBuffer(trimmedBuffer);
+ 
+                 foreach (byte[] packet in packets)
++                {
++                    if (_captureSafeMode)
++                        TryLogChatSocket("IN", packet);
+                     _pluginProxy.ChatRecv(packet);
++                }
+             }
+ 
+             return bytesRead;
          }
+ 
++        public unsafe int WsSend_Hook(int socket, IntPtr buffer, int len, int flags)
++        {
++            if (_captureSafeMode
++                && socket == ChatSocketListener.Socket
++                && len > 0
++                && buffer != IntPtr.Zero)
++            {
++                try
++                {
++                    byte[] trimmedBuffer = new byte[len];
++                    Marshal.Copy(buffer, trimmedBuffer, 0, len);
++                    TryLogChatSocket("OUT-RAW", trimmedBuffer);
++
++                    if (_chatSocketOutboundListener != null)
++                    {
++                        List<byte[]> packets = _chatSocketOutboundListener.ProcessBuffer(trimmedBuffer);
++                        foreach (byte[] packet in packets)
++                            TryLogChatSocket("OUT", packet);
++                    }
++                }
++                catch (Exception ex)
++                {
++                    TryLogError("Chat socket send logging failed.", ex);
++                }
++            }
++
++            return Ws2_32.send(socket, buffer, len, flags);
++        }
++
+         public int DynamicID_GetID_Hook(IntPtr pThis, string name, bool unk)
+         {
+             int customId = (_pluginProxy?.GetDynamicIDOverride(name)).GetValueOrDefault(0);
+@@ -285,10 +548,28 @@ namespace AOSharp.Bootstrap
  
          public byte ProcessChatInput_Hook(IntPtr pThis, IntPtr pWindow, IntPtr pCmdText)
          {
@@ -274,6 +395,7 @@ index 639dde5..ccb222a 100644
 +                {
 +                    ChatGUIModule_t.ExpandChatTextArgs(tokenized.Pointer, pCmdText);
 +                    string chatInput = tokenized.ToString();
++                    TryLogTypedChatInput(chatInput);
 +                    string captureCommand = NormalizeCaptureChatCommand(chatInput);
 +                    if (_captureSafeMode && captureCommand != null && _pluginProxy != null)
 +                    {
@@ -342,3 +464,17 @@ index 7d455c8..51285ea 100644
  
          public override string ToString()
          {
+diff --git a/AOSharp.Common/Unmanaged/Imports/Native/Ws2_32.cs b/AOSharp.Common/Unmanaged/Imports/Native/Ws2_32.cs
+index c093913..4a4fa80 100644
+--- a/AOSharp.Common/Unmanaged/Imports/Native/Ws2_32.cs
++++ b/AOSharp.Common/Unmanaged/Imports/Native/Ws2_32.cs
+@@ -12,7 +12,7 @@ namespace AOSharp.Common.Unmanaged.Imports
+ 
+         [DllImport("ws2_32.dll", CallingConvention = CallingConvention.StdCall)]
+         public static unsafe extern int send(int socket, IntPtr buffer, int len, int flags);
+-        [UnmanagedFunctionPointer(CallingConvention.Cdecl, SetLastError = true)]
+-        public delegate int SendDelegate(int socket, IntPtr buffer, int len, int flags);
++        [UnmanagedFunctionPointer(CallingConvention.StdCall, SetLastError = true)]
++        public unsafe delegate int SendDelegate(int socket, IntPtr buffer, int len, int flags);
+     }
+ }

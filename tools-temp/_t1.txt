@@ -1,0 +1,196 @@
+Capture: C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260723-221330
+generatedUtc: 2026-07-23T20:20:19.3566020Z
+playfield runtime=4310 identity=(Playfield2:10D6) objectId=10D6 resource=''
+enemy count: 86
+focusedEnemyIdentities count: 21
+
+==============================================================================
+0) focusedEnemyIdentities — unique names
+==============================================================================
+  (SimpleChar:787B53FF) -> Emissary of Jobe
+  (SimpleChar:787B5400) -> Guardian of the Weak
+  (SimpleChar:787B5401) -> Joshua Falker
+  (SimpleChar:78CCD52F) -> Sharon Goldman
+  (SimpleChar:78CCD532) -> Doctor James Monaghan
+  (SimpleChar:78CCD535) -> Winnie Glowtail
+  (SimpleChar:78CCD536) -> Pedro Gavrillo
+  (SimpleChar:78CCD538) -> Trond McDougal
+  (SimpleChar:78CCD53A) -> Luna Erke
+  (SimpleChar:78CCD541) -> Prince Creehan
+  (SimpleChar:7963A853) -> Scientist Drake Rodriguez
+  (SimpleChar:798894DE) -> Swift Silvertail
+  (SimpleChar:798C1F0D) -> Yuttos Nascence Geosurvey Dog
+  (SimpleChar:798C1F4C) -> Barking Chimera
+  (SimpleChar:798C1F4E) -> Barking Chimera
+  (SimpleChar:798C1F83) -> Dreaming Silvertail
+  (SimpleChar:798C1F89) -> Swift Silvertail
+  (SimpleChar:798C1F96) -> Barking Chimera
+  (SimpleChar:798C1F97) -> Barking Chimera
+  (SimpleChar:798C1F9E) -> Barking Chimera
+  (SimpleChar:798E09BC) -> Barking Chimera
+UNIQUE NAMES in focusedEnemyIdentities (15):
+  - Barking Chimera
+  - Doctor James Monaghan
+  - Dreaming Silvertail
+  - Emissary of Jobe
+  - Guardian of the Weak
+  - Joshua Falker
+  - Luna Erke
+  - Pedro Gavrillo
+  - Prince Creehan
+  - Scientist Drake Rodriguez
+  - Sharon Goldman
+  - Swift Silvertail
+  - Trond McDougal
+  - Winnie Glowtail
+  - Yuttos Nascence Geosurvey Dog
+
+==============================================================================
+1) Unique NPC/mob names from enemy-dossier.json
+==============================================================================
+Unique name count: 28
+  NAME: Angus McDuff
+    identity=(SimpleChar:78CCD539) level=50 monsterData=215022 headMesh='40284' pos=(169.121048, 280.005, 330.614319) deathObserved=False playfield=11B3
+  NAME: Barking Chimera
+    identity=(SimpleChar:798A31CE) level=5 monsterData=209173 headMesh='' pos=(824.0064, 32.41, 1238.14832) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1901) level=5 monsterData=209173 headMesh='' pos=(823.2643, 31.70564, 1220.54175) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1942) level=5 monsterData=209173 headMesh='' pos=(829.4157, 32.0283546, 1203.64917) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1CEA) level=5 monsterData=209173 headMesh='' pos=(845.019165, 41.93154, 1119.92151) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1EE2) level=8 monsterData=209173 headMesh='' pos=(793.7988, 31.5444164, 1188.14075) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1EE3) level=5 monsterData=209173 headMesh='' pos=(793.641052, 32.16808, 1179.151) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1EE4) level=8 monsterData=209173 headMesh='' pos=(797.19635, 32.234787, 1164.66443) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F4C) level=8 monsterData=209173 headMesh='' pos=(838.820251, 32.2390327, 1164.361) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F4E) level=5 monsterData=209173 headMesh='' pos=(836.342163, 31.8673229, 1176.817) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F4F) level=7 monsterData=209173 headMesh='' pos=(814.728638, 29.1796455, 1189.13635) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F50) level=8 monsterData=209173 headMesh='' pos=(812.766052, 29.5309067, 1200.1366) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F51) level=6 monsterData=209173 headMesh='' pos=(795.6418, 29.4100018, 1204.49719) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F53) level=6 monsterData=209173 headMesh='' pos=(794.9958, 28.9648724, 1212.92151) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F54) level=5 monsterData=209173 headMesh='' pos=(783.3616, 30.4646435, 1213.66406) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F93) level=5 monsterData=209173 headMesh='' pos=(880.0196, 30.7086945, 1126.29919) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F94) level=5 monsterData=209173 headMesh='' pos=(857.759338, 32.41, 1131.09656) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F95) level=7 monsterData=209173 headMesh='' pos=(833.7516, 32.41, 1147.46423) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F96) level=6 monsterData=209173 headMesh='' pos=(819.4266, 31.157156, 1160.20447) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F97) level=5 monsterData=209173 headMesh='' pos=(847.9895, 32.41, 1134.38562) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F98) level=5 monsterData=209173 headMesh='' pos=(812.419861, 31.8100014, 1153.41333) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F9A) level=6 monsterData=209173 headMesh='' pos=(798.8815, 31.34495, 1146.42151) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F9B) level=8 monsterData=209173 headMesh='' pos=(797.4719, 31.7029381, 1136.99084) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F9C) level=5 monsterData=209173 headMesh='' pos=(796.7295, 31.7046185, 1132.63684) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F9D) level=8 monsterData=209173 headMesh='' pos=(801.105957, 31.5500221, 1129.45447) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F9E) level=8 monsterData=209173 headMesh='' pos=(835.8804, 32.41, 1135.516) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F9F) level=7 monsterData=209173 headMesh='' pos=(838.163269, 32.73598, 1124.03) deathObserved=False playfield=4310
+    identity=(SimpleChar:798E09BC) level=7 monsterData=209173 headMesh='' pos=(854.1367, 28.4937325, 1111.16589) deathObserved=True playfield=4310
+    identity=(SimpleChar:798E09BD) level=7 monsterData=209173 headMesh='' pos=(878.1095, 28.4012356, 1096.23657) deathObserved=False playfield=4310
+    identity=(SimpleChar:798E09BE) level=5 monsterData=209173 headMesh='' pos=(884.6184, 31.56923, 1103.58289) deathObserved=False playfield=4310
+    identity=(SimpleChar:798E09BF) level=7 monsterData=209173 headMesh='' pos=(889.7944, 31.63246, 1107.981) deathObserved=False playfield=4310
+    identity=(SimpleChar:798E09E9) level=8 monsterData=209173 headMesh='' pos=(853.4119, 28.6024513, 1111.24756) deathObserved=False playfield=4310
+  NAME: Beebela Andravita
+    identity=(SimpleChar:78CCD537) level=30 monsterData=215030 headMesh='40663' pos=(168.3899, 282.005, 341.5665) deathObserved=False playfield=11B3
+  NAME: Crippler of Growth
+    identity=(SimpleChar:78D4AAD4) level=10 monsterData=209333 headMesh='' pos=(869.711548, 49.62684, 1135.08862) deathObserved=False playfield=4310
+    identity=(SimpleChar:796D182A) level=10 monsterData=209333 headMesh='' pos=(743.461, 48.9561234, 1242.4585) deathObserved=False playfield=4310
+    identity=(SimpleChar:796D182B) level=10 monsterData=209333 headMesh='' pos=(762.3445, 48.9924927, 1227.79578) deathObserved=False playfield=4310
+    identity=(SimpleChar:796D1836) level=10 monsterData=209333 headMesh='' pos=(826.6433, 49.6784477, 1248.63928) deathObserved=False playfield=4310
+    identity=(SimpleChar:796D1837) level=10 monsterData=209333 headMesh='' pos=(830.280457, 49.5951233, 1222.44165) deathObserved=False playfield=4310
+    identity=(SimpleChar:796D183C) level=10 monsterData=209333 headMesh='' pos=(826.9979, 50.10325, 1268.36389) deathObserved=False playfield=4310
+    identity=(SimpleChar:7971B96D) level=10 monsterData=209333 headMesh='' pos=(892.1318, 49.51239, 1109.83191) deathObserved=False playfield=4310
+    identity=(SimpleChar:7971B96E) level=10 monsterData=209333 headMesh='' pos=(890.7891, 49.6057968, 1111.66052) deathObserved=False playfield=4310
+    identity=(SimpleChar:797651FC) level=10 monsterData=209333 headMesh='' pos=(792.4533, 48.3362427, 1175.214) deathObserved=False playfield=4310
+    identity=(SimpleChar:797651FD) level=10 monsterData=209333 headMesh='' pos=(785.7208, 49.03706, 1189.92871) deathObserved=False playfield=4310
+    identity=(SimpleChar:79765200) level=10 monsterData=209333 headMesh='' pos=(840.397766, 49.6193733, 1182.51685) deathObserved=False playfield=4310
+    identity=(SimpleChar:797BDF97) level=10 monsterData=209333 headMesh='' pos=(775.909, 49.0314178, 1208.23267) deathObserved=False playfield=4310
+    identity=(SimpleChar:797FA090) level=10 monsterData=209333 headMesh='' pos=(830.5576, 49.5591125, 1209.99487) deathObserved=False playfield=4310
+  NAME: Doctor James Monaghan
+    identity=(SimpleChar:78CCD532) level=40 monsterData=215027 headMesh='40132' pos=(199.06012, 280.005, 343.575562) deathObserved=False playfield=11B3
+  NAME: Dreaming Silvertail
+    identity=(SimpleChar:798A3568) level=15 monsterData=208922 headMesh='' pos=(826.222656, 33.08879, 1277.10657) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F52) level=15 monsterData=208922 headMesh='' pos=(823.976868, 32.41, 1246.44531) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F82) level=15 monsterData=208922 headMesh='' pos=(847.958435, 32.41, 1156.49756) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F83) level=15 monsterData=208922 headMesh='' pos=(789.352966, 29.2112961, 1223.38867) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F84) level=15 monsterData=208922 headMesh='' pos=(778.1665, 31.4892635, 1218.39453) deathObserved=False playfield=4310
+  NAME: Dustin Fornataro
+    identity=(SimpleChar:78CCD53B) level=33 monsterData=204977 headMesh='40680' pos=(219.644867, 280.005, 364.3161) deathObserved=False playfield=11B3
+  NAME: Emissary of Jobe
+    identity=(SimpleChar:787B53FF) level=200 monsterData=215047 headMesh='40656' pos=(854.6917, 30.015, 1062.84363) deathObserved=False playfield=4310
+  NAME: Guardian of the Weak
+    identity=(SimpleChar:787B5400) level=200 monsterData=26097 headMesh='40111' pos=(849.2039, 30.015, 1062.43359) deathObserved=False playfield=4310
+  NAME: Hai-Tempterus
+    identity=(SimpleChar:79889383) level=8 monsterData=209182 headMesh='' pos=(876.3662, 31.7593079, 1243.087) deathObserved=False playfield=4310
+    identity=(SimpleChar:79889385) level=10 monsterData=209182 headMesh='' pos=(878.251465, 32.07652, 1262.44812) deathObserved=False playfield=4310
+    identity=(SimpleChar:7988938F) level=10 monsterData=209182 headMesh='' pos=(879.321655, 31.9159927, 1229.64709) deathObserved=False playfield=4310
+  NAME: Jane Simmons
+    identity=(SimpleChar:78CCD534) level=30 monsterData=215026 headMesh='40169' pos=(186.6493, 285.005, 321.882263) deathObserved=False playfield=11B3
+  NAME: Joshua Falker
+    identity=(SimpleChar:787B5401) level=100 monsterData=259896 headMesh='223820' pos=(847.667847, 29.7936077, 1100.85828) deathObserved=False playfield=4310
+  NAME: Luna Erke
+    identity=(SimpleChar:78CCD53A) level=31 monsterData=26143 headMesh='40137' pos=(196.280258, 280.005, 355.0273) deathObserved=False playfield=11B3
+  NAME: Magnus Galway
+    identity=(SimpleChar:78CCD530) level=10 monsterData=215024 headMesh='40716' pos=(193.259445, 280.005, 335.215057) deathObserved=False playfield=11B3
+  NAME: Pedro Gavrillo
+    identity=(SimpleChar:78CCD536) level=20 monsterData=215028 headMesh='40715' pos=(174.95314, 282.0062, 354.525635) deathObserved=False playfield=11B3
+  NAME: Prince Creehan
+    identity=(SimpleChar:78CCD541) level=19 monsterData=26103 headMesh='' pos=(179.270325, 285.005, 311.859344) deathObserved=False playfield=11B3
+  NAME: Roland Penders
+    identity=(SimpleChar:78CCD53D) level=31 monsterData=26133 headMesh='40251' pos=(172.953415, 282.005, 348.852844) deathObserved=False playfield=11B3
+  NAME: Samuel Caesar
+    identity=(SimpleChar:78CCD531) level=25 monsterData=215031 headMesh='40206' pos=(189.8317, 280.005, 325.947052) deathObserved=False playfield=11B3
+  NAME: Scientist Drake Rodriguez
+    identity=(SimpleChar:7963A853) level=200 monsterData=26092 headMesh='40694' pos=(854.512451, 34.405, 958.5875) deathObserved=False playfield=4001
+  NAME: Sharon Goldman
+    identity=(SimpleChar:78CCD52F) level=50 monsterData=215029 headMesh='40664' pos=(177.375259, 282.006378, 359.798065) deathObserved=False playfield=11B3
+  NAME: Swift Silvertail
+    identity=(SimpleChar:79841864) level=6 monsterData=208922 headMesh='' pos=(813.367554, 32.41, 1279.72717) deathObserved=False playfield=4310
+    identity=(SimpleChar:7988911E) level=6 monsterData=208922 headMesh='' pos=(810.3012, 32.41, 1269.59717) deathObserved=False playfield=4310
+    identity=(SimpleChar:798894DB) level=5 monsterData=208922 headMesh='' pos=(799.1443, 30.2835522, 1191.08862) deathObserved=False playfield=4310
+    identity=(SimpleChar:798894DE) level=5 monsterData=208922 headMesh='' pos=(857.6873, 36.1836052, 1123.52368) deathObserved=False playfield=4310
+    identity=(SimpleChar:798894FB) level=8 monsterData=208922 headMesh='' pos=(808.063538, 31.82553, 1257.60938) deathObserved=False playfield=4310
+    identity=(SimpleChar:798894FC) level=7 monsterData=208922 headMesh='' pos=(801.017456, 30.0515575, 1251.2196) deathObserved=False playfield=4310
+    identity=(SimpleChar:798894FD) level=7 monsterData=208922 headMesh='' pos=(783.259033, 28.5519772, 1258.98083) deathObserved=False playfield=4310
+    identity=(SimpleChar:798894FF) level=7 monsterData=208922 headMesh='' pos=(800.1268, 31.8100014, 1279.69531) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F89) level=6 monsterData=208922 headMesh='' pos=(825.543152, 31.09682, 1118.96729) deathObserved=True playfield=4310
+    identity=(SimpleChar:798C1F8B) level=5 monsterData=208922 headMesh='' pos=(825.7564, 31.8100014, 1134.34631) deathObserved=False playfield=4310
+    identity=(SimpleChar:798C1F8C) level=5 monsterData=208922 headMesh='' pos=(824.113953, 31.8100014, 1132.90637) deathObserved=False playfield=4310
+  NAME: Swiftwind
+    identity=(SimpleChar:798894FE) level=10 monsterData=208922 headMesh='' pos=(792.4255, 30.67982, 1270.5824) deathObserved=False playfield=4310
+  NAME: Trond McDougal
+    identity=(SimpleChar:78CCD538) level=45 monsterData=215025 headMesh='40283' pos=(182.3278, 280.006226, 353.1129) deathObserved=False playfield=11B3
+  NAME: Urolok the Rotten
+    identity=(SimpleChar:798E646B) level=200 monsterData=209441 headMesh='' pos=(897.919, 31.8100014, 906.347534) deathObserved=False playfield=4001
+  NAME: Winnie Glowtail
+    identity=(SimpleChar:78CCD535) level=5 monsterData=215023 headMesh='40665' pos=(198.689789, 280.005, 355.650116) deathObserved=False playfield=11B3
+  NAME: Yuttos Nascence Geosurvey Dog
+    identity=(SimpleChar:798C1F0D) level=10 monsterData=209173 headMesh='' pos=(798.9694, 29.4100018, 1206.336) deathObserved=False playfield=4310
+  NAME: doctorek
+    identity=(SimpleChar:798A7BB7) level=192 monsterData=96193 headMesh='' pos=(898.291931, 31.8100014, 908.1036) deathObserved=False playfield=4001
+  NAME: test
+    identity=(SimpleChar:798EC84C) level=199 monsterData=96194 headMesh='' pos=(897.0625, 31.8100014, 909.3504) deathObserved=False playfield=4001
+
+==============================================================================
+2) Dreaming Silvertail + CharacterFlags / HasBlueName / blue-name
+==============================================================================
+Dreaming Silvertail entries: 5
+  (SimpleChar:798A3568) lvl=15 md=208922 headMesh='' pos=(826.222656, 33.08879, 1277.10657) death=False visualFlags=31
+  (SimpleChar:798C1F52) lvl=15 md=208922 headMesh='' pos=(823.976868, 32.41, 1246.44531) death=False visualFlags=31
+  (SimpleChar:798C1F82) lvl=15 md=208922 headMesh='' pos=(847.958435, 32.41, 1156.49756) death=False visualFlags=31
+  (SimpleChar:798C1F83) lvl=15 md=208922 headMesh='' pos=(789.352966, 29.2112961, 1223.38867) death=False visualFlags=31
+  (SimpleChar:798C1F84) lvl=15 md=208922 headMesh='' pos=(778.1665, 31.4892635, 1218.39453) death=False visualFlags=31
+All *Silvertail* entries: 16
+--- scfu-appearance.csv rows for *Silvertail* / Dreaming ---
+matching scfu rows: 18
+  (SimpleChar:79841864) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=6 MonsterData=208922 HeadMesh= FlagsNumeric=36391491 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:7988911E) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=6 MonsterData=208922 HeadMesh= FlagsNumeric=36325955 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798894DB) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag']
+    VisualFlags unique: ['31']
+    last: Level=5 MonsterData=208922 HeadMesh= FlagsNumeric=36325955 Flags2=0 Textures='0:0:0|1:0:0|2:0:0|3:0:0|4:0:0' TextureOverrides='' Meshes=''
+  (SimpleChar:798894DE) names=['Swift Silvertail']
+    CharacterFlags unique: ['268964353']
+    Flags unique: ['IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNp

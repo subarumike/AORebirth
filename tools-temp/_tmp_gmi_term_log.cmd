@@ -1,0 +1,2 @@
+@echo off
+powershell -NoProfile -Command "$p='AORebirth\Built\Debug\ZoneEngineLog.txt'; Select-String -Path $p -Pattern '1073282272|OpenNpc|Market|GMI terminal|Acknowledge|StaticDynelSnapshot|Pool miss|UseStatel' | Select-Object -Last 50 | ForEach-Object { $_.Line }; Write-Host '---'; Select-String -Path $p -Pattern '-> GenericCmd action=Use' | Where-Object { $_.Line -match '2026-07-15 1[789]:' } | Select-Object -Last 20 | ForEach-Object { $_.Line }"

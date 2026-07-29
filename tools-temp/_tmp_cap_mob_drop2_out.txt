@@ -1,0 +1,207 @@
+=== LOOT BY ENEMY (initial snapshots) ===
+  Garbage Flea credits= 11 itemCount= 0 items= 
+  Cleaning Robot credits= 5 itemCount= 3 items= 155666:155666:1:1;70560:70560:1:1;42620:42620:1:1
+  Cleanmeister Intelligence Robot credits= 17 itemCount= 7 items= 70561:85744:2:1;85481:85690:2:1;124364:124365:2:1;125343:125344:2:1;160173:160174:2:1;162736:162736:7:1;204993:204994:2:1
+  Cleaning Robot credits= 5 itemCount= 1 items= 42620:42620:1:1
+  Cleaning Robot credits= 5 itemCount= 0 items= 
+  Waste Collector credits= 11 itemCount= 1 items= 248334:248334:1:1
+  Garbage Flea credits= 5 itemCount= 0 items= 
+  Waste Collector credits= 11 itemCount= 2 items= 248315:248315:1:1;42620:42619:2:1
+  Waste Collector credits= 11 itemCount= 0 items= 
+  Garbage Flea credits= 5 itemCount= 0 items= 
+  Supreme Collector of Waste credits= 35 itemCount= 7 items= 70564:85515:5:1;85750:85749:5:1;124855:124856:5:1;121665:121666:5:1;163318:163319:5:1;162497:162497:14:1;208099:208100:5:1
+  32-V Docker credits= 4 itemCount= 0 items= 
+  IIV-X Advanced Docker credits= 35 itemCount= 8 items= 42620:42619:4:1;85572:22219:4:1;70563:85558:4:1;124348:124349:4:1;123343:123344:4:1;160145:160146:4:1;162623:162623:14:1;201160:201161:4:1
+  32-V Docker credits= 4 itemCount= 1 items= 248307:248307:1:1
+  32-V Docker credits= 4 itemCount= 0 items= 
+  Supreme Collector of Waste credits= 35 itemCount= 6 items= 85510:85509:3:1;85533:85532:3:1;160184:160185:3:1;130163:130164:3:1;160704:160704:24:1;201141:201142:3:1
+  IIV-X Advanced Docker credits= 0 itemCount= 8 items= 42620:42619:4:1;85572:22219:4:1;70563:85558:4:1;124348:124349:4:1;123343:123344:4:1;160145:160146:4:1;162623:162623:14:1;201160:201161:4:1
+
+CREDIT RANGES:
+ 32-V Docker                         n=6 credits=[4] avg=4.0
+ Cleaning Robot                      n=7 credits=[5] avg=5.0
+ Cleanmeister Intelligence Robot     n=1 credits=[17] avg=17.0
+ Garbage Flea                        n=6 credits=[5, 11] avg=7.0
+ IIV-X Advanced Docker               n=2 credits=[0, 35] avg=17.5
+ Supreme Collector of Waste          n=2 credits=[35] avg=35.0
+ Waste Collector                     n=17 credits=[11] avg=11.0
+
+=== YOU GOT HIT / DAMAGE TEXT ===
+system-messages.log hit-like lines shown 0
+events.log hit-like lines shown 0
+chat-dialogue.log hit-like lines shown 0
+
+=== FormatFeedback in events ===
+2026-07-22T11:35:16.8828809Z [IN-N3] #415 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:35:16.8838798Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMedinossWhisper of Medinos" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMedinossWhisper of Medinos" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-22T11:38:09.7334265Z [IN-N3] #2707 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:38:09.7334265Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMedinossWhisper of Medinos" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMedinossWhisper of Medinos" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-22T11:38:22.7897375Z [IN-N3] #2831 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:38:22.7897375Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMedinossWhisper of Medinos" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMedinossWhisper of Medinos" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-22T11:39:41.2509807Z [IN-N3] #3559 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:39:41.2509807Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMedinossWhisper of Medinos" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMedinossWhisper of Medinos" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-22T11:39:54.4850588Z [IN-N3] #3673 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:39:54.4850588Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMedinossWhisper of Medinos" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMedinossWhisper of Medinos" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-22T11:40:44.5601428Z [IN-N3] #4438 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:40:44.5601428Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$gM*@sDistracting SpheresWaste Collector~" Unknown2=0 FormattedMessage="Distracting Sphere attacked by Waste Collector!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N
+2026-07-22T11:41:51.2456250Z [IN-N3] #5426 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:41:51.2456250Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$Dt11sMedinossWhisper of Medinos" Unknown2=0 FormattedMessage="~&!!!":$Dt11sMedinossWhisper of Medinos" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3Message }
+2026-07-22T11:42:47.0579836Z [IN-N3] #6388 type=FormatFeedback identity=(SimpleChar:641D0C3C)
+2026-07-22T11:42:47.0579836Z [IN-N3-DETAIL] FormatFeedbackMessage { Unknown1=0 Message="~&!!!":$gM*@sDistracting SpheresCleaning Robot~" Unknown2=0 FormattedMessage="Distracting Sphere attacked by Cleaning Robot!" N3MessageType=FormatFeedback Identity=(SimpleChar:641D0C3C) Unknown=1 PacketType=N3M
+total shown 16
+
+=== AttackInfo / SpecialAttackWeapon sample ===
+AttackInfo 143
+   -> (SimpleChar:7988CE94) amt 22 detail AttackInfoMessage { Amount=22 AmmoCount=-1 WeaponSlot=8 Target=(SimpleChar:7988CE94) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:641D0C3C) 
+   -> (SimpleChar:7988CE94) amt 16 detail AttackInfoMessage { Amount=16 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:7988CE94) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:641D0C3C) 
+  (SimpleChar:7987C4E3) -> (SimpleChar:7988CE94) amt 23 detail AttackInfoMessage { Amount=23 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7988CE94) Unk1=0 HitType=Normal WeaponInstance=1296389938 N3MessageType=AttackInfo Identity=(SimpleChar:7
+  (SimpleChar:7988CE94) ->  amt 6 detail AttackInfoMessage { Amount=6 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:641D0C3C) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:79
+   -> (SimpleChar:7988CE94) amt 66 detail AttackInfoMessage { Amount=66 AmmoCount=-1 WeaponSlot=8 Target=(SimpleChar:7988CE94) Unk1=0 HitType=Critical WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:641D0C3C
+SpecialAttackWeapon 153
+   -> 78 amt  detail SpecialAttackWeaponMessage { Specials=count=3[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AO
+   -> 78 amt  detail SpecialAttackWeaponMessage { Specials=count=3[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AO
+   -> 78 amt  detail SpecialAttackWeaponMessage { Specials=count=3[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AO
+  (SimpleChar:7988CE94) -> 16 amt  detail SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=55 U
+  (SimpleChar:7987C4E3) -> 54 amt  detail SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=54 U
+HealthDamage 7
+   -> (SimpleChar:7987C4E2) amt 12 detail HealthDamageMessage { TargetHp=421 Amount=12 Stat=Flags Unk1=0 Target=(SimpleChar:7987C4E2) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3
+   -> (SimpleChar:7987C4E2) amt 18 detail HealthDamageMessage { TargetHp=421 Amount=18 Stat=Flags Unk1=0 Target=(SimpleChar:7987C4E2) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3
+   -> (SimpleChar:7987C4E2) amt 26 detail HealthDamageMessage { TargetHp=421 Amount=26 Stat=Flags Unk1=0 Target=(SimpleChar:7987C4E2) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3
+   -> (SimpleChar:7987C4E2) amt 14 detail HealthDamageMessage { TargetHp=421 Amount=14 Stat=Flags Unk1=0 Target=(SimpleChar:7987C4E2) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3
+   -> (SimpleChar:7987C4E2) amt 14 detail HealthDamageMessage { TargetHp=421 Amount=14 Stat=Flags Unk1=0 Target=(SimpleChar:7987C4E2) Unk2=0 N3MessageType=HealthDamage Identity=(SimpleChar:641D0C3C) Unknown=0 PacketType=N3
+Feedback 0
+VicinityDamage 0
+
+MessageType counts:
+[('Despawn', 662), ('CharacterAction', 375), ('Attack', 202), ('StopFight', 156), ('SpecialAttackWeapon', 153), ('AttackInfo', 143), ('CharSecSpecAttack', 117), ('CastNanoSpell', 102), ('Buff', 94), ('SpecialAttackInfo', 45), ('HealthDamage', 7), ('MissedAttackInfo', 1)]
+
+=== MOB FIRST POSITIONS (dossier) ===
+Cleaning Robot                      (SimpleChar:796DDBFE) hp=12/12 pos=(3625.450, 5.110, 843.185) death=False
+Cleaning Robot                      (SimpleChar:797EF502) hp=15/15 pos=(3549.584, 5.110, 855.811) death=False
+Cleaning Robot                      (SimpleChar:79840B3F) hp=15/15 pos=(3577.535, 10.310, 910.124) death=False
+Cleaning Robot                      (SimpleChar:79857DB0) hp=12/12 pos=(3625.450, 5.110, 843.185) death=False
+Waste Collector                     (SimpleChar:7987C74D) hp=0/29 pos=(3585.885, 6.998, 921.242) death=True
+32-V Docker                         (SimpleChar:79882840) hp=0/35 pos=(3516.197, 5.110, 914.061) death=True
+32-V Docker                         (SimpleChar:79882844) hp=0/35 pos=(3523.497, 5.110, 898.504) death=True
+32-V Docker                         (SimpleChar:7988284B) hp=35/35 pos=(3513.585, 5.110, 883.818) death=False
+Cleaning Robot                      (SimpleChar:79882C4D) hp=15/15 pos=(3631.390, 40.985, 855.366) death=False
+Burning Cleaning Robot              (SimpleChar:7988CA1A) hp=35/35 pos=(3583.814, 40.965, 843.534) death=False
+Cleaning Robot                      (SimpleChar:7988CB57) hp=0/15 pos=(3551.560, 8.958, 929.870) death=True
+Cleaning Robot                      (SimpleChar:7988CB5F) hp=15/15 pos=(3623.234, 38.416, 841.062) death=False
+Garbage Flea                        (SimpleChar:7988CB66) hp=0/12 pos=(3542.344, 9.143, 946.621) death=True
+Cleaning Robot                      (SimpleChar:7988CB69) hp=15/15 pos=(3603.429, 9.637, 896.295) death=False
+Cleaning Robot                      (SimpleChar:7988CB86) hp=15/15 pos=(3622.196, 37.565, 847.131) death=False
+Cleaning Robot                      (SimpleChar:7988CB88) hp=15/15 pos=(3622.705, 35.657, 863.141) death=False
+Cleaning Robot                      (SimpleChar:7988CB89) hp=15/15 pos=(3610.227, 28.497, 877.223) death=False
+Cleaning Robot                      (SimpleChar:7988CB8E) hp=15/15 pos=(3600.023, 25.585, 880.644) death=False
+Cleaning Robot                      (SimpleChar:7988CB93) hp=15/15 pos=(3590.964, 19.731, 897.585) death=False
+Cleaning Robot                      (SimpleChar:7988CB97) hp=15/15 pos=(3598.152, 14.925, 914.701) death=False
+Cleaning Robot                      (SimpleChar:7988CC2E) hp=0/15 pos=(3574.699, 5.110, 885.785) death=True
+Garbage Flea                        (SimpleChar:7988CC50) hp=0/12 pos=(3565.514, 8.356, 913.615) death=True
+Cleaning Robot                      (SimpleChar:7988CC9B) hp=0/15 pos=(3586.173, 5.110, 882.134) death=True
+Cleaning Robot                      (SimpleChar:7988CC9D) hp=15/15 pos=(3562.434, 8.635, 889.876) death=False
+Garbage Flea                        (SimpleChar:7988CCA5) hp=0/12 pos=(3554.027, 8.097, 901.755) death=True
+Cleaning Robot                      (SimpleChar:7988CCBD) hp=0/15 pos=(3558.291, 8.110, 908.094) death=True
+Waste Collector                     (SimpleChar:7988CCBF) hp=0/29 pos=(3551.497, 7.700, 908.076) death=True
+Cleaning Robot                      (SimpleChar:7988CCC7) hp=0/15 pos=(3561.099, 5.110, 870.651) death=True
+Cleaning Robot                      (SimpleChar:7988CCFB) hp=0/15 pos=(3586.874, 5.110, 862.680) death=True
+Cleaning Robot                      (SimpleChar:7988CCFF) hp=0/15 pos=(3575.646, 5.110, 873.304) death=True
+Cleaning Robot                      (SimpleChar:7988CD00) hp=0/15 pos=(3577.971, 5.110, 862.238) death=True
+Cleaning Robot                      (SimpleChar:7988CD02) hp=0/15 pos=(3556.002, 5.110, 861.581) death=True
+Cleaning Robot                      (SimpleChar:7988CD03) hp=0/15 pos=(3554.206, 5.110, 877.712) death=True
+Cleaning Robot                      (SimpleChar:7988CD04) hp=0/15 pos=(3538.653, 5.293, 877.877) death=True
+Waste Collector                     (SimpleChar:7988CD08) hp=0/29 pos=(3543.671, 7.400, 890.012) death=True
+32-V Docker                         (SimpleChar:7988CD0B) hp=0/35 pos=(3524.711, 5.110, 879.633) death=True
+Waste Collector                     (SimpleChar:7988CD11) hp=0/29 pos=(3542.971, 7.692, 890.515) death=True
+Waste Collector                     (SimpleChar:7988CE5F) hp=0/29 pos=(3510.761, 5.110, 864.661) death=True
+32-V Docker                         (SimpleChar:7988CE61) hp=35/35 pos=(3499.848, 5.110, 854.707) death=False
+Waste Collector                     (SimpleChar:7988CE65) hp=0/29 pos=(3494.696, 5.110, 865.149) death=True
+32-V Docker                         (SimpleChar:7988CE69) hp=0/35 pos=(3498.504, 5.110, 892.478) death=True
+32-V Docker                         (SimpleChar:7988CE6B) hp=0/35 pos=(3498.684, 5.110, 894.738) death=True
+32-V Docker                         (SimpleChar:7988CE6F) hp=0/35 pos=(3498.525, 7.730, 913.251) death=True
+32-V Docker                         (SimpleChar:7988CE71) hp=0/35 pos=(3496.321, 5.110, 901.157) death=True
+Garbage Flea                        (SimpleChar:7988CE75) hp=0/24 pos=(3529.015, 5.110, 891.201) death=True
+Waste Collector                     (SimpleChar:7988CE7E) hp=0/29 pos=(3506.614, 5.110, 891.661) death=True
+Cleanmeister Intelligence Robot     (SimpleChar:7988CE94) hp=0/180 pos=(3549.280, 5.110, 864.321) death=True
+Supreme Collector of Waste          (SimpleChar:7988CEBD) hp=0/437 pos=(3508.270, 11.186, 943.605) death=True
+Garbage Flea                        (SimpleChar:7988CEC4) hp=0/12 pos=(3502.315, 5.110, 902.829) death=True
+IIV-X Advanced Docker               (SimpleChar:7988CECA) hp=0/323 pos=(3515.109, 5.305, 904.289) death=True
+Garbage Flea                        (SimpleChar:7988CF26) hp=0/58 pos=(3451.613, 0.010, 870.983) death=True
+Garbage Flea                        (SimpleChar:7988CF28) hp=0/69 pos=(3454.209, 0.010, 876.924) death=True
+Garbage Flea                        (SimpleChar:7988CF4C) hp=69/69 pos=(3442.076, 0.010, 801.364) death=False
+Garbage Flea                        (SimpleChar:7988CF83) hp=0/24 pos=(3562.391, 5.110, 864.537) death=True
+Waste Collector                     (SimpleChar:7989108F) hp=0/29 pos=(3560.623, 8.336, 925.676) death=True
+Waste Collector                     (SimpleChar:79891091) hp=0/29 pos=(3567.060, 8.218, 918.754) death=True
+Waste Collector                     (SimpleChar:79891094) hp=0/29 pos=(3555.855, 8.336, 915.219) death=True
+Waste Collector                     (SimpleChar:79891097) hp=0/29 pos=(3539.482, 9.050, 942.336) death=True
+Waste Collector                     (SimpleChar:7989109A) hp=0/29 pos=(3526.509, 9.501, 951.883) death=True
+Waste Collector                     (SimpleChar:798910A5) hp=0/29 pos=(3510.884, 7.982, 923.173) death=True
+Waste Collector                     (SimpleChar:798910A8) hp=0/29 pos=(3507.345, 8.185, 930.825) death=True
+Malfunctioning Cleaning Robot       (SimpleChar:798910AB) hp=12/12 pos=(3595.211, 51.745, 800.133) death=False
+Waste Collector                     (SimpleChar:798910AC) hp=0/29 pos=(3497.703, 9.380, 918.384) death=True
+Cleaning Robot                      (SimpleChar:798910AF) hp=0/15 pos=(3556.315, 5.110, 861.866) death=True
+Waste Collector                     (SimpleChar:798910B2) hp=0/29 pos=(3520.183, 8.987, 940.308) death=True
+Cleaning Robot                      (SimpleChar:798910B5) hp=15/15 pos=(3553.338, 5.110, 877.694) death=False
+Cleaning Robot                      (SimpleChar:798910B6) hp=15/15 pos=(3538.446, 5.412, 878.772) death=False
+32-V Docker                         (SimpleChar:798910B7) hp=0/35 pos=(3496.017, 5.110, 903.404) death=True
+Burning Cleaning Robot              (SimpleChar:798910B8) hp=0/35 pos=(3625.188, 33.695, 877.386) death=True
+Waste Collector                     (SimpleChar:798910B9) hp=29/29 pos=(3544.436, 7.252, 889.746) death=False
+32-V Docker                         (SimpleChar:798910BB) hp=12/35 pos=(3495.464, 5.110, 890.018) death=False
+32-V Docker                         (SimpleChar:798910BE) hp=35/35 pos=(3489.609, 5.110, 875.961) death=False
+Waste Collector                     (SimpleChar:798910BF) hp=29/29 pos=(3542.399, 8.045, 890.165) death=False
+Cleaning Robot                      (SimpleChar:798910C0) hp=15/15 pos=(3558.223, 8.110, 908.157) death=False
+32-V Docker                         (SimpleChar:798910C1) hp=0/35 pos=(3503.399, 5.110, 888.679) death=True
+32-V Docker                         (SimpleChar:798910C3) hp=0/35 pos=(3497.224, 5.110, 892.841) death=True
+Waste Collector                     (SimpleChar:798910C6) hp=29/29 pos=(3549.620, 7.396, 906.258) death=False
+32-V Docker                         (SimpleChar:798910CA) hp=0/35 pos=(3495.252, 5.110, 891.427) death=True
+Waste Collector                     (SimpleChar:798910CB) hp=29/29 pos=(3567.076, 8.253, 919.159) death=False
+32-V Docker                         (SimpleChar:798910CC) hp=10/35 pos=(3493.492, 5.110, 892.886) death=False
+Waste Collector                     (SimpleChar:798910D0) hp=29/29 pos=(3586.754, 7.109, 921.700) death=False
+32-V Docker                         (SimpleChar:798910D2) hp=0/35 pos=(3512.276, 5.110, 892.964) death=True
+Waste Collector                     (SimpleChar:798910D4) hp=29/29 pos=(3558.766, 8.575, 927.072) death=False
+32-V Docker                         (SimpleChar:798910D5) hp=0/35 pos=(3494.971, 5.235, 905.821) death=True
+Cleaning Robot                      (SimpleChar:798910D6) hp=15/15 pos=(3551.062, 9.065, 929.811) death=False
+32-V Docker                         (SimpleChar:798910D9) hp=0/35 pos=(3496.404, 5.110, 880.170) death=True
+Waste Collector                     (SimpleChar:798910DA) hp=29/29 pos=(3556.855, 8.376, 916.340) death=False
+Waste Collector                     (SimpleChar:798910DC) hp=29/29 pos=(3539.143, 9.087, 942.056) death=False
+32-V Docker                         (SimpleChar:798910DE) hp=0/35 pos=(3489.426, 5.110, 875.835) death=True
+Waste Collector                     (SimpleChar:798910E0) hp=29/29 pos=(3526.632, 9.510, 951.915) death=False
+Waste Collector                     (SimpleChar:798910E1) hp=29/29 pos=(3519.717, 9.080, 940.067) death=False
+32-V Docker                         (SimpleChar:798910E2) hp=0/35 pos=(3499.984, 5.110, 854.182) death=True
+Garbage Flea                        (SimpleChar:798910E3) hp=12/12 pos=(3554.468, 8.074, 919.910) death=False
+Waste Collector                     (SimpleChar:798910E8) hp=29/29 pos=(3507.611, 8.180, 931.025) death=False
+Waste Collector                     (SimpleChar:798910EE) hp=0/29 pos=(3498.247, 9.214, 919.120) death=True
+Garbage Flea                        (SimpleChar:798910F0) hp=12/12 pos=(3549.231, 9.371, 938.996) death=False
+32-V Docker                         (SimpleChar:798910F1) hp=35/35 pos=(3494.314, 5.223, 906.400) death=False
+Waste Collector                     (SimpleChar:798910F3) hp=0/29 pos=(3511.687, 7.669, 923.652) death=True
+32-V Docker                         (SimpleChar:798910F5) hp=35/35 pos=(3512.169, 5.110, 892.637) death=False
+Malfunctioning Cleaning Robot       (SimpleChar:798910F8) hp=12/12 pos=(3608.835, 51.745, 800.638) death=False
+32-V Docker                         (SimpleChar:798910FD) hp=35/35 pos=(3523.440, 5.110, 898.358) death=False
+32-V Docker                         (SimpleChar:79891100) hp=35/35 pos=(3524.225, 5.110, 879.666) death=False
+Waste Collector                     (SimpleChar:79891104) hp=29/29 pos=(3507.363, 5.110, 892.521) death=False
+Garbage Flea                        (SimpleChar:79891106) hp=12/12 pos=(3541.526, 8.190, 892.471) death=False
+Waste Collector                     (SimpleChar:79891107) hp=29/29 pos=(3511.135, 5.110, 864.680) death=False
+32-V Docker                         (SimpleChar:79891109) hp=35/35 pos=(3499.633, 5.110, 855.734) death=False
+Garbage Flea                        (SimpleChar:7989110A) hp=24/24 pos=(3502.761, 5.110, 891.211) death=False
+Supreme Collector of Waste          (SimpleChar:7989110C) hp=0/303 pos=(3508.897, 11.414, 941.817) death=True
+32-V Docker                         (SimpleChar:7989110F) hp=35/35 pos=(3489.752, 5.110, 876.330) death=False
+Burning Cleaning Robot              (SimpleChar:79891112) hp=2/35 pos=(3625.179, 33.695, 877.390) death=False
+32-V Docker                         (SimpleChar:79891113) hp=35/35 pos=(3495.097, 5.110, 880.632) death=False
+Malfunctioning Cleaning Robot       (SimpleChar:79891115) hp=12/12 pos=(3608.486, 52.355, 801.114) death=False
+Waste Collector                     (SimpleChar:79891117) hp=29/29 pos=(3492.532, 5.110, 866.601) death=False
+Burning Cleaning Robot              (SimpleChar:79891122) hp=0/58 pos=(3636.516, 40.985, 832.775) death=True
+Garbage Flea                        (SimpleChar:79891124) hp=58/58 pos=(3451.083, 0.010, 862.681) death=False
+Garbage Flea                        (SimpleChar:79891129) hp=69/69 pos=(3450.701, 0.010, 887.035) death=False
+Cleaning Robot                      (SimpleChar:7989112A) hp=15/15 pos=(3554.765, 5.110, 861.782) death=False
+Cleaning Robot                      (SimpleChar:7989112B) hp=15/15 pos=(3560.497, 5.110, 871.389) death=False
+Cleaning Robot                      (SimpleChar:7989112D) hp=0/15 pos=(3578.911, 5.110, 862.114) death=True
+Cleaning Robot                      (SimpleChar:7989112E) hp=15/15 pos=(3575.802, 5.110, 873.406) death=False
+Malfunctioning Cleaning Robot       (SimpleChar:7989112F) hp=12/12 pos=(3596.146, 51.745, 800.024) death=False
+Burning Cleaning Robot              (SimpleChar:79891130) hp=29/35 pos=(3625.188, 33.695, 877.386) death=False
+Cleaning Robot                      (SimpleChar:79891131) hp=15/15 pos=(3588.812, 5.110, 884.429) death=False
+Cleaning Robot                      (SimpleChar:79891133) hp=15/15 pos=(3575.459, 5.110, 885.763) death=False
+Cleaning Robot                      (SimpleChar:79891136) hp=15/15 pos=(3586.826, 5.110, 862.576) death=False
+Cleaning Robot                      (SimpleChar:79891137) hp=15/15 pos=(3578.798, 5.110, 861.841) death=False
+Garbage Flea                        (SimpleChar:7989113D) hp=12/12 pos=(3509.731, 7.394, 926.952) death=False
+Waste Collector                     (SimpleChar:79891143) hp=29/29 pos=(3512.028, 7.564, 923.670) death=False
+Supreme Collector of Waste          (SimpleChar:79891148) hp=370/370 pos=(3506.573, 11.074, 943.099) death=False

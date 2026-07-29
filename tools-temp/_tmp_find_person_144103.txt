@@ -1,0 +1,236 @@
+=== chat-dialogue.log ===
+lines=25
+﻿2026-07-24T12:41:39.2242641Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:42:36.2219496Z [CHAT] #0 type=CharacterName text=chat-protocol detail=CharacterNameMessage { PacketType=CharacterName Id=134573633 Name="Seksybot" }
+2026-07-24T12:42:36.2219496Z [CHAT] #0 type=GroupMessage text=chat-protocol detail=GroupMsgMessage { PacketType=GroupMessage MessageType=OOC ChannelId=2 SenderId=134573633 Text="Old Omni PvP org "The Dream Team" is back and recruiting! If you're PvPer, or want to become one - join us NOW! We also do
+2026-07-24T12:43:36.2166304Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:44:32.4166375Z [CHAT] #0 type=GroupMessage text=chat-protocol detail=GroupMsgMessage { PacketType=GroupMessage MessageType=OOC ChannelId=2 SenderId=1835871985 Text="<font color=#FFFF32> Tired of pushing papers all day? Want to be part of the best office parties?</font><a href="text://<
+2026-07-24T12:45:32.2247382Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:46:32.2207989Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:47:32.2176484Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:48:32.2209716Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:49:32.2180023Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:50:32.2248015Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:51:32.2229120Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:52:32.2258825Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:53:32.2203843Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:54:32.2199092Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:54:37.4197169Z [CHAT] #0 type=GroupMessage text=chat-protocol detail=GroupMsgMessage { PacketType=GroupMessage MessageType=OOC ChannelId=2 SenderId=1835871985 Text="<font color=#FFFF32> Tired of pushing papers all day? Want to be part of the best office parties?</font><a href="text://<
+2026-07-24T12:55:37.2246719Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:56:37.2251224Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:57:37.2201843Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:58:37.2207209Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:59:37.2162678Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T12:59:43.6199285Z [CHAT] #0 type=GroupMessage text=chat-protocol detail=GroupMsgMessage { PacketType=GroupMessage MessageType=OOC ChannelId=2 SenderId=1818374922 Text="FairPvP back online, only real omnis are welcomed to join /tell Fairpvp join" }
+2026-07-24T13:00:43.2096875Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T13:01:43.2163991Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+2026-07-24T13:02:43.2137794Z [CHAT] #0 type=Ping text=chat-protocol detail=ChatPingMessage { PacketType=Ping Data=byte[0]: }
+
+=== system-messages.log ===
+lines=2061
+﻿2026-07-24T12:42:16.2126387Z [IN-N3] #44 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:16.6704665Z [IN-N3] #45 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:17.6864585Z [IN-N3] #46 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:18.7090239Z [IN-N3] #52 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:19.7174486Z [IN-N3] #53 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:20.7236457Z [IN-N3] #54 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:21.7638386Z [IN-N3] #55 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:22.7439403Z [IN-N3] #56 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:23.7542160Z [IN-N3] #57 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:24.7738931Z [IN-N3] #58 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:25.7862583Z [IN-N3] #59 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:26.7945468Z [IN-N3] #60 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:27.7843543Z [IN-N3] #61 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:28.8266659Z [IN-N3] #62 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:29.8304380Z [IN-N3] #64 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:30.8525960Z [IN-N3] #65 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:31.8915158Z [IN-N3] #66 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:32.8817854Z [IN-N3] #68 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:33.8917607Z [IN-N3] #69 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:34.9018452Z [IN-N3] #70 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:35.9116145Z [IN-N3] #71 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:36.9214065Z [IN-N3] #72 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:37.9324736Z [IN-N3] #73 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=21] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:38.9432740Z [IN-N3] #77 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:39.9535176Z [IN-N3] #78 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:40.9736578Z [IN-N3] #80 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:41.9837009Z [IN-N3] #81 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:42.9855880Z [IN-N3] #82 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:43.9935590Z [IN-N3] #83 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:45.0034519Z [IN-N3] #84 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:46.0133530Z [IN-N3] #85 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:47.0234977Z [IN-N3] #86 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:48.0442989Z [IN-N3] #87 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:49.0534987Z [IN-N3] #88 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:50.0635463Z [IN-N3] #89 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:51.0835802Z [IN-N3] #90 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:52.0809155Z [IN-N3] #91 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:53.0978510Z [IN-N3] #92 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:54.1037245Z [IN-N3] #93 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:55.1525299Z [IN-N3] #94 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:56.1332516Z [IN-N3] #95 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:57.1423112Z [IN-N3] #96 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:58.1428662Z [IN-N3] #100 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:42:59.1533627Z [IN-N3] #101 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:00.1630766Z [IN-N3] #102 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:01.1630021Z [IN-N3] #103 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:02.1826124Z [IN-N3] #104 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:03.1825765Z [IN-N3] #105 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:04.1930435Z [IN-N3] #106 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:05.2125895Z [IN-N3] #107 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:06.2125180Z [IN-N3] #108 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:07.2224521Z [IN-N3] #109 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:08.2295390Z [IN-N3] #110 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=24] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:09.2388603Z [IN-N3] #111 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:10.2388354Z [IN-N3] #112 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:11.2584386Z [IN-N3] #113 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:12.2685158Z [IN-N3] #114 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:13.2888048Z [IN-N3] #115 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:14.3084952Z [IN-N3] #116 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:15.3285266Z [IN-N3] #117 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:16.3592596Z [IN-N3] #118 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:17.3895367Z [IN-N3] #119 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:18.4374203Z [IN-N3] #123 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:19.3977197Z [IN-N3] #124 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:20.4376930Z [IN-N3] #125 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:21.4582290Z [IN-N3] #126 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:22.4725632Z [IN-N3] #127 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:23.4986621Z [IN-N3] #128 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:24.4784193Z [IN-N3] #129 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:25.5085941Z [IN-N3] #130 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:26.5191628Z [IN-N3] #131 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:27.5384222Z [IN-N3] #132 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:28.5596309Z [IN-N3] #133 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:29.5696899Z [IN-N3] #134 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:30.5825710Z [IN-N3] #135 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:31.5826083Z [IN-N3] #136 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:32.5927542Z [IN-N3] #137 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:33.6032450Z [IN-N3] #138 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:34.6062969Z [IN-N3] #139 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:35.6166717Z [IN-N3] #140 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:36.6563592Z [IN-N3] #141 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:37.6373237Z [IN-N3] #142 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:38.7126096Z [IN-N3] #146 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=27] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:39.6880084Z [IN-N3] #147 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:40.6688986Z [IN-N3] #148 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:41.7012626Z [IN-N3] #149 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:42.6807600Z [IN-N3] #150 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:43.7053653Z [IN-N3] #151 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:44.7491122Z [IN-N3] #152 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:45.7226813Z [IN-N3] #153 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:46.7380552Z [IN-N3] #154 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:47.7514089Z [IN-N3] #155 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:48.7691930Z [IN-N3] #156 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:49.8196946Z [IN-N3] #157 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:50.8194069Z [IN-N3] #158 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:51.8452453Z [IN-N3] #159 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:52.8786823Z [IN-N3] #160 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:53.8863417Z [IN-N3] #161 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:54.9266276Z [IN-N3] #162 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:55.9363262Z [IN-N3] #163 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:56.9574559Z [IN-N3] #164 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:57.9684510Z [IN-N3] #165 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:43:58.9974843Z [IN-N3] #169 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:00.0203563Z [IN-N3] #170 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:01.0621987Z [IN-N3] #171 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:02.0662706Z [IN-N3] #172 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:03.0960286Z [IN-N3] #173 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:04.1070444Z [IN-N3] #174 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:05.1364167Z [IN-N3] #175 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:06.1864609Z [IN-N3] #176 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:07.2061555Z [IN-N3] #177 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:08.1963602Z [IN-N3] #178 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:09.2073660Z [IN-N3] #179 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=30] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:10.2271047Z [IN-N3] #180 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:11.2475861Z [IN-N3] #181 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:12.2675394Z [IN-N3] #182 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:13.2881976Z [IN-N3] #183 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:14.2975205Z [IN-N3] #184 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:15.3074448Z [IN-N3] #185 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:16.3275011Z [IN-N3] #186 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:17.3471491Z [IN-N3] #187 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:18.3595163Z [IN-N3] #191 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:19.3694695Z [IN-N3] #192 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:20.3893075Z [IN-N3] #193 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:21.4128537Z [IN-N3] #194 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:22.4292269Z [IN-N3] #195 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:23.4376048Z [IN-N3] #196 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:24.4494215Z [IN-N3] #197 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:25.4626875Z [IN-N3] #198 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:26.4703136Z [IN-N3] #199 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:27.4776921Z [IN-N3] #200 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:28.4890900Z [IN-N3] #201 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:29.4963101Z [IN-N3] #202 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:30.5065099Z [IN-N3] #203 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:31.5465258Z [IN-N3] #204 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:32.5178569Z [IN-N3] #205 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:33.5775839Z [IN-N3] #206 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:34.5875159Z [IN-N3] #207 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:35.5675873Z [IN-N3] #208 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:36.5675257Z [IN-N3] #209 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:37.5777375Z [IN-N3] #210 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:38.5778014Z [IN-N3] #214 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:39.5878071Z [IN-N3] #215 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=33] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:40.5879776Z [IN-N3] #216 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:41.6074341Z [IN-N3] #217 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:42.6064675Z [IN-N3] #218 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:43.6198428Z [IN-N3] #219 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:44.6221052Z [IN-N3] #220 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:45.6672454Z [IN-N3] #221 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:46.6765521Z [IN-N3] #222 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:47.6464932Z [IN-N3] #223 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:48.6962626Z [IN-N3] #224 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:49.6807287Z [IN-N3] #225 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:50.6805848Z [IN-N3] #226 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:51.7015053Z [IN-N3] #227 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:52.7102853Z [IN-N3] #228 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:53.7305998Z [IN-N3] #229 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:54.7458713Z [IN-N3] #230 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:55.7612344Z [IN-N3] #231 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:56.8085900Z [IN-N3] #232 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:57.7969799Z [IN-N3] #233 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:58.8122707Z [IN-N3] #237 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:44:59.8239300Z [IN-N3] #238 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:00.8665289Z [IN-N3] #239 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:01.8376675Z [IN-N3] #240 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:02.8774879Z [IN-N3] #241 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:03.8572680Z [IN-N3] #242 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:04.8784934Z [IN-N3] #243 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:05.8954691Z [IN-N3] #244 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:06.9063637Z [IN-N3] #245 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:07.9306546Z [IN-N3] #246 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:08.9802989Z [IN-N3] #247 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:10.2227768Z [IN-N3] #248 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=36] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:10.9762372Z [IN-N3] #249 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:11.9965877Z [IN-N3] #250 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:13.0294132Z [IN-N3] #251 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:14.0235513Z [IN-N3] #252 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:15.0336910Z [IN-N3] #253 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:16.0735505Z [IN-N3] #254 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:17.0732319Z [IN-N3] #255 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:18.6041524Z [IN-N3] #259 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:19.0931178Z [IN-N3] #260 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:20.1033325Z [IN-N3] #261 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:21.1364815Z [IN-N3] #262 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:22.1626950Z [IN-N3] #263 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:23.1830655Z [IN-N3] #264 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:24.2094319Z [IN-N3] #265 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:25.2212086Z [IN-N3] #266 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:26.2511452Z [IN-N3] #267 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:27.2606287Z [IN-N3] #268 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:28.2849901Z [IN-N3] #269 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:29.3043608Z [IN-N3] #270 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:30.3347796Z [IN-N3] #271 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:31.3550974Z [IN-N3] #272 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:32.3749777Z [IN-N3] #273 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:33.4049683Z [IN-N3] #274 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:34.4250395Z [IN-N3] #275 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:35.4566019Z [IN-N3] #276 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:36.4984361Z [IN-N3] #277 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+2026-07-24T12:45:37.4679894Z [IN-N3] #278 type=Stat text= detail=StatMessage { Stats=count=1[CurrentNano=39] N3MessageType=Stat Identity=(SimpleChar:7991412C) Unknown=0 PacketType=N3Message }
+... (1861 more)
+
+=== mission-flow.log ===
+lines=2
+﻿2026-07-24T12:41:03.1640740Z [MISSION-FLOW] session bound path=C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260724-144103\mission-flow.log (roll/accept/key/teleport/playfield-init for mission instance reconstruction)
+2026-07-24T13:02:57.2354316Z [IN-QUEST] action=Delete mission=(Mission:556312D8) identity=(SimpleChar:797E30D7) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage

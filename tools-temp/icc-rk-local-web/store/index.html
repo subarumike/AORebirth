@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/shop/">
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Item Store</title>
+  <style type="text/css">
+    body { margin:0; font-family:Verdana,Geneva,Tahoma,sans-serif; font-size:11px; color:#d4d8dc; background:#1a1c1e; }
+    .banner { background:#163820; color:#7dff9a; padding:8px 10px; font-weight:bold; border-bottom:1px solid #2a5a38; }
+    .head { width:100%; border-collapse:collapse; background:#121416; }
+    .head td { padding:8px 10px; vertical-align:middle; border-bottom:1px solid #3a4048; }
+    .name { color:#fff; font-size:13px; font-weight:bold; }
+    .funds { color:#9eb4c8; text-align:right; }
+    .tabs { width:100%; border-collapse:collapse; background:#121416; }
+    .tabs td { padding:0; }
+    .tabs a { display:block; color:#b8bcc0; text-decoration:none; padding:6px 12px; background:#2a2e32; border:1px solid #3a4048; border-bottom:none; margin-right:2px; }
+    .tabs a.active { color:#fff; background:#3a424c; font-weight:bold; }
+    .grid { padding:10px; }
+    .card {
+      display:inline-block; width:140px; height:110px; margin:4px; vertical-align:top;
+      background:#22262a; border:1px solid #3a4048; color:#d4d8dc; text-align:center;
+      padding:8px 4px; cursor:pointer;
+    }
+    .card .label { margin-top:8px; }
+    .card .price { margin-top:6px; color:#9eb4c8; }
+    .status { padding:8px 10px; color:#9eb4c8; }
+    a.btn, span.btn {
+      display:inline-block; border:1px solid #1a1c1e; background:#c8d0d8; color:#111;
+      padding:4px 12px; cursor:pointer; text-decoration:none; font-weight:bold; margin-right:4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">LOCAL AORebirth Item Store — aoshop.funcom.com/shop/</div>
+  <table class="head" cellspacing="0" cellpadding="0">
+    <tr>
+      <td>
+        <div>Level 1</div>
+        <div class="name" id="charName">Local Character</div>
+        <div style="margin-top:6px">
+          <a class="btn" href="#" id="claimItemsBtn">Claim Items</a>
+          <span class="btn">Membership</span>
+        </div>
+      </td>
+      <td class="funds">
+        <div>0 + 600 [F]</div>
+        <div style="margin-top:6px"><span class="btn">ADD [F]</span></div>
+      </td>
+    </tr>
+  </table>
+  <table class="tabs" cellspacing="0" cellpadding="0">
+    <tr>
+      <td><a class="tab active" href="#" data-tab="convenience">Convenience</a></td>
+      <td><a class="tab" href="#" data-tab="special">Special</a></td>
+      <td><a class="tab" href="#" data-tab="nanos">Nanos</a></td>
+      <td><a class="tab" href="#" data-tab="vehicles">Vehicles</a></td>
+    </tr>
+  </table>
+  <div class="grid" id="storeGrid">
+    <div class="card"><div class="label">Nophex Vanity Voucher</div><div class="price">360 F</div></div>
+    <div class="card"><div class="label">Nophex Equipment Voucher</div><div class="price">480 F</div></div>
+    <div class="card"><div class="label">Leet Bundle</div><div class="price">620 F</div></div>
+    <div class="card"><div class="label">Character Slot</div><div class="price">1200 F</div></div>
+  </div>
+  <div class="status" id="storeStatus">Local stub — display only (no purchase).</div>
+  <script src="js/store.js"></script>
+</body>
+</html>

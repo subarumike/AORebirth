@@ -1,0 +1,311 @@
+        // Shape playfield 1419349 from capture 20260724-mission-find-person (27 trash + FindPerson)
+        new MissionShape
+        {
+            CapturedPlayfieldId = 1419349,
+            SpawnX = 242.990005f, SpawnY = 5.01000023f, SpawnZ = 47.7380295f,
+            Npcs = new[]
+            {
+                new MissionNpc
+                {
+                    Name = "Gary Arnall",
+                    Role = MissionNpcRole.FindTarget,
+                    Level = 187, Health = 18885, MonsterData = 26151, Scale = 120, HeadMesh = 40171,
+                    X = 190.01f, Y = 5.01000166f, Z = 106.5f,
+                    Hx = 0.0f, Hy = -0.9948113f, Hz = 0.0f, Hw = 0.101736359f,
+                    Textures = new[] { new[] { 0, 0 }, new[] { 1, 81911 }, new[] { 2, 81913 }, new[] { 3, 81908 }, new[] { 4, 81916 } },
+                    Meshes = new[] { new[] { 0, 40171, 0, 4 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Medusa Entviner Initiate",
+                    Role = MissionNpcRole.Trash,
+                    Level = 188, Health = 15228, MonsterData = 26048, Scale = 120, HeadMesh = 0,
+                    X = 210.205856f, Y = 5.01f, Z = 122.105209f,
+                    Hx = 0.0f, Hy = -0.368230253f, Hz = 0.0f, Hw = 0.929734647f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Programthief",
+                    Role = MissionNpcRole.Trash,
+                    Level = 176, Health = 17245, MonsterData = 26133, Scale = 119, HeadMesh = 40251,
+                    X = 226.420364f, Y = 5.01f, Z = 136.969925f,
+                    Hx = 0.0f, Hy = -0.461028427f, Hz = 0.0f, Hw = 0.887385368f,
+                    Textures = new[] { new[] { 0, 8816 }, new[] { 1, 8740 }, new[] { 2, 8814 }, new[] { 3, 42246 }, new[] { 4, 8813 } },
+                    Meshes = new[] { new[] { 0, 20065, 0, 2 }, new[] { 0, 40251, 0, 4 }, new[] { 1, 99154, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Major",
+                    Role = MissionNpcRole.Trash,
+                    Level = 171, Health = 16500, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 234.371445f, Y = 5.01f, Z = 115.272743f,
+                    Hx = 0.0f, Hy = 0.307242453f, Hz = 0.0f, Hw = 0.951631248f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 45788, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Brigadier General",
+                    Role = MissionNpcRole.Trash,
+                    Level = 190, Health = 19332, MonsterData = 17637, Scale = 120, HeadMesh = 0,
+                    X = 201.739609f, Y = 5.01f, Z = 95.5506744f,
+                    Hx = 0.0f, Hy = 0.588362f, Hz = 0.0f, Hw = 0.8085977f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 31861, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Major",
+                    Role = MissionNpcRole.Trash,
+                    Level = 173, Health = 16798, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 187.766846f, Y = 5.01f, Z = 95.64759f,
+                    Hx = 0.0f, Hy = 0.101736359f, Hz = 0.0f, Hw = 0.994811356f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 31861, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Contract Killer",
+                    Role = MissionNpcRole.Trash,
+                    Level = 176, Health = 17245, MonsterData = 26133, Scale = 119, HeadMesh = 40251,
+                    X = 247.2887f, Y = 5.01f, Z = 86.39284f,
+                    Hx = 0.0f, Hy = -0.0207756441f, Hz = 0.0f, Hw = 0.9997842f,
+                    Textures = new[] { new[] { 0, 9452 }, new[] { 1, 22570 }, new[] { 2, 22594 }, new[] { 3, 9451 }, new[] { 4, 22625 } },
+                    Meshes = new[] { new[] { 0, 20065, 0, 2 }, new[] { 0, 40251, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Lieutenant Colonel",
+                    Role = MissionNpcRole.Trash,
+                    Level = 177, Health = 17394, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 242.35968f, Y = 5.01f, Z = 91.20316f,
+                    Hx = 0.0f, Hy = -0.2982018f, Hz = 0.0f, Hw = 0.9545028f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 21130, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Medusa Entertainer Elder",
+                    Role = MissionNpcRole.Trash,
+                    Level = 172, Health = 13319, MonsterData = 26048, Scale = 119, HeadMesh = 0,
+                    X = 242.143692f, Y = 5.01f, Z = 104.741028f,
+                    Hx = 0.0f, Hy = 0.8779489f, Hz = 0.0f, Hw = 0.478754371f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Major General",
+                    Role = MissionNpcRole.Trash,
+                    Level = 191, Health = 19481, MonsterData = 17637, Scale = 120, HeadMesh = 0,
+                    X = 232.87468f, Y = 5.01f, Z = 43.57561f,
+                    Hx = 0.0f, Hy = -0.450086832f, Hz = 0.0f, Hw = 0.8929848f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 35544, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Major",
+                    Role = MissionNpcRole.Trash,
+                    Level = 171, Health = 16500, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 257.137573f, Y = 5.01f, Z = 101.826027f,
+                    Hx = 0.0f, Hy = -0.9993648f, Hz = 0.0f, Hw = 0.0356374644f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 31865, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Hellhound",
+                    Role = MissionNpcRole.Trash,
+                    Level = 184, Health = 36875, MonsterData = 17720, Scale = 120, HeadMesh = 0,
+                    X = 233.348083f, Y = 5.01f, Z = 55.8024f,
+                    Hx = 0.0f, Hy = 0.401305556f, Hz = 0.0f, Hw = 0.9159442f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Lasersniper",
+                    Role = MissionNpcRole.Trash,
+                    Level = 189, Health = 19183, MonsterData = 26103, Scale = 120, HeadMesh = 40103,
+                    X = 216.944458f, Y = 5.01f, Z = 46.1885223f,
+                    Hx = 0.0f, Hy = -0.345456064f, Hz = 0.0f, Hw = 0.938434958f,
+                    Textures = new[] { new[] { 0, 9418 }, new[] { 1, 8729 }, new[] { 2, 9420 }, new[] { 3, 9419 }, new[] { 4, 9421 } },
+                    Meshes = new[] { new[] { 0, 19994, 0, 2 }, new[] { 0, 40103, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Hellhound",
+                    Role = MissionNpcRole.Trash,
+                    Level = 184, Health = 36875, MonsterData = 17720, Scale = 120, HeadMesh = 0,
+                    X = 205.173111f, Y = 5.01f, Z = 143.168549f,
+                    Hx = 0.0f, Hy = 0.774918854f, Hz = 0.0f, Hw = 0.6320607f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Major General",
+                    Role = MissionNpcRole.Trash,
+                    Level = 191, Health = 19481, MonsterData = 17637, Scale = 120, HeadMesh = 0,
+                    X = 214.665329f, Y = 5.01f, Z = 148.44f,
+                    Hx = 0.0f, Hy = 0.7194523f, Hz = 0.0f, Hw = 0.6945419f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 7793, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Brigadier General",
+                    Role = MissionNpcRole.Trash,
+                    Level = 190, Health = 19332, MonsterData = 17637, Scale = 120, HeadMesh = 0,
+                    X = 197.699448f, Y = 5.01f, Z = 126.99f,
+                    Hx = 0.0f, Hy = -0.9823162f, Hz = 0.0f, Hw = 0.18722944f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 99144, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Hellhound",
+                    Role = MissionNpcRole.Trash,
+                    Level = 183, Health = 36577, MonsterData = 17720, Scale = 120, HeadMesh = 0,
+                    X = 233.8582f, Y = 5.01f, Z = 122.539787f,
+                    Hx = 0.0f, Hy = 0.5486959f, Hz = 0.0f, Hw = 0.836022f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Lasersniper",
+                    Role = MissionNpcRole.Trash,
+                    Level = 189, Health = 19183, MonsterData = 26103, Scale = 120, HeadMesh = 40103,
+                    X = 235.898987f, Y = 5.01f, Z = 134.851242f,
+                    Hx = 0.0f, Hy = -0.499018341f, Hz = 0.0f, Hw = 0.8665914f,
+                    Textures = new[] { new[] { 0, 9418 }, new[] { 1, 8729 }, new[] { 2, 9420 }, new[] { 3, 9419 }, new[] { 4, 9421 } },
+                    Meshes = new[] { new[] { 0, 20004, 0, 2 }, new[] { 0, 40103, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Brigadier General",
+                    Role = MissionNpcRole.Trash,
+                    Level = 189, Health = 19183, MonsterData = 17637, Scale = 120, HeadMesh = 0,
+                    X = 247.374176f, Y = 5.01f, Z = 41.7619667f,
+                    Hx = 0.0f, Hy = 0.6718634f, Hz = 0.0f, Hw = 0.7406751f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 31861, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Colonel",
+                    Role = MissionNpcRole.Trash,
+                    Level = 185, Health = 18587, MonsterData = 17645, Scale = 120, HeadMesh = 0,
+                    X = 272.320435f, Y = 5.01f, Z = 64.99f,
+                    Hx = 0.0f, Hy = -0.0940332562f, Hz = 0.0f, Hw = 0.99556905f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 35544, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Colonel",
+                    Role = MissionNpcRole.Trash,
+                    Level = 181, Health = 17990, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 192.4275f, Y = 5.01f, Z = 113.647667f,
+                    Hx = 0.0f, Hy = -0.7792166f, Hz = 0.0f, Hw = 0.626754761f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 45788, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Medusa Entviner Initiate",
+                    Role = MissionNpcRole.Trash,
+                    Level = 188, Health = 15228, MonsterData = 26048, Scale = 120, HeadMesh = 0,
+                    X = 187.162582f, Y = 5.01f, Z = 114.324295f,
+                    Hx = 0.0f, Hy = -0.2990147f, Hz = 0.0f, Hw = 0.9542485f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Master Lasersniper",
+                    Role = MissionNpcRole.Trash,
+                    Level = 189, Health = 19183, MonsterData = 26103, Scale = 120, HeadMesh = 40103,
+                    X = 186.024551f, Y = 5.01f, Z = 75.40573f,
+                    Hx = 0.0f, Hy = -0.9098052f, Hz = 0.0f, Hw = 0.415035635f,
+                    Textures = new[] { new[] { 0, 9418 }, new[] { 1, 8729 }, new[] { 2, 9420 }, new[] { 3, 9419 }, new[] { 4, 9421 } },
+                    Meshes = new[] { new[] { 0, 19994, 0, 2 }, new[] { 0, 40103, 0, 4 }, new[] { 1, 15839, 0, 2 } },
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Lieutenant Colonel",
+                    Role = MissionNpcRole.Trash,
+                    Level = 176, Health = 17245, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 173.104126f, Y = 5.01f, Z = 104.159576f,
+                    Hx = 0.0f, Hy = 0.589128137f, Hz = 0.0f, Hw = 0.8080396f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 31865, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Lieutenant Colonel",
+                    Role = MissionNpcRole.Trash,
+                    Level = 179, Health = 17692, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 175.3891f, Y = 5.01f, Z = 98.38699f,
+                    Hx = 0.0f, Hy = -0.06476769f, Hz = 0.0f, Hw = 0.997900367f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 35544, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Hellhound",
+                    Role = MissionNpcRole.Trash,
+                    Level = 175, Health = 34191, MonsterData = 17720, Scale = 119, HeadMesh = 0,
+                    X = 177.9186f, Y = 5.01f, Z = 85.7794952f,
+                    Hx = 0.0f, Hy = -0.5421079f, Hz = 0.0f, Hw = 0.8403089f,
+                    Textures = null,
+                    Meshes = null,
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Lieutenant Colonel",
+                    Role = MissionNpcRole.Trash,
+                    Level = 177, Health = 17394, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 203.1925f, Y = 5.01f, Z = 74.93399f,
+                    Hx = 0.0f, Hy = 0.48738423f, Hz = 0.0f, Hw = 0.8731876f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 31861, 0, 2 } },
+                    IsGrey = true,
+                },
+                new MissionNpc
+                {
+                    Name = "Cyborg Major",
+                    Role = MissionNpcRole.Trash,
+                    Level = 175, Health = 17096, MonsterData = 17645, Scale = 119, HeadMesh = 0,
+                    X = 211.347519f, Y = 5.01f, Z = 54.1003151f,
+                    Hx = 0.0f, Hy = 0.488966733f, Hz = 0.0f, Hw = 0.8723024f,
+                    Textures = null,
+                    Meshes = new[] { new[] { 1, 35544, 0, 2 } },
+                    IsGrey = true,
+                },
+            },
+        },

@@ -1,0 +1,45 @@
+player SCFU pos samples in instance: 1
+  2026-07-24 22:25:30.773064 (298.2, 225.0)
+MOVE sample: 2026-07-24T22:24:36.2745031Z [OUT-N3] #4 type=CharDCMove identity=(SimpleChar:797E30D7)
+
+MOVE sample: 2026-07-24T22:24:36.2745031Z [OUT-N3-DETAIL] CharDCMoveMessage { MoveType=TurnRightStart Heading=X: 0 | Y: 0.9925445 | Z: 0 | W: 0.1218824 Position=(430.0048, 17.01, 339.7988) DeltaTime=34849 Unknown2
+MOVE sample: 2026-07-24T22:24:36.5313459Z [OUT-N3] #5 type=CharDCMove identity=(SimpleChar:797E30D7)
+
+MOVE sample: 2026-07-24T22:24:36.5313459Z [OUT-N3-DETAIL] CharDCMoveMessage { MoveType=Update Heading=X: 0 | Y: -0.9456979 | Z: 0 | W: 0.3250467 Position=(430.0048, 17.01, 339.7988) DeltaTime=259 Unknown2=0 Unknow
+MOVE sample: 2026-07-24T22:24:36.7340347Z [IN-N3] #21 type=CharDCMove identity=(SimpleChar:797E30D7)
+
+move-like lines=2516
+SAW hex head 00F8000A0001004500000DB4797E30D71D3C0F1C0000C350799361E700000007E2000235660002356753495731534957310000001400000014000000140000001400000000
+SAW hex head 02C9000A0001004500000DB4797E30D71D3C0F1C0000C350799361E300000007E2000235660002356753495731534957310000001E0000001E0000001E0000001E00000000
+SAW hex head 0348000A0001004500000DB4797E30D71D3C0F1C0000C350799361F400000007E2000235660002356753495731534957310000001400000014000000140000001400000000
+
+=== AttackInfo after mob SAW (first fights) ===
+2026-07-24T22:26:20.2719898Z [IN-N3] #383 type=SpecialAttackWeapon identity=(SimpleChar:799361E7)
+2026-07-24T22:26:20.2719898Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=1[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=20 Unknown2=20 Unknown3=20 Unknown4=20 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799361E7) Unknown=0 PacketType=N3Me
+2026-07-24T22:26:20.2719898Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:797E30D7) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799361E7) Unknown=0 PacketType=N3Message }
+---
+2026-07-24T22:27:38.5841952Z [IN-N3] #806 type=SpecialAttackWeapon identity=(SimpleChar:799361E3)
+2026-07-24T22:27:38.5841952Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=1[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=30 Unknown2=30 Unknown3=30 Unknown4=30 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799361E3) Unknown=0 PacketType=N3Me
+2026-07-24T22:27:38.5841952Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:797E30D7) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799361E3) Unknown=0 PacketType=N3Message }
+2026-07-24T22:27:38.8160520Z [OUT-N3-DETAIL] AttackMessage { Target=(SimpleChar:799361E3) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+---
+OUT CharDCMove samples=630
+  2026-07-24 22:24:36.274503 (430.0,339.8)
+  2026-07-24 22:26:02.618881 (284.8,225.0)
+  2026-07-24 22:27:02.256790 (278.2,205.0)
+  2026-07-24 22:27:37.902578 (255.4,214.9)
+  2026-07-24 22:28:31.248489 (243.1,233.7)
+  2026-07-24 22:30:03.011716 (244.9,254.8)
+  2026-07-24 22:30:52.470302 (235.0,263.8)
+  2026-07-24 22:31:50.782943 (216.8,245.0)
+  2026-07-24 22:33:02.443745 (214.9,236.7)
+  2026-07-24 22:33:33.982947 (235.1,210.2)
+
+=== sight aggro with player move pos ===
+SIGHT mob=799361E3 name=Sid Basso dist=9.95 player=(255.4,215.2) mob=(254.5,225.1)
+SIGHT mob=799361E5 name=Carina Markarian dist=11.21 player=(235.7,246.9) mob=(227.9,254.9)
+SIGHT mob=799361EE name=Malcom Thompon dist=2.66 player=(251.4,254.3) mob=(251.9,251.7)
+SIGHT mob=799361F3 name=Antoine Waldram dist=7.94 player=(228.0,201.1) mob=(229.3,193.2)
+SIGHT mob=799361E9 name=Kirk Danczak dist=3.14 player=(235.5,178.3) mob=(235.0,175.2)
+SIGHT mob=7990F375 name=Malcom Thompon dist=11.61 player=(234.7,181.1) mob=(236.4,192.6)
+sight n=6 min=2.7 p25=3.1 med=10.0 p75=11.2 max=11.6

@@ -1,0 +1,14 @@
+==== events.log
+matched 0
+==== system-messages.log
+matched 0
+==== chat-dialogue.log
+matched 0
+==== npc-interactions.log
+matched 0
+==== mission-flow.log
+matched 0
+==== raw printable interesting
+hits 0
+==== capture_info character Getkeep pf (Playfield2:FF02D)
+packetCounts keys sample ['inboundRaw', 'outboundRaw', 'decodedInboundN3', 'decodedOutboundN3', 'decodedN3EventRows', 'decodedN3StageErrors', 'rawCombatPackets', 'rawSimpleCharFullUpdatePackets', 'rawPacketLogRows', 'rawPacketIndexRows', 'rawPacketPreserved', 'rawPacketWriteErrors', 'rawPacketCallbackDrainTimeouts', 'rawPacketProjectionErrors', 'rawSimpleCharFullUpdateDecoded', 'rawSimpleCharFullUpdateDecodeErrors', 'rawSimpleCharFullUpdateIncompleteDecodes', 'rawNpcSimpleCharFullUpdates', 'scfuAppearanceRows']

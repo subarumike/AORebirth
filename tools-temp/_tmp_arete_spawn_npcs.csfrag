@@ -1,0 +1,158 @@
+            new AreteNpc
+            {
+                // Capture dossier + arete-analysis pos; dialogue id 782DE568
+                FixedIdentityInstance = unchecked((int)0x782DE568),
+                Name = "Rex Larsson",
+                Level = 15, Health = 5000, MonsterData = 26074, Scale = 100, VisualFlags = 31, HeadMesh = 0, RunSpeed = 53,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3624.599f, Y = 51.745f, Z = 787.7465f,
+                Hx = 0f, Hy = -0.5f, Hz = 0f, Hw = 0.866f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205120, 0, 2 }, new[] { 0, 40691, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture dossier + marcus_stone_evidence; dialogue id 782DE567
+                FixedIdentityInstance = unchecked((int)0x782DE567),
+                Name = "Marcus Stone",
+                Level = 15, Health = 117800, MonsterData = 258744, Scale = 105, VisualFlags = 31, HeadMesh = 40667, RunSpeed = 53,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1576,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3630.962f, Y = 40.985f, Z = 823.1738f,
+                Hx = 0f, Hy = -0.2588223f, Hz = 0f, Hw = -0.965926f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 40667, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 7974E756
+                Name = "Protester",
+                Level = 2, Health = 48, MonsterData = 203740, Scale = 91, VisualFlags = 31, HeadMesh = 40127, RunSpeed = 10,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3560.036f, Y = 6.91000032f, Z = 778.597961f,
+                Hx = 0.0f, Hy = 0.790892839f, Hz = 0.0f, Hw = 0.6119547f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40127, 0, 4 }, new[] { 1, 284183, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 79785644
+                Name = "Protester",
+                Level = 2, Health = 48, MonsterData = 203740, Scale = 91, VisualFlags = 31, HeadMesh = 40127, RunSpeed = 10,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3560.023f, Y = 5.11000061f, Z = 824.6964f,
+                Hx = 0.0f, Hy = 0.6888814f, Hz = 0.0f, Hw = 0.7248741f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40127, 0, 4 }, new[] { 1, 284183, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 797DD27A
+                Name = "Bureaucrat Worker",
+                Level = 2, Health = 38, MonsterData = 96056, Scale = 91, VisualFlags = 31, HeadMesh = 0, RunSpeed = 12,
+                NpcFamily = 95, LosHeight = 0, CharacterFlags = 403182081, AppearanceValue = 1512,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3560.09546f, Y = 5.11000061f, Z = 805.6953f,
+                Hx = 0.0f, Hy = 0.530035f, Hz = 0.0f, Hw = 0.8479758f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 797DD2B7
+                Name = "Bruiser",
+                Level = 2, Health = 10, MonsterData = 26088, Scale = 91, VisualFlags = 31, HeadMesh = 40687, RunSpeed = 10,
+                NpcFamily = 103, LosHeight = 0, CharacterFlags = 269226497, AppearanceValue = 1576,
+                Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3579.89941f, Y = 8.055f, Z = 833.733765f,
+                Hx = 0.0f, Hy = 0.892271638f, Hz = 0.0f, Hw = 0.451499f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 81912 }, new[] { 2, 81914 }, new[] { 3, 81909 }, new[] { 4, 81917 } },
+                Meshes = new[] { new[] { 0, 40687, 0, 4 }, new[] { 1, 7826, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 797DD2BC
+                Name = "Kneebreaker Alfonzo Rizzolo",
+                Level = 4, Health = 28, MonsterData = 165196, Scale = 120, VisualFlags = 31, HeadMesh = 40117, RunSpeed = 16,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1672,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3579.37f, Y = 8.055f, Z = 832.5199f,
+                Hx = 0.0f, Hy = -0.7056494f, Hz = 0.0f, Hw = 0.7085612f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 284557 }, new[] { 2, 247977 }, new[] { 3, 247887 }, new[] { 4, 248016 } },
+                Meshes = new[] { new[] { 0, 40117, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 78E0FC64
+                Name = "Flint Novak",
+                Level = 20, Health = 559, MonsterData = 26133, Scale = 90, VisualFlags = 31, HeadMesh = 40251, RunSpeed = 69,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1608,
+                Side = 0, Breed = 2, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3598.331f, Y = 5.11000061f, Z = 862.9781f,
+                Hx = 0.0f, Hy = 0.493891031f, Hz = 0.0f, Hw = 0.8695238f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205116, 0, 2 }, new[] { 0, 40251, 0, 4 }, new[] { 1, 258983, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 78E0FC72
+                Name = "Wounded Dockworker",
+                Level = 1, Health = 32, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
+                NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3599.11182f, Y = 25.585f, Z = 878.1775f,
+                Hx = 0.0f, Hy = 0.00216258457f, Hz = 0.0f, Hw = 0.9999977f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40130, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 79666CF1
+                Name = "Dockworker",
+                Level = 3, Health = 3495, MonsterData = 26137, Scale = 92, VisualFlags = 31, HeadMesh = 40209, RunSpeed = 13,
+                NpcFamily = 137, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 42824,
+                Side = 0, Breed = 2, Gender = 3, Race = 41, Fatness = 1, MovementMode = 3,
+                X = 3586.60522f, Y = 40.9649963f, Z = 844.243f,
+                Hx = 0.0f, Hy = -0.7891955f, Hz = 0.0f, Hw = 0.6141474f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205112, 0, 2 }, new[] { 0, 40209, 0, 4 }, new[] { 1, 292936, 0, 2 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 78E0FC70
+                Name = "Wounded Dockworker",
+                Level = 1, Health = 32, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
+                NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3621.29224f, Y = 37.565f, Z = 855.1413f,
+                Hx = 0.0f, Hy = 0.0012998787f, Hz = 0.0f, Hw = 0.999999166f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40130, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 78E0FC71
+                Name = "Wounded Dockworker",
+                Level = 1, Health = 32, MonsterData = 296008, Scale = 90, VisualFlags = 31, HeadMesh = 40130, RunSpeed = 30,
+                NpcFamily = 137, LosHeight = 3000, CharacterFlags = 277615105, AppearanceValue = 1416,
+                Side = 0, Breed = 4, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3620.278f, Y = 31.205f, Z = 873.665833f,
+                Hx = 0.0f, Hy = -0.00200429629f, Hz = 0.0f, Hw = 0.999998f,
+                Textures = new[] { new[] { 0, 295555 }, new[] { 1, 295553 }, new[] { 2, 295554 }, new[] { 3, 295552 }, new[] { 4, 295556 } },
+                Meshes = new[] { new[] { 0, 205110, 0, 2 }, new[] { 0, 40130, 0, 4 } },
+            },
+            new AreteNpc
+            {
+                // Capture 20260719-Rex-Markus-stone 797DD223
+                Name = "Garbage Flea",
+                Level = 1, Health = 12, MonsterData = 17657, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 5,
+                NpcFamily = 25, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 1483,
+                Side = 0, Breed = 6, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3560.03882f, Y = 5.11000061f, Z = 865.6941f,
+                Hx = 0.0f, Hy = 0.7673956f, Hz = 0.0f, Hw = 0.6411739f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },

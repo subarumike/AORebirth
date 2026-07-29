@@ -1,0 +1,68 @@
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=54 Unknown2=54 Unknown3=54 Unknown4=54 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=59 Unknown2=59 Unknown3=59 Unknown4=59 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=65 Unknown2=65 Unknown3=65 Unknown4=65 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799B444E) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=70 Unknown2=70 Unknown3=70 Unknown4=70 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799B4519) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=65 Unknown2=65 Unknown3=65 Unknown4=65 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD44F) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=49 Unknown2=49 Unknown3=49 Unknown4=49 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD46E) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=45 Unknown2=45 Unknown3=45 Unknown4=45 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD483) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=59 Unknown2=59 Unknown3=59 Unknown4=59 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD474) Unknown=0 PacketType=N3Message }
+SAW: SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=65 Unknown2=65 Unknown3=65 Unknown4=65 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD491) Unknown=0 PacketType=N3Message }
+=== id 799B4653 SAW/AttackInfo ===
+2026-07-26T20:31:39.2712974Z [IN-N3] #12490 type=SpecialAttackWeapon identity=(SimpleChar:799B4653)
+2026-07-26T20:31:39.2712974Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=54 Unknown2=54 Unknown3=54 Unknown4=54 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:40.9882386Z [IN-N3-DETAIL] AttackInfoMessage { Amount=14 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:43.2618375Z [IN-N3-DETAIL] AttackInfoMessage { Amount=15 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:47.4113996Z [IN-N3-DETAIL] AttackInfoMessage { Amount=15 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:49.4211601Z [IN-N3-DETAIL] AttackInfoMessage { Amount=12 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:53.3717229Z [IN-N3-DETAIL] AttackInfoMessage { Amount=10 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+=== id 799BD405 SAW/AttackInfo ===
+2026-07-26T20:32:28.8840105Z [IN-N3] #12665 type=SpecialAttackWeapon identity=(SimpleChar:799BD405)
+2026-07-26T20:32:28.8840105Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=59 Unknown2=59 Unknown3=59 Unknown4=59 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:32.7896124Z [IN-N3-DETAIL] AttackInfoMessage { Amount=9 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:37.0549818Z [IN-N3-DETAIL] AttackInfoMessage { Amount=15 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:39.6902321Z [IN-N3-DETAIL] AttackInfoMessage { Amount=9 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:43.4509133Z [IN-N3-DETAIL] AttackInfoMessage { Amount=10 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:45.6315678Z [IN-N3-DETAIL] AttackInfoMessage { Amount=7 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:50.3337617Z [IN-N3-DETAIL] AttackInfoMessage { Amount=12 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+=== id 799BD46E SAW/AttackInfo ===
+2026-07-26T20:35:03.6177953Z [IN-N3] #13201 type=SpecialAttackWeapon identity=(SimpleChar:799BD46E)
+2026-07-26T20:35:03.6177953Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=49 Unknown2=49 Unknown3=49 Unknown4=49 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD46E) Unknown=0 PacketType=N3Message }
+2026-07-26T20:35:09.2683128Z [IN-N3-DETAIL] AttackInfoMessage { Amount=13 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD46E) Unknown=0 PacketType=N3Message }
+2026-07-26T20:35:13.3078935Z [IN-N3-DETAIL] AttackInfoMessage { Amount=9 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799BD46E) Unknown=0 PacketType=N3Message }
+2026-07-26T20:35:15.5834880Z [IN-N3-DETAIL] AttackInfoMessage { Amount=5 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD46E) Unknown=0 PacketType=N3Message }
+=== id 799BD474 SAW/AttackInfo ===
+2026-07-26T20:36:36.0251881Z [IN-N3] #13453 type=SpecialAttackWeapon identity=(SimpleChar:799BD474)
+2026-07-26T20:36:36.0251881Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=59 Unknown2=59 Unknown3=59 Unknown4=59 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD474) Unknown=0 PacketType=N3Message }
+2026-07-26T20:36:40.0836854Z [IN-N3-DETAIL] AttackInfoMessage { Amount=19 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Critical WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD474) Unknown=0 PacketType=N3Message }
+2026-07-26T20:36:44.7767908Z [IN-N3-DETAIL] AttackInfoMessage { Amount=12 AmmoCount=-1 WeaponSlot=1 Target=(SimpleChar:7996C028) Unk1=0 HitType=Normal WeaponInstance=1279612722 N3MessageType=AttackInfo Identity=(SimpleChar:799BD474) Unknown=0 PacketType=N3Message }
+2026-07-26T20:36:46.3068476Z [IN-N3-DETAIL] AttackInfoMessage { Amount=20 AmmoCount=-1 WeaponSlot=0 Target=(SimpleChar:7996C028) Unk1=0 HitType=Critical WeaponInstance=1279612721 N3MessageType=AttackInfo Identity=(SimpleChar:799BD474) Unknown=0 PacketType=N3Message }
+CHUNK:
+SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=54 Unknown2=54 Unknown3=54 Unknown4=54 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:39.2712974Z [IN-N3] #12491 type=Attack identity=(SimpleChar:799B4653)
+2026-07-26T20:31:39.2712974Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:7996C028) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799B4653) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:39.2712974Z [IN-N3] #12492 type=Stat identity=(SimpleChar:7996C028)
+2026-07-26T20:31:39.2712974Z [IN-N3-DETAIL] StatMessage { Stats=count=1[NumFightingOpponents=1] N3MessageType=Stat Iden
+CHUNK:
+SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=30 Unknown2=30 Unknown3=30 Unknown4=30 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799AC1E5) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:42.8610844Z [IN-N3] #12512 type=Attack identity=(SimpleChar:799AC1E5)
+2026-07-26T20:31:42.8610844Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:799B4653) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799AC1E5) Unknown=0 PacketType=N3Message }
+2026-07-26T20:31:42.8610844Z [IN-N3] #12513 type=FollowTarget identity=(SimpleChar:799AC1E5)
+2026-07-26T20:31:42.8610844Z [IN-N3-DETAIL] FollowTargetMessage { Type=Target Unknown1=25 Info=SmokeLounge.AOto
+CHUNK:
+SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=30 Unknown2=30 Unknown3=30 Unknown4=30 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799AC1E5) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:27.1071081Z [IN-N3] #12659 type=Attack identity=(SimpleChar:799AC1E5)
+2026-07-26T20:32:27.1071081Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:799BD405) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799AC1E5) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:27.1670713Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="Mrengyner's pet, Engineer Automaton I: Attack command received." Unk2=1 }
+2026-07-26T20:32:27.5818134Z [OUT-N3] #2226 ty
+CHUNK:
+SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=59 Unknown2=59 Unknown3=59 Unknown4=59 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:28.8840105Z [IN-N3] #12666 type=Attack identity=(SimpleChar:799BD405)
+2026-07-26T20:32:28.8840105Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:7996C028) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799BD405) Unknown=0 PacketType=N3Message }
+2026-07-26T20:32:28.8840105Z [IN-N3] #12667 type=Stat identity=(SimpleChar:7996C028)
+2026-07-26T20:32:28.8840105Z [IN-N3-DETAIL] StatMessage { Stats=count=1[NumFightingOpponents=1] N3MessageType=Stat Iden
+CHUNK:
+SpecialAttackWeaponMessage { Specials=count=2[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=70 Unknown2=70 Unknown3=70 Unknown4=70 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799B4519) Unknown=0 PacketType=N3Message }
+2026-07-26T20:34:05.8813739Z [IN-N3] #12947 type=Attack identity=(SimpleChar:799B4519)
+2026-07-26T20:34:05.8813739Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:7996C028) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799B4519) Unknown=0 PacketType=N3Message }
+2026-07-26T20:34:05.8813739Z [IN-N3] #12948 type=Stat identity=(SimpleChar:7996C028)
+2026-07-26T20:34:05.8813739Z [IN-N3-DETAIL] StatMessage { Stats=count=1[NumFightingOpponents=1] N3MessageType=Stat Iden

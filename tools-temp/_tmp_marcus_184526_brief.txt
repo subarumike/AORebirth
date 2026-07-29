@@ -1,0 +1,69 @@
+=== capture_info.json ===
+{
+  "timestampUtc": "2026-07-27T16:46:35.6702748Z",
+  "captureStartUtc": "2026-07-27T16:45:26.2381206Z",
+  "captureEndUtc": "2026-07-27T16:46:35.6342966Z",
+  "captureStopRequestedUtc": "2026-07-27T16:46:30.6243528Z",
+  "lastRawPacketUtc": "2026-07-27T16:46:35.4703975Z",
+  "captureFinalizedUtc": "2026-07-27T16:46:35.6342966Z",
+  "quietPeriodPassed": false,
+  "sessionDurationSeconds": 69.396,
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-184526",
+  "rawPacketLogPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-184526\\packets.hex.log",
+  "rawPacketIndexPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-184526\\raw-packets.csv",
+  "scfuAppearancePath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-184526\\scfu-appearance.csv",
+  "characterName": "Mrfrdrsol",
+  "playfieldId": "(Playfield2:FF02D)",
+  "packetCounts": {
+    "inboundRaw": 1700,
+    "outboundRaw": 13,
+    "decodedInboundN3": 1695,
+    "decodedOutboundN3
+=== capture-session.json ===
+{
+  "captureStartUtc": "2026-07-27T16:45:26.2381206Z",
+  "captureStartLocal": "2026-07-27T18:45:26.2381206+02:00",
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260727-184526",
+  "aoClientProcess": {
+    "id": 15708,
+    "processName": "AnarchyOnline",
+    "mainWindowTitle": "Anarchy Online - Mrfrdrsol"
+  },
+  "notes": ""
+}
+
+=== files ===
+capture-health.json, capture-session.json, capture_info.json, chat-dialogue.log, corpse-full-updates.csv, corpse-loot-observations.csv, enemy-combat.csv, enemy-dossier.json, enemy-fight-events.log, enemy-full-updates.csv, enemy-movement.csv, enemy-respawns.csv, enemy-stat-updates.csv, enemy-state.csv, enemy-state.json, events.log, inventory-updates.csv, mission-flow.log, movement-packets.csv, movement-summary.json, npc-interactions.log, npc-lifecycle.csv, packets.hex.log, raw-packets.csv, scfu-appearance.csv, shop-updates.csv, system-messages.log, vendor-full-updates.csv
+
+=== Marcus/SAW/AttackInfo DETAIL ===
+2026-07-27T16:45:27.2554922Z [CHAR-SEEN] identity=(SimpleChar:78E0FC62) name=Marcus Stone player=False npc=True pet=False inPlay=True alive=True hp=117800/117800 pct=100.0 level=15 computerLiteracy=6 pos=(3629.358, 40.985, 823.6023) attacking=False fightingTarget=null monsterData=258744 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType=1234567890 corpseInstance=1234567890 corpseAnimKey=1234567890 dieAnim=1234567890
+2026-07-27T16:45:57.5237519Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=0[] Unknown1=121 Unknown2=121 Unknown3=121 Unknown4=83 Unknown5=50 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:45:57.5237519Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:799F0756) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:45:59.9132777Z [IN-N3-DETAIL] AttackInfoMessage { Amount=23 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F0756) Unk1=0 HitType=Critical WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:45:59.9132777Z [IN-N3-DETAIL] AttackMessage { Target=(SimpleChar:78E0FC62) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:799F0756) Unknown=0 PacketType=N3Message }
+2026-07-27T16:46:05.9645610Z [IN-N3-DETAIL] AttackInfoMessage { Amount=11 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F0756) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:46:12.2506842Z [IN-N3-DETAIL] AttackInfoMessage { Amount=23 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F0756) Unk1=0 HitType=Critical WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:46:18.5238148Z [IN-N3-DETAIL] AttackInfoMessage { Amount=17 AmmoCount=0 WeaponSlot=6 Target=(SimpleChar:799F0756) Unk1=4 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:46:18.5238148Z [IN-N3-DETAIL] StopFightMessage { Unk=1 N3MessageType=StopFight Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+
+=== all SpecialAttackWeapon DETAIL ===
+2026-07-27T16:45:57.5237519Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=0[] Unknown1=121 Unknown2=121 Unknown3=121 Unknown4=83 Unknown5=50 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:78E0FC62) Unknown=0 PacketType=N3Message }
+2026-07-27T16:45:59.9132777Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=1[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=43 Unknown2=43 Unknown3=43 Unknown4=3 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F0756) Unknown=0 PacketType=N3Message }
+2026-07-27T16:46:02.8504661Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=0[] Unknown1=60 Unknown2=60 Unknown3=60 Unknown4=21 Unknown5=0 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:797DD44C) Unknown=0 PacketType=N3Message }
+2026-07-27T16:46:05.2929755Z [IN-N3-DETAIL] SpecialAttackWeaponMessage { Specials=count=1[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo] Unknown1=42 Unknown2=42 Unknown3=42 Unknown4=2 Unknown5=26 N3MessageType=SpecialAttackWeapon Identity=(SimpleChar:799F0758) Unknown=0 PacketType=N3Message }
+
+=== scfu / enemy-full for Marcus ===
+
+=== enemy-combat Marcus ===
+total combat rows=99 types=Counter({'CharacterAction': 25, 'CastNanoSpell': 18, 'Buff': 17, 'AttackInfo': 14, 'Despawn': 13, 'SpecialAttackWeapon': 4, 'Attack': 4, 'StopFight': 4})
+SpecialAttackWeapon src=(SimpleChar:78E0FC62) tgt=83 amt= action= u=121/121/121/83/50
+Attack src=(SimpleChar:78E0FC62) tgt=(SimpleChar:799F0756) amt= action= u=0////
+AttackInfo src=(SimpleChar:78E0FC62) tgt=(SimpleChar:799F0756) amt=23 action= u=////
+Attack src=(SimpleChar:799F0756) tgt=(SimpleChar:78E0FC62) amt= action= u=0////
+AttackInfo src=(SimpleChar:78E0FC62) tgt=(SimpleChar:799F0756) amt=11 action= u=////
+AttackInfo src=(SimpleChar:78E0FC62) tgt=(SimpleChar:799F0756) amt=23 action= u=////
+AttackInfo src=(SimpleChar:78E0FC62) tgt=(SimpleChar:799F0756) amt=17 action= u=////
+StopFight src=(SimpleChar:78E0FC62) tgt= amt= action= u=////
+
+=== chat Marcus ===
+2026-07-27T16:45:27.2554922Z [CHAR-SEEN] identity=(SimpleChar:78E0FC62) name=Marcus Stone player=False npc=True pet=False inPlay=True alive=True hp=117800/117800 pct=100.0 level=15 computerLiteracy=6 pos=(3629.358, 40.985, 823.6023) attacking=False fightingTarget=null monsterData=258744 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTy

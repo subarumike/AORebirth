@@ -1,0 +1,58 @@
+---
+2026-07-28T07:59:49.6488721Z [DYNEL-SPAWNED] identity=(Terminal:57AC323C) name=Encrypted Info Capsule pos=(47.39999, 5.1, 133.6)
+
+---
+2026-07-28T08:08:35.4405298Z [DYNEL-SPAWNED] identity=(Terminal:57AC323C) name=Encrypted Info Capsule pos=(47.39999, 5.1, 133.6)
+
+---
+2026-07-28T08:08:35.5364712Z [DYNEL-SPAWNED] identity=(Terminal:57AC323C) name=Encrypted Info Capsule pos=(47.39999, 5.1, 133.6)
+
+---
+2026-07-28T08:08:35.6014312Z [DYNEL-SPAWNED] identity=(Terminal:57AC323C) name=Encrypted Info Capsule pos=(47.39999, 5.1, 133.6)
+
+---
+2026-07-28T08:08:42.3742535Z [DYNEL-SPAWNED] identity=(Terminal:57AC323C) name=Encrypted Info Capsule pos=(47.39999, 5.1, 133.6)
+
+==== PICKUP CONTEXT ====
+Target=(SimpleChar:79A1DD1C) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageType=AttackInfo Identity=(SimpleChar:765A6D34) Unknown=0 PacketType=N3Message }
+2026-07-28T08:09:05.9796954Z [OUT-N3] #453 type=PickUp identity=(SimpleChar:765A6D34)
+2026-07-28T08:09:06.0536502Z [IN-N3] #4206 type=Stat identity=(SimpleChar:765A6D34)
+2026-07-28T08:09:06.0536502Z [IN-N3-DETAIL] StatMessage { Stats=count=1[Health=1146] N3MessageType=Stat Identity=(SimpleChar:765A6D34) Unknown=0 PacketType=N3Message }
+2026-07-28T08:09:06.0536502Z [IN-N3] #4207 type=Stat identity=(SimpleChar:79A1DD16)
+2026-07-28T08:09:06.0
+---
+ [IN-N3-DETAIL] StatMessage { Stats=count=2[Health=1191,CurrentNano=1185] N3MessageType=Stat Identity=(SimpleChar:79A1DD1C) Unknown=0 PacketType=N3Message }
+2026-07-28T08:09:07.6236815Z [OUT-N3] #454 type=PickUp identity=(SimpleChar:765A6D34)
+2026-07-28T08:09:07.7725905Z [IN-N3] #4222 type=Feedback identity=(SimpleChar:765A6D34)
+2026-07-28T08:09:07.7725905Z [IN-N3-DETAIL] FeedbackMessage { Unknown1=0 CategoryId=110 MessageId=100495847 N3MessageType=Feedback Identity=(SimpleChar:765A6D34) Unknown=1 PacketType=N3Message }
+2026-07-28T08:09:07.7725905Z [SMOKE] IN CharacterAction identity=(SimpleCh
+---
+==== 100361 SIFU snippets ====
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=1 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=1 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=1 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=1 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=1 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=1985637684 Position=null Rotation=null PlayfieldId=1468417 StateMachine=(1000015:0000) Unknown2=328 Stats=count=7[Flags=-2147483645,StaticInstance=100361,ACGItemLevel=1,ACGItemTemplateID=100361,ACGItemTemplateID2=100361,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=50000 OwnerInstance=1985637684 Position=null Rotation=null PlayfieldId=800 StateMachine=(1000015:0000) Unknown2=328 Stats=count=7[Flags=-2147483645,StaticInstance=100361,ACGItemLevel=1,ACGItemTemplateID=100361,ACGItemTemplateID2=100361,MultipleCount=1] N3MessageType=SimpleItemFullUpdate Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---
+Identity=(Terminal:57AC323C) Unknown=0 PacketType=N3Message }
+---

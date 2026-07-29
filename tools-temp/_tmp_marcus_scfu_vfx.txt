@@ -1,0 +1,12 @@
+==== scfu-appearance.csv
+==== enemy-full-updates.csv
+==== marcus-related combat rows
+2026-07-21T20:06:39.0538826Z Attack None 
+2026-07-21T20:06:41.2312070Z SpecialAttackWeapon None 
+2026-07-21T20:06:41.2312070Z Attack None 
+2026-07-21T20:06:43.7206726Z AttackInfo None 
+2026-07-21T20:06:50.0591536Z AttackInfo None 
+2026-07-21T20:06:56.3153863Z AttackInfo None 
+2026-07-21T20:07:02.5025710Z AttackInfo None 
+2026-07-21T20:07:08.9795771Z AttackInfo None 
+2026-07-21T20:07:08.9795771Z StopFight None 

@@ -1,0 +1,140 @@
+SCFU rows=73
+unique identities=40 names=[('Master Techno-Architect', 6), ('Rough Clan Informer', 4), ('Veteran Dealer', 3), ('Veteran Rustler', 3), ('Master Virusbuilder', 3), ('Seasoned Martial Artist', 2), ('Seasoned Engineer', 2), ('Veteran Functionary', 2), ('Veteran Clan Functionary', 2), ('Veteran Poacher', 2), ('Zoftig Blimp', 1), ('Morttowers', 1), ('Skilled Contract Killer', 1), ('Seasoned Adventurer', 1), ('Seasoned Trader', 1), ('Seasoned Soldier', 1), ('Cratonera', 1), ('Carlo Pinnetti', 1), ('CEO Guardian', 1), ('Veteran Ruffian', 1), ('Tough Clan Diversionist', 1)]
+
+=== PROPS (0) ===
+
+=== MOBS unique (37) ===
+Master Techno-Architect lvl=168 hp=16052 md=26155 scale=118 xyz=(35.3955574,5.010003,227.405579) id=(SimpleChar:7990DAC4)
+Master Techno-Architect lvl=168 hp=16052 md=26155 scale=118 xyz=(55.0371323,5.01000166,216.1886) id=(SimpleChar:7990DAB1)
+Master Techno-Architect lvl=168 hp=16052 md=26155 scale=118 xyz=(56.96526,5.01000166,144.427856) id=(SimpleChar:7990DAC7)
+Master Techno-Architect lvl=168 hp=16052 md=26155 scale=118 xyz=(42.4278641,5.01,125.299225) id=(SimpleChar:7990DAB6)
+Master Techno-Architect lvl=168 hp=16052 md=26155 scale=118 xyz=(26.15962,5.01000166,125.160065) id=(SimpleChar:7990DAB8)
+Master Techno-Architect lvl=168 hp=16052 md=26155 scale=118 xyz=(15.401803,5.01000166,163.724609) id=(SimpleChar:7990DAC1)
+Master Virusbuilder lvl=152 hp=13667 md=26151 scale=117 xyz=(87.04694,5.01000166,194.508041) id=(SimpleChar:7990DABF)
+Master Virusbuilder lvl=153 hp=13816 md=26151 scale=117 xyz=(51.6340446,5.01,125.264458) id=(SimpleChar:7990DABA)
+Master Virusbuilder lvl=162 hp=15158 md=26151 scale=118 xyz=(67.44747,5.01000166,127.228241) id=(SimpleChar:7990DABB)
+Morttowers lvl=13 hp=371 md=0 scale=100 xyz=(2819.08887,52.975,1890.03821) id=(SimpleChar:51210B11)
+Rough Clan Informer lvl=151 hp=13518 md=26139 scale=117 xyz=(23.06019,5.01,178.786621) id=(SimpleChar:7990DAB4)
+Rough Clan Informer lvl=158 hp=14562 md=26139 scale=118 xyz=(14.4653845,5.01000166,145.616837) id=(SimpleChar:7990DAB9)
+Rough Clan Informer lvl=160 hp=14860 md=26139 scale=118 xyz=(57.66246,5.01000166,208.092163) id=(SimpleChar:7990DAC6)
+Rough Clan Informer lvl=163 hp=15307 md=26139 scale=118 xyz=(66.743,5.01000166,162.280319) id=(SimpleChar:7990DAC8)
+Seasoned Adventurer lvl=125 hp=9794 md=26074 scale=115 xyz=(2826.52759,36.61,1904.4613) id=(SimpleChar:797BF203)
+Seasoned Engineer lvl=139 hp=11729 md=26103 scale=116 xyz=(2826.78247,36.61,1905.76392) id=(SimpleChar:797BF11B)
+Seasoned Engineer lvl=140 hp=11878 md=26103 scale=116 xyz=(2829.42017,37.96519,1880.68738) id=(SimpleChar:797BF258)
+Seasoned Martial Artist lvl=122 hp=9439 md=26082 scale=114 xyz=(2825.968,37.37933,1906.10364) id=(SimpleChar:797BF15A)
+Seasoned Martial Artist lvl=124 hp=9676 md=26082 scale=115 xyz=(2834.80444,36.61,1928.44043) id=(SimpleChar:797BF16E)
+Seasoned Soldier lvl=133 hp=10835 md=26103 scale=116 xyz=(2831.8,36.61,1928.42151) id=(SimpleChar:797BF236)
+Seasoned Trader lvl=144 hp=12475 md=26082 scale=117 xyz=(2804.22876,36.61,1888.20508) id=(SimpleChar:797BF130)
+Skilled Contract Killer lvl=103 hp=7185 md=26137 scale=112 xyz=(2838.61841,36.61,1917.97974) id=(SimpleChar:797BF1D0)
+Tough Clan Diversionist lvl=162 hp=15158 md=26125 scale=118 xyz=(88.47811,5.01,138.101) id=(SimpleChar:7990DABD)
+Veteran Clan Functionary lvl=164 hp=12365 md=26143 scale=118 xyz=(73.72305,5.01000166,125.30249) id=(SimpleChar:7990DABC)
+Veteran Clan Functionary lvl=168 hp=12842 md=26143 scale=118 xyz=(28.99,5.01,233.1249) id=(SimpleChar:7990DAAF)
+Veteran Dealer lvl=162 hp=15158 md=26123 scale=118 xyz=(14.7782631,5.01000166,205.239456) id=(SimpleChar:7990DAAE)
+Veteran Dealer lvl=162 hp=15158 md=26123 scale=118 xyz=(39.0758438,5.01000166,174.853638) id=(SimpleChar:7990DAB0)
+Veteran Dealer lvl=168 hp=16052 md=26123 scale=118 xyz=(82.6614456,5.01000166,147.599472) id=(SimpleChar:7990DABE)
+Veteran Functionary lvl=157 hp=11531 md=26155 scale=118 xyz=(45.77344,5.01,204.18103) id=(SimpleChar:7990DAC3)
+Veteran Functionary lvl=162 hp=12127 md=26155 scale=118 xyz=(94.5845947,5.01000166,175.303558) id=(SimpleChar:7990DAC0)
+Veteran Poacher lvl=163 hp=15307 md=26090 scale=118 xyz=(23.1397152,5.01000166,186.269531) id=(SimpleChar:7990DAC2)
+Veteran Poacher lvl=168 hp=16052 md=26090 scale=118 xyz=(71.92619,5.01000166,170.706467) id=(SimpleChar:7990DAB3)
+Veteran Ruffian lvl=154 hp=19551 md=26137 scale=117 xyz=(37.93821,5.01,126.623955) id=(SimpleChar:7990DAB7)
+Veteran Rustler lvl=165 hp=15605 md=26133 scale=118 xyz=(58.21275,5.01000166,152.367966) id=(SimpleChar:7990DAB2)
+Veteran Rustler lvl=165 hp=15605 md=26133 scale=118 xyz=(46.8244934,5.01000166,193.6612) id=(SimpleChar:7990DAB5)
+Veteran Rustler lvl=166 hp=15754 md=26133 scale=118 xyz=(39.2914543,5.01000166,175.333435) id=(SimpleChar:7990DAC5)
+Zoftig Blimp lvl=90 hp=56430 md=205867 scale=90 xyz=(2830.819,36.61,1919.0802) id=(SimpleChar:797BF105)
+
+=== INVENTORY ALL (last 40) ===
+low=122650 high=122651 ql=164 slot=0 item=(None:0000)
+low=122900 high=122901 ql=156 slot=0 item=(None:0000)
+low=107085 high=107086 ql=137 slot=0 item=(None:0000)
+low=137247 high=137248 ql=190 slot=1 item=(None:0000)
+low=122997 high=122998 ql=194 slot=0 item=(None:0000)
+low=301675 high=301675 ql=1 slot=0 item=(None:0000)
+low=259103 high=259103 ql=1 slot=1 item=(None:0000)
+low=296465 high=296465 ql=1 slot=2 item=(None:0000)
+low=268748 high=268748 ql=1 slot=3 item=(None:0000)
+low=303225 high=303225 ql=1 slot=4 item=(None:0000)
+low=150922 high=150922 ql=10 slot=5 item=(None:0000)
+low=87810 high=87810 ql=1 slot=6 item=(None:0000)
+low=269417 high=269417 ql=100 slot=7 item=(None:0000)
+low=303137 high=303137 ql=1 slot=8 item=(None:0000)
+low=269403 high=269403 ql=100 slot=9 item=(None:0000)
+low=269405 high=269405 ql=100 slot=10 item=(None:0000)
+low=269409 high=269409 ql=100 slot=11 item=(None:0000)
+low=269411 high=269411 ql=100 slot=12 item=(None:0000)
+low=269414 high=269414 ql=100 slot=13 item=(None:0000)
+low=293701 high=293701 ql=100 slot=14 item=(None:0000)
+low=303259 high=303260 ql=60 slot=15 item=(None:0000)
+low=288765 high=288765 ql=1 slot=16 item=(None:0000)
+low=296961 high=296961 ql=1 slot=17 item=(None:0000)
+low=297144 high=297144 ql=1 slot=18 item=(None:0000)
+low=95577 high=95577 ql=1 slot=19 item=(None:0000)
+low=117322 high=117322 ql=30 slot=20 item=(None:0000)
+
+=== INVENTORY with LowId around complete window ===
+2026-07-24T09:36:51.5634858Z low=122650 high=122651 ql=164 item=(None:0000)
+2026-07-24T09:36:53.0899868Z low=122900 high=122901 ql=156 item=(None:0000)
+2026-07-24T09:37:18.5640342Z low=107085 high=107086 ql=137 item=(None:0000)
+2026-07-24T09:37:18.5640342Z low=137247 high=137248 ql=190 item=(None:0000)
+2026-07-24T09:37:26.4354091Z low=122997 high=122998 ql=194 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=301675 high=301675 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=259103 high=259103 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=296465 high=296465 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=268748 high=268748 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=303225 high=303225 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=150922 high=150922 ql=10 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=87810 high=87810 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=269417 high=269417 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=303137 high=303137 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=269403 high=269403 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=269405 high=269405 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=269409 high=269409 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=269411 high=269411 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=269414 high=269414 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=293701 high=293701 ql=100 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=303259 high=303260 ql=60 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=288765 high=288765 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=296961 high=296961 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=297144 high=297144 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=95577 high=95577 ql=1 item=(None:0000)
+2026-07-24T09:37:36.3651205Z low=117322 high=117322 ql=30 item=(None:0000)
+
+=== CORPSE LOOT ===
+enemy=Veteran Clan Functionary md=26143 lvl=168 credits=4248 items=122650:122651:164:1
+enemy=Master Techno-Architect md=26155 lvl=168 credits=2833 items=122900:122901:156:1
+enemy=Rough Clan Informer md=26139 lvl=160 credits=2571 items=107085:107086:137:1;137247:137248:190:1
+enemy=Master Techno-Architect md=26155 lvl=168 credits=2833 items=122997:122998:194:1
+
+=== EVENTS Container/Chest/Door name lines (sample) ===
+counts Counter({'Door': 468, 'Treasure': 16, 'Barrel': 11, 'Small Crate': 4, 'Skeleton': 3, 'Bottles': 2, 'Garbage': 2, 'Android': 1, 'Chest': 1})
+-- Door --
+2026-07-24T09:36:05.0203414Z [IN-N3] #70 type=DoorStatusUpdate identity=(ACGEntrance:C0270230)
+2026-07-24T09:36:05.0213410Z [IN-N3] #71 type=DoorStatusUpdate identity=(ACGEntrance:C0310230)
+2026-07-24T09:36:05.0213410Z [IN-N3] #72 type=DoorStatusUpdate identity=(Door:C0090230)
+-- Treasure --
+2026-07-24T09:36:12.8542376Z [DYNEL-SPAWNED] identity=(Container:BA0CF53) name=Treasure pos=(31.60001, 5.1, 193.2)
+2026-07-24T09:36:12.8542376Z [DYNEL-SPAWNED] identity=(Container:BA0CF55) name=Treasure pos=(46.60001, 5.1, 208.4)
+2026-07-24T09:36:15.9870048Z [DYNEL-SPAWNED] identity=(Container:BA0CF5C) name=Treasure pos=(81.10001, 5.1, 167.7)
+-- Skeleton --
+2026-07-24T09:36:12.8542376Z [DYNEL-SPAWNED] identity=(Container:BA0CF56) name=A blasted Skeleton pos=(29.5, 5.1, 238.4)
+2026-07-24T09:36:15.9870048Z [DYNEL-SPAWNED] identity=(Container:BA0CF5E) name=Skeleton pos=(68.39999, 5.1, 208.01)
+2026-07-24T09:36:57.5332266Z [DYNEL-SPAWNED] identity=(Container:BA0CF5E) name=Skeleton pos=(68.39999, 5.1, 208.01)
+-- Barrel --
+2026-07-24T09:36:12.8542376Z [DYNEL-SPAWNED] identity=(Container:BA0CF57) name=Barrel pos=(57.70001, 5.1, 227.5)
+2026-07-24T09:36:15.9540251Z [DYNEL-SPAWNED] identity=(Container:BA0CF5A) name=Barrel pos=(59.2, 5.1, 198.9)
+2026-07-24T09:36:57.2174213Z [DYNEL-SPAWNED] identity=(Container:BA0CF5A) name=Barrel pos=(59.2, 5.1, 198.9)
+-- Android --
+2026-07-24T09:36:12.9221578Z [DYNEL-SPAWNED] identity=(Container:BA0CF58) name=A Crashed Android pos=(53.29999, 5.1, 201.6)
+-- Small Crate --
+2026-07-24T09:36:15.9870048Z [DYNEL-SPAWNED] identity=(Container:BA0CF5B) name=Small Crate pos=(79.5, 5.1, 188.1)
+2026-07-24T09:36:57.2174213Z [DYNEL-SPAWNED] identity=(Container:BA0CF5B) name=Small Crate pos=(79.5, 5.1, 188.1)
+2026-07-24T09:37:56.8857701Z [DYNEL-SPAWNED] identity=(Container:BA0CF5B) name=Small Crate pos=(79.5, 5.1, 188.1)
+-- Chest --
+2026-07-24T09:37:36.3641212Z [IN-N3] #1320 type=ChestFullUpdate identity=(Container:A67B15A)
+-- Bottles --
+2026-07-24T09:38:06.8927130Z [DYNEL-SPAWNED] identity=(Container:BA0CF61) name=Bottles and Garbage pos=(88.10001, 5.1, 158.3)
+2026-07-24T09:38:07.1885289Z [DYNEL-SPAWNED] identity=(Container:BA0CF61) name=Bottles and Garbage pos=(88.10001, 5.1, 158.3)
+-- Garbage --
+2026-07-24T09:38:06.8927130Z [DYNEL-SPAWNED] identity=(Container:BA0CF61) name=Bottles and Garbage pos=(88.10001, 5.1, 158.3)
+2026-07-24T09:38:07.1885289Z [DYNEL-SPAWNED] identity=(Container:BA0CF61) name=Bottles and Garbage pos=(88.10001, 5.1, 158.3)
+
+SCFU PlayfieldId counts: [('1441804', 63), ('560', 10)]

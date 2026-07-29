@@ -1,0 +1,495 @@
+=== capture_info ===
+﻿{
+  "timestampUtc": "2026-07-24T16:14:50.9338239Z",
+  "captureStartUtc": "2026-07-24T16:12:14.7037681Z",
+  "captureEndUtc": "2026-07-24T16:14:50.9158348Z",
+  "captureStopRequestedUtc": "2026-07-24T16:14:45.9136116Z",
+  "lastRawPacketUtc": "2026-07-24T16:14:49.9652603Z",
+  "captureFinalizedUtc": "2026-07-24T16:14:50.9158348Z",
+  "quietPeriodPassed": false,
+  "sessionDurationSeconds": 156.212,
+  "captureFolderPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-181214",
+  "rawPacketLogPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-181214\\packets.hex.log",
+  "rawPacketIndexPath": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\
+
+=== mission-flow.log (key) ===
+2026-07-24T16:14:35.6776625Z [IN-QUEST] action=Delete mission=(Mission:556312CC) identity=(SimpleChar:797E30D7) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+
+=== events.log mission/machine ===
+2026-07-24T16:12:16.8761279Z [DYNEL-SPAWNED] identity=(Door:10995ABE) name=Door pos=(245, 5, 239.999)
+2026-07-24T16:12:16.8761279Z [DYNEL-SPAWNED] identity=(Door:10995ABF) name=Door pos=(250.001, 5, 245)
+2026-07-24T16:12:16.8761279Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68A) name=Amateur Clan Sharpshooter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(254.3292, 5.01, 247.7981) attacking=False fight
+2026-07-24T16:12:16.8791258Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68A) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121569,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:12:16.8801257Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68B) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:12:16.9021121Z [DYNEL-SPAWNED] identity=(Door:10995AC0) name=Door pos=(229.999, 5, 245)
+2026-07-24T16:12:16.9021121Z [DYNEL-SPAWNED] identity=(Door:10995AC1) name=Door pos=(225, 5, 290.001)
+2026-07-24T16:12:16.9021121Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68B) name=Fresh Clan Hired Killer player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(227.1844, 5.01, 294.0114) attacking=False fightin
+2026-07-24T16:12:34.9960869Z [DYNEL-SPAWNED] identity=(Corpse:F6B001) name=Remains of Fresh Clan Functionary pos=(257.092, 5.01, 268.8615) open=False
+2026-07-24T16:12:34.9970861Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:15:34 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(257.092, 5.01, 268.8615) Heading=X: 0 | Y: -0.5876337 | Z: 0 | W: 0.809127 PlayfieldId=1413191 StateMachine=
+2026-07-24T16:12:48.6337401Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:15:48 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(249.3151, 5.01, 265.01) Heading=X: 0 | Y: 0.5759971 | Z: 0 | W: 0.8174517 PlayfieldId=1413191 StateMachine=(
+2026-07-24T16:12:48.6527279Z [DYNEL-SPAWNED] identity=(Corpse:F6B002) name=Remains of Fresh Clan Techhunter pos=(249.3151, 5.01, 265.01) open=False
+2026-07-24T16:12:57.3986166Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68B) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:12:57.4176048Z [DYNEL-SPAWNED] identity=(Door:10995AC1) name=Door pos=(225, 5, 290.001)
+2026-07-24T16:12:57.4176048Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68B) name=Fresh Clan Hired Killer player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(227.1844, 5.01, 294.0114) attacking=False fightin
+2026-07-24T16:13:11.9649058Z [DYNEL-SPAWNED] identity=(Corpse:F6B003) name=Remains of Daft Clan Informer pos=(239.9731, 5.01, 246.6669) open=False
+2026-07-24T16:13:11.9659048Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:16:11 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(239.9731, 5.01, 246.6669) Heading=X: 0 | Y: -0.9093674 | Z: 0 | W: 0.4159938 PlayfieldId=1413191 StateMachin
+2026-07-24T16:13:17.2189145Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:17.2189145Z [IN-N3] #312 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:17.2189145Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:17.2189145Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:17.2189145Z [IN-N3] #314 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:17.2189145Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:17.2199131Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:17.2199131Z [IN-N3] #317 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:17.2199131Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTar
+2026-07-24T16:13:19.9442591Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:19.9452585Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:19.9452585Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:19.9462584Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:19.9462584Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:19.9472572Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:19.9472572Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:19.9682453Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarg
+2026-07-24T16:13:19.9682453Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:19.9682453Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False f
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTar
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarg
+2026-07-24T16:13:19.9792377Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:19.9792377Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingT
+2026-07-24T16:13:20.4319585Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:20.4319585Z [IN-N3] #364 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:20.4319585Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:20.4319585Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:20.4319585Z [IN-N3] #366 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:20.4319585Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:20.4329578Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:20.4329578Z [IN-N3] #369 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:20.4329578Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:20.4339571Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:20.4349566Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:20.4349566Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:20.4359563Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:20.4359563Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:20.4369568Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:20.4369568Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:20.4569435Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTar
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarg
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False f
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTar
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarg
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingT
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:23.2704161Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.2704161Z [IN-N3] #421 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:23.2704161Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.3283798Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:23.3283798Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:23.3283798Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:23.3293796Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTar
+2026-07-24T16:13:23.3703552Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.3703552Z [IN-N3] #423 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:23.3703552Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.3753510Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.3753510Z [IN-N3] #426 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:23.3753510Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.3803490Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:23.3813474Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.3823463Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.3823463Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:23.3853464Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.3853464Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.3863440Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarg
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False f
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:23.4133271Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:23.4133271Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:23.4133271Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTar
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarg
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingT
+2026-07-24T16:13:23.4852833Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.4852833Z [IN-N3] #459 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:23.4852833Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.4852833Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.4852833Z [IN-N3] #461 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:23.4852833Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.4852833Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.4852833Z [IN-N3] #464 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:23.4852833Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.4872817Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:23.4872817Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.4882813Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.4882813Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:23.4882813Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.4892807Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.4892807Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:23.4902798Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.4902798Z [IN-N3] #496 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:23.4902798Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.4902798Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.4902798Z [IN-N3] #498 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:23.4902798Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.4912799Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:23.4912799Z [IN-N3] #501 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:23.4912799Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:23.5222609Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTar
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarg
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False f
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTar
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarg
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingT
+2026-07-24T16:13:23.5562395Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:23.5562395Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:23.5562395Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:33.8970371Z [DYNEL-SPAWNED] identity=(Corpse:F6B004) name=Remains of Amateur Clan Sharpshooter pos=(254.3292, 5.01, 247.7981) open=False
+2026-07-24T16:13:33.8980366Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:16:33 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(254.3292, 5.01, 247.7981) Heading=X: 0 | Y: -0.9952962 | Z: 0 | W: 0.0968781 PlayfieldId=1413191 StateMachin
+2026-07-24T16:13:36.2515846Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:36.2535854Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:36.2535854Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:36.2545840Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:36.5643918Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:36.5643918Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:36.5643918Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:36.5653911Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:36.5653911Z [IN-N3] #588 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:36.5653911Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:36.5663905Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:36.5663905Z [IN-N3] #590 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:36.5663905Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:36.5663905Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:36.5663905Z [IN-N3] #593 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:36.5663905Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTar
+2026-07-24T16:13:37.0241085Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:37.0251082Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:37.0251082Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:37.0261071Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:37.0261071Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:37.0261071Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarg
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False f
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTar
+2026-07-24T16:13:37.0590867Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:37.0590867Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:37.0590867Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarg
+2026-07-24T16:13:37.1590250Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:37.1590250Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingT
+2026-07-24T16:13:37.1610238Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:40.2242977Z [SMOKE] IN Despawn identity=(Container:BA11265) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:40.2242977Z [IN-N3] #640 type=Despawn identity=(Container:BA11265)
+2026-07-24T16:13:40.2242977Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11265) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:40.5470987Z [SMOKE] IN Despawn identity=(Container:BA11266) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:40.5470987Z [IN-N3] #642 type=Despawn identity=(Container:BA11266)
+2026-07-24T16:13:40.5470987Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11266) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:40.5470987Z [SMOKE] IN Despawn identity=(Container:BA11267) N3MessageType=Despawn Unknown=1 PacketType=N3Message
+2026-07-24T16:13:40.5470987Z [IN-N3] #645 type=Despawn identity=(Container:BA11267)
+2026-07-24T16:13:40.5470987Z [IN-N3-DETAIL] DespawnMessage { N3MessageType=Despawn Identity=(Container:BA11267) Unknown=1 PacketType=N3Message }
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTar
+2026-07-24T16:13:42.7487402Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=
+2026-07-24T16:13:42.7497396Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:42.7497396Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:42.7507390Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateI
+2026-07-24T16:13:42.7507390Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarg
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False f
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTar
+2026-07-24T16:13:42.7777222Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:42.8946502Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:42.8946502Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarg
+2026-07-24T16:13:42.8966483Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:42.8966483Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:42.9126386Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:42.9126386Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingT
+2026-07-24T16:13:44.3578385Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68B) name=Fresh Clan Hired Killer player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(227.1844, 5.01, 294.0114) attacking=False fightin
+2026-07-24T16:13:44.3598373Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68B) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=1
+2026-07-24T16:13:59.9274496Z [DYNEL-SPAWNED] identity=(Corpse:F6B005) name=Remains of Fresh Clan Saboteur pos=(233.7288, 5.01, 275.0699) open=False
+2026-07-24T16:13:59.9284490Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:16:59 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(233.7288, 5.01, 275.0699) Heading=X: 0 | Y: 0.9898773 | Z: 0 | W: 0.1419259 PlayfieldId=1413191 StateMachine
+2026-07-24T16:14:12.5481309Z [DYNEL-SPAWNED] identity=(Corpse:F6B005) name=Remains of Daft Clan Informer pos=(227.4229, 5.01, 273.8826) open=False
+2026-07-24T16:14:12.5491302Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:17:12 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(227.4229, 5.01, 273.8826) Heading=X: 0 | Y: 0.7180963 | Z: 0 | W: 0.6959437 PlayfieldId=1413191 StateMachine
+2026-07-24T16:14:35.6776625Z [SMOKE] IN ContainerAddItem identity=(SimpleChar:797E30D7) Source=(OverflowWindow:0000) Target=(OverflowWindow:797E30D7) Slot=111 N3MessageType=ContainerAddItem Unknown=0 PacketType=N3Message
+2026-07-24T16:14:35.6776625Z [IN-N3] #961 type=ContainerAddItem identity=(SimpleChar:797E30D7)
+2026-07-24T16:14:35.6776625Z [IN-N3-DETAIL] ContainerAddItem { Source=(OverflowWindow:0000) Target=(OverflowWindow:797E30D7) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+
+=== raw-packets IN summary ===
+  364 Stat
+  161 CharDCMove
+  137 Despawn
+   55 DoorFullUpdate
+   46 SimpleCharFullUpdate
+   46 WeaponItemFullUpdate
+   33 AttackInfo
+   25 CharacterAction
+   21 ChestFullUpdate
+   15 CastNanoSpell
+   13 FollowTarget
+   12 SpecialAttackWeapon
+   12 Attack
+   12 StopFight
+   10 FormatFeedback
+    7 SetPos
+    7 InfoPacket
+    7 Feedback
+    7 SimpleItemFullUpdate
+    7 TrapItemFullUpdate
+    6 CorpseFullUpdate
+    5 SetWantedDirection
+    5 SpellList
+    4 Buff
+    3 HealthDamage
+    3 GenericCmd
+    2 MissedAttackInfo
+    2 CharSecSpecAttack
+    2 SpecialAttackInfo
+    1 InventoryUpdate
+    1 Action
+    1 1
+    1 11
+    1 TemplateAction
+    1 ContainerAddItem
+    1 Quest
+
+=== Teleports ===
+
+=== PAF count 0 ===
+
+=== ChestFullUpdate count 21 ===
+template-like 0x02xxxx hits:
+  0x27A8F (162447) x42
+  0x27A90 (162448) x21
+  0x2BD00 (179456) x21
+  0x2BE00 (179712) x21
+  0x2BF00 (179968) x21
+  0x20000 (131072) x21
+unique chests ~2
+
+=== scfu / dynel names mentioning machine/rift/crate ===
+
+=== npc-lifecycle Container/Chest ===
+2026-07-24T16:14:35.6776625Z,IN-N3,961,loot-move-result,ContainerAddItem,(SimpleChar:797E30D7),(OverflowWindow:0000),Getkeep,ContainerAddItem { Source=(OverflowWindow:0000) Target=(OverflowWindow:797E30D7) Slot=111 N3MessageType=ContainerAddItem Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3
+
+=== DYNEL-SPAWNED from events ===
+2026-07-24T16:12:16.8761279Z [DYNEL-SPAWNED] identity=(Door:10995ABE) name=Door pos=(245, 5, 239.999)
+2026-07-24T16:12:16.8761279Z [DYNEL-SPAWNED] identity=(Door:10995ABF) name=Door pos=(250.001, 5, 245)
+2026-07-24T16:12:16.8761279Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68A) name=Amateur Clan Sharpshooter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(254.3292, 5.01, 247.7981) attacking=False fightingTarget=null monsterData=26097 catMesh
+2026-07-24T16:12:16.8791258Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68A) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121569,ACGItemLevel=1,ACGItemTemplateID=121569,ACGItemTemplateID2=121569,Multiple
+2026-07-24T16:12:16.8801257Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68B) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:12:16.9021121Z [DYNEL-SPAWNED] identity=(Door:10995AC0) name=Door pos=(229.999, 5, 245)
+2026-07-24T16:12:16.9021121Z [DYNEL-SPAWNED] identity=(Door:10995AC1) name=Door pos=(225, 5, 290.001)
+2026-07-24T16:12:16.9021121Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68B) name=Fresh Clan Hired Killer player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(227.1844, 5.01, 294.0114) attacking=False fightingTarget=null monsterData=26092 catMesh=1
+2026-07-24T16:12:34.9960869Z [DYNEL-SPAWNED] identity=(Corpse:F6B001) name=Remains of Fresh Clan Functionary pos=(257.092, 5.01, 268.8615) open=False
+2026-07-24T16:12:34.9970861Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:15:34 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(257.092, 5.01, 268.8615) Heading=X: 0 | Y: -0.5876337 | Z: 0 | W: 0.809127 PlayfieldId=1413191 StateMachine=(None:0000) Unknown3=111 Stats=count=18[
+2026-07-24T16:12:48.6337401Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:15:48 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(249.3151, 5.01, 265.01) Heading=X: 0 | Y: 0.5759971 | Z: 0 | W: 0.8174517 PlayfieldId=1413191 StateMachine=(None:0000) Unknown3=111 Stats=count=18[F
+2026-07-24T16:12:48.6527279Z [DYNEL-SPAWNED] identity=(Corpse:F6B002) name=Remains of Fresh Clan Techhunter pos=(249.3151, 5.01, 265.01) open=False
+2026-07-24T16:12:57.3986166Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68B) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:12:57.4176048Z [DYNEL-SPAWNED] identity=(Door:10995AC1) name=Door pos=(225, 5, 290.001)
+2026-07-24T16:12:57.4176048Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68B) name=Fresh Clan Hired Killer player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(227.1844, 5.01, 294.0114) attacking=False fightingTarget=null monsterData=26092 catMesh=1
+2026-07-24T16:13:11.9649058Z [DYNEL-SPAWNED] identity=(Corpse:F6B003) name=Remains of Daft Clan Informer pos=(239.9731, 5.01, 246.6669) open=False
+2026-07-24T16:13:11.9659048Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:16:11 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(239.9731, 5.01, 246.6669) Heading=X: 0 | Y: -0.9093674 | Z: 0 | W: 0.4159938 PlayfieldId=1413191 StateMachine=(None:0000) Unknown3=111 Stats=count=1
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:19.9392629Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:19.9442591Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:19.9452585Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:19.9452585Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:19.9462584Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:19.9462584Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:19.9472572Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:19.9472572Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:19.9682453Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarget=null monsterData=26076 catMesh=123456
+2026-07-24T16:13:19.9682453Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:19.9682453Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False fightingTarget=null monsterData=26155 cat
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:19.9692447Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarget=null monsterData=26074 catMesh=123456
+2026-07-24T16:13:19.9792377Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:19.9792377Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingTarget=null monsterData=26090 catMesh=123
+2026-07-24T16:13:20.4339571Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:20.4349566Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:20.4349566Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:20.4359563Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:20.4359563Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:20.4369568Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:20.4369568Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:20.4569435Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarget=null monsterData=26076 catMesh=123456
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False fightingTarget=null monsterData=26155 cat
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:20.4819286Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarget=null monsterData=26074 catMesh=123456
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingTarget=null monsterData=26090 catMesh=123
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:20.4829280Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:23.3283798Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:23.3283798Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:23.3283798Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:23.3293796Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:23.3803490Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:23.3813474Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:23.3823463Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:23.3823463Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:23.3853464Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:23.3853464Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:23.3863440Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarget=null monsterData=26076 catMesh=123456
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False fightingTarget=null monsterData=26155 cat
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:23.4043330Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:23.4133271Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:23.4133271Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:23.4133271Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarget=null monsterData=26074 catMesh=123456
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:23.4303172Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingTarget=null monsterData=26090 catMesh=123
+2026-07-24T16:13:23.4872817Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:23.4872817Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:23.4882813Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:23.4882813Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:23.4882813Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:23.4892807Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:23.4892807Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:23.5222609Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarget=null monsterData=26076 catMesh=123456
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False fightingTarget=null monsterData=26155 cat
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarget=null monsterData=26074 catMesh=123456
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:23.5552400Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingTarget=null monsterData=26090 catMesh=123
+2026-07-24T16:13:23.5562395Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:23.5562395Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:23.5562395Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:33.8970371Z [DYNEL-SPAWNED] identity=(Corpse:F6B004) name=Remains of Amateur Clan Sharpshooter pos=(254.3292, 5.01, 247.7981) open=False
+2026-07-24T16:13:33.8980366Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:16:33 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(254.3292, 5.01, 247.7981) Heading=X: 0 | Y: -0.9952962 | Z: 0 | W: 0.0968781 PlayfieldId=1413191 StateMachine=(None:0000) Unknown3=111 Stats=count=1
+2026-07-24T16:13:36.2515846Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:36.2535854Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:36.2535854Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:36.2545840Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:36.5643918Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:36.5643918Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:36.5643918Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:37.0181120Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:37.0241085Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:37.0251082Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:37.0251082Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:37.0261071Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:37.0261071Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:37.0261071Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarget=null monsterData=26076 catMesh=123456
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False fightingTarget=null monsterData=26155 cat
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:37.0440957Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:37.0590867Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:37.0590867Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:37.0590867Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarget=null monsterData=26074 catMesh=123456
+2026-07-24T16:13:37.1590250Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:37.1590250Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingTarget=null monsterData=26090 catMesh=123
+2026-07-24T16:13:37.1610238Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(Door:10995AB5) name=Door pos=(299.999, 5, 245)
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(Door:10995AB8) name=Door pos=(235, 5, 270.001)
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(Terminal:5796D655) name=Radar Display pos=(238.4, 5.1, 280.01)
+2026-07-24T16:13:42.7457420Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A685) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(233.7288, 5.01, 275.0699) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:42.7487402Z [IN-N3-DETAIL] SimpleItemFullUpdateMessage { Unknown1=11 OwnerType=0 OwnerInstance=0 Position=(238.4, 5.1, 280.01) Rotation=X: 0 | Y: 0 | Z: 0 | W: 1 PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=111 Stats=count=7[Flags=536883715,StaticInstance=100358,ACGItemL
+2026-07-24T16:13:42.7497396Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A685) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:42.7497396Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68D) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121571,ACGItemLevel=1,ACGItemTemplateID=121571,ACGItemTemplateID2=121571,Multiple
+2026-07-24T16:13:42.7507390Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A686) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=-1006631421,StaticInstance=121566,ACGItemLevel=1,ACGItemTemplateID=121566,ACGItemTemplateID2=121566,Multi
+2026-07-24T16:13:42.7507390Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A687) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68D) name=Daft Clan Informer player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(227.4229, 5.01, 273.8826) attacking=False fightingTarget=null monsterData=26076 catMesh=123456
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Door:10995AB9) name=Door pos=(255, 5, 259.999)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A686) name=Amateur Clan Techno-Architect player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(256.3021, 5.01, 255.3905) attacking=False fightingTarget=null monsterData=26155 cat
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Container:BA11265) name=Treasure pos=(258.01, 5.1, 251.6)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Door:10995ABA) name=Door pos=(229.999, 5, 255)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Container:BA11266) name=Treasure pos=(221.8, 5.1, 258.8)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(Door:10995ABB) name=Door pos=(269.999, 5, 255)
+2026-07-24T16:13:42.7687277Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A687) name=Fresh Clan Saboteur player=False npc=True pet=False inPlay=True alive=True hp=70/70 pct=100.0 level=3 computerLiteracy=6 pos=(264.3597, 5.01, 254.5082) attacking=False fightingTarget=null monsterData=26135 catMesh=12345
+2026-07-24T16:13:42.7777222Z [DYNEL-SPAWNED] identity=(Container:BA11267) name=Treasure pos=(264.3328, 5.10007, 251.2121)
+2026-07-24T16:13:42.8946502Z [DYNEL-SPAWNED] identity=(Door:10995ABC) name=Door pos=(249.999, 5, 275)
+2026-07-24T16:13:42.8946502Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A688) name=Daft Clan Techwrecker player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(244.905, 5.01, 271.99) attacking=False fightingTarget=null monsterData=26074 catMesh=123456
+2026-07-24T16:13:42.8966483Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A688) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121565,ACGItemLevel=1,ACGItemTemplateID=121565,ACGItemTemplateID2=121565,Multiple
+2026-07-24T16:13:42.8966483Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A689) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121567,ACGItemLevel=1,ACGItemTemplateID=121567,ACGItemTemplateID2=121567,Multiple
+2026-07-24T16:13:42.9126386Z [DYNEL-SPAWNED] identity=(Door:10995ABD) name=Door pos=(280.001, 5, 275)
+2026-07-24T16:13:42.9126386Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A689) name=Fresh Clan Techhunter player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(282.0285, 5.01, 276.6196) attacking=False fightingTarget=null monsterData=26090 catMesh=123
+2026-07-24T16:13:44.3578385Z [DYNEL-SPAWNED] identity=(SimpleChar:7991A68B) name=Fresh Clan Hired Killer player=False npc=True pet=False inPlay=True alive=True hp=93/93 pct=100.0 level=4 computerLiteracy=6 pos=(227.1844, 5.01, 294.0114) attacking=False fightingTarget=null monsterData=26092 catMesh=1
+2026-07-24T16:13:44.3598373Z [IN-N3-DETAIL] WeaponItemFullUpdateMessage { Unknown1=11 Owner=(SimpleChar:7991A68B) PlayfieldId=1413191 StateMachine=(1000015:0000) Unknown2=262 Stats=count=9[Flags=67109889,StaticInstance=121568,ACGItemLevel=1,ACGItemTemplateID=121568,ACGItemTemplateID2=121568,Multiple
+2026-07-24T16:13:59.9274496Z [DYNEL-SPAWNED] identity=(Corpse:F6B005) name=Remains of Fresh Clan Saboteur pos=(233.7288, 5.01, 275.0699) open=False
+2026-07-24T16:13:59.9284490Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:16:59 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(233.7288, 5.01, 275.0699) Heading=X: 0 | Y: 0.9898773 | Z: 0 | W: 0.1419259 PlayfieldId=1413191 StateMachine=(None:0000) Unknown3=111 Stats=count=18
+2026-07-24T16:14:12.5481309Z [DYNEL-SPAWNED] identity=(Corpse:F6B005) name=Remains of Daft Clan Informer pos=(227.4229, 5.01, 273.8826) open=False
+2026-07-24T16:14:12.5491302Z [IN-N3-DETAIL] CorpseFullUpdateMessage { DecayTime=24-Jul-26 6:17:12 PM Unknown1=8 Unknown2=11 Owner=(None:0000) Position=(227.4229, 5.01, 273.8826) Heading=X: 0 | Y: 0.7180963 | Z: 0 | W: 0.6959437 PlayfieldId=1413191 StateMachine=(None:0000) Unknown3=111 Stats=count=18

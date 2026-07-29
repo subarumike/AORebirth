@@ -1,54 +1,50 @@
---- Nano 100194 NCU=1037 events=1
+--- Nano 300495 NCU=0 events=1
   Attr8(duration)=0
   Attr88(?)=0
-  Attr287(range)=20
-  OnUse Fn 53117 target=3 reqs=1 [2000]
-    Req op=LessThan stat=129 val=50 child=Or tgt=100
-  OnUse Fn 53117 target=3 reqs=2 [3000]
-    Req op=LessThan stat=129 val=150 child=And tgt=100
-    Req op=GreaterThan stat=129 val=49 child=And tgt=Self
-  OnUse Fn 53117 target=3 reqs=1 [4000]
-    Req op=GreaterThan stat=129 val=149 child=Or tgt=100
---- Nano 100195 NCU=1037 events=1
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,10,10,0]
+--- Nano 300496 NCU=0 events=1
   Attr8(duration)=0
   Attr88(?)=0
-  Attr287(range)=20
-  OnUse Fn 53117 target=3 reqs=1 [11000]
-    Req op=LessThan stat=129 val=750 child=Or tgt=100
-  OnUse Fn 53117 target=3 reqs=2 [12000]
-    Req op=LessThan stat=129 val=1000 child=And tgt=100
-    Req op=GreaterThan stat=129 val=749 child=And tgt=Self
-  OnUse Fn 53117 target=3 reqs=1 [13000]
-    Req op=GreaterThan stat=129 val=999 child=Or tgt=100
---- Nano 100196 NCU=1037 events=1
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,53,53,0]
+--- Nano 300497 NCU=0 events=1
   Attr8(duration)=0
   Attr88(?)=0
-  Attr287(range)=20
-  OnUse Fn 53117 target=3 reqs=1 [8000]
-    Req op=LessThan stat=129 val=550 child=Or tgt=100
-  OnUse Fn 53117 target=3 reqs=2 [9000]
-    Req op=LessThan stat=129 val=600 child=And tgt=100
-    Req op=GreaterThan stat=129 val=549 child=And tgt=Self
-  OnUse Fn 53117 target=3 reqs=1 [10000]
-    Req op=GreaterThan stat=129 val=599 child=Or tgt=100
---- Nano 100197 NCU=188 events=1
-  Attr8(duration)=2000
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,143,143,0]
+--- Nano 300498 NCU=0 events=1
+  Attr8(duration)=0
   Attr88(?)=0
   Attr287(range)=1
-  OnUse Fn 53002 target=1 reqs=0 [27,169,169,0]
-  OnUse Fn 53057 target=1 reqs=0 [Mongo Smash!,2]
-  OnUse Fn 53087 target=1 reqs=0 [100196,20]
---- Nano 100199 NCU=188 events=1
-  Attr8(duration)=2000
+  OnUse Fn 53002 target=3 reqs=0 [27,243,243,0]
+--- Nano 300491 NCU=0 events=1
+  Attr8(duration)=0
   Attr88(?)=0
   Attr287(range)=1
-  OnUse Fn 53002 target=1 reqs=0 [27,224,224,0]
-  OnUse Fn 53057 target=1 reqs=0 [Mongo Crush!,2]
-  OnUse Fn 53087 target=1 reqs=0 [100195,20]
---- Nano 100200 NCU=188 events=1
-  Attr8(duration)=2000
+  OnUse Fn 53002 target=3 reqs=0 [27,381,381,0]
+--- Nano 300492 NCU=0 events=1
+  Attr8(duration)=0
   Attr88(?)=0
   Attr287(range)=1
-  OnUse Fn 53002 target=1 reqs=0 [27,79,79,0]
-  OnUse Fn 53057 target=1 reqs=0 [Mongo Bash!,2]
-  OnUse Fn 53087 target=1 reqs=0 [100193,20]
+  OnUse Fn 53002 target=3 reqs=0 [27,494,494,0]
+--- Nano 300456 NCU=0 events=1
+  Attr8(duration)=0
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,708,708,0]
+--- Nano 300457 NCU=0 events=1
+  Attr8(duration)=0
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,948,948,0]
+--- Nano 300489 NCU=0 events=1
+  Attr8(duration)=0
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,737,737,0]
+--- Nano 300490 NCU=0 events=1
+  Attr8(duration)=0
+  Attr88(?)=0
+  Attr287(range)=1
+  OnUse Fn 53002 target=3 reqs=0 [27,843,843,0]

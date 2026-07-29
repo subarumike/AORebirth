@@ -1,0 +1,50 @@
+
+=== ACCEPT / OFFERS icon=11330 Kill ===
+[IN-MISSION-OFFER] capturedUtc=2026-07-28T19:19:54.5295479Z globalOrdinal=86 rawSequence=84 rollOrdinal=1 index=2 mission=(Mission:556E7E16) title="Mission Assignment MXIL: Jon..." description="Mission Assignment MXIL: Joni Cordiero is a notorious thief, and important people have grown extremely tired of thievery done by this person.  Could you go to Stret West Bank within 48 hours and simply... kill this person?" terminal=(MissionTerminal:C0020320) rewardDescriptorVersion=6 credits=4098 xp=2141 unk1=0 icon=11330 playfield=(Playfield2:316) location=(670.7497,10.4186163,1362.17871) rewards=[113115/113116@42:0] unkChunk1=0000000F000000000000000000000000 unkChunk2=000003F1000003F1 unkChunk3=0000000000000000000000004D5352450000002A000000000000000000000000000000000000000000000000 unkChunk4=0000000000000B40000007E20000000100000000000000000000000000000000000111D351303232000000000000000000000000
+CREATE: [OUT-CREATE-QUEST] capturedUtc=2026-07-28T19:20:40.2953232Z globalOrdinal=641 rawSequence=13 selectedOffer=(Mission:556E7E3E) identity=(SimpleChar:765A6D34) rollOrdinal=9 playerSnapshot={player=(SimpleChar:765A6D34) level=unknown cash=unknown xp=unknown}
+CREATE: [OUT-CREATE-QUEST] capturedUtc=2026-07-28T19:25:48.9961590Z globalOrdinal=2299 rawSequence=342 selectedOffer=(Mission:556E7E44) identity=(SimpleChar:765A6D34) rollOrdinal=10 playerSnapshot={player=(SimpleChar:765A6D34) level=unknown cash=unknown xp=unknown}
+ACCEPT: [IN-MISSION-ACCEPT-CORRELATION] capturedUtc=2026-07-28T19:20:40.4572232Z globalOrdinal=644 rawSequence=631 selectedOffer=(Mission:556E7E3E) acceptedQuest=(Mission:556E7E41) missionKey=(MissionKey:F6F304) temporalCorrelationOnly=true
+ACCEPT: [IN-MISSION-ACCEPT-CORRELATION] capturedUtc=2026-07-28T19:25:49.1570593Z globalOrdinal=2302 rawSequence=1960 selectedOffer=(Mission:556E7E44) acceptedQuest=(Mission:556E7E47) missionKey=(MissionKey:F6F305) temporalCorrelationOnly=true
+QUEST: [IN-MISSION-QUEST] capturedUtc=2026-07-28T19:20:40.4572232Z globalOrdinal=644 rawSequence=631 index=0 quest=(Mission:556E7E41) isNew=True selectedOffer=(Mission:556E7E3E) temporalCorrelationOnly=True icon=11330 title="Hello. Thanks for taking on ..." description="Hello. Thanks for taking on this assignment. Inocencia Western is a notorious thief, and important people have grown extremely tired of thievery done by this person.  Could you go to Holes in the Wall within 48 hours and simply... kill this person?" rewards=[104258/104259@42:0] decoded={QuestId=(Mission:556E7E41),Unknown1=15,Unknown2=0,Unknown3=0,Unknown4=2,ShortInfo="Hello. Thanks for taking on ...",LongInfo="Hello. Thanks for taki
+KEY: [IN-MISSION-KEY] capturedUtc=2026-07-28T19:20:40.4562238Z globalOrdinal=642 rawSequence=629 item=(MissionKey:F6F304) owner=(SimpleChar:765A6D34) playfieldId=800 stateMachine=(1000015:0) unknown1=11 unknown2=29039 position=null rotation=null low=28577 high=28577 ql=1 stats=[Flags=-2147483131;StaticInstance=28577;ACGItemLevel=1;ACGItemTemplateID=28577;ACGItemTemplateID2=28577;MultipleCount=1] nameSo
+KEY: [IN-MISSION-KEY] capturedUtc=2026-07-28T19:23:01.0193602Z globalOrdinal=1213 rawSequence=1083 item=(MissionKey:F6F304) owner=(SimpleChar:765A6D34) playfieldId=791 stateMachine=(1000015:0) unknown1=11 unknown2=328 position=null rotation=null low=28577 high=28577 ql=1 stats=[Flags=-2147483131;StaticInstance=28577;ACGItemLevel=1;ACGItemTemplateID=28577;ACGItemTemplateID2=28577;MultipleCount=1;TimeExi
+
+=== INSTANCE / TARGET / FINISH COUNTS ===
+PLAYFIELD-INIT]: 8
+ACGBuildingGeneratorData: 3
+icon=11330: 0
+Suzie: 0
+Kill: 6
+Action=59: 2
+QuestMessage { Action=Delete: 3
+Received reward: 1
+MissionTarget: 0
+type=Attack: 87
+Death: 6
+Corpse: 51
+
+=== SPAWN / KILL TARGET SNIPPETS ===
+[PLAYFIELD-INIT] 791
+[PLAYFIELD-INIT] 1468417
+[PLAYFIELD-INIT] 800
+[PLAYFIELD-INIT] 1437698
+[PLAYFIELD-INIT] 800
+[PLAYFIELD-INIT] 790
+[PLAYFIELD-INIT] 1433600
+[PLAYFIELD-INIT] 790
+ACGBuildingGeneratorData:D79ABD
+name=Suzie[^\n]* hits=0
+DYNEL-SPAWNED\][^\n]*SimpleChar[^\n]* hits=178
+DYNEL-SPAWNED] identity=(SimpleChar:6E264FDF) name=Llolmolax player=True npc=False pet=False inPlay=False alive=True hp=4444/4444 pct=100.0 level=210 computerLiteracy=225 pos=(636.4823, 66.81001, 724.8651) attacking=False fightingTarget=null monsterData=0 catMesh=1234567890 visualFlags=127 state=1234567890 currentState=0 actionCategory=1234567890 d
+DYNEL-SPAWNED] identity=(SimpleChar:79A3C7B8) name=Devastator Drone player=False npc=False pet=True inPlay=True alive=True hp=36609/36609 pct=100.0 level=205 computerLiteracy=6 pos=(635.7247, 66.81001, 727.1597) attacking=False fightingTarget=null monsterData=218783 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=12
+DYNEL-SPAWNED] identity=(SimpleChar:79A3C7B3) name=Semi-Sentinent Predator M-30 player=False npc=False pet=True inPlay=True alive=True hp=11375/11375 pct=100.0 level=207 computerLiteracy=6 pos=(637.1306, 66.81001, 721.9825) attacking=False fightingTarget=null monsterData=218695 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actio
+Received reward[^\n]* hits=1
+Received reward: 0 XP, 4386 credits." N3MessageType=FormatFeedback Identity=(SimpleChar:765A6D34) Unknown=1 PacketType=N3Message }
+Action=59[^\n]* hits=2
+Action=59 Unknown1=0 Target=(Mission:556E7E47) Parameter1=56003 Parameter2=1433304647 Unknown2=0 N3MessageType=CharacterAction Unknown=0 PacketType=N3Message
+Action=59 Unknown1=0 Target=(Mission:556E7E47) Parameter1=56003 Parameter2=1433304647 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:765A6D34) Unknown=0 PacketType=N3Message }
+QuestMessage \{ Action=Delete[^\n]* hits=3
+QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:556E7E41) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A6D34) Unknown=0 PacketType=N3Message }
+QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:556E7E41) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A6D34) Unknown=0 PacketType=N3Message }
+QuestMessage { Action=Delete Unknown1=0 Mission=(Mission:556E7E47) Unknown2=0 Unknown3=0 N3MessageType=Quest Identity=(SimpleChar:765A6D34) Unknown=0 PacketType=N3Message }
+DESC: Hello. Thanks for taking on this assignment. Inocencia Western is a notorious thief, and important people have grown extremely tired of thievery done by this person.  Could you go to Holes in the Wall within 48 hours and simply... kill this person?

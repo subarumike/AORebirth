@@ -1,0 +1,148 @@
+=== LOOT/OBJECT NAME HITS (events.log) ===
+Treasure count=89
+  2026-07-24T08:39:31.5123796Z [DYNEL-SPAWNED] identity=(Container:BA10691) name=Treasure pos=(245.1313, 5.1, 281.7034)
+  2026-07-24T08:39:39.3182556Z [DYNEL-SPAWNED] identity=(Container:BA10699) name=Treasure pos=(223.3, 5.1, 231.5)
+  2026-07-24T08:39:39.4336759Z [DYNEL-SPAWNED] identity=(Container:BA1069B) name=Treasure pos=(216.8, 5.1, 281.3)
+Bottles and Garbage count=75
+  2026-07-24T08:39:31.5123796Z [DYNEL-SPAWNED] identity=(Container:BA10692) name=Bottles and Garbage pos=(284.99, 5.1, 261.5294)
+  2026-07-24T08:39:31.6721513Z [DYNEL-SPAWNED] identity=(Container:BA10696) name=Bottles and Garbage pos=(228.2, 5.1, 267.01)
+  2026-07-24T08:39:39.4336759Z [DYNEL-SPAWNED] identity=(Container:BA106A2) name=Bottles and Garbage pos=(278.4, 5.1, 238.3)
+Garbage count=63
+  2026-07-24T08:39:31.6721513Z [DYNEL-SPAWNED] identity=(Container:BA10697) name=Garbage pos=(244.01, 5.1, 268.4)
+  2026-07-24T08:43:24.7521616Z [DYNEL-SPAWNED] identity=(Container:BA10697) name=Garbage pos=(244.01, 5.1, 268.4)
+  2026-07-24T08:43:25.0010083Z [DYNEL-SPAWNED] identity=(Container:BA10697) name=Garbage pos=(244.01, 5.1, 268.4)
+Barrel count=41
+  2026-07-24T08:39:31.6721513Z [DYNEL-SPAWNED] identity=(Container:BA10694) name=Barrel pos=(261.7, 5.1, 236.6)
+  2026-07-24T08:39:39.4336759Z [DYNEL-SPAWNED] identity=(Container:BA1069E) name=Barrel pos=(291.2, 5.1, 292.6)
+  2026-07-24T08:39:39.4336759Z [DYNEL-SPAWNED] identity=(Container:BA106A3) name=Barrel pos=(271.4, 5.1, 231.4)
+Shadow Rift count=25
+  2026-07-24T08:39:39.3182556Z [DYNEL-SPAWNED] identity=(Container:BA1069A) name=Shadow Rift of the Phoenix pos=(225.2, 5.1, 238.7)
+  2026-07-24T08:41:55.8746198Z [DYNEL-SPAWNED] identity=(Container:BA1069A) name=Shadow Rift of the Phoenix pos=(225.2, 5.1, 238.7)
+  2026-07-24T08:42:26.9179301Z [DYNEL-SPAWNED] identity=(Container:BA1069A) name=Shadow Rift of the Phoenix pos=(225.2, 5.1, 238.7)
+Small Crate count=22
+  2026-07-24T08:39:31.5123796Z [DYNEL-SPAWNED] identity=(Container:BA10690) name=Small Crate pos=(237.8369, 5.1, 287.8768)
+  2026-07-24T08:39:39.3172563Z [DYNEL-SPAWNED] identity=(Container:BA10698) name=Small Crate pos=(268.3, 5.100602, 202.01)
+  2026-07-24T08:41:55.8426398Z [DYNEL-SPAWNED] identity=(Container:BA10698) name=Small Crate pos=(268.3, 5.100602, 202.01)
+blasted Skeleton count=2
+  2026-07-24T08:39:39.4336759Z [DYNEL-SPAWNED] identity=(Container:BA1069D) name=A blasted Skeleton pos=(247.6, 5.1, 292.1)
+  2026-07-24T08:47:50.3123539Z [DYNEL-SPAWNED] identity=(Container:BA1069D) name=A blasted Skeleton pos=(247.6, 5.1, 292.1)
+Crashed Android count=1
+  2026-07-24T08:39:31.5123796Z [DYNEL-SPAWNED] identity=(Container:BA10693) name=A Crashed Android pos=(245.01, 5.1, 245.01)
+
+=== CHEST/DOOR/CONTAINER PACKET TYPES (events.log) ===
+ChestFullUpdate hits=13
+DoorFullUpdate hits=651
+Container hits=1390
+Barrel hits=41
+Crate hits=22
+Treasure hits=89
+Skeleton hits=2
+Android hits=4
+Rift hits=25
+
+=== FORMAT FEEDBACK / TOKEN (system-messages + events) ===
+
+=== ENEMY DOSSIER INSIDE PF 1419360 ===
+mission-ish mobs=32
+names: Counter({'Aquaan Vicar': 6, 'Hellhound': 6, 'Demon': 6, 'Bileswarm Dominator': 5, 'Aquaan Grunt': 4, 'Bileswarm Colossus': 2, 'Bileswarm Breeder': 2, 'Garbage Flea': 1})
+levels min=151 max=168 sample=[156, 168, 157, 162, 165, 156, 168, 159, 161, 154, 158, 163, 164, 154, 164, 152, 153, 158, 153, 151]
+monsterData top: [('30369', 10), ('17720', 6), ('40515', 6), ('31909', 5), ('31907', 4), ('17657', 1)]
+
+=== FIRST 25 MISSION MOBS DETAIL ===
+name=Aquaan Vicar lvl=156 md=30369 scale=117 hp=11411/11411 side_pf=(Playfield2:15A860) pos=(274.605,5.01,285.019958) death=False
+name=Bileswarm Colossus lvl=168 md=31907 scale=118 hp=0/16052 side_pf=(Playfield2:15A860) pos=(252.986252,4.01,248.01) death=True
+name=Bileswarm Breeder lvl=157 md=31907 scale=118 hp=0/14413 side_pf=(Playfield2:15A860) pos=(235.53,5.01,293.223541) death=True
+name=Hellhound lvl=162 md=17720 scale=118 hp=30315/30315 side_pf=(Playfield2:15A860) pos=(275.831024,5.01,293.57074) death=False
+name=Bileswarm Dominator lvl=165 md=31909 scale=118 hp=0/18726 side_pf=(Playfield2:15A860) pos=(264.536133,5.01,245.0794) death=True
+name=Aquaan Vicar lvl=156 md=30369 scale=117 hp=11411/11411 side_pf=(Playfield2:15A860) pos=(226.812653,5.01,262.044067) death=False
+name=Demon lvl=168 md=40515 scale=118 hp=0/22473 side_pf=(Playfield2:15A860) pos=(255.366333,5.01,264.595917) death=True
+name=Bileswarm Dominator lvl=159 md=31909 scale=118 hp=17652/17652 side_pf=(Playfield2:15A860) pos=(293.5443,5.01,285.351) death=False
+name=Bileswarm Dominator lvl=161 md=31909 scale=118 hp=0/18010 side_pf=(Playfield2:15A860) pos=(257.765869,5.010602,221.023056) death=True
+name=Aquaan Vicar lvl=154 md=30369 scale=117 hp=0/11173 side_pf=(Playfield2:15A860) pos=(232.748535,5.01,225.673157) death=True
+name=Demon lvl=158 md=40515 scale=118 hp=0/20386 side_pf=(Playfield2:15A860) pos=(222.687515,5.01,258.249634) death=True
+name=Bileswarm Dominator lvl=163 md=31909 scale=118 hp=0/18368 side_pf=(Playfield2:15A860) pos=(226.527237,5.01,242.5965) death=True
+name=Aquaan Grunt lvl=164 md=30369 scale=118 hp=0/12365 side_pf=(Playfield2:15A860) pos=(224.261261,5.01,233.940659) death=True
+name=Demon lvl=154 md=40515 scale=117 hp=0/19551 side_pf=(Playfield2:15A860) pos=(215.04657,5.01,287.357971) death=True
+name=Hellhound lvl=164 md=17720 scale=118 hp=0/30912 side_pf=(Playfield2:15A860) pos=(242.291672,5.01,296.7276) death=True
+name=Aquaan Vicar lvl=152 md=30369 scale=117 hp=0/10934 side_pf=(Playfield2:15A860) pos=(202.445053,5.01,294.606659) death=True
+name=Aquaan Grunt lvl=153 md=30369 scale=117 hp=11054/11054 side_pf=(Playfield2:15A860) pos=(291.6401,5.01,297.204468) death=False
+name=Demon lvl=158 md=40515 scale=118 hp=0/20386 side_pf=(Playfield2:15A860) pos=(266.795166,5.01,265.657532) death=True
+name=Aquaan Vicar lvl=153 md=30369 scale=117 hp=0/11054 side_pf=(Playfield2:15A860) pos=(275.8961,5.01,232.6601) death=True
+name=Aquaan Grunt lvl=151 md=30369 scale=117 hp=10815/10815 side_pf=(Playfield2:15A860) pos=(217.146652,5.01,254.623459) death=False
+name=Aquaan Grunt lvl=168 md=30369 scale=118 hp=0/12842 side_pf=(Playfield2:15A860) pos=(275.470337,5.01,207.699615) death=True
+name=Bileswarm Colossus lvl=167 md=31907 scale=118 hp=0/15903 side_pf=(Playfield2:15A860) pos=(232.744522,5.01,207.078445) death=True
+name=Demon lvl=152 md=40515 scale=117 hp=0/19134 side_pf=(Playfield2:15A860) pos=(235.99,5.01,213.62146) death=True
+name=Hellhound lvl=166 md=17720 scale=118 hp=0/31508 side_pf=(Playfield2:15A860) pos=(273.01,5.01,225.142273) death=True
+name=Hellhound lvl=167 md=17720 scale=118 hp=0/31806 side_pf=(Playfield2:15A860) pos=(255.098038,5.01,196.01) death=True
+
+=== COMBAT CSV HEAD (mission window) ===
+cols=['\ufeffCapturedUtc', 'Direction', 'Sequence', 'MessageType', 'SourceRole', 'SourceIdentity', 'TargetRole', 'TargetIdentity', 'AuxRole1', 'AuxIdentity1', 'AuxRole2', 'AuxIdentity2', 'Action', 'Amount', 'TargetHp', 'Unknown1', 'Unknown2', 'Unknown3', 'Unknown4', 'Unknown5', 'Unknown6', 'Detail']
+{'\ufeffCapturedUtc': '2026-07-24T08:31:46.7975539Z', 'Direction': 'OUT-N3', 'Sequence': '1', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': 
+{'\ufeffCapturedUtc': '2026-07-24T08:31:46.8303706Z', 'Direction': 'OUT-N3', 'Sequence': '3', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': 
+{'\ufeffCapturedUtc': '2026-07-24T08:31:46.8313737Z', 'Direction': 'OUT-N3', 'Sequence': '5', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2': 
+{'\ufeffCapturedUtc': '2026-07-24T08:31:47.1076712Z', 'Direction': 'IN-N3', 'Sequence': '2', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIde
+{'\ufeffCapturedUtc': '2026-07-24T08:31:47.1116678Z', 'Direction': 'IN-N3', 'Sequence': '4', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIde
+{'\ufeffCapturedUtc': '2026-07-24T08:31:47.1136679Z', 'Direction': 'IN-N3', 'Sequence': '5', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:46802)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '',
+{'\ufeffCapturedUtc': '2026-07-24T08:31:47.1196633Z', 'Direction': 'IN-N3', 'Sequence': '7', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2'
+{'\ufeffCapturedUtc': '2026-07-24T08:31:47.1206623Z', 'Direction': 'IN-N3', 'Sequence': '11', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:47.1216620Z', 'Direction': 'IN-N3', 'Sequence': '12', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:36894)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': ''
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.1150503Z', 'Direction': 'OUT-N3', 'Sequence': '11', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2':
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.4498427Z', 'Direction': 'IN-N3', 'Sequence': '16', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxId
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.4498427Z', 'Direction': 'IN-N3', 'Sequence': '18', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.4508420Z', 'Direction': 'IN-N3', 'Sequence': '19', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:3688C)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': ''
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.4688317Z', 'Direction': 'OUT-N3', 'Sequence': '13', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2':
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.4688317Z', 'Direction': 'OUT-N3', 'Sequence': '14', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2':
+{'\ufeffCapturedUtc': '2026-07-24T08:31:48.6287326Z', 'Direction': 'IN-N3', 'Sequence': '21', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.1667470Z', 'Direction': 'IN-N3', 'Sequence': '22', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.4065982Z', 'Direction': 'OUT-N3', 'Sequence': '16', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2':
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.5874868Z', 'Direction': 'IN-N3', 'Sequence': '24', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxId
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.5874868Z', 'Direction': 'IN-N3', 'Sequence': '25', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:40502)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': ''
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.6214671Z', 'Direction': 'OUT-N3', 'Sequence': '18', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2':
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.8333351Z', 'Direction': 'IN-N3', 'Sequence': '27', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxId
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.8343345Z', 'Direction': 'IN-N3', 'Sequence': '29', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.8343345Z', 'Direction': 'IN-N3', 'Sequence': '30', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:46146)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': ''
+{'\ufeffCapturedUtc': '2026-07-24T08:31:49.8343345Z', 'Direction': 'IN-N3', 'Sequence': '32', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:50.2302459Z', 'Direction': 'IN-N3', 'Sequence': '33', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'None', 'TargetIdentity': '(None:0000)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2
+{'\ufeffCapturedUtc': '2026-07-24T08:31:50.8888555Z', 'Direction': 'IN-N3', 'Sequence': '35', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxId
+{'\ufeffCapturedUtc': '2026-07-24T08:31:50.8898550Z', 'Direction': 'IN-N3', 'Sequence': '36', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'NanoProgram', 'TargetIdentity': '(NanoProgram:4052D)', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': ''
+{'\ufeffCapturedUtc': '2026-07-24T08:31:50.9178360Z', 'Direction': 'OUT-N3', 'Sequence': '20', 'MessageType': 'CharacterAction', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': '', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxIdentity2':
+{'\ufeffCapturedUtc': '2026-07-24T08:31:51.2326420Z', 'Direction': 'IN-N3', 'Sequence': '38', 'MessageType': 'CastNanoSpell', 'SourceRole': 'local-player', 'SourceIdentity': '', 'TargetRole': 'local-player', 'TargetIdentity': '', 'AuxRole1': 'local-player', 'AuxIdentity1': '', 'AuxRole2': '', 'AuxId
+
+=== SCFU APPEARANCE MISSION WINDOW NAME HITS ===
+cols=['CapturedUtc', 'ElapsedMilliseconds', 'Direction', 'GlobalOrdinal', 'Sequence', 'PacketLength', 'DecodeStatus', 'DecodeError', 'BytesConsumed', 'UndecodedTailHex', 'RawPacketHex', 'RawBodyHex', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY']
+name hits: Counter({'Garbage': 1})
+
+=== NPC-LIFECYCLE NAME HITS ===
+cols=['\ufeffCapturedUtc', 'Direction', 'Sequence', 'Phase', 'MessageType', 'PrimaryIdentity', 'RelatedIdentity', 'Name', 'Detail']
+2026-07-24T08:45:34.5198858Z LOCAL 0 character-seen DynelSnapshot (SimpleChar:79907B4C)  Garbage Flea identity=(SimpleChar:79907B4C) name=Garbage Flea player=False npc=True pet=False inPlay=True alive=True hp=1676/1676 pct=100.0 level=168 computerLiteracy=6 pos=(276.4214, 5.01, 2
+2026-07-24T08:45:37.2102258Z IN-N3 5898 death-action CharacterAction (SimpleChar:79907B4C) (None:0000) Garbage Flea CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:79907B
+2026-07-24T08:45:37.9057988Z IN 6252 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:45:38.5504012Z LOCAL 0 corpse-seen DynelSnapshot (Corpse:F73811)  Remains of Garbage Flea identity=(Corpse:F73811) name=Remains of Garbage Flea pos=(276.4214, 5.01, 236.1237) open=False
+2026-07-24T08:45:47.2789610Z IN-N3 5935 enemy-despawn Despawn (SimpleChar:79907B4C)  Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:79907B4C) Unknown=1 PacketType=N3Message }
+2026-07-24T08:46:19.8712968Z IN-N3 6428 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:46:21.8270918Z IN 6838 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:46:21.8320889Z IN 6884 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:46:22.0159764Z LOCAL 0 corpse-seen DynelSnapshot (Corpse:F73811)  Remains of Garbage Flea identity=(Corpse:F73811) name=Remains of Garbage Flea pos=(276.4214, 5.01, 236.1237) open=False
+2026-07-24T08:46:22.9883746Z IN 6951 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:46:22.9933715Z IN-N3 6532 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:46:23.0013665Z IN-N3 6594 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:16.5815600Z IN 7283 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:16.6225368Z LOCAL 0 corpse-seen DynelSnapshot (Corpse:F73811)  Remains of Garbage Flea identity=(Corpse:F73811) name=Remains of Garbage Flea pos=(276.4214, 5.01, 236.1237) open=False
+2026-07-24T08:47:16.7524565Z IN-N3 6912 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:35.3058579Z IN 7539 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:35.3970183Z IN 7601 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:35.4040136Z IN 7665 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:35.4070119Z IN-N3 7155 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:35.4140087Z IN-N3 7213 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:35.4210021Z IN-N3 7269 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:35.4499865Z IN 7727 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:35.8187568Z LOCAL 0 corpse-seen DynelSnapshot (Corpse:F73811)  Remains of Garbage Flea identity=(Corpse:F73811) name=Remains of Garbage Flea pos=(276.4214, 5.01, 236.1237) open=False
+2026-07-24T08:47:37.0732979Z IN 7808 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:37.0762961Z IN-N3 7335 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:37.1512485Z IN-N3 7394 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:48.7663086Z IN 8019 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:47:48.9961672Z LOCAL 0 corpse-seen DynelSnapshot (Corpse:F73811)  Remains of Garbage Flea identity=(Corpse:F73811) name=Remains of Garbage Flea pos=(276.4214, 5.01, 236.1237) open=False
+2026-07-24T08:47:54.7436378Z IN-N3 7693 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }
+2026-07-24T08:47:59.6393066Z IN 8246 corpse-full-update CorpseFullUpdate SimpleChar:79907B4C Corpse:00F73811 Remains of Garbage Flea catMesh=15231 monsterData=17657 deadNpc=SimpleChar:79907B4C tailDeadNpc=SimpleChar:79907B4C
+2026-07-24T08:48:00.0840312Z LOCAL 0 corpse-seen DynelSnapshot (Corpse:F73811)  Remains of Garbage Flea identity=(Corpse:F73811) name=Remains of Garbage Flea pos=(276.4214, 5.01, 236.1237) open=False
+2026-07-24T08:48:06.3716532Z IN-N3 7844 corpse-despawn Despawn (Corpse:F73811)  Remains of Garbage Flea DespawnMessage { N3MessageType=Despawn Identity=(Corpse:F73811) Unknown=1 PacketType=N3Message }

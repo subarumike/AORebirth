@@ -1,0 +1,129 @@
+=== capture_info ===
+pf=710 char=Getkeep
+counts={'inboundRaw': 2191, 'outboundRaw': 443, 'decodedInboundN3': 2051, 'decodedOutboundN3': 429, 'decodedN3EventRows': 2480, 'decodedN3StageErrors': 0, 'rawCombatPackets': 218, 'rawSimpleCharFullUpdatePackets': 39, 'rawPacketLogRows': 2634, 'rawPacketIndexRows': 2634, 'rawPacketPreserved': 2634, 'rawPacketWriteErrors': 0, 'rawPacketCallbackDrainTimeouts': 0, 'rawPacketProjectionErrors': 38, 'rawSimpleCharFullUpdateDecoded': 39, 'rawSimpleCharFullUpdateDecodeErrors': 0, 'rawSimpleCharFullUpdateIncompleteDecodes': 0, 'rawNpcSimpleCharFullUpdates': 38, 'scfuAppearanceRows': 39}
+
+=== mission-flow ===
+2026-07-25T16:54:32.6947496Z [MISSION-FLOW] session bound path=C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260725-185432\mission-flow.log (roll/accept/key/teleport/playfield-init for mission ins
+2026-07-25T16:55:41.8726325Z [IN-QUEST] action=Delete mission=(Mission:5565990A) identity=(SimpleChar:797E30D7) detail=SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestMessage
+2026-07-25T17:01:00.9881250Z [TELEPORT] started lastPf=1419349 pendingCreateQuest=(SimpleChar:797E30D7)
+2026-07-25T17:01:01.9515310Z [IN-N3-TELEPORT] identity=(SimpleChar:797E30D7) destPf=(PlayfieldProxy:2C6) changePf=(Playfield2:2C6) playfield2=(100007:1) gameServerId=0 sgId=0 dest=(0.76,5.01,94.91) likelyMissionInstance=False pendingCreateQ
+2026-07-25T17:01:02.2543440Z [PLAYFIELD-INIT] pf=710 hex=0x2C6 likelyMissionInstance=False pendingCreateQuest=(SimpleChar:797E30D7)
+2026-07-25T17:01:02.4012532Z [TELEPORT] ended lastPf=710 pendingCreateQuest=(SimpleChar:797E30D7)
+
+doors=115 uniq=13 chests=83 uniq=11
+
+=== SCFU uniq NPCs (mission-ish coords) ===
+scfu cols=['CapturedUtc', 'ElapsedMilliseconds', 'Direction', 'GlobalOrdinal', 'Sequence', 'PacketLength', 'DecodeStatus', 'DecodeError', 'BytesConsumed', 'UndecodedTailHex', 'RawPacketHex', 'RawBodyHex', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'PrePositionFightingTarget', 'FightingTarget', 'Version', 'FlagsNumeric', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NpcFamily', 'NpcLosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'AppearanceValue', 'Side', 'Fatness', 'Breed', 'Gender', 'Race', 'ScfuUnknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanos', 'WaypointOwner', 'Waypoints', 'TextureOverrides', 'Textures', 'Meshes', 'Flags2Numeric', 'Flags2', 'Owner', 'ScfuUnknown2', 'ScfuUnknown4', 'SpecialAttacks', 'ImmuneUnknown', 'UnknownFlag3Data', 'HeaderUnknown', 'TowerUnknown', 'PlayerInfo', 'N3MessageTypeNumeric', 'DecodeFullyConsumed', 'NpcUnknownDataWidth', 'ScfuUnknown3', 'LegacyExtendedRunSpeedAlignment', 'TerminalSpecialAttackSlotOmitted', 'OpaqueExtensionHex']
+uniq=10 interior_cluster=9
+  Fresh Nanorobber xyz=(84.989006,5.01,147.131226) md=26090 lvl=4 head=40629 meshes=0:40629:0:4|1:99154:0:2 tex=0:0:0|1:42243:0|2:45792:0|3:42241:0|4:42245:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Hired Killer xyz=(63.8188934,5.01,105.868) md=26123 lvl=5 head=40214 meshes=0:20057:17998:2|0:40214:0:4|1:15839:0:2 tex=0:40975:0|1:21824:0|2:9615:0|3:21819:0|4:21831:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Marauder xyz=(75.2472,5.01,134.20784) md=26101 lvl=5 head=40105 meshes=0:40105:0:4|1:7826:0:2 tex=0:0:0|1:22586:0|2:9619:0|3:22557:0|4:22645:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Lookout xyz=(75.6809845,5.01,121.504959) md=26074 lvl=6 head=40691 meshes=0:40691:0:4|1:7777:0:2 tex=0:0:0|1:22571:0|2:45792:0|3:42254:0|4:42251:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Exterminator xyz=(76.71904,5.01,113.576485) md=26137 lvl=6 head=40209 meshes=0:40209:0:4|1:7777:0:2 tex=0:0:0|1:42249:0|2:42260:0|3:42252:0|4:42248:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Clan Hired Killer xyz=(56.90598,5.01,102.572029) md=26092 lvl=4 head=40694 meshes=0:20108:17998:2|0:40694:0:4|1:15839:0:2 tex=0:40975:0|1:21824:0|2:9615:0|3:21819:0|4:21831:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Clan Gridcourier xyz=(44.1562729,5.01,127.933655) md=26135 lvl=6 head=40271 meshes=0:40271:0:4|1:35542:0:2 tex=0:40975:0|1:8732:0|2:40903:0|3:40892:0|4:40907:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Fresh Swindler xyz=(36.4197426,5.01,72.79878) md=26137 lvl=4 head=40209 meshes=0:40209:0:4|1:99154:0:2 tex=0:0:0|1:42244:0|2:45792:0|3:42241:0|4:42245:0 flags=IsNpc, UnknownFlag, UnknownFlag6, HasPla
+  Garbage Flea xyz=(73.9470749,5.01,134.615845) md=17657 lvl=6 head= meshes= tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 flags=IsNpc, UnknownFlag, HasExtendedTextures,
+
+=== enemy-dossier summary ===
+keys=['generatedUtc', 'captureFolder', 'resourcePlayfieldId', 'runtimePlayfieldId', 'capturePlayfieldIdentity', 'capturePlayfieldObjectId', 'autoCaptureEnabled', 'manualCaptureEnabled', 'focusedEnemyIdentities', 'enemies']
+  generatedUtc -> 2026-07-25T17:01:21.2141646Z
+  captureFolder -> C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures\20260725-185432
+  resourcePlayfieldId -> 
+  runtimePlayfieldId -> 710
+  capturePlayfieldIdentity -> (Playfield2:02C6)
+
+=== enemy-fight-events (Death/Attack/SAW) ===
+2026-07-25T16:54:37.3748632Z IN-N3 #15 type=SimpleCharFullUpdate identity=(SimpleChar:7996DAEA) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, Ha
+2026-07-25T16:54:37.3748632Z IN-N3 #18 type=SimpleCharFullUpdate identity=(SimpleChar:7996DAEB) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, Ha
+2026-07-25T16:54:37.3758625Z IN-N3 #22 type=SimpleCharFullUpdate identity=(SimpleChar:7996DAEC) SimpleCharFullUpdateMessage { Version=58 Flags=IsNpc, UnknownFlag, UnknownFlag6, HasPlayfieldId, HasHeadMesh, HasHeading, Ha
+2026-07-25T16:54:49.5325436Z OUT-N3 #9 type=Attack identity=(SimpleChar:797E30D7) AttackMessage { Target=(SimpleChar:7996DAED) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message
+2026-07-25T16:54:49.6854486Z IN-N3 #66 type=SpecialAttackWeapon identity=(SimpleChar:797E30D7) SpecialAttackWeaponMessage { Specials=count=3[SmokeLounge.AOtomation.Messaging.GameData.SpecialAttackInfo,SmokeLounge.AOtomat
+2026-07-25T16:54:49.6854486Z IN-N3 #67 type=Attack identity=(SimpleChar:797E30D7) AttackMessage { Target=(SimpleChar:7996DAED) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message
+2026-07-25T16:54:50.6538533Z IN-N3 #71 type=SpecialAttackWeapon identity=(SimpleChar:7996DAED) SpecialAttackWeaponMessage { Specials=count=0[] Unknown1=30 Unknown2=30 Unknown3=30 Unknown4=30 Unknown5=0 N3MessageType=Spec
+2026-07-25T16:54:50.6538533Z IN-N3 #72 type=Attack identity=(SimpleChar:7996DAED) AttackMessage { Target=(SimpleChar:797E30D7) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:7996DAED) Unknown=0 PacketType=N3Message
+2026-07-25T16:54:51.3384296Z IN-N3 #80 type=ReflectAttack identity=(SimpleChar:797E30D7) ReflectAttackMessage { Amount=1 Target=(SimpleChar:7996DAED) Stat=Flags N3MessageType=ReflectAttack Identity=(SimpleChar:797E30D7) 
+2026-07-25T16:54:51.3384296Z IN-N3 #81 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=17 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:7996DAED) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageT
+2026-07-25T16:54:53.6799856Z IN-N3 #91 type=ReflectAttack identity=(SimpleChar:797E30D7) ReflectAttackMessage { Amount=1 Target=(SimpleChar:7996DAED) Stat=Flags N3MessageType=ReflectAttack Identity=(SimpleChar:797E30D7) 
+2026-07-25T16:54:53.6799856Z IN-N3 #92 type=AttackInfo identity=(SimpleChar:797E30D7) AttackInfoMessage { Amount=18 AmmoCount=-1 WeaponSlot=6 Target=(SimpleChar:7996DAED) Unk1=0 HitType=Normal WeaponInstance=0 N3MessageT
+
+=== SAW sample (25) ===
+  None |  | 073B000A0001006500000DBE797E30D71D3C0F1C0000C350797E30D70000000FC40000AAC000023569000000644D414154000339C7000339C8000000904449495400011294000112950000008E425241
+  None |  | 0741000A0001003500000DBE797E30D71D3C0F1C0000C3507996DAED00000003F10000001E0000001E0000001E0000001E00000000
+  None |  | 07C1000A0001003500000DBE797E30D71D3C0F1C0000C3507996DAE500000003F10000001E0000001E0000001E0000001E00000000
+  None |  | 07C7000A0001006500000DBE797E30D71D3C0F1C0000C350797E30D70000000FC40000AAC000023569000000644D414154000339C7000339C8000000904449495400011294000112950000008E425241
+  None |  | 0860000A0001004500000DBE797E30D71D3C0F1C0000C35079941BB400000007E2000235660002356753495731534957310000001E0000001E0000001E0000001E00000000
+  None |  | 086B000A0001006500000DBE797E30D71D3C0F1C0000C350797E30D70000000FC40000AAC000023569000000644D414154000339C7000339C8000000904449495400011294000112950000008E425241
+  None |  | 090F000A0001006500000DBE797E30D71D3C0F1C0000C350797E30D70000000FC40000AAC000023569000000644D414154000339C7000339C8000000904449495400011294000112950000008E425241
+  None |  | 0916000A0001003500000DBE797E30D71D3C0F1C0000C3507996DAEA00000003F10000001900000019000000190000001900000000
+  None |  | 09FF000A0001003500000DBE797E30D71D3C0F1C0000C3507996DAEE00000003F10000002300000023000000230000002300000000
+  None |  | 0A0A000A0001006500000DBE797E30D71D3C0F1C0000C350797E30D70000000FC40000AAC000023569000000644D414154000339C7000339C8000000904449495400011294000112950000008E425241
+  None |  | 0A12000A0001003500000DBE797E30D71D3C0F1C0000C3507996DAE600000003F10000002300000023000000230000002300000000
+  None |  | 0A61000A0001006500000DBE797E30D71D3C0F1C0000C350797E30D70000000FC40000AAC000023569000000644D414154000339C7000339C8000000904449495400011294000112950000008E425241
+
+=== Attack/WIFU sample ===
+  WeaponItemFullUpdate None | 
+  WeaponItemFullUpdate None | 
+  WeaponItemFullUpdate None | 
+  Attack None | 
+  Attack None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  Attack None | 
+  Attack None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+  AttackInfo None | 
+
+=== corpse-full-updates ===
+rows=21 cols=dict_keys(['CapturedUtc', 'Direction', 'Sequence', 'ReceiverInstance', 'CorpseType', 'CorpseInstance', 'CorpseIdentity', 'CorpseName', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'MonsterScale', 'Sex', 'Breed', 'Race', 'DeadNpcType', 'DeadNpcInstance', 'DeadNpcIdentity', 'DeadNpcName', 'CorpseCatMesh', 'CorpseCredits', 'CorpseMonsterData', 'TailDeadNpcType', 'TailDeadNpcInstance', 'TailDeadNpcIdentity', 'PacketLength', 'RawHex'])
+  name=Remains of Fresh Marksman md=None mesh=None xyz=(79.1583405,5.01000023,97.3615417) hx=0783000A000101A500000DBE797E30D74F474E05
+  name=Remains of Fresh Clan Lookout md=None mesh=None xyz=(86.9899979,5.01000023,105.196808) hx=081E000A000101A900000DBE797E30D74F474E05
+  name=Remains of Levi McDannold md=None mesh=None xyz=(83.2374573,3.56775022,126.037575) hx=08A1000A000101A500000DBE797E30D74F474E05
+  name=Remains of Fresh Nanorobber md=None mesh=None xyz=(84.989006,5.01000023,147.131226) hx=0937000A000101A700000DBE797E30D74F474E05
+  name=Remains of Fresh Nanorobber md=None mesh=None xyz=(84.989006,5.01000023,147.131226) hx=09A7000A000101A700000DBE797E30D74F474E05
+  name=Remains of Fresh Nanorobber md=None mesh=None xyz=(84.989006,5.01000023,147.131226) hx=09DA000A000101A700000DBE797E30D74F474E05
+  name=Remains of Fresh Exterminator md=None mesh=None xyz=(77.4700089,5.01000023,108.33255) hx=0A5B000A000101A900000DBE797E30D74F474E05
+  name=Remains of Fresh Lookout md=None mesh=None xyz=(77.8637085,5.01000023,111.103127) hx=0AB4000A000101A400000DBE797E30D74F474E05
+  name=Remains of Levi McDannold md=None mesh=None xyz=(83.2374573,3.56775022,126.037575) hx=0AF6000A000101A500000DBE797E30D74F474E05
+  name=Remains of Levi McDannold md=None mesh=None xyz=(83.2374573,3.56775022,126.037575) hx=0B1B000A000101A500000DBE797E30D74F474E05
+  name=Remains of Fresh Marauder md=None mesh=None xyz=(75.2472,5.01000023,134.20784) hx=0B7B000A000101A500000DBE797E30D74F474E05
+  name=Remains of Garbage Flea md=None mesh=None xyz=(73.9470749,5.01000023,134.615845) hx=0BBD000A000101CB00000DBE797E30D74F474E05
+  name=Remains of Levi McDannold md=None mesh=None xyz=(83.2374573,3.56775022,126.037575) hx=0BCC000A000101A500000DBE797E30D74F474E05
+  name=Remains of Levi McDannold md=None mesh=None xyz=(83.2374573,3.56775022,126.037575) hx=0C1C000A000101A500000DBE797E30D74F474E05
+  name=Remains of Fresh Hired Killer md=None mesh=None xyz=(63.8188934,5.01000023,105.867996) hx=0C8C000A000101A900000DBE797E30D74F474E05
+
+=== corpse-loot-observations ===
+rows=10
+cols=['CapturedUtc', 'Direction', 'Sequence', 'CorpseIdentity', 'OpenOrdinal', 'InitialSnapshot', 'ItemCount', 'DeadNpcIdentity', 'EnemyName', 'MonsterData', 'EnemyLevel', 'CorpseCredits', 'PlayerIdentity', 'PlayerLevel', 'PlayfieldId', 'Items', 'CorrelationStatus']
+  CapturedUtc=2026-07-25T16:55:10.5531574Z | Direction=IN-N3 | Sequence=175 | CorpseIdentity=(Corpse:F73007) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAED | EnemyName=Fresh Marksman | MonsterData=26103 | EnemyLevel=5 | CorpseCredits=87
+  CapturedUtc=2026-07-25T16:55:35.3765339Z | Direction=IN-N3 | Sequence=302 | CorpseIdentity=(Corpse:F73005) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAE5 | EnemyName=Fresh Clan Lookout | MonsterData=26074 | EnemyLevel=5 | CorpseCredits=29
+  CapturedUtc=2026-07-25T16:57:06.3086561Z | Direction=IN-N3 | Sequence=856 | CorpseIdentity=(Corpse:F7300A) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAEE | EnemyName=Fresh Exterminator | MonsterData=26137 | EnemyLevel=6 | CorpseCredits=53
+  CapturedUtc=2026-07-25T16:57:21.3276858Z | Direction=IN-N3 | Sequence=927 | CorpseIdentity=(Corpse:F73004) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=1 | DeadNpcIdentity=SimpleChar:7996DAE6 | EnemyName=Fresh Lookout | MonsterData=26074 | EnemyLevel=6 | CorpseCredits=35
+  CapturedUtc=2026-07-25T16:58:10.8564745Z | Direction=IN-N3 | Sequence=1214 | CorpseIdentity=(Corpse:F7300A) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAEC | EnemyName=Fresh Marauder | MonsterData=26101 | EnemyLevel=5 | CorpseCredits=44
+  CapturedUtc=2026-07-25T16:58:14.5284192Z | Direction=IN-N3 | Sequence=1229 | CorpseIdentity=(Corpse:F73006) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DC25 | EnemyName=Garbage Flea | MonsterData=17657 | EnemyLevel=6 | CorpseCredits=21
+  CapturedUtc=2026-07-25T16:58:44.4934577Z | Direction=IN-N3 | Sequence=1363 | CorpseIdentity=(Corpse:F73006) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAEB | EnemyName=Fresh Hired Killer | MonsterData=26123 | EnemyLevel=5 | CorpseCredits=44
+  CapturedUtc=2026-07-25T16:59:19.8448135Z | Direction=IN-N3 | Sequence=1546 | CorpseIdentity=(Corpse:F73002) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAE7 | EnemyName=Fresh Clan Hired Killer | MonsterData=26092 | EnemyLevel=4 | CorpseCredits=35
+  CapturedUtc=2026-07-25T16:59:52.9745431Z | Direction=IN-N3 | Sequence=1691 | CorpseIdentity=(Corpse:F73003) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAE8 | EnemyName=Fresh Clan Gridcourier | MonsterData=26135 | EnemyLevel=6 | CorpseCredits=35
+  CapturedUtc=2026-07-25T17:00:32.2917221Z | Direction=IN-N3 | Sequence=1840 | CorpseIdentity=(Corpse:F73005) | OpenOrdinal=1 | InitialSnapshot=true | ItemCount=0 | DeadNpcIdentity=SimpleChar:7996DAE9 | EnemyName=Fresh Swindler | MonsterData=26137 | EnemyLevel=4 | CorpseCredits=35
+
+=== inventory / TemplateAction loot hints ===
+inv rows=5
+  CapturedUtc=2026-07-25T16:56:02.4098116Z | Direction=IN-N3 | Sequence=435 | InventoryIdentity=(Container:BA13DED) | Handle=114 | Slot=0 | Placement=0 | Flags=33 | Count=1 | ItemIdentity=(None:0000)
+  CapturedUtc=2026-07-25T16:57:21.3276858Z | Direction=IN-N3 | Sequence=927 | InventoryIdentity=(Corpse:F73004) | Handle=117 | Slot=0 | Placement=0 | Flags=161 | Count=1 | ItemIdentity=(None:0000)
+  CapturedUtc=2026-07-25T16:57:52.4018558Z | Direction=IN-N3 | Sequence=1105 | InventoryIdentity=(Container:BA13DF7) | Handle=119 | Slot=0 | Placement=0 | Flags=33 | Count=25 | ItemIdentity=(None:0000)
+  CapturedUtc=2026-07-25T16:58:48.4500180Z | Direction=IN-N3 | Sequence=1377 | InventoryIdentity=(Container:BA13DF6) | Handle=123 | Slot=0 | Placement=0 | Flags=33 | Count=1 | ItemIdentity=(None:0000)
+  CapturedUtc=2026-07-25T16:59:54.7804294Z | Direction=IN-N3 | Sequence=1699 | InventoryIdentity=(Container:BA13DF1) | Handle=126 | Slot=0 | Placement=0 | Flags=33 | Count=1 | ItemIdentity=(None:0000)
+Traceback (most recent call last):
+  File "C:\Users\nermi\source\repos\AORebirth\tools-temp\_tmp_cap_185432_full.py", line 222, in <module>
+    open(OUT, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'tools-temp/_tmp_cap_185432_full.txt'

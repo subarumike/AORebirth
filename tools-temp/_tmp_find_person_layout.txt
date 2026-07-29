@@ -1,0 +1,38 @@
+movement-summary keys=['generatedUtc', 'movementPacketsCsv', 'followTargetDecodedWithUsablePath', 'counts']
+{
+  "generatedUtc": "2026-07-24T09:45:16.4629987Z",
+  "movementPacketsCsv": "C:\\Users\\nermi\\source\\repos\\AORebirth\\tools-temp\\AOSharpLiveCapture\\bin\\Debug\\captures\\20260724-114307\\movement-packets.csv",
+  "followTargetDecodedWithUsablePath": true,
+  "counts": {
+    "movementPacketRows": 303,
+    "followTargetPackets": 283,
+    "usableFollowTargetPackets": 210,
+    "setPosPackets": 11,
+    "stopMovingCmdPackets": 9,
+    "decodeErrors": 0
+  }
+}
+spawn_from_early_mov=(242.990005, 5.01000023, 47.7380295)
+PF=1419349 doors=134 chests=0 props=18 trash=27 find=Gary Arnall
+COLORED (token %+): Neutral/Clan with non-zero textures
+GREY (token 0%): Monster side tex all zero — Cyborgs/Hellhounds/Medusas
+trash colored=5 grey=22
+PROPS:
+  A blasted Skeleton @ (203.500,5.100,117.900) locked=False id=BA10732
+  Barrel @ (238.600,5.100,111.700) locked=False id=BA10733
+  Treasure @ (200.010,5.100,83.500) locked=False id=BA10734
+  Treasure @ (238.800,5.100,41.500) locked=False id=BA10735
+  Treasure @ (242.800,5.100,31.800) locked=False id=BA10736
+  Barrel @ (191.600,5.100,61.500) locked=False id=BA10737
+  Treasure @ (207.200,5.100,148.200) locked=False id=BA1073A
+  A Crashed Android @ (221.200,5.100,144.300) locked=False id=BA1073B
+  A Skull @ (233.900,5.100,138.300) locked=False id=BA1073C
+  Shadow Rift of the Eagle @ (264.600,5.100,106.500) locked=False id=BA10730
+  A Broken Android @ (278.010,5.100,62.010) locked=False id=BA10731
+  Treasure @ (191.400,5.100,116.800) locked=False id=BA1073D
+  Treasure @ (186.700,5.100,118.600) locked=False id=BA1073E
+  Barrel @ (181.400,5.100,116.800) locked=False id=BA1073F
+  Barrel @ (171.700,5.100,94.400) locked=False id=BA10740
+  Broken Machine @ (175.700,5.100,91.200) locked=False id=BA10741
+  Shadow Rift of the Firefly @ (178.800,5.100,81.500) locked=False id=BA10742
+  A bag @ (246.800,5.100,78.100) locked=False id=BA1072D

@@ -1,0 +1,212 @@
+=== ALL uniq SCFU (10) ===
+Fresh Nanorobber | id=(SimpleChar:7996DAEA) | xyz=(84.989006,5.01,147.131226) | md=26090 lvl=4 hp=93 scale=92 head=40629 | meshes=0:40629:0:4|1:99154:0:2 | tex=0:0:0|1:42243:0|2:45792:0|3:42241:0|4:42245:0 | specials=
+Fresh Hired Killer | id=(SimpleChar:7996DAEB) | xyz=(63.8188934,5.01,105.868) | md=26123 lvl=5 hp=115 scale=93 head=40214 | meshes=0:20057:17998:2|0:40214:0:4|1:15839:0:2 | tex=0:40975:0|1:21824:0|2:9615:0|3:21819:0|4:21831:0 | specials=
+Fresh Marauder | id=(SimpleChar:7996DAEC) | xyz=(75.2472,5.01,134.20784) | md=26101 lvl=5 hp=161 scale=93 head=40105 | meshes=0:40105:0:4|1:7826:0:2 | tex=0:0:0|1:22586:0|2:9619:0|3:22557:0|4:22645:0 | specials=
+Fresh Lookout | id=(SimpleChar:7996DAE6) | xyz=(75.6809845,5.01,121.504959) | md=26074 lvl=6 hp=138 scale=93 head=40691 | meshes=0:40691:0:4|1:7777:0:2 | tex=0:0:0|1:22571:0|2:45792:0|3:42254:0|4:42251:0 | specials=
+Fresh Exterminator | id=(SimpleChar:7996DAEE) | xyz=(76.71904,5.01,113.576485) | md=26137 lvl=6 hp=110 scale=93 head=40209 | meshes=0:40209:0:4|1:7777:0:2 | tex=0:0:0|1:42249:0|2:42260:0|3:42252:0|4:42248:0 | specials=
+Fresh Clan Hired Killer | id=(SimpleChar:7996DAE7) | xyz=(56.90598,5.01,102.572029) | md=26092 lvl=4 hp=93 scale=92 head=40694 | meshes=0:20108:17998:2|0:40694:0:4|1:15839:0:2 | tex=0:40975:0|1:21824:0|2:9615:0|3:21819:0|4:21831:0 | specials=
+Fresh Clan Gridcourier | id=(SimpleChar:7996DAE8) | xyz=(44.1562729,5.01,127.933655) | md=26135 lvl=6 hp=138 scale=93 head=40271 | meshes=0:40271:0:4|1:35542:0:2 | tex=0:40975:0|1:8732:0|2:40903:0|3:40892:0|4:40907:0 | specials=
+Fresh Swindler | id=(SimpleChar:7996DAE9) | xyz=(36.4197426,5.01,72.79878) | md=26137 lvl=4 hp=93 scale=92 head=40209 | meshes=0:40209:0:4|1:99154:0:2 | tex=0:0:0|1:42244:0|2:45792:0|3:42241:0|4:42245:0 | specials=
+Garbage Flea | id=(SimpleChar:7996DC25) | xyz=(73.9470749,5.01,134.615845) | md=17657 lvl=6 hp=67 scale=38 head= | meshes= | tex=0:0:0|1:0:0|2:0:0|3:0:0|4:0:0 | specials=
+Female Guard | id=(SimpleChar:79760F02) | xyz=(535.4999,8.01,326.532959) | md=26090 lvl=103 hp=7185 scale=112 head=40629 | meshes=0:20089:0:2|0:40629:0:4|1:35566:0:2 | tex=0:15806:0|1:15809:0|2:15807:0|3:15808:0|4:15805:0 | specials=
+
+=== Enemy SAW decoded ===
+  7996DAED ? ints=00000003 F1000000 1E000000 1E000000 1E000000 1E000000
+  7996DAE5 ? ints=00000003 F1000000 1E000000 1E000000 1E000000 1E000000
+  79941BB4 ? ints=00000007 E2000235 66000235 67534957 31534957 31000000 1E000000 1E000000 1E000000 1E000000
+  7996DAEA Fresh Nanorobber ints=00000003 F1000000 19000000 19000000 19000000 19000000
+  7996DAEE Fresh Exterminator ints=00000003 F1000000 23000000 23000000 23000000 23000000
+  7996DAE6 Fresh Lookout ints=00000003 F1000000 23000000 23000000 23000000 23000000
+  7996DAEC Fresh Marauder ints=00000003 F1000000 1E000000 1E000000 1E000000 1E000000
+  7996DC25 Garbage Flea ints=0000000B D300033F DC00033F DD584644 54584644 5400033F D700033F DA545659 4C545659 4C000000
+  7996DAEB Fresh Hired Killer ints=00000003 F1000000 1E000000 1E000000 1E000000 1E000000
+  7996DAE7 Fresh Clan Hired Killer ints=00000003 F1000000 19000000 19000000 19000000 19000000
+  7996DAE8 Fresh Clan Gridcourier ints=00000003 F1000000 23000000 23000000 23000000 23000000
+  7996DAE9 Fresh Swindler ints=00000003 F1000000 19000000 19000000 19000000 19000000
+
+=== WIFU ===
+  det= hx=0703000A0001008700000DBE797E30D73B1D22680000C74A2584082A000000000B0000C3507996DAEA0015A855000F424F00
+  det= hx=0707000A0001008700000DBE797E30D73B1D22680000C74A2584082B000000000B0000C3507996DAEB0015A855000F424F00
+  det= hx=070C000A0001008700000DBE797E30D73B1D22680000C74A2584082C000000000B0000C3507996DAEC0015A855000F424F00
+  det= hx=08E2000A0001008700000DBE797E30D73B1D22680000C74A25840826000000000B0000C3507996DAE60015A855000F424F00
+  det= hx=08E6000A0001008700000DBE797E30D73B1D22680000C74A2584082E000000000B0000C3507996DAEE0015A855000F424F00
+  det= hx=08EB000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=08EE000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=08F6000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0944000A0001008700000DBE797E30D73B1D22680000C74A25840826000000000B0000C3507996DAE60015A855000F424F00
+  det= hx=0948000A0001008700000DBE797E30D73B1D22680000C74A2584082E000000000B0000C3507996DAEE0015A855000F424F00
+  det= hx=094D000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=0950000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=0958000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0967000A0001008700000DBE797E30D73B1D22680000C74A2584082B000000000B0000C3507996DAEB0015A855000F424F00
+  det= hx=096C000A0001008700000DBE797E30D73B1D22680000C74A2584082C000000000B0000C3507996DAEC0015A855000F424F00
+  det= hx=097B000A0001008700000DBE797E30D73B1D22680000C74A2584082B000000000B0000C3507996DAEB0015A855000F424F00
+  det= hx=0980000A0001008700000DBE797E30D73B1D22680000C74A2584082C000000000B0000C3507996DAEC0015A855000F424F00
+  det= hx=09AA000A0001008700000DBE797E30D73B1D22680000C74A2584082B000000000B0000C3507996DAEB0015A855000F424F00
+  det= hx=09AF000A0001008700000DBE797E30D73B1D22680000C74A2584082C000000000B0000C3507996DAEC0015A855000F424F00
+  det= hx=09DD000A0001008700000DBE797E30D73B1D22680000C74A2584082B000000000B0000C3507996DAEB0015A855000F424F00
+  det= hx=09E2000A0001008700000DBE797E30D73B1D22680000C74A2584082C000000000B0000C3507996DAEC0015A855000F424F00
+  det= hx=0AFA000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=0AFD000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=0B05000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0B1F000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=0B22000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=0B2A000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0BD0000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=0BD3000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=0BDB000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0C20000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=0C23000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=0C2B000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0CC1000A0001008700000DBE797E30D73B1D22680000C74A25840827000000000B0000C3507996DAE70015A855000F424F00
+  det= hx=0CC4000A0001008700000DBE797E30D73B1D22680000C74A25840828000000000B0000C3507996DAE80015A855000F424F00
+  det= hx=0CCC000A0001008700000DBE797E30D73B1D22680000C74A25840829000000000B0000C3507996DAE90015A855000F424F00
+  det= hx=0005000A0001007700000DAF797E30D73B1D22680000C74A257F006D000000000B0000C350797E30D7000002C6000F424F00
+  det= hx=0008000A0001008700000DAF797E30D73B1D22680000C74A257AE158000000000B0000C35079760F02000002C6000F424F00
+
+=== Corpse decoded (first unique names) ===
+  Remains of Fresh Marksman cat=23365 md=26103 credits=87 dead=Fresh Marksman len=421
+    tail_ints=0 0 0 1 9404 0 2 40903 0 3 42241 0 4 42242 0 0
+  Remains of Fresh Clan Lookout cat=17532 md=26074 credits=29 dead=Fresh Clan Lookout len=425
+    tail_ints=0 0 0 1 22571 0 2 45792 0 3 42254 0 4 42251 0 0
+  Remains of Levi McDannold cat=5900 md=26097 credits=29 dead=Levi McDannold len=421
+    tail_ints=0 0 0 1 81911 0 2 81913 0 3 81908 0 4 81916 0 0
+  Remains of Fresh Nanorobber cat=5927 md=26090 credits=35 dead=Fresh Nanorobber len=423
+    tail_ints=0 0 0 1 42243 0 2 45792 0 3 42241 0 4 42245 0 0
+  Remains of Fresh Exterminator cat=5934 md=26137 credits=53 dead=Fresh Exterminator len=425
+    tail_ints=0 0 0 1 42249 0 2 42260 0 3 42252 0 4 42248 0 0
+  Remains of Fresh Lookout cat=17532 md=26074 credits=35 dead=Fresh Lookout len=420
+    tail_ints=0 0 0 1 22571 0 2 45792 0 3 42254 0 4 42251 0 0
+  Remains of Fresh Marauder cat=23366 md=26101 credits=44 dead=Fresh Marauder len=421
+    tail_ints=0 0 0 1 22586 0 2 9619 0 3 22557 0 4 22645 0 0
+  Remains of Garbage Flea cat=15231 md=17657 credits=21 dead=Garbage Flea len=459
+    tail_ints=4 0 0 1 2018 1298232421 1919508844 539179264 0 0 0 0 0 95883 0 1
+  Remains of Fresh Hired Killer cat=23373 md=26123 credits=44 dead=Fresh Hired Killer len=425
+    tail_ints=0 40975 0 1 21824 0 2 9615 0 3 21819 0 4 21831 0 0
+  Remains of Fresh Clan Hired Killer cat=5907 md=26092 credits=35 dead=Fresh Clan Hired Killer len=430
+    tail_ints=0 40975 0 1 21824 0 2 9615 0 3 21819 0 4 21831 0 0
+  Remains of Fresh Clan Gridcourier cat=23378 md=26135 credits=35 dead=Fresh Clan Gridcourier len=429
+    tail_ints=0 40975 0 1 8732 0 2 40903 0 3 40892 0 4 40907 0 0
+  Remains of Fresh Swindler cat=5934 md=26137 credits=35 dead=Fresh Swindler len=421
+    tail_ints=0 0 0 1 42244 0 2 45792 0 3 42241 0 4 42245 0 0
+
+=== corpse loot Items field ===
+  Fresh Marksman count=0 items= md=26103 credits=87
+  Fresh Clan Lookout count=0 items= md=26074 credits=29
+  Fresh Exterminator count=0 items= md=26137 credits=53
+  Fresh Lookout count=1 items=124444:124445:5:1 md=26074 credits=35
+  Fresh Marauder count=0 items= md=26101 credits=44
+  Garbage Flea count=0 items= md=17657 credits=21
+  Fresh Hired Killer count=0 items= md=26123 credits=44
+  Fresh Clan Hired Killer count=0 items= md=26092 credits=35
+  Fresh Clan Gridcourier count=0 items= md=26135 credits=35
+  Fresh Swindler count=0 items= md=26137 credits=35
+
+=== Death CharacterAction ===
+2026-07-25T16:54:41.6419132Z IN-N3 #37 type=CharacterAction identity=(SimpleChar:7996DAE5) CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=74178 Unknown2=0 N3MessageType=CharacterActio
+2026-07-25T16:54:41.6429121Z IN-N3 #39 type=CharacterAction identity=(SimpleChar:7996DAE5) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:121C2) Parameter1=2039929573 Parameter2=1440000 Unknown2=0 N3MessageTy
+2026-07-25T16:54:49.0338506Z OUT-N3 #6 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAED) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterActio
+2026-07-25T16:54:57.0859424Z IN-N3 #109 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:55:00.3099548Z IN-N3 #130 type=CharacterAction identity=(SimpleChar:7996DAED) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:55:11.4945770Z IN-N3 #179 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction 
+2026-07-25T16:55:11.7174396Z IN-N3 #182 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simpl
+2026-07-25T16:55:13.8278236Z OUT-N3 #25 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAE5) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterActi
+2026-07-25T16:55:26.5809589Z IN-N3 #258 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:55:30.8443301Z IN-N3 #280 type=CharacterAction identity=(SimpleChar:7996DAE5) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:55:36.5388177Z IN-N3 #307 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simpl
+2026-07-25T16:55:41.0111643Z IN-N3 #337 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction 
+2026-07-25T16:55:41.5248472Z OUT-N3 #53 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:79941BB4) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterActi
+2026-07-25T16:55:41.8726325Z IN-N3 #345 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=59 Unknown1=0 Target=(Mission:5565990A) Parameter1=56003 Parameter2=1432721674 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:55:44.1201656Z IN-N3 #358 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=47 Unknown1=0 Target=(MissionKey:F699D9) Parameter1=1 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity
+2026-07-25T16:55:46.6576004Z IN-N3 #372 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:55:57.0451934Z IN-N3 #413 type=CharacterAction identity=(SimpleChar:79941BB4) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:56:01.4204214Z IN-N3 #431 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction 
+2026-07-25T16:56:09.1896294Z OUT-N3 #74 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAEA) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterActi
+2026-07-25T16:56:20.1638614Z IN-N3 #550 type=CharacterAction identity=(SimpleChar:7996DAEA) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:56:42.7276660Z OUT-N3 #131 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAEE) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:56:45.6138856Z IN-N3 #758 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:56:48.4791188Z IN-N3 #773 type=CharacterAction identity=(SimpleChar:7996DAEE) CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=28602 Unknown2=0 N3MessageType=CharacterActi
+2026-07-25T16:56:48.4791188Z IN-N3 #774 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:6FBA) Parameter1=2039929582 Parameter2=4500 Unknown2=0 N3MessageType=
+2026-07-25T16:56:57.9752630Z IN-N3 #814 type=CharacterAction identity=(SimpleChar:7996DAEE) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:56:58.8367319Z OUT-N3 #140 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAE6) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:57:00.4857141Z IN-N3 #835 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction 
+2026-07-25T16:57:07.4739368Z IN-N3 #862 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simpl
+2026-07-25T16:57:08.9959991Z IN-N3 #873 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:57:10.0083740Z OUT-N3 #153 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:797E30D7) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:57:11.2536058Z IN-N3 #882 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=123 Parameter2=40 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:57:11.7113238Z IN-N3 #886 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUnavailable Unknown1=0 Target=(None:0000) Parameter1=123 Parameter2=40 Unknown2=0 N3MessageType=CharacterActi
+2026-07-25T16:57:15.2154549Z IN-N3 #901 type=CharacterAction identity=(SimpleChar:7996DAE6) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:57:18.6033650Z IN-N3 #915 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=124 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Iden
+2026-07-25T16:57:18.6033650Z IN-N3 #917 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:47109) Parameter1=2038313175 Parameter2=200 Unknown2=0 N3MessageType=
+2026-07-25T16:57:19.1110536Z OUT-N3 #161 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=StandUp Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T16:57:19.2909411Z IN-N3 #922 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=StandUp Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(S
+2026-07-25T16:57:24.4327702Z IN-N3 #930 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction 
+2026-07-25T16:57:25.0473909Z IN-N3 #935 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simpl
+2026-07-25T16:57:30.8061730Z OUT-N3 #181 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAEC) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:57:33.1387341Z IN-N3 #1043 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=124 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:57:45.6640102Z IN-N3 #1076 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T16:57:47.5778297Z IN-N3 #1088 type=CharacterAction identity=(SimpleChar:7996DAEC) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T16:57:51.4884179Z IN-N3 #1103 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=123 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:57:53.9988708Z OUT-N3 #196 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DC25) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:58:00.6497684Z IN-N3 #1138 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:58:02.9733356Z IN-N3 #1147 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T16:58:03.5150011Z IN-N3 #1152 type=CharacterAction identity=(SimpleChar:7996DC25) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T16:58:10.1239252Z IN-N3 #1210 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=137 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T16:58:12.0959201Z IN-N3 #1218 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T16:58:13.1962409Z IN-N3 #1225 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=137 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T16:58:15.8206244Z IN-N3 #1234 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T16:58:16.5301846Z OUT-N3 #234 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=142 Unknown1=0 Target=(None:0000) Parameter1=51017 Parameter2=195116535 Unknown2=0 N3MessageType=CharacterAction Id
+2026-07-25T16:58:18.0832276Z IN-N3 #1260 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:58:20.6476454Z IN-N3 #1271 type=CharacterAction identity=(SimpleChar:7996DAE8) CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=85215 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:58:20.6476454Z IN-N3 #1272 type=CharacterAction identity=(SimpleChar:7996DAE8) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:14CDF) Parameter1=2039929576 Parameter2=20000 Unknown2=0 N3MessageTy
+2026-07-25T16:58:21.8888804Z OUT-N3 #239 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAEB) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:58:26.1712391Z IN-N3 #1315 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T16:58:34.9763280Z IN-N3 #1343 type=CharacterAction identity=(SimpleChar:7996DAEB) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T16:58:40.5768729Z IN-N3 #1358 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:58:45.6457471Z IN-N3 #1368 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T16:59:01.8044630Z OUT-N3 #278 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAE7) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:59:05.7250453Z IN-N3 #1488 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T16:59:14.7664211Z IN-N3 #1527 type=CharacterAction identity=(SimpleChar:7996DAE7) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T16:59:20.3095265Z IN-N3 #1548 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:59:21.0010991Z IN-N3 #1552 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T16:59:29.5709566Z OUT-N3 #306 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAE8) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T16:59:33.7313915Z IN-N3 #1631 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T16:59:48.4353425Z IN-N3 #1677 type=CharacterAction identity=(SimpleChar:7996DAE8) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T16:59:48.8940596Z IN-N3 #1678 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T16:59:54.4366424Z IN-N3 #1696 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T17:00:09.3838497Z OUT-N3 #337 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:7996DAE9) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAct
+2026-07-25T17:00:13.1665168Z IN-N3 #1772 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=123 Parameter2=40 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T17:00:16.4295050Z OUT-N3 #346 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:797E30D7) Parameter1=53019 Parameter2=210528 Unknown2=0 N3MessageType=Charac
+2026-07-25T17:00:16.5594253Z OUT-N3 #347 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=CastNano Unknown1=0 Target=(SimpleChar:797E30D7) Parameter1=53019 Parameter2=210528 Unknown2=0 N3MessageType=Charac
+2026-07-25T17:00:16.6223856Z IN-N3 #1789 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=FinishNanoCasting Unknown1=0 Target=(None:0000) Parameter1=1 Parameter2=210528 Unknown2=0 N3MessageType=CharacterAc
+2026-07-25T17:00:16.6223856Z IN-N3 #1790 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SetNanoDuration Unknown1=0 Target=(NanoProgram:33660) Parameter1=2038313175 Parameter2=1440000 Unknown2=0 N3Message
+2026-07-25T17:00:21.0216726Z IN-N3 #1809 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialUsed Unknown1=0 Target=(None:0000) Parameter1=147 Parameter2=15 Unknown2=0 N3MessageType=CharacterAction Ide
+2026-07-25T17:00:24.0338148Z IN-N3 #1822 type=CharacterAction identity=(SimpleChar:7996DAE9) CharacterActionMessage { Action=Death Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=501 Unknown2=0 N3MessageType=CharacterAction Identity=(
+2026-07-25T17:00:33.4350173Z IN-N3 #1844 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=110 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T17:00:35.7755745Z IN-N3 #1871 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=147 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T17:00:53.0549182Z IN-N3 #1959 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=SpecialAvailable Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=123 Unknown2=0 N3MessageType=CharacterAction
+2026-07-25T17:00:57.6776851Z IN-N3 #1979 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=137 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+2026-07-25T17:00:59.0778217Z IN-N3 #1983 type=CharacterAction identity=(SimpleChar:797E30D7) CharacterActionMessage { Action=137 Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(Simp
+
+=== enemy-state.csv sample ===
+rows=2151 cols=['timestamp', 'direction', 'sequence', 'messageType', 'evidenceSource', 'entityId', 'level', 'currentHealth', 'maxHealth', 'x', 'y', 'z', 'eventType']
+  timestamp=2026-07-25T16:54:33.7051263Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAE5) | level=5 | currentHealth=115 | maxHealth=115 | x=85.85072
+  timestamp=2026-07-25T16:54:33.7051263Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAED) | level=5 | currentHealth=115 | maxHealth=115 | x=85.4812241
+  timestamp=2026-07-25T16:54:33.7051263Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:79941BB4) | level=5 | currentHealth=115 | maxHealth=115 | x=81.3
+  timestamp=2026-07-25T16:54:33.7051263Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAE6) | level=6 | currentHealth=138 | maxHealth=138 | x=75.6809845
+  timestamp=2026-07-25T16:54:33.7051263Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAEE) | level=6 | currentHealth=110 | maxHealth=110 | x=76.71904
+  timestamp=2026-07-25T16:54:33.7061257Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAE7) | level=4 | currentHealth=93 | maxHealth=93 | x=56.90598
+  timestamp=2026-07-25T16:54:33.7061257Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAE8) | level=6 | currentHealth=138 | maxHealth=138 | x=44.1562729
+  timestamp=2026-07-25T16:54:33.7061257Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=CHAR-SEEN | entityId=(SimpleChar:7996DAE9) | level=4 | currentHealth=93 | maxHealth=93 | x=36.4197426
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE5) | level=5 | currentHealth=115 | maxHealth=115 | x=85.85072
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAED) | level=5 | currentHealth=115 | maxHealth=115 | x=85.4812241
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:79941BB4) | level=5 | currentHealth=115 | maxHealth=115 | x=81.3
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE6) | level=6 | currentHealth=138 | maxHealth=138 | x=75.6809845
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAEE) | level=6 | currentHealth=110 | maxHealth=110 | x=76.71904
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE7) | level=4 | currentHealth=93 | maxHealth=93 | x=56.90598
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE8) | level=6 | currentHealth=138 | maxHealth=138 | x=44.1562729
+  timestamp=2026-07-25T16:54:34.7085079Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE9) | level=4 | currentHealth=93 | maxHealth=93 | x=36.4197426
+  timestamp=2026-07-25T16:54:35.7108894Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE5) | level=5 | currentHealth=115 | maxHealth=115 | x=85.85072
+  timestamp=2026-07-25T16:54:35.7108894Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAED) | level=5 | currentHealth=115 | maxHealth=115 | x=85.4812241
+  timestamp=2026-07-25T16:54:35.7108894Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:79941BB4) | level=5 | currentHealth=115 | maxHealth=115 | x=81.3
+  timestamp=2026-07-25T16:54:35.7108894Z | direction=LOCAL | sequence=0 | messageType=DynelSnapshot | evidenceSource=VISIBLE-SURVEY | entityId=(SimpleChar:7996DAE6) | level=6 | currentHealth=138 | maxHealth=138 | x=75.6809845

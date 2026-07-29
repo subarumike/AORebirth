@@ -1,0 +1,65 @@
+HIT chat-dialogue.log
+  2026-07-27T16:35:53.3292619Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Marcus Stone: What're you looking at? Help me out here!" Unk2=1 }
+HIT enemy-dossier.json
+        "name": "Marcus Stone",
+HIT events.log
+  2026-07-27T16:35:40.6101231Z [CHAR-SEEN] identity=(SimpleChar:78E0FC62) name=Marcus Stone player=False npc=True pet=False inPlay=True alive=True hp=117800/117800 pct=100.0 level=15 computerLiteracy=6 pos=(3629.358, 40.985, 823.6023) attacking=True fightingTarget=(SimpleChar:799F06DF) monsterData=258
+  2026-07-27T16:35:53.3292619Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="Marcus Stone: What're you looking at? Help me out here!" Unk2=1 }
+HIT npc-lifecycle.csv
+  "2026-07-27T16:35:40.6101231Z","LOCAL",0,"character-seen","DynelSnapshot","(SimpleChar:78E0FC62)","","Marcus Stone","identity=(SimpleChar:78E0FC62) name=Marcus Stone player=False npc=True pet=False inPlay=True alive=True hp=117800/117800 pct=100.0 level=15 computerLiteracy=6 pos=(3629.358, 40.985, 8
+=== identity name map ===
+799F3D2B -> (no name)
+799F049E -> (no name)
+799F06DF -> (no name)
+797DD44C -> (no name)
+799F06E4 -> [('(SimpleChar:799F06E4)', ['Burning Cleaning Robot'])]
+79666CF1 -> (no name)
+799F06E7 -> [('(SimpleChar:799F06E7)', ['Burning Cleaning Robot'])]
+7996C261 -> (no name)
+78E0FC62 -> (no name)
+78E0FC6F -> (no name)
+78E0FC63 -> (no name)
+799F01F6 -> (no name)
+
+=== all named entities (unique) ===
+(SimpleChar:799F04E2) : Garbage Flea
+(SimpleChar:799F06E0) : Malfunctioning Cleaning Robot
+(SimpleChar:799F06E4) : Burning Cleaning Robot
+(SimpleChar:799F06E7) : Burning Cleaning Robot
+
+=== Attack chains (Attack + AttackInfo) ===
+AttackInfo src=(SimpleChar:78E0FC62)() tgt=(SimpleChar:799F06DF)() action= amount=17
+CharacterAction src=(SimpleChar:78E0FC63)() tgt=(None:002F)() action=100 amount=
+CharacterAction src=(SimpleChar:78E0FC6F)() tgt=(None:0000)() action=StandUp amount=
+HealthDamage src=(SimpleChar:78E0FC6F)() tgt=(SimpleChar:78E0FC6F)() action= amount=20
+SpecialAttackWeapon src=(SimpleChar:799F3D2B)() tgt=25() action= amount=
+Attack src=(SimpleChar:799F3D2B)() tgt=(SimpleChar:799F049E)() action= amount=
+SpecialAttackWeapon src=(SimpleChar:7996C261)() tgt=9(Malfunctioning Cleaning Robot) action= amount=
+Attack src=(SimpleChar:7996C261)() tgt=(SimpleChar:799F049E)() action= amount=
+AttackInfo src=(SimpleChar:7996C261)() tgt=(SimpleChar:799F049E)() action= amount=11
+SpecialAttackWeapon src=(SimpleChar:799F049E)() tgt=10() action= amount=
+Attack src=(SimpleChar:799F049E)() tgt=(SimpleChar:7996C261)() action= amount=
+AttackInfo src=(SimpleChar:78E0FC62)() tgt=(SimpleChar:799F06DF)() action= amount=16
+CharacterAction src=(SimpleChar:78E0FC6F)() tgt=(None:0009)() action=100 amount=
+AttackInfo src=(SimpleChar:799F3D2B)() tgt=(SimpleChar:799F049E)() action= amount=17
+CharacterAction src=(SimpleChar:799F049E)() tgt=(None:0000)() action=Death amount=
+SpecialAttackWeapon src=(SimpleChar:799F3D2B)() tgt=25() action= amount=
+Attack src=(SimpleChar:799F3D2B)() tgt=(SimpleChar:799F06DF)() action= amount=
+AttackInfo src=(SimpleChar:78E0FC62)() tgt=(SimpleChar:799F06DF)() action= amount=15
+CharacterAction src=(SimpleChar:799F06DF)() tgt=(None:0000)() action=Death amount=
+CharacterAction src=(SimpleChar:78E0FC63)() tgt=(None:001F)() action=100 amount=
+SpecialAttackWeapon src=(SimpleChar:797DD44C)() tgt=21() action= amount=
+Attack src=(SimpleChar:797DD44C)() tgt=(SimpleChar:799F06E4)(Burning Cleaning Robot) action= amount=
+AttackInfo src=(SimpleChar:797DD44C)() tgt=(SimpleChar:799F06E4)(Burning Cleaning Robot) action= amount=4
+SpecialAttackWeapon src=(SimpleChar:799F06E4)(Burning Cleaning Robot) tgt=2(Garbage Flea) action= amount=
+Attack src=(SimpleChar:799F06E4)(Burning Cleaning Robot) tgt=(SimpleChar:797DD44C)() action= amount=
+CharacterAction src=(SimpleChar:78E0FC6F)() tgt=(None:0000)() action=86 amount=
+HealthDamage src=(SimpleChar:78E0FC6F)() tgt=(SimpleChar:78E0FC6F)() action= amount=-20
+AttackInfo src=(SimpleChar:797DD44C)() tgt=(SimpleChar:799F06E4)(Burning Cleaning Robot) action= amount=7
+CharacterAction src=(SimpleChar:78E0FC63)() tgt=(None:002F)() action=100 amount=
+SpecialAttackWeapon src=(SimpleChar:79666CF1)() tgt=21() action= amount=
+Attack src=(SimpleChar:79666CF1)() tgt=(SimpleChar:799F06E7)(Burning Cleaning Robot) action= amount=
+AttackInfo src=(SimpleChar:797DD44C)() tgt=(SimpleChar:799F06E4)(Burning Cleaning Robot) action= amount=8
+AttackInfo src=(SimpleChar:79666CF1)() tgt=(SimpleChar:799F06E7)(Burning Cleaning Robot) action= amount=2
+SpecialAttackWeapon src=(SimpleChar:799F06E7)(Burning Cleaning Robot) tgt=2(Garbage Flea) action= amount=
+Attack src=(SimpleChar:799F06E7)(Burning Cleaning Robot) tgt=(SimpleChar:79666CF1)() action= amount=

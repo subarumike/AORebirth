@@ -1,0 +1,13 @@
+Unhandled exception. McMaster.Extensions.CommandLineUtils.CommandParsingException: Missing value for option 'l'
+   at McMaster.Extensions.CommandLineUtils.CommandLineProcessor.ProcessOption(OptionArgument arg)
+   at McMaster.Extensions.CommandLineUtils.CommandLineProcessor.ProcessNext()
+   at McMaster.Extensions.CommandLineUtils.CommandLineProcessor.Process()
+   at McMaster.Extensions.CommandLineUtils.CommandLineApplication.Parse(String[] args)
+   at McMaster.Extensions.CommandLineUtils.CommandLineApplication.ExecuteAsync(String[] args, CancellationToken cancellationToken)
+   at McMaster.Extensions.Hosting.CommandLine.Internal.CommandLineService`1.RunAsync(CancellationToken cancellationToken)
+   at McMaster.Extensions.Hosting.CommandLine.Internal.CommandLineLifetime.<>c__DisplayClass10_0.<<WaitForStartAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.Extensions.Hosting.HostExtensions.RunCommandLineApplicationAsync(IHost host, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.HostBuilderExtensions.RunCommandLineApplicationAsync[TApp](IHostBuilder hostBuilder, String[] args, Action`1 configure, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.HostBuilderExtensions.RunCommandLineApplicationAsync[TApp](IHostBuilder hostBuilder, String[] args, CancellationToken cancellationToken)
+   at ICSharpCode.ILSpyCmd.ILSpyCmdProgram.<Main>(String[] args)

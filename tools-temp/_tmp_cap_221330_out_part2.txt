@@ -1,0 +1,189 @@
+ 2026-07-23T20:15:08.9750645Z [CHAR-SEEN] identity=(SimpleChar:798C1F82) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(847.9584, 32.41, 1156.498) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTy
+  L1094: 2026-07-23T20:15:22.0816172Z [DYNEL-SPAWNED] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(834.5659, 32.20087, 1159.982) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L1108: 2026-07-23T20:15:23.0630015Z [CHAR-SEEN] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(835.2646, 32.30568, 1159.211) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L1783: 2026-07-23T20:16:24.9615629Z [DYNEL-SPAWNED] identity=(SimpleChar:798894DB) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(799.1443, 30.28355, 1191.089) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L1803: 2026-07-23T20:16:25.4052871Z [CHAR-SEEN] identity=(SimpleChar:798894DB) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(799.1443, 30.28355, 1191.089) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L3216: 2026-07-23T20:18:39.9842854Z [DYNEL-SPAWNED] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(812.9963, 29.56544, 1199.953) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L3220: 2026-07-23T20:18:40.2900977Z [CHAR-SEEN] identity=(SimpleChar:798894DE) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=225/225 pct=100.0 level=5 computerLiteracy=6 pos=(813.0331, 29.57097, 1199.798) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseTyp
+  L3446: 2026-07-23T20:19:02.4746079Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeig
+  L3448: 2026-07-23T20:19:02.4746079Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeig
+  L3459: 2026-07-23T20:19:02.4915974Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F83) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 cor
+  L3460: 2026-07-23T20:19:02.5045893Z [DYNEL-SPAWNED] identity=(SimpleChar:798C1F84) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 c
+  L3463: 2026-07-23T20:19:03.4530576Z [CHAR-SEEN] identity=(SimpleChar:798C1F83) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(789.353, 29.2113, 1223.389) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseT
+  L3475: 2026-07-23T20:19:03.4550565Z [CHAR-SEEN] identity=(SimpleChar:798C1F84) name=Dreaming Silvertail player=False npc=True pet=False inPlay=True alive=True hp=600/600 pct=100.0 level=15 computerLiteracy=6 pos=(778.1665, 31.48926, 1218.395) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L3493: 2026-07-23T20:19:05.4937991Z [DYNEL-SPAWNED] identity=(SimpleChar:79841864) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=270/270 pct=100.0 level=6 computerLiteracy=6 pos=(774.5911, 30.44653, 1239.993) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L3498: 2026-07-23T20:19:05.4947985Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=93 VisualFlags=31 HeadMesh=null RunSpeedBase=22 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmal
+  L3515: 2026-07-23T20:19:06.4623497Z [CHAR-SEEN] identity=(SimpleChar:79841864) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=270/270 pct=100.0 level=6 computerLiteracy=6 pos=(775.4027, 30.3738, 1238.854) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corpseType
+  L3960: 2026-07-23T20:19:58.6892634Z [DYNEL-SPAWNED] identity=(SimpleChar:798894FC) name=Swift Silvertail player=False npc=True pet=False inPlay=True alive=True hp=315/315 pct=100.0 level=7 computerLiteracy=6 pos=(799.9115, 30.00357, 1252.006) attacking=False fightingTarget=null monsterData=208922 catMesh=1234567890 visualFlags=31 state=1234567890 currentState=0 actionCategory=1234567890 deadTimer=0 corps
+  L4021: 2026-07-23T20:19:58.6942602Z [IN-N3-DETAIL] SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=94 VisualFlags=31 HeadMesh=null RunSpeedBase=28 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcFamily, HasSmal
+enemy-fight-events.log: blue-name pattern lines=0
+  L937: 2026-07-23T20:19:02.4746079Z IN-N3 #1259 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F83) SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSm
+  L938: 2026-07-23T20:19:02.4746079Z IN-N3 #1260 type=SimpleCharFullUpdate identity=(SimpleChar:798C1F84) SimpleCharFullUpdateMessage { Name="Dreaming Silvertail" MonsterData=208922 MonsterScale=73 VisualFlags=31 HeadMesh=null RunSpeedBase=52 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSm
+  L948: 2026-07-23T20:19:05.4947985Z IN-N3 #1269 type=SimpleCharFullUpdate identity=(SimpleChar:79841864) SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=93 VisualFlags=31 HeadMesh=null RunSpeedBase=22 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmall
+  L1131: 2026-07-23T20:19:58.6942602Z IN-N3 #1489 type=SimpleCharFullUpdate identity=(SimpleChar:798894FC) SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=94 VisualFlags=31 HeadMesh=null RunSpeedBase=25 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmall
+  L1132: 2026-07-23T20:19:58.6952597Z IN-N3 #1490 type=SimpleCharFullUpdate identity=(SimpleChar:798894FB) SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=94 VisualFlags=31 HeadMesh=null RunSpeedBase=28 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmall
+  L1133: 2026-07-23T20:19:58.6952597Z IN-N3 #1491 type=SimpleCharFullUpdate identity=(SimpleChar:79841864) SimpleCharFullUpdateMessage { Name="Swift Silvertail" MonsterData=208922 MonsterScale=93 VisualFlags=31 HeadMesh=null RunSpeedBase=22 CharacterInfo=SmokeLounge.AOtomation.Messaging.GameData.SimpleCharInfo+NPCInfo Version=58 Flags=IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmall
+npc-interactions.log: blue-name pattern lines=0
+  (no HasBlueName/BlueName hits; checking CharacterFlags samples for Dreaming)
+Dreaming Silvertail CharacterFlags (all scfu+efu unique values):
+  ('efu', '277352961', 'IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', None)
+  ('scfu', '277352961', 'IsNpc, UnknownFlag, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcFamily, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', '170543683')
+
+==============================================================================
+3) Dialog NPCs (KnubotOpenChatWindow) + AnswerList + bodies
+==============================================================================
+[npc-interactions.log] open -> (SimpleChar:78CCD541) | Prince Creehan
+  2026-07-23T20:13:36.3173217Z [OUT-N3] #15 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78CCD541) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[npc-interactions.log] open -> (SimpleChar:7963A853) | Scientist Drake Rodriguez
+  2026-07-23T20:14:20.4464369Z [IN-N3] #156 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:7963A853) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[npc-interactions.log] open -> (SimpleChar:787B5401) | Joshua Falker
+  2026-07-23T20:15:11.5644675Z [OUT-N3] #163 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:787B5401) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[npc-interactions.log] open -> (SimpleChar:787B5401) | Joshua Falker
+  2026-07-23T20:15:11.9676662Z [IN-N3] #270 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:787B5401) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] open -> (SimpleChar:78CCD541) | Prince Creehan
+  2026-07-23T20:13:36.3173217Z [OUT-N3] #15 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:78CCD541) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] open -> (SimpleChar:7963A853) | Scientist Drake Rodriguez
+  2026-07-23T20:14:20.4464369Z [IN-N3] #156 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:7963A853) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] open -> (SimpleChar:787B5401) | Joshua Falker
+  2026-07-23T20:15:11.5644675Z [OUT-N3] #163 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:787B5401) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] open -> (SimpleChar:787B5401) | Joshua Falker
+  2026-07-23T20:15:11.9676662Z [IN-N3] #270 type=KnubotOpenChatWindow text= detail=KnuBotOpenChatWindowMessage { Unknown1=2 Target=(SimpleChar:787B5401) Unknown2=0 Unknown3=0 N3MessageType=KnubotOpenChatWindow Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+Dialog NPC map (identity -> name):
+  (SimpleChar:78CCD541) -> Prince Creehan
+  (SimpleChar:7963A853) -> Scientist Drake Rodriguez
+  (SimpleChar:787B5401) -> Joshua Falker
+--- AnswerList option texts ---
+[npc-interactions.log] options=[]
+  2026-07-23T20:14:22.3715430Z [IN-N3] #165 type=KnubotAnswerList text=What is the purpose of this bracer? | What are you doing here? | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketT
+[npc-interactions.log] options=[]
+  2026-07-23T20:14:28.3441931Z [IN-N3] #172 type=KnubotAnswerList text=So this is Nascence? | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[npc-interactions.log] options=[]
+  2026-07-23T20:14:30.5518325Z [IN-N3] #177 type=KnubotAnswerList text=Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[npc-interactions.log] options=[]
+  2026-07-23T20:15:21.4380053Z [IN-N3] #281 type=KnubotAnswerList text=Yes! | No! | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:787B5401) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[npc-interactions.log] options=[]
+  2026-07-23T20:15:26.5804938Z [IN-N3] #292 type=KnubotAnswerList text=Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:787B5401) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] options=[]
+  2026-07-23T20:14:22.3715430Z [IN-N3] #165 type=KnubotAnswerList text=What is the purpose of this bracer? | What are you doing here? | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketT
+[chat-dialogue.log] options=[]
+  2026-07-23T20:14:28.3441931Z [IN-N3] #172 type=KnubotAnswerList text=So this is Nascence? | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] options=[]
+  2026-07-23T20:14:30.5518325Z [IN-N3] #177 type=KnubotAnswerList text=Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] options=[]
+  2026-07-23T20:15:21.4380053Z [IN-N3] #281 type=KnubotAnswerList text=Yes! | No! | Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:787B5401) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[chat-dialogue.log] options=[]
+  2026-07-23T20:15:26.5804938Z [IN-N3] #292 type=KnubotAnswerList text=Goodbye detail=KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:787B5401) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[events.log] options=[]
+  2026-07-23T20:14:22.3705437Z [IN-N3] #165 type=KnubotAnswerList identity=(SimpleChar:797E30D7)
+[events.log] options=[]
+  2026-07-23T20:14:22.3705437Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[events.log] options=[]
+  2026-07-23T20:14:28.3441931Z [IN-N3] #172 type=KnubotAnswerList identity=(SimpleChar:797E30D7)
+[events.log] options=[]
+  2026-07-23T20:14:28.3441931Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=2[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[events.log] options=[]
+  2026-07-23T20:14:30.5518325Z [IN-N3] #177 type=KnubotAnswerList identity=(SimpleChar:797E30D7)
+[events.log] options=[]
+  2026-07-23T20:14:30.5518325Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:7963A853) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[events.log] options=[]
+  2026-07-23T20:15:21.4380053Z [IN-N3] #281 type=KnubotAnswerList identity=(SimpleChar:797E30D7)
+[events.log] options=[]
+  2026-07-23T20:15:21.4380053Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:787B5401) DialogOptions=count=3[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption,SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+[events.log] options=[]
+  2026-07-23T20:15:26.5804938Z [IN-N3] #292 type=KnubotAnswerList identity=(SimpleChar:797E30D7)
+[events.log] options=[]
+  2026-07-23T20:15:26.5804938Z [IN-N3-DETAIL] KnuBotAnswerListMessage { Unknown1=2 Target=(SimpleChar:787B5401) DialogOptions=count=1[SmokeLounge.AOtomation.Messaging.GameData.KnuBotDialogOption] N3MessageType=KnubotAnswerList Identity=(SimpleChar:797E30D7) Unknown=0 PacketType=N3Message }
+--- NPCMessage / Feedback / systemtext for dialog NPC names ---
+[chat-dialogue.log] 2026-07-23T20:13:37.5115864Z [CHAT] #0 type=NpcMessage text=chat-protocol detail=NpcMessage { PacketType=NpcMessage Unk1=0 Text="Prince Creehan: Say what?" Unk2=1 }
+[events.log] 2026-07-23T20:13:37.5115864Z [CHAT] NpcMessage { PacketType=NpcMessage Unk1=0 Text="Prince Creehan: Say what?" Unk2=1 }
+
+==============================================================================
+4) Corpse loot (corpse-loot-observations + corpse-full-updates)
+==============================================================================
+corpse-loot-observations rows: 1
+  corpse=(Corpse:F49805) enemy=Swift Silvertail deadNpc=SimpleChar:798C1F89 itemCount=2 credits=0 items='232839:232840:6:1;42640:42641:7:1' status=linked
+corpse-full-updates rows: 2
+  corpse=Corpse:00F49802 name=Remains of Barking Chimera deadNpc=SimpleChar:798E09BC deadName=Barking Chimera monsterData=209173 credits=0 pos=(854.136719,28.4937325,1111.16589) pf=4310
+  corpse=Corpse:00F49805 name=Remains of Swift Silvertail deadNpc=SimpleChar:798C1F89 deadName=Swift Silvertail monsterData=208922 credits=0 pos=(825.543152,31.0968246,1118.96729) pf=4310
+
+==============================================================================
+5) Combat — fought mobs / attack types / animation fields
+==============================================================================
+enemy-combat.csv rows: 275
+mobs appearing in combat with dossier identity: 58
+  (SimpleChar:78CCD539) (Angus McDuff)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:78CCD539) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F9C) (Barking Chimera)
+    actions: {'': 4}
+    messageTypes: {'Despawn': 4}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9C) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9C) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9C) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798E09BC) (Barking Chimera)
+    actions: {'InfoRequest': 1, '': 27, 'CastNano': 2, 'Death': 1}
+    messageTypes: {'CharacterAction': 4, 'Attack': 3, 'MissedAttackInfo': 4, 'SpecialAttackWeapon': 1, 'AttackInfo': 17, 'StopFight': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798E09BC) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Attack/ amt= detail=AttackMessage { Target=(SimpleChar:798E09BC) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 Pa
+    sample: Attack/ amt= detail=AttackMessage { Target=(SimpleChar:798E09BC) Unknown1=0 N3MessageType=Attack Identity=(SimpleChar:797E30D7) Unknown=0 Pa
+  (SimpleChar:798C1F97) (Barking Chimera)
+    actions: {'': 2, 'InfoRequest': 1}
+    messageTypes: {'Despawn': 2, 'CharacterAction': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F97) Unknown=1 PacketType=N3Message }
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F97) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F97) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F96) (Barking Chimera)
+    actions: {'': 4, 'InfoRequest': 1}
+    messageTypes: {'Despawn': 4, 'CharacterAction': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F96) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F96) Unknown=1 PacketType=N3Message }
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F96) Parameter1=0 Parameter2=0 Unknown2=0
+  (SimpleChar:798E09BE) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798E09BE) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798E09BF) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798E09BF) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F93) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F93) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F9E) (Barking Chimera)
+    actions: {'InfoRequest': 1, '': 2}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 2}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F9E) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9E) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F9E) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F54) (Barking Chimera)
+    actions: {'': 4}
+    messageTypes: {'Despawn': 4}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F54) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F54) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F54) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F53) (Barking Chimera)
+    actions: {'': 7}
+    messageTypes: {'Despawn': 7}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F53) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F53) Unknown=1 PacketType=N3Message }
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F53) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1F4C) (Barking Chimera)
+    actions: {'InfoRequest': 1, '': 1}
+    messageTypes: {'CharacterAction': 1, 'Despawn': 1}
+    sample: CharacterAction/InfoRequest amt= detail=CharacterActionMessage { Action=InfoRequest Unknown1=0 Target=(SimpleChar:798C1F4C) Parameter1=0 Parameter2=0 Unknown2=0
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1F4C) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798C1CEA) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798C1CEA) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798E09BD) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798E09BD) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798E09E9) (Barking Chimera)
+    actions: {'': 1}
+    messageTypes: {'Despawn': 1}
+    sample: Despawn/ amt= detail=DespawnMessage { N3MessageType=Despawn Identity=(SimpleChar:798E09E9) Unknown=1 PacketType=N3Message }
+  (SimpleChar:798

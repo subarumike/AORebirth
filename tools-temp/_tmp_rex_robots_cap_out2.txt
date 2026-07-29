@@ -1,0 +1,92 @@
+enemy-state cols=['timestamp', 'direction', 'sequence', 'messageType', 'evidenceSource', 'entityId', 'level', 'currentHealth', 'maxHealth', 'x', 'y', 'z', 'eventType']
+sample={'timestamp': '2026-07-21T19:55:03.9168170Z', 'direction': 'IN-N3', 'sequence': '15', 'messageType': 'Stat', 'evidenceSource': 'Stat', 'entityId': '(SimpleChar:78E0FC6E)', 'level': '', 'currentHealth': '12', 'maxHealth': '', 'x': '', 'y': '', 'z': '', 'eventType': 'spawn'}
+
+lifecycle cols=['CapturedUtc', 'Direction', 'Sequence', 'Phase', 'MessageType', 'PrimaryIdentity', 'RelatedIdentity', 'Name', 'Detail']
+malf lifecycle rows=25
+  2026-07-21T19:55:04.3405741Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3405741Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3415735Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:04.3425727Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:55:34.5211528Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:56:16.0757406Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:56:21.9134052Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:56:45.3452355Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:56:52.4328646Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:56:52.4328646Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:56:54.9423165Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:57:25.7589972Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:57:27.7877461Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:58:06.0294046Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:58:08.0331726Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:58:22.8065444Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:58:25.9612368Z | None | None | Malfunctioning Cleaning Robot
+  2026-07-21T19:58:28.1728544Z | None | None | Malfunctioning Cleaning Robot
+life keys example=['CapturedUtc', 'Direction', 'Sequence', 'Phase', 'MessageType', 'PrimaryIdentity', 'RelatedIdentity', 'Name', 'Detail']
+
+max_concurrent_malf=0 at None
+ids=[]
+
+=== POSITION CLUSTERS (Malfunctioning only, y>=50 platform) ===
+cluster_count=13
+  C00 n=3 center=(3594.546,51.745,799.168) first=(SimpleChar:79866553) @ 2026-07-21T19:55:04.3415735Z last_ids=['(SimpleChar:79866553)', '(SimpleChar:79866565)', '(SimpleChar:79866570)']
+  C01 n=1 center=(3596.812,51.745,788.209) first=(SimpleChar:797D36A5) @ 2026-07-21T19:55:04.3415735Z last_ids=['(SimpleChar:797D36A5)']
+  C02 n=1 center=(3596.979,51.745,783.936) first=(SimpleChar:79543CB6) @ 2026-07-21T19:55:04.3415735Z last_ids=['(SimpleChar:79543CB6)']
+  C03 n=2 center=(3597.419,51.745,772.863) first=(SimpleChar:79866577) @ 2026-07-21T19:56:15.0658400Z last_ids=['(SimpleChar:79866577)', '(SimpleChar:79866586)']
+  C04 n=1 center=(3602.961,52.135,787.817) first=(SimpleChar:79866547) @ 2026-07-21T19:55:04.3415735Z last_ids=['(SimpleChar:79866547)']
+  C05 n=1 center=(3608.250,51.745,796.428) first=(SimpleChar:7986659D) @ 2026-07-21T19:58:27.8230698Z last_ids=['(SimpleChar:7986659D)']
+  C06 n=1 center=(3608.861,52.265,787.404) first=(SimpleChar:7986657B) @ 2026-07-21T19:56:45.1493557Z last_ids=['(SimpleChar:7986657B)']
+  C07 n=1 center=(3609.404,52.135,791.897) first=(SimpleChar:7986655E) @ 2026-07-21T19:55:04.3425727Z last_ids=['(SimpleChar:7986655E)']
+  C08 n=1 center=(3610.836,51.745,797.945) first=(SimpleChar:79866594) @ 2026-07-21T19:58:07.3695799Z last_ids=['(SimpleChar:79866594)']
+  C09 n=1 center=(3612.793,51.745,795.230) first=(SimpleChar:79866590) @ 2026-07-21T19:58:05.0370174Z last_ids=['(SimpleChar:79866590)']
+  C10 n=4 center=(3612.924,52.135,787.641) first=(SimpleChar:79866562) @ 2026-07-21T19:55:04.3405741Z last_ids=['(SimpleChar:79866562)', '(SimpleChar:79866518)', '(SimpleChar:7986653C)', '(SimpleChar:7986657D)']
+  C11 n=1 center=(3617.228,51.745,785.992) first=(SimpleChar:79866560) @ 2026-07-21T19:55:04.3405741Z last_ids=['(SimpleChar:79866560)']
+  C12 n=3 center=(3622.509,51.745,798.139) first=(SimpleChar:7986655D) @ 2026-07-21T19:55:04.3415735Z last_ids=['(SimpleChar:7986655D)', '(SimpleChar:7986657C)', '(SimpleChar:79866585)']
+
+=== STATE TRACKING ===
+mapped name=None id=None xyz=x,y,z t=None
+
+=== MOVEMENT for Malfunctioning source instances ===
+move cols=['CapturedUtc', 'Direction', 'Sequence', 'MessageType', 'SourceType', 'SourceInstance', 'SourceIdentity', 'SourceName', 'TargetType', 'TargetInstance', 'TargetIdentity', 'TargetName', 'FollowKind', 'CurrentX', 'CurrentY', 'CurrentZ', 'DestinationX', 'DestinationY', 'DestinationZ', 'Speed', 'Animation', 'Flags', 'PathCount', 'RawParams', 'RawTailHex']
+malf movers=0
+
+=== SCFU appearance Malfunctioning ===
+cols=['CapturedUtc', 'ElapsedMilliseconds', 'Direction', 'GlobalOrdinal', 'Sequence', 'PacketLength', 'DecodeStatus', 'DecodeError', 'BytesConsumed', 'UndecodedTailHex', 'RawPacketHex', 'RawBodyHex', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'PrePositionFightingTarget', 'FightingTarget', 'Version', 'FlagsNumeric', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NpcFamily', 'NpcLosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'AppearanceValue', 'Side', 'Fatness', 'Breed', 'Gender', 'Race', 'ScfuUnknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanos', 'WaypointOwner', 'Waypoints', 'TextureOverrides', 'Textures', 'Meshes', 'Flags2Numeric', 'Flags2', 'Owner', 'ScfuUnknown2', 'ScfuUnknown4', 'SpecialAttacks', 'ImmuneUnknown', 'UnknownFlag3Data', 'HeaderUnknown', 'TowerUnknown', 'PlayerInfo', 'N3MessageTypeNumeric', 'DecodeFullyConsumed', 'NpcUnknownDataWidth', 'ScfuUnknown3', 'LegacyExtendedRunSpeedAlignment', 'TerminalSpecialAttackSlotOmitted', 'OpaqueExtensionHex']
+  {'Identity': '(SimpleChar:79866534)', 'Name': 'Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '15', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866569)', 'Name': 'Burning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '5', 'Health': '58', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1018'}
+  {'Identity': '(SimpleChar:79866534)', 'Name': 'Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '15', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866570)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866534)', 'Name': 'Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '15', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866577)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866534)', 'Name': 'Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '15', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866579)', 'Name': 'Burning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '5', 'Health': '58', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1018'}
+  {'Identity': '(SimpleChar:7986657B)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:7986657C)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:7986657D)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866534)', 'Name': 'Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '15', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866585)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866534)', 'Name': 'Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '15', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasWaypoints, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866586)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866590)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866594)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+  {'Identity': '(SimpleChar:79866598)', 'Name': 'Burning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '5', 'Health': '58', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1018'}
+  {'Identity': '(SimpleChar:7986659D)', 'Name': 'Malfunctioning Cleaning Robot', 'MonsterData': '297023', 'MonsterScale': '200', 'VisualFlags': '31', 'Level': '1', 'Health': '12', 'Flags': 'IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet', 'NpcFamily': '1019'}
+
+=== enemy-full-updates Malfunctioning sample ===
+cols=['CapturedUtc', 'Direction', 'Sequence', 'Identity', 'Name', 'PlayfieldId', 'PositionX', 'PositionY', 'PositionZ', 'HeadingX', 'HeadingY', 'HeadingZ', 'HeadingW', 'FightingTargetRole', 'FightingTargetIdentity', 'Version', 'Flags', 'CharacterFlags', 'AccountFlags', 'Expansions', 'CharacterInfoType', 'NPCFamily', 'LosHeight', 'NpcUnknownData', 'NpcUnknownData2', 'NpcUnknownData3', 'Level', 'Health', 'HealthDamage', 'MonsterData', 'MonsterScale', 'VisualFlags', 'VisibleTitle', 'Unknown1Length', 'Unknown1Hex', 'HeadMesh', 'RunSpeedBase', 'ActiveNanoCount', 'ActiveNanos', 'WaypointCount', 'WaypointOwner', 'Waypoints', 'TextureOverrideCount', 'TextureOverrides', 'TextureCount', 'Textures', 'MeshCount', 'Meshes', 'Flags2', 'Unknown2', 'Unknown4', 'DecodeFullyConsumed', 'UndecodedTailHex', 'RawBodyHex', 'Detail']
+  id=(SimpleChar:79866570) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:79866577) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:7986657B) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:7986657C) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:7986657D) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:79866585) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:79866586) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:79866590) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:79866594) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None
+  id=(SimpleChar:7986659D) pos=(None,None,None) flags=IsNpc, UnknownFlag, HasExtendedTextures, HasPlayfieldId, HasHeading, HasSmallHealth, HasSmallHealthDamage, HasSmallNpcLosHeight, UnknownFlag7, UnknownDataFlag, IsPet waypoints= los=None scale=200 fam=None hp=12/None

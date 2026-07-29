@@ -1,0 +1,38 @@
+COUNTS
+TryAttach=0
+TakeAll=0
+RemoveAttached=0
+FailureNo=0
+ToMailTime=0
+BuildMailDetail=0
+RequestedMailId=0
+AcgLow=0
+MultipleCount=0
+unreadmailcount=0
+ExtendedField64=2
+FormatFeedback=6
+container items=4
+nodrop items=1
+IsSummary = false=0
+
+SAMPLES
+L949 FormatFeedback: ole":"assistant","message":{"content":[{"type":"text","text":"**Chat silence:** FormatFeedback alone doesn’t show as normal chat. Insurance Terminal now also sends **ChatText**, so you’ll see the credit deduct and “Character stored…” lines.\n\n**`/command term
+L1010 ExtendedField64: {"role":"assistant","message":{"content":[{"type":"text","text":"ExtendedField64 (`MailMessage+0x64` / window `+0x11c`) holds the signed money amount for UI and Take All — we were always writing 0. Fixing that and implementing COD payment."}]}}
+
+L1011 ExtendedField64: **Root cause:** The client fills **Credits** / **C.O.D.** and ConfirmTake from `ExtendedField64` (`MailMessage+0x64` → window `+0x11c`), not from CreditsField/CodField alone. Positive = gift credits; negative = COD to pay. We always sent `ExtendedField64=0`.\n
+L1047 FormatFeedback: {"role":"assistant","message":{"content":[{"type":"text","text":"Implementing FormatFeedback popup (screenshot text) for NoDrop/chests instead of chat, then validating the build."}]}}
+
+L1048 FormatFeedback: — backpacks currently send empty identity. Fixing that and switching rejects to FormatFeedback."}]}}
+
+L1049 FormatFeedback: es left stopped).\n\n**What changed**\n1. **NoDrop / chests** → info popup via `FormatFeedback` (same style as your screenshot), not chat:\n   - `\"You can not send nodrop items through the mail system.\"`\n   - `\"You can not send chests through the mail syst
+L1049 nodrop items: tFeedback` (same style as your screenshot), not chat:\n   - `\"You can not send nodrop items through the mail system.\"`\n   - `\"You can not send chests through the mail system.\"`\n2. **Backpacks** → inventory wire now uses `IdentityType.Container` so the li
+L1054 FormatFeedback: ,"message":{"content":[{"type":"text","text":"Capture popup is client-local (no FormatFeedback in logs). Searching inventory/mail packets for Container identity, then finishing the wire-up."}]}}
+
+L1055 FormatFeedback: text","text":"**Capture `20260715-100540`：** that popup is **client-only**. No `FormatFeedback` packet — only Mail Terminal Use. Exact text:\n\n`You can not send container items through the mail system.`\n\nThat is `Feedback_MailNoChests` when the dragged item
+L1055 container items: rmatFeedback` packet — only Mail Terminal Use. Exact text:\n\n`You can not send container items through the mail system.`\n\nThat is `Feedback_MailNoChests` when the dragged item’s inventory identity is `IdentityType.Container` (same style as NoDrop).\n\n**Wha
+L1058 container items:  FullCharacter) → drag backpack into Item.\n\nYou should get: `You can not send container items through the mail system.` and the slot should stay empty."}]}}
+
+L1062 container items:  **full relog** → drag backpack into Item. You should get:  \n`You can not send container items through the mail system.`  \nand the slot should stay empty."}]}}
+
+L1066 container items:  **N ≥ 1**  \n4. Drag backpack into Item  \n\nYou should get: `You can not send container items through the mail system.`\n\nIf the log shows **published 0**, tell me — then the backpack isn’t matching the container detector and we’ll fix detection next."}]}}
+

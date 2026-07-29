@@ -1,0 +1,442 @@
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7983556E
+                CaptureInstance = unchecked((int)0x7983556E),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3285.67676f, Y = 4.930795f, Z = 689.8245f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7983AA11
+                CaptureInstance = unchecked((int)0x7983AA11),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3365.80322f, Y = 2.11000013f, Z = 594.7955f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7983AA16
+                CaptureInstance = unchecked((int)0x7983AA16),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3356.30347f, Y = 2.955723f, Z = 604.348633f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7983AA17
+                CaptureInstance = unchecked((int)0x7983AA17),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3351.4314f, Y = 3.44252276f, Z = 599.8372f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C5E8
+                CaptureInstance = unchecked((int)0x7984C5E8),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3344.14478f, Y = 3.93772221f, Z = 644.2455f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C5F0
+                CaptureInstance = unchecked((int)0x7984C5F0),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3321.16968f, Y = 0.01f, Z = 650.7424f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C5F5
+                CaptureInstance = unchecked((int)0x7984C5F5),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3321.49976f, Y = 0.01f, Z = 676.924561f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C5FA
+                CaptureInstance = unchecked((int)0x7984C5FA),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3301.30566f, Y = 0.290517569f, Z = 694.266663f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C5FB
+                CaptureInstance = unchecked((int)0x7984C5FB),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3313.06885f, Y = 0.01f, Z = 665.6914f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C5FC
+                CaptureInstance = unchecked((int)0x7984C5FC),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3314.00854f, Y = 0.01f, Z = 708.599854f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7984C65F
+                CaptureInstance = unchecked((int)0x7984C65F),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3362.621f, Y = 5.934419f, Z = 565.1134f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 79851809
+                CaptureInstance = unchecked((int)0x79851809),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3375.66431f, Y = 2.11000013f, Z = 585.995f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 798578F7
+                CaptureInstance = unchecked((int)0x798578F7),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3364.04175f, Y = 2.11000013f, Z = 610.8309f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 79857901
+                CaptureInstance = unchecked((int)0x79857901),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3350.78687f, Y = 4.210948f, Z = 626.3588f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 79857963
+                CaptureInstance = unchecked((int)0x79857963),
+                Name = "Rollerrat",
+                Level = 5, Health = 58, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3423.55225f, Y = 2.11000013f, Z = 691.272949f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 79857D4E
+                CaptureInstance = unchecked((int)0x79857D4E),
+                Name = "Rollerrat",
+                Level = 5, Health = 58, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3392.27124f, Y = 3.01f, Z = 755.309631f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 79857F51
+                CaptureInstance = unchecked((int)0x79857F51),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3399.07422f, Y = 2.11000013f, Z = 560.7023f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 79857F5D
+                CaptureInstance = unchecked((int)0x79857F5D),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3397.174f, Y = 2.11000013f, Z = 575.0718f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985C845
+                CaptureInstance = unchecked((int)0x7985C845),
+                Name = "Rollerrat",
+                Level = 6, Health = 69, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3392.08887f, Y = 2.11000013f, Z = 680.0598f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985C972
+                CaptureInstance = unchecked((int)0x7985C972),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3369.47314f, Y = 2.407519f, Z = 672.06134f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CAE4
+                CaptureInstance = unchecked((int)0x7985CAE4),
+                Name = "Rollerrat",
+                Level = 5, Health = 58, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3417.22949f, Y = 2.11000013f, Z = 718.296631f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CAEC
+                CaptureInstance = unchecked((int)0x7985CAEC),
+                Name = "Lolly the Reet",
+                Level = 10, Health = 114, MonsterData = 30365, Scale = 95, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3360.186f, Y = 3.52684283f, Z = 620.34845f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CAEE
+                CaptureInstance = unchecked((int)0x7985CAEE),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3360.01831f, Y = 3.01150155f, Z = 699.91864f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CAFA
+                CaptureInstance = unchecked((int)0x7985CAFA),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3348.06079f, Y = 2.25192523f, Z = 694.462769f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CAFB
+                CaptureInstance = unchecked((int)0x7985CAFB),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3351.91968f, Y = 4.24259329f, Z = 658.1612f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CAFE
+                CaptureInstance = unchecked((int)0x7985CAFE),
+                Name = "Rollerrat",
+                Level = 6, Health = 69, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3379.18262f, Y = 2.17342782f, Z = 662.9322f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CB01
+                CaptureInstance = unchecked((int)0x7985CB01),
+                Name = "Desert Reet",
+                Level = 6, Health = 69, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3341.605f, Y = 3.79891f, Z = 664.03064f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CB15
+                CaptureInstance = unchecked((int)0x7985CB15),
+                Name = "Rollerrat",
+                Level = 6, Health = 69, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3431.682f, Y = 2.11000013f, Z = 664.818054f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CB18
+                CaptureInstance = unchecked((int)0x7985CB18),
+                Name = "Rollerrat",
+                Level = 6, Health = 69, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3384.95166f, Y = 1.79523718f, Z = 639.3722f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CB20
+                CaptureInstance = unchecked((int)0x7985CB20),
+                Name = "Rollerrat",
+                Level = 6, Health = 69, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3457.39575f, Y = 4.289871f, Z = 746.9633f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CB5C
+                CaptureInstance = unchecked((int)0x7985CB5C),
+                Name = "Desert Reet",
+                Level = 5, Health = 58, MonsterData = 30365, Scale = 93, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3389.78076f, Y = 2.11000013f, Z = 593.955933f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CB6C
+                CaptureInstance = unchecked((int)0x7985CB6C),
+                Name = "Greedy Desert Reet",
+                Level = 7, Health = 80, MonsterData = 30365, Scale = 130, VisualFlags = 31, HeadMesh = 0, RunSpeed = 22,
+                NpcFamily = 53, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3377.23315f, Y = 2.11000013f, Z = 570.3986f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CBA7
+                CaptureInstance = unchecked((int)0x7985CBA7),
+                Name = "Gnarl the Roller",
+                Level = 7, Health = 674, MonsterData = 17687, Scale = 200, VisualFlags = 31, HeadMesh = 0, RunSpeed = 20,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3396.06787f, Y = 2.460354f, Z = 721.5289f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },
+            new AreteNpc
+            {
+                // Capture 20260721-loralei 7985CBC1
+                CaptureInstance = unchecked((int)0x7985CBC1),
+                Name = "Rollerrat",
+                Level = 5, Health = 58, MonsterData = 17687, Scale = 125, VisualFlags = 31, HeadMesh = 0, RunSpeed = 17,
+                NpcFamily = 55, LosHeight = 0, CharacterFlags = 268964353, AppearanceValue = 0,
+                Side = 3, Breed = 6, Gender = 1, Race = 1, Fatness = 1, MovementMode = 3,
+                X = 3387.48f, Y = 3.01f, Z = 744.358f,
+                Hx = 0.0f, Hy = 0.0f, Hz = 0.0f, Hw = 1.0f,
+                Textures = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 }, new[] { 3, 0 }, new[] { 4, 0 } },
+                Meshes = null,
+            },

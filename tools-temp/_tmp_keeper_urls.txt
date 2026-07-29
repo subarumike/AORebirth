@@ -1,0 +1,10 @@
+==== events.log
+matched 0
+==== chat-dialogue.log
+matched 0
+==== system-messages.log
+matched 0
+==== packets.hex.log
+matched 0
+==== raw ascii urls/strings
+ascii matches 0

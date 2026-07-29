@@ -1,0 +1,6 @@
+PF 1419310 PAF=2 doors=26 chests=17
+PF 1419335 PAF=1 doors=27 chests=15
+PF 1419382 PAF=2 doors=12 chests=7
+player_spawn PF1419310 Cratonera @ 298.198975,5.01,115.01001
+player_spawn PF1419335 Cratonera @ 298.198975,5.01,145.01001
+player_spawn PF1419382 Cratonera @ 1.80102539,5.01,195.01001
