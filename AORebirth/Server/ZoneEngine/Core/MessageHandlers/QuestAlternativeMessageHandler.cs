@@ -133,6 +133,26 @@ namespace ZoneEngine.Core.MessageHandlers
                         zoneClient.LastGameTimeSyncUtc,
                         DateTime.UtcNow));
 
+                if (response == null
+                    || response.QuestInfos == null
+                    || response.QuestInfos.Length == 0)
+                {
+                    client.Server.Info(client, "QuestAlternative roll blocked — empty offer set");
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                "The mission terminal failed to prepare missions. No credits were deducted.")
+                        });
+                    return;
+                }
+
+                // Capture order: fee deduct feedback, then the 5-offer QuestAlternative.
+                // Never charge unless we have a non-empty roll ready to send.
                 int fee;
                 if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
                 {
@@ -151,7 +171,7 @@ namespace ZoneEngine.Core.MessageHandlers
                 client.Server.Info(
                     client,
                     "QuestAlternative roll response sent offers={0} charLvl={1} slider={2} ql={3} fee={4} terminal={5}",
-                    response.QuestInfos == null ? 0 : response.QuestInfos.Length,
+                    response.QuestInfos.Length,
                     characterLevel,
                     message.LevelSlider,
                     missionQuality,
@@ -160,7 +180,18 @@ namespace ZoneEngine.Core.MessageHandlers
             }
             catch (Exception ex)
             {
+                MissionDiagnostics.Log("ROLL-FAIL {0}", ex);
                 client.Server.Info(client, "QuestAlternative roll response failed: {0}", ex);
+                character.Send(
+                    new FormatFeedbackMessage
+                    {
+                        Identity = character.Identity,
+                        Unknown = 1,
+                        Unknown1 = 0,
+                        Unknown2 = 0,
+                        FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                            "The mission terminal failed to prepare missions. No credits were deducted.")
+                    });
             }
         }
     }

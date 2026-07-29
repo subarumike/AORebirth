@@ -333,7 +333,9 @@ namespace ZoneEngine.Core.Missions
         }
 
         /// <summary>
-        /// Fog gold 20260725-184103: Playfield2 = 1419349 with ACG D7418B.
+        /// Fog gold: Find-Person 20260725-184103 PF 1419349 / ACG D7418B;
+        /// RepairMachine 20260728-093557 PF 1441792 / ACG D79A93.
+        /// Exact gold PF id + building; remap / foreign ACG → open grey map.
         /// </summary>
         internal static int ResolveInstancePlayfieldId(ICharacter character)
         {
@@ -343,8 +345,8 @@ namespace ZoneEngine.Core.Missions
                 return InstancePlayfieldId;
             }
 
-            // Exact gold PF id + building; remap / foreign ACG → open grey map.
-            const int fogShapePf = 1419349;
+            MissionRollType objective = ResolveCharacterObjective(character);
+            int fogShapePf = objective == MissionRollType.RepairMachine ? 1441792 : 1419349;
             StampShapeSource(fogShapePf, fogShapePf);
             return fogShapePf;
         }

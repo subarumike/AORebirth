@@ -58,6 +58,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Playfields;
 
     #endregion
@@ -96,6 +97,13 @@ namespace ZoneEngine.Core.MessageHandlers
             switch (message.Action)
             {
                 case GenericCmdAction.Get:
+                    // Capture 20260728-095215: right-click PickUp Encrypted Info Capsule Terminal.
+                    if (MissionFindItemService.TryHandleWorldPickUp(client, target))
+                    {
+                        Acknowledge(client.Controller.Character, message);
+                        break;
+                    }
+
                     break;
                 case GenericCmdAction.Drop:
                     break;

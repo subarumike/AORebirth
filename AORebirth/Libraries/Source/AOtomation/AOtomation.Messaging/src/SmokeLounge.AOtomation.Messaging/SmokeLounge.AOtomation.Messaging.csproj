@@ -287,6 +287,7 @@
     <Compile Include="Messages\N3Messages\RemovePetMessage.cs" />
     <Compile Include="Messages\N3Messages\ResearchRequestMessage.cs" />
     <Compile Include="Messages\N3Messages\ResearchUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\ReloadMessage.cs" />
     <Compile Include="Messages\N3Messages\ResurrectMessage.cs" />
     <Compile Include="Messages\N3Messages\SetPosMessage.cs" />
     <Compile Include="Messages\N3Messages\SetWantedDirectionMessage.cs" />
@@ -309,6 +310,7 @@
     <Compile Include="Messages\N3Messages\StopMovingCmdMessage.cs" />
     <Compile Include="Messages\N3Messages\TeamMemberInfoMessage.cs" />
     <Compile Include="Messages\N3Messages\TeamMemberMessage.cs" />
+    <Compile Include="Messages\N3Messages\TeamInviteMessage.cs" />
     <Compile Include="Messages\N3Messages\TemplateActionMessage.cs" />
     <Compile Include="Messages\N3Messages\TradeAction.cs" />
     <Compile Include="Messages\N3Messages\TradeMessage.cs" />

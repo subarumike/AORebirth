@@ -185,9 +185,11 @@ namespace ZoneEngine.Core.Missions
             int pf = character.Playfield.Identity.Instance;
             MissionShape shape = MissionInstanceShapeCatalog.PickShape(pf, null);
             int shapePf = shape != null ? shape.CapturedPlayfieldId : pf;
-            MissionRollType objective;
-            bool repair = MissionInstanceService.TryGetStampedObjective(pf, out objective)
-                          && objective == MissionRollType.RepairMachine;
+            MissionRollType objective = MissionRollType.KillPerson;
+            bool hasObjective = MissionInstanceService.TryGetStampedObjective(pf, out objective);
+            bool repair = hasObjective && objective == MissionRollType.RepairMachine;
+            bool findItemReturn = (hasObjective && objective == MissionRollType.FindItemReturn)
+                                  || MissionFindItemService.CharacterHasActiveReturnMission(character);
 
             // Zone-in (force): anchor to shape entrance — RawCoordinates can still be outdoor.
             float px;
@@ -216,6 +218,13 @@ namespace ZoneEngine.Core.Missions
             float doorRadius = force ? ZoneInRevealRadius : WalkRevealRadius;
             int doorMax = force ? ZoneInMaxDoors : WalkMaxDoorsPerTick;
 
+            // Capture 20260728-093557: ~8 doors within ~40m of spawn (298,255); do not flood all 18.
+            if (force && (repair || shapePf == 1441792))
+            {
+                doorRadius = 40.0f;
+                doorMax = 8;
+            }
+
             if (force)
             {
                 lock (Gate)
@@ -242,6 +251,7 @@ namespace ZoneEngine.Core.Missions
                     MissionInstanceDynelCapture.CapturedCharacterInstance,
                     false,
                     repair,
+                    findItemReturn,
                     px,
                     pz,
                     doorRadius,
@@ -253,8 +263,20 @@ namespace ZoneEngine.Core.Missions
                 // Gold 184103: 8 ChestFullUpdate with enter flood for PF 1419349.
                 string[] chests = MissionInstanceDynelCapture.GetChests(shapePf);
                 string[] terminals = MissionInstanceDynelCapture.GetTerminals(shapePf);
+                if (findItemReturn)
+                {
+                    // Capture 20260728-095215: Encrypted Info Capsule is a world Terminal, not a person.
+                    terminals = MissionInstanceDynelCapture.Terminals_FindItemReturn;
+                }
+
                 float propRadius = force ? ZoneInRevealRadius : WalkRevealRadius;
                 int propMax = force ? 8 : 4;
+                if (findItemReturn && force)
+                {
+                    propRadius = 200.0f;
+                    propMax = 4;
+                }
+
                 sentNow += SendNearestPackets(
                     zoneClient,
                     character,
@@ -262,6 +284,7 @@ namespace ZoneEngine.Core.Missions
                     MissionInstanceDynelCapture.CapturedCharacterInstance,
                     true,
                     repair,
+                    findItemReturn,
                     px,
                     pz,
                     propRadius,
@@ -276,6 +299,7 @@ namespace ZoneEngine.Core.Missions
                     MissionInstanceDynelCapture.CapturedCharacterInstance,
                     false,
                     repair,
+                    findItemReturn,
                     px,
                     pz,
                     propRadius,
@@ -283,6 +307,34 @@ namespace ZoneEngine.Core.Missions
                     sent,
                     ref chestsRegistered,
                     ref machinesRegistered);
+
+                if (findItemReturn)
+                {
+                    // Do not re-spawn capsule if the player already carries it (re-enter spam).
+                    if (MissionFindItemService.CharacterAlreadyHoldingReturnItem(character))
+                    {
+                        MissionDiagnostics.Log(
+                            "FINDITEM-RETURN-SKIP-SIFU char={0} alreadyHolding=1",
+                            character.Identity.Instance);
+                    }
+                    else
+                    {
+                        // Gold 20260728-095215: capsule ~45m into the mish, not on the exit door.
+                        float sx;
+                        float sy;
+                        float sz;
+                        ResolveFindItemReturnCapsulePosition(shape, px, pz, out sx, out sy, out sz);
+                        if (MissionFindItemService.TrySendWorldCapsule(
+                            zoneClient,
+                            character,
+                            sx,
+                            sy,
+                            sz))
+                        {
+                            sentNow++;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -315,6 +367,7 @@ namespace ZoneEngine.Core.Missions
             int capturedCharacterInstance,
             bool registerChests,
             bool repairObjective,
+            bool findItemReturnObjective,
             float playerX,
             float playerZ,
             float radius,
@@ -350,17 +403,28 @@ namespace ZoneEngine.Core.Missions
                 float dx;
                 float dy;
                 float dz;
-                if (!TryParseWorldPosition(hex, out dx, out dy, out dz))
+                float distSq;
+                bool remap = false;
+                if (findItemReturnObjective && !registerChests
+                    && hex.IndexOf("C73D", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    // Hex capsule replay is superseded by TrySendWorldCapsule; skip so we do not
+                    // stack a second Terminal (or remap onto the exit door).
+                    continue;
+                }
+                else if (!TryParseWorldPosition(hex, out dx, out dy, out dz))
                 {
                     continue;
                 }
-
-                float ddx = dx - playerX;
-                float ddz = dz - playerZ;
-                float distSq = (ddx * ddx) + (ddz * ddz);
-                if (distSq > radiusSq)
+                else
                 {
-                    continue;
+                    float ddx = dx - playerX;
+                    float ddz = dz - playerZ;
+                    distSq = (ddx * ddx) + (ddz * ddz);
+                    if (distSq > radiusSq)
+                    {
+                        continue;
+                    }
                 }
 
                 candidates.Add(
@@ -368,7 +432,11 @@ namespace ZoneEngine.Core.Missions
                     {
                         Hex = hex,
                         Key = key,
-                        DistSq = distSq
+                        DistSq = distSq,
+                        RemapX = dx,
+                        RemapY = dy,
+                        RemapZ = dz,
+                        RemapPosition = remap
                     });
             }
 
@@ -391,7 +459,13 @@ namespace ZoneEngine.Core.Missions
                     MissionInstanceDoorCapture.CapturedCharacterInstance,
                     character.Identity.Instance);
                 ReplaceInstance(packet, unchecked((int)0x797E30D7), character.Identity.Instance);
+                ReplaceInstance(packet, unchecked((int)0x765A6D34), character.Identity.Instance);
                 RetargetPlayfieldIds(packet, character.Playfield.Identity.Instance);
+                if (c.RemapPosition)
+                {
+                    TryWriteWorldPosition(packet, c.RemapX, c.RemapY, c.RemapZ);
+                }
+
                 zoneClient.SendCompressed(packet);
                 lock (Gate)
                 {
@@ -402,6 +476,27 @@ namespace ZoneEngine.Core.Missions
 
                 if (!registerChests)
                 {
+                    // Capture 20260728-093557: Repair finish target is Terminal Radar Display (not Container).
+                    Identity terminal;
+                    if (TryParseTerminal(packet, out terminal))
+                    {
+                        if (repairObjective)
+                        {
+                            MissionMachineTracker.Register(terminal);
+                            machinesRegistered++;
+                        }
+
+                        if (findItemReturnObjective)
+                        {
+                            MissionFindItemService.RegisterWorldPickup(terminal);
+                            MissionDiagnostics.Log(
+                                "FINDITEM-RETURN-TERMINAL char={0} pf={1} terminal={2}",
+                                character.Identity.Instance,
+                                character.Playfield.Identity.Instance,
+                                terminal);
+                        }
+                    }
+
                     continue;
                 }
 
@@ -444,6 +539,89 @@ namespace ZoneEngine.Core.Missions
             public string Key;
 
             public float DistSq;
+
+            public float RemapX;
+
+            public float RemapY;
+
+            public float RemapZ;
+
+            public bool RemapPosition;
+        }
+
+        /// <summary>
+        /// Capture 20260728-095215: capsule ~45m into the layout from spawn, not on the exit door.
+        /// </summary>
+        private static void ResolveFindItemReturnCapsulePosition(
+            MissionShape shape,
+            float fallbackX,
+            float fallbackZ,
+            out float x,
+            out float y,
+            out float z)
+        {
+            if (shape != null)
+            {
+                x = shape.SpawnX + 45.6f;
+                y = shape.SpawnY > 0.1f ? shape.SpawnY : 5.1f;
+                z = shape.SpawnZ + 18.6f;
+                return;
+            }
+
+            x = fallbackX + 45.6f;
+            y = 5.1f;
+            z = fallbackZ + 18.6f;
+        }
+
+        private static bool TryWriteWorldPosition(byte[] packet, float x, float y, float z)
+        {
+            if (packet == null || packet.Length < 40)
+            {
+                return false;
+            }
+
+            for (int i = 0; i + 28 <= packet.Length; i++)
+            {
+                if (packet[i] != 0x00 || packet[i + 1] != 0x00 || packet[i + 2] != 0xC7
+                    || packet[i + 3] != 0x3D)
+                {
+                    continue;
+                }
+
+                // Terminal identity at i; MsgVersion (0x0000000B), owner type/instance zeros, then XYZ.
+                // Gold 20260728-095215 Encrypted Info Capsule SIFU.
+                int xyz = i + 20;
+                if (xyz + 12 > packet.Length)
+                {
+                    return false;
+                }
+
+                WriteFloatBe(packet, xyz, x);
+                WriteFloatBe(packet, xyz + 4, y);
+                WriteFloatBe(packet, xyz + 8, z);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static void WriteFloatBe(byte[] packet, int offset, float value)
+        {
+            byte[] bits = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+            {
+                packet[offset] = bits[3];
+                packet[offset + 1] = bits[2];
+                packet[offset + 2] = bits[1];
+                packet[offset + 3] = bits[0];
+            }
+            else
+            {
+                packet[offset] = bits[0];
+                packet[offset + 1] = bits[1];
+                packet[offset + 2] = bits[2];
+                packet[offset + 3] = bits[3];
+            }
         }
 
         private static bool TryParseWorldPosition(string hex, out float x, out float y, out float z)
@@ -497,6 +675,28 @@ namespace ZoneEngine.Core.Missions
             int bits = (packet[offset] << 24) | (packet[offset + 1] << 16) | (packet[offset + 2] << 8)
                        | packet[offset + 3];
             return BitConverter.ToSingle(BitConverter.GetBytes(bits), 0);
+        }
+
+        private static bool TryParseTerminal(byte[] packet, out Identity identity)
+        {
+            identity = new Identity();
+            if (packet == null || packet.Length < 20)
+            {
+                return false;
+            }
+
+            for (int i = 0; i + 8 <= packet.Length; i++)
+            {
+                if (packet[i] == 0x00 && packet[i + 1] == 0x00 && packet[i + 2] == 0xC7 && packet[i + 3] == 0x3D)
+                {
+                    int instance = (packet[i + 4] << 24) | (packet[i + 5] << 16) | (packet[i + 6] << 8)
+                                   | packet[i + 7];
+                    identity = new Identity { Type = IdentityType.Terminal, Instance = instance };
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool TryParseContainer(

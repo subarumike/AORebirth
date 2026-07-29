@@ -1162,73 +1162,225 @@ namespace ZoneEngine.Core.Controllers
 
         private static readonly Dictionary<int, Identity> PendingInvites = new Dictionary<int, Identity>();
 
+        /// <summary>inviteeInstance → (inviterInstance, utc ticks) after decline — block re-invite spam.</summary>
+        private static readonly Dictionary<int, long> DeclinedInviteUntilUtcTicks = new Dictionary<int, long>();
+
+        private static readonly TimeSpan DeclineCooldown = TimeSpan.FromSeconds(30);
+
         private static readonly Dictionary<int, List<Identity>> TeamMembers = new Dictionary<int, List<Identity>>();
 
         private static readonly Dictionary<int, int> CharacterTeams = new Dictionary<int, int>();
+
+        /// <summary>teamId → leader character instance.</summary>
+        private static readonly Dictionary<int, int> TeamLeaders = new Dictionary<int, int>();
 
         private static int nextTeamId = 1;
 
         public static bool Invite(ICharacter inviter, Identity targetIdentity)
         {
-            ICharacter target = ResolveOnlineCharacter(inviter, targetIdentity);
+            ICharacter target = FindInviteTarget(inviter, targetIdentity);
+
             if (target == null || target.Identity.Equals(inviter.Identity))
             {
-                ChatTextMessageHandler.Default.Send(inviter, "Team invite target is not available.");
+                ChatTextMessageHandler.Default.Send(
+                    inviter,
+                    "Team invite target is not available"
+                    + (targetIdentity.Instance != 0 ? " (id " + targetIdentity.Instance + ")." : "."));
                 return false;
             }
 
+            // Do NOT re-check XP window here. LFT already filters by TeamLevelRanges.
+            // A second gate false-blocked invites when levels were stale/wrong after GM set.
+            // Live client may still show TooHigh/TooLow on Recruit (GUI) — server cannot clear that.
+            // Out-of-range same-PF Recruit can still deliver a popup on private (unlike live).
+
             lock (Sync)
             {
+                Identity existingInviter;
+                if (PendingInvites.TryGetValue(target.Identity.Instance, out existingInviter)
+                    && existingInviter.Instance == inviter.Identity.Instance)
+                {
+                    // Already waiting on this invite — do not re-send popup (No then re-invite loop).
+                    ChatTextMessageHandler.Default.Send(
+                        inviter,
+                        "Team invite already pending for " + target.Name + ".");
+                    return true;
+                }
+
+                long untilTicks;
+                if (DeclinedInviteUntilUtcTicks.TryGetValue(target.Identity.Instance, out untilTicks)
+                    && DateTime.UtcNow.Ticks < untilTicks)
+                {
+                    ChatTextMessageHandler.Default.Send(
+                        inviter,
+                        target.Name + " declined recently. Wait a moment before inviting again.");
+                    return false;
+                }
+
                 PendingInvites[target.Identity.Instance] = inviter.Identity;
             }
+
+            // Cross-PF LFT: seed name/dynel on inviter BEFORE 0x1A so first click works
+            // (missing name → NoName / first click silent / second click warn).
+            if (LftInviteClientPresence.IsRemoteFrom(inviter, target)
+                || LftInviteArm.IsArmedTarget(inviter, target.Identity))
+            {
+                string armedName;
+                LftInviteArm.TryGetArmedName(inviter, target.Identity, out armedName);
+                LftInviteClientPresence.SeedForInviteLookup(inviter, target, armedName);
+            }
+
+            // Popup delivery: CA TeamRequestInvite (0x1A) works same- and cross-PF
+            // (log proved remote=True TeamInvite-only left invitee with no popup).
+            // Live captures also use TeamInvite for cross-zone name; send both.
+            // Accept is gated on Parameter2==1 only — dual wire no longer auto-joins.
+            bool remoteInvite = LftInviteClientPresence.IsRemoteFrom(inviter, target);
+            if (remoteInvite)
+            {
+                TeamInviteMessageHandler.Default.Send(target, inviter);
+            }
+
+            CharacterActionMessageHandler.Default.SendTeamInviteRequest(target, inviter);
+            CharacterActionMessageHandler.Default.SendTeamInviteAck(inviter, target);
 
             ChatTextMessageHandler.Default.Send(inviter, "Team invite sent to " + target.Name + ".");
             ChatTextMessageHandler.Default.Send(
                 target,
-                inviter.Name + " invited you to a team. Use /team accept or /team decline.");
-
+                inviter.Name + " invited you to a team. Click Yes on the invite (or /team accept).");
+            // Keep PendingInvites until Accept (live L60: TeamRequestReply 0x15 p2=1).
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 "Team invite pending inviter=" + inviter.Identity.ToString(true)
-                + " target=" + target.Identity.ToString(true));
+                + " target=" + target.Identity.ToString(true)
+                + " remote=" + remoteInvite
+                + " inviterPf="
+                + (inviter.Playfield != null ? inviter.Playfield.Identity.Instance.ToString() : "?")
+                + " targetPf="
+                + (target.Playfield != null ? target.Playfield.Identity.Instance.ToString() : "?"));
 
             return true;
         }
 
         public static bool Reply(ICharacter character, bool accept, Identity requester)
         {
-            Identity inviterIdentity;
+            Identity inviterIdentity = Identity.None;
             lock (Sync)
             {
                 if (!PendingInvites.TryGetValue(character.Identity.Instance, out inviterIdentity))
                 {
                     inviterIdentity = requester;
                 }
-
-                PendingInvites.Remove(character.Identity.Instance);
             }
 
-            if (inviterIdentity == null || inviterIdentity.Equals(Identity.None))
+            // AcceptTeamRequest / reply Target may be self; keep pending inviter when present.
+            if (inviterIdentity.Equals(Identity.None)
+                || inviterIdentity.Instance == character.Identity.Instance)
+            {
+                lock (Sync)
+                {
+                    Identity pending;
+                    if (PendingInvites.TryGetValue(character.Identity.Instance, out pending))
+                    {
+                        inviterIdentity = pending;
+                    }
+                }
+            }
+
+            // Cross-zone Accept Target is the inviter identity from the popup.
+            if ((inviterIdentity.Equals(Identity.None)
+                 || inviterIdentity.Instance == character.Identity.Instance)
+                && requester.Instance != 0
+                && requester.Instance != character.Identity.Instance)
+            {
+                inviterIdentity = new Identity
+                {
+                    Type = IdentityType.CanbeAffected,
+                    Instance = requester.Instance
+                };
+            }
+
+            if (inviterIdentity.Equals(Identity.None)
+                || inviterIdentity.Instance == character.Identity.Instance)
             {
                 ChatTextMessageHandler.Default.Send(character, "No pending team invite.");
                 return false;
             }
 
-            ICharacter inviter = ResolveOnlineCharacter(character, inviterIdentity);
+            ICharacter inviter = LftInviteClientPresence.ResolveOnlinePlayer(character, inviterIdentity)
+                                ?? ResolveOnlineCharacter(character, inviterIdentity)
+                                ?? FindOnlineCharacterByInstance(inviterIdentity.Instance);
             if (inviter == null)
             {
                 ChatTextMessageHandler.Default.Send(character, "The team inviter is no longer available.");
+                lock (Sync)
+                {
+                    PendingInvites.Remove(character.Identity.Instance);
+                }
+
                 return false;
             }
 
             if (!accept)
             {
+                lock (Sync)
+                {
+                    PendingInvites.Remove(character.Identity.Instance);
+                    DeclinedInviteUntilUtcTicks[character.Identity.Instance] =
+                        DateTime.UtcNow.Add(DeclineCooldown).Ticks;
+                }
+
+                CharacterActionMessageHandler.Default.SendTeamRequestDeclined(inviter, character);
                 ChatTextMessageHandler.Default.Send(character, "Team invite declined.");
                 ChatTextMessageHandler.Default.Send(inviter, character.Name + " declined your team invite.");
                 return true;
             }
 
+            // Already teamed (stale auto-join / double Accept): re-push roster to both clients.
+            int characterTeam;
+            int inviterTeam;
+            lock (Sync)
+            {
+                CharacterTeams.TryGetValue(character.Identity.Instance, out characterTeam);
+                CharacterTeams.TryGetValue(inviter.Identity.Instance, out inviterTeam);
+            }
+
+            if (characterTeam != 0 && characterTeam == inviterTeam)
+            {
+                List<Identity> members;
+                lock (Sync)
+                {
+                    members = TeamMembers.ContainsKey(characterTeam)
+                                  ? TeamMembers[characterTeam].ToList()
+                                  : new List<Identity>();
+                }
+
+                if (members.Count > 0)
+                {
+                    BroadcastTeamJoined(characterTeam, members, character.Identity);
+                }
+
+                lock (Sync)
+                {
+                    PendingInvites.Remove(character.Identity.Instance);
+                }
+
+                ChatTextMessageHandler.Default.Send(character, "Team roster refreshed.");
+                return true;
+            }
+
+            // Cross-zone join: InfoPacket name only (no SCFU ghosts).
+            if (LftInviteClientPresence.IsRemoteFrom(inviter, character))
+            {
+                LftInviteClientPresence.SeedNameAndLevelOnly(character, inviter, null);
+                LftInviteClientPresence.SeedNameAndLevelOnly(inviter, character, null);
+            }
+
             Join(inviter, character);
+            lock (Sync)
+            {
+                PendingInvites.Remove(character.Identity.Instance);
+            }
+
             return true;
         }
 
@@ -1258,17 +1410,71 @@ namespace ZoneEngine.Core.Controllers
             return true;
         }
 
+        /// <summary>
+        /// Disconnect / leave-game: drop from team so remaining clients clear the gray slot.
+        /// Zone transfers must not call this.
+        /// </summary>
+        public static void OnCharacterDisconnected(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            lock (Sync)
+            {
+                if (!CharacterTeams.ContainsKey(character.Identity.Instance))
+                {
+                    return;
+                }
+            }
+
+            Leave(character, notifyLeavingCharacter: false);
+        }
+
         public static bool Leave(ICharacter character)
+        {
+            return Leave(character, notifyLeavingCharacter: true);
+        }
+
+        private static bool Leave(ICharacter character, bool notifyLeavingCharacter)
         {
             int teamId;
             List<Identity> remainingMembers;
+            bool wasLeader;
             lock (Sync)
             {
                 if (!CharacterTeams.TryGetValue(character.Identity.Instance, out teamId))
                 {
-                    ChatTextMessageHandler.Default.Send(character, "You are not in a team.");
-                    return false;
+                    // Repair desync: still listed in a team roster without CharacterTeams entry.
+                    foreach (KeyValuePair<int, List<Identity>> entry in TeamMembers)
+                    {
+                        if (entry.Value != null
+                            && entry.Value.Any(x => x.Instance == character.Identity.Instance))
+                        {
+                            teamId = entry.Key;
+                            CharacterTeams[character.Identity.Instance] = teamId;
+                            break;
+                        }
+                    }
                 }
+
+                if (!CharacterTeams.TryGetValue(character.Identity.Instance, out teamId))
+                {
+                    // Client still shows a team window but server has no membership —
+                    // always clear the UI so Leave is never a dead end.
+                    ForceClearStuckTeamUi(character);
+                    if (notifyLeavingCharacter)
+                    {
+                        ChatTextMessageHandler.Default.Send(character, "Team window cleared.");
+                    }
+
+                    return true;
+                }
+
+                int leaderInstance;
+                wasLeader = TeamLeaders.TryGetValue(teamId, out leaderInstance)
+                            && leaderInstance == character.Identity.Instance;
 
                 remainingMembers = TeamMembers[teamId];
                 remainingMembers.RemoveAll(x => x.Instance == character.Identity.Instance);
@@ -1276,14 +1482,138 @@ namespace ZoneEngine.Core.Controllers
                 if (remainingMembers.Count == 0)
                 {
                     TeamMembers.Remove(teamId);
+                    TeamLeaders.Remove(teamId);
+                }
+                else if (wasLeader)
+                {
+                    TeamLeaders[teamId] = remainingMembers[0].Instance;
                 }
             }
 
-            ApplyTeamStats(character, 0, 1);
-            ChatTextMessageHandler.Default.Send(character, "You left the team.");
+            // Capture leave: TeamMemberLeft only — never re-broadcast TeamMember roster
+            // (that stacked duplicate names in the team window).
+            ApplyTeamStats(character, memberCount: 0);
+            CharacterActionMessageHandler.Default.SendTeamMemberLeft(
+                character,
+                character.Identity,
+                teamId);
+            foreach (Identity remaining in remainingMembers.ToList())
+            {
+                ICharacter member = FindOnlineCharacterByInstance(remaining.Instance)
+                                    ?? Pool.Instance.GetObject<ICharacter>(remaining);
+                if (member != null)
+                {
+                    CharacterActionMessageHandler.Default.SendTeamMemberLeft(
+                        member,
+                        character.Identity,
+                        teamId);
+                }
+            }
+
+            if (notifyLeavingCharacter)
+            {
+                ChatTextMessageHandler.Default.Send(character, "You left the team.");
+            }
+
             NotifyMembers(remainingMembers, character.Name + " left the team.");
-            UpdateTeamMemberStats(teamId);
+
+            // 2-person team: when one leaves, dissolve the last member so the UI clears.
+            if (remainingMembers.Count == 1)
+            {
+                DissolveSoloMember(remainingMembers[0], teamId);
+            }
+            else if (remainingMembers.Count > 1)
+            {
+                // Promote leader signals only — do not resend TeamMember list.
+                NotifyLeadershipStats(teamId, remainingMembers);
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// Client team window stuck after server lost CharacterTeams (zone / Yes-No bug).
+        /// </summary>
+        private static void ForceClearStuckTeamUi(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            ApplyTeamStats(character, memberCount: 0);
+            SendTeamStatSingle(character, StatIds.teamside, 0);
+            SendTeamStatSingle(character, StatIds.socialstatus, 4);
+            CharacterActionMessageHandler.Default.SendTeamMemberLeft(
+                character,
+                character.Identity,
+                0);
+        }
+
+        /// <summary>
+        /// Last member after a 2-person leave: clear their team window completely.
+        /// </summary>
+        private static void DissolveSoloMember(Identity lastMemberIdentity, int teamId)
+        {
+            lock (Sync)
+            {
+                CharacterTeams.Remove(lastMemberIdentity.Instance);
+                TeamMembers.Remove(teamId);
+                TeamLeaders.Remove(teamId);
+            }
+
+            ICharacter last = FindOnlineCharacterByInstance(lastMemberIdentity.Instance)
+                              ?? Pool.Instance.GetObject<ICharacter>(lastMemberIdentity);
+            if (last == null)
+            {
+                return;
+            }
+
+            ApplyTeamStats(last, memberCount: 0);
+            SendTeamStatSingle(last, StatIds.teamside, 0);
+            SendTeamStatSingle(last, StatIds.socialstatus, 4);
+            CharacterActionMessageHandler.Default.SendTeamMemberLeft(
+                last,
+                last.Identity,
+                teamId);
+            ChatTextMessageHandler.Default.Send(last, "Your team has been disbanded.");
+        }
+
+        /// <summary>
+        /// After a leave with 3+ remaining: update SocialStatus / AcceptTeamRequest for new leader
+        /// without re-announcing roster (avoids duplicate name rows).
+        /// </summary>
+        private static void NotifyLeadershipStats(int teamId, List<Identity> members)
+        {
+            int leaderInstance;
+            lock (Sync)
+            {
+                if (!TeamLeaders.TryGetValue(teamId, out leaderInstance) && members.Count > 0)
+                {
+                    leaderInstance = members[0].Instance;
+                    TeamLeaders[teamId] = leaderInstance;
+                }
+            }
+
+            foreach (Identity memberIdentity in members)
+            {
+                ICharacter member = Pool.Instance.GetObject<ICharacter>(memberIdentity);
+                if (member == null)
+                {
+                    continue;
+                }
+
+                bool isLeader = member.Identity.Instance == leaderInstance;
+                int social = isLeader ? 7 : 5;
+                ApplyTeamStats(member, members.Count, socialStatus: social, sendWireSingles: true);
+                SendTeamStatSingle(member, StatIds.socialstatus, social);
+                if (isLeader)
+                {
+                    CharacterActionMessageHandler.Default.SendTeamRequestReplyAck(member);
+                    CharacterActionMessageHandler.Default.SendAcceptTeamRequest(member, teamId);
+                    SendTeamStatSingle(member, StatIds.socialstatus, social);
+                }
+            }
         }
 
         /// <summary>
@@ -1333,6 +1663,14 @@ namespace ZoneEngine.Core.Controllers
                     || CharacterTeams[target.Identity.Instance] != teamId)
                 {
                     ChatTextMessageHandler.Default.Send(leader, target.Name + " is not in your team.");
+                    return false;
+                }
+
+                int leaderInstance;
+                if (!TeamLeaders.TryGetValue(teamId, out leaderInstance)
+                    || leaderInstance != leader.Identity.Instance)
+                {
+                    ChatTextMessageHandler.Default.Send(leader, "Only the team leader can kick.");
                     return false;
                 }
             }
@@ -1386,15 +1724,46 @@ namespace ZoneEngine.Core.Controllers
 
         private static void Join(ICharacter leader, ICharacter newMember)
         {
+            // Invitee must not stay on a leftover solo/ghost team from a prior leave bug.
+            int existingMemberTeam;
+            lock (Sync)
+            {
+                if (CharacterTeams.TryGetValue(newMember.Identity.Instance, out existingMemberTeam))
+                {
+                    int leaderTeam;
+                    if (!CharacterTeams.TryGetValue(leader.Identity.Instance, out leaderTeam)
+                        || existingMemberTeam != leaderTeam)
+                    {
+                        // Leave without holding Sync (Leave takes Sync itself).
+                    }
+                    else
+                    {
+                        existingMemberTeam = 0;
+                    }
+                }
+                else
+                {
+                    existingMemberTeam = 0;
+                }
+            }
+
+            if (existingMemberTeam != 0)
+            {
+                Leave(newMember, notifyLeavingCharacter: false);
+            }
+
             int teamId;
             List<Identity> members;
             lock (Sync)
             {
                 if (!CharacterTeams.TryGetValue(leader.Identity.Instance, out teamId))
                 {
-                    teamId = nextTeamId++;
+                    // Capture team ids are large TeamWindow instances (e.g. 0x0280F02A).
+                    teamId = unchecked((int)(0x02800000 + (uint)nextTeamId));
+                    nextTeamId++;
                     CharacterTeams[leader.Identity.Instance] = teamId;
                     TeamMembers[teamId] = new List<Identity> { leader.Identity };
+                    TeamLeaders[teamId] = leader.Identity.Instance;
                 }
 
                 members = TeamMembers[teamId];
@@ -1406,8 +1775,13 @@ namespace ZoneEngine.Core.Controllers
                 CharacterTeams[newMember.Identity.Instance] = teamId;
             }
 
-            UpdateTeamMemberStats(teamId);
-            NotifyMembers(members, newMember.Name + " joined the team.");
+            BroadcastTeamJoined(teamId, members.ToList(), newMember.Identity);
+            ChatTextMessageHandler.Default.Send(
+                leader,
+                newMember.Name + " has joined your team.");
+            ChatTextMessageHandler.Default.Send(
+                newMember,
+                "You joined " + leader.Name + "'s team.");
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 "Team joined teamId=" + teamId
@@ -1415,9 +1789,152 @@ namespace ZoneEngine.Core.Controllers
                 + " member=" + newMember.Identity.ToString(true));
         }
 
+        private static void BroadcastTeamJoined(
+            int teamId,
+            List<Identity> members,
+            Identity newMemberIdentity)
+        {
+            var teamIdentity = new Identity
+            {
+                Type = IdentityType.TeamWindow,
+                Instance = teamId
+            };
+
+            int leaderInstance;
+            lock (Sync)
+            {
+                if (!TeamLeaders.TryGetValue(teamId, out leaderInstance) && members.Count > 0)
+                {
+                    leaderInstance = members[0].Instance;
+                    TeamLeaders[teamId] = leaderInstance;
+                }
+            }
+
+            foreach (Identity viewerIdentity in members)
+            {
+                // Cross-PF: Pool.GetObject(identity) alone misses the other playfield.
+                ICharacter viewer = FindOnlineCharacterByInstance(viewerIdentity.Instance)
+                                   ?? LftInviteClientPresence.ResolveOnlinePlayer(null, viewerIdentity)
+                                   ?? Pool.Instance.GetObject<ICharacter>(viewerIdentity);
+                if (viewer == null)
+                {
+                    continue;
+                }
+
+                bool isLeader = viewer.Identity.Instance == leaderInstance;
+                // Capture 20260728-234012 / 20260729-003944 LFT accept:
+                //   Member: TeamSide=2 + SocialStatus=5 + TeamMember(self/others)
+                //   Leader: SocialStatus=7 + 0x15 ack + AcceptTeamRequest + TeamMembers
+                int social = isLeader ? 7 : 5;
+                ApplyTeamStats(viewer, members.Count, teamSide: 2, socialStatus: social, sendWireSingles: true);
+                SendTeamStatSingle(viewer, StatIds.teamside, 2);
+                SendTeamStatSingle(viewer, StatIds.socialstatus, social);
+
+                if (isLeader)
+                {
+                    CharacterActionMessageHandler.Default.SendTeamRequestReplyAck(viewer);
+                    SendTeamStatSingle(viewer, StatIds.socialstatus, social);
+                }
+
+                SendTeamMemberAnnounce(viewer, viewer, teamIdentity);
+
+                if (isLeader)
+                {
+                    CharacterActionMessageHandler.Default.SendAcceptTeamRequest(viewer, teamId);
+                    SendTeamStatSingle(viewer, StatIds.socialstatus, social);
+                }
+
+                foreach (Identity memberIdentity in members)
+                {
+                    if (memberIdentity.Instance == viewer.Identity.Instance)
+                    {
+                        continue;
+                    }
+
+                    ICharacter member = FindOnlineCharacterByInstance(memberIdentity.Instance)
+                                       ?? ResolveOnlineCharacter(viewer, memberIdentity)
+                                       ?? Pool.Instance.GetObject<ICharacter>(memberIdentity);
+                    if (member == null)
+                    {
+                        continue;
+                    }
+
+                    SendTeamMemberAnnounce(viewer, member, teamIdentity);
+
+                    int life = member.Stats[StatIds.life].Value;
+                    int nano = member.Stats[StatIds.maxnanoenergy].Value;
+                    if (life <= 0)
+                    {
+                        life = member.Stats[StatIds.health].Value;
+                    }
+
+                    if (life <= 0)
+                    {
+                        life = 1;
+                    }
+
+                    if (nano <= 0)
+                    {
+                        nano = member.Stats[StatIds.currentnano].Value;
+                    }
+
+                    if (nano <= 0)
+                    {
+                        nano = 469;
+                    }
+
+                    TeamMemberInfoMessageHandler.Default.Send(viewer, member.Identity, life, nano);
+                    SendTeamStatSingle(viewer, StatIds.socialstatus, social);
+                }
+            }
+        }
+
+        private static void SendTeamMemberAnnounce(ICharacter viewer, ICharacter member, Identity teamIdentity)
+        {
+            // Client XP "too high" dialog compares teammate Level from this packet.
+            // Clamp garbage / unset stats so two low-level chars never look like 60+.
+            int level = 1;
+            try
+            {
+                level = member.Stats[StatIds.level].Value;
+            }
+            catch
+            {
+                level = 1;
+            }
+
+            if (level < 1 || level > 220)
+            {
+                level = 1;
+            }
+
+            short unknown5 = 3;
+            try
+            {
+                int profession = member.Stats[StatIds.profession].Value;
+                if (profession != 0)
+                {
+                    unknown5 = (short)profession;
+                }
+            }
+            catch
+            {
+                unknown5 = 3;
+            }
+
+            TeamMemberMessageHandler.Default.Send(
+                viewer,
+                member.Identity,
+                teamIdentity,
+                member.Name,
+                level,
+                unknown5);
+        }
+
         private static void UpdateTeamMemberStats(int teamId)
         {
             List<Identity> members;
+            int leaderInstance = 0;
             lock (Sync)
             {
                 if (!TeamMembers.TryGetValue(teamId, out members))
@@ -1426,26 +1943,57 @@ namespace ZoneEngine.Core.Controllers
                 }
 
                 members = members.ToList();
+                TeamLeaders.TryGetValue(teamId, out leaderInstance);
             }
 
             int memberCount = members.Count;
             foreach (Identity memberIdentity in members)
             {
-                ICharacter member = Pool.Instance.GetObject<ICharacter>(memberIdentity);
-                if (member != null)
+                ICharacter member = Pool.Instance.GetObject<ICharacter>(memberIdentity)
+                                   ?? FindOnlineCharacterByInstance(memberIdentity.Instance);
+                if (member == null)
                 {
-                    ApplyTeamStats(member, teamId, memberCount);
+                    continue;
                 }
+
+                bool isLeader = member.Identity.Instance == leaderInstance;
+                ApplyTeamStats(member, memberCount, socialStatus: isLeader ? 7 : 5);
             }
         }
 
-        private static void ApplyTeamStats(ICharacter character, int teamId, int memberCount)
+        private static void ApplyTeamStats(
+            ICharacter character,
+            int memberCount,
+            int? teamSide = null,
+            int? socialStatus = null,
+            bool sendWireSingles = false)
         {
-            character.Stats[StatIds.team].Value = teamId;
-            character.Stats[StatIds.team].BaseValue = (uint)teamId;
+            bool inTeam = memberCount > 0;
+            int resolvedTeamSide = teamSide ?? (inTeam ? 2 : 0);
+            // Capture: members SocialStatus=5, leader SocialStatus=7; leave → 4.
+            int social = socialStatus ?? (inTeam ? 5 : 4);
+            // Do not put TeamWindow id into StatIds.team, and do not send stat 6 on join.
             character.Stats[StatIds.numberofteammembers].Value = memberCount;
             character.Stats[StatIds.numberofteammembers].BaseValue = (uint)memberCount;
-            character.Controller.SendChangedStats();
+            character.Stats[StatIds.teamside].Value = resolvedTeamSide;
+            character.Stats[StatIds.teamside].BaseValue = (uint)resolvedTeamSide;
+            character.Stats[StatIds.socialstatus].Value = social;
+            character.Stats[StatIds.socialstatus].BaseValue = (uint)social;
+            if (sendWireSingles)
+            {
+                SendTeamStatSingle(character, StatIds.socialstatus, social);
+            }
+            else
+            {
+                character.Controller.SendChangedStats();
+            }
+        }
+
+        private static void SendTeamStatSingle(ICharacter character, StatIds statId, int value)
+        {
+            character.Stats[statId].Value = value;
+            character.Stats[statId].BaseValue = (uint)value;
+            StatMessageHandler.Default.SendSingle(character, (int)statId, (uint)value);
         }
 
         private static void NotifyMembers(List<Identity> members, string text)
@@ -1465,15 +2013,95 @@ namespace ZoneEngine.Core.Controllers
             }
         }
 
-        private static ICharacter ResolveOnlineCharacter(ICharacter reference, Identity identity)
+        private static ICharacter FindInviteTarget(ICharacter inviter, Identity targetIdentity)
         {
-            if (reference == null || reference.Playfield == null || identity == null)
+            if (targetIdentity.Instance == 0)
             {
                 return null;
             }
 
-            return Pool.Instance.GetObject<ICharacter>(reference.Playfield.Identity, identity)
-                   ?? Pool.Instance.GetObject<ICharacter>(identity);
+            ICharacter target = FindOnlineCharacterByInstance(targetIdentity.Instance);
+            if (target != null)
+            {
+                return target;
+            }
+
+            var typed = new Identity
+            {
+                Type = IdentityType.CanbeAffected,
+                Instance = targetIdentity.Instance
+            };
+
+            // Same lookup ZoneServer uses for chat commands (cross-playfield).
+            target = Pool.Instance.GetObject<ICharacter>(typed);
+            if (target != null)
+            {
+                return target;
+            }
+
+            return ResolveOnlineCharacter(inviter, typed);
+        }
+
+        private static ICharacter ResolveOnlineCharacter(ICharacter reference, Identity identity)
+        {
+            if (reference == null || identity.Instance == 0)
+            {
+                return null;
+            }
+
+            if (reference.Playfield != null)
+            {
+                ICharacter samePf = Pool.Instance.GetObject<ICharacter>(
+                    reference.Playfield.Identity,
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = identity.Instance
+                    });
+                if (samePf != null)
+                {
+                    return samePf;
+                }
+            }
+
+            return FindOnlineCharacterByInstance(identity.Instance);
+        }
+
+        private static ICharacter FindOnlineCharacterByInstance(int instance)
+        {
+            if (instance == 0)
+            {
+                return null;
+            }
+
+            uint want = unchecked((uint)instance);
+
+            // All playfields, any player with a client — required for LFT cross-zone invites.
+            foreach (ICharacter candidate in Pool.Instance.GetAll<ICharacter>((int)IdentityType.CanbeAffected))
+            {
+                if (candidate == null || candidate.Identity.Instance == 0)
+                {
+                    continue;
+                }
+
+                if (unchecked((uint)candidate.Identity.Instance) != want)
+                {
+                    continue;
+                }
+
+                if (candidate.Controller is PlayerController)
+                {
+                    return candidate;
+                }
+
+                if (candidate.Controller != null && candidate.Controller.Client != null)
+                {
+                    return candidate;
+                }
+            }
+
+            return Pool.Instance.GetObject<ICharacter>(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = instance });
         }
 
         private static ICharacter FindOnlineCharacterByName(ICharacter reference, string name)

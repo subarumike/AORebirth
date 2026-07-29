@@ -6,6 +6,7 @@ namespace ZoneEngine.Core.Missions
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Exceptions;
     using AORebirth.Core.NPCHandler;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Textures;
@@ -150,8 +151,7 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 Identity runtimeIdentity = ToIdentity(npcState.RuntimeIdentity);
-                ICharacter existing =
-                    Pool.Instance.GetObject<ICharacter>(playfield.Identity, runtimeIdentity);
+                ICharacter existing = TryGetExistingNpc(playfield, runtimeIdentity);
                 if (existing != null)
                 {
                     continue;
@@ -1031,6 +1031,29 @@ namespace ZoneEngine.Core.Missions
                     state.Heading.Y,
                     state.Heading.Z,
                     state.Heading.W);
+        }
+
+        private static ICharacter TryGetExistingNpc(Playfield playfield, Identity runtimeIdentity)
+        {
+            if (playfield == null || runtimeIdentity.Instance == 0)
+            {
+                return null;
+            }
+
+            // During Playfield construction the parent is often not in Pool yet —
+            // Pool.GetObject(parent, ...) throws ParentNotInPoolException and aborts entry.
+            try
+            {
+                return Pool.Instance.GetObject<ICharacter>(playfield.Identity, runtimeIdentity);
+            }
+            catch (ParentNotInPoolException)
+            {
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private static MissionAcgNpcSlotRecord FindNpcSlot(

@@ -18,6 +18,7 @@
 - Protect the context window: avoid command spam, large logs, repeated searches, and noisy transcripts.
 - Never launch the AO game/client unless Mike explicitly instructs it in the current task.
 - For AOSharp live capture startup, use only the approved `cmd.exe` wrapper documented in `docs/ai/WORKFLOW.md`.
+- For mission-terminal / mission-lifecycle capture **analyze and implement**, ALWAYS run `C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe "<capture-folder>"` first (see `docs/ai/WORKFLOW.md`). Ground implementation in its `mission-flow.replay.log`. Do not start with ad-hoc log greps or other analyzers.
 - Report files inspected.
 - Report files changed.
 - Report validation performed.

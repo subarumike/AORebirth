@@ -421,12 +421,25 @@ namespace ZoneEngine.Core
             if (client != null)
             {
                 // Same post-FullCharacter bar wire used on login (SK path at 200-219).
+                // NOTE: SyncXpBarStatsOnLogin skips NewLevelMessage for shadowlevels (200+).
+                // Team Recruit XP warn uses Level from NewLevel — without it, UI can show 200
+                // while Recruit still treats the old level (200→25 = silent; 25→200 = warn).
                 SyncXpBarStatsOnLogin(character);
+                SendManualLevelNewLevelMessage(client, character, level);
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.level, (uint)level);
+                StatMessageHandler.Default.AnnounceSingle(character, (int)StatIds.level, (uint)level);
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.life, (uint)maxLife);
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.health, (uint)maxLife);
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.maxnanoenergy, (uint)maxNano);
                 StatMessageHandler.Default.SendSingle(character, (int)StatIds.currentnano, (uint)maxNano);
+                try
+                {
+                    Packets.SimpleCharFullUpdate.SendToPlayfield(client);
+                }
+                catch
+                {
+                    // SCFU refresh is best-effort so nearby clients see the new Level.
+                }
             }
 
             ClearManualXpWireStatChangedFlags(character, true);
@@ -441,6 +454,56 @@ namespace ZoneEngine.Core
                 + " nextSk=" + _ns.ToString(CultureInfo.InvariantCulture)
                 + " sk=" + NormalizeStatValue(character.Stats[StatIds.sk].BaseValue)
                     .ToString(CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// GM <c>/set level</c> must always push one <see cref="NewLevelMessage"/> even at 200+,
+        /// because <see cref="SendLoginXpBarSync"/> skips NewLevel on the SK path.
+        /// </summary>
+        private static void SendManualLevelNewLevelMessage(
+            IZoneClient client,
+            ICharacter character,
+            int level)
+        {
+            if (client == null || character == null || level < 1)
+            {
+                return;
+            }
+
+            uint floorXp = GetCumulativeXpForLevelStart(Math.Min(level, MaxRubikaLevel));
+            uint cumulativeXp = NormalizeStatValue(character.Stats[StatIds.xp].BaseValue);
+            if (level >= ShadowLevelFloor)
+            {
+                cumulativeXp = GetCumulativeXpForLevelStart(MaxRubikaLevel);
+            }
+
+            uint nextLevelCumulative = level >= MaxRubikaLevel
+                ? 0
+                : GetCumulativeXpForLevelStart(level + 1);
+
+            var newLevelMessage = new NewLevelMessage
+                                  {
+                                      Identity = character.Identity,
+                                      Unknown = 0,
+                                      Level = level,
+                                      Ip = Math.Max(0, character.Stats[StatIds.ip].Value),
+                                      Xp = (int)cumulativeXp,
+                                      LastSaveXp = (int)floorXp,
+                                      NextLevelXp = (int)nextLevelCumulative,
+                                      Unknown1 = 0,
+                                      Unknown2 = CapturedNewLevelUnknown2,
+                                      LastXp = Math.Max(0, character.Stats[StatIds.lastxp].Value)
+                                  };
+            LogXpWireNewLevel(
+                "CombatXpRuntimeService",
+                "gm-level-set-newlevel",
+                character,
+                newLevelMessage);
+            client.SendCompressed(newLevelMessage);
+            LogXpTrace(
+                character,
+                "gm-level-set-newlevel",
+                "level=" + level.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>

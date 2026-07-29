@@ -16,7 +16,7 @@ namespace ZoneEngine.Core.Missions
 
     /// <summary>
     /// Tracks trash kills inside a mission instance for Clan/Omni token chance only.
-    /// Each trash kill raises chance by 100/totalTrash percent; token grants require 100%.
+    /// Each trash kill raises chance by 100/totalTrash percent; token grants require &gt;=86%.
     /// Token % never gates the rolled mission ItemRewards / cash / XP — those pay on objective complete.
     /// </summary>
     internal static class MissionTokenProgressTracker
@@ -255,7 +255,8 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
-                return session.Percent >= 100;
+                // Mike rule / plan Phase 5: grant at >=86% trash clear (not only 100%).
+                return session.Percent >= 86;
             }
         }
 

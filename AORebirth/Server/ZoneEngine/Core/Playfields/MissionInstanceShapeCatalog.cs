@@ -2292,6 +2292,15 @@ namespace AORebirth.Core.Playfields
                 },
             }
         },
+
+        // Shape playfield 1441792 from capture 20260728-093557 (RepairMachine fog ACG D79A93).
+        // NPCs deferred to Phase 2 (SCFU HP/textures from same capture).
+        new MissionShape
+        {
+            CapturedPlayfieldId = 1441792,
+            SpawnX = 298.199f, SpawnY = 5.010f, SpawnZ = 255.010f,
+            Npcs = new MissionNpc[0],
+        },
         };
 
         internal static MissionShape PickShape(int playfieldInstance, Random rng)
@@ -2544,6 +2553,30 @@ namespace AORebirth.Core.Playfields
                        0x07, 0x10, 0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                        0xFF, 0xFF, 0xFF,
                     };
+                case 1441792:
+                    // Fog gold ACG D79A93 — capture 20260728-093557.
+                    return new byte[]
+                    {
+                       0x00, 0x00, 0xC7, 0x9F, 0x00, 0xD7, 0x9A, 0x93,
+                       0x00, 0x00, 0x00, 0x02, 0x00, 0x03, 0x00, 0x1E,
+                       0x00, 0x1E, 0x00, 0x40, 0x00, 0x00, 0x01, 0x44,
+                       0x64, 0x64, 0x64, 0x00, 0x00, 0x00, 0x12, 0x00,
+                       0x2B, 0x00, 0x1D, 0x04, 0x02, 0x00, 0x33, 0x00,
+                       0x1A, 0x02, 0x03, 0x00, 0x0E, 0x00, 0x19, 0x01,
+                       0x03, 0x00, 0x12, 0x00, 0x1C, 0x05, 0x03, 0x00,
+                       0x01, 0x00, 0x18, 0x04, 0x03, 0x00, 0x06, 0x00,
+                       0x19, 0x02, 0x03, 0x00, 0x05, 0x00, 0x18, 0x01,
+                       0x03, 0x00, 0x06, 0x00, 0x1B, 0x01, 0x01, 0x00,
+                       0x25, 0x00, 0x1C, 0x07, 0x00, 0x00, 0x17, 0x00,
+                       0x18, 0x07, 0x02, 0x00, 0x05, 0x00, 0x18, 0x03,
+                       0x00, 0x00, 0x0D, 0x00, 0x19, 0x07, 0x02, 0x00,
+                       0x0D, 0x00, 0x19, 0x03, 0x00, 0x00, 0x0A, 0x00,
+                       0x1A, 0x07, 0x02, 0x00, 0x0A, 0x00, 0x1A, 0x03,
+                       0x00, 0x00, 0x25, 0x00, 0x1B, 0x06, 0x03, 0x00,
+                       0x25, 0x00, 0x1B, 0x05, 0x03, 0x00, 0x05, 0x00,
+                       0x17, 0x04, 0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                       0xFF, 0xFF, 0xFF,
+                    };
                 default:
                     return null;
             }
@@ -2607,13 +2640,14 @@ namespace AORebirth.Core.Playfields
             new LootDrop { MonsterData = 26113, LowId = 122123, HighId = 122123, Quality = 1 },
         };
 
-        // QuestAlternative FindItem templates from capture 20260719-Rolling different mishes:
-        // Radioactive Isotope Container (FindItemA) / Encrypted Info Capsule (FindItemB).
+        // QuestAlternative FindItem templates:
+        // Radioactive Isotope Container (FindItem keep) / Encrypted Info Capsule (FindItemReturn).
+        // Capture 20260728-095215: return capsule world Terminal StaticInstance=100361.
         internal static readonly LootDrop FindItemA =
             new LootDrop { MonsterData = 0, LowId = 100010, HighId = 100010, Quality = 1 };
 
         internal static readonly LootDrop FindItemB =
-            new LootDrop { MonsterData = 0, LowId = 165839, HighId = 165840, Quality = 1 };
+            new LootDrop { MonsterData = 0, LowId = 100361, HighId = 100361, Quality = 1 };
 
         internal static LootDrop ResolveFindItemDrop(int salt)
         {

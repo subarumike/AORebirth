@@ -130,6 +130,12 @@ namespace ChatEngine
                 case 120:
                     new ChatCommand().Read(client, packet);
                     break;
+                case 1500:
+                    LftRegister.Read(client, packet);
+                    break;
+                case 1502:
+                    LftSearch.Read(client, packet);
+                    break;
                 default:
                     client.Server.Warning(client, "Client sent unknown message {0}", messageNumber.ToString());
                     return false;

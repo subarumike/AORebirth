@@ -1,0 +1,293 @@
+{
+  "Identity": {
+    "Id": "arete-leonora-marty-dialogue-20260725-credit-card",
+    "Version": "captured-leonora-dialog-20260725-credit-card",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260725-credit-card"
+  },
+  "SourceCaptures": [
+    "20260725-credit-card"
+  ],
+  "Npcs": [
+    {
+      "Id": "leonora-marty",
+      "NpcIdentity": "SimpleChar:78E0FC74",
+      "Name": "Leonora Marty",
+      "RootNodeId": "leonora_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC74)"
+      ],
+      "Nodes": [
+        {
+          "Id": "leonora_001",
+          "PromptText": "How could I be so stupid...\n\nOh hello there, I'm having a really bad day... What do you want?",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:18:26.046",
+          "Options": [
+            {
+              "Id": "leonora_001_option_0",
+              "Index": 0,
+              "Text": "I have a few questions...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:26.0739257Z",
+              "NextNodeId": "leonora_questions",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:26.0739257Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_001_with_card",
+          "PromptText": "How could I be so stupid...\n\nOh hello there, I'm having a really bad day... What do you want?",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:20:19.702 (with card in inventory)",
+          "Options": [
+            {
+              "Id": "leonora_001_with_card_option_0",
+              "Index": 0,
+              "Text": "I am here to make your day brighter. I have found your credit card!",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:20:19.7038597Z",
+              "NextNodeId": "leonora_hand_over",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_001_with_card_option_1",
+              "Index": 1,
+              "Text": "I have a few questions...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:20:19.7038597Z",
+              "NextNodeId": "leonora_questions",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_001_with_card_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:20:19.7038597Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_001_with_card_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_questions",
+          "PromptText": "What do you want to know?",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:18:28.271",
+          "Options": [
+            {
+              "Id": "leonora_questions_option_0",
+              "Index": 0,
+              "Text": "Why do you hang around here?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:28.2725688Z",
+              "NextNodeId": "leonora_shopping",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_questions_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:28.2725688Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_questions_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_shopping",
+          "PromptText": "I love shopping! Shopping is my life... Don't you like shopping?",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:18:30.216",
+          "Options": [
+            {
+              "Id": "leonora_shopping_option_0",
+              "Index": 0,
+              "Text": "I do!",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:30.2243650Z",
+              "NextNodeId": "leonora_like_you",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_shopping_option_1",
+              "Index": 1,
+              "Text": "I just buy what I need..",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:30.2243650Z",
+              "NextNodeId": "leonora_boring",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_shopping_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:30.2243650Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_shopping_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_like_you",
+          "PromptText": "I like you. Maybe we should go shopping together some time. But right now I have some stuff to pick up! See you around.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:18:34.023",
+          "Options": [
+            {
+              "Id": "leonora_like_you_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:34.0230229Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_like_you_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_boring",
+          "PromptText": "How boring.. I guess we don't have much to talk about.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:18:49.354",
+          "Options": [
+            {
+              "Id": "leonora_boring_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:18:49.3549054Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_boring_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_hand_over",
+          "PromptText": "Really? Hand it over!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:20:23.684 then StartTrade",
+          "Options": [
+            {
+              "Id": "leonora_hand_over_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → thank you",
+              "NextNodeId": "leonora_thanks",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_thanks",
+          "PromptText": "Thank you so much. I really hope that the vendor still have the t-shirt I wanted!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:20:28.774",
+          "Options": [
+            {
+              "Id": "leonora_thanks_option_0",
+              "Index": 0,
+              "Text": "You are welcome.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:20:28.7742647Z",
+              "NextNodeId": "leonora_shopping_again",
+              "Actions": []
+            },
+            {
+              "Id": "leonora_thanks_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:20:28.7742647Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_thanks_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_shopping_again",
+          "PromptText": "Finally I can go shopping again!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:20:32.379",
+          "Options": [
+            {
+              "Id": "leonora_shopping_again_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:20:32.3790423Z",
+              "NextNodeId": "leonora_close",
+              "Actions": [
+                {
+                  "Id": "leonora_shopping_again_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "leonora_close",
+          "PromptText": "Don't leave your belongings unattended around here.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-credit-card 20:18:37.658",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "leonora_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Safe close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

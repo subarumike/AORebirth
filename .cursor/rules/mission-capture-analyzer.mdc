@@ -1,0 +1,22 @@
+---
+description: Always use AOSharpMissionCaptureAnalyzer for mission analyze and implement
+alwaysApply: true
+---
+
+# Mission Capture Analyzer (MANDATORY)
+
+For mission analyze **and** mission implement work, ALWAYS use this tool:
+
+```cmd
+cmd /d /c tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe "<capture-folder>"
+```
+
+Absolute path:
+`C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe`
+
+Rules:
+
+- When Mike provides a mission / mission-terminal / mission-lifecycle capture, run this exe **first**.
+- Ground implementation in `mission-flow.replay.log` from that run (and `mission-flow.replay.errors.log` if errors &gt; 0).
+- Do not substitute ad-hoc Python scripts, `events.log` greps, geometry `AOSharpCaptureAnalyzer`, or legacy mission decoders as the first step.
+- Rebuild only if the exe is missing or fails; build command is in `docs/ai/WORKFLOW.md`.

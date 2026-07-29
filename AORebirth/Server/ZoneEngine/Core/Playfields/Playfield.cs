@@ -3414,17 +3414,16 @@ namespace AORebirth.Core.Playfields
                 && MissionAcgOperationalRuntime.IsOperationalNpc(
                     this.Identity.Instance,
                     target.Identity);
-            if (operationalMissionNpc)
-            {
-                // The finalized mission captures do not prove corpse contents. Stage 5 keeps
-                // these outcomes explicitly unresolved-empty instead of invoking generic drops.
-                lootItems.Clear();
-            }
+            bool missionInteriorLoot =
+                target != null
+                && (operationalMissionNpc
+                    || ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                        this.Identity.Instance));
 
             // Capture-backed mission interior drops (20260719-5-different-shape-fo-mish).
-            if (!operationalMissionNpc
-                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(this.Identity.Instance)
-                && target != null)
+            // ACG operational trash uses the same credits/sparse-item path — empty
+            // lifetimeSeconds=0 corpses despawn instantly and crash the client on kill.
+            if (missionInteriorLoot)
             {
                 if (ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsFindItemHost(target.Identity))
                 {
@@ -3559,13 +3558,10 @@ namespace AORebirth.Core.Playfields
                     }
                 }
             }
-            int credits = operationalMissionNpc ? 0 : generatedLoot.Credits;
+            int credits = generatedLoot.Credits;
             // Capture 20260725-185432 mission trash corpses: credits 21–87 even when Items empty.
-            if (!operationalMissionNpc
-                && credits <= 0
-                && ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
-                    this.Identity.Instance)
-                && target != null)
+            // ACG operational NPCs previously forced credits=0 → Empty + instant despawn.
+            if (credits <= 0 && missionInteriorLoot && target != null)
             {
                 int salt = unchecked(target.Identity.Instance * 131) ^ this.Identity.Instance;
                 credits = 20 + (Math.Abs(salt) % 68);
@@ -3619,8 +3615,7 @@ namespace AORebirth.Core.Playfields
                 Credits = credits,
                 GenerationResult = generatedLoot,
                 LootUnresolved =
-                    operationalMissionNpc
-                    || generatedLoot.LootUnresolved
+                    generatedLoot.LootUnresolved
                     || generatedLoot.CreditsUnresolved,
                 RightsPolicy = CorpseLootRightsPolicy.Public,
                 InventoryHandle = this.AllocateCorpseInventoryHandle(),

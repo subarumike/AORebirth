@@ -1903,12 +1903,6 @@ namespace ZoneEngine.Core
                     return true;
                 }
 
-                if (toPlacement == (int)WeaponSlots.Righthand
-                    || toPlacement == (int)WeaponSlots.LeftHand)
-                {
-                    WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);
-                }
-
                 if (itemTo != null)
                 {
                     if (affectsAppearance)
@@ -1944,6 +1938,15 @@ namespace ZoneEngine.Core
                     ackSourceContainer,
                     ackTargetPlacement);
                 Equip.Send(client, receivingPage, toPlacement);
+
+                // WIFU must follow the hand move. Sending before Equip used the bag slot in Unknown2,
+                // so the client never treated the gun as worn and hid Actions→Reload.
+                if (toPlacement == (int)WeaponSlots.Righthand
+                    || toPlacement == (int)WeaponSlots.LeftHand)
+                {
+                    WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);
+                }
+
                 if (VehicleHudWearRuntime.IsVehicleItem(itemFrom))
                 {
                     // Save prior MonsterScale/morph before OnWear ChangeVariable/MonsterShape.
@@ -2263,6 +2266,8 @@ namespace ZoneEngine.Core
 
         /// <summary>
         /// Normalize unequip/equip destination when the client sent a page marker or an occupied slot.
+        /// Weapon/armor/implant concrete slots must HotSwap when occupied — never spill to Hud1
+        /// via FindFreeSlot (RH occupied + r-click wield was parking the new weapon on Hud1).
         /// </summary>
         private int ResolveConcreteTargetSlot(IInventoryPage receivingPage, int requestedPlacement)
         {
@@ -2280,6 +2285,12 @@ namespace ZoneEngine.Core
 
             if (!isPageMarker)
             {
+                // Equipment pages: honor the client's exact slot so occupied RH/LH HotSwap.
+                if (receivingPage is IEquipmentPage)
+                {
+                    return requestedPlacement;
+                }
+
                 try
                 {
                     if (receivingPage[requestedPlacement] == null)

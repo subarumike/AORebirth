@@ -47,12 +47,12 @@ namespace ZoneEngine.Core.Missions
 
         private const byte MissionKeyOverflowSlot = 0x6F;
 
-        // Accept-grant repair kits (capture 20260724-134055): StaticInstance varies per accept among
-        // 100292 / 100299 / 100344 / 100349 / 100361, ACGItemLevel=1, Flags=0x80000003.
-        // Fall back to Hacker Tool / Bomb tools when none of those templates exist in items.dat.
+        // Accept-grant repair kits (capture 20260724-134055 / 20260728-093557): StaticInstance varies
+        // per accept among 100292 / 100299 / 100344 / 100348 / 100349 / 100361, ACGItemLevel=1,
+        // Flags=0x80000003. Fall back to Hacker Tool / Bomb tools when none exist in items.dat.
         private static readonly int[] RepairItemCaptureIds =
             {
-                100292, 100299, 100344, 100349, 100361
+                100292, 100299, 100344, 100348, 100349, 100361
             };
 
         private const int RepairItemHackerLowId = 87810;

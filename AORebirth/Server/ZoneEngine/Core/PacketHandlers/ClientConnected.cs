@@ -53,6 +53,7 @@ namespace ZoneEngine.Core.PacketHandlers
     using ZoneEngine.Core.MessageHandlers;
     using ZoneEngine.Core.Missions;
     using ZoneEngine.Core.Packets;
+    using ZoneEngine;
     using ZoneEngine.Core.Perks;
     using ZoneEngine.Core.Playfields;
     using ZoneEngine.Script;
@@ -412,6 +413,19 @@ client.Controller.Character.Playfield.Identity,
             client.PacketSequencing.CompleteSessionInitialization(
                 client.SessionLifecycle.CompleteInPlayForSessionInit);
             client.Controller.Character.DoNotDoTimers = false;
+
+            // Do NOT ExchangeOnlinePresence / SCFU-seed remotes here — that spawned
+            // visible doubles of the same players in both zones.
+            if (Program.ISComClient != null && client.Controller.Character.Playfield != null)
+            {
+                Program.ISComClient.Send(
+                    new AORebirth.Communication.Messages.ChatCommand
+                    {
+                        CharacterId = client.Controller.Character.Identity.Instance,
+                        ChatCommandString =
+                            "#aorebirth-pf " + client.Controller.Character.Playfield.Identity.Instance
+                    });
+            }
         }
 
         private static void CompleteDeathRespawnCharInPlay(ZoneClient client)
