@@ -327,6 +327,16 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            string missionSpatialFailure;
+            if (!ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.TryValidateCombatPair(
+                attacker,
+                target,
+                out missionSpatialFailure))
+            {
+                this.playfield.ClearInvalidNpcCombatTarget(attacker);
+                return;
+            }
+
             DateTime pendingAttackStart;
             if (this.pendingCapturedAttackStarts.TryGetValue(
                     attacker.Identity.Instance,

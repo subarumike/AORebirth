@@ -610,16 +610,146 @@ or loot is rerolled. Completion, abandonment, and expiry persist Stage 5
 cleanup, remove only that PF2's NPC/combat/corpse/container ownership, delete
 its operational sidecar, and leave PF2 release with the Stage 2 lifecycle.
 
-## Deferred Stage 6 behavior
+## Stage 6 capture-backed interior spatial authority
+
+Stage 6 adds one `MissionAcgSpatialRuntime` ownership layer:
+
+```text
+allocated live PF2
+  -> active MissionAcgInstanceBinding
+  -> exact immutable MissionAcgLayoutBundle
+  -> exact instance runtime identity
+  -> spatial decision
+```
+
+It never resolves by newest mission, mission type, captured PF2, building
+identity alone, template, or cross-playfield proximity.
+
+### Captured spatial envelope
+
+Each selectable bundle derives an axis-aligned envelope from its immutable
+captured interior spawn, exit, every extracted dynel, every NPC slot, and every
+objective slot. Derivation requires at least three distinct finite captured
+coordinates. Missing, null, NaN, infinite, or insufficient coordinates make
+that bundle spatially non-operational without changing its evidence
+selectability.
+
+The envelope expands each minimum and maximum by exactly `2.0` coordinate
+units. This is a bounded deterministic Rebirth tolerance for ordinary client
+coordinate variance at a captured boundary. It is not a wall thickness,
+interaction range, room polygon, floor, corridor, connectivity edge, or
+navigation clearance. The envelope is rebuilt from the selected bundle and is
+not persisted. All five selectable bundles derive finite envelopes; incomplete
+shape `1441804` remains nonselectable and spatially non-operational.
+
+An axis-aligned envelope can reject non-finite and obviously out-of-layout
+positions. It cannot prove that a point between captured extrema is walkable.
+No opaque `C79F` bytes are interpreted.
+
+### Player movement and recovery
+
+`CharDCMove` validates a mission player before `Controller.Move` accepts the
+coordinate. The authority requires the exact owner, allocated PF2, active
+lifecycle, finite coordinate, and membership in that bundle's envelope.
+Rejected movement is broadcast at the last accepted exact-mission position, or
+the captured interior spawn when no prior accepted position exists. It does not
+disconnect the player.
+
+The current server has no authenticated player-speed or packet-time movement
+policy that can safely distinguish a fast legal move from an in-envelope
+teleport. Stage 6 therefore does not invent a speed constant. The maximum
+accepted delta is bounded by the complete derived envelope; production movement
+semantics remain otherwise unchanged.
+
+The last accepted position is kept in memory. A durable checkpoint is written
+after `2.0` coordinate units or five seconds, and is always flushed before a
+validated exit. A crash can therefore restore a position up to one checkpoint
+old, but never a position from another accepted mission or PF2.
+
+### Interaction, exit, and door authority
+
+Doors, chests, mission terminals, static objectives, repair machines, Find
+Person actors, and exits use the same central validation. Each use requires the
+exact accepted binding, owner, allocated PF2, mapped runtime identity, captured
+slot, active registration, finite player/target coordinates, envelope
+membership, and the existing production melee interaction limit of `8.0`.
+Objective contracts still add their Stage 4 item, terminal, component, machine,
+template, and lifecycle requirements.
+
+Door topology is not inferred. Stage 3 remains the durable open/closed-state
+owner. Stage 6 adds only exact identity and range authority. Exit use resolves
+the exact captured exit and exterior destination from the binding, flushes the
+position checkpoint, and does not complete the mission.
+
+### Combat, LOS, and NPC movement
+
+Player attack start, special damage, repeating player damage, NPC aggro, NPC
+combat ticks, and NPC damage require both participants to share the exact
+active PF2. One participant must be the bound owner and the other an exact
+operational mission NPC. Both coordinates must be finite and inside the same
+envelope. Stale, cleaned, expired, cross-instance, cross-PF2, and passive Find
+Person combat remains rejected. Existing production combat range remains
+authoritative.
+
+No collision geometry is registered for allocated generated-mission PF2s.
+Stage 6 therefore distinguishes:
+
+- range-and-ownership operations, which may proceed without claiming clear
+  LOS; and
+- operations that require authoritative geometry, which return explicit
+  `UnresolvedGeometryUnavailable` and fail closed.
+
+Distance is never described as clear LOS. PF127 collision data is not reused
+for generated interiors.
+
+The production chase system requires a supported navigation owner or otherwise
+falls back to direct following. That fallback is unsafe inside opaque ACG
+interiors. Generated mission NPCs therefore remain at their captured slots,
+stop follow/pursuit state, and attack only when existing production range
+permits. If an NPC is observed outside its envelope it is restored to its exact
+captured slot before further combat. There is no random roaming, waypoint
+inference, room traversal, or pathfinding claim.
+
+### Durable spatial state and cleanup
+
+Version-1 sidecars under `mission-state/acg-spatial` contain only:
+
+- accepted quest, owner, allocated live PF2, bundle ID and payload hash;
+- building identity;
+- whether a last valid player position exists and that exact position;
+- cleanup state and UTC update time; and
+- SHA-256 over deterministic UTF-8 `key=value` fields.
+
+Writes use same-directory temporary files, strict readback, and atomic
+replacement. Unknown versions, truncation, malformed floats, integrity
+mismatch, binding mismatch, bundle mismatch, building mismatch, PF2 mismatch,
+or an out-of-envelope restored position fail closed. Stage 2 binding format 2,
+Stage 3 runtime format 1, Stage 4 objective format 1, and Stage 5 operational
+format 1 remain unchanged and readable; no migration rewrites those records.
+
+Startup restores binding/PF2 ownership, Stage 3 materialization, Stage 4
+objective state, Stage 5 operational state, then Stage 6 spatial state.
+Completion, abandonment, expiry, and cleanup delete only the exact mission's
+spatial registration and sidecar. The envelope is never serialized or rerolled.
+
+Thirty-one focused Stage 6 tests cover deterministic bounds, finite and
+insufficient evidence, tolerance, layout isolation, explicit LOS policy,
+versioned persistence, SHA-256 rejection, exact identity/PF2 restoration,
+cleanup state, shared-PF exclusion, and source-level integration guardrails for
+movement, interaction, combat, stationary pursuit, startup, entry, and exit.
+
+## Deferred Stage 7 behavior
 
 The following work remains intentionally deferred:
 
+- obtain directly supported generated-interior collision or room geometry
+  before enabling geometry-backed LOS or navigation;
+- add an authenticated player-speed/timing authority before rejecting legal
+  in-envelope movement by a guessed speed constant;
 - reconcile a reward journal left `Pending` across the non-atomic legacy
   character-persistence boundary with operator evidence;
 - obtain direct mission corpse/chest inventory transfer captures before
   enabling any non-empty container outcome;
-- derive or implement server collision, line-of-sight, navigation, and
-  room/tile resource loading from non-speculative evidence;
 - add safe restart reconstruction for an already-visible production corpse;
 - emit additional door, chest, machine, or objective state packets only when
   direct capture proves their values and ordering;

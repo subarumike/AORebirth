@@ -369,6 +369,9 @@
     <Compile Include="Core\Missions\MissionAcgOperationalState.cs" />
     <Compile Include="Core\Missions\MissionAcgOperationalStateStore.cs" />
     <Compile Include="Core\Missions\MissionAcgOperationalRuntime.cs" />
+    <Compile Include="Core\Missions\MissionAcgSpatialAuthority.cs" />
+    <Compile Include="Core\Missions\MissionAcgSpatialStateStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgSpatialRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveBinding.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveStore.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveContracts.cs" />

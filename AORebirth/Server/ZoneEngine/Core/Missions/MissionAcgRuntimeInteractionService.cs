@@ -60,15 +60,14 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
-            AORebirth.Core.Vector.Coordinate coordinates = character.Coordinates();
-            if (runtimeObject.Position == null
-                || !MissionAcgSpatialValidator.IsWithinDistance(
-                    new MissionAcgPointRecord(
-                        coordinates.x,
-                        coordinates.y,
-                        coordinates.z),
-                    runtimeObject.Position,
-                    NpcCombatAttackRules.MaxMeleeCombatDistance))
+            string spatialFailure;
+            if (!MissionAcgSpatialRuntime.TryValidateInteraction(
+                character,
+                instance,
+                runtimeObject,
+                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                "use-" + runtimeObject.Identity.Kind,
+                out spatialFailure))
             {
                 GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
                 return true;

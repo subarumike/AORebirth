@@ -566,6 +566,23 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
+                MissionAcgSpatialState spatialState;
+                MissionAcgSpatialEnvelope spatialEnvelope;
+                if (!MissionAcgSpatialRuntime.TryEnsureState(
+                    exact,
+                    out spatialState,
+                    out spatialEnvelope,
+                    out materializeFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-REJECT char={0} accepted={1}:{2} reason=spatial-authority-failed detail={3}",
+                        character.Identity.Instance,
+                        exact.Binding.AcceptedQuestIdentity.Type,
+                        exact.Binding.AcceptedQuestIdentity.Instance,
+                        materializeFailure);
+                    return false;
+                }
+
                 if (exact.State.LifecycleState == MissionAcgLifecycleState.Accepted)
                 {
                     MissionAcgBindingRecord active;
@@ -617,13 +634,29 @@ namespace ZoneEngine.Core.Missions
                         Type = IdentityType.Playfield,
                         Instance = exact.Binding.AllocatedLivePlayfield2
                     };
+                MissionAcgPointRecord entryPosition;
+                if (!MissionAcgSpatialRuntime.TryResolveEntryPosition(
+                    exact,
+                    materialized,
+                    out entryPosition,
+                    out materializeFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-REJECT char={0} accepted={1}:{2} reason=spatial-entry-failed detail={3}",
+                        character.Identity.Instance,
+                        exact.Binding.AcceptedQuestIdentity.Type,
+                        exact.Binding.AcceptedQuestIdentity.Instance,
+                        materializeFailure);
+                    return false;
+                }
+
                 character.DoNotDoTimers = false;
                 character.Teleport(
                     new Coordinate
                     {
-                        x = materialized.Spawn.X,
-                        y = materialized.Spawn.Y,
-                        z = materialized.Spawn.Z
+                        x = entryPosition.X,
+                        y = entryPosition.Y,
+                        z = entryPosition.Z
                     },
                     character.Heading,
                     exactPlayfield);
@@ -640,9 +673,9 @@ namespace ZoneEngine.Core.Missions
                     plan.BuildingIdentity.Type,
                     plan.BuildingIdentity.Instance,
                     plan.AllocatedLivePlayfield2,
-                    materialized.Spawn.X,
-                    materialized.Spawn.Y,
-                    materialized.Spawn.Z);
+                    entryPosition.X,
+                    entryPosition.Y,
+                    entryPosition.Z);
                 return true;
             }
 
@@ -814,6 +847,24 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
+                string spatialFailure;
+                if (!MissionAcgSpatialRuntime.TryValidateExitPosition(
+                    character,
+                    exactBinding,
+                    ZoneEngine.Core.Playfields.NpcCombatAttackRules.MaxMeleeCombatDistance,
+                    out spatialFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "EXIT-REJECT char={0} accepted={1}:{2} livePf2={3} reason={4}",
+                        character.Identity.Instance,
+                        exactBinding.Binding.AcceptedQuestIdentity.Type,
+                        exactBinding.Binding.AcceptedQuestIdentity.Instance,
+                        exactBinding.Binding.AllocatedLivePlayfield2,
+                        spatialFailure);
+                    return false;
+                }
+
+                MissionAcgSpatialRuntime.FlushPlayerPosition(character);
                 destPf = exactBinding.Binding.ExteriorEntranceIdentity.Instance;
                 destX = exactBinding.Binding.ExteriorX + OutdoorExitMarkerStandoff;
                 destY = exactBinding.Binding.ExteriorY;

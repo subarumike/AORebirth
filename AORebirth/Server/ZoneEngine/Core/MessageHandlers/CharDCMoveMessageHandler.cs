@@ -81,6 +81,14 @@ namespace ZoneEngine.Core.MessageHandlers
             byte moveType = NormalizeMoveTypeForServer(rawMoveType, client);
             var heading = new Quaternion(message.Heading.X, message.Heading.Y, message.Heading.Z, message.Heading.W);
             Coordinate coordinates = new Coordinate(message.Coordinates);
+            Coordinate spatiallyAccepted;
+            string spatialFailure;
+            ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.TryValidatePlayerMove(
+                client.Controller.Character,
+                coordinates,
+                out spatiallyAccepted,
+                out spatialFailure);
+            coordinates = spatiallyAccepted;
 
             // TODO: Find out what these (tmpInt) are and name them
             int tmpInt1 = message.Unknown1;

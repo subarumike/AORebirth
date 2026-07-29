@@ -2,24 +2,29 @@
 
 ## Active
 
-### RK terminal missions: Stage 5 operational isolated interiors
+### RK terminal missions: Stage 6 captured spatial authority
 
-Bound generated-mission PF2 instances now bypass the legacy mission spawner and
-materialize exact captured NPC slots as real server combat actors with Stage 3
-runtime identities. Version-1 operational sidecars persist exact NPC health,
-life/combat/corpse state and explicit unresolved-empty chest state. Kill death
-is durable before Stage 4 completion, Find Person remains passive and exact
-interaction-only, and all combat/container lookups require owner, live PF2, and
-runtime identity.
+Each bound generated-mission PF2 now derives a deterministic finite
+axis-aligned envelope from the exact selected bundle's captured spawn, exit,
+dynels, NPC slots, and objective slots. A bounded `2.0` coordinate tolerance is
+the only expansion. Player movement, doors, chests, objectives, repair,
+Find Person, exit, player/NPC combat, aggro, and damage all require the exact
+owner, live PF2, mapped runtime identity, finite coordinates, active lifecycle,
+and the same bundle envelope.
 
-Captured position, rotation, template, MonsterData, level, health, name, scale,
-textures, and meshes remain authoritative. Existing production mission combat
-owns damage and weapon behavior; no new formula is introduced. The finalized
-captures do not prove corpse or chest contents, so generic loot is suppressed
-and no item or credit outcome is fabricated. Distance and finite-coordinate
-validation are active, but server collision, line-of-sight, room topology,
-waypoint navigation, procedural generation, durable team rewards, and
-private-client validation remain deferred. No database schema changed.
+Version-1 `acg-spatial` sidecars persist only the last valid mission-player
+position and exact binding identity with SHA-256 and atomic replacement.
+Invalid movement restores the last accepted position or captured spawn. The
+existing production `8.0` interaction/combat distance remains authoritative.
+No generated-PF collision geometry exists, so LOS that requires geometry is
+explicitly unresolved and fail-closed; range-only operations do not claim clear
+LOS. Mission NPC pursuit is stationary because no safe navigation graph exists.
+
+Stage 1 payloads and hashes, Stage 2 bindings/PF2s, Stage 3 runtime identities,
+Stage 4 completion/rewards, and Stage 5 combat/corpse/container state remain
+unchanged. No procedural generation, room topology, collision mesh,
+pathfinding, loot, reward, slider, authored-quest, or database-schema work is
+included.
 
 Evidence and architecture:
 

@@ -568,6 +568,15 @@ namespace AORebirth.Core.Playfields
             ICharacter target,
             bool allowSocialAggro)
         {
+            string missionSpatialFailure;
+            if (!ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.TryValidateCombatPair(
+                attacker,
+                target,
+                out missionSpatialFailure))
+            {
+                return;
+            }
+
             NPCController npcController = target.Controller as NPCController;
             if (npcController == null)
             {
@@ -706,6 +715,15 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            string missionSpatialFailure;
+            if (!ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.TryValidateCombatPair(
+                taunter,
+                target,
+                out missionSpatialFailure))
+            {
+                return;
+            }
+
             NPCController npcController = target.Controller as NPCController;
             if (npcController == null
                 || npcController.KnuBot != null
@@ -783,6 +801,22 @@ namespace AORebirth.Core.Playfields
             PetCommandService.ProcessPetHealTick(character);
 
             DateTime utcNow = DateTime.UtcNow;
+            string missionStationaryReason;
+            bool missionStationary =
+                ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.RequiresStationaryNpc(
+                    character,
+                    null,
+                    out missionStationaryReason);
+            if (missionStationary)
+            {
+                NPCController missionController = character.Controller as NPCController;
+                if (missionController != null)
+                {
+                    missionController.SnapshotCurrentMotionPosition();
+                    missionController.StopFollow();
+                }
+            }
+
             if (this.TryBeginLeashReturn(character))
             {
                 this.TryProcessLeashReturn(character, utcNow);
@@ -822,7 +856,7 @@ namespace AORebirth.Core.Playfields
 
             if (character.FightingTarget.Instance != 0)
             {
-                if (character.Controller.IsFollowing())
+                if (!missionStationary && character.Controller.IsFollowing())
                 {
                     character.Controller.DoFollow();
                 }
@@ -873,7 +907,16 @@ namespace AORebirth.Core.Playfields
             target.SetFightingTarget(attacker.Identity);
 
             NPCController npcController = target.Controller as NPCController;
+            string stationaryReason;
             if (npcController != null
+                && ZoneEngine.Core.Missions.MissionAcgSpatialRuntime
+                    .RequiresStationaryNpc(target, attacker, out stationaryReason))
+            {
+                npcController.SnapshotCurrentMotionPosition();
+                npcController.StopFollow();
+                this.ResetCombatTick(target);
+            }
+            else if (npcController != null
                 && capturedContract != null
                 && capturedContract.HasCapturedCombatStopSequence)
             {

@@ -108,6 +108,17 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (!ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.TryValidateCombatPair(
+                character,
+                target,
+                out missionIsolationFailure))
+            {
+                this.CancelPlayerAttack(character);
+                this.SendAttackState(character, Identity.None, 0);
+                client.Server.Info(client, "Attack ignored: mission spatial ownership mismatch.");
+                return;
+            }
+
             if (ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target) || IsImmuneTarget(target))
             {
                 this.CancelPlayerAttack(character);

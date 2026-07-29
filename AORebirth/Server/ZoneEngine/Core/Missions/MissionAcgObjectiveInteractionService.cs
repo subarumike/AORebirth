@@ -10,6 +10,8 @@ namespace ZoneEngine.Core.Missions
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core.Playfields;
+
     #endregion
 
     internal static class MissionAcgObjectiveInteractionService
@@ -141,6 +143,18 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            string spatialFailure;
+            if (!MissionAcgSpatialRuntime.TryValidateObjectiveRuntimeInteraction(
+                character,
+                binding,
+                objective.Binding.RuntimeObjectiveIdentity,
+                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                "find-person-info",
+                out spatialFailure))
+            {
+                return true;
+            }
+
             return Complete(
                 client,
                 character,
@@ -242,6 +256,18 @@ namespace ZoneEngine.Core.Missions
                     character.Identity.Instance,
                     objective.Binding.AcceptedQuestIdentity.Instance,
                     out binding))
+                {
+                    return true;
+                }
+
+                string spatialFailure;
+                if (!MissionAcgSpatialRuntime.TryValidateObjectiveRuntimeInteraction(
+                    character,
+                    binding,
+                    ToRecord(message.Target[1]),
+                    NpcCombatAttackRules.MaxMeleeCombatDistance,
+                    "repair-machine",
+                    out spatialFailure))
                 {
                     return true;
                 }
