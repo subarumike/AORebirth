@@ -43,6 +43,7 @@ namespace AORebirth.Core.Playfields
         internal int ItemTemplateId { get; set; }
         internal int HighItemTemplateId { get; set; }
         internal int? FixedQuality { get; set; }
+        internal bool UsesEnemyLevelQuality { get; set; }
         internal int MinimumQuality { get; set; }
         internal int MaximumQuality { get; set; }
         internal int MinimumQuantity { get; set; }
@@ -295,9 +296,15 @@ namespace AORebirth.Core.Playfields
                 foreach (LootEntryDefinition entry in snapshot.Entries)
                 {
                     ValidateEntry(entry, snapshot.SnapshotKey, table.Enabled);
-                    if (!entry.FixedQuality.HasValue
-                        || entry.MinimumQuality != entry.FixedQuality.Value
-                        || entry.MaximumQuality != entry.FixedQuality.Value
+                    bool hasExactCapturedQuality =
+                        entry.FixedQuality.HasValue
+                        && entry.MinimumQuality == entry.FixedQuality.Value
+                        && entry.MaximumQuality == entry.FixedQuality.Value;
+                    bool hasLevelBoundedProductionQuality =
+                        entry.UsesEnemyLevelQuality
+                        && !entry.FixedQuality.HasValue;
+                    if ((!hasExactCapturedQuality
+                         && !hasLevelBoundedProductionQuality)
                         || entry.MinimumQuantity != entry.MaximumQuantity
                         || entry.Weight != 0
                         || entry.DropChanceBasisPoints != 0
@@ -366,6 +373,8 @@ namespace AORebirth.Core.Playfields
                 && (entry.FixedQuality.Value < entry.MinimumQuality
                     || entry.FixedQuality.Value > entry.MaximumQuality))
                 throw new LootDefinitionValidationException("Fixed quality is outside the declared range in " + groupKey);
+            if (entry.UsesEnemyLevelQuality && entry.FixedQuality.HasValue)
+                throw new LootDefinitionValidationException("Enemy-level quality cannot also be fixed in " + groupKey);
             if (entry.MinimumQuantity < 1 || entry.MaximumQuantity < entry.MinimumQuantity)
                 throw new LootDefinitionValidationException("Invalid quantity range in " + groupKey);
             if (entry.Weight < 0 || entry.DropChanceBasisPoints < 0 || entry.DropChanceBasisPoints > 10000)

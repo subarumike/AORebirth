@@ -2548,10 +2548,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
             string ordinaryProviderText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string encounterText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
             string catalogText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
             string combatContractText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+            string globalLootText = File.ReadAllText(
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
             string attackRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
             string combatSetupGeneratorText = File.ReadAllText(
@@ -3041,7 +3045,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && strikeForemanOtherPlayerReport.Contains("\"minDamage\": 18")
                 && strikeForemanOtherPlayerReport.Contains("\"maxDamage\": 40")
                 && strikeForemanOtherPlayerReport.Contains("\"hitType\": \"Critical\"")
-                && strikeForemanCombatReport.Contains("\"runtimeStatus\": \"report-only-dormant\"")
                 && strikeForemanCombatReport.Contains("\"reviewedLootEvidence\":")
                 && strikeForemanCombatReport.Contains("\"observationStatus\": \"atomic-outcomes-not-guaranteed-drops\"")
                 && strikeForemanCombatReport.Contains("\"initialSnapshots\": 2")
@@ -3074,7 +3077,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && strikeForemanSecondLootReport.Contains("\"quality\": 1")
                 && CountOccurrences(strikeForemanSecondLootReport, "\"count\": 1") == 2
                 && !ordinaryProviderText.Contains("\"Strike Foreman\""),
-                "Strike Foreman must keep six local 13-point normals and two misses separate from the older other-player 18/18/40 evidence, retain two atomic observed loot outcomes without treating them as guarantees, and remain named/report-only/dormant.");
+                "Strike Foreman must keep six local 13-point normals and two misses separate from the older other-player 18/18/40 evidence and retain two atomic observed loot outcomes without treating them as guarantees.");
+            Assert.IsTrue(
+                combatContractText.Contains("case 203744:")
+                && combatContractText.Contains(
+                    "subway-strike-foreman-122767-equipped-level-bounded-v1")
+                && encounterText.Contains("CreateStrikeForemanDefinition()")
+                && encounterText.Contains(
+                    "this.ProcessStrikeForemanRespawn(utcNow);")
+                && globalLootText.Contains(
+                    "CapturedStrikeForemanCredits = 176")
+                && globalLootText.Contains(
+                    "captured-atomic-membership-enemy-level-bounded-item-ql"),
+                "Strike Foreman must be active through its exact named encounter contract with production-owned item QL and level-bounded atomic loot quality.");
 
             Assert.AreEqual(
                 12,

@@ -28,16 +28,20 @@ namespace AORebirth.Core.Playfields
         internal const int InfectorMonsterData = 31909;
         internal const int VergilAeneidMonsterData = 203748;
         internal const int EumenidesMonsterData = 203726;
+        internal const int StrikeForemanMonsterData = 203744;
         internal const string AbmouthProfileKey = "subway.127.boss.abmouth-supremus";
         internal const string InfectorProfileKey = "subway.127.encounter.abmouth-infector";
         internal const string VergilAeneidProfileKey = "subway.127.boss.vergil-aeneid";
         internal const string EumenidesProfileKey = "subway.127.named.eumenides";
+        internal const string StrikeForemanProfileKey = "subway.127.named.strike-foreman";
         internal const string EncounterKey = "subway.127.encounter.abmouth";
         internal const string VergilAeneidEncounterKey = "subway.127.encounter.vergil-aeneid";
         internal const string EumenidesEncounterKey = "subway.127.encounter.eumenides";
+        internal const string StrikeForemanEncounterKey = "subway.127.encounter.strike-foreman";
 
         private const float CapturedAggroRadius = 13.4151f;
         private const float CapturedEumenidesAggroRadius = 23.359f;
+        private const float CapturedStrikeForemanAggroRadius = 20.250672f;
         private const float CapturedReplacementInfectorOffsetX = 3.0f;
         private const string FirstInfectorUnknown1 =
             "80000000000000000000000003010001000100010001000000020000";
@@ -100,6 +104,7 @@ namespace AORebirth.Core.Playfields
         private Identity abmouthIdentity = Identity.None;
         private Identity vergilAeneidIdentity = Identity.None;
         private Identity eumenidesIdentity = Identity.None;
+        private Identity strikeForemanIdentity = Identity.None;
         private bool combatActive;
         private bool abmouthDead;
         private DateTime? abmouthRespawnDueAtUtc;
@@ -108,6 +113,7 @@ namespace AORebirth.Core.Playfields
         private bool vergilDead;
         private DateTime? vergilRespawnDueAtUtc;
         private DateTime? eumenidesRespawnDueAtUtc;
+        private DateTime? strikeForemanRespawnDueAtUtc;
         private DateTime vergilNextHealAtUtc;
         private PendingVergilHeal vergilPendingHeal;
         private int refillDelayIndex;
@@ -161,6 +167,18 @@ namespace AORebirth.Core.Playfields
                     this.eumenidesIdentity = eumenides.Identity;
                 }
             }
+
+            if (this.strikeForemanIdentity.Instance == 0
+                && !this.strikeForemanRespawnDueAtUtc.HasValue)
+            {
+                Character strikeForeman = this.SpawnCharacter(
+                    CreateStrikeForemanDefinition(),
+                    Identity.None);
+                if (strikeForeman != null)
+                {
+                    this.strikeForemanIdentity = strikeForeman.Identity;
+                }
+            }
         }
 
         internal void ClearRuntimeState()
@@ -169,6 +187,7 @@ namespace AORebirth.Core.Playfields
             this.abmouthIdentity = Identity.None;
             this.vergilAeneidIdentity = Identity.None;
             this.eumenidesIdentity = Identity.None;
+            this.strikeForemanIdentity = Identity.None;
             this.combatActive = false;
             this.abmouthDead = false;
             this.abmouthRespawnDueAtUtc = null;
@@ -176,6 +195,7 @@ namespace AORebirth.Core.Playfields
             this.ClearVergilCombatState();
             this.vergilRespawnDueAtUtc = null;
             this.eumenidesRespawnDueAtUtc = null;
+            this.strikeForemanRespawnDueAtUtc = null;
             this.refillDelayIndex = 0;
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
@@ -204,16 +224,22 @@ namespace AORebirth.Core.Playfields
                 definition.ProfileKey,
                 EumenidesProfileKey,
                 StringComparison.Ordinal);
-            if (!isAbmouth && !isEumenides)
+            bool isStrikeForeman = string.Equals(
+                definition.ProfileKey,
+                StrikeForemanProfileKey,
+                StringComparison.Ordinal);
+            if (!isAbmouth && !isEumenides && !isStrikeForeman)
             {
                 return null;
             }
 
             // Each capture proves proactive acquisition only at its observed
-            // horizontal boundary. Do not extend either profile beyond it.
+            // horizontal boundary. Do not extend any profile beyond it.
             float radius = isEumenides
                                ? CapturedEumenidesAggroRadius
-                               : CapturedAggroRadius;
+                               : isStrikeForeman
+                                 ? CapturedStrikeForemanAggroRadius
+                                 : CapturedAggroRadius;
             return this.dynelRegistry
                 .FindCharactersInRange(npc, radius)
                 .Where(
@@ -323,6 +349,7 @@ namespace AORebirth.Core.Playfields
         {
             this.ProcessNamedBossRespawns(utcNow);
             this.ProcessEumenidesRespawn(utcNow);
+            this.ProcessStrikeForemanRespawn(utcNow);
             this.ProcessVergilHealing(utcNow);
 
             if (!this.combatActive || this.abmouthDead || this.abmouthIdentity.Instance == 0)
@@ -468,6 +495,16 @@ namespace AORebirth.Core.Playfields
                 return new ICharacter[0];
             }
 
+            if (string.Equals(
+                definition.ProfileKey,
+                StrikeForemanProfileKey,
+                StringComparison.Ordinal))
+            {
+                this.strikeForemanRespawnDueAtUtc =
+                    diedAtUtc.Add(CapturedNamedBossRespawnDelay);
+                return new ICharacter[0];
+            }
+
             if (!string.Equals(
                 definition.ProfileKey,
                 AbmouthProfileKey,
@@ -561,6 +598,27 @@ namespace AORebirth.Core.Playfields
             this.eumenidesRespawnDueAtUtc = null;
         }
 
+        private void ProcessStrikeForemanRespawn(DateTime utcNow)
+        {
+            if (!this.strikeForemanRespawnDueAtUtc.HasValue
+                || this.strikeForemanRespawnDueAtUtc.Value > utcNow
+                || this.strikeForemanIdentity.Instance != 0)
+            {
+                return;
+            }
+
+            Character strikeForeman = this.SpawnCharacter(
+                CreateStrikeForemanDefinition(),
+                Identity.None);
+            if (strikeForeman == null)
+            {
+                return;
+            }
+
+            this.strikeForemanIdentity = strikeForeman.Identity;
+            this.strikeForemanRespawnDueAtUtc = null;
+        }
+
         internal void NotifyNpcDespawn(ICharacter target, DateTime utcNow)
         {
             CapturedEncounterRuntimeDefinition definition;
@@ -597,6 +655,15 @@ namespace AORebirth.Core.Playfields
                 StringComparison.Ordinal))
             {
                 this.eumenidesIdentity = Identity.None;
+                return;
+            }
+
+            if (string.Equals(
+                definition.ProfileKey,
+                StrikeForemanProfileKey,
+                StringComparison.Ordinal))
+            {
+                this.strikeForemanIdentity = Identity.None;
                 return;
             }
 
@@ -1152,6 +1219,66 @@ namespace AORebirth.Core.Playfields
                 {
                     new CapturedSubwayMeshDefinition(0, 29708u, 0, 4),
                     new CapturedSubwayMeshDefinition(1, 35564u, 0, 2)
+                },
+                maximumNpcLeashDistanceFromHome: 100.0);
+        }
+
+        private static CapturedEncounterRuntimeDefinition CreateStrikeForemanDefinition()
+        {
+            return new CapturedEncounterRuntimeDefinition(
+                StrikeForemanProfileKey,
+                "subway.127.named.strike-foreman.spawn",
+                StrikeForemanEncounterKey,
+                "Strike Foreman",
+                StrikeForemanMonsterData,
+                false,
+                false,
+                19,
+                736,
+                98,
+                67,
+                66,
+                0,
+                3,
+                333.719055f,
+                109.015f,
+                206.525848f,
+                0.0f,
+                0.32742402f,
+                0.0f,
+                0.944877505f,
+                1579u,
+                unchecked((int)0x020A4ACB),
+                0,
+                HexToBytes("00000000000000000000000003010001000100010001000000020000"),
+                0,
+                17870,
+                60.0,
+                0.0,
+                "20260709-212336 exact initial SCFU and 122767/122768 WIFU; "
+                + "20260709-220439 L19 generation and 20260709-222339 aggression/death/corpse; "
+                + "20260720-032106/033513 exact SAW, Attack, normal/miss result, credits, and atomic loot outcomes; "
+                + "enemy level owns bounded weapon and loot QL through shared production item interpolation; "
+                + "shared PF127 named respawn, corpse, chase, leash, and runtime disposal",
+                npcFamily: 149,
+                npcLosHeight: 0,
+                fatness: 1,
+                breed: 3,
+                sex: 2,
+                race: 1,
+                headMesh: 40673,
+                textures: new[]
+                {
+                    new CapturedSubwayTextureDefinition(0, 9452, 0),
+                    new CapturedSubwayTextureDefinition(1, 45759, 0),
+                    new CapturedSubwayTextureDefinition(2, 9450, 0),
+                    new CapturedSubwayTextureDefinition(3, 45758, 0),
+                    new CapturedSubwayTextureDefinition(4, 45760, 0)
+                },
+                meshes: new[]
+                {
+                    new CapturedSubwayMeshDefinition(0, 40673u, 0, 4),
+                    new CapturedSubwayMeshDefinition(1, 27723u, 0, 2)
                 },
                 maximumNpcLeashDistanceFromHome: 100.0);
         }

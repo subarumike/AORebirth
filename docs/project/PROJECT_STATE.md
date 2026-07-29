@@ -4,8 +4,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- PF127/PF1931 named encounter completion is authoritative across 18 unique
-  active combat/profile domains: 13 initial stages, two successors, two
+- PF127/PF1931 named encounter completion is authoritative across 19 unique
+  active combat/profile domains: 14 initial stages, two successors, two
   owned-add domains, and Murial's ordinary-owned named patrol. All active
   domains have exact capture-backed combat; packet-only nano behavior remains
   bounded where downstream effects are not proven. The shared registry now
@@ -17,14 +17,16 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   definitions with zero errors and a second-run no-diff result. The remaining
   dungeon-gameplay ownership pass now schedules exactly one full-chain reset
   from Aztur NPC despawn to Uklesh after the explicit 600-second Temple named
-  policy, classifies all 18 named respawn domains, gives Murial an explicit
+  policy, classifies all 19 named respawn domains, gives Murial an explicit
   300-second post-despawn policy reset without duplicating his patrol worker,
   and applies the captured three-second empty-corpse cleanup bound to
-  Eumenides. Exact unresolved boundaries are unproven downstream or scheduling
-  behavior for packet-only Temple nanos, unknown loot probabilities and wider
-  pools, Murial nano `70294` and loot, and inactive Strike Foreman
-  generation/lifecycle policy. The Aztur reset delay remains policy-owned, not
-  capture-timed. Evidence:
+  Eumenides. Strike Foreman is active as a PF127 named encounter with exact
+  capture-backed `122767/122768` equipped semantics, production-owned L19/QL19
+  selection, shared encounter lifecycle, and capture-proven atomic loot
+  memberships. Exact unresolved boundaries are unproven downstream or
+  scheduling behavior for packet-only Temple nanos, unknown loot probabilities
+  and wider pools, and Murial nano `70294` and loot. The Aztur reset delay
+  remains policy-owned, not capture-timed. Evidence:
   `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md` and
   `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.
 

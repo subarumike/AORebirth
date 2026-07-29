@@ -44,6 +44,7 @@ namespace AORebirth.Core.Playfields
         private const int CapturedAbmouthCredits = 587;
         private const int CapturedInfectorCredits = 150;
         private const int CapturedEumenidesCredits = 186;
+        private const int CapturedStrikeForemanCredits = 176;
         private const string CapturedVergilProfileKey = "subway.127.boss.vergil-aeneid";
         private const int CapturedVergilMonsterData = 203748;
         private const string CapturedAbmouthLootEvidence =
@@ -52,6 +53,12 @@ namespace AORebirth.Core.Playfields
             "official-live-captures 20260712-232711/234401/20260716-034433; three exact observed corpse snapshots with linked credits 610/587/563; 20260716-034433 inventory linked by normalized corpse identity F69001; snapshot probabilities and wider pool unresolved";
         private const string CapturedEumenidesLootEvidence =
             "official-live-captures 20260717-214751/20260717-215250; two exact identity-linked Eumenides corpse snapshots, each with 186 credits and three item rows; 20260717-220340 adds exact local-name/identity-linked item membership for two already-existing Remains of Eumenides corpses but no CorpseFullUpdate, credits, dead-NPC link, or playfield context, so those rows are not promoted as atomic runtime snapshots; snapshot probabilities and wider pool unresolved";
+        private const string CapturedStrikeForemanLootEvidence =
+            "official-live-captures 20260720-032106/033513; two exact "
+            + "identity-linked Strike Foreman corpse snapshots, each with 176 "
+            + "credits; item membership is atomic, snapshot probabilities and "
+            + "the wider pool remain unresolved, and enemy level owns item QL "
+            + "within each captured template pair";
         private readonly object sync = new object();
         private readonly object productionRandomSync = new object();
         private readonly Random productionRandom = new Random();
@@ -312,7 +319,11 @@ namespace AORebirth.Core.Playfields
                 encounter.ProfileKey,
                 CapturedSubwayEncounterRuntimeService.EumenidesProfileKey,
                 StringComparison.Ordinal);
-            if (!isAbmouth && !isInfector && !isEumenides) return;
+            bool isStrikeForeman = string.Equals(
+                encounter.ProfileKey,
+                CapturedSubwayEncounterRuntimeService.StrikeForemanProfileKey,
+                StringComparison.Ordinal);
+            if (!isAbmouth && !isInfector && !isEumenides && !isStrikeForeman) return;
 
             ObservedCorpseSnapshotDefinition[] snapshots = isAbmouth
                 ? new[]
@@ -355,6 +366,53 @@ namespace AORebirth.Core.Playfields
                         ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-215250", 160051, 160050, 16, 1),
                         ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, "capture.20260717-215250", 287146, 287146, 200, 1))
                 }
+                : isStrikeForeman
+                ? new[]
+                {
+                    ObservedCorpseSnapshot(
+                        CapturedStrikeForemanLootEvidence,
+                        "capture.20260720-032106",
+                        CapturedStrikeForemanCredits,
+                        LevelBoundedObservedCorpseSnapshotEntry(
+                            CapturedStrikeForemanLootEvidence,
+                            "capture.20260720-032106",
+                            27199,
+                            27199,
+                            10,
+                            1),
+                        LevelBoundedObservedCorpseSnapshotEntry(
+                            CapturedStrikeForemanLootEvidence,
+                            "capture.20260720-032106",
+                            123744,
+                            123745,
+                            20,
+                            1),
+                        LevelBoundedObservedCorpseSnapshotEntry(
+                            CapturedStrikeForemanLootEvidence,
+                            "capture.20260720-032106",
+                            301713,
+                            301713,
+                            1,
+                            1)),
+                    ObservedCorpseSnapshot(
+                        CapturedStrikeForemanLootEvidence,
+                        "capture.20260720-033513",
+                        CapturedStrikeForemanCredits,
+                        LevelBoundedObservedCorpseSnapshotEntry(
+                            CapturedStrikeForemanLootEvidence,
+                            "capture.20260720-033513",
+                            85676,
+                            22072,
+                            15,
+                            1),
+                        LevelBoundedObservedCorpseSnapshotEntry(
+                            CapturedStrikeForemanLootEvidence,
+                            "capture.20260720-033513",
+                            301707,
+                            301707,
+                            1,
+                            1))
+                }
                 : new ObservedCorpseSnapshotDefinition[0];
             var table = new LootTableDefinition
             {
@@ -363,7 +421,7 @@ namespace AORebirth.Core.Playfields
                 TableType = isAbmouth ? LootTableType.Boss : LootTableType.EnemyType,
                 RollGroups = new LootGroupDefinition[0],
                 ObservedCorpseSnapshots = snapshots,
-                CreditsPolicy = isAbmouth || isEumenides
+                CreditsPolicy = isAbmouth || isEumenides || isStrikeForeman
                     ? new CreditsPolicyDefinition
                     {
                         Mode = CreditsPolicyMode.Unresolved,
@@ -373,15 +431,19 @@ namespace AORebirth.Core.Playfields
                         CapturedInfectorCredits,
                         CapturedInfectorCredits,
                         LootEvidenceConfidence.ProvenCapture),
-                QualityPolicy = isAbmouth || isEumenides
-                    ? "captured-observed-corpse-snapshots"
+                QualityPolicy = isAbmouth || isEumenides || isStrikeForeman
+                    ? isStrikeForeman
+                      ? "captured-atomic-membership-enemy-level-bounded-item-ql"
+                      : "captured-observed-corpse-snapshots"
                     : "unresolved",
                 Evidence = isAbmouth
                     ? CapturedAbmouthLootEvidence
                     : isEumenides
                     ? CapturedEumenidesLootEvidence
+                    : isStrikeForeman
+                    ? CapturedStrikeForemanLootEvidence
                     : encounter.Evidence + "; item pool unresolved",
-                Confidence = isAbmouth || isEumenides
+                Confidence = isAbmouth || isEumenides || isStrikeForeman
                     ? LootEvidenceConfidence.ObservedAvailableLoot
                     : LootEvidenceConfidence.Unresolved,
                 ItemPoolUnresolved = true,
@@ -541,6 +603,50 @@ namespace AORebirth.Core.Playfields
                 Semantics = LootSemantics.ObservedAvailable,
                 Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
                 EvidenceReference = evidence + "; " + snapshotKey,
+                ProbabilityEvidence = "unresolved"
+            };
+        }
+
+        private static LootEntryDefinition LevelBoundedObservedCorpseSnapshotEntry(
+            string evidence,
+            string snapshotKey,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int observedQuality,
+            int quantity)
+        {
+            if (!ItemLoader.ItemList.ContainsKey(itemTemplateId)
+                || !ItemLoader.ItemList.ContainsKey(highItemTemplateId))
+            {
+                throw new LootDefinitionValidationException(
+                    "Level-bounded loot template is unavailable: "
+                    + itemTemplateId
+                    + "/"
+                    + highItemTemplateId);
+            }
+
+            int lowTemplateQuality = ItemLoader.ItemList[itemTemplateId].Quality;
+            int highTemplateQuality = ItemLoader.ItemList[highItemTemplateId].Quality;
+            return new LootEntryDefinition
+            {
+                SelectionKey = snapshotKey,
+                ItemTemplateId = itemTemplateId,
+                HighItemTemplateId = highItemTemplateId,
+                UsesEnemyLevelQuality = true,
+                MinimumQuality = Math.Min(lowTemplateQuality, highTemplateQuality),
+                MaximumQuality = Math.Max(lowTemplateQuality, highTemplateQuality),
+                MinimumQuantity = quantity,
+                MaximumQuantity = quantity,
+                Weight = 0,
+                DropChanceBasisPoints = 0,
+                UniquePerCorpse = true,
+                Semantics = LootSemantics.ObservedAvailable,
+                Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                EvidenceReference = evidence
+                                    + "; "
+                                    + snapshotKey
+                                    + "; observed QL"
+                                    + observedQuality.ToString(CultureInfo.InvariantCulture),
                 ProbabilityEvidence = "unresolved"
             };
         }

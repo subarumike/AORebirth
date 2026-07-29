@@ -230,6 +230,24 @@ namespace ZoneEngine.Core.Playfields
 
         public const int CapturedSubwayEumenidesSpecialAttackWeaponUnknown5 = 0;
 
+        public const int CapturedSubwayStrikeForemanMonsterData = 203744;
+
+        public const int CapturedSubwayStrikeForemanWeaponLowTemplate = 122767;
+
+        public const int CapturedSubwayStrikeForemanWeaponHighTemplate = 122768;
+
+        public const int CapturedSubwayStrikeForemanWeaponSlot = 6;
+
+        public const int CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown1 = 154;
+
+        public const int CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown2 = 154;
+
+        public const int CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown3 = 154;
+
+        public const int CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown4 = 117;
+
+        public const int CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown5 = 0;
+
         public const int CapturedSubwayMeldedPatternsMonsterData = 203747;
 
         public const int CapturedSubwayMeldedPatternsWeaponLowTemplate = 121817;

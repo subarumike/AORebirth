@@ -68,7 +68,7 @@ Evidence:
 ### PF127/PF1931 named encounter completion
 
 The full named/scripted runtime inventory is complete for every active PF127
-and PF1931 domain: 13 initial profiles, two successor stages, two owned-add
+and PF1931 domain: 14 initial profiles, two successor stages, two owned-add
 domains, and Murial's ordinary-owned named patrol. The ordinary baseline
 remains `489/489`.
 
@@ -83,17 +83,22 @@ produces no diff.
 The remaining dungeon-gameplay backlog is now explicitly owned. Aztur NPC
 despawn schedules exactly one full-chain reset by rematerializing Uklesh after
 the Temple named-policy delay; successor stages and owned adds never respawn
-independently. All 18 named respawn domains are classified explicitly. Murial
+independently. All 19 named respawn domains are classified explicitly. Murial
 retains one ordinary-population-owned patrol and an explicit 300-second
 post-despawn policy reset. Eumenides retains its captured 30-minute
 loot-bearing corpse and now uses the captured shared three-second empty-corpse
 cleanup bound.
 
+Strike Foreman is active under the PF127 named-encounter owner. Its level-19
+runtime selects QL19 inside the exact `122767/122768` item range, retains the
+captured equipped/slot/packet semantics, and uses the shared PF127 lifecycle
+and level-bounded loot-quality policy.
+
 Exact unresolved boundaries remain fail-closed: downstream gameplay effects
 and scheduling for presentation-only Temple nanos, unknown loot probabilities
-and wider pools, Murial nano `70294` and loot, and inactive Strike Foreman
-generation/lifecycle policy. The Aztur-to-Uklesh 600-second interval remains an
-explicit Temple policy rather than a capture-timed interval.
+and wider pools, and Murial nano `70294` and loot. The Aztur-to-Uklesh
+600-second interval remains an explicit Temple policy rather than a
+capture-timed interval.
 
 Evidence:
 

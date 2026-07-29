@@ -18,11 +18,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             Entry[] entries = Inventory();
 
-            Assert.AreEqual(18, entries.Length);
+            Assert.AreEqual(19, entries.Length);
             Assert.AreEqual(entries.Length, entries.Select(value => value.ProfileKey).Distinct().Count());
-            Assert.AreEqual(4, entries.Count(value => value.Playfield == 127));
+            Assert.AreEqual(5, entries.Count(value => value.Playfield == 127));
             Assert.AreEqual(14, entries.Count(value => value.Playfield == 1931));
-            Assert.AreEqual(13, entries.Count(value => value.Kind == "initial"));
+            Assert.AreEqual(14, entries.Count(value => value.Kind == "initial"));
             Assert.AreEqual(2, entries.Count(value => value.Kind == "successor"));
             Assert.AreEqual(2, entries.Count(value => value.Kind == "add"));
             Assert.AreEqual(1, entries.Count(value => value.Kind == "ordinary-patrol"));
@@ -63,6 +63,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(subwayCombat.Contains("case 155962:"));
             Assert.IsTrue(subwayCombat.Contains("case 203748:"));
             Assert.IsTrue(subwayCombat.Contains("case 203726:"));
+            Assert.IsTrue(subwayCombat.Contains("case 203744:"));
             Assert.IsTrue(subwayCombat.Contains("case 31909:"));
             Assert.AreNotEqual("totw.1931.boss.uklesh-the-frozen", "totw.1931.boss.khalum");
             Assert.AreNotEqual("totw.1931.boss.khalum", "totw.1931.boss.aztur-the-immortal");
@@ -204,7 +205,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(30.0, murialProfile.Corpse.LootedCleanupSeconds);
             Assert.IsFalse(
                 subwayOrdinary.Contains("\"Strike Foreman\""),
-                "Strike Foreman must remain inactive while its QL17/QL19 generation selector and lifecycle are unresolved.");
+                "Strike Foreman is named encounter content and must remain outside ordinary population generation.");
+            Assert.IsTrue(
+                subway.Contains(
+                    "StrikeForemanProfileKey = \"subway.127.named.strike-foreman\"")
+                && subway.Contains("CreateStrikeForemanDefinition()")
+                && subway.Contains("this.ProcessStrikeForemanRespawn(utcNow);")
+                && subway.Contains(
+                    "diedAtUtc.Add(CapturedNamedBossRespawnDelay)")
+                && subway.Contains(
+                    "this.strikeForemanIdentity = Identity.None;"),
+                "Strike Foreman must be active through the shared PF127 named encounter lifecycle.");
         }
 
         [TestMethod]
@@ -395,6 +406,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new Entry(127, "subway.127.boss.vergil-aeneid", "initial",
                     null),
                 new Entry(127, "subway.127.named.eumenides", "initial",
+                    null),
+                new Entry(127, "subway.127.named.strike-foreman", "initial",
                     null),
                 new Entry(127, "subway.127.encounter.abmouth-infector", "add",
                     null),

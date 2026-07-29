@@ -872,6 +872,115 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void StrikeForemanUsesExactCapturedWifuAndSharedAttackSuffix()
+        {
+            const int wifuSourceIdentity = unchecked((int)0x7954512E);
+            const int attackSourceIdentity = unchecked((int)0x798037CF);
+            const int defenderIdentity = unchecked((int)0x7944C065);
+            string production = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+
+            Assert.IsTrue(
+                production.Contains("case 203744:")
+                && production.Contains("StrikeForeman(level.Value)")
+                && production.Contains(
+                    "subway-strike-foreman-122767-equipped-level-bounded-v1")
+                && production.Contains(
+                    ".WithProductionEquippedWeaponValues()")
+                && production.Contains(".WithProductionWeaponQuality()")
+                && production.Contains(
+                    ".WithProductionActorValuesForPresentationWeapon()"),
+                "The production selector must bind Strike Foreman to the exact categorical contract while leaving item-derived values with production.");
+
+            CapturedEnemyWeaponDefinition weaponDefinition =
+                StrikeForemanWeaponDefinition();
+            AssertHex(
+                "3B1D22680000C74A25713A73000000000B0000C3507954512E00122002000F424F0000000001060000276A0000000000000403000000170001DF8F000002BD00000013000002BE0001DF8F000002BF0001DF900000019C000000010000001A0000001400000126000000EB000000D2000000EB00000000",
+                CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
+                    SimpleChar(wifuSourceIdentity),
+                    0x00122002,
+                    Weapon(unchecked((int)0x25713A73)),
+                    weaponDefinition));
+
+            CapturedEnemyCombatContract attackContract =
+                CapturedEnemyCombatContract
+                    .EquippedWeaponWithCapturedPacketSequence(
+                        "20260720-033513 Strike Foreman exact attack suffix",
+                        wifuSourceIdentity,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanWeaponLowTemplate,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanWeaponHighTemplate,
+                        19,
+                        NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponSlot,
+                        true,
+                        0,
+                        0,
+                        0,
+                        null,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        0.0d,
+                        true,
+                        true,
+                        19,
+                        0,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown1,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown2,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown3,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown4,
+                        NpcCombatAttackRules
+                            .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown5,
+                        3,
+                        0,
+                        0,
+                        0,
+                        0,
+                        true,
+                        true)
+                    .WithCapturedWeapon(weaponDefinition);
+            Identity attacker = SimpleChar(attackSourceIdentity);
+            Identity defender = SimpleChar(defenderIdentity);
+            MessageBody[] attackSuffix =
+            {
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    attacker,
+                    attackContract),
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    attacker,
+                    defender,
+                    attackContract),
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    attacker,
+                    defender,
+                    13,
+                    19,
+                    6,
+                    0,
+                    3,
+                    0,
+                    0)
+            };
+
+            AssertCapturedOrder(attackSuffix);
+            AssertHex(
+                "1D3C0F1C0000C350798037CF00000003F10000009A0000009A0000009A0000007500000000",
+                attackSuffix[0]);
+            AssertHex(
+                "284940700000C350798037CF000000C3507944C06500",
+                attackSuffix[1]);
+            AssertHex(
+                "46002F160000C350798037CF000000000D00000013000000060000C3507944C065000000000000000300000000",
+                attackSuffix[2]);
+        }
+
+        [TestMethod]
         public void LooterStableProfileUsesTheCapturedSharedPacketSequence()
         {
             const string profileId = "1f9bcd8f10a573fe-3a02a8bc94c80061";
@@ -3081,6 +3190,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     WeaponStat(CharacterStat.ACGItemTemplateID2, 121567),
                     WeaponStat(CharacterStat.MultipleCount, 1),
                     WeaponStat(CharacterStat.Energy, -1),
+                    WeaponStat(CharacterStat.AttackDelay, 235),
+                    WeaponStat(CharacterStat.RechargeDelay, 235)
+                },
+                0);
+        }
+
+        private static CapturedEnemyWeaponDefinition StrikeForemanWeaponDefinition()
+        {
+            return new CapturedEnemyWeaponDefinition(
+                "20260709-220439 IN #6672 exact Strike Foreman QL19 WIFU",
+                unchecked((int)0x7954512E),
+                0,
+                11,
+                NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponSlot,
+                1000015,
+                0,
+                262,
+                new[]
+                {
+                    WeaponStat(CharacterStat.Flags, 1027),
+                    WeaponStat(CharacterStat.StaticInstance, 122767),
+                    WeaponStat(CharacterStat.ACGItemLevel, 19),
+                    WeaponStat(CharacterStat.ACGItemTemplateID, 122767),
+                    WeaponStat(CharacterStat.ACGItemTemplateID2, 122768),
+                    WeaponStat(CharacterStat.MultipleCount, 1),
+                    WeaponStat(CharacterStat.Energy, 20),
                     WeaponStat(CharacterStat.AttackDelay, 235),
                     WeaponStat(CharacterStat.RechargeDelay, 235)
                 },
