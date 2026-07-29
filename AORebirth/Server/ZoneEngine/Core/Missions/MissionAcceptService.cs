@@ -574,12 +574,23 @@ namespace ZoneEngine.Core.Missions
 
             try
             {
+                int clientExpirySeconds =
+                    MissionRollService.ResolveClientExpirySeconds(
+                        client.LastGameTimeSyncUtc,
+                        DateTime.UtcNow,
+                        binding.ExpiryUtc);
+                if (clientExpirySeconds <= 0)
+                {
+                    return false;
+                }
+
                 MissionAcgAcceptedQfuContract contract =
                     MissionAcgAcceptedQfuBuilder.Build(
                         character,
                         offer,
                         binding,
-                        objective);
+                        objective,
+                        clientExpirySeconds);
                 client.SendCompressed(contract.Message);
                 if (stored != null)
                 {

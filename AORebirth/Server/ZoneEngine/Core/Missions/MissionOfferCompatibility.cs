@@ -28,6 +28,7 @@ namespace ZoneEngine.Core.Missions
         internal MissionObjectiveCategory Objective;
         internal MissionRewardCategory Reward;
         internal string TargetName;
+        internal string ShortInfo;
         internal Identity ObjectiveIdentity;
         internal Identity AuxiliaryObjectiveIdentity1;
         internal Identity AuxiliaryObjectiveIdentity2;
@@ -102,6 +103,7 @@ namespace ZoneEngine.Core.Missions
                                           ? MissionRewardCategory.CurrencyAndItem
                                           : MissionRewardCategory.Currency,
                              TargetName = targetName,
+                             ShortInfo = offer.ShortInfo,
                              ObjectiveIdentity = offer.QuestActions[0].Action,
                              AuxiliaryObjectiveIdentity1 = offer.QuestActions[0].Unknown1,
                              AuxiliaryObjectiveIdentity2 = offer.QuestActions[0].Unknown2
@@ -186,6 +188,10 @@ namespace ZoneEngine.Core.Missions
                 || generated.ActionCode != source.ActionCode
                 || generated.Objective != source.Objective
                 || generated.Reward != source.Reward
+                || !string.Equals(
+                    generated.ShortInfo,
+                    source.ShortInfo,
+                    StringComparison.Ordinal)
                 || generated.ObjectiveIdentity != source.ObjectiveIdentity
                 || generated.AuxiliaryObjectiveIdentity2 != source.AuxiliaryObjectiveIdentity2)
             {
@@ -209,13 +215,9 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            string shortInfo = offer.ShortInfo.TrimEnd('\0');
-            if (!string.Equals(
-                    shortInfo,
-                    MissionTypeCatalog.ShortTitle(generated.Type),
-                    StringComparison.Ordinal))
+            if (offer.ShortInfo.Length != 31 || offer.ShortInfo.IndexOf('\0') >= 0)
             {
-                error = "Generated title does not match mission type.";
+                error = "Generated title does not preserve the captured 31-byte wire width.";
                 return false;
             }
 

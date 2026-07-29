@@ -3,8 +3,6 @@ namespace ZoneEngine.Core.Missions
     #region Usings ...
 
     using System;
-    using System.Text;
-
     using AORebirth.Core.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -42,7 +40,8 @@ namespace ZoneEngine.Core.Missions
             ICharacter character,
             QuestInfo acceptedState,
             MissionAcgInstanceBinding instanceBinding,
-            MissionAcgObjectiveRecord objectiveRecord)
+            MissionAcgObjectiveRecord objectiveRecord,
+            int clientExpirySeconds)
         {
             if (character == null
                 || acceptedState == null
@@ -51,20 +50,51 @@ namespace ZoneEngine.Core.Missions
             {
                 throw new ArgumentNullException("Accepted QFU inputs are required.");
             }
+            if (clientExpirySeconds <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "clientExpirySeconds",
+                    "Accepted QFU requires a positive client-clock expiry.");
+            }
 
             MissionRollType type = instanceBinding.MissionType;
             switch (type)
             {
                 case MissionRollType.KillPerson:
-                    return BuildKill(character, acceptedState, instanceBinding, objectiveRecord);
+                    return BuildKill(
+                        character,
+                        acceptedState,
+                        instanceBinding,
+                        objectiveRecord,
+                        clientExpirySeconds);
                 case MissionRollType.FindPerson:
-                    return BuildFindPerson(character, acceptedState, instanceBinding, objectiveRecord);
+                    return BuildFindPerson(
+                        character,
+                        acceptedState,
+                        instanceBinding,
+                        objectiveRecord,
+                        clientExpirySeconds);
                 case MissionRollType.FindItem:
-                    return BuildFindItem(character, acceptedState, instanceBinding, objectiveRecord);
+                    return BuildFindItem(
+                        character,
+                        acceptedState,
+                        instanceBinding,
+                        objectiveRecord,
+                        clientExpirySeconds);
                 case MissionRollType.FindItemReturn:
-                    return BuildReturnItem(character, acceptedState, instanceBinding, objectiveRecord);
+                    return BuildReturnItem(
+                        character,
+                        acceptedState,
+                        instanceBinding,
+                        objectiveRecord,
+                        clientExpirySeconds);
                 case MissionRollType.RepairMachine:
-                    return BuildRepair(character, acceptedState, instanceBinding, objectiveRecord);
+                    return BuildRepair(
+                        character,
+                        acceptedState,
+                        instanceBinding,
+                        objectiveRecord,
+                        clientExpirySeconds);
                 default:
                     throw new InvalidOperationException(
                         "Unsupported generated mission accepted QFU type.");
@@ -75,43 +105,76 @@ namespace ZoneEngine.Core.Missions
             ICharacter character,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
-            MissionAcgObjectiveRecord objective)
+            MissionAcgObjectiveRecord objective,
+            int clientExpirySeconds)
         {
-            return BuildCore(character, state, binding, objective, 16, 0);
+            return BuildCore(
+                character,
+                state,
+                binding,
+                objective,
+                16,
+                0,
+                clientExpirySeconds);
         }
 
         private static MissionAcgAcceptedQfuContract BuildFindPerson(
             ICharacter character,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
-            MissionAcgObjectiveRecord objective)
+            MissionAcgObjectiveRecord objective,
+            int clientExpirySeconds)
         {
-            return BuildCore(character, state, binding, objective, 16, 64);
+            return BuildCore(
+                character,
+                state,
+                binding,
+                objective,
+                16,
+                64,
+                clientExpirySeconds);
         }
 
         private static MissionAcgAcceptedQfuContract BuildFindItem(
             ICharacter character,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
-            MissionAcgObjectiveRecord objective)
+            MissionAcgObjectiveRecord objective,
+            int clientExpirySeconds)
         {
-            return BuildCore(character, state, binding, objective, 15, 0);
+            return BuildCore(
+                character,
+                state,
+                binding,
+                objective,
+                15,
+                0,
+                clientExpirySeconds);
         }
 
         private static MissionAcgAcceptedQfuContract BuildReturnItem(
             ICharacter character,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
-            MissionAcgObjectiveRecord objective)
+            MissionAcgObjectiveRecord objective,
+            int clientExpirySeconds)
         {
-            return BuildCore(character, state, binding, objective, 8, 0);
+            return BuildCore(
+                character,
+                state,
+                binding,
+                objective,
+                8,
+                0,
+                clientExpirySeconds);
         }
 
         private static MissionAcgAcceptedQfuContract BuildRepair(
             ICharacter character,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
-            MissionAcgObjectiveRecord objective)
+            MissionAcgObjectiveRecord objective,
+            int clientExpirySeconds)
         {
             if (objective.Binding.RequiredMissionItemTemplateId
                     != MissionAcgObjectiveContract.RepairComponentTemplateId
@@ -122,7 +185,14 @@ namespace ZoneEngine.Core.Missions
                     "Repair QFU requires the captured component-to-machine contract.");
             }
 
-            return BuildCore(character, state, binding, objective, 16, 0);
+            return BuildCore(
+                character,
+                state,
+                binding,
+                objective,
+                16,
+                0,
+                clientExpirySeconds);
         }
 
         private static MissionAcgAcceptedQfuContract BuildCore(
@@ -131,7 +201,8 @@ namespace ZoneEngine.Core.Missions
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
             int version,
-            int questIdentityFlag)
+            int questIdentityFlag,
+            int clientExpirySeconds)
         {
             Identity accepted = ToIdentity(binding.AcceptedQuestIdentity);
             Identity building = ToIdentity(binding.AcgBuildingIdentity);
@@ -163,7 +234,7 @@ namespace ZoneEngine.Core.Missions
                     Unknown8 = source == null ? 0 : source.Unknown13,
                     UnknownId6 = source == null ? Identity.None : Copy(source.Unknown14),
                     UnknownHash1 =
-                        source == null ? "\0\0\0\0" : IntToFixedString(source.UnknownHash15),
+                        MissionRollService.IntToFixedBinaryString(clientExpirySeconds),
                     Unknown9 = source == null ? 0 : source.Unknown16,
                     UnknownId7 = terminal,
                     PlayfieldId =
@@ -242,7 +313,8 @@ namespace ZoneEngine.Core.Missions
                     Unknown11 = state.Unknown7,
                     Unknown12 = state.Unknown8,
                     Unknown13 = state.Unknown9,
-                    UnknownHash1 = IntToFixedString(state.UnknownHash),
+                    UnknownHash1 =
+                        MissionRollService.IntToFixedBinaryString(state.UnknownHash),
                     Unknown14 = state.Unknown10,
                     Unknown15 = state.Unknown11,
                     Unknown16 = state.Unknown12,
@@ -312,16 +384,5 @@ namespace ZoneEngine.Core.Missions
                          };
         }
 
-        private static string IntToFixedString(int value)
-        {
-            byte[] bytes =
-            {
-                (byte)(value >> 24),
-                (byte)(value >> 16),
-                (byte)(value >> 8),
-                (byte)value
-            };
-            return Encoding.ASCII.GetString(bytes);
-        }
     }
 }

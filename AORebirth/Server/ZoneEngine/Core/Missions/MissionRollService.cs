@@ -31,6 +31,10 @@ namespace ZoneEngine.Core.Missions
 
         private const int MissionIdentityTypeRaw = 0x0000DAC3;
 
+        private const int ClientClockBaseSeconds = 1201445827;
+
+        private const int MissionOfferLifetimeSeconds = 48 * 60 * 60;
+
         private static readonly object InitLock = new object();
 
         private static volatile bool initialized;
@@ -61,10 +65,11 @@ namespace ZoneEngine.Core.Missions
             QuestAlternativeMessage request,
             Identity character,
             int characterLevel,
-            int terminalPlayfieldId = 0,
-            float terminalX = 0f,
-            float terminalZ = 0f,
-            MissionLocationSide characterSide = MissionLocationSide.Neutral)
+            int terminalPlayfieldId,
+            float terminalX,
+            float terminalZ,
+            MissionLocationSide characterSide,
+            int clientClockNowSeconds)
         {
             EnsureInitialized();
 
@@ -97,6 +102,7 @@ namespace ZoneEngine.Core.Missions
                 sliders,
                 rng,
                 unchecked((int)(uint)Environment.TickCount),
+                clientClockNowSeconds,
                 NextQuestInstance);
         }
 
@@ -110,7 +116,8 @@ namespace ZoneEngine.Core.Missions
             MissionLocationSide characterSide,
             int seed,
             int responseNonce,
-            int firstQuestInstance)
+            int firstQuestInstance,
+            int clientClockNowSeconds)
         {
             EnsureInitialized();
 
@@ -143,6 +150,7 @@ namespace ZoneEngine.Core.Missions
                 sliders,
                 new Random(seed),
                 responseNonce,
+                clientClockNowSeconds,
                 delegate
                 {
                     int allocated = nextQuestInstance;
@@ -163,6 +171,7 @@ namespace ZoneEngine.Core.Missions
             MissionSliderProfile sliders,
             Random rng,
             int responseNonce,
+            int clientClockNowSeconds,
             Func<int> questIdAllocator)
         {
             int effectiveCharacterLevel = MissionLevelTable.ClampCharacterLevel(characterLevel);
@@ -273,6 +282,11 @@ namespace ZoneEngine.Core.Missions
                         terminal);
                 }
                 offer.Quality = missionQuality;
+                // Official five-offer pulls carry one common deadline exactly
+                // 48 hours after the roll. This server's GameTime packet anchors
+                // that clock to 2008, so wall-clock Unix seconds are invalid here.
+                offer.QuestActions[0].UnknownHash15 = checked(
+                    clientClockNowSeconds + MissionOfferLifetimeSeconds);
 
                 int markerPf = 0;
                 float markerX = 0;
@@ -796,6 +810,47 @@ namespace ZoneEngine.Core.Missions
         {
             int instance = Interlocked.Increment(ref questInstanceSeed) & 0x7fffffff;
             return instance == 0 ? NextQuestInstance() : instance;
+        }
+
+        internal static int ResolveClientClockNowSeconds(
+            DateTime lastGameTimeSyncUtc,
+            DateTime utcNow)
+        {
+            double secondsSinceSync = (utcNow - lastGameTimeSyncUtc).TotalSeconds;
+            if (secondsSinceSync < 0)
+            {
+                secondsSinceSync = 0;
+            }
+
+            return checked(ClientClockBaseSeconds + (int)secondsSinceSync);
+        }
+
+        internal static int ResolveClientExpirySeconds(
+            DateTime lastGameTimeSyncUtc,
+            DateTime utcNow,
+            DateTime expiryUtc)
+        {
+            double remainingSeconds = (expiryUtc - utcNow).TotalSeconds;
+            if (remainingSeconds <= 0)
+            {
+                return 0;
+            }
+
+            return checked(
+                ResolveClientClockNowSeconds(lastGameTimeSyncUtc, utcNow)
+                + (int)Math.Ceiling(remainingSeconds));
+        }
+
+        internal static string IntToFixedBinaryString(int value)
+        {
+            return new string(
+                new[]
+                {
+                    (char)(byte)(value >> 24),
+                    (char)(byte)(value >> 16),
+                    (char)(byte)(value >> 8),
+                    (char)(byte)value
+                });
         }
 
         private static void RestoreStringTerminators(QuestAlternativeMessage message)
