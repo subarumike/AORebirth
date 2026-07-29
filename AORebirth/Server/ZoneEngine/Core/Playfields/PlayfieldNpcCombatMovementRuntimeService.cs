@@ -89,6 +89,20 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
+            string missionStationaryReason;
+            if (ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.RequiresStationaryNpc(
+                attacker,
+                target,
+                out missionStationaryReason))
+            {
+                this.chaseNavigation.Clear(
+                    attacker.Identity.Instance,
+                    NpcChaseInvalidationReason.RouteSegmentInvalid);
+                npcController.SnapshotCurrentMotionPosition();
+                npcController.StopFollow();
+                return;
+            }
+
             if (!CanChase(attacker))
             {
                 npcController.StopFollow();
@@ -124,6 +138,20 @@ namespace ZoneEngine.Core.Playfields
             NPCController npcController = attacker.Controller as NPCController;
             if (npcController == null)
             {
+                return;
+            }
+
+            string missionStationaryReason;
+            if (ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.RequiresStationaryNpc(
+                attacker,
+                target,
+                out missionStationaryReason))
+            {
+                this.chaseNavigation.Clear(
+                    attacker.Identity.Instance,
+                    NpcChaseInvalidationReason.RouteSegmentInvalid);
+                npcController.SnapshotCurrentMotionPosition();
+                npcController.StopFollow();
                 return;
             }
 
@@ -173,6 +201,15 @@ namespace ZoneEngine.Core.Playfields
                               ? new AORebirth.Core.Vector.Vector3()
                               : GetCombatPosition(attacker);
             if (attacker == null || target == null)
+            {
+                return false;
+            }
+
+            string missionStationaryReason;
+            if (ZoneEngine.Core.Missions.MissionAcgSpatialRuntime.RequiresStationaryNpc(
+                attacker,
+                target,
+                out missionStationaryReason))
             {
                 return false;
             }

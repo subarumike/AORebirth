@@ -1321,6 +1321,15 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            string missionSpatialFailure;
+            if (!MissionAcgSpatialRuntime.TryValidateCombatPair(
+                attacker,
+                target,
+                out missionSpatialFailure))
+            {
+                return false;
+            }
+
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
             if (attackSource == null)
             {
@@ -1628,6 +1637,16 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessValidatedPlayerCombatTick(ICharacter attacker, ICharacter target)
         {
+            string missionSpatialFailure;
+            if (!MissionAcgSpatialRuntime.TryValidateCombatPair(
+                attacker,
+                target,
+                out missionSpatialFailure))
+            {
+                this.CancelPlayerAttack(attacker);
+                return;
+            }
+
             CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);
             DateTime nextTick;
             DateTime now = DateTime.UtcNow;

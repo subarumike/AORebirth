@@ -101,8 +101,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
   `20260727-223041` replay with zero decoder/extractor errors.
 
-- Generated RK mission interiors now have capture-backed Stage 5 operational
-  combat-space ownership.
+- Generated RK mission interiors now have capture-backed Stage 6 spatial
+  authority.
   The five immutable selectable bundles and their payload hashes are unchanged;
   eight legacy shapes remain nonselectable and PF2 `1441804` remains excluded.
   An accepted binding enters its persisted isolated PF2 with the exact bundle
@@ -124,11 +124,18 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   unresolved-empty chest inventory, and restart-resumable cleanup. Real
   mission NPCs use captured appearance and attributes plus the existing
   production mission-combat policy; Kill deaths route through the exact Stage 4
-  target while Find Person remains interaction-only. Combat, interaction,
-  corpse, and chest access require the bound PF2 and bounded finite
-  coordinates. Client ACG geometry remains authoritative: server line of sight,
-  collision meshes, room reachability, navigation, fabricated loot, and
-  procedural generation remain deferred. Stage 2 still owns PF release. No
+  target while Find Person remains interaction-only. Stage 6 deterministically
+  derives a finite axis-aligned envelope from each exact bundle's spawn, exit,
+  dynels, NPCs, and objective slots with a bounded `2.0` coordinate tolerance.
+  Player movement, interaction, exit, combat, aggro, damage, corpse access, and
+  stationary NPC safety now require exact owner/PF2/runtime ownership and the
+  same envelope. Version-1 `acg-spatial` sidecars atomically preserve only the
+  last valid player position and binding identity. No generated-PF collision
+  geometry exists: geometry-required LOS is explicitly unresolved and
+  fail-closed, range-only behavior does not claim clear LOS, and mission NPCs
+  do not pursue without a safe navigation graph. Client ACG geometry remains
+  authoritative; room topology, collision meshes, navigation, fabricated loot,
+  and procedural generation remain deferred. Stage 2 still owns PF release. No
   schema changed.
   Evidence:
   `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
