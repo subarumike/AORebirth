@@ -4,13 +4,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using System;
     using System.Globalization;
+    using System.IO;
+    using System.Reflection;
     using System.Security.Cryptography;
     using System.Text;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using SmokeLounge.AOtomation.Messaging.Serialization;
+    using SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom;
 
     using ZoneEngine.Core.Missions;
 
@@ -149,7 +154,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     MissionLocationSide.Omni,
                     12345,
                     capturedResponseIndex,
-                    unchecked((int)0x55690000));
+                    unchecked((int)0x55690000),
+                    1201445827);
 
             Assert.AreEqual(captured.VersionId, generated.VersionId);
             Assert.AreEqual(captured.LevelSlider, generated.LevelSlider);
@@ -170,6 +176,146 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 request.MissionTerminalIdentity,
                 generated.MissionTerminalIdentity);
             Assert.AreEqual(5, generated.QuestInfos.Length);
+        }
+
+        [TestMethod]
+        public void GeneratedRollPreservesClientTitleWidthFreshExpiryAndRoundTrips()
+        {
+            var request = new QuestAlternativeMessage
+                          {
+                              Identity = new Identity
+                                         {
+                                             Type = (IdentityType)50000,
+                                             Instance = 22
+                                         },
+                              MissionTerminalIdentity =
+                                  new Identity
+                                  {
+                                      Type = (IdentityType)56001,
+                                      Instance = unchecked((int)0xC000028F)
+                                  },
+                              VersionId = 4,
+                              LevelSlider = 1,
+                              GoodBadSlider = 0,
+                              OrderChaosSlider = 0,
+                              OpenHiddenSlider = 0,
+                              PhysicalMysticalSlider = 0,
+                              HeadOnStealthSlider = 0,
+                              MoneyExperienceSlider = 0,
+                              Unknown4 = 0,
+                              Unknown5 = 1,
+                              QuestInfos = new QuestInfo[0]
+                          };
+
+            QuestAlternativeMessage generated =
+                MissionRollService.BuildRollResponseDeterministic(
+                    request,
+                    request.Identity,
+                    4,
+                    100,
+                    0f,
+                    0f,
+                    MissionLocationSide.Omni,
+                    12345,
+                    7,
+                    unchecked((int)0x55690000),
+                    1201445827);
+            foreach (QuestInfo offer in generated.QuestInfos)
+            {
+                Assert.AreEqual(
+                    31,
+                    Encoding.ASCII.GetByteCount(offer.ShortInfo),
+                    "Captured QuestAlternative titles occupy 31 bytes before the terminator.");
+                Assert.AreEqual(
+                    -1,
+                    offer.ShortInfo.IndexOf('\0'),
+                    "A zero-padded short title misaligns the live client reader.");
+                Assert.AreEqual(
+                    0x51534F52,
+                    offer.UnknownHash,
+                    "The fixed top-level QSOR tag must remain captured evidence.");
+                Assert.AreEqual(
+                    1201618627,
+                    offer.QuestActions[0].UnknownHash15,
+                    "Every offer must expire exactly 48 client-clock hours after this roll.");
+            }
+
+            byte[] body = MissionRollService.SerializeBody(generated);
+
+            var builder = new SerializerResolverBuilder<MessageBody>();
+            SerializerResolver resolver = builder.Build();
+            ISerializer serializer = resolver.GetSerializer(typeof(QuestAlternativeMessage));
+            using (var memoryStream = new MemoryStream(body))
+            using (var reader =
+                new SmokeLounge.AOtomation.Messaging.Serialization.StreamReader(memoryStream))
+            {
+                QuestAlternativeMessage decoded;
+                try
+                {
+                    decoded = (QuestAlternativeMessage)serializer.Deserialize(
+                        reader,
+                        new SerializationContext(resolver));
+                }
+                catch (Exception exception)
+                {
+                    Assert.Fail(
+                        "Generated roll failed to decode at byte "
+                        + reader.Position
+                        + "/"
+                        + reader.Length
+                        + ": "
+                        + exception);
+                    return;
+                }
+
+                Assert.AreEqual(body.Length, reader.Position);
+                Assert.AreEqual(5, decoded.QuestInfos.Length);
+            }
+        }
+
+        [TestMethod]
+        public void MissionRollDeadlineUsesThePrivateServerGameTimeAnchor()
+        {
+            var synced = new DateTime(2026, 7, 29, 4, 33, 16, DateTimeKind.Utc);
+
+            Assert.AreEqual(
+                1201445832,
+                MissionRollService.ResolveClientClockNowSeconds(
+                    synced,
+                    synced.AddSeconds(5)));
+            Assert.AreEqual(
+                1201445827,
+                MissionRollService.ResolveClientClockNowSeconds(
+                    synced,
+                    synced.AddSeconds(-5)));
+            Assert.AreEqual(
+                1201618632,
+                MissionRollService.ResolveClientExpirySeconds(
+                    synced,
+                    synced.AddSeconds(5),
+                    synced.AddSeconds(172805)));
+            Assert.AreEqual(
+                0,
+                MissionRollService.ResolveClientExpirySeconds(
+                    synced,
+                    synced.AddSeconds(5),
+                    synced.AddSeconds(4)));
+        }
+
+        [TestMethod]
+        public void AcceptedMissionExpirySerializesAsFourLosslessWireBytes()
+        {
+            string expiry =
+                MissionRollService.IntToFixedBinaryString(0x479F3EC3);
+            MethodInfo fixedStringBytes =
+                typeof(QuestFullUpdateMessageSerializer).GetMethod(
+                    "FixedStringBytes",
+                    BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.IsNotNull(fixedStringBytes);
+
+            CollectionAssert.AreEqual(
+                new byte[] { 0x47, 0x9F, 0x3E, 0xC3 },
+                (byte[])fixedStringBytes.Invoke(null, new object[] { expiry, 4 }));
         }
 
         private static int FirstDifference(byte[] expected, byte[] actual)

@@ -6,9 +6,9 @@ namespace ZoneEngine.Core.Missions
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     /// <summary>
-    /// Rebuilds only the mutable part of a captured offer's text. An unchanged captured combination keeps
-    /// its exact original title and description; once location, QL, reward, or payout item changes, both
-    /// fields are regenerated from the compatible objective family so stale captured values cannot leak.
+    /// Rebuilds only the length-prefixed mutable description. The captured 32-byte title remains intact:
+    /// live QuestAlternative readers treat that field as a non-zero fixed-width title ending immediately
+    /// before the description length. Shorter zero-padded replacements misalign the remaining offer.
     /// </summary>
     internal static class MissionOfferTextBuilder
     {
@@ -84,7 +84,6 @@ namespace ZoneEngine.Core.Missions
                                 ? "the assigned target"
                                 : descriptor.TargetName.TrimEnd('\0');
 
-            offer.ShortInfo = MissionTypeCatalog.ShortTitle(descriptor.Type);
             offer.Info = BuildDescription(
                 descriptor.Type,
                 target,

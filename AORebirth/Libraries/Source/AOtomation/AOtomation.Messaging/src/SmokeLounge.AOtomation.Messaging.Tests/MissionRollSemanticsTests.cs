@@ -251,7 +251,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     Assert.IsTrue(MissionOfferCompatibility.IsCompatibleWithSliders(descriptor, sliders));
                     Assert.AreEqual(42, offer.Quality);
                     Assert.AreEqual(MissionTypeCatalog.IconId(descriptor.Type, 0), offer.MissionIconId);
-                    Assert.AreEqual(MissionTypeCatalog.ShortTitle(descriptor.Type), offer.ShortInfo);
+                    Assert.AreEqual(
+                        31,
+                        offer.ShortInfo.Length,
+                        "Captured title width must remain client-decodable.");
+                    Assert.IsTrue(offer.ShortInfo.EndsWith("...", StringComparison.Ordinal));
                     Assert.IsTrue(questIds.Add(offer.QuestIdentity.Instance), "duplicate quest id");
 
                     QuestActionList destination = offer.QuestActions[0];
@@ -486,7 +490,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 MissionLocationSide.Omni,
                 seed,
                 0x24681357,
-                0x55660000);
+                0x55660000,
+                1201445827);
         }
 
         private static QuestAlternativeMessage Request(

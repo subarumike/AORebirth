@@ -35,6 +35,11 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             ICharacter character = client.Controller.Character;
+            var zoneClient = client as ZoneEngine.Core.ZoneClient;
+            if (zoneClient == null)
+            {
+                return;
+            }
 
             client.Server.Info(
                 client,
@@ -123,7 +128,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     terminalPlayfieldId,
                     terminalX,
                     terminalZ,
-                    characterSide);
+                    characterSide,
+                    MissionRollService.ResolveClientClockNowSeconds(
+                        zoneClient.LastGameTimeSyncUtc,
+                        DateTime.UtcNow));
 
                 int fee;
                 if (!MissionRollFeeService.TryChargeRollFee(character, out fee))

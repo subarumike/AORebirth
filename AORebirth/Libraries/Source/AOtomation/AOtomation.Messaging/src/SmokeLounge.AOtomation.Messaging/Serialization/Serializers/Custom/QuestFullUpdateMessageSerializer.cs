@@ -115,7 +115,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                        Unknown11 = reader.ReadInt32(),
                        Unknown12 = reader.ReadInt32(),
                        Unknown13 = reader.ReadInt32(),
-                       UnknownHash1 = reader.ReadString(4),
+                       UnknownHash1 = ReadFixedString(reader, 4),
                        Unknown14 = reader.ReadInt32(),
                        Unknown15 = reader.ReadInt32(),
                        Unknown16 = reader.ReadInt32(),
@@ -236,7 +236,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                        Unknown7 = reader.ReadSingle(),
                        Unknown8 = reader.ReadSingle(),
                        UnknownId6 = reader.ReadIdentity(),
-                       UnknownHash1 = reader.ReadString(4),
+                       UnknownHash1 = ReadFixedString(reader, 4),
                        Unknown9 = reader.ReadInt32(),
                        UnknownId7 = reader.ReadIdentity(),
                        PlayfieldId = reader.ReadIdentity(),
@@ -331,7 +331,36 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 
         private static void WriteFixedString(StreamWriter writer, string value, int length)
         {
-            writer.WriteString(value ?? string.Empty, length);
+            byte[] bytes = FixedStringBytes(value, length);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                writer.WriteByte(bytes[i]);
+            }
+        }
+
+        private static string ReadFixedString(StreamReader reader, int length)
+        {
+            byte[] bytes = reader.ReadBytes(length);
+            var chars = new char[bytes.Length];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                chars[i] = (char)bytes[i];
+            }
+
+            return new string(chars).TrimEnd('\0');
+        }
+
+        internal static byte[] FixedStringBytes(string value, int length)
+        {
+            string safe = value ?? string.Empty;
+            var bytes = new byte[length];
+            int count = Math.Min(safe.Length, length);
+            for (int i = 0; i < count; i++)
+            {
+                bytes[i] = checked((byte)safe[i]);
+            }
+
+            return bytes;
         }
 
         private static int ReadX3F1Count(StreamReader reader)
