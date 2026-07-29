@@ -199,6 +199,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLocationPool.cs">
       <Link>MissionLocationPool.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionNpcDifficultyPolicy.cs">
+      <Link>MissionNpcDifficultyPolicy.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCatalog.cs">
       <Link>MissionRewardCatalog.cs</Link>
     </Compile>

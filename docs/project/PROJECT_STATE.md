@@ -126,7 +126,7 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   packet-send state, and exact artifact cleanup survive restart; already
   granted rewards are not repeated. A legacy reward grant left `Pending` fails
   closed because character persistence and the sidecar are not one atomic
-  transaction. Version-1 operational sidecars add exact accepted-mission/PF2
+  transaction. Version-2 operational sidecars add exact accepted-mission/PF2
   ownership for captured NPC slots, health, death/corpse state, explicit
   unresolved-empty chest inventory, and restart-resumable cleanup. Real
   mission NPCs use captured appearance and attributes plus the existing
@@ -146,6 +146,20 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   schema changed.
   Evidence:
   `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
+
+- A live level-4 Find Item run now proves roll, distinct acceptance, key grant,
+  isolated entry, exact objective pickup, reward/item grant, key removal, and
+  completion cleanup. That run also exposed two integration defects now repaired
+  in source: same-playfield ICC markers were being rejected by cross-playfield
+  side filtering, and bound ACG PF2s were excluded from the Stage 5 operational
+  NPC spawn hook. Same-playfield capture-backed markers now remain eligible,
+  bound instances enter the operational NPC path, hostile mission NPCs register
+  with mission combat, and their live level/health reuse the existing
+  deterministic mission-QL policy while captured appearance, identity,
+  position, and template remain unchanged. Focused and mission-filtered
+  regressions pass. Active version-1 captured-difficulty state is validated and
+  atomically migrated without losing proportional health or mutable lifecycle
+  state; the post-repair live destination/NPC recheck remains pending.
 
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
   `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the

@@ -350,6 +350,7 @@
     <Compile Include="Core\Missions\MissionInstanceDynelCapture.cs" />
     <Compile Include="Core\Missions\MissionInstanceDoorReplay.cs" />
     <Compile Include="Core\Missions\MissionInstanceMobCombat.cs" />
+    <Compile Include="Core\Missions\MissionNpcDifficultyPolicy.cs" />
     <Compile Include="Core\Missions\MissionAcgLayoutRecords.cs" />
     <Compile Include="Core\Missions\MissionAcgLayoutBundle.cs" />
     <Compile Include="Core\Missions\MissionAcgInstanceBinding.cs" />

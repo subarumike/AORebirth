@@ -475,6 +475,56 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, MissionRollFeeRules.FeeForLevel(0));
         }
 
+        [TestMethod]
+        public void LevelFourNeutralIccRollStaysInTheTerminalPlayfield()
+        {
+            QuestAlternativeMessage generated =
+                MissionRollService.BuildRollResponseDeterministic(
+                    Request(1, 0, 0, 0, 0, 0, 0),
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = 0x12345678
+                    },
+                    4,
+                    655,
+                    3238f,
+                    918f,
+                    MissionLocationSide.Neutral,
+                    12345,
+                    0x24681357,
+                    0x55660000,
+                    1201445827);
+
+            Assert.AreEqual(5, generated.QuestInfos.Length);
+            foreach (QuestInfo offer in generated.QuestInfos)
+            {
+                Assert.AreEqual(
+                    655,
+                    offer.QuestActions[0].Playfield.Instance,
+                    "A neutral ICC roll must prefer proven same-playfield markers.");
+            }
+        }
+
+        [TestMethod]
+        public void AcgNpcDifficultyReusesStableMissionQualityPolicy()
+        {
+            var first = new Random(0x12345678);
+            var second = new Random(0x12345678);
+
+            int firstLevel = MissionNpcDifficultyPolicy.ResolveLevel(2, first);
+            int firstHealth = MissionNpcDifficultyPolicy.ResolveHealth(firstLevel, first);
+            int secondLevel = MissionNpcDifficultyPolicy.ResolveLevel(2, second);
+            int secondHealth = MissionNpcDifficultyPolicy.ResolveHealth(secondLevel, second);
+
+            Assert.AreEqual(firstLevel, secondLevel);
+            Assert.AreEqual(firstHealth, secondHealth);
+            Assert.IsTrue(firstLevel >= 1 && firstLevel <= 4);
+            Assert.IsTrue(firstHealth >= 50 && firstHealth <= 100);
+            Assert.AreNotEqual(38, firstLevel);
+            Assert.AreNotEqual(1221, firstHealth);
+        }
+
         private static QuestAlternativeMessage Build(
             QuestAlternativeMessage request,
             int characterLevel,

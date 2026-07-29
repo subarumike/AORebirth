@@ -516,7 +516,7 @@ team reward distribution is not inferred from the current captures.
 
 ## Stage 5 operational NPC, corpse, container, and spatial state
 
-Stage 5 adds a version-1 mutable sidecar under
+Stage 5 uses a version-2 mutable sidecar under
 `mission-state/acg-operational`. Each record binds the accepted quest, owner,
 allocated live PF2, selected bundle and payload hash, and building identity to
 indexed NPC and chest state. NPC records persist captured slot and identity,
@@ -532,7 +532,12 @@ the canonical field block, same-directory temporary write, strict readback,
 and atomic replacement. Unknown, truncated, hash-invalid, duplicate, or
 binding/bundle/building/PF2-mismatched records fail closed. Stage 2 binding
 format version 2, Stage 3 runtime format version 1, Stage 4 objective format
-version 1, and all Stage 1 payload hashes remain unchanged.
+version 1, and all Stage 1 payload hashes remain unchanged. Operational version
+1 remains readable only as the legacy captured-difficulty format. Active
+version-1 records are validated against their exact captured slots, atomically
+migrated to deterministic mission-QL level/health, and retain proportional
+current health plus life, combat, corpse, chest, and cleanup state. Invalid or
+unwritable migrations fail closed.
 
 The runtime owner is always:
 
@@ -551,14 +556,18 @@ Captured NPC `SimpleCharFullUpdate` replay is suppressed only after the Stage 5
 owner is valid; real server `Character` objects are created with the same
 restart-stable Stage 3 identities.
 
-Capture-proven NPC facts are position, rotation, template, MonsterData, level,
-health, scale, head mesh where present, name, textures, and meshes. The
-existing production `BART` template is only the construction shell. Exact
-captured fields overwrite its visible/identity state. The existing
-`MissionInstanceMobCombat` QL policy remains the production owner for damage,
-weapon context, death action, and combat packets because the five finalized
-mission captures do not contain a complete per-NPC attack contract. Stage 5
-does not add a new damage or health formula.
+Capture-proven NPC facts are position, rotation, template, MonsterData, source
+level, source health, scale, head mesh where present, name, textures, and
+meshes. The existing production `BART` template is only the construction
+shell. Exact captured identity, placement, appearance, and MonsterData fields
+overwrite its visible state. Source level and health remain immutable catalog
+provenance but are not replayed into an accepted mission of a different QL.
+Live level and health reuse the pre-existing `MissionInstanceSpawn` QL policy,
+seeded by the durable mission seed and captured slot so restart cannot reroll
+them. The existing `MissionInstanceMobCombat` policy remains the production
+owner for damage, weapon context, death action, and combat packets because the
+five finalized mission captures do not contain a complete per-NPC attack
+contract. Stage 5 adds no new combat or health formula.
 
 Kill targets and ambient NPCs enter the normal attack, damage, aggro,
 changed-stat, death, and corpse pipelines. A death is persisted before Stage 4
@@ -731,6 +740,36 @@ Startup restores binding/PF2 ownership, Stage 3 materialization, Stage 4
 objective state, Stage 5 operational state, then Stage 6 spatial state.
 Completion, abandonment, expiry, and cleanup delete only the exact mission's
 spatial registration and sidecar. The envelope is never serialized or rerolled.
+
+## Live validation repair: 2026-07-29
+
+A level-4 neutral character at terminal PF `655` successfully rolled, accepted,
+entered, found the exact static item, completed, received credits and the item
+reward, and had the exact key removed. The accepted Find Item binding used live
+PF2 `1441792`, the persisted `20260728-005042` bundle, and its exact building.
+
+That run exposed two independent integration defects:
+
+- The destination filter classified the neutral ICC terminal through character
+  side, rejected all same-PF `655` markers because the marker zone is sided,
+  and fell through to a 14-entry `nearRing` pool. The accepted offer therefore
+  used PF `505`. Same-playfield markers now bypass marker-side exclusion before
+  low-level same-zone selection; cross-playfield side filtering is unchanged.
+- The selected bundle contains 18 captured NPC slots, but the content module
+  excluded every bound ACG PF2 before `MissionAcgOperationalRuntime` could
+  create server NPCs. Stage 3 then correctly suppressed all 18 raw captured NPC
+  packets, producing the observed `59` objects / `41` packets and an empty
+  interior. Bound mission PF2 values now enter the Stage 5 spawn hook; the
+  existing bound/unbound branch still prevents legacy NPC generation.
+
+The source capture's first Find Item NPC is level 38 with 1221 health. Those
+source values are not safe live values for the accepted QL2 mission. The
+existing mission QL scaling owner now supplies deterministic live level/health,
+while captured position, identity, appearance, name, template, and MonsterData
+remain unchanged. Operational format version 2 records those live values; an
+exact atomic version-1 migration prevents active pre-repair missions from
+becoming unenterable or retaining unsafe captured difficulty. A post-repair
+live roll/entry/combat check remains pending.
 
 Thirty-one focused Stage 6 tests cover deterministic bounds, finite and
 insufficient evidence, tolerance, layout isolation, explicit LOS policy,

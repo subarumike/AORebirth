@@ -590,11 +590,18 @@ namespace ZoneEngine.Core.Missions
             for (int i = 0; i < count; i++)
             {
                 MissionLocationPool.Spot spot = MissionLocationPool.Spots[i];
-                if (!MissionLocationPool.IsSpotAllowedForTerminal(spot.Playfield, poolSide))
+                bool samePlayfield =
+                    terminalPlayfieldId != 0 && spot.Playfield == terminalPlayfieldId;
+                if (!samePlayfield
+                    && !MissionLocationPool.IsSpotAllowedForTerminal(spot.Playfield, poolSide))
                 {
                     continue;
                 }
 
+                // A usable terminal can sit in a neutral hub whose outdoor marker playfield has
+                // a sided classification (ICC PF 655 is the live example). A same-playfield
+                // marker cannot cross-route the character and is the safest low-level result,
+                // so marker affiliation must not discard it before same-zone selection.
                 sideMatched.Add(i);
 
                 int nearRank = MissionLocationPool.NearClusterRank(terminalPlayfieldId, spot.Playfield);

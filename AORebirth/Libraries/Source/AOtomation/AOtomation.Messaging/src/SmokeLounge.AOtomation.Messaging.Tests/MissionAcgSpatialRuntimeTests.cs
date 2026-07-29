@@ -248,10 +248,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void SpatialFormatIsSeparateAndEarlierFormatsRemainReadable()
+        public void SpatialFormatIsSeparateAndOperationalMigrationRemainsExplicit()
         {
             Assert.AreEqual(1, MissionAcgSpatialState.CurrentFormatVersion);
-            Assert.AreEqual(1, MissionAcgOperationalState.CurrentFormatVersion);
+            Assert.AreEqual(
+                1,
+                MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion);
+            Assert.AreEqual(2, MissionAcgOperationalState.CurrentFormatVersion);
             Assert.AreEqual(1, MissionAcgRuntimeState.CurrentFormatVersion);
             Assert.AreEqual(2, MissionAcgInstanceBinding.CurrentFormatVersion);
         }

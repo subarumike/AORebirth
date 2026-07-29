@@ -36,11 +36,106 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void OperationalFormatIsVersionOneAndSeparateFromEarlierFormats()
+        public void OperationalFormatIsVersionTwoWithExplicitLegacySupport()
         {
-            Assert.AreEqual(1, MissionAcgOperationalState.CurrentFormatVersion);
+            Assert.AreEqual(1, MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion);
+            Assert.AreEqual(2, MissionAcgOperationalState.CurrentFormatVersion);
             Assert.AreEqual(1, MissionAcgRuntimeState.CurrentFormatVersion);
             Assert.AreEqual(2, MissionAcgInstanceBinding.CurrentFormatVersion);
+        }
+
+        [TestMethod]
+        public void BoundMissionContentRegistrationReachesOperationalNpcSpawning()
+        {
+            string module =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MissionInstanceContentModule.cs");
+            string npcRuntime =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
+            string operational =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
+
+            Assert.IsTrue(
+                module.Contains(
+                    "return MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance);"));
+            Assert.IsFalse(
+                module.Contains("!MissionAcgBindingRuntime.IsBoundLivePlayfield"));
+            Assert.IsTrue(module.Contains("registration.RegisterCapturedNpcSpawns();"));
+            Assert.IsTrue(
+                npcRuntime.Contains("MissionAcgOperationalRuntime.TrySpawnForPlayfield"));
+            Assert.IsTrue(
+                operational.Contains("MissionInstanceMobCombat.RegisterAggressive(mob.Identity);"));
+            Assert.IsTrue(operational.Contains("npcState.Level"));
+            Assert.IsTrue(
+                operational.Contains("MissionNpcDifficultyPolicy.ResolveLevel"));
+        }
+
+        [TestMethod]
+        public void LegacyCapturedDifficultyMigratesWithoutLosingMutableState()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(20, this.FirstPf());
+            MissionAcgOperationalState template = this.CreateState(record, false, true);
+            MissionAcgOperationalState legacyExpected =
+                WithDifficulty(
+                    template,
+                    MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion,
+                    38,
+                    1221,
+                    1221);
+            MissionAcgOperationalState legacyPersisted =
+                WithDifficulty(
+                    template,
+                    MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion,
+                    38,
+                    1221,
+                    610);
+            MissionAcgOperationalState currentExpected =
+                WithDifficulty(
+                    template,
+                    MissionAcgOperationalState.CurrentFormatVersion,
+                    2,
+                    50,
+                    50);
+            var store = new MissionAcgOperationalStateStore(this.temporaryRoot);
+            string failure;
+            Assert.IsTrue(store.TryWrite(legacyPersisted, false, out failure), failure);
+
+            MissionAcgOperationalState restored;
+            bool exists;
+            Assert.IsTrue(
+                store.TryLoad(record.Binding, out restored, out exists, out failure),
+                failure);
+            Assert.IsTrue(exists);
+            Assert.AreEqual(
+                MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion,
+                restored.FormatVersion);
+
+            MissionAcgOperationalState migrated;
+            Assert.IsTrue(
+                MissionAcgOperationalStateMigration.TryUpgradeLegacyDifficulty(
+                    restored,
+                    legacyExpected,
+                    currentExpected,
+                    DateTime.UtcNow,
+                    out migrated,
+                    out failure),
+                failure);
+            Assert.AreEqual(MissionAcgOperationalState.CurrentFormatVersion, migrated.FormatVersion);
+            Assert.AreEqual(2, migrated.Npcs[0].Level);
+            Assert.AreEqual(50, migrated.Npcs[0].MaximumHealth);
+            Assert.AreEqual(24, migrated.Npcs[0].CurrentHealth);
+            Assert.IsTrue(migrated.Chests[0].IsOpen);
+            Assert.IsTrue(migrated.Chests[0].IsExhausted);
+            Assert.IsTrue(store.TryWrite(migrated, true, out failure), failure);
+
+            MissionAcgOperationalState roundTrip;
+            Assert.IsTrue(
+                store.TryLoad(record.Binding, out roundTrip, out exists, out failure),
+                failure);
+            Assert.AreEqual(MissionAcgOperationalState.CurrentFormatVersion, roundTrip.FormatVersion);
+            Assert.AreEqual(24, roundTrip.Npcs[0].CurrentHealth);
         }
 
         [TestMethod]
@@ -171,7 +266,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 store.TryWrite(this.CreateState(record, false, false), false, out failure),
                 failure);
             string path = store.PathFor(record.Binding.AcceptedQuestIdentity);
-            string contents = File.ReadAllText(path).Replace("FormatVersion=1", "FormatVersion=99");
+            string contents =
+                File.ReadAllText(path).Replace(
+                    "FormatVersion="
+                    + MissionAcgOperationalState.CurrentFormatVersion,
+                    "FormatVersion=99");
             File.WriteAllText(path, contents);
             MissionAcgOperationalState restored;
             bool exists;
@@ -359,6 +458,50 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new DateTime(2026, 7, 28, 18, 0, 0, DateTimeKind.Utc));
         }
 
+        private static MissionAcgOperationalState WithDifficulty(
+            MissionAcgOperationalState state,
+            int formatVersion,
+            int level,
+            int maximumHealth,
+            int currentHealth)
+        {
+            MissionAcgNpcRuntimeState source = state.Npcs[0];
+            var npc =
+                new MissionAcgNpcRuntimeState(
+                    source.CapturedSlot,
+                    source.CapturedIdentity,
+                    source.RuntimeIdentity,
+                    source.Position,
+                    source.Heading,
+                    source.TemplateId,
+                    source.MonsterData,
+                    level,
+                    maximumHealth,
+                    currentHealth,
+                    source.MonsterScale,
+                    source.HeadMesh,
+                    source.Name,
+                    source.Role,
+                    source.LifeState,
+                    source.CombatState,
+                    source.CorpseIdentity,
+                    source.CorpseState,
+                    source.SpawnGeneration,
+                    source.CleanupCompleted);
+            return new MissionAcgOperationalState(
+                formatVersion,
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                state.BundleId,
+                state.BundlePayloadSha256,
+                state.BuildingIdentity,
+                new[] { npc },
+                state.Chests,
+                state.CleanupState,
+                DateTime.UtcNow);
+        }
+
         private MissionAcgBindingRecord CreateBinding(int salt, int livePf)
         {
             var owner = new MissionAcgIdentityRecord(0xC350, 10000 + salt);
@@ -424,6 +567,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             return unchecked((int)0x60000000)
                    | ((livePf - MissionAcgAllocationService.MinimumLivePlayfield2) << 8)
                    | ordinal;
+        }
+
+        private static string ReadSource(string relativePath)
+        {
+            DirectoryInfo current =
+                new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (current != null)
+            {
+                if (Directory.Exists(Path.Combine(current.FullName, ".git")))
+                {
+                    return File.ReadAllText(Path.Combine(current.FullName, relativePath));
+                }
+
+                current = current.Parent;
+            }
+
+            throw new InvalidOperationException("Repository root was not found.");
         }
     }
 }

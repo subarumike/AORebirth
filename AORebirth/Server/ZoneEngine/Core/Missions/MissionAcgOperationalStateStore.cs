@@ -226,7 +226,9 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 int formatVersion = ParseInt(Require(values, "FormatVersion"), "FormatVersion");
-                if (formatVersion != MissionAcgOperationalState.CurrentFormatVersion)
+                if (formatVersion
+                        != MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion
+                    && formatVersion != MissionAcgOperationalState.CurrentFormatVersion)
                 {
                     failure = "Unknown operational-state format version " + formatVersion + ".";
                     return false;

@@ -186,7 +186,7 @@ namespace ZoneEngine.Core.Missions
                         captured.Heading.Z,
                         captured.Heading.W),
                     controller,
-                    captured.CapturedLevel,
+                    npcState.Level,
                     runtimeIdentity);
                 if (mob == null)
                 {
@@ -208,7 +208,7 @@ namespace ZoneEngine.Core.Missions
                 else if (!MissionInstanceMobCombat.TryPrepareCombat(
                     mob,
                     controller,
-                    captured.CapturedLevel))
+                    npcState.Level))
                 {
                     controller.AiProfile = NpcAiProfile.Passive;
                     mob.Stats.SetBaseValueWithoutTriggering(
@@ -220,6 +220,10 @@ namespace ZoneEngine.Core.Missions
                         bindingRecord.Binding.AcceptedQuestIdentity.Instance,
                         bindingRecord.Binding.AllocatedLivePlayfield2,
                         npcState.RuntimeIdentity.Instance);
+                }
+                else
+                {
+                    MissionInstanceMobCombat.RegisterAggressive(mob.Identity);
                 }
 
                 mob.Stats.SetBaseValueWithoutTriggering(
@@ -614,6 +618,35 @@ namespace ZoneEngine.Core.Missions
             MissionAcgObjectiveRecord objective,
             DateTime nowUtc)
         {
+            return CreateState(
+                bindingRecord,
+                instance,
+                objective,
+                nowUtc,
+                false);
+        }
+
+        private static MissionAcgOperationalState CreateLegacyExpectedState(
+            MissionAcgBindingRecord bindingRecord,
+            MissionAcgMaterializedInstance instance,
+            MissionAcgObjectiveRecord objective,
+            DateTime nowUtc)
+        {
+            return CreateState(
+                bindingRecord,
+                instance,
+                objective,
+                nowUtc,
+                true);
+        }
+
+        private static MissionAcgOperationalState CreateState(
+            MissionAcgBindingRecord bindingRecord,
+            MissionAcgMaterializedInstance instance,
+            MissionAcgObjectiveRecord objective,
+            DateTime nowUtc,
+            bool legacyCapturedDifficulty)
+        {
             MissionAcgInstanceBinding binding = bindingRecord.Binding;
             MissionAcgLayoutBundle bundle = instance.Bundle;
             var byCaptured = new Dictionary<string, MissionAcgRuntimeIdentityEntry>(
@@ -644,11 +677,35 @@ namespace ZoneEngine.Core.Missions
                             : MissionAcgNpcRole.FindPerson;
                 }
 
-                int maximumHealth = Math.Max(0, captured.CapturedHealth);
-                int currentHealth =
-                    Math.Max(
-                        0,
-                        maximumHealth - Math.Max(0, captured.CapturedHealthDamage));
+                int runtimeLevel;
+                int maximumHealth;
+                int currentHealth;
+                if (legacyCapturedDifficulty)
+                {
+                    runtimeLevel = captured.CapturedLevel;
+                    maximumHealth = Math.Max(0, captured.CapturedHealth);
+                    currentHealth =
+                        Math.Max(
+                            0,
+                            maximumHealth - Math.Max(0, captured.CapturedHealthDamage));
+                }
+                else
+                {
+                    var difficultyRng =
+                        new Random(
+                            unchecked(
+                                binding.DeterministicSeed
+                                ^ (captured.Slot * 397)
+                                ^ captured.CapturedIdentity.Instance));
+                    runtimeLevel =
+                        MissionNpcDifficultyPolicy.ResolveLevel(
+                            binding.MissionQuality,
+                            difficultyRng);
+                    maximumHealth =
+                        MissionNpcDifficultyPolicy.ResolveHealth(runtimeLevel, difficultyRng);
+                    currentHealth = maximumHealth;
+                }
+
                 bool valid =
                     captured.TemplateId > 0
                     && captured.MonsterData > 0
@@ -665,7 +722,7 @@ namespace ZoneEngine.Core.Missions
                         captured.Heading,
                         captured.TemplateId,
                         captured.MonsterData,
-                        captured.CapturedLevel,
+                        runtimeLevel,
                         maximumHealth,
                         currentHealth,
                         captured.Scale,
@@ -712,7 +769,9 @@ namespace ZoneEngine.Core.Missions
             }
 
             return new MissionAcgOperationalState(
-                MissionAcgOperationalState.CurrentFormatVersion,
+                legacyCapturedDifficulty
+                    ? MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion
+                    : MissionAcgOperationalState.CurrentFormatVersion,
                 binding.AcceptedQuestIdentity,
                 binding.OwnerIdentity,
                 binding.AllocatedLivePlayfield2,
@@ -730,67 +789,10 @@ namespace ZoneEngine.Core.Missions
             MissionAcgOperationalState expected,
             out string failure)
         {
-            failure = string.Empty;
-            if (restored == null
-                || expected == null
-                || !restored.AcceptedQuestIdentity.Equals(expected.AcceptedQuestIdentity)
-                || !restored.OwnerIdentity.Equals(expected.OwnerIdentity)
-                || restored.AllocatedLivePlayfield2 != expected.AllocatedLivePlayfield2
-                || !string.Equals(restored.BundleId, expected.BundleId, StringComparison.Ordinal)
-                || !string.Equals(
-                    restored.BundlePayloadSha256,
-                    expected.BundlePayloadSha256,
-                    StringComparison.OrdinalIgnoreCase)
-                || !restored.BuildingIdentity.Equals(expected.BuildingIdentity)
-                || restored.Npcs.Count != expected.Npcs.Count
-                || restored.Chests.Count != expected.Chests.Count)
-            {
-                failure = "Operational state identity or slot counts changed.";
-                return false;
-            }
-
-            for (int i = 0; i < expected.Npcs.Count; i++)
-            {
-                MissionAcgNpcRuntimeState expectedNpc = expected.Npcs[i];
-                MissionAcgNpcRuntimeState restoredNpc;
-                if (!restored.TryGetNpc(expectedNpc.RuntimeIdentity.Instance, out restoredNpc)
-                    || restoredNpc.CapturedSlot != expectedNpc.CapturedSlot
-                    || !restoredNpc.CapturedIdentity.Equals(expectedNpc.CapturedIdentity)
-                    || !restoredNpc.RuntimeIdentity.Equals(expectedNpc.RuntimeIdentity)
-                    || restoredNpc.TemplateId != expectedNpc.TemplateId
-                    || restoredNpc.MonsterData != expectedNpc.MonsterData
-                    || restoredNpc.Level != expectedNpc.Level
-                    || restoredNpc.MaximumHealth != expectedNpc.MaximumHealth
-                    || restoredNpc.MonsterScale != expectedNpc.MonsterScale
-                    || restoredNpc.HeadMesh != expectedNpc.HeadMesh
-                    || !string.Equals(restoredNpc.Name, expectedNpc.Name, StringComparison.Ordinal)
-                    || restoredNpc.Role != expectedNpc.Role
-                    || !SamePoint(restoredNpc.Position, expectedNpc.Position)
-                    || !SameRotation(restoredNpc.Heading, expectedNpc.Heading))
-                {
-                    failure = "Operational NPC immutable identity or captured attributes changed.";
-                    return false;
-                }
-            }
-
-            for (int i = 0; i < expected.Chests.Count; i++)
-            {
-                MissionAcgChestRuntimeState expectedChest = expected.Chests[i];
-                MissionAcgChestRuntimeState restoredChest;
-                if (!restored.TryGetChest(
-                        expectedChest.RuntimeIdentity.Instance,
-                        out restoredChest)
-                    || restoredChest.CapturedSlot != expectedChest.CapturedSlot
-                    || !restoredChest.CapturedIdentity.Equals(expectedChest.CapturedIdentity)
-                    || !restoredChest.RuntimeIdentity.Equals(expectedChest.RuntimeIdentity)
-                    || restoredChest.LootAuthority != expectedChest.LootAuthority)
-                {
-                    failure = "Operational chest identity or loot authority changed.";
-                    return false;
-                }
-            }
-
-            return true;
+            return MissionAcgOperationalStateMigration.ValidateImmutable(
+                restored,
+                expected,
+                out failure);
         }
 
         private static bool TryEnsureStateLocked(
@@ -855,6 +857,43 @@ namespace ZoneEngine.Core.Missions
             if (!store.TryLoad(record.Binding, out restored, out exists, out failure))
             {
                 return false;
+            }
+
+            if (exists
+                && restored.FormatVersion
+                    == MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion)
+            {
+                MissionAcgOperationalState legacyExpected =
+                    CreateLegacyExpectedState(
+                        record,
+                        instance,
+                        objective,
+                        DateTime.UtcNow);
+                MissionAcgOperationalState migrated;
+                if (!MissionAcgOperationalStateMigration.TryUpgradeLegacyDifficulty(
+                        restored,
+                        legacyExpected,
+                        expected,
+                        DateTime.UtcNow,
+                        out migrated,
+                        out failure))
+                {
+                    return false;
+                }
+
+                if (!store.TryWrite(migrated, true, out failure))
+                {
+                    failure = "Legacy operational-state migration failed: " + failure;
+                    return false;
+                }
+
+                restored = migrated;
+                MissionDiagnostics.Log(
+                    "ACG-OPERATIONAL-MIGRATE accepted={0}:{1} livePf2={2} from=1 to={3}",
+                    record.Binding.AcceptedQuestIdentity.Type,
+                    record.Binding.AcceptedQuestIdentity.Instance,
+                    record.Binding.AllocatedLivePlayfield2,
+                    MissionAcgOperationalState.CurrentFormatVersion);
             }
 
             if (exists && !ValidateRestoredState(restored, expected, out failure))
@@ -935,7 +974,7 @@ namespace ZoneEngine.Core.Missions
             mob.LastName = string.Empty;
             mob.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.level,
-                (uint)captured.CapturedLevel);
+                (uint)state.Level);
             mob.Stats.SetBaseValueWithoutTriggering(
                 (int)StatIds.monsterdata,
                 (uint)captured.MonsterData);
@@ -1018,25 +1057,6 @@ namespace ZoneEngine.Core.Missions
                    && record.State.LifecycleState != MissionAcgLifecycleState.CleanupPending
                    && record.State.LifecycleState != MissionAcgLifecycleState.Cleaned
                    && record.State.LifecycleState != MissionAcgLifecycleState.Invalid;
-        }
-
-        private static bool SamePoint(
-            MissionAcgPointRecord first,
-            MissionAcgPointRecord second)
-        {
-            return first.X.Equals(second.X)
-                   && first.Y.Equals(second.Y)
-                   && first.Z.Equals(second.Z);
-        }
-
-        private static bool SameRotation(
-            MissionAcgRotationRecord first,
-            MissionAcgRotationRecord second)
-        {
-            return first.X.Equals(second.X)
-                   && first.Y.Equals(second.Y)
-                   && first.Z.Equals(second.Z)
-                   && first.W.Equals(second.W);
         }
 
         private static string IdentityKey(MissionAcgIdentityRecord identity)
