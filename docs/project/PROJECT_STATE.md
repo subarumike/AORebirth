@@ -12,14 +12,21 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   owns definitions by playfield instance, and runtime retirement removes
   combat, movement, patrol, add, successor, respawn, corpse, and visibility
   work without PF127-specific cleanup assumptions. Full-corpus generation now
-  streams 374 sessions in bounded memory and reproduces 358 canonical sessions,
+  streams 375 sessions in bounded memory and reproduces 359 canonical sessions,
   2,827 complete chains, 255 capture-certified profiles, and 303 semantic
-  definitions with zero errors and a second-run no-diff result. Exact
-  unresolved boundaries are post-Aztur full-chain reset/respawn, unproven
-  downstream Temple nano effects, unknown loot probabilities,
-  Murial-specific nano/respawn behavior, and inactive Strike Foreman
-  generation/lifecycle policy. Evidence:
-  `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md`.
+  definitions with zero errors and a second-run no-diff result. The remaining
+  dungeon-gameplay ownership pass now schedules exactly one full-chain reset
+  from Aztur NPC despawn to Uklesh after the explicit 600-second Temple named
+  policy, classifies all 18 named respawn domains, gives Murial an explicit
+  300-second post-despawn policy reset without duplicating his patrol worker,
+  and applies the captured three-second empty-corpse cleanup bound to
+  Eumenides. Exact unresolved boundaries are unproven downstream or scheduling
+  behavior for packet-only Temple nanos, unknown loot probabilities and wider
+  pools, Murial nano `70294` and loot, and inactive Strike Foreman
+  generation/lifecycle policy. The Aztur reset delay remains policy-owned, not
+  capture-timed. Evidence:
+  `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md` and
+  `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.
 
 - The fixed PF127/PF1931 ordinary-combat checkpoint is complete at `489/0`:
   PF127 `322/0`, PF1931 `167/0`. The final slice restored all 22 Violent

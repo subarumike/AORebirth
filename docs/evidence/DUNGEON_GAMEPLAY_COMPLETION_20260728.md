@@ -440,14 +440,13 @@ still incomplete.
   separated damage-policy, mission/inventory ownership, absent clean-worktree
   geometry/capture assets, Arete/content deployment, route-guardrail, and
   stale visibility-count baselines.
-- Primary workspace before the latest concurrent mission edit:
-  `692/729` PASS with `37` unrelated failures. A later preserved, unstaged
-  mission edit temporarily made that workspace's test project fail compilation
-  in `MissionRollTemplateContractTests` while
+- Primary workspace after the concurrent mission commit: `694/731` PASS with
+  the same `37` unrelated failures. During that concurrent edit the test
+  project temporarily failed compilation while
   `MissionAcgAcceptedQfuBuilder` and
-  `QuestFullUpdateMessageSerializer.FixedStringBytes` were being added.
-  Concurrent mission work continued afterward; this task's clean result and
-  focused suites remain the isolated authoritative validation.
+  `QuestFullUpdateMessageSerializer.FixedStringBytes` were being added; the
+  completed concurrent commit resolves that transient state. This task's
+  focused suites and clean result remain separately authoritative.
 
 ### Production and runtime
 

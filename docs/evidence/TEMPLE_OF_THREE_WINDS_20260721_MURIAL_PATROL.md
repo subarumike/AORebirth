@@ -76,7 +76,11 @@ The captured clean SCFU flags were `0x020A4ACB`; runtime adds the established
 
 - Murial-specific respawn timing. Runtime uses the established shared Temple
   ordinary policy of 300 seconds after NPC despawn; that is policy, not a
-  Murial-specific measurement.
+  Murial-specific measurement. The policy is now assigned explicitly to
+  Murial and resets his original anchor, health, movement, aggression, and
+  single population-owned patrol worker.
 - Loot contents and L34 credits. No identity-linked loot inventory was opened.
-- Nano `70294` effect and ownership.
+- Nano `70294` target choice, cadence, and downstream effect. Its captured
+  packet identity is retained, but it remains unscheduled rather than being
+  emitted with invented gameplay behavior.
 - Exact official-live patrol-loop timing reproduction on the private runtime.

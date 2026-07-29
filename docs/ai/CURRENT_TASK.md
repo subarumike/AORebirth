@@ -62,16 +62,27 @@ remains `489/489`.
 The shared encounter registry now owns registrations by playfield instance, so
 PF127 and PF1931 retirement removes all encounter definitions without stale
 combat, add, successor, patrol, respawn, corpse, or visibility workers.
-Full-corpus combat generation is bounded-memory and reproducible: 374 sessions,
-358 canonical sessions, 2,827 complete chains, 255 capture-certified profiles,
+Full-corpus combat generation is bounded-memory and reproducible: 375 sessions,
+359 canonical sessions, 2,827 complete chains, 255 capture-certified profiles,
 303 semantic definitions, and zero generator errors; the second generation
 produces no diff.
 
-Exact unresolved boundaries remain fail-closed: the post-Aztur full-chain
-reset/respawn condition, downstream gameplay effects for presentation-only
-Temple nanos, unknown loot probabilities, Murial-specific nano/respawn
-behavior, and inactive Strike Foreman generation/lifecycle policy.
+The remaining dungeon-gameplay backlog is now explicitly owned. Aztur NPC
+despawn schedules exactly one full-chain reset by rematerializing Uklesh after
+the Temple named-policy delay; successor stages and owned adds never respawn
+independently. All 18 named respawn domains are classified explicitly. Murial
+retains one ordinary-population-owned patrol and an explicit 300-second
+post-despawn policy reset. Eumenides retains its captured 30-minute
+loot-bearing corpse and now uses the captured shared three-second empty-corpse
+cleanup bound.
+
+Exact unresolved boundaries remain fail-closed: downstream gameplay effects
+and scheduling for presentation-only Temple nanos, unknown loot probabilities
+and wider pools, Murial nano `70294` and loot, and inactive Strike Foreman
+generation/lifecycle policy. The Aztur-to-Uklesh 600-second interval remains an
+explicit Temple policy rather than a capture-timed interval.
 
 Evidence:
 
 - `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md`
+- `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`

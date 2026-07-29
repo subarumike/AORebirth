@@ -1125,11 +1125,13 @@ namespace AORebirth.Core.Playfields
                 0,
                 17905,
                 1800.0,
-                1800.0,
+                3.0,
                 "20260716-034559 atomic SCFU; 20260709-222339 plus 20260717-214612/214751/215250 weapon/combat/chase; "
                 + "20260716-222007 exact 416-byte corpse CATMesh 17905/MonsterData 203726/scale 130; "
                 + "20260717-214751/215250 two exact 186-credit item-plus-credit corpse snapshots; "
                 + "20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse; "
+                + "the same observed loot-bearing corpse survives for more than 9m46s, then retires 0.660..1.960s after its final transfer; "
+                + "the shared three-second empty-corpse retirement bound is therefore retained; "
                 + "confirmed 30-minute boss corpse and shared 100-unit leash; active nano refresh unresolved and omitted",
                 npcFamily: 148,
                 npcLosHeight: 0,
