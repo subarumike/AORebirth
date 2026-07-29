@@ -2,19 +2,22 @@
 
 ## Active
 
-### RK terminal missions: Stage 3 captured interior materialization
+### RK terminal missions: Stage 4 exact objective completion
 
-Accepted generated missions now enter their exact isolated live PF2 and
-materialize only the selected bundle's captured PAF payload, building, spawn,
-exit, doors, chests, terminals, objective objects, and NPC placeholders.
-Deterministic PF2-local runtime identities are persisted separately under
-`mission-state/acg-runtime`; owner + live PF2 + runtime identity is required
-for every lookup. Door/chest mutable state survives restart, shared replay is
-blocked for bound missions, and abandoned/expired/cleaned bindings remove only
-their own runtime registry and state.
+All five generated mission types now resolve through accepted quest, owner,
+isolated PF2, exact runtime objective identity, and captured objective slot.
+Version-1 objective sidecars persist the immutable objective contract,
+mission-item identity, frozen rewards, grant states, completion packets, and
+exact cleanup. Separate structured accepted-QFU builders preserve the captured
+Find Person version `16`/flag `64`, Find Item version `15`, Return Item version
+`8`, and Repair component `100348` to machine `100358` relationship.
 
-Completion, rewards, loot outcomes, NPC combat, collision, navigation, and
-procedural generation remain deferred. No database schema changed.
+Completion is durably resumable and never repeats a reward already marked
+granted. A legacy cash/XP/inventory grant left in `Pending` fails closed for
+operator reconciliation because that persistence cannot atomically commit with
+the journal. NPC combat simulation, generic loot, collision, navigation,
+procedural generation, durable team rewards, and private-client validation
+remain deferred. No database schema changed.
 
 Evidence and architecture:
 

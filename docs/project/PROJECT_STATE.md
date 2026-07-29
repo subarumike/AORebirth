@@ -84,7 +84,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   geometry analyzer. Captures `20260727-222650`, `20260727-222946`, and
   `20260727-223041` replay with zero decoder/extractor errors.
 
-- Generated RK mission interiors now have a capture-backed Stage 3 runtime.
+- Generated RK mission interiors now have capture-backed Stage 4 objective
+  ownership and durable completion.
   The five immutable selectable bundles and their payload hashes are unchanged;
   eight legacy shapes remain nonselectable and PF2 `1441804` remains excluded.
   An accepted binding enters its persisted isolated PF2 with the exact bundle
@@ -93,9 +94,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   isolated by live PF2; version-1 mutable sidecars preserve identity maps plus
   door/chest state across restart. Every interaction lookup requires owner,
   allocated PF2, and runtime identity, and bound missions cannot reach shared
-  replay or PF `1419349`. Cleanup removes only the exact runtime instance;
-  Stage 2 still owns PF release. Completion, rewards, loot, combat, collision,
-  navigation, and procedural generation remain deferred. No schema changed.
+  replay or PF `1419349`. Version-1 objective sidecars bind every Kill, Find
+  Person, Find Item, Return Item, and Repair event to its accepted quest,
+  captured slot, exact runtime identity, and required inventory/terminal/tool
+  relationship. Structured per-type QFUs preserve the captured versions and
+  identity fields. Frozen credit/XP/item claims, monotonic completion phases,
+  packet-send state, and exact artifact cleanup survive restart; already
+  granted rewards are not repeated. A legacy reward grant left `Pending` fails
+  closed because character persistence and the sidecar are not one atomic
+  transaction. Stage 2 still owns PF release. Generic loot, broad NPC combat,
+  collision, navigation, procedural generation, durable team rewards, and
+  private-client validation remain deferred. No schema changed.
   Evidence:
   `docs/evidence/RK_MISSION_ACG_INTERIOR_EVIDENCE_20260728.md`.
 

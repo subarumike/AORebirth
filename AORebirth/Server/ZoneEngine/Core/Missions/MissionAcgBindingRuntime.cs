@@ -79,11 +79,36 @@ namespace ZoneEngine.Core.Missions
                         + allocationFailure);
                 }
 
+                MissionAcgObjectiveLoadResult objectiveProbe =
+                    new MissionAcgObjectiveStore(
+                        missionStateDirectory,
+                        catalog).LoadAll();
+                if (!objectiveProbe.IsValid)
+                {
+                    throw new InvalidOperationException(
+                        "Mission objective restoration failed closed before expiry reconciliation: "
+                        + string.Join(" | ", objectiveProbe.Diagnostics));
+                }
+
+                var completionOwned =
+                    new HashSet<int>();
+                for (int i = 0; i < objectiveProbe.Records.Count; i++)
+                {
+                    if (objectiveProbe.Records[i].State.Phase
+                        >= MissionAcgCompletionPhase.RewardClaimStarted)
+                    {
+                        completionOwned.Add(
+                            objectiveProbe.Records[i].Binding.AcceptedQuestIdentity.Instance);
+                    }
+                }
+
                 DateTime now = DateTime.UtcNow;
                 for (int i = 0; i < loaded.Records.Count; i++)
                 {
                     MissionAcgBindingRecord record = loaded.Records[i];
                     if (record.Binding.ExpiryUtc <= now
+                        && !completionOwned.Contains(
+                            record.Binding.AcceptedQuestIdentity.Instance)
                         && (record.State.LifecycleState
                             == MissionAcgLifecycleState.Accepted
                             || record.State.LifecycleState
@@ -117,6 +142,10 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 MissionAcgRuntimeManager.Initialize(
+                    new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
+                    catalog,
+                    missionStateDirectory);
+                MissionAcgObjectiveRuntime.Initialize(
                     new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
                     catalog,
                     missionStateDirectory);

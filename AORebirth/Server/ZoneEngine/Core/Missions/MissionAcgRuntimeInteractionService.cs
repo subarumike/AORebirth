@@ -130,10 +130,28 @@ namespace ZoneEngine.Core.Missions
                 case MissionAcgRuntimeObjectKind.RepairMachine:
                 case MissionAcgRuntimeObjectKind.StaticObjective:
                 case MissionAcgRuntimeObjectKind.ObjectiveNpc:
+                    bool objectiveAccepted;
+                    if (!MissionAcgObjectiveInteractionService.TryHandleRuntimeUse(
+                        client,
+                        instance,
+                        runtimeObject,
+                        out objectiveAccepted)
+                        || !objectiveAccepted)
+                    {
+                        GenericCmdMessageHandler.Default.AcknowledgeDenied(
+                            character,
+                            message);
+                    }
+                    else
+                    {
+                        GenericCmdMessageHandler.Default.Acknowledge(
+                            character,
+                            message);
+                    }
+
+                    return true;
                 case MissionAcgRuntimeObjectKind.AmbientNpc:
-                    // Ownership and routing are now exact. Stage 4 owns type-specific completion,
-                    // loot, NPC combat, and reward behavior.
-                    GenericCmdMessageHandler.Default.Acknowledge(character, message);
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
                     return true;
                 default:
                     GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);

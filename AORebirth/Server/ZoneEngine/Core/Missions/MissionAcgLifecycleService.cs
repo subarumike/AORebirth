@@ -19,6 +19,10 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
+            MissionAcgCompletionJournalService.ResumeForCharacter(
+                client,
+                character);
+
             IList<MissionAcgBindingRecord> work =
                 MissionAcgBindingRuntime.GetOwnedCleanupWork(
                     character.Identity.Instance);
@@ -33,25 +37,28 @@ namespace ZoneEngine.Core.Missions
                         Instance =
                             record.Binding.AcceptedQuestIdentity.Instance
                     };
-                MissionKeyGrantService.TryRemoveMissionKey(
-                    client,
-                    character,
-                    record.Binding.MissionKeyIdentity.Instance);
-                int ignoredKey;
-                MissionKeyStore.TryTake(
+                MissionAcgObjectiveRecord objective;
+                if (MissionAcgObjectiveRuntime.TryGetByAccepted(
                     character.Identity.Instance,
-                    accepted,
-                    out ignoredKey);
-                int repairInstance;
-                if (MissionKeyStore.TryTakeRepairKit(
-                    character.Identity.Instance,
-                    accepted,
-                    out repairInstance))
+                    record.Binding.AcceptedQuestIdentity.Instance,
+                    out objective))
                 {
-                    MissionKeyGrantService.TryRemoveRepairItem(
+                    string artifactFailure;
+                    if (!MissionAcgCompletionJournalService.RemoveExactArtifacts(
                         client,
                         character,
-                        repairInstance);
+                        record.Binding,
+                        objective,
+                        out artifactFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "ACG-CLEANUP-FAIL accepted={0}:{1} path={2} reason={3}",
+                            record.Binding.AcceptedQuestIdentity.Type,
+                            record.Binding.AcceptedQuestIdentity.Instance,
+                            objective.RecordPath,
+                            artifactFailure);
+                        continue;
+                    }
                 }
 
                 MissionAcceptedStore.Remove(
@@ -96,6 +103,28 @@ namespace ZoneEngine.Core.Missions
                         record.Binding.AcceptedQuestIdentity.Instance,
                         record.RecordPath,
                         failure);
+                    continue;
+                }
+
+                if (objective != null)
+                {
+                    MissionAcgObjectiveRecord cleanedObjective;
+                    if (!MissionAcgObjectiveRuntime.TryReplaceState(
+                        objective,
+                        objective.State.Copy(
+                            lifecycle: MissionAcgObjectiveLifecycle.CleanupCompleted,
+                            objectiveCleanupCompleted: true,
+                            missionCleanupCompleted: true),
+                        out cleanedObjective,
+                        out failure))
+                    {
+                        MissionDiagnostics.Log(
+                            "ACG-CLEANUP-FAIL accepted={0}:{1} path={2} reason={3}",
+                            record.Binding.AcceptedQuestIdentity.Type,
+                            record.Binding.AcceptedQuestIdentity.Instance,
+                            objective.RecordPath,
+                            failure);
+                    }
                 }
             }
         }

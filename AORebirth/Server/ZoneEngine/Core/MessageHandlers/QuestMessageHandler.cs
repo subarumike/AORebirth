@@ -78,8 +78,28 @@ namespace ZoneEngine.Core.MessageHandlers
                     deleteMission.Instance,
                     out generatedBinding))
                 {
+                    MissionAcgObjectiveRecord objectiveRecord;
+                    MissionAcgObjectiveRecord abandonedObjective;
+                    string lifecycleFailure = "objective record missing";
+                    if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                            character.Identity.Instance,
+                            deleteMission.Instance,
+                            out objectiveRecord)
+                        || !MissionAcgObjectiveRuntime.TrySetLifecycle(
+                            objectiveRecord,
+                            MissionAcgObjectiveLifecycle.Abandoned,
+                            out abandonedObjective,
+                            out lifecycleFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "JOURNAL-DELETE-FAIL char={0} mission={1:X8} objective={2}",
+                            character.Identity.Instance,
+                            deleteMission.Instance,
+                            lifecycleFailure);
+                        return;
+                    }
+
                     MissionAcgBindingRecord abandoned;
-                    string lifecycleFailure;
                     if (!MissionAcgBindingRuntime.TryTransition(
                         generatedBinding,
                         MissionAcgLifecycleState.Abandoned,
@@ -137,6 +157,24 @@ namespace ZoneEngine.Core.MessageHandlers
                             DateTime.UtcNow,
                             out cleaned,
                             out lifecycleFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "JOURNAL-DELETE-CLEANUP-PENDING char={0} mission={1:X8} reason={2}",
+                            character.Identity.Instance,
+                            deleteMission.Instance,
+                            lifecycleFailure);
+                        return;
+                    }
+
+                    MissionAcgObjectiveRecord cleanedObjective;
+                    if (!MissionAcgObjectiveRuntime.TryReplaceState(
+                        abandonedObjective,
+                        abandonedObjective.State.Copy(
+                            lifecycle: MissionAcgObjectiveLifecycle.CleanupCompleted,
+                            objectiveCleanupCompleted: true,
+                            missionCleanupCompleted: true),
+                        out cleanedObjective,
+                        out lifecycleFailure))
                     {
                         MissionDiagnostics.Log(
                             "JOURNAL-DELETE-CLEANUP-PENDING char={0} mission={1:X8} reason={2}",
