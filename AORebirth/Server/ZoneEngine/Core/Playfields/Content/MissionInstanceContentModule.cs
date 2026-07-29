@@ -12,16 +12,15 @@ namespace ZoneEngine.Core.Playfields.Content
 
     /// <summary>
     /// Dynamic RK mission instances (high id band, see <see cref="MissionInstanceService"/>).
-    /// Populates any per-character mission-instance playfield with the captured "repair machine" mob set
-    /// (captures 20260717-211215 + 211849). Empty-instance test slice: mobs only, no geometry/collision.
+    /// Bound ACG playfields must enter the same captured-NPC registration hook: the NPC runtime
+    /// selects Stage 5 operational materialization for a bound PF2 and retains the legacy spawn
+    /// path only for an unbound mission instance.
     /// </summary>
     public sealed class MissionInstanceContentModule : IPlayfieldContentModule
     {
         public bool Supports(Identity playfieldIdentity)
         {
-            return MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance)
-                   && !MissionAcgBindingRuntime.IsBoundLivePlayfield(
-                       playfieldIdentity.Instance);
+            return MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance);
         }
 
         public void Register(PlayfieldContentRegistration registration)

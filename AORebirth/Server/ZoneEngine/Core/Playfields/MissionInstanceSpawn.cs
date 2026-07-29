@@ -348,21 +348,7 @@ namespace AORebirth.Core.Playfields
 
         private static int ScaleLevelToMission(int missionQl, Random rng)
         {
-            // Always mission QL (never capture catalog level ~150/165).
-            int baseQl = missionQl > 0 ? missionQl : 1;
-            int delta = rng != null ? rng.Next(-2, 3) : 0;
-            int level = baseQl + delta;
-            if (level < 1)
-            {
-                level = 1;
-            }
-
-            if (level > 220)
-            {
-                level = 220;
-            }
-
-            return level;
+            return MissionNpcDifficultyPolicy.ResolveLevel(missionQl, rng);
         }
 
         /// <summary>
@@ -371,26 +357,7 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         private static int HealthForMissionLevel(int level, Random rng)
         {
-            int lvl = level > 0 ? level : 1;
-            int hp = lvl * 25;
-            if (rng != null)
-            {
-                int jitter = rng.Next(-10, 11);
-                hp = hp + ((hp * jitter) / 100);
-            }
-
-            if (hp < 50)
-            {
-                hp = 50;
-            }
-
-            // High-QL mishs stay tough without inheriting capture 12k–14k shells at L18.
-            if (hp > 40000)
-            {
-                hp = 40000;
-            }
-
-            return hp;
+            return MissionNpcDifficultyPolicy.ResolveHealth(level, rng);
         }
 
         private static int SpawnLootProps(

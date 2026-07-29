@@ -348,7 +348,9 @@ namespace ZoneEngine.Core.Missions
     /// </summary>
     internal sealed class MissionAcgOperationalState
     {
-        internal const int CurrentFormatVersion = 1;
+        internal const int LegacyCapturedDifficultyFormatVersion = 1;
+
+        internal const int CurrentFormatVersion = 2;
 
         private readonly Dictionary<int, MissionAcgNpcRuntimeState> npcByRuntime;
 
@@ -367,7 +369,8 @@ namespace ZoneEngine.Core.Missions
             MissionAcgOperationalCleanupState cleanupState,
             DateTime updatedUtc)
         {
-            if (formatVersion != CurrentFormatVersion
+            if ((formatVersion != LegacyCapturedDifficultyFormatVersion
+                 && formatVersion != CurrentFormatVersion)
                 || acceptedQuestIdentity == null
                 || ownerIdentity == null
                 || buildingIdentity == null
@@ -560,6 +563,263 @@ namespace ZoneEngine.Core.Missions
                 chests,
                 cleanupState,
                 updatedUtc);
+        }
+    }
+
+    internal static class MissionAcgOperationalStateMigration
+    {
+        internal static bool ValidateImmutable(
+            MissionAcgOperationalState restored,
+            MissionAcgOperationalState expected,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (restored == null
+                || expected == null
+                || restored.FormatVersion != expected.FormatVersion
+                || !SameStateIdentity(restored, expected)
+                || restored.Npcs.Count != expected.Npcs.Count
+                || restored.Chests.Count != expected.Chests.Count)
+            {
+                failure = "Operational state identity, version, or slot counts changed.";
+                return false;
+            }
+
+            for (int i = 0; i < expected.Npcs.Count; i++)
+            {
+                MissionAcgNpcRuntimeState expectedNpc = expected.Npcs[i];
+                MissionAcgNpcRuntimeState restoredNpc;
+                if (!restored.TryGetNpc(expectedNpc.RuntimeIdentity.Instance, out restoredNpc)
+                    || !SameNpcImmutable(restoredNpc, expectedNpc, true))
+                {
+                    failure = "Operational NPC immutable identity or attributes changed.";
+                    return false;
+                }
+            }
+
+            for (int i = 0; i < expected.Chests.Count; i++)
+            {
+                MissionAcgChestRuntimeState expectedChest = expected.Chests[i];
+                MissionAcgChestRuntimeState restoredChest;
+                if (!restored.TryGetChest(
+                        expectedChest.RuntimeIdentity.Instance,
+                        out restoredChest)
+                    || !SameChestImmutable(restoredChest, expectedChest))
+                {
+                    failure = "Operational chest identity or loot authority changed.";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        internal static bool TryUpgradeLegacyDifficulty(
+            MissionAcgOperationalState restored,
+            MissionAcgOperationalState legacyExpected,
+            MissionAcgOperationalState currentExpected,
+            DateTime updatedUtc,
+            out MissionAcgOperationalState upgraded,
+            out string failure)
+        {
+            upgraded = null;
+            failure = string.Empty;
+            if (restored == null
+                || legacyExpected == null
+                || currentExpected == null
+                || restored.FormatVersion
+                    != MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion
+                || legacyExpected.FormatVersion
+                    != MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion
+                || currentExpected.FormatVersion
+                    != MissionAcgOperationalState.CurrentFormatVersion)
+            {
+                failure = "Operational state does not have a supported legacy migration shape.";
+                return false;
+            }
+
+            if (!ValidateImmutable(restored, legacyExpected, out failure))
+            {
+                return false;
+            }
+
+            if (!SameStateIdentity(legacyExpected, currentExpected)
+                || legacyExpected.Npcs.Count != currentExpected.Npcs.Count
+                || legacyExpected.Chests.Count != currentExpected.Chests.Count)
+            {
+                failure = "Operational migration expectations do not describe one binding.";
+                return false;
+            }
+
+            var migratedNpcs =
+                new List<MissionAcgNpcRuntimeState>(currentExpected.Npcs.Count);
+            for (int i = 0; i < currentExpected.Npcs.Count; i++)
+            {
+                MissionAcgNpcRuntimeState currentNpc = currentExpected.Npcs[i];
+                MissionAcgNpcRuntimeState legacyNpc;
+                MissionAcgNpcRuntimeState restoredNpc;
+                if (!legacyExpected.TryGetNpc(
+                        currentNpc.RuntimeIdentity.Instance,
+                        out legacyNpc)
+                    || !restored.TryGetNpc(
+                        currentNpc.RuntimeIdentity.Instance,
+                        out restoredNpc)
+                    || !SameNpcImmutable(legacyNpc, currentNpc, false))
+                {
+                    failure = "Operational NPC migration identity changed.";
+                    return false;
+                }
+
+                migratedNpcs.Add(
+                    new MissionAcgNpcRuntimeState(
+                        currentNpc.CapturedSlot,
+                        currentNpc.CapturedIdentity,
+                        currentNpc.RuntimeIdentity,
+                        currentNpc.Position,
+                        currentNpc.Heading,
+                        currentNpc.TemplateId,
+                        currentNpc.MonsterData,
+                        currentNpc.Level,
+                        currentNpc.MaximumHealth,
+                        ScaleCurrentHealth(restoredNpc, currentNpc.MaximumHealth),
+                        currentNpc.MonsterScale,
+                        currentNpc.HeadMesh,
+                        currentNpc.Name,
+                        currentNpc.Role,
+                        restoredNpc.LifeState,
+                        restoredNpc.CombatState,
+                        restoredNpc.CorpseIdentity,
+                        restoredNpc.CorpseState,
+                        restoredNpc.SpawnGeneration,
+                        restoredNpc.CleanupCompleted));
+            }
+
+            var migratedChests =
+                new List<MissionAcgChestRuntimeState>(currentExpected.Chests.Count);
+            for (int i = 0; i < currentExpected.Chests.Count; i++)
+            {
+                MissionAcgChestRuntimeState currentChest = currentExpected.Chests[i];
+                MissionAcgChestRuntimeState restoredChest;
+                if (!restored.TryGetChest(
+                        currentChest.RuntimeIdentity.Instance,
+                        out restoredChest)
+                    || !SameChestImmutable(restoredChest, currentChest))
+                {
+                    failure = "Operational chest migration identity changed.";
+                    return false;
+                }
+
+                migratedChests.Add(restoredChest);
+            }
+
+            upgraded =
+                new MissionAcgOperationalState(
+                    MissionAcgOperationalState.CurrentFormatVersion,
+                    currentExpected.AcceptedQuestIdentity,
+                    currentExpected.OwnerIdentity,
+                    currentExpected.AllocatedLivePlayfield2,
+                    currentExpected.BundleId,
+                    currentExpected.BundlePayloadSha256,
+                    currentExpected.BuildingIdentity,
+                    migratedNpcs,
+                    migratedChests,
+                    restored.CleanupState,
+                    updatedUtc);
+            if (!ValidateImmutable(upgraded, currentExpected, out failure))
+            {
+                upgraded = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        private static int ScaleCurrentHealth(
+            MissionAcgNpcRuntimeState restored,
+            int migratedMaximumHealth)
+        {
+            if (restored.CurrentHealth <= 0
+                || restored.MaximumHealth <= 0
+                || migratedMaximumHealth <= 0)
+            {
+                return 0;
+            }
+
+            int scaled =
+                (int)Math.Min(
+                    migratedMaximumHealth,
+                    ((long)restored.CurrentHealth * migratedMaximumHealth)
+                    / restored.MaximumHealth);
+            return Math.Max(1, scaled);
+        }
+
+        private static bool SameStateIdentity(
+            MissionAcgOperationalState first,
+            MissionAcgOperationalState second)
+        {
+            return first.AcceptedQuestIdentity.Equals(second.AcceptedQuestIdentity)
+                   && first.OwnerIdentity.Equals(second.OwnerIdentity)
+                   && first.AllocatedLivePlayfield2 == second.AllocatedLivePlayfield2
+                   && string.Equals(first.BundleId, second.BundleId, StringComparison.Ordinal)
+                   && string.Equals(
+                       first.BundlePayloadSha256,
+                       second.BundlePayloadSha256,
+                       StringComparison.OrdinalIgnoreCase)
+                   && first.BuildingIdentity.Equals(second.BuildingIdentity);
+        }
+
+        private static bool SameNpcImmutable(
+            MissionAcgNpcRuntimeState first,
+            MissionAcgNpcRuntimeState second,
+            bool compareDifficulty)
+        {
+            return first.CapturedSlot == second.CapturedSlot
+                   && first.CapturedIdentity.Equals(second.CapturedIdentity)
+                   && first.RuntimeIdentity.Equals(second.RuntimeIdentity)
+                   && first.TemplateId == second.TemplateId
+                   && first.MonsterData == second.MonsterData
+                   && (!compareDifficulty
+                       || (first.Level == second.Level
+                           && first.MaximumHealth == second.MaximumHealth))
+                   && first.MonsterScale == second.MonsterScale
+                   && first.HeadMesh == second.HeadMesh
+                   && string.Equals(first.Name, second.Name, StringComparison.Ordinal)
+                   && first.Role == second.Role
+                   && SamePoint(first.Position, second.Position)
+                   && SameRotation(first.Heading, second.Heading);
+        }
+
+        private static bool SameChestImmutable(
+            MissionAcgChestRuntimeState first,
+            MissionAcgChestRuntimeState second)
+        {
+            return first.CapturedSlot == second.CapturedSlot
+                   && first.CapturedIdentity.Equals(second.CapturedIdentity)
+                   && first.RuntimeIdentity.Equals(second.RuntimeIdentity)
+                   && first.LootAuthority == second.LootAuthority;
+        }
+
+        private static bool SamePoint(
+            MissionAcgPointRecord first,
+            MissionAcgPointRecord second)
+        {
+            return first != null
+                   && second != null
+                   && first.X.Equals(second.X)
+                   && first.Y.Equals(second.Y)
+                   && first.Z.Equals(second.Z);
+        }
+
+        private static bool SameRotation(
+            MissionAcgRotationRecord first,
+            MissionAcgRotationRecord second)
+        {
+            return first != null
+                   && second != null
+                   && first.X.Equals(second.X)
+                   && first.Y.Equals(second.Y)
+                   && first.Z.Equals(second.Z)
+                   && first.W.Equals(second.W);
         }
     }
 

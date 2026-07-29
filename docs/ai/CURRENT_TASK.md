@@ -2,6 +2,19 @@
 
 ## Active
 
+### RK terminal missions: live level-4 integration repair
+
+Private-server validation now proves roll, accept, exact key grant, isolated
+entry, Find Item pickup, completion, credit/item reward, and exact key removal.
+The same run exposed an ICC destination-filter bug and an unreachable bound-PF2
+NPC spawn hook. Same-playfield PF655 markers now remain eligible for low-level
+neutral ICC rolls, bound ACG instances reach Stage 5 NPC materialization, and
+live NPC level/health reuse the existing deterministic mission-QL policy rather
+than the source capture's higher values. Version-1 operational state is
+validated and atomically migrated to version 2 so active missions preserve
+mutable state while adopting safe difficulty. Build/regression and one live
+roll/entry/combat recheck are the active acceptance steps.
+
 ### RK terminal missions: Stage 6 captured spatial authority
 
 Each bound generated-mission PF2 now derives a deterministic finite
