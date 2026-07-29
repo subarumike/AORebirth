@@ -306,23 +306,14 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearRuntimeState()
         {
+            CapturedEncounterRuntimeRegistry.RemoveForPlayfield(this.playfield.Identity.Instance);
             foreach (NamedEncounterState state in this.namedEncounters)
             {
-                if (state.Identity.Instance != 0)
-                {
-                    CapturedEncounterRuntimeRegistry.Remove(state.Identity.Instance);
-                }
-
                 state.ResetAll();
             }
 
             foreach (ReanimatedSlotState slot in this.reanimatedSlots)
             {
-                if (slot.Identity.Instance != 0)
-                {
-                    CapturedEncounterRuntimeRegistry.Remove(slot.Identity.Instance);
-                }
-
                 slot.Reset();
             }
         }
@@ -1534,7 +1525,10 @@ namespace AORebirth.Core.Playfields
             }
 
             character.DoNotDoTimers = false;
-            CapturedEncounterRuntimeRegistry.Register(character.Identity.Instance, definition);
+            CapturedEncounterRuntimeRegistry.Register(
+                character.Identity.Instance,
+                this.playfield.Identity.Instance,
+                definition);
             this.activateNpc(character);
             this.playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);
             LogUtil.Debug(

@@ -397,27 +397,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     current,
                     out resolved,
                     out failure);
-                if (variant.Level == 20)
-                {
-                    Assert.IsTrue(success, failure);
-                    Assert.IsTrue(resolved.IsCombatReady);
-                    Assert.AreEqual(123381, resolved.WeaponLowId);
-                    Assert.AreEqual(123382, resolved.WeaponHighId);
-                    Assert.AreEqual(16, resolved.WeaponQuality);
-                    CollectionAssert.AreEqual(
-                        new[] { 0, 20 },
-                        resolved.CapturedSpecialAttackWeaponUnknown5Observations);
-                }
-                else
-                {
-                    Assert.IsFalse(success);
-                    StringAssert.Contains(
-                        current.QuarantineReason,
-                        "captured attack contract is unresolved");
-                    StringAssert.Contains(
-                        current.Evidence,
-                        "no complete same-level normal AttackInfo contract");
-                }
+                Assert.IsTrue(success, failure);
+                Assert.IsTrue(resolved.IsCombatReady);
+                Assert.IsTrue(resolved.UsesProductionEquippedWeaponValues);
+                Assert.AreEqual(variant.WeaponLoadout.LowId, resolved.WeaponLowId);
+                Assert.AreEqual(variant.WeaponLoadout.HighId, resolved.WeaponHighId);
+                Assert.AreEqual(variant.WeaponLoadout.Quality, resolved.WeaponQuality);
+                Assert.AreEqual(6, resolved.AttackInfoWeaponSlot);
+                Assert.AreEqual(0, resolved.AttackInfoWeaponInstance);
+                Assert.AreEqual(3, resolved.AttackInfoHitType);
+                Assert.AreEqual(0, resolved.AttackInfoUnknown);
             }
             Assert.AreEqual(5, sentinel.Loot.ObservedCompleteInventories);
             Assert.AreEqual(5, sentinel.Loot.ObservedEmptyInventories);

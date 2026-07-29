@@ -1825,7 +1825,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                         .Select(match => match.Groups[1].Value)
                                         .Distinct()
                                         .OrderBy(session => session, StringComparer.Ordinal)))));
-                this.TestContext.WriteLine(
+                this.WriteDiagnostic(
                     "AUDIT md={0} level={1} actors={2} sources={3} failure={4} candidates={5}",
                     first.Item2.MonsterData,
                     first.Item1.Level,
@@ -1853,7 +1853,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     StringComparer.Ordinal))
                 {
                     CapturedEnemyWeaponDefinition weapon = profile.WeaponDefinition;
-                    this.TestContext.WriteLine(
+                    this.WriteDiagnostic(
                         "PROFILE md={0} level={1} id={2} "
                         + "wifu={3}/{4}/ql{5}/slot{6}/n3{7}/u1{8}/sm{9}:{10}/u2{11}/u3{12}/"
                         + "energy{13}/stats[{14}] saw={15}:{16}:{17}:{18}:{19}/n3{20} "
@@ -1927,7 +1927,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         archetype = new[] { representative };
                     }
 
-                    this.TestContext.WriteLine(
+                    this.WriteDiagnostic(
                         "ARCHETYPE md={0} compatible={1} profiles={2} levels={3} "
                         + "weapon={4}/{5}/slot{6} packetReady={7} reusable={8} "
                         + "streams={9} sessions={10}",
@@ -2000,7 +2000,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 foreach (CapturedEnemyCombatProfileDefinition[] packetGroup in packetGroups)
                 {
                     CapturedEnemyCombatProfileDefinition representative = packetGroup[0];
-                    this.TestContext.WriteLine(
+                    this.WriteDiagnostic(
                         "PACKET_ARCHETYPE md={0} compatible={1} profiles={2} levels={3} "
                         + "weapon={4}/{5}/slot{6} streams={7}",
                         family.Key,
@@ -2037,7 +2037,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 {
                     CapturedEnemyCombatProfileDefinition representative =
                         structuralGroup.First();
-                    this.TestContext.WriteLine(
+                    this.WriteDiagnostic(
                         "STRUCTURAL_ARCHETYPE md={0} compatible={1} profiles={2} levels={3} "
                         + "weapon={4}/{5}/slot{6} sessions={7}",
                         family.Key,
@@ -2067,26 +2067,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.AreEqual(
-                72,
-                quarantined.Count(
-                    value => value.Item3.StartsWith(
-                        "no canonical raw combat profile for ",
-                        StringComparison.Ordinal)));
-            Assert.AreEqual(
-                4,
-                quarantined.Count(
-                    value => value.Item3.Contains(
-                        "does not distinguish 2 compatible exact contracts")));
-
-            Tuple<OrdinaryEnemySpawnDefinition, OrdinaryEnemyProfile, string>[]
-                largestStructurallySimilarBlockedCohort = quarantined.Where(
-                    value => value.Item2.MonsterData == 26137).ToArray();
-            Assert.AreEqual(10, largestStructurallySimilarBlockedCohort.Length);
-            Assert.IsTrue(
-                largestStructurallySimilarBlockedCohort.All(
-                    value => value.Item3.StartsWith(
-                        "no canonical raw combat profile for ",
-                        StringComparison.Ordinal)));
+                0,
+                quarantined.Count,
+                "All 76 active Cultists are restored by the bounded capture-backed "
+                + "setup domains and exact categorical weapon streams.");
 
             CapturedEnemyCombatProfileDefinition[] captured26137 =
                 generatedProfiles.Where(
@@ -3377,8 +3361,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         value => value.ProfileId == expectedProfileId);
                 Assert.IsTrue(resolved.IsCombatReady);
                 Assert.IsTrue(resolved.UsesCaptureProvenArchetype);
-                Assert.IsTrue(resolved.UsesEquippedWeaponDamage);
-                Assert.IsTrue(resolved.UsesEquippedWeaponTiming);
+                Assert.IsTrue(
+                    resolved.UsesEquippedWeaponDamage,
+                    string.Format(
+                        "source=0x{0:X8} level={1} archetype={2} production={3}",
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level,
+                        resolved.CaptureProvenArchetypeId,
+                        resolved.UsesProductionEquippedWeaponValues));
+                Assert.IsTrue(
+                    resolved.UsesEquippedWeaponTiming,
+                    string.Format(
+                        "source=0x{0:X8} level={1} archetype={2} production={3}",
+                        activeSpawn.SourceIdentity,
+                        activeSpawn.Level,
+                        resolved.CaptureProvenArchetypeId,
+                        resolved.UsesProductionEquippedWeaponValues));
                 Assert.IsTrue(
                     resolved.CaptureProvenArchetypeId.Contains(expectedProfileId));
                 Assert.AreEqual(
@@ -5077,7 +5075,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 + string.Join(" | ", failures.Take(5).ToArray()));
             if (this.TestContext != null)
             {
-                this.TestContext.WriteLine(
+                this.WriteDiagnostic(
                     "PF127 certified={0} quarantined={1}; PF1931 certified={2} quarantined={3}; total certified={4} quarantined={5}",
                     subwayCertified,
                     subwayQuarantined,
@@ -5085,6 +5083,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     templeQuarantined,
                     certified,
                     quarantined);
+            }
+        }
+
+        private void WriteDiagnostic(string format, params object[] values)
+        {
+            if (this.TestContext != null)
+            {
+                this.TestContext.WriteLine(format, values);
             }
         }
 

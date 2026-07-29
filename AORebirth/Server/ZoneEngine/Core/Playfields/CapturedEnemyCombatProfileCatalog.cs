@@ -1381,6 +1381,11 @@ namespace AORebirth.Core.Playfields
                 resolved = resolved.WithCapturedWeapon(weapon);
             }
 
+            if (current.UsesProductionEquippedWeaponValues)
+            {
+                resolved = resolved.WithProductionEquippedWeaponValues();
+            }
+
             resolved = resolved.WithCapturedSpecialAttackWeaponUnknown5Observations(
                 profile.SpecialAttackWeaponUnknown5Observations)
                 .WithCaptureProvenArchetype(profile.ProfileId);

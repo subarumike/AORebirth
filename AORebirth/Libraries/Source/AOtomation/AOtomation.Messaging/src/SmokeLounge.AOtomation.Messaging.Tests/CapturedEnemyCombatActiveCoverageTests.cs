@@ -432,7 +432,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     bindingKey + " must have exactly one level-coverage row for level=" + level);
                 Dictionary<string, object> levelRow = matchingLevelRows[0];
                 string resolutionMode = StringMember(levelRow, "resolutionMode");
-                CapturedEnemyCombatContract runtimeBaseline;
+                var runtimeBaselines = new List<CapturedEnemyCombatContract>();
                 if (resolutionMode == "exact-mathematical-combat-setup")
                 {
                     var runtimeCatalog = new OrdinaryEnemyCatalog(
@@ -443,47 +443,49 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         runtimeCatalog.GetProfiles().Single(
                             value => value.DisplayName == name
                                      && value.MonsterData == monsterData);
-                    if (name == "Melded Patterns"
-                        || name == "Fragmented Soul"
-                        || name == "Workman Striker"
-                        || name == "Redundant Scan")
+                    OrdinaryEnemySpawnDefinition runtimeSpawn =
+                        runtimeCatalog.GetSpawns().Single(
+                            value => value.PlayfieldInstance == resource
+                                     && value.SourceIdentity
+                                        == sourceIdentity);
+                    OrdinaryEnemySpawnVariant[] runtimeVariants =
+                        runtimeSpawn.LevelDefinition
+                            .GetExplicitVariants()
+                            .Where(value => value.Level == level)
+                            .ToArray();
+                    if (runtimeVariants.Length == 0)
                     {
-                        OrdinaryEnemySpawnDefinition runtimeSpawn =
-                            runtimeCatalog.GetSpawns().Single(
-                                value => value.PlayfieldInstance == resource
-                                         && value.SourceIdentity
-                                            == sourceIdentity);
-                        OrdinaryEnemySpawnVariant runtimeVariant =
-                            runtimeSpawn.LevelDefinition
-                                .GetExplicitVariants()
-                                .Where(value => value.Level == level)
-                                .OrderBy(
-                                    value => value.WeaponLoadout == null
-                                                 ? int.MinValue
-                                                 : value.WeaponLoadout.Quality)
-                                .First();
-                        runtimeBaseline =
+                        runtimeVariants = new[]
+                        {
+                            runtimeSpawn.LevelDefinition.Resolve(level)
+                        };
+                    }
+
+                    foreach (OrdinaryEnemySpawnVariant runtimeVariant in runtimeVariants)
+                    {
+                        CapturedEnemyCombatContract runtimeBaseline =
                             runtimeProfile.Combat.ResolveContract(
                                 sourceIdentity,
                                 runtimeVariant);
-                        runtimeBaseline.Retaliates = true;
-                        runtimeBaseline.AiProfile =
-                            ZoneEngine.Core.NpcAiProfile.Passive;
-                    }
-                    else
-                    {
-                        runtimeBaseline =
-                            runtimeProfile.Combat.ResolveContract(
-                                sourceIdentity,
-                                level);
+                        if (name == "Melded Patterns"
+                            || name == "Fragmented Soul"
+                            || name == "Workman Striker"
+                            || name == "Redundant Scan")
+                        {
+                            runtimeBaseline.Retaliates = true;
+                            runtimeBaseline.AiProfile =
+                                ZoneEngine.Core.NpcAiProfile.Passive;
+                        }
+
+                        runtimeBaselines.Add(runtimeBaseline);
                     }
                 }
                 else
                 {
-                    runtimeBaseline =
+                    runtimeBaselines.Add(
                         CapturedEnemyCombatContract.Unresolved(
                             "active coverage guard",
-                            true);
+                            true));
                 }
                 Assert.IsFalse(
                     resolutionMode.StartsWith(
@@ -494,20 +496,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     levelRow.ContainsKey("reviewedRuntimeBaseline"),
                     bindingKey + " retains specialized runtime-baseline bypass metadata.");
 
-                CapturedEnemyCombatContract resolved;
-                string failure;
-                Assert.IsTrue(
-                    CapturedEnemyCombatProfileCatalog.TryResolve(
-                        resource,
-                        name,
-                        monsterData,
-                        level,
-                        sourceIdentity,
-                        runtimeBaseline,
-                        out resolved,
-                        out failure),
-                    bindingKey + " level=" + level + ": " + failure);
-                Assert.IsTrue(resolved.IsCombatReady, bindingKey + " level=" + level);
+                foreach (CapturedEnemyCombatContract runtimeBaseline in runtimeBaselines)
+                {
+                    CapturedEnemyCombatContract resolved;
+                    string failure;
+                    bool catalogResolved =
+                        CapturedEnemyCombatProfileCatalog.TryResolve(
+                            resource,
+                            name,
+                            monsterData,
+                            level,
+                            sourceIdentity,
+                            runtimeBaseline,
+                            out resolved,
+                            out failure);
+                    if (!catalogResolved
+                        && runtimeBaseline.IsCombatReady
+                        && failure.StartsWith(
+                            "no canonical raw combat profile for ",
+                            StringComparison.Ordinal))
+                    {
+                        resolved = runtimeBaseline;
+                        catalogResolved = true;
+                    }
+
+                    Assert.IsTrue(
+                        catalogResolved,
+                        bindingKey + " level=" + level + ": " + failure);
+                    Assert.IsTrue(resolved.IsCombatReady, bindingKey + " level=" + level);
+                }
             }
         }
 

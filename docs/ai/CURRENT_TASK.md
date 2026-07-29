@@ -46,3 +46,27 @@ Evidence:
 - `docs/evidence/FINAL_ORDINARY_DUNGEON_COMBAT_COMPLETION_20260728.md`
 - `docs/generated/enemy_combat_setup_formula_dataset.json`
 - `docs/generated/capture_backed_npc_combat_active_coverage.json`
+
+### PF127/PF1931 named encounter completion
+
+The full named/scripted runtime inventory is complete for every active PF127
+and PF1931 domain: 13 initial profiles, two successor stages, two owned-add
+domains, and Murial's ordinary-owned named patrol. The ordinary baseline
+remains `489/489`.
+
+The shared encounter registry now owns registrations by playfield instance, so
+PF127 and PF1931 retirement removes all encounter definitions without stale
+combat, add, successor, patrol, respawn, corpse, or visibility workers.
+Full-corpus combat generation is bounded-memory and reproducible: 374 sessions,
+358 canonical sessions, 2,827 complete chains, 255 capture-certified profiles,
+303 semantic definitions, and zero generator errors; the second generation
+produces no diff.
+
+Exact unresolved boundaries remain fail-closed: the post-Aztur full-chain
+reset/respawn condition, downstream gameplay effects for presentation-only
+Temple nanos, unknown loot probabilities, Murial-specific nano/respawn
+behavior, and inactive Strike Foreman generation/lifecycle policy.
+
+Evidence:
+
+- `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md`
