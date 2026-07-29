@@ -257,6 +257,7 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
+                MissionAcgOperationalRuntime.NotifyChestOpened(instance, runtimeInstance);
                 return true;
             }
         }
@@ -322,6 +323,13 @@ namespace ZoneEngine.Core.Missions
             {
                 MissionAcgRuntimeObject runtimeObject = instance.Objects[i];
                 if (!runtimeObject.HasPacket)
+                {
+                    continue;
+                }
+
+                if (MissionAcgOperationalRuntime.ShouldSuppressCapturedNpcPacket(
+                    instance,
+                    runtimeObject))
                 {
                     continue;
                 }

@@ -9,6 +9,7 @@ namespace ZoneEngine.Core.Missions
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -54,6 +55,20 @@ namespace ZoneEngine.Core.Missions
                 target,
                 out instance,
                 out runtimeObject))
+            {
+                GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                return true;
+            }
+
+            AORebirth.Core.Vector.Coordinate coordinates = character.Coordinates();
+            if (runtimeObject.Position == null
+                || !MissionAcgSpatialValidator.IsWithinDistance(
+                    new MissionAcgPointRecord(
+                        coordinates.x,
+                        coordinates.y,
+                        coordinates.z),
+                    runtimeObject.Position,
+                    NpcCombatAttackRules.MaxMeleeCombatDistance))
             {
                 GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
                 return true;

@@ -2,22 +2,24 @@
 
 ## Active
 
-### RK terminal missions: Stage 4 exact objective completion
+### RK terminal missions: Stage 5 operational isolated interiors
 
-All five generated mission types now resolve through accepted quest, owner,
-isolated PF2, exact runtime objective identity, and captured objective slot.
-Version-1 objective sidecars persist the immutable objective contract,
-mission-item identity, frozen rewards, grant states, completion packets, and
-exact cleanup. Separate structured accepted-QFU builders preserve the captured
-Find Person version `16`/flag `64`, Find Item version `15`, Return Item version
-`8`, and Repair component `100348` to machine `100358` relationship.
+Bound generated-mission PF2 instances now bypass the legacy mission spawner and
+materialize exact captured NPC slots as real server combat actors with Stage 3
+runtime identities. Version-1 operational sidecars persist exact NPC health,
+life/combat/corpse state and explicit unresolved-empty chest state. Kill death
+is durable before Stage 4 completion, Find Person remains passive and exact
+interaction-only, and all combat/container lookups require owner, live PF2, and
+runtime identity.
 
-Completion is durably resumable and never repeats a reward already marked
-granted. A legacy cash/XP/inventory grant left in `Pending` fails closed for
-operator reconciliation because that persistence cannot atomically commit with
-the journal. NPC combat simulation, generic loot, collision, navigation,
-procedural generation, durable team rewards, and private-client validation
-remain deferred. No database schema changed.
+Captured position, rotation, template, MonsterData, level, health, name, scale,
+textures, and meshes remain authoritative. Existing production mission combat
+owns damage and weapon behavior; no new formula is introduced. The finalized
+captures do not prove corpse or chest contents, so generic loot is suppressed
+and no item or credit outcome is fabricated. Distance and finite-coordinate
+validation are active, but server collision, line-of-sight, room topology,
+waypoint navigation, procedural generation, durable team rewards, and
+private-client validation remain deferred. No database schema changed.
 
 Evidence and architecture:
 

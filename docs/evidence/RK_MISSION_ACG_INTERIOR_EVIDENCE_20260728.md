@@ -514,16 +514,113 @@ the exact objective path rejects a team identity. The objective model and
 validation preserve an explicit team identity when one exists, but durable
 team reward distribution is not inferred from the current captures.
 
-## Deferred Stage 5 behavior
+## Stage 5 operational NPC, corpse, container, and spatial state
+
+Stage 5 adds a version-1 mutable sidecar under
+`mission-state/acg-operational`. Each record binds the accepted quest, owner,
+allocated live PF2, selected bundle and payload hash, and building identity to
+indexed NPC and chest state. NPC records persist captured slot and identity,
+deterministic runtime identity, captured position/rotation, template,
+MonsterData, level, maximum health, current health, scale, optional head mesh,
+name, objective role, combat/life state, instance-local corpse identity/state,
+spawn generation, and cleanup state. Chest records persist captured/runtime
+identity, explicit loot authority, open/exhausted state, transfer count, and
+cleanup state.
+
+The format uses sorted invariant `key=value` fields, Base64 text, SHA-256 over
+the canonical field block, same-directory temporary write, strict readback,
+and atomic replacement. Unknown, truncated, hash-invalid, duplicate, or
+binding/bundle/building/PF2-mismatched records fail closed. Stage 2 binding
+format version 2, Stage 3 runtime format version 1, Stage 4 objective format
+version 1, and all Stage 1 payload hashes remain unchanged.
+
+The runtime owner is always:
+
+```text
+MissionAcgInstanceBinding
+  -> allocated live PF2
+  -> exact bundle NPC/chest slot
+  -> Stage 3 deterministic runtime identity
+  -> Stage 5 mutable state
+```
+
+Bound ACG PF2 values bypass the legacy `MissionInstanceSpawn` path, so that
+path cannot add guessed NPCs, the character-shaped Mission Cube, global
+newest-target registrations, or legacy random loot to an isolated instance.
+Captured NPC `SimpleCharFullUpdate` replay is suppressed only after the Stage 5
+owner is valid; real server `Character` objects are created with the same
+restart-stable Stage 3 identities.
+
+Capture-proven NPC facts are position, rotation, template, MonsterData, level,
+health, scale, head mesh where present, name, textures, and meshes. The
+existing production `BART` template is only the construction shell. Exact
+captured fields overwrite its visible/identity state. The existing
+`MissionInstanceMobCombat` QL policy remains the production owner for damage,
+weapon context, death action, and combat packets because the five finalized
+mission captures do not contain a complete per-NPC attack contract. Stage 5
+does not add a new damage or health formula.
+
+Kill targets and ambient NPCs enter the normal attack, damage, aggro,
+changed-stat, death, and corpse pipelines. A death is persisted before Stage 4
+objective/reward hooks run; a persistence failure blocks completion. Only the
+exact Kill runtime identity can complete its accepted mission, dead state is
+not respawned after restart, and repeated death cannot re-enter the reward
+journal. Find Person uses the same captured NPC materialization but is passive
+and combat-rejected; only its exact Stage 4 `InfoRequest` contract completes
+it. Repair machines, static objectives, terminals, doors, and chests never
+enter NPC combat registration.
+
+Combat selection additionally validates owner, active lifecycle, allocated
+PF2, exact runtime NPC identity, living state, and cleanup state. Runtime
+identities remain collision-free between simultaneous PF2 instances. Existing
+production combat registries are reused only after that instance boundary and
+cannot select a mission target by template or mission type.
+
+Corpse identity uses the exact dead NPC runtime instance with identity type
+`Corpse`, making it deterministic, instance-isolated, and reversible for
+diagnostics. A live corpse is created only when the existing production
+MonsterData/CATMesh owner can build a proven visual. Corpse opening and loot
+transfer require the owning PF2 and the existing melee-distance authority.
+The finalized captures do not prove mission corpse items or credits, so Stage
+5 explicitly clears generic drops and records the outcome as unresolved-empty.
+Persistent dead/corpse state survives restart; the current corpse runtime does
+not safely reconstruct an already-visible corpse after process loss, so it
+does not fabricate that visual.
+
+The captures likewise do not prove chest inventories or transfers. Every
+captured chest therefore has `UnresolvedEmpty` authority: isolated open and
+exhausted state survives restart, the item count remains zero, and no generic
+loot table or reroll runs. Stage 3 remains the packet/open-state owner while
+Stage 5 mirrors durable container authority and cleanup.
+
+All captured entry, exit, objective, dynel, and NPC coordinates are validated
+as finite; duplicate NPC slots and missing objective runtime slots fail
+closed. Door, chest, exit, and objective use require the same PF2/runtime
+identity and the existing server melee-distance bound. Combat uses the
+existing production range checks. No server room mesh, ACG collision graph,
+line-of-sight result, or navigation topology is available from the opaque
+payload. NPCs therefore receive no fabricated waypoint route and remain
+stationary until the existing combat owner can engage them.
+
+Startup restoration order is binding/PF2 reservation, Stage 3 identity and
+interior state, Stage 4 objective/completion state, then Stage 5 mutable state.
+Living NPCs rematerialize once, dead targets remain dead, opened/exhausted
+chests remain consumed, and no bundle, PF2, identity, NPC attributes, corpse,
+or loot is rerolled. Completion, abandonment, and expiry persist Stage 5
+cleanup, remove only that PF2's NPC/combat/corpse/container ownership, delete
+its operational sidecar, and leave PF2 release with the Stage 2 lifecycle.
+
+## Deferred Stage 6 behavior
 
 The following work remains intentionally deferred:
 
-- instantiate combat-capable Kill and Find Person NPCs beyond exact objective
-  identity/death-or-inspect routing;
-- implement captured/proven generic loot behavior and NPC AI/lifecycle;
 - reconcile a reward journal left `Pending` across the non-atomic legacy
   character-persistence boundary with operator evidence;
-- derive or implement collision, navigation, and room/tile resource loading;
+- obtain direct mission corpse/chest inventory transfer captures before
+  enabling any non-empty container outcome;
+- derive or implement server collision, line-of-sight, navigation, and
+  room/tile resource loading from non-speculative evidence;
+- add safe restart reconstruction for an already-visible production corpse;
 - emit additional door, chest, machine, or objective state packets only when
   direct capture proves their values and ordering;
 - implement durable team-owned generated missions and reward distribution

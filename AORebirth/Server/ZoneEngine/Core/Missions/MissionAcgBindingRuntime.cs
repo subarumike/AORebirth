@@ -149,6 +149,10 @@ namespace ZoneEngine.Core.Missions
                     new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
                     catalog,
                     missionStateDirectory);
+                MissionAcgOperationalRuntime.Initialize(
+                    new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
+                    catalog,
+                    missionStateDirectory);
                 initialized = true;
             }
         }
@@ -219,6 +223,7 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 ReplaceIndexes(updated);
+                MissionAcgOperationalRuntime.OnBindingStateChanged(updated);
                 MissionAcgRuntimeManager.OnBindingStateChanged(updated);
                 if (updated.State.LifecycleState == MissionAcgLifecycleState.Cleaned
                     && updated.State.CleanupState == MissionAcgCleanupState.Completed)

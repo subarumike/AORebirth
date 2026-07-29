@@ -80,9 +80,55 @@ namespace AORebirth.Core.NPCHandler
                     level = (level < mob.MinLvl ? mob.MinLvl : level);
                     level = level > mob.MaxLvl ? mob.MaxLvl : level;
                 }
-                mobCharacter = CreateMob(mob, playfieldIdentity, coord, heading, controller, level);
+                mobCharacter = CreateMob(
+                    mob,
+                    playfieldIdentity,
+                    coord,
+                    heading,
+                    controller,
+                    level,
+                    null);
             }
             return mobCharacter;
+        }
+
+        /// <summary>
+        /// Creates an NPC through the normal production template owner while preserving a durable,
+        /// caller-reserved identity. Generated mission instances use this to keep captured slots
+        /// restart-stable and isolated by PF2.
+        /// </summary>
+        public static Character SpawnMobFromTemplateWithIdentity(
+            string hash,
+            Identity playfieldIdentity,
+            Coordinate coord,
+            Quaternion heading,
+            IController controller,
+            int desiredLevel,
+            Identity reservedIdentity)
+        {
+            if (reservedIdentity.Type != IdentityType.CanbeAffected
+                || reservedIdentity.Instance < 1000000)
+            {
+                return null;
+            }
+
+            DBMobTemplate mob = MobTemplateDao.Instance.GetMobTemplateByHash(hash);
+            if (mob == null)
+            {
+                return null;
+            }
+
+            int level = desiredLevel;
+            level = level < mob.MinLvl ? mob.MinLvl : level;
+            level = level > mob.MaxLvl ? mob.MaxLvl : level;
+            return CreateMob(
+                mob,
+                playfieldIdentity,
+                coord,
+                heading,
+                controller,
+                level,
+                reservedIdentity);
         }
 
         private static Character CreateMob(
@@ -91,13 +137,43 @@ namespace AORebirth.Core.NPCHandler
             Coordinate coord,
             Quaternion heading,
             IController controller,
-            int level)
+            int level,
+            Identity? reservedIdentity)
         {
             IPlayfield playfield = Pool.Instance.GetObject<IPlayfield>(Identity.None, playfieldIdentity);
             if (playfield != null)
             {
-                int newInstanceId = Pool.Instance.GetFreeInstance<Character>(1000000, IdentityType.CanbeAffected);
-                Identity newIdentity = new Identity() { Type = IdentityType.CanbeAffected, Instance = newInstanceId };
+                Identity newIdentity;
+                if (!reservedIdentity.HasValue)
+                {
+                    int newInstanceId =
+                        Pool.Instance.GetFreeInstance<Character>(
+                            1000000,
+                            IdentityType.CanbeAffected);
+                    newIdentity =
+                        new Identity
+                        {
+                            Type = IdentityType.CanbeAffected,
+                            Instance = newInstanceId
+                        };
+                }
+                else
+                {
+                    Identity reserved = reservedIdentity.Value;
+                    if (Pool.Instance.GetObject(playfield.Identity, reserved) != null)
+                    {
+                        return null;
+                    }
+
+                    Pool.Instance.PurgeResidualChildren(reserved);
+                    newIdentity =
+                        new Identity
+                        {
+                            Type = reserved.Type,
+                            Instance = reserved.Instance
+                        };
+                }
+
                 Character mobCharacter = new Character(playfield.Identity, newIdentity, controller);
                 mobCharacter.Read();
                 mobCharacter.Coordinates(coord);
