@@ -9,6 +9,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.Missions;
@@ -103,6 +104,72 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string originalHex = hexBodies[0];
             hexBodies[0] = string.Empty;
             Assert.AreEqual(originalHex, MissionRollCaptureLibrary.CapturedRollBodiesHex[0]);
+        }
+
+        [TestMethod]
+        public void GeneratedRollPreservesOneCompleteCapturedServerResponseEnvelope()
+        {
+            const int capturedResponseIndex = 7;
+            QuestAlternativeMessage captured =
+                MissionRollService.DecodeCapturedRoll(capturedResponseIndex);
+            var request = new QuestAlternativeMessage
+                          {
+                              Identity = new Identity
+                                         {
+                                             Type = (IdentityType)50000,
+                                             Instance = 22
+                                         },
+                              MissionTerminalIdentity =
+                                  new Identity
+                                  {
+                                      Type = (IdentityType)56001,
+                                      Instance = unchecked((int)0xC000028F)
+                                  },
+                              VersionId = 4,
+                              LevelSlider = 1,
+                              GoodBadSlider = 0,
+                              OrderChaosSlider = 0,
+                              OpenHiddenSlider = 0,
+                              PhysicalMysticalSlider = 0,
+                              HeadOnStealthSlider = 0,
+                              MoneyExperienceSlider = 0,
+                              Unknown4 = 0,
+                              Unknown5 = 1,
+                              QuestInfos = new QuestInfo[0]
+                          };
+
+            QuestAlternativeMessage generated =
+                MissionRollService.BuildRollResponseDeterministic(
+                    request,
+                    request.Identity,
+                    4,
+                    100,
+                    0f,
+                    0f,
+                    MissionLocationSide.Omni,
+                    12345,
+                    capturedResponseIndex,
+                    unchecked((int)0x55690000));
+
+            Assert.AreEqual(captured.VersionId, generated.VersionId);
+            Assert.AreEqual(captured.LevelSlider, generated.LevelSlider);
+            Assert.AreEqual(captured.GoodBadSlider, generated.GoodBadSlider);
+            Assert.AreEqual(captured.OrderChaosSlider, generated.OrderChaosSlider);
+            Assert.AreEqual(captured.OpenHiddenSlider, generated.OpenHiddenSlider);
+            Assert.AreEqual(captured.PhysicalMysticalSlider, generated.PhysicalMysticalSlider);
+            Assert.AreEqual(captured.HeadOnStealthSlider, generated.HeadOnStealthSlider);
+            Assert.AreEqual(captured.MoneyExperienceSlider, generated.MoneyExperienceSlider);
+            Assert.AreEqual(captured.Unknown4, generated.Unknown4);
+            Assert.AreEqual(captured.Unknown5, generated.Unknown5);
+            Assert.AreNotEqual(
+                request.GoodBadSlider,
+                generated.GoodBadSlider,
+                "Server response envelope must not echo request-only slider bytes.");
+            Assert.AreEqual(request.Identity, generated.Identity);
+            Assert.AreEqual(
+                request.MissionTerminalIdentity,
+                generated.MissionTerminalIdentity);
+            Assert.AreEqual(5, generated.QuestInfos.Length);
         }
 
         private static int FirstDifference(byte[] expected, byte[] actual)

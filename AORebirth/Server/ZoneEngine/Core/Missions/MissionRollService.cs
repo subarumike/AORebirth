@@ -173,20 +173,20 @@ namespace ZoneEngine.Core.Missions
                                                ? citySide
                                                : characterSide;
 
-            QuestAlternativeMessage response = DecodeTemplate();
+            int capturedResponseHeaderIndex =
+                (int)((uint)responseNonce % (uint)CapturedRollCount);
+            QuestAlternativeMessage response = DecodeCapturedRoll(capturedResponseHeaderIndex);
             Identity terminal = request.MissionTerminalIdentity;
             response.Identity = character;
             response.MissionTerminalIdentity = terminal;
-            response.VersionId = request.VersionId;
-            response.Unknown5 = request.Unknown5;
-            response.LevelSlider = request.LevelSlider;
-            response.GoodBadSlider = request.GoodBadSlider;
-            response.OrderChaosSlider = request.OrderChaosSlider;
-            response.OpenHiddenSlider = request.OpenHiddenSlider;
-            response.PhysicalMysticalSlider = request.PhysicalMysticalSlider;
-            response.HeadOnStealthSlider = request.HeadOnStealthSlider;
-            response.MoneyExperienceSlider = request.MoneyExperienceSlider;
-            response.Unknown4 = responseNonce;
+
+            // QuestAlternative is direction-sensitive. In client requests these
+            // fields carry the visible slider values. Official server responses
+            // instead carry an opaque response envelope whose bytes vary between
+            // captured rolls. Echoing request sliders here produced a structurally
+            // valid packet that the live client silently rejected. Preserve one
+            // complete captured response envelope atomically and retarget only
+            // identities and generated offers below.
 
             MissionRollType[] typeMix = MissionRollEvidenceCatalog.SelectTypeMix(
                 effectiveCharacterLevel,
