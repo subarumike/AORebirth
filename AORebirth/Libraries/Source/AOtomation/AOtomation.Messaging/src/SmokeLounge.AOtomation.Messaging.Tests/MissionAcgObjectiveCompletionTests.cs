@@ -9,6 +9,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.Core.Missions;
 
     [TestClass]
@@ -64,6 +66,287 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     bundle.ObjectiveSlots[0].CapturedIdentity,
                     record.Binding.CapturedObjectiveIdentity);
             }
+        }
+
+        [TestMethod]
+        public void AbandonedExpiredAndCleanedObjectivesCannotResumeCompletion()
+        {
+            MissionAcgObjectiveState verified =
+                StateAtPhase(
+                    NewState(DateTime.UtcNow),
+                    MissionAcgCompletionPhase.ObjectiveVerified);
+            Assert.IsTrue(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(verified));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    verified.Copy(
+                        lifecycle: MissionAcgObjectiveLifecycle.Abandoned)));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    verified.Copy(
+                        lifecycle: MissionAcgObjectiveLifecycle.Expired)));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    verified.Copy(
+                        lifecycle:
+                            MissionAcgObjectiveLifecycle.CleanupCompleted)));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    verified.Copy(
+                        lifecycle: MissionAcgObjectiveLifecycle.Invalid)));
+
+            MissionAcgObjectiveState completionOwned =
+                StateAtPhase(
+                    NewState(DateTime.UtcNow),
+                    MissionAcgCompletionPhase.RewardClaimStarted);
+            Assert.IsTrue(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    completionOwned));
+            Assert.IsTrue(
+                MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    completionOwned.Copy(
+                        lifecycle: MissionAcgObjectiveLifecycle.Completed)));
+        }
+
+        [TestMethod]
+        public void CleanupCompletionRequiresBothDurableOwners()
+        {
+            DateTime now = DateTime.UtcNow;
+            var cleanedBinding =
+                new MissionAcgInstanceState(
+                    MissionAcgLifecycleState.Cleaned,
+                    MissionAcgCleanupState.Completed,
+                    now,
+                    now);
+            MissionAcgObjectiveState incompleteObjective =
+                NewState(now).Copy(
+                    lifecycle:
+                        MissionAcgObjectiveLifecycle.CleanupCompleted,
+                    objectiveCleanupCompleted: true,
+                    missionCleanupCompleted: false);
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsCleanupComplete(
+                    cleanedBinding,
+                    incompleteObjective));
+
+            MissionAcgObjectiveState cleanedObjective =
+                incompleteObjective.Copy(missionCleanupCompleted: true);
+            Assert.IsTrue(
+                MissionAcgLifecyclePolicy.IsCleanupComplete(
+                    cleanedBinding,
+                    cleanedObjective));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsCleanupComplete(
+                    new MissionAcgInstanceState(
+                        MissionAcgLifecycleState.CleanupPending,
+                        MissionAcgCleanupState.InstanceReleasePending,
+                        now,
+                        now),
+                    cleanedObjective));
+        }
+
+        [TestMethod]
+        public void PfReleaseGateRequiresVerifiedTerminalCleanup()
+        {
+            Assert.IsTrue(
+                MissionAcgLifecyclePolicy.RequiresVerifiedRuntimeCleanup(
+                    MissionAcgLifecycleState.Cleaned,
+                    MissionAcgCleanupState.Completed));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.RequiresVerifiedRuntimeCleanup(
+                    MissionAcgLifecycleState.CleanupPending,
+                    MissionAcgCleanupState.InstanceReleasePending));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.RequiresVerifiedRuntimeCleanup(
+                    MissionAcgLifecycleState.Cleaned,
+                    MissionAcgCleanupState.Failed));
+        }
+
+        [TestMethod]
+        public void BindingTransitionsRejectStaleStateVersions()
+        {
+            DateTime now = DateTime.UtcNow;
+            var current =
+                new MissionAcgInstanceState(
+                    MissionAcgLifecycleState.Accepted,
+                    MissionAcgCleanupState.None,
+                    now,
+                    null);
+            var sameVersion =
+                new MissionAcgInstanceState(
+                    MissionAcgLifecycleState.Accepted,
+                    MissionAcgCleanupState.None,
+                    now,
+                    null);
+            Assert.IsTrue(
+                MissionAcgLifecyclePolicy.IsSameBindingStateVersion(
+                    current,
+                    sameVersion));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsSameBindingStateVersion(
+                    current,
+                    new MissionAcgInstanceState(
+                        MissionAcgLifecycleState.Active,
+                        MissionAcgCleanupState.None,
+                        now,
+                        null)));
+            Assert.IsFalse(
+                MissionAcgLifecyclePolicy.IsSameBindingStateVersion(
+                    current,
+                    new MissionAcgInstanceState(
+                        MissionAcgLifecycleState.Accepted,
+                        MissionAcgCleanupState.None,
+                        now.AddTicks(1),
+                        null)));
+        }
+
+        [TestMethod]
+        public void ExactKeyLookupNeverConsumesAnotherAcceptedMissionsKey()
+        {
+            int characterInstance = Guid.NewGuid().GetHashCode();
+            var firstMission =
+                new Identity
+                {
+                    Type =
+                        (IdentityType)
+                        MissionAcgAllocationService.AcceptedQuestIdentityType,
+                    Instance = 101
+                };
+            var secondMission =
+                new Identity
+                {
+                    Type = firstMission.Type,
+                    Instance = 102
+                };
+            var missingMission =
+                new Identity
+                {
+                    Type = firstMission.Type,
+                    Instance = 103
+                };
+            MissionKeyStore.Register(characterInstance, firstMission, 7001);
+            MissionKeyStore.Register(characterInstance, secondMission, 7002);
+
+            int key;
+            Assert.IsFalse(
+                MissionKeyStore.TryTakeExact(
+                    characterInstance,
+                    missingMission,
+                    out key));
+            Assert.AreEqual(0, key);
+            Assert.IsTrue(
+                MissionKeyStore.TryTakeExact(
+                    characterInstance,
+                    firstMission,
+                    out key));
+            Assert.AreEqual(7001, key);
+            Assert.IsTrue(
+                MissionKeyStore.TryTakeExact(
+                    characterInstance,
+                    secondMission,
+                    out key));
+            Assert.AreEqual(7002, key);
+        }
+
+        [TestMethod]
+        public void ProductionAbandonmentUsesExactOwnedCleanupWithoutNewestFallback()
+        {
+            string handler =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\QuestMessageHandler.cs");
+            int ownedLookup =
+                handler.IndexOf(
+                    "TryGetOwnedByAcceptedQuest",
+                    StringComparison.Ordinal);
+            int acknowledgement =
+                handler.IndexOf(
+                    "SendDeleteAcknowledgement(client, character, deleteMission)",
+                    ownedLookup,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(ownedLookup >= 0);
+            Assert.IsTrue(acknowledgement > ownedLookup);
+            StringAssert.Contains(handler, "TryAbandonGeneratedMission");
+            StringAssert.Contains(handler, "TryCleanupOwnedRecord");
+            StringAssert.Contains(handler, "TryTakeExact");
+            Assert.IsFalse(handler.Contains("TryRemoveAnyMissionKey"));
+            Assert.IsFalse(handler.Contains("TryRemoveAnyRepairItem"));
+            Assert.IsFalse(
+                handler.Contains("MissionTokenProgressTracker.ClearCharacter"));
+            Assert.IsFalse(
+                handler.Contains("MissionFindItemService.ClearCharacter"));
+
+            string bindingRuntime =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgBindingRuntime.cs");
+            int cleanupGate =
+                bindingRuntime.IndexOf(
+                    "TryVerifyRuntimeCleanup",
+                    StringComparison.Ordinal);
+            int release =
+                bindingRuntime.IndexOf(
+                    "allocator.ReleaseAfterCleanup",
+                    StringComparison.Ordinal);
+            Assert.IsTrue(cleanupGate >= 0);
+            Assert.IsTrue(release > cleanupGate);
+            StringAssert.Contains(
+                bindingRuntime,
+                "MissionAcgLifecyclePolicy.IsSameBindingStateVersion");
+            StringAssert.Contains(
+                bindingRuntime,
+                "TryReleaseAfterDurableCleanup");
+            StringAssert.Contains(
+                bindingRuntime,
+                "TryReleaseFailedAcceptanceAfterCleanup");
+
+            string objectiveRuntime =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveRuntime.cs");
+            StringAssert.Contains(
+                objectiveRuntime,
+                "MissionAcgLifecyclePolicy.IsCompletionResumeEligible");
+
+            string completion =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgCompletionJournalService.cs");
+            int objectiveFinal =
+                completion.IndexOf(
+                    "missionCleanupCompleted: true",
+                    StringComparison.Ordinal);
+            int completionRelease =
+                completion.IndexOf(
+                    "TryReleaseAfterDurableCleanup",
+                    StringComparison.Ordinal);
+            Assert.IsTrue(objectiveFinal >= 0);
+            Assert.IsTrue(completionRelease > objectiveFinal);
+
+            string lifecycle =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgLifecycleService.cs");
+            int lifecycleObjectiveFinal =
+                lifecycle.IndexOf(
+                    "missionCleanupCompleted: true",
+                    StringComparison.Ordinal);
+            int cleanedTransition =
+                lifecycle.IndexOf(
+                    "MissionAcgLifecycleState.Cleaned",
+                    lifecycleObjectiveFinal,
+                    StringComparison.Ordinal);
+            int lifecycleRelease =
+                lifecycle.IndexOf(
+                    "TryReleaseAfterDurableCleanup",
+                    lifecycleObjectiveFinal,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(lifecycleObjectiveFinal >= 0);
+            Assert.IsTrue(cleanedTransition > lifecycleObjectiveFinal);
+            Assert.IsTrue(lifecycleRelease > cleanedTransition);
+
+            string acceptance =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgAcceptanceCoordinator.cs");
+            StringAssert.Contains(
+                acceptance,
+                "TryReleaseFailedAcceptanceAfterCleanup");
+            Assert.IsFalse(acceptance.Contains("MissionKeyStore.TryTake("));
         }
 
         [TestMethod]
@@ -645,6 +928,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             return value;
+        }
+
+        private static string ReadSource(string relativePath)
+        {
+            DirectoryInfo current =
+                new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (current != null)
+            {
+                if (Directory.Exists(Path.Combine(current.FullName, ".git")))
+                {
+                    return File.ReadAllText(
+                        Path.Combine(current.FullName, relativePath));
+                }
+
+                current = current.Parent;
+            }
+
+            throw new InvalidOperationException("Repository root was not found.");
         }
 
         private static string Rehash(string content)

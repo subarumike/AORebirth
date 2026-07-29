@@ -103,6 +103,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgInstanceState.cs">
       <Link>MissionAcgInstanceState.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLifecyclePolicy.cs">
+      <Link>MissionAcgLifecyclePolicy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionKeyStore.cs">
+      <Link>MissionKeyStore.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingRecord.cs">
       <Link>MissionAcgBindingRecord.cs</Link>
     </Compile>

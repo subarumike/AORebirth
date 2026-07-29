@@ -115,24 +115,43 @@ namespace ZoneEngine.Core.Missions
         /// </summary>
         public static bool TryTake(int characterInstance, Identity mission, out int keyInstance)
         {
-            keyInstance = 0;
-            lock (Sync)
+            if (TryTakeExact(characterInstance, mission, out keyInstance))
             {
-                if (mission != null && (int)mission.Type != 0 && mission.Instance != 0)
-                {
-                    long mk = MissionKey(characterInstance, mission);
-                    int mapped;
-                    if (KeyByMission.TryGetValue(mk, out mapped) && mapped != 0)
-                    {
-                        KeyByMission.Remove(mk);
-                        keyInstance = mapped;
-                        RemoveFromStack_NoLock(characterInstance, mapped);
-                        return true;
-                    }
-                }
+                return true;
             }
 
             return TryTakeLatest(characterInstance, out keyInstance);
+        }
+
+        /// <summary>
+        /// Removes only the key mapped to the exact accepted mission. It never falls back to a
+        /// different mission's latest key.
+        /// </summary>
+        public static bool TryTakeExact(
+            int characterInstance,
+            Identity mission,
+            out int keyInstance)
+        {
+            keyInstance = 0;
+            if (mission == null || (int)mission.Type == 0 || mission.Instance == 0)
+            {
+                return false;
+            }
+
+            lock (Sync)
+            {
+                long mk = MissionKey(characterInstance, mission);
+                int mapped;
+                if (!KeyByMission.TryGetValue(mk, out mapped) || mapped == 0)
+                {
+                    return false;
+                }
+
+                KeyByMission.Remove(mk);
+                keyInstance = mapped;
+                RemoveFromStack_NoLock(characterInstance, mapped);
+                return true;
+            }
         }
 
         /// <summary>

@@ -502,12 +502,29 @@ packet; the protocol evidence provides no client acknowledgement. Unsent
 durable packet phases resume on reconnect without recalculating or repaying
 rewards.
 
-Abandonment and expiry win only before the durable reward-claim boundary.
-Once reward claiming starts, completion owns the persisted race. Otherwise
-abandonment/expiry blocks objective verification, removes only the exact
-mission artifacts and runtime instance, grants no rewards, and releases only
-that binding's PF2 after terminal cleanup. Server shutdown preserves active or
+User-driven abandonment proves the exact accepted binding owner before sending
+Quest Delete. It advances only that objective and binding, reuses the durable
+exact-artifact remover for the bound key and mission item/tool, and never falls
+back to a newest key, template-only inventory removal, character-wide token
+cleanup, or character-wide Find Item cleanup. Unknown and authored quest
+deletes remain outside this generated-terminal cleanup path.
+
+Abandonment and expiry can win only before the durable reward-claim boundary.
+Once reward claiming starts, completion owns the persisted race. Abandoned,
+expired, cleanup-complete, and invalid objectives are excluded from restart
+completion work, so cleanup cannot resume rewards. A binding cannot transition
+to `Cleaned` or release its PF2 until spatial, operational, and materialized
+runtime cleanup all report success and the objective journal durably records
+both cleanup markers. Stale binding state versions are rejected, making the
+binding transition the completion-versus-abandonment race owner instead of
+allowing a later stale write to resurrect the loser. Failed cleanup remains
+durable `CleanupPending` work for retry. Server shutdown preserves active or
 in-progress records.
+
+This pass does not add a live expiry scheduler, evacuate an occupant from an
+expiring PF2, or retire every mission-owned corpse before PF2 reuse. Those
+expiry/corpse boundaries remain deferred and must not be inferred from the
+user-driven abandonment result.
 
 Stage 2 currently persists generated missions as explicit solo ownership, so
 the exact objective path rejects a team identity. The objective model and
@@ -777,6 +794,11 @@ versioned persistence, SHA-256 rejection, exact identity/PF2 restoration,
 cleanup state, shared-PF exclusion, and source-level integration guardrails for
 movement, interaction, combat, stationary pursuit, startup, entry, and exit.
 
+The exact-abandonment pass adds lifecycle-policy and production-wiring
+regressions to the Stage 4 objective suite: `16/16` focused tests and the
+`164/164` mission-filtered suite pass, together with the isolated Debug
+AORebirth.Core and ZoneEngine build.
+
 ## Deferred Stage 7 behavior
 
 The following work remains intentionally deferred:
@@ -792,6 +814,8 @@ The following work remains intentionally deferred:
 - add safe restart reconstruction for an already-visible production corpse;
 - emit additional door, chest, machine, or objective state packets only when
   direct capture proves their values and ordering;
+- add live expiry scheduling, safe occupant evacuation, and exact
+  mission-corpse retirement before expired PF2 reuse;
 - implement durable team-owned generated missions and reward distribution
   after stable team persistence exists; and
 - perform private-client end-to-end lifecycle validation.

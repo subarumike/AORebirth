@@ -298,7 +298,7 @@ namespace ZoneEngine.Core.Missions
                 // The reserved durable record is deliberately retained for startup reconciliation.
                 MissionAcceptedStore.Remove(character.Identity.Instance, acceptedQuest);
                 int ignoredMappedKey;
-                MissionKeyStore.TryTake(
+                MissionKeyStore.TryTakeExact(
                     character.Identity.Instance,
                     acceptedQuest,
                     out ignoredMappedKey);
@@ -341,7 +341,7 @@ namespace ZoneEngine.Core.Missions
             if (removeKey)
             {
                 int ignoredKey;
-                MissionKeyStore.TryTake(
+                MissionKeyStore.TryTakeExact(
                     character.Identity.Instance,
                     ToIdentity(persisted.Binding.AcceptedQuestIdentity),
                     out ignoredKey);
@@ -362,9 +362,17 @@ namespace ZoneEngine.Core.Missions
             }
 
             string objectiveCleanupFailure;
-            MissionAcgObjectiveRuntime.TryDeleteAfterFailedAcceptance(
+            if (!MissionAcgObjectiveRuntime.TryDeleteAfterFailedAcceptance(
                 persisted.Binding.AcceptedQuestIdentity,
-                out objectiveCleanupFailure);
+                out objectiveCleanupFailure))
+            {
+                MissionDiagnostics.Log(
+                    "ACG-ACCEPT-ROLLBACK-PENDING accepted={0}:{1} reason={2}",
+                    persisted.Binding.AcceptedQuestIdentity.Type,
+                    persisted.Binding.AcceptedQuestIdentity.Instance,
+                    objectiveCleanupFailure);
+                return;
+            }
 
             MissionAcgBindingRecord cleanupPending;
             string ignored;
@@ -377,13 +385,23 @@ namespace ZoneEngine.Core.Missions
                 out ignored))
             {
                 MissionAcgBindingRecord cleaned;
-                MissionAcgBindingRuntime.TryTransition(
+                if (MissionAcgBindingRuntime.TryTransition(
                     cleanupPending,
                     MissionAcgLifecycleState.Cleaned,
                     MissionAcgCleanupState.Completed,
                     DateTime.UtcNow,
                     out cleaned,
-                    out ignored);
+                    out ignored)
+                    && !MissionAcgBindingRuntime.TryReleaseFailedAcceptanceAfterCleanup(
+                        cleaned,
+                        out ignored))
+                {
+                    MissionDiagnostics.Log(
+                        "ACG-ACCEPT-ROLLBACK-PENDING accepted={0}:{1} reason={2}",
+                        persisted.Binding.AcceptedQuestIdentity.Type,
+                        persisted.Binding.AcceptedQuestIdentity.Instance,
+                        ignored);
+                }
             }
         }
 

@@ -163,6 +163,21 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   atomically migrated without losing proportional health or mutable lifecycle
   state; the post-repair live destination/NPC recheck remains pending.
 
+- Generated-terminal abandonment is now exact and restart-resumable. Inbound
+  Quest Delete proves ownership before acknowledging the client; unknown and
+  authored quests do not enter generated/terminal fallback cleanup. Bound
+  missions reuse the durable exact-artifact owner for key and mission-item/tool
+  removal, and legacy terminal missions no longer fall back to another
+  mission's newest key or clear character-wide token/Find Item state. Objective
+  completion recovery excludes abandoned, expired, cleanup-complete, and
+  invalid records. A binding cannot reach `Cleaned` or release its PF2 until
+  spatial, operational, and materialized runtime cleanup all succeed; failed
+  cleanup remains retryable. The objective cleanup-complete journal is
+  persisted before the binding becomes `Cleaned`, PF2 release requires both
+  durable owners, and stale binding state versions cannot overwrite the
+  completion-versus-abandonment winner. Live expiry scheduling, occupant
+  evacuation, and exact mission-corpse retirement remain deferred.
+
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
   `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the
   proven L10..L17 domain. Five exact raw SIW1 packets and five leave-one-out

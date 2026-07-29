@@ -207,6 +207,13 @@ namespace ZoneEngine.Core.Missions
             {
                 updated = null;
                 failure = string.Empty;
+                MissionAcgBindingRecord current;
+                if (!TryGetCurrentRecord(record, out current, out failure))
+                {
+                    return false;
+                }
+
+                record = current;
                 MissionAcgInstanceState state;
                 try
                 {
@@ -215,6 +222,14 @@ namespace ZoneEngine.Core.Missions
                 catch (Exception ex)
                 {
                     failure = ex.Message;
+                    return false;
+                }
+
+                if (MissionAcgLifecyclePolicy.RequiresVerifiedRuntimeCleanup(
+                        lifecycle,
+                        cleanup)
+                    && !TryVerifyRuntimeCleanup(record, out failure))
+                {
                     return false;
                 }
 
@@ -230,14 +245,122 @@ namespace ZoneEngine.Core.Missions
                 MissionAcgSpatialRuntime.OnBindingStateChanged(updated);
                 MissionAcgOperationalRuntime.OnBindingStateChanged(updated);
                 MissionAcgRuntimeManager.OnBindingStateChanged(updated);
-                if (updated.State.LifecycleState == MissionAcgLifecycleState.Cleaned
-                    && updated.State.CleanupState == MissionAcgCleanupState.Completed)
+                return true;
+            }
+        }
+
+        internal static bool TryCompleteRuntimeCleanup(
+            MissionAcgBindingRecord record,
+            out string failure)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgBindingRecord current;
+                if (!TryGetCurrentRecord(record, out current, out failure))
                 {
-                    allocator.ReleaseAfterCleanup(updated);
-                    ByLivePlayfield.Remove(updated.Binding.AllocatedLivePlayfield2);
+                    return false;
                 }
 
-                return true;
+                return TryVerifyRuntimeCleanup(current, out failure);
+            }
+        }
+
+        internal static bool TryReleaseAfterDurableCleanup(
+            MissionAcgBindingRecord record,
+            MissionAcgObjectiveRecord objective,
+            out string failure)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                failure = string.Empty;
+                MissionAcgBindingRecord current;
+                if (!TryGetCurrentRecord(record, out current, out failure))
+                {
+                    return false;
+                }
+
+                if (objective == null
+                    || objective.Binding.AcceptedQuestIdentity.Instance
+                       != current.Binding.AcceptedQuestIdentity.Instance
+                    || objective.Binding.OwnerIdentity.Instance
+                       != current.Binding.OwnerIdentity.Instance
+                    || objective.Binding.AllocatedLivePlayfield2
+                       != current.Binding.AllocatedLivePlayfield2
+                    || !MissionAcgLifecyclePolicy.IsCleanupComplete(
+                        current.State,
+                        objective.State))
+                {
+                    failure =
+                        "PF2 release requires matching durable binding and objective cleanup.";
+                    return false;
+                }
+
+                MissionAcgBindingRecord mapped;
+                if (!ByLivePlayfield.TryGetValue(
+                    current.Binding.AllocatedLivePlayfield2,
+                    out mapped))
+                {
+                    return true;
+                }
+
+                if (mapped.Binding.AcceptedQuestIdentity.Instance
+                    != current.Binding.AcceptedQuestIdentity.Instance)
+                {
+                    return true;
+                }
+
+                return ReleaseCurrentPlayfield(current);
+            }
+        }
+
+        internal static bool TryReleaseFailedAcceptanceAfterCleanup(
+            MissionAcgBindingRecord record,
+            out string failure)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                failure = string.Empty;
+                MissionAcgBindingRecord current;
+                if (!TryGetCurrentRecord(record, out current, out failure))
+                {
+                    return false;
+                }
+
+                if (current.State.LifecycleState
+                    != MissionAcgLifecycleState.Cleaned
+                    || current.State.CleanupState
+                    != MissionAcgCleanupState.Completed)
+                {
+                    failure =
+                        "Failed acceptance PF2 release requires terminal binding cleanup.";
+                    return false;
+                }
+
+                MissionAcgObjectiveRecord objective;
+                if (MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    current.Binding.OwnerIdentity.Instance,
+                    current.Binding.AcceptedQuestIdentity.Instance,
+                    out objective))
+                {
+                    failure =
+                        "Failed acceptance PF2 release requires the provisional objective to be absent.";
+                    return false;
+                }
+
+                MissionAcgBindingRecord mapped;
+                if (!ByLivePlayfield.TryGetValue(
+                    current.Binding.AllocatedLivePlayfield2,
+                    out mapped)
+                    || mapped.Binding.AcceptedQuestIdentity.Instance
+                       != current.Binding.AcceptedQuestIdentity.Instance)
+                {
+                    return true;
+                }
+
+                return ReleaseCurrentPlayfield(current);
             }
         }
 
@@ -401,8 +524,10 @@ namespace ZoneEngine.Core.Missions
                             == MissionAcgLifecycleState.Abandoned
                             || record.State.LifecycleState
                             == MissionAcgLifecycleState.Completed
-                            || record.State.LifecycleState
-                            == MissionAcgLifecycleState.CleanupPending))
+                        || record.State.LifecycleState
+                            == MissionAcgLifecycleState.CleanupPending
+                        || record.State.LifecycleState
+                            == MissionAcgLifecycleState.Cleaned))
                     {
                         records.Add(record);
                     }
@@ -410,6 +535,107 @@ namespace ZoneEngine.Core.Missions
 
                 return records.AsReadOnly();
             }
+        }
+
+        private static bool TryVerifyRuntimeCleanup(
+            MissionAcgBindingRecord record,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (!MissionAcgSpatialRuntime.Cleanup(record))
+            {
+                failure = "Spatial runtime cleanup did not complete.";
+                return false;
+            }
+
+            string subsystemFailure;
+            if (!MissionAcgOperationalRuntime.Cleanup(record, out subsystemFailure))
+            {
+                failure = "Operational runtime cleanup did not complete: " + subsystemFailure;
+                return false;
+            }
+
+            if (!MissionAcgRuntimeManager.Cleanup(record, out subsystemFailure))
+            {
+                failure = "Materialized runtime cleanup did not complete: " + subsystemFailure;
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool TryGetCurrentRecord(
+            MissionAcgBindingRecord supplied,
+            out MissionAcgBindingRecord current,
+            out string failure)
+        {
+            current = null;
+            failure = string.Empty;
+            if (supplied == null
+                || !ByAcceptedInstance.TryGetValue(
+                    supplied.Binding.AcceptedQuestIdentity.Instance,
+                    out current)
+                || !HasSameTransitionIdentity(current, supplied))
+            {
+                failure = "Generated-mission binding record is not active.";
+                return false;
+            }
+
+            if (!MissionAcgLifecyclePolicy.IsSameBindingStateVersion(
+                current.State,
+                supplied.State))
+            {
+                failure =
+                    "Generated-mission binding transition rejected a stale state version.";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool HasSameTransitionIdentity(
+            MissionAcgBindingRecord current,
+            MissionAcgBindingRecord supplied)
+        {
+            return current != null
+                   && supplied != null
+                   && SameIdentity(
+                       current.Binding.AcceptedQuestIdentity,
+                       supplied.Binding.AcceptedQuestIdentity)
+                   && SameIdentity(
+                       current.Binding.OwnerIdentity,
+                       supplied.Binding.OwnerIdentity)
+                   && SameIdentity(
+                       current.Binding.MissionKeyIdentity,
+                       supplied.Binding.MissionKeyIdentity)
+                   && SameIdentity(
+                       current.Binding.AcgBuildingIdentity,
+                       supplied.Binding.AcgBuildingIdentity)
+                   && current.Binding.AllocatedLivePlayfield2
+                      == supplied.Binding.AllocatedLivePlayfield2
+                   && string.Equals(
+                       current.Binding.SelectedBundleId,
+                       supplied.Binding.SelectedBundleId,
+                       StringComparison.Ordinal);
+        }
+
+        private static bool SameIdentity(
+            MissionAcgIdentityRecord first,
+            MissionAcgIdentityRecord second)
+        {
+            return first != null
+                   && second != null
+                   && first.Type == second.Type
+                   && first.Instance == second.Instance;
+        }
+
+        private static bool ReleaseCurrentPlayfield(
+            MissionAcgBindingRecord current)
+        {
+            ByLivePlayfield.Remove(
+                current.Binding.AllocatedLivePlayfield2);
+            allocator.ReleaseAfterCleanup(current);
+            return true;
         }
 
         private static bool IsAccessible(
