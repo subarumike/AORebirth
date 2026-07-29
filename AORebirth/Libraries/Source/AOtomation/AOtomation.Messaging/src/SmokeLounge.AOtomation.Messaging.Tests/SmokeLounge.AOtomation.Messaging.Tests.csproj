@@ -302,6 +302,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs">
       <Link>CapturedTempleOfThreeWindsContentProvider.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs">
+      <Link>CapturedTempleOfThreeWindsEncounterRules.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs">
       <Link>CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs</Link>
     </Compile>

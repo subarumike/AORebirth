@@ -36148,7 +36148,7 @@
   "combatInventory": {
     "path": "docs/generated/capture_backed_npc_combat_inventory.json",
     "schemaVersion": 3,
-    "sha256": "004f940faaedf1b1df337a70988c854ec63b1d64e0a30675b07b21be4ec3237c"
+    "sha256": "c142e86879a11f66813daf65687bcede7e7fea16f4857210347b24d109d2b235"
   },
   "contentInputs": [
     {
@@ -36189,7 +36189,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
-      "sha256": "9019395dc2167f1a45750aa568305cc14537a0d33176582411c9ea400dd77265"
+      "sha256": "4cd743c0c907efcf41eda5743583291d15ce8e305bd9e48b4a81457bdc3705e6"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs",
@@ -36205,11 +36205,11 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
-      "sha256": "5d2958236485d6704560181ebc871992f39ce9853a65b0622ec01bb5a633ef3c"
+      "sha256": "ae6bd492ba4aecbc0f6ddcf278a16f9f4cb874c1359c91c3689d0a922ab85363"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-      "sha256": "b5c080924b4b9257a9c708c9519c8fb539c8d5e075c5524a6c134a1a898df6b4"
+      "sha256": "292769a8be8b206666a8a04233bc34b81da4316cf1959291f5ef6063e17e191e"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs",
@@ -36271,7 +36271,7 @@
       "raw-only legacy capture directories under For Repo"
     ],
     "scope": "all sessions scanned by the canonical combat inventory extractor",
-    "sessionCount": 374,
+    "sessionCount": 375,
     "sessionsSearched": [
       "For Repo/Omni-Tek Virtual Training Ground - 138.0, 100.9, 13.5 (138.0 100.9 y 13.5 1108028)",
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260509-175138",
@@ -36646,7 +36646,8 @@
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-005042",
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-010220",
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-010846",
-      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-012547"
+      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-012547",
+      "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-231938"
     ]
   },
   "fixedDenominatorExclusions": [
@@ -53047,7 +53048,7 @@
         "auditFamily": "scripted-hostiles",
         "auditKey": "81a2c202ddc74e4cf993",
         "captureSearchScope": "corpusSearch.sessionsSearched",
-        "captureSessionCountSearched": 374,
+        "captureSessionCountSearched": 375,
         "captureSessions": [],
         "capturedContractDataRuntimeReady": false,
         "classification": "unresolved",
@@ -53123,7 +53124,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -53395,7 +53396,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -53747,7 +53748,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -54079,7 +54080,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -54441,7 +54442,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -54961,7 +54962,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -55113,7 +55114,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -55380,7 +55381,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -55489,7 +55490,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -55598,7 +55599,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -55707,7 +55708,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -55816,7 +55817,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -55925,7 +55926,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -56034,7 +56035,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -56149,7 +56150,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -56264,7 +56265,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -56379,7 +56380,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -56494,7 +56495,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -56682,7 +56683,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -56870,7 +56871,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -57044,7 +57045,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -57218,7 +57219,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -57392,7 +57393,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -57566,7 +57567,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -57720,7 +57721,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-175514",
@@ -57874,7 +57875,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -58172,7 +58173,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -58470,7 +58471,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -58768,7 +58769,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -58942,7 +58943,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -59116,7 +59117,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -59290,7 +59291,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -59464,7 +59465,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -59638,7 +59639,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -59812,7 +59813,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -59986,7 +59987,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -61252,7 +61253,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
@@ -61558,7 +61559,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
@@ -61866,7 +61867,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -62330,7 +62331,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -62710,7 +62711,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -69245,7 +69246,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -69741,7 +69742,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -70239,7 +70240,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -70375,7 +70376,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -70679,7 +70680,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -70750,7 +70751,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -71006,7 +71007,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -71260,7 +71261,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -71666,7 +71667,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -71812,7 +71813,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -72182,7 +72183,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -72338,7 +72339,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
@@ -72556,7 +72557,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -72902,7 +72903,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -73172,7 +73173,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -73542,7 +73543,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -73617,7 +73618,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -73847,7 +73848,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -74005,7 +74006,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -74163,7 +74164,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -74355,7 +74356,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -74527,7 +74528,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -74699,7 +74700,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -74851,7 +74852,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -75077,7 +75078,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -75283,7 +75284,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -75507,7 +75508,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -75711,7 +75712,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -75845,7 +75846,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -75985,7 +75986,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -76113,7 +76114,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -77508,7 +77509,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-223719",
@@ -77935,7 +77936,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -78361,7 +78362,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -78863,7 +78864,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -79668,7 +79669,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-004038",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
@@ -79898,7 +79899,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -80374,7 +80375,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -80638,7 +80639,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -80876,7 +80877,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -81752,7 +81753,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -82090,7 +82091,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -82414,7 +82415,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -82818,7 +82819,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -83152,7 +83153,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -83354,7 +83355,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -83423,7 +83424,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -83729,7 +83730,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -83869,7 +83870,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-211430",
@@ -84027,7 +84028,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -84189,7 +84190,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -84351,7 +84352,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -84513,7 +84514,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -84592,7 +84593,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -85045,7 +85046,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -85483,7 +85484,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -85885,7 +85886,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -86211,7 +86212,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -86367,7 +86368,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -86661,7 +86662,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -87101,7 +87102,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -87429,7 +87430,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -87757,7 +87758,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -87913,7 +87914,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -88069,7 +88070,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -88225,7 +88226,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -88629,7 +88630,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
@@ -88785,7 +88786,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -88921,7 +88922,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -89057,7 +89058,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -89271,7 +89272,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -89407,7 +89408,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -89549,7 +89550,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -89691,7 +89692,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -89831,7 +89832,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -90165,7 +90166,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -90543,7 +90544,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -90685,7 +90686,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -90913,7 +90914,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -91223,7 +91224,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -91379,7 +91380,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -91535,7 +91536,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -91771,7 +91772,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -91852,7 +91853,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -91933,7 +91934,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -92014,7 +92015,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -92412,7 +92413,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -92495,7 +92496,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -92578,7 +92579,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -92661,7 +92662,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -92945,7 +92946,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -93113,7 +93114,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -93561,7 +93562,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -93729,7 +93730,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -94009,7 +94010,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -94287,7 +94288,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -94559,7 +94560,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -94831,7 +94832,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -95067,7 +95068,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -95303,7 +95304,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -95539,7 +95540,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -95775,7 +95776,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -96047,7 +96048,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -96319,7 +96320,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -96479,7 +96480,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -96751,7 +96752,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -97017,7 +97018,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -97283,7 +97284,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -97611,7 +97612,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -99599,7 +99600,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -99947,7 +99948,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -100091,7 +100092,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
@@ -100231,7 +100232,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408"
@@ -100569,7 +100570,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -100779,7 +100780,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -103436,7 +103437,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
@@ -103860,7 +103861,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
@@ -104418,7 +104419,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -104748,7 +104749,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -105130,7 +105131,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -105548,7 +105549,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -105754,7 +105755,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -106074,7 +106075,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -106604,7 +106605,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336",
@@ -107429,7 +107430,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -108725,7 +108726,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -109739,7 +109740,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-225408",
@@ -160098,7 +160099,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-041439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139",
@@ -160932,7 +160933,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-033006",
@@ -162120,7 +162121,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230824"
@@ -162494,7 +162495,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426"
       ],
@@ -162836,7 +162837,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163013,7 +163014,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -163196,7 +163197,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-035526",
@@ -163902,7 +163903,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-041439",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139",
@@ -165378,7 +165379,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EB",
@@ -165465,7 +165466,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EC",
@@ -165552,7 +165553,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1ED",
@@ -165639,7 +165640,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EE",
@@ -165726,7 +165727,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1EF",
@@ -165813,7 +165814,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71BC",
@@ -165900,7 +165901,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71C0",
@@ -165987,7 +165988,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7244",
@@ -166074,7 +166075,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7249",
@@ -166161,7 +166162,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C724A",
@@ -166248,7 +166249,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C724F",
@@ -166335,7 +166336,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7252",
@@ -166422,7 +166423,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C725E",
@@ -166509,7 +166510,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7268",
@@ -166596,7 +166597,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C726B",
@@ -166683,7 +166684,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7276",
@@ -166770,7 +166771,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C727D",
@@ -166857,7 +166858,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7286",
@@ -166944,7 +166945,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C728F",
@@ -167031,7 +167032,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C7297",
@@ -167118,7 +167119,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72A2",
@@ -167205,7 +167206,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72A8",
@@ -167292,7 +167293,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1E8",
@@ -167379,7 +167380,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF201",
@@ -167466,7 +167467,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71CD",
@@ -167553,7 +167554,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71D2",
@@ -167640,7 +167641,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C71D3",
@@ -167727,7 +167728,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72BF",
@@ -167814,7 +167815,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72CA",
@@ -167901,7 +167902,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72D2",
@@ -167988,7 +167989,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72D5",
@@ -168075,7 +168076,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72EB",
@@ -168162,7 +168163,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72F3",
@@ -168249,7 +168250,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1DE",
@@ -168336,7 +168337,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F6",
@@ -168423,7 +168424,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F7",
@@ -168510,7 +168511,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F8",
@@ -168597,7 +168598,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1F9",
@@ -168684,7 +168685,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x795FF1FF",
@@ -168771,7 +168772,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x796C72FB",
@@ -168858,7 +168859,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -168944,7 +168945,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169030,7 +169031,7 @@
     {
       "actorCount": 11,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169118,7 +169119,7 @@
     {
       "actorCount": 8,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169206,7 +169207,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169294,7 +169295,7 @@
     {
       "actorCount": 17,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169380,7 +169381,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169466,7 +169467,7 @@
     {
       "actorCount": 31,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169552,7 +169553,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169638,7 +169639,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169724,7 +169725,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169810,7 +169811,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169896,7 +169897,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -169982,7 +169983,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170068,7 +170069,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170154,7 +170155,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170240,7 +170241,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170326,7 +170327,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170412,7 +170413,7 @@
     {
       "actorCount": 11,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170498,7 +170499,7 @@
     {
       "actorCount": 15,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170584,7 +170585,7 @@
     {
       "actorCount": 9,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170672,7 +170673,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170760,7 +170761,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170846,7 +170847,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -170932,7 +170933,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171018,7 +171019,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171104,7 +171105,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171190,7 +171191,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171276,7 +171277,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171362,7 +171363,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171448,7 +171449,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171534,7 +171535,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171620,7 +171621,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171706,7 +171707,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171792,7 +171793,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171878,7 +171879,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -171964,7 +171965,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172050,7 +172051,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172136,7 +172137,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172224,7 +172225,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172310,7 +172311,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172396,7 +172397,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172482,7 +172483,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172568,7 +172569,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172654,7 +172655,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172740,7 +172741,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172826,7 +172827,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172912,7 +172913,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -172998,7 +172999,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173086,7 +173087,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173172,7 +173173,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173258,7 +173259,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173344,7 +173345,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173430,7 +173431,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173516,7 +173517,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173602,7 +173603,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173688,7 +173689,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173774,7 +173775,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173860,7 +173861,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -173946,7 +173947,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174032,7 +174033,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174120,7 +174121,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174206,7 +174207,7 @@
     {
       "actorCount": 17,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174292,7 +174293,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174378,7 +174379,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174466,7 +174467,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174552,7 +174553,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174638,7 +174639,7 @@
     {
       "actorCount": 18,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174724,7 +174725,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174810,7 +174811,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174896,7 +174897,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -174982,7 +174983,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175068,7 +175069,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175154,7 +175155,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175240,7 +175241,7 @@
     {
       "actorCount": 37,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175326,7 +175327,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175412,7 +175413,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175498,7 +175499,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175584,7 +175585,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175670,7 +175671,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175756,7 +175757,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175844,7 +175845,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -175930,7 +175931,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176018,7 +176019,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176104,7 +176105,7 @@
     {
       "actorCount": 49,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176192,7 +176193,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176280,7 +176281,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176368,7 +176369,7 @@
     {
       "actorCount": 8,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176456,7 +176457,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176544,7 +176545,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176630,7 +176631,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176716,7 +176717,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176802,7 +176803,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176888,7 +176889,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -176974,7 +176975,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177060,7 +177061,7 @@
     {
       "actorCount": 16,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177146,7 +177147,7 @@
     {
       "actorCount": 44,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177232,7 +177233,7 @@
     {
       "actorCount": 15,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177318,7 +177319,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177404,7 +177405,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177490,7 +177491,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177576,7 +177577,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177662,7 +177663,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177748,7 +177749,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177834,7 +177835,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -177920,7 +177921,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178006,7 +178007,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178092,7 +178093,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178178,7 +178179,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178264,7 +178265,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178350,7 +178351,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178436,7 +178437,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178522,7 +178523,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178608,7 +178609,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178694,7 +178695,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178780,7 +178781,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178866,7 +178867,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -178952,7 +178953,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179038,7 +179039,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179124,7 +179125,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179210,7 +179211,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179296,7 +179297,7 @@
     {
       "actorCount": 9,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179384,7 +179385,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179470,7 +179471,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179556,7 +179557,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179642,7 +179643,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179728,7 +179729,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179814,7 +179815,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179900,7 +179901,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -179986,7 +179987,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180072,7 +180073,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180158,7 +180159,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180244,7 +180245,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180330,7 +180331,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180416,7 +180417,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180502,7 +180503,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180588,7 +180589,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180674,7 +180675,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180760,7 +180761,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180846,7 +180847,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -180932,7 +180933,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181018,7 +181019,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181104,7 +181105,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181190,7 +181191,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181276,7 +181277,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181362,7 +181363,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181448,7 +181449,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181534,7 +181535,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181620,7 +181621,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181706,7 +181707,7 @@
     {
       "actorCount": 7,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181792,7 +181793,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181878,7 +181879,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -181964,7 +181965,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182050,7 +182051,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182136,7 +182137,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182222,7 +182223,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182308,7 +182309,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182394,7 +182395,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182480,7 +182481,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182566,7 +182567,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182652,7 +182653,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182738,7 +182739,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182824,7 +182825,7 @@
     {
       "actorCount": 18,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182910,7 +182911,7 @@
     {
       "actorCount": 18,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -182996,7 +182997,7 @@
     {
       "actorCount": 28,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183082,7 +183083,7 @@
     {
       "actorCount": 20,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183168,7 +183169,7 @@
     {
       "actorCount": 29,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183254,7 +183255,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183340,7 +183341,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183426,7 +183427,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183512,7 +183513,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183598,7 +183599,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183684,7 +183685,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183770,7 +183771,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183856,7 +183857,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -183942,7 +183943,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -184028,7 +184029,7 @@
     {
       "actorCount": 13,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -188405,7 +188406,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -199496,7 +199497,7 @@
     {
       "actorCount": 14,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -200967,7 +200968,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -201926,7 +201927,7 @@
     {
       "actorCount": 12,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914"
@@ -202223,7 +202224,7 @@
     {
       "actorCount": 10,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212914",
@@ -203438,7 +203439,7 @@
     {
       "actorCount": 6,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -204165,7 +204166,7 @@
     {
       "actorCount": 3,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -205804,7 +205805,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -212769,7 +212770,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -219416,7 +219417,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-205724",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-212335",
@@ -220061,7 +220062,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -220530,7 +220531,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -222013,7 +222014,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-024525",
@@ -223452,7 +223453,7 @@
     {
       "actorCount": 4,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-160142",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
@@ -226435,7 +226436,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
@@ -228564,7 +228565,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -229163,7 +229164,7 @@
     {
       "actorCount": 15,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-172753",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260613-181432",
@@ -233362,7 +233363,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": "0x7985CD86",
@@ -233449,7 +233450,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -233767,7 +233768,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -234085,7 +234086,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -234403,7 +234404,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -234721,7 +234722,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -235039,7 +235040,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -235357,7 +235358,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -235675,7 +235676,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -235993,7 +235994,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -236311,7 +236312,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -236629,7 +236630,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-023030",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260531-155930",
@@ -236947,7 +236948,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -237139,7 +237140,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -237331,7 +237332,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -237523,7 +237524,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -237715,7 +237716,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -237907,7 +237908,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-210452",
@@ -238099,7 +238100,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238184,7 +238185,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238269,7 +238270,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238354,7 +238355,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238439,7 +238440,7 @@
     {
       "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238524,7 +238525,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238609,7 +238610,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238694,7 +238695,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238779,7 +238780,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238864,7 +238865,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -238949,7 +238950,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239034,7 +239035,7 @@
     {
       "actorCount": 5,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239119,7 +239120,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239204,7 +239205,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239289,7 +239290,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239374,7 +239375,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239459,7 +239460,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239544,7 +239545,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239629,7 +239630,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239714,7 +239715,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239799,7 +239800,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239884,7 +239885,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -239969,7 +239970,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -240054,7 +240055,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -240139,7 +240140,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -240224,7 +240225,7 @@
     {
       "actorCount": 1,
       "captureSearchScope": "corpusSearch.sessionsSearched",
-      "captureSessionCountSearched": 374,
+      "captureSessionCountSearched": 375,
       "captureSessions": [],
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -240406,7 +240407,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          1513
+          1608
         ]
       },
       {

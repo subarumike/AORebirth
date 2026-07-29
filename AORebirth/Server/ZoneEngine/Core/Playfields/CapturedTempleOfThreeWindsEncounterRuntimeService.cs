@@ -66,21 +66,43 @@ namespace AORebirth.Core.Playfields
             CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey;
         internal const string ReanimatedProfileKey = "totw.647.encounter.re-animator.reanimated-corpse";
 
-        internal const int DefenderPrimaryNanoId = 205389;
-        internal const int DefenderSecondaryNanoId = 205561;
-        internal const int YatilaPrimaryNanoId = 205600;
-        internal const int YatilaSecondaryNanoId = 205594;
-        internal const int YatilaTertiaryNanoId = 205592;
-        internal const int GulardNanoId = 205584;
-        internal const int ReAnimatorNanoId = 205604;
-        internal const int BetanyNanoId = 205383;
-        internal const int CuratorNanoId = 205565;
-        internal const int NematetPrimaryNanoId = 205395;
-        internal const int NematetSecondaryNanoId = 205563;
-        internal const int NematetTertiaryNanoId = 205592;
-        internal const int GartuaNanoId = 205590;
+        internal const int DefenderPrimaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.DefenderPrimaryNanoId;
+        internal const int DefenderSecondaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.DefenderSecondaryNanoId;
+        internal const int DefenderUnscheduledNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.DefenderUnscheduledNanoId;
+        internal const int YatilaPrimaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.YatilaPrimaryNanoId;
+        internal const int YatilaSecondaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.YatilaSecondaryNanoId;
+        internal const int YatilaTertiaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.YatilaTertiaryNanoId;
+        internal const int GulardNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.GulardNanoId;
+        internal const int ReAnimatorNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.ReAnimatorNanoId;
+        internal const int ReAnimatorUnscheduledNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.YatilaTertiaryNanoId;
+        internal const int BetanyNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.BetanyNanoId;
+        internal const int CuratorNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.CuratorNanoId;
+        internal const int NematetPrimaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.NematetPrimaryNanoId;
+        internal const int NematetSecondaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.NematetSecondaryNanoId;
+        internal const int NematetTertiaryNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.YatilaTertiaryNanoId;
+        internal const int GartuaNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.GartuaNanoId;
+        internal const int UkleshUnscheduledNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.UkleshUnscheduledNanoId;
+        internal const int MurialNanoId =
+            CapturedTempleOfThreeWindsEncounterRules.MurialUnscheduledNanoId;
 
-        internal const double NamedRespawnAfterNpcDespawnSeconds = 600.0;
+        internal const double NamedRespawnAfterNpcDespawnSeconds =
+            CapturedTempleOfThreeWindsEncounterRules.NamedRespawnAfterNpcDespawnSeconds;
         internal const double NamedUnlootedCorpseLifetimePolicySeconds = 120.0;
         internal const double GuardianUnlootedCorpseLifetimeSeconds = 1800.0;
         internal const double DefenderLootedCleanupSeconds = 1.277;
@@ -172,56 +194,64 @@ namespace AORebirth.Core.Playfields
                     false,
                     DefenderNanoCycle,
                     DefenderInitialNanoDelaySeconds,
-                    DefenderNanoRepeatSeconds),
+                    DefenderNanoRepeatSeconds,
+                    CapturedTempleNamedRespawnMode.CapturedAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateYatilaDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.WindcallerYatila(),
                     true,
                     YatilaNanoCycle,
                     YatilaInitialNanoDelayPolicySeconds,
-                    YatilaNanoRepeatPolicySeconds),
+                    YatilaNanoRepeatPolicySeconds,
+                    CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateGulardDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.ReverendGulard(),
                     true,
                     new[] { GulardNanoId },
                     GulardInitialNanoDelaySeconds,
-                    GulardNanoRepeatPolicySeconds),
+                    GulardNanoRepeatPolicySeconds,
+                    CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateReAnimatorDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.ReAnimator(),
                     false,
                     new[] { ReAnimatorNanoId },
                     ReAnimatorInitialNanoDelaySeconds,
-                    ReAnimatorNanoRepeatSeconds),
+                    ReAnimatorNanoRepeatSeconds,
+                    CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateBetanyDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.AcolyteBetany(),
                     true,
                     new[] { BetanyNanoId },
                     BetanyInitialNanoDelaySeconds,
-                    BetanyNanoRepeatSeconds),
+                    BetanyNanoRepeatSeconds,
+                    CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateCuratorDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.TheCurator(),
                     true,
                     new[] { CuratorNanoId },
                     CuratorInitialNanoDelaySeconds,
-                    CuratorNanoRepeatSeconds),
+                    CuratorNanoRepeatSeconds,
+                    CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateNematetDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.NematetTheCustodianOfTime(),
                     false,
                     NematetNanoCycle,
                     NematetInitialNanoDelaySeconds,
-                    NematetNanoRepeatSeconds),
+                    NematetNanoRepeatSeconds,
+                    CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateGuardianDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.GuardianOfTomorrow(),
                     false,
                     new int[0],
                     0.0,
-                    0.0),
+                    0.0,
+                    CapturedTempleNamedRespawnMode.CapturedAfterNpcDespawn),
                 new NamedEncounterState(
                     CreateGartuaDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.GartuaTheDoorkeeper(),
@@ -229,7 +259,8 @@ namespace AORebirth.Core.Playfields
                     new[] { GartuaNanoId },
                     GartuaInitialNanoDelaySeconds,
                     GartuaNanoRepeatSeconds,
-                    true),
+                    CapturedTempleNamedRespawnMode.CapturedAfterNpcDespawn,
+                    nanoTargetsSelf: true),
                 new NamedEncounterState(
                     CreateUkleshDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.UkleshTheFrozen(),
@@ -237,8 +268,8 @@ namespace AORebirth.Core.Playfields
                     new int[0],
                     0.0,
                     0.0,
-                    spawnOnActivation: true,
-                    suppressIndependentRespawn: true),
+                    CapturedTempleNamedRespawnMode.SuccessorOnly,
+                    spawnOnActivation: true),
                 new NamedEncounterState(
                     CreateKhalumDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.Khalum(),
@@ -246,8 +277,8 @@ namespace AORebirth.Core.Playfields
                     new int[0],
                     0.0,
                     0.0,
-                    spawnOnActivation: false,
-                    suppressIndependentRespawn: true),
+                    CapturedTempleNamedRespawnMode.SuccessorOnly,
+                    spawnOnActivation: false),
                 new NamedEncounterState(
                     CreateAzturDefinition(),
                     CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal(),
@@ -255,8 +286,8 @@ namespace AORebirth.Core.Playfields
                     new int[0],
                     0.0,
                     0.0,
-                    spawnOnActivation: false,
-                    suppressIndependentRespawn: true)
+                    CapturedTempleNamedRespawnMode.ChainResetAfterNpcDespawn,
+                    spawnOnActivation: false)
             };
             this.reanimatedSlots = new[]
             {
@@ -428,11 +459,18 @@ namespace AORebirth.Core.Playfields
             if (state != null)
             {
                 state.Identity = Identity.None;
-                state.RespawnDueAtUtc = state.SuppressIndependentRespawn
-                                            ? (DateTime?)null
-                                            : utcNow.AddSeconds(
-                                                NamedRespawnAfterNpcDespawnSeconds);
+                state.RespawnDueAtUtc =
+                    CapturedTempleOfThreeWindsEncounterRules.ResolveNamedRespawnDueAtUtc(
+                    state.RespawnMode,
+                    state.RespawnDueAtUtc,
+                    utcNow);
                 state.ClearCombat();
+                if (state.RespawnMode
+                    == CapturedTempleNamedRespawnMode.ChainResetAfterNpcDespawn)
+                {
+                    this.ScheduleMainRoomReset(utcNow);
+                }
+
                 return;
             }
 
@@ -1171,6 +1209,61 @@ namespace AORebirth.Core.Playfields
             return false;
         }
 
+        internal static bool TryResolveNamedRespawnDelay(
+            CapturedTempleNamedRespawnMode mode,
+            out double delaySeconds)
+        {
+            return CapturedTempleOfThreeWindsEncounterRules.TryResolveNamedRespawnDelay(
+                mode,
+                out delaySeconds);
+        }
+
+        internal static bool TryGetCapturedNanoEffectOwnership(
+            int nanoId,
+            out CapturedTempleNanoEffectOwnership ownership)
+        {
+            return CapturedTempleOfThreeWindsEncounterRules
+                .TryGetCapturedNanoEffectOwnership(nanoId, out ownership);
+        }
+
+        private void ScheduleMainRoomReset(DateTime resetAtUtc)
+        {
+            NamedEncounterState uklesh = this.FindNamed(UkleshProfileKey);
+            NamedEncounterState khalum = this.FindNamed(KhalumProfileKey);
+            NamedEncounterState aztur = this.FindNamed(AzturProfileKey);
+            if (uklesh == null
+                || khalum == null
+                || aztur == null)
+            {
+                return;
+            }
+
+            DateTime resetDueAtUtc;
+            if (!CapturedTempleOfThreeWindsEncounterRules.TryResolveMainRoomResetDue(
+                    resetAtUtc,
+                    CapturedTempleOfThreeWindsEncounterRules.IsLivingMainRoomStage(
+                        uklesh.Identity.Instance,
+                        uklesh.Dead),
+                    CapturedTempleOfThreeWindsEncounterRules.IsLivingMainRoomStage(
+                        khalum.Identity.Instance,
+                        khalum.Dead),
+                    CapturedTempleOfThreeWindsEncounterRules.IsLivingMainRoomStage(
+                        aztur.Identity.Instance,
+                        aztur.Dead),
+                    uklesh.RespawnDueAtUtc.HasValue,
+                    khalum.RespawnDueAtUtc.HasValue,
+                    aztur.RespawnDueAtUtc.HasValue,
+                    out resetDueAtUtc))
+            {
+                return;
+            }
+
+            uklesh.ClearCombat();
+            khalum.ClearCombat();
+            aztur.ClearCombat();
+            uklesh.RespawnDueAtUtc = resetDueAtUtc;
+        }
+
         private void ProcessNamedNano(NamedEncounterState state, DateTime utcNow)
         {
             if (!state.CombatActive || state.Dead || state.Identity.Instance == 0)
@@ -1230,7 +1323,9 @@ namespace AORebirth.Core.Playfields
                 1,
                 pending.NanoId);
 
-            if (pending.NanoId == ReAnimatorNanoId)
+            CapturedTempleNanoEffectOwnership ownership;
+            if (TryGetCapturedNanoEffectOwnership(pending.NanoId, out ownership)
+                && ownership == CapturedTempleNanoEffectOwnership.ReanimatedAddLifecycle)
             {
                 this.RequestNextReanimation(pending.FinishAtUtc);
             }
@@ -1632,9 +1727,9 @@ namespace AORebirth.Core.Playfields
                 int[] nanoCycle,
                 double initialNanoDelaySeconds,
                 double nanoRepeatSeconds,
+                CapturedTempleNamedRespawnMode respawnMode,
                 bool nanoTargetsSelf = false,
-                bool spawnOnActivation = true,
-                bool suppressIndependentRespawn = false)
+                bool spawnOnActivation = true)
             {
                 this.Definition = definition;
                 this.Combat = combat;
@@ -1642,9 +1737,9 @@ namespace AORebirth.Core.Playfields
                 this.NanoCycle = nanoCycle;
                 this.InitialNanoDelaySeconds = initialNanoDelaySeconds;
                 this.NanoRepeatSeconds = nanoRepeatSeconds;
+                this.RespawnMode = respawnMode;
                 this.NanoTargetsSelf = nanoTargetsSelf;
                 this.SpawnOnActivation = spawnOnActivation;
-                this.SuppressIndependentRespawn = suppressIndependentRespawn;
                 this.Identity = Identity.None;
             }
 
@@ -1654,9 +1749,9 @@ namespace AORebirth.Core.Playfields
             internal int[] NanoCycle { get; private set; }
             internal double InitialNanoDelaySeconds { get; private set; }
             internal double NanoRepeatSeconds { get; private set; }
+            internal CapturedTempleNamedRespawnMode RespawnMode { get; private set; }
             internal bool NanoTargetsSelf { get; private set; }
             internal bool SpawnOnActivation { get; private set; }
-            internal bool SuppressIndependentRespawn { get; private set; }
             internal Identity Identity { get; set; }
             internal DateTime? RespawnDueAtUtc { get; set; }
             internal DateTime? NextNanoAtUtc { get; set; }

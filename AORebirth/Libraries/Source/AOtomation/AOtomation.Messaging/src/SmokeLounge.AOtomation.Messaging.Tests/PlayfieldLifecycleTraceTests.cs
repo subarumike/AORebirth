@@ -2506,6 +2506,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
             string encounterText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
+            encounterText = encounterText.Replace("\r\n", "\n");
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
@@ -2534,8 +2535,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Shared regular-mob lifecycle constants must remain exact.");
             Assert.IsTrue(
                 encounterText.Contains("CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10)")
-                && CountOccurrences(encounterText, "1800.0,\n                1800.0,") == 3,
-                "Subway bosses must retain ten-minute respawns and 30-minute corpses.");
+                && CountOccurrences(encounterText, "1800.0,\n                1800.0,") == 2
+                && encounterText.Contains("17905,\n                1800.0,\n                3.0,"),
+                "Subway named encounters must retain ten-minute respawns and 30-minute loot-bearing corpses while Eumenides uses the captured three-second empty cleanup.");
         }
 
         [TestMethod]

@@ -66,6 +66,25 @@ namespace AORebirth.Core.Playfields
                 Enabled = true
             };
 
+        private static readonly RespawnPolicyDefinition MurialRespawn =
+            new RespawnPolicyDefinition
+            {
+                RespawnPolicyKey = "totw.named.murial.300-after-npc-despawn-policy",
+                Mode = WorldRespawnMode.FixedDelay,
+                FixedDelaySeconds = RuntimeRespawnAfterNpcDespawnSeconds,
+                RespawnAtOriginalPosition = true,
+                ResetHealth = true,
+                ResetMovementState = true,
+                ResetAggressionState = true,
+                DelayStartsAt = RespawnDelayStartsAt.NpcDespawn,
+                Evidence =
+                    "20260721-232051/234614 prove Murial's exact spawn anchor, death/corpse lifecycle, "
+                    + "and 20-destination patrol; the shared PF1931 300-second post-despawn "
+                    + "ordinary runtime policy supplies the bounded respawn delay",
+                Confidence = "EXPLICIT_TEMPLE_POLICY",
+                Enabled = true
+            };
+
         private static readonly ProfileSeed[] ProfileSeeds =
         {
             new ProfileSeed("totw.cultist.26074", 26074, 1579u, 40691, 204735u, 17532,
@@ -888,7 +907,7 @@ namespace AORebirth.Core.Playfields
                 "20260721-232051,20260721-234614",
                 "2026-07-22T04:36:41.2783126Z",
                 null,
-                WorldRespawnPolicyAssignment.Explicit(CultistRespawn),
+                WorldRespawnPolicyAssignment.Explicit(MurialRespawn),
                 CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.Resolve(
                     unchecked((int)0x7987F12Du),
                     26090,

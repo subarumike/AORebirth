@@ -31,7 +31,7 @@ and combat behavior cross the encounter boundary.
 | 1931 | `totw.1931.boss.gartua-the-doorkeeper` | Gartua the Doorkeeper | 159085 | initial boss | complete with bounded packet-only nano behavior |
 | 1931 | `totw.1931.boss.uklesh-the-frozen` | Uklesh the Frozen | 40515 | initial chain stage | complete |
 | 1931 | `totw.1931.boss.khalum` | Khalum | 95352 | successor stage | complete |
-| 1931 | `totw.1931.boss.aztur-the-immortal` | Aztur the Immortal | 159966 | successor stage | complete; full-chain post-Aztur reset remains evidence-bounded |
+| 1931 | `totw.1931.boss.aztur-the-immortal` | Aztur the Immortal | 159966 | successor stage | complete; NPC despawn owns one policy-timed full-chain reset |
 | 1931 | `totw.ordinary.main-room.murial-the-faithful.26090` | Murial the Faithful | 26090 | ordinary-owned named patrol | complete; ordinary respawn policy retained |
 
 This is 18 unique combat/profile domains: 13 initial stages, two successors,
@@ -110,9 +110,11 @@ Uklesh active
 Only one stage may be active. Predecessor state is cleaned before successor
 visibility, successor stages suppress independent respawn, and pending
 successor work is canceled when the owning runtime is disposed. No
-out-of-order or duplicate stage is materialized. A complete captured
-post-Aztur abandonment/reset/respawn condition is not present, so production
-does not invent an independent chain reset.
+out-of-order or duplicate stage is materialized. Aztur NPC despawn now owns
+exactly one complete-chain reset that schedules Uklesh after the explicit
+600-second Temple named policy. Any active or already scheduled Uklesh,
+Khalum, or Aztur state rejects a duplicate reset. The delay remains
+policy-owned because no complete captured Aztur-to-Uklesh interval exists.
 
 The Re-Animator owns exactly two Reanimated Corpse slots. Nano `205604`
 requests refill of an empty/dead slot; generation tokens prevent duplicate
@@ -146,9 +148,9 @@ sample. Subway bosses retain ten-minute death-based respawn and 30-minute
 loot-bearing corpses. Guardian retains a 1,800-second unlooted corpse; Gartua
 retains a 120-second corpse. Other Temple named actors retain the existing
 600-second post-NPC-despawn policy only where production already records that
-policy. Successor stages do not schedule independent chain respawns. Unknown
-pool probabilities, unobserved loot, and the post-Aztur complete-chain reset
-remain explicitly unresolved.
+policy. Successor stages do not schedule independent respawn; Aztur NPC
+despawn alone owns the policy-timed full-chain reset. Unknown pool
+probabilities and unobserved loot remain explicitly unresolved.
 
 ## Runtime ownership and re-entry
 
@@ -189,8 +191,8 @@ Generation is now bounded to two passes:
 5. release session state before processing the next capture.
 
 Stable ordering and semantic identity generation are unchanged. A full write
-run completed in `312.3 s`; a second full check completed in `341.4 s` with no
-diff. Final counts are 374 sessions, 358 canonical sessions, 2,827 complete
+run completed in `274.5 s`; a second full check completed in `314.1 s` with no
+diff. Final counts are 375 sessions, 359 canonical sessions, 2,827 complete
 chains, 255 capture-certified profiles, 95 runtime-ready profiles, 303
 semantic definitions, 100 runtime-ready definitions, 1,404 unresolved
 profiles, and zero generator errors. Formula generation reports 422 profiles
@@ -238,7 +240,14 @@ gates.
 - Ordinary-owned named patrol domains: 1/1 complete.
 - Ordinary actors: 489/489 unchanged.
 - Bounded packet-only nano behavior: implemented without invented effects.
-- Exact unresolved boundaries: post-Aztur full-chain reset/respawn,
-  downstream effects for presentation-only Temple nanos, unknown loot
-  probabilities, Murial-specific respawn/nano effect, and inactive Strike
-  Foreman generation/lifecycle policy.
+- Explicit gameplay ownership added after this report: Aztur NPC despawn owns
+  one policy-timed Uklesh chain reset; all 18 named respawn domains are
+  classified; Murial owns an explicit shared-policy respawn; and Eumenides
+  uses the captured shared empty-corpse cleanup bound.
+- Exact unresolved boundaries: downstream effects or scheduling for
+  presentation-only Temple nanos, unknown loot probabilities and wider pools,
+  Murial nano/loot behavior, and inactive Strike Foreman
+  generation/lifecycle policy.
+
+The authoritative gameplay disposition and evidence boundaries are continued
+in `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.

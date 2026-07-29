@@ -288,7 +288,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 "corpusSearch.sessionsSearched",
                 StringMember(cursed, "captureSearchScope"));
-            Assert.AreEqual(374, IntMember(cursed, "captureSessionCountSearched"));
+            Assert.AreEqual(375, IntMember(cursed, "captureSessionCountSearched"));
             Assert.AreEqual(
                 IntMember(corpusSearch, "sessionCount"),
                 IntMember(cursed, "captureSessionCountSearched"));
