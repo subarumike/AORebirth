@@ -72,12 +72,30 @@ namespace ZoneEngine.Core.Missions
         /// </summary>
         public static bool TryHandleInfoRequest(IZoneClient client, Identity target)
         {
-            if (client == null || target == null || !IsFindPersonTarget(target))
+            if (client == null || target == null)
             {
                 return false;
             }
 
             ICharacter character = client.Controller != null ? client.Controller.Character : null;
+            if (character != null
+                && character.Playfield != null
+                && MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    character.Playfield.Identity.Instance)
+                && MissionAcgRuntimeManager.IsRuntimeIdentityCandidate(
+                    character.Playfield.Identity.Instance,
+                    target))
+            {
+                return MissionAcgObjectiveInteractionService.TryHandleInfoRequest(
+                    client,
+                    target);
+            }
+
+            if (!IsFindPersonTarget(target))
+            {
+                return false;
+            }
+
             if (character == null || character.Playfield == null
                 || !MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
             {

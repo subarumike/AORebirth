@@ -136,6 +136,34 @@ namespace ZoneEngine.Core.Missions
         }
 
         /// <summary>
+        /// Removes only the exact accepted-mission mapping and exact inventory instance from the
+        /// compatibility stack. It never falls back to another mission's latest key.
+        /// </summary>
+        public static void ForgetExact(
+            int characterInstance,
+            Identity mission,
+            int keyInstance)
+        {
+            if (mission == null || (int)mission.Type == 0 || mission.Instance == 0)
+            {
+                return;
+            }
+
+            lock (Sync)
+            {
+                long mk = MissionKey(characterInstance, mission);
+                int mapped;
+                if (KeyByMission.TryGetValue(mk, out mapped)
+                    && mapped == keyInstance)
+                {
+                    KeyByMission.Remove(mk);
+                }
+
+                RemoveFromStack_NoLock(characterInstance, keyInstance);
+            }
+        }
+
+        /// <summary>
         /// Removes and returns the most recently granted mission-key instance for a character, if any.
         /// </summary>
         public static bool TryTakeLatest(int characterInstance, out int keyInstance)

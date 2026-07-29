@@ -419,17 +419,116 @@ expired, cleanup-pending, cleaned, or invalid bindings remove only their own
 runtime objects, identity maps, registry entries, send state, and mutable
 sidecar. Stage 2 lifecycle remains the sole owner of PF2 release.
 
-## Deferred Stage 4 behavior
+## Stage 4 exact objectives and durable completion
+
+Each accepted generated mission now owns one version-1 objective record under
+`mission-state/acg-objectives`. The immutable portion binds the accepted quest,
+owner or explicit team, live PF2, bundle ID and payload hash, building,
+captured objective slot and identity, deterministic runtime identity, template,
+name, required interaction, issuing terminal, and required mission item or
+machine template. Mutable state separately records lifecycle, the exact
+mission-item inventory identity, frozen rewards, stable claim IDs, per-reward
+grant state, packet-send state, exact artifact cleanup, and runtime/mission
+cleanup.
+
+The objective sidecar uses sorted invariant `key=value` fields, Base64 text
+fields, a SHA-256 over the canonical field block, and same-directory temporary
+write, flush, readback validation, and atomic replacement. Unknown versions,
+truncated files, integrity failures, duplicate accepted identities, missing
+bundles, payload/building/slot mismatches, or runtime identities outside the
+bound PF2 fail closed. Stage 2 binding format version 2 and Stage 3 runtime
+format version 1 are unchanged.
+
+The five explicit contracts are:
+
+- Kill: exact owner, accepted quest, live PF2, runtime target, captured slot,
+  template/name contract, and first target-death observation.
+- Find Person: exact runtime person `InfoRequest`; accepted QFU action version
+  `16` and `QuestIdentity` flag `64`. Proximity alone does not complete it.
+- Find Item: exact static runtime object pickup; accepted QFU action version
+  `15`. The item identity is persisted before completion and the generated
+  character-shaped legacy cube path is not used.
+- Return Item: exact persisted inventory instance delivered to the exact
+  issuing terminal; accepted QFU action version `8`. Template-only delivery is
+  rejected.
+- Repair: exact persisted repair-kit inventory instance used on the exact
+  runtime machine in the bound PF2. The semantic captured relationship remains
+  component template `100348` to machine template `100358`; another kit or
+  another mission machine is rejected.
+
+Kill and Repair accepted QFUs use their explicit version-16 structured
+builders. Every builder emits the accepted quest identity, persisted building,
+runtime objective, mission item/tool where applicable, issuing terminal where
+applicable, and accepted offer title, description, QL, and reward fields.
+Generated acceptance no longer mutates a captured Kill QFU by byte offset.
+
+Completion advances through the following durable phases:
+
+```text
+ObjectiveVerified
+CompletionStarted
+RewardCalculationFrozen
+RewardClaimStarted
+CreditsGranted
+XpGranted
+ItemRewardGrantedOrNone
+MissionArtifactsRemoved
+Action59Sent
+QuestDeleteSent
+ObjectiveCleanupCompleted
+MissionCleanupCompleted
+```
+
+Credit, XP, and item values are frozen before the first grant. Each has a
+stable accepted-quest claim ID and `NotStarted`, `Pending`, `Granted`, or
+`ExplicitNone` state. A retry after `Granted` never repeats that reward and a
+later packet failure does not restart the reward set. The exact mission key,
+Return Item instance, Repair component, objective registry/runtime state, and
+accepted mission are cleaned independently; no template-only or newest-mission
+fallback is used. PF2 release remains owned by the Stage 2 terminal lifecycle.
+
+The remaining crash boundary is explicit: legacy character cash, XP, and
+inventory persistence cannot atomically commit with the objective sidecar.
+The journal therefore writes `Pending` before invoking an existing reward
+owner and `Granted` afterward. A restart that finds `Pending` fails closed and
+logs the accepted quest and sidecar for reconciliation instead of risking a
+duplicate grant. This is durable server-controlled idempotency, not a
+distributed transaction.
+
+Captured completion ordering is preserved as server-controlled reward/artifact
+work followed by action `59`, Quest Delete, objective cleanup, and mission
+cleanup. `Action59Sent` and `QuestDeleteSent` mean that the server sent the
+packet; the protocol evidence provides no client acknowledgement. Unsent
+durable packet phases resume on reconnect without recalculating or repaying
+rewards.
+
+Abandonment and expiry win only before the durable reward-claim boundary.
+Once reward claiming starts, completion owns the persisted race. Otherwise
+abandonment/expiry blocks objective verification, removes only the exact
+mission artifacts and runtime instance, grants no rewards, and releases only
+that binding's PF2 after terminal cleanup. Server shutdown preserves active or
+in-progress records.
+
+Stage 2 currently persists generated missions as explicit solo ownership, so
+the exact objective path rejects a team identity. The objective model and
+validation preserve an explicit team identity when one exists, but durable
+team reward distribution is not inferred from the current captures.
+
+## Deferred Stage 5 behavior
 
 The following work remains intentionally deferred:
 
-- implement all five objective completion paths and exactly-once rewards;
-- implement captured/proven loot behavior and NPC combat/lifecycle;
+- instantiate combat-capable Kill and Find Person NPCs beyond exact objective
+  identity/death-or-inspect routing;
+- implement captured/proven generic loot behavior and NPC AI/lifecycle;
+- reconcile a reward journal left `Pending` across the non-atomic legacy
+  character-persistence boundary with operator evidence;
 - derive or implement collision, navigation, and room/tile resource loading;
-- emit capture-proven server door/chest state-change packets if required beyond
-  GenericCmd acknowledgement;
-- implement durable team-owned generated missions after a stable team identity
-  exists; and
-- perform private-server lifecycle regression capture after runtime wiring.
+- emit additional door, chest, machine, or objective state packets only when
+  direct capture proves their values and ordering;
+- implement durable team-owned generated missions and reward distribution
+  after stable team persistence exists; and
+- perform private-client end-to-end lifecycle validation.
 
-Any future database-schema change still requires separate explicit approval.
+Procedural ACG generation, speculative `C79F` topology, payload mutation,
+reward-formula changes, and database-schema changes remain out of scope.

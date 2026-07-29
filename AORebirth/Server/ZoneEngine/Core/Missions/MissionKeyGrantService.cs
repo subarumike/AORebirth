@@ -211,6 +211,123 @@ namespace ZoneEngine.Core.Missions
                 out inventoryError);
         }
 
+        public static bool TryGrantReservedNamedItem(
+            IZoneClient client,
+            ICharacter character,
+            int lowId,
+            int highId,
+            int quality,
+            string itemName,
+            int reservedItemInstance,
+            out int itemInstance,
+            out InventoryError inventoryError)
+        {
+            return TryGrantItem(
+                client,
+                character,
+                lowId,
+                highId,
+                quality > 0 ? quality : 1,
+                string.IsNullOrEmpty(itemName) ? "Mission Item" : itemName,
+                MissionKeyOverflowSlot,
+                MissionKeyFlags,
+                MissionKeyIdentityType,
+                true,
+                reservedItemInstance,
+                out itemInstance,
+                out inventoryError);
+        }
+
+        internal static bool TryGetExactInventoryItem(
+            ICharacter character,
+            Identity source,
+            out IItem item)
+        {
+            item = null;
+            if (character == null
+                || character.BaseInventory == null
+                || source == null)
+            {
+                return false;
+            }
+
+            IInventoryPage page;
+            if (!character.BaseInventory.Pages.TryGetValue(
+                (int)source.Type,
+                out page))
+            {
+                return false;
+            }
+
+            item = page?[source.Instance];
+            return item != null;
+        }
+
+        internal static bool TryRemoveExactMissionArtifact(
+            IZoneClient client,
+            ICharacter character,
+            int identityType,
+            int identityInstance,
+            int requiredTemplateId,
+            bool requireRepairTool,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (client == null
+                || character == null
+                || character.BaseInventory == null
+                || identityInstance == 0)
+            {
+                failure = "Exact inventory artifact inputs are required.";
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List().ToList())
+                {
+                    IItem item = itemEntry.Value;
+                    if (item == null
+                        || item.Identity == null
+                        || item.Identity.Instance != identityInstance)
+                    {
+                        continue;
+                    }
+
+                    bool exactArtifact =
+                        requireRepairTool
+                            ? IsRepairTool(item)
+                            : requiredTemplateId > 0
+                              ? item.LowID == requiredTemplateId
+                                || item.HighID == requiredTemplateId
+                              : (int)item.Identity.Type == identityType;
+                    if (!exactArtifact)
+                    {
+                        failure =
+                            "Inventory instance exists but is not the bound mission artifact.";
+                        return false;
+                    }
+
+                    pageEntry.Value.Remove(itemEntry.Key);
+                    if (!character.BaseInventory.Write())
+                    {
+                        failure = "Exact inventory artifact persistence failed.";
+                        return false;
+                    }
+
+                    client.SendCompressed(
+                        new DespawnMessage
+                        {
+                            Identity = item.Identity,
+                            Unknown = 1
+                        });
+                    return true;
+                }
+            }
+
+            return true;
+        }
+
         public static bool IsRepairTool(IItem item)
         {
             if (item == null)

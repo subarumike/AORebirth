@@ -150,6 +150,13 @@ namespace ZoneEngine.Core.Missions
             ICharacter victim,
             string reason)
         {
+            if (MissionAcgObjectiveInteractionService.TryHandleTargetDeath(
+                attacker,
+                victim))
+            {
+                return true;
+            }
+
             if (attacker == null || victim == null || !MissionTargetTracker.IsMissionTarget(victim.Identity))
             {
                 return false;
@@ -207,6 +214,26 @@ namespace ZoneEngine.Core.Missions
             if (client == null || character == null || entry == null)
             {
                 return false;
+            }
+
+            MissionAcgBindingRecord generatedBinding;
+            MissionAcgObjectiveRecord generatedObjective;
+            if (MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
+                    character.Identity.Instance,
+                    entry.QuestIdentity.Instance,
+                    out generatedBinding)
+                && MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    character.Identity.Instance,
+                    entry.QuestIdentity.Instance,
+                    out generatedObjective))
+            {
+                return MissionAcgCompletionJournalService.TryCompleteVerified(
+                    client,
+                    character,
+                    entry,
+                    generatedBinding,
+                    generatedObjective,
+                    reason);
             }
 
             string flightKey = character.Identity.Instance.ToString("X") + ":"
@@ -322,7 +349,7 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private static int ResolveCashReward(MissionAcceptedStore.AcceptedMission entry)
+        internal static int ResolveCashReward(MissionAcceptedStore.AcceptedMission entry)
         {
             if (entry == null)
             {
@@ -361,7 +388,7 @@ namespace ZoneEngine.Core.Missions
             return cash;
         }
 
-        private static int ResolveXpReward(MissionAcceptedStore.AcceptedMission entry)
+        internal static int ResolveXpReward(MissionAcceptedStore.AcceptedMission entry)
         {
             if (entry == null)
             {
@@ -405,11 +432,28 @@ namespace ZoneEngine.Core.Missions
         /// Always grants the rolled offer ItemRewards on complete (0 kills still pays).
         /// Independent of token % progress.
         /// </summary>
-        private static bool TryGrantOfferItemReward(
+        internal static bool TryGrantOfferItemReward(
             IZoneClient client,
             ICharacter character,
             MissionAcceptedStore.AcceptedMission entry)
         {
+            int ignored;
+            return TryGrantOfferItemReward(
+                client,
+                character,
+                entry,
+                0,
+                out ignored);
+        }
+
+        internal static bool TryGrantOfferItemReward(
+            IZoneClient client,
+            ICharacter character,
+            MissionAcceptedStore.AcceptedMission entry,
+            int reservedItemInstance,
+            out int grantedItemInstance)
+        {
+            grantedItemInstance = 0;
             if (entry == null || entry.Offer == null || entry.Offer.ItemRewards == null
                 || entry.Offer.ItemRewards.Length == 0)
             {
@@ -427,15 +471,27 @@ namespace ZoneEngine.Core.Missions
             string name = "Mission Reward";
             int itemInstance;
             InventoryError error;
-            bool ok = MissionKeyGrantService.TryGrantNamedItem(
-                client,
-                character,
-                reward.LowId,
-                highId,
-                ql,
-                name,
-                out itemInstance,
-                out error);
+            bool ok =
+                reservedItemInstance == 0
+                    ? MissionKeyGrantService.TryGrantNamedItem(
+                        client,
+                        character,
+                        reward.LowId,
+                        highId,
+                        ql,
+                        name,
+                        out itemInstance,
+                        out error)
+                    : MissionKeyGrantService.TryGrantReservedNamedItem(
+                        client,
+                        character,
+                        reward.LowId,
+                        highId,
+                        ql,
+                        name,
+                        reservedItemInstance,
+                        out itemInstance,
+                        out error);
             MissionDiagnostics.Log(
                 "COMPLETE-ITEM char={0} ok={1} low={2} high={3} ql={4} err={5}",
                 character.Identity.Instance,
@@ -444,10 +500,11 @@ namespace ZoneEngine.Core.Missions
                 highId,
                 ql,
                 error);
+            grantedItemInstance = ok ? itemInstance : 0;
             return ok;
         }
 
-        private static void GrantCredits(ICharacter character, int cashReward)
+        internal static void GrantCredits(ICharacter character, int cashReward)
         {
             if (cashReward <= 0 || character == null)
             {
@@ -490,14 +547,14 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private static void SendRewardFeedback(ICharacter character, int xp, int cash)
+        internal static void SendRewardFeedback(ICharacter character, int xp, int cash)
         {
             SendYellowFeedback(
                 character,
                 string.Format("Received reward: {0} XP, {1} credits.", xp, cash));
         }
 
-        private static void SendMissionAccomplishedFeedback(ICharacter character)
+        internal static void SendMissionAccomplishedFeedback(ICharacter character)
         {
             if (character == null)
             {
@@ -525,7 +582,7 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private static void SendYellowFeedback(ICharacter character, string plainText)
+        internal static void SendYellowFeedback(ICharacter character, string plainText)
         {
             if (character == null || string.IsNullOrEmpty(plainText))
             {
@@ -648,7 +705,7 @@ namespace ZoneEngine.Core.Missions
             return ok;
         }
 
-        private static void SendMissionCompleteAction(ICharacter character, Identity mission)
+        internal static void SendMissionCompleteAction(ICharacter character, Identity mission)
         {
             var missionId = new Identity
                             {
@@ -679,7 +736,7 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private static void SendQuestDelete(ICharacter character, Identity mission)
+        internal static void SendQuestDelete(ICharacter character, Identity mission)
         {
             var message = new QuestMessage
                           {

@@ -23,6 +23,13 @@ namespace ZoneEngine.Core.MessageHandlers
 
         public bool TryHandle(IZoneClient client, GenericCmdMessage message)
         {
+            if (MissionAcgObjectiveInteractionService.TryHandleUseItemOnItem(
+                client,
+                message))
+            {
+                return true;
+            }
+
             if (MissionRepairService.TryHandleUseItemOnItem(client, message))
             {
                 return true;

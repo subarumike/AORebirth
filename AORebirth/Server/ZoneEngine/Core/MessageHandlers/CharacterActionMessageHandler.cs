@@ -132,6 +132,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.InfoRequest:
 
                     // If action == Info Request
+                    if (ZoneEngine.Core.Missions.MissionAcgObjectiveInteractionService
+                        .TryHandleInfoRequest(client, message.Target))
+                    {
+                        break;
+                    }
+
                     IInstancedEntity tPlayer = client.Controller.Character.Playfield.FindByIdentity(message.Target);
 
                     // TODO: Think of a new method to distinguish players from mobs (NPCFamily for example)

@@ -185,13 +185,11 @@ namespace ZoneEngine.Core.Missions
                              MarkerY = binding.ExteriorY,
                              MarkerZ = binding.ExteriorZ
                          };
-            return SendOneMissionWindow(
+            return SendStructuredGeneratedMission(
                 character,
                 offer,
                 stored,
-                register: false,
-                deleteBeforeSend: false,
-                acgBinding: binding);
+                binding);
         }
 
         /// <summary>
@@ -311,6 +309,15 @@ namespace ZoneEngine.Core.Missions
                     {
                         acgBinding = restoredBinding.Binding;
                     }
+                }
+
+                if (acgBinding != null)
+                {
+                    return SendStructuredGeneratedMission(
+                        character,
+                        offer ?? (stored == null ? null : stored.Offer),
+                        stored,
+                        acgBinding);
                 }
 
                 int remainingSeconds = MissionDurationSeconds;
@@ -527,6 +534,71 @@ namespace ZoneEngine.Core.Missions
                     markerX,
                     markerZ);
 
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.ErrorException(ex);
+                return false;
+            }
+        }
+
+        private static bool SendStructuredGeneratedMission(
+            ICharacter character,
+            QuestInfo offer,
+            MissionAcceptedStore.AcceptedMission stored,
+            MissionAcgInstanceBinding binding)
+        {
+            if (character == null
+                || character.Controller == null
+                || offer == null
+                || binding == null)
+            {
+                return false;
+            }
+
+            var client = character.Controller.Client as ZoneClient;
+            if (client == null)
+            {
+                return false;
+            }
+
+            MissionAcgObjectiveRecord objective;
+            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                character.Identity.Instance,
+                binding.AcceptedQuestIdentity.Instance,
+                out objective))
+            {
+                return false;
+            }
+
+            try
+            {
+                MissionAcgAcceptedQfuContract contract =
+                    MissionAcgAcceptedQfuBuilder.Build(
+                        character,
+                        offer,
+                        binding,
+                        objective);
+                client.SendCompressed(contract.Message);
+                if (stored != null)
+                {
+                    stored.TargetName = objective.Binding.ObjectiveName;
+                }
+
+                MissionDiagnostics.Log(
+                    "ACCEPT-QFU-STRUCTURED char={0} accepted={1}:{2} type={3} version={4} flag={5} building={6}:{7} objective={8}:{9} livePf2={10}",
+                    character.Identity.Instance,
+                    binding.AcceptedQuestIdentity.Type,
+                    binding.AcceptedQuestIdentity.Instance,
+                    binding.MissionType,
+                    contract.QuestActionVersion,
+                    contract.QuestIdentityFlag,
+                    binding.AcgBuildingIdentity.Type,
+                    binding.AcgBuildingIdentity.Instance,
+                    objective.Binding.RuntimeObjectiveIdentity.Type,
+                    objective.Binding.RuntimeObjectiveIdentity.Instance,
+                    binding.AllocatedLivePlayfield2);
                 return true;
             }
             catch (Exception ex)

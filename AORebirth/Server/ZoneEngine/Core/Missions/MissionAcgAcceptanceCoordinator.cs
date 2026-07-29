@@ -148,6 +148,16 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            MissionAcgObjectiveRecord objectiveRecord;
+            if (!MissionAcgObjectiveRuntime.TryCreateForBinding(
+                persisted,
+                out objectiveRecord,
+                out failure))
+            {
+                CleanupFailedAcceptance(persisted, client, character, false, 0, false, 0);
+                return false;
+            }
+
             var acceptedQuest =
                 new Identity
                 {
@@ -213,8 +223,51 @@ namespace ZoneEngine.Core.Missions
                     character.Identity.Instance,
                     acceptedQuest,
                     repairInstance);
+
+                MissionAcgObjectiveRecord objectiveWithItem;
+                if (!MissionAcgObjectiveRuntime.TrySetMissionItem(
+                    objectiveRecord,
+                    new MissionAcgIdentityRecord(0x0000C73D, repairInstance),
+                    out objectiveWithItem,
+                    out failure))
+                {
+                    MissionAcceptedStore.Remove(character.Identity.Instance, acceptedQuest);
+                    CleanupFailedAcceptance(
+                        persisted,
+                        client,
+                        character,
+                        true,
+                        keyIdentity.Instance,
+                        true,
+                        repairInstance);
+                    return false;
+                }
+
+                objectiveRecord = objectiveWithItem;
             }
 
+            MissionAcgObjectiveRecord exposed;
+            if (!MissionAcgObjectiveRuntime.TrySetLifecycle(
+                objectiveRecord,
+                objectiveRecord.State.MissionItemIdentity == null
+                    ? MissionAcgObjectiveLifecycle.Exposed
+                    : MissionAcgObjectiveLifecycle.ItemPossessed,
+                out exposed,
+                out failure))
+            {
+                MissionAcceptedStore.Remove(character.Identity.Instance, acceptedQuest);
+                CleanupFailedAcceptance(
+                    persisted,
+                    client,
+                    character,
+                    true,
+                    keyIdentity.Instance,
+                    repairGranted,
+                    repairInstance);
+                return false;
+            }
+
+            objectiveRecord = exposed;
             if (!MissionAcceptService.SendAcceptedGeneratedMission(
                 character,
                 offer,
@@ -307,6 +360,11 @@ namespace ZoneEngine.Core.Missions
                     character,
                     repairInstance);
             }
+
+            string objectiveCleanupFailure;
+            MissionAcgObjectiveRuntime.TryDeleteAfterFailedAcceptance(
+                persisted.Binding.AcceptedQuestIdentity,
+                out objectiveCleanupFailure);
 
             MissionAcgBindingRecord cleanupPending;
             string ignored;

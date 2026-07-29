@@ -366,6 +366,13 @@
     <Compile Include="Core\Missions\MissionAcgRuntimeStateStore.cs" />
     <Compile Include="Core\Missions\MissionAcgRuntimeManager.cs" />
     <Compile Include="Core\Missions\MissionAcgRuntimeInteractionService.cs" />
+    <Compile Include="Core\Missions\MissionAcgObjectiveBinding.cs" />
+    <Compile Include="Core\Missions\MissionAcgObjectiveStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgObjectiveContracts.cs" />
+    <Compile Include="Core\Missions\MissionAcgObjectiveRuntime.cs" />
+    <Compile Include="Core\Missions\MissionAcgAcceptedQfuBuilder.cs" />
+    <Compile Include="Core\Missions\MissionAcgObjectiveInteractionService.cs" />
+    <Compile Include="Core\Missions\MissionAcgCompletionJournalService.cs" />
     <Compile Include="Core\Missions\MissionAcgLayoutCatalog.cs" />
     <Compile Include="Core\Missions\MissionAcgLayoutSelector.cs" />
     <Compile Include="Core\Missions\MissionAcgLegacyLayoutCatalogFactory.cs" />
