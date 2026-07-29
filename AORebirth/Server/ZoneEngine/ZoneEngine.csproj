@@ -355,6 +355,7 @@
     <Compile Include="Core\Missions\MissionAcgLayoutBundle.cs" />
     <Compile Include="Core\Missions\MissionAcgInstanceBinding.cs" />
     <Compile Include="Core\Missions\MissionAcgInstanceState.cs" />
+    <Compile Include="Core\Missions\MissionAcgLifecyclePolicy.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingRecord.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingStore.cs" />
     <Compile Include="Core\Missions\MissionAcgAllocationService.cs" />

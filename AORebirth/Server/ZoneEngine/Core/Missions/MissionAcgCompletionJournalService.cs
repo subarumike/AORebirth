@@ -515,6 +515,26 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
+            if (!MissionAcgBindingRuntime.TryCompleteRuntimeCleanup(
+                binding,
+                out failure))
+            {
+                return false;
+            }
+
+            if (!objective.State.MissionCleanupCompleted
+                && !Replace(
+                    objective,
+                    objective.State.Copy(
+                        lifecycle: MissionAcgObjectiveLifecycle.CleanupCompleted,
+                        missionCleanupCompleted: true,
+                        phase: MissionAcgCompletionPhase.MissionCleanupCompleted),
+                    out objective,
+                    out failure))
+            {
+                return false;
+            }
+
             if (binding.State.LifecycleState
                 == MissionAcgLifecycleState.CleanupPending)
             {
@@ -530,15 +550,10 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
-            if (!objective.State.MissionCleanupCompleted
-                && !Replace(
-                    objective,
-                    objective.State.Copy(
-                        lifecycle: MissionAcgObjectiveLifecycle.CleanupCompleted,
-                        missionCleanupCompleted: true,
-                        phase: MissionAcgCompletionPhase.MissionCleanupCompleted),
-                    out objective,
-                    out failure))
+            if (!MissionAcgBindingRuntime.TryReleaseAfterDurableCleanup(
+                binding,
+                objective,
+                out failure))
             {
                 return false;
             }

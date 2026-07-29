@@ -226,10 +226,8 @@ namespace ZoneEngine.Core.Missions
                 foreach (MissionAcgObjectiveRecord record in ByAccepted.Values)
                 {
                     if (record.Binding.OwnerIdentity.Instance == ownerInstance
-                        && record.State.Phase
-                           >= MissionAcgCompletionPhase.ObjectiveVerified
-                        && record.State.Phase
-                           < MissionAcgCompletionPhase.MissionCleanupCompleted)
+                        && MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                            record.State))
                     {
                         records.Add(record);
                     }

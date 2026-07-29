@@ -2,6 +2,23 @@
 
 ## Active
 
+### RK terminal missions: exact abandonment cleanup
+
+Generated-mission abandonment now authorizes the exact accepted binding before
+sending Quest Delete, advances only that objective and binding, removes only
+the binding-owned key/tool/item artifacts, and retries durable cleanup without
+resuming completion rewards. Unknown or authored quest deletes no longer enter
+terminal-mission fallback cleanup, and legacy terminal cleanup no longer pops a
+different mission's newest key or clears character-wide mission state.
+
+PF2 release is now gated by successful spatial, operational, and materialized
+runtime cleanup plus the objective journal's durable cleanup-complete state.
+Stale binding transitions are rejected so completion and abandonment cannot
+overwrite each other. Failed cleanup remains durable work instead of reaching
+`Cleaned`. Focused and mission-filtered regressions plus the isolated Debug
+build pass. Live expiry scheduling, occupant evacuation, and mission-corpse
+retirement remain separate work.
+
 ### RK terminal missions: live level-4 integration repair
 
 Private-server validation now proves roll, accept, exact key grant, isolated
@@ -13,7 +30,8 @@ live NPC level/health reuse the existing deterministic mission-QL policy rather
 than the source capture's higher values. Version-1 operational state is
 validated and atomically migrated to version 2 so active missions preserve
 mutable state while adopting safe difficulty. Build/regression and one live
-roll/entry/combat recheck are the active acceptance steps.
+roll/entry/combat recheck remain available, but Mike deferred further live
+testing for this session.
 
 ### RK terminal missions: Stage 6 captured spatial authority
 

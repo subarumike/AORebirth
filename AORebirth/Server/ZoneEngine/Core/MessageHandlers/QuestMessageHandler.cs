@@ -3,8 +3,6 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
-
     using AORebirth.Core.Components;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
@@ -60,101 +58,18 @@ namespace ZoneEngine.Core.MessageHandlers
                     return;
                 }
 
-                client.SendCompressed(
-                    new QuestMessage
-                    {
-                        Identity = character.Identity,
-                        Unknown = 0,
-                        Action = QuestAction.Delete,
-                        Unknown1 = 0,
-                        Mission = deleteMission,
-                        Unknown2 = 0,
-                        Unknown3 = 0
-                    });
-
                 MissionAcgBindingRecord generatedBinding;
                 if (MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
                     character.Identity.Instance,
                     deleteMission.Instance,
                     out generatedBinding))
                 {
-                    MissionAcgObjectiveRecord objectiveRecord;
-                    MissionAcgObjectiveRecord abandonedObjective;
-                    string lifecycleFailure = "objective record missing";
-                    if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
-                            character.Identity.Instance,
-                            deleteMission.Instance,
-                            out objectiveRecord)
-                        || !MissionAcgObjectiveRuntime.TrySetLifecycle(
-                            objectiveRecord,
-                            MissionAcgObjectiveLifecycle.Abandoned,
-                            out abandonedObjective,
-                            out lifecycleFailure))
-                    {
-                        MissionDiagnostics.Log(
-                            "JOURNAL-DELETE-FAIL char={0} mission={1:X8} objective={2}",
-                            character.Identity.Instance,
-                            deleteMission.Instance,
-                            lifecycleFailure);
-                        return;
-                    }
-
-                    MissionAcgBindingRecord abandoned;
-                    if (!MissionAcgBindingRuntime.TryTransition(
-                        generatedBinding,
-                        MissionAcgLifecycleState.Abandoned,
-                        MissionAcgCleanupState.KeyRemovalPending,
-                        DateTime.UtcNow,
-                        out abandoned,
-                        out lifecycleFailure))
-                    {
-                        MissionDiagnostics.Log(
-                            "JOURNAL-DELETE-FAIL char={0} mission={1:X8} lifecycle={2}",
-                            character.Identity.Instance,
-                            deleteMission.Instance,
-                            lifecycleFailure);
-                        return;
-                    }
-
-                    int exactKey = generatedBinding.Binding.MissionKeyIdentity.Instance;
-                    bool exactKeyRemoved = MissionKeyGrantService.TryRemoveMissionKey(
-                        client,
-                        character,
-                        exactKey);
-                    int exactKit;
-                    bool exactKitRemoved =
-                        MissionKeyStore.TryTakeRepairKit(
-                            character.Identity.Instance,
-                            deleteMission,
-                            out exactKit)
-                        && MissionKeyGrantService.TryRemoveRepairItem(
+                    MissionAcgBindingRecord cleaned;
+                    string lifecycleFailure;
+                    if (!TryAbandonGeneratedMission(
                             client,
                             character,
-                            exactKit);
-                    int ignoredKey;
-                    MissionKeyStore.TryTake(
-                        character.Identity.Instance,
-                        deleteMission,
-                        out ignoredKey);
-                    bool exactStoreRemoved =
-                        MissionAcceptedStore.Remove(
-                            character.Identity.Instance,
-                            deleteMission);
-
-                    MissionAcgBindingRecord cleanupPending;
-                    MissionAcgBindingRecord cleaned;
-                    if (!MissionAcgBindingRuntime.TryTransition(
-                        abandoned,
-                        MissionAcgLifecycleState.CleanupPending,
-                        MissionAcgCleanupState.InstanceReleasePending,
-                        DateTime.UtcNow,
-                        out cleanupPending,
-                        out lifecycleFailure)
-                        || !MissionAcgBindingRuntime.TryTransition(
-                            cleanupPending,
-                            MissionAcgLifecycleState.Cleaned,
-                            MissionAcgCleanupState.Completed,
-                            DateTime.UtcNow,
+                            generatedBinding,
                             out cleaned,
                             out lifecycleFailure))
                     {
@@ -166,32 +81,23 @@ namespace ZoneEngine.Core.MessageHandlers
                         return;
                     }
 
-                    MissionAcgObjectiveRecord cleanedObjective;
-                    if (!MissionAcgObjectiveRuntime.TryReplaceState(
-                        abandonedObjective,
-                        abandonedObjective.State.Copy(
-                            lifecycle: MissionAcgObjectiveLifecycle.CleanupCompleted,
-                            objectiveCleanupCompleted: true,
-                            missionCleanupCompleted: true),
-                        out cleanedObjective,
-                        out lifecycleFailure))
-                    {
-                        MissionDiagnostics.Log(
-                            "JOURNAL-DELETE-CLEANUP-PENDING char={0} mission={1:X8} reason={2}",
-                            character.Identity.Instance,
-                            deleteMission.Instance,
-                            lifecycleFailure);
-                        return;
-                    }
-
+                    SendDeleteAcknowledgement(client, character, deleteMission);
                     MissionDiagnostics.Log(
-                        "JOURNAL-DELETE-BOUND char={0} mission={1:X8} livePf2={2} keyRemoved={3} kitRemoved={4} storeRemoved={5}",
+                        "JOURNAL-DELETE-BOUND char={0} mission={1:X8} livePf2={2} lifecycle={3} cleanup={4}",
                         character.Identity.Instance,
                         deleteMission.Instance,
                         generatedBinding.Binding.AllocatedLivePlayfield2,
-                        exactKeyRemoved,
-                        exactKitRemoved,
-                        exactStoreRemoved);
+                        cleaned.State.LifecycleState,
+                        cleaned.State.CleanupState);
+                    return;
+                }
+
+                if (stored == null)
+                {
+                    MissionDiagnostics.Log(
+                        "JOURNAL-DELETE-IGNORE char={0} mission={1:X8} reason=not-owned-terminal-mission",
+                        character.Identity.Instance,
+                        deleteMission.Instance);
                     return;
                 }
 
@@ -201,26 +107,16 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                     kitRemoved = MissionKeyGrantService.TryRemoveRepairItem(client, character, kitInstance);
                 }
-                else if (IsDeletedRepairMission(character.Identity.Instance, deleteMission))
-                {
-                    kitRemoved = MissionKeyGrantService.TryRemoveAnyRepairItem(client, character);
-                }
 
                 int keyInstance;
                 bool keyRemoved = false;
-                if (MissionKeyStore.TryTake(character.Identity.Instance, deleteMission, out keyInstance))
+                if (MissionKeyStore.TryTakeExact(character.Identity.Instance, deleteMission, out keyInstance))
                 {
                     keyRemoved = MissionKeyGrantService.TryRemoveMissionKey(client, character, keyInstance);
                 }
 
-                if (!keyRemoved)
-                {
-                    keyRemoved = MissionKeyGrantService.TryRemoveAnyMissionKey(client, character);
-                }
-
                 bool storeRemoved = MissionAcceptedStore.Remove(character.Identity.Instance, deleteMission);
-                MissionTokenProgressTracker.ClearCharacter(character.Identity.Instance);
-                MissionFindItemService.ClearCharacter(character.Identity.Instance);
+                SendDeleteAcknowledgement(client, character, deleteMission);
 
                 MissionDiagnostics.Log(
                     "JOURNAL-DELETE char={0} mission={1:X8} type={2:X} kitRemoved={3} keyRemoved={4} storeRemoved={5}",
@@ -249,29 +145,154 @@ namespace ZoneEngine.Core.MessageHandlers
             }
         }
 
-        private static bool IsDeletedRepairMission(int characterInstance, Identity mission)
+        private static bool TryAbandonGeneratedMission(
+            IZoneClient client,
+            ICharacter character,
+            MissionAcgBindingRecord generatedBinding,
+            out MissionAcgBindingRecord cleaned,
+            out string failure)
         {
-            if (mission == null)
+            cleaned = null;
+            failure = string.Empty;
+            if (generatedBinding == null)
             {
+                failure = "Exact generated-mission binding is required.";
                 return false;
             }
 
-            List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(characterInstance);
-            for (int i = 0; i < all.Count; i++)
+            MissionAcgObjectiveRecord objective;
+            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                character.Identity.Instance,
+                generatedBinding.Binding.AcceptedQuestIdentity.Instance,
+                out objective))
             {
-                MissionAcceptedStore.AcceptedMission entry = all[i];
-                if (entry == null || entry.QuestIdentity == null)
-                {
-                    continue;
-                }
+                failure = "Exact generated-mission objective record is unavailable.";
+                return false;
+            }
 
-                if (entry.QuestIdentity.Instance == mission.Instance)
+            MissionAcgObjectiveLifecycle targetObjectiveLifecycle;
+            switch (generatedBinding.State.LifecycleState)
+            {
+                case MissionAcgLifecycleState.Accepted:
+                case MissionAcgLifecycleState.Active:
+                case MissionAcgLifecycleState.Abandoned:
+                    targetObjectiveLifecycle = MissionAcgObjectiveLifecycle.Abandoned;
+                    break;
+                case MissionAcgLifecycleState.Expired:
+                    targetObjectiveLifecycle = MissionAcgObjectiveLifecycle.Expired;
+                    break;
+                case MissionAcgLifecycleState.CleanupPending:
+                case MissionAcgLifecycleState.Cleaned:
+                    if (objective.State.Lifecycle
+                        != MissionAcgObjectiveLifecycle.Abandoned
+                        && objective.State.Lifecycle
+                        != MissionAcgObjectiveLifecycle.Expired
+                        && objective.State.Lifecycle
+                        != MissionAcgObjectiveLifecycle.CleanupCompleted)
+                    {
+                        failure =
+                            "Generated-mission cleanup has no durable abandonment or expiry owner.";
+                        return false;
+                    }
+
+                    targetObjectiveLifecycle = objective.State.Lifecycle;
+                    break;
+                default:
+                    failure =
+                        "Generated-mission lifecycle is owned by completion or is not abandonable.";
+                    return false;
+            }
+
+            bool objectiveNeedsTransition =
+                objective.State.Lifecycle != targetObjectiveLifecycle
+                && objective.State.Lifecycle
+                   != MissionAcgObjectiveLifecycle.CleanupCompleted;
+            if (objectiveNeedsTransition
+                && (objective.State.Phase
+                        >= MissionAcgCompletionPhase.RewardClaimStarted
+                    || objective.State.Lifecycle
+                       == MissionAcgObjectiveLifecycle.CompletionStarted
+                    || objective.State.Lifecycle
+                       == MissionAcgObjectiveLifecycle.Completed
+                    || objective.State.Lifecycle
+                       == MissionAcgObjectiveLifecycle.Abandoned
+                    || objective.State.Lifecycle
+                       == MissionAcgObjectiveLifecycle.Expired
+                    || objective.State.Lifecycle
+                       == MissionAcgObjectiveLifecycle.Invalid))
+            {
+                failure =
+                    "Generated-mission objective lifecycle is owned by completion or another terminal outcome.";
+                return false;
+            }
+
+            MissionAcgBindingRecord terminal = generatedBinding;
+            if (generatedBinding.State.LifecycleState
+                == MissionAcgLifecycleState.Accepted
+                || generatedBinding.State.LifecycleState
+                == MissionAcgLifecycleState.Active)
+            {
+                if (!MissionAcgBindingRuntime.TryTransition(
+                    generatedBinding,
+                    MissionAcgLifecycleState.Abandoned,
+                    MissionAcgCleanupState.KeyRemovalPending,
+                    DateTime.UtcNow,
+                    out terminal,
+                    out failure))
                 {
-                    return MissionRepairService.IsRepairMission(entry);
+                    return false;
                 }
             }
 
-            return false;
+            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                character.Identity.Instance,
+                generatedBinding.Binding.AcceptedQuestIdentity.Instance,
+                out objective))
+            {
+                failure =
+                    "Exact generated-mission objective record became unavailable.";
+                return false;
+            }
+
+            if (objective.State.Lifecycle != targetObjectiveLifecycle
+                && objective.State.Lifecycle
+                   != MissionAcgObjectiveLifecycle.CleanupCompleted)
+            {
+                MissionAcgObjectiveRecord updatedObjective;
+                if (!MissionAcgObjectiveRuntime.TrySetLifecycle(
+                    objective,
+                    targetObjectiveLifecycle,
+                    out updatedObjective,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            return MissionAcgLifecycleService.TryCleanupOwnedRecord(
+                client,
+                character,
+                terminal,
+                out cleaned,
+                out failure);
+        }
+
+        private static void SendDeleteAcknowledgement(
+            IZoneClient client,
+            ICharacter character,
+            Identity mission)
+        {
+            client.SendCompressed(
+                new QuestMessage
+                {
+                    Identity = character.Identity,
+                    Unknown = 0,
+                    Action = QuestAction.Delete,
+                    Unknown1 = 0,
+                    Mission = mission,
+                    Unknown2 = 0,
+                    Unknown3 = 0
+                });
         }
     }
 }
