@@ -463,12 +463,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 contracts.Contains("case 203726:")
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate")
                 && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate")
-                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesRechargeOverrideSeconds")
                 && contracts.Contains("requiresDamageLineOfSight: true")
-                && contracts.Contains("weapons are observed at QL20 and QL17")
-                && contracts.Contains("runtime retains QL20 because the respawn selection rule is unresolved")
-                && contracts.Contains("21 observed normal local-player hits 25..45")
-                && contracts.Contains("4.311321-second median interval across 17 intervals"),
+                && contracts.Contains("exact packet sequence is resolved from the generated capture catalog"),
                 "The runtime contract must preserve both observed weapon variants without inventing their selection rule and require PF127 damage LOS.");
             Assert.IsTrue(
                 eumenides.Contains("\"normalAttackInfoRows\": 21")
@@ -529,21 +525,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && captured.Contains(",416,"),
                 "The preserved official-live corpse row must retain packet length, scale, sex, breed, race, CATMesh, credits, and MonsterData.");
             Assert.IsTrue(
-                capturedLoot.Contains("\"Eumenides\",\"203726\",\"20\",\"186\"")
+                capturedLoot.Contains(",Eumenides,203726,20,186,")
                 && capturedLoot.Contains("163430:163431:22:1;301714:301714:1:1;287146:287146:200:1"),
                 "The first finalized capture must preserve Eumenides' exact initial three-item plus 186-credit corpse snapshot.");
             Assert.IsTrue(
-                capturedLootSecond.Contains("\"(Corpse:F6900C)\"")
-                && capturedLootSecond.Contains("\"SimpleChar:79748626\",\"Eumenides\",\"203726\",\"20\",\"186\"")
+                capturedLootSecond.Contains("(Corpse:F6900C)")
+                && capturedLootSecond.Contains("(SimpleChar:79748626),Eumenides,203726,20,186")
                 && capturedLootSecond.Contains("301715:301715:1:1;160051:160050:16:1;287146:287146:200:1")
-                && capturedLootSecond.Contains("\"linked\""),
+                && capturedLootSecond.Contains("linked-offline-generation"),
                 "The second finalized capture must preserve Eumenides' exact linked three-item plus 186-credit corpse snapshot.");
             Assert.IsTrue(
                 membershipLifecycle.Contains("(Corpse:F6900F)")
                 && membershipLifecycle.Contains("(Corpse:F6900C)")
                 && membershipLifecycle.Contains("Remains of Eumenides")
                 && membershipLoot.Contains("234875:234875:1:1;202717:202718:15:1;301717:301717:1:1;163426:163427:23:1;85521:85520:15:1;287146:287146:200:1")
-                && membershipLoot.Contains("\"unlinked\""),
+                && membershipLoot.Contains("unlinked"),
                 "The later capture must retain exact item membership while remaining unlinked to credits, dead-NPC identity, and playfield context.");
             Assert.IsTrue(
                 encounter.Contains("17905,\n                1800.0,\n                1800.0,")
@@ -1216,7 +1212,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 captureProject.Contains("<Compile Include=\"Pf127GeometryCapture.cs\" />")
                 && captureProject.Contains("<Compile Include=\"MinimalPf127Capture.cs\" />")
-                && captureTool.Contains("new Pf127GeometryCapture(this.sessionDirectory, this.LogEvent)")
+                && minimalCapture.Contains("new Pf127GeometryCapture(")
                 && geometryCapture.Contains("Path.Combine(sessionDirectory, \"pf127-geometry.json\")")
                 && geometryCapture.Contains("Path.Combine(sessionDirectory, \"pf127-line-of-sight.csv\")")
                 && geometryCapture.Contains("Path.Combine(sessionDirectory, \"pf127-door-state.csv\")"),

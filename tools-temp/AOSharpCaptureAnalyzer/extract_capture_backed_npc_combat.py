@@ -3438,6 +3438,22 @@ def audit_uncertified_complete_chains(
     return exclusions, blockers
 
 
+def _referenced_packet_ids(
+    value: Any, available_packet_ids: set[str], result: set[str]
+) -> None:
+    if isinstance(value, str):
+        if value in available_packet_ids:
+            result.add(value)
+        return
+    if isinstance(value, dict):
+        for member in value.values():
+            _referenced_packet_ids(member, available_packet_ids, result)
+        return
+    if isinstance(value, (list, tuple)):
+        for member in value:
+            _referenced_packet_ids(member, available_packet_ids, result)
+
+
 def build_inventory() -> dict[str, Any]:
     captures = set(discover_capture_directories(CAPTURE_ROOT))
     if LEGACY_CAPTURE_ROOT.exists():
@@ -3449,39 +3465,93 @@ def build_inventory() -> dict[str, Any]:
         captures,
         key=lambda path: path.relative_to(REPO_ROOT).as_posix(),
     )
-    all_records: list[PacketRecord] = []
     all_metadata: list[MetadataGeneration] = []
     sessions = []
     decode_errors = []
     for capture in captures:
         try:
-            records, metadata, session, errors = parse_capture_isolated(capture)
+            _, metadata, session, errors = parse_capture_isolated(capture)
         except Exception as error:
             relative_capture = capture.relative_to(REPO_ROOT).as_posix()
             raise RuntimeError(
                 f"capture parsing failed for {relative_capture}: {error}"
             ) from error
-        all_records.extend(records)
         all_metadata.extend(metadata)
         sessions.append(session)
         decode_errors.extend(errors)
 
-    local_metadata: dict[tuple[str, int], list[MetadataGeneration]] = defaultdict(list)
     corpus_metadata: dict[int, list[MetadataGeneration]] = defaultdict(list)
     for generation in all_metadata:
-        local_metadata[(generation.capture, generation.source)].append(generation)
         corpus_metadata[generation.source].append(generation)
-    for values in local_metadata.values():
-        values.sort(key=lambda row: row.sequence)
 
-    for record in all_records:
-        metadata, resolution = choose_metadata(record, local_metadata, corpus_metadata)
-        record.metadata = metadata
-        record.metadata_resolution = resolution
-    del local_metadata, corpus_metadata
+    complete: list[dict[str, Any]] = []
+    incomplete: list[dict[str, Any]] = []
+    unsupported: list[dict[str, Any]] = []
+    lifecycle_records: list[PacketRecord] = []
+    packet_by_id: dict[str, PacketRecord] = {}
+    relevant_npc_packets_decoded = 0
+    for capture in captures:
+        try:
+            records, metadata, _, _ = parse_capture_isolated(capture)
+        except Exception as error:
+            relative_capture = capture.relative_to(REPO_ROOT).as_posix()
+            raise RuntimeError(
+                f"capture correlation failed for {relative_capture}: {error}"
+            ) from error
 
-    complete, incomplete, unsupported = correlate(all_records)
-    packet_by_id = {row.packet_id: row for row in all_records}
+        local_metadata: dict[tuple[str, int], list[MetadataGeneration]] = defaultdict(
+            list
+        )
+        for generation in metadata:
+            local_metadata[(generation.capture, generation.source)].append(generation)
+        for values in local_metadata.values():
+            values.sort(key=lambda row: row.sequence)
+
+        for record in records:
+            selected_metadata, resolution = choose_metadata(
+                record, local_metadata, corpus_metadata
+            )
+            record.metadata = selected_metadata
+            record.metadata_resolution = resolution
+            if selected_metadata is not None:
+                relevant_npc_packets_decoded += 1
+
+        capture_complete, capture_incomplete, capture_unsupported = correlate(records)
+        complete.extend(capture_complete)
+        incomplete.extend(capture_incomplete)
+        unsupported.extend(capture_unsupported)
+
+        local_packet_by_id = {record.packet_id: record for record in records}
+        retained_packet_ids: set[str] = set()
+        _referenced_packet_ids(
+            (
+                capture_complete,
+                capture_incomplete,
+                capture_unsupported,
+            ),
+            set(local_packet_by_id),
+            retained_packet_ids,
+        )
+        for record in records:
+            if record.message_type in {"StopFight", "Despawn"}:
+                lifecycle_records.append(record)
+                retained_packet_ids.add(record.packet_id)
+        for packet_id in retained_packet_ids:
+            packet_by_id[packet_id] = local_packet_by_id[packet_id]
+
+        del (
+            records,
+            metadata,
+            local_metadata,
+            local_packet_by_id,
+            retained_packet_ids,
+            capture_complete,
+            capture_incomplete,
+            capture_unsupported,
+        )
+        gc.collect()
+
+    del corpus_metadata
     complete, duplicate_chains = deduplicate_chains(complete, packet_by_id)
     profiles = build_profiles(
         complete,
@@ -3490,11 +3560,7 @@ def build_inventory() -> dict[str, Any]:
         packet_by_id,
         all_metadata,
     )
-    lifecycle_records = [
-        record
-        for record in sorted(all_records, key=packet_sort_key)
-        if record.message_type in {"StopFight", "Despawn"}
-    ]
+    lifecycle_records.sort(key=packet_sort_key)
     sorted_sessions = sorted(sessions, key=lambda row: row["capture"])
     public_metadata_generations = [
         row.public()
@@ -3513,9 +3579,6 @@ def build_inventory() -> dict[str, Any]:
     recapture_required_sessions = sum(
         1 for row in sessions if row["recaptureRequired"]
     )
-    relevant_npc_packets_decoded = sum(
-        1 for row in all_records if row.metadata is not None
-    )
     incomplete_observation_count = len(incomplete)
     incomplete_attack_info_count = sum(
         1 for row in incomplete if row.get("messageType") == "AttackInfo"
@@ -3526,7 +3589,7 @@ def build_inventory() -> dict[str, Any]:
         if row.get("classification") == "orphan-combat-prefix"
     )
     unsupported_observation_count = len(unsupported)
-    del captures, sessions, all_metadata, all_records, incomplete, unsupported
+    del captures, sessions, all_metadata, incomplete, unsupported
     gc.collect()
     compact_evidence = compact_packet_evidence(
         profiles,

@@ -212,6 +212,7 @@
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
+    <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />

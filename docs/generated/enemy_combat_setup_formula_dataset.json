@@ -11376,20 +11376,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918",
-        "captureId": "20260712-153918",
-        "capturedRealmId": 1388552,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-153918|0x795EC78D|scfu=3636",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921",
+        "captureId": "20260709-205921",
+        "capturedRealmId": 1187842,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-205921|0x794F6080|scfu=2418",
         "globalOrdinal": null,
         "level": 6,
         "monsterData": 17649,
         "name": "Disobedient Bot",
         "ownerIdentity": "",
-        "packetSha256": "b38f4681470c2e785a658cb5bb878f25b7da7bda7d6b062d4d83d0d7d0f4f9d1",
+        "packetSha256": "0e50d6470e829cf799117840ba19081cc64e352f3c18065454f343c75039c459",
         "projection": "raw-validated scfu-appearance.csv",
-        "scfuSpecialAttacks": "13670:2:13671:21321:22321:SIW1:0|null",
-        "sequence": 3636,
-        "sourceIdentity": "0x795EC78D"
+        "scfuSpecialAttacks": "",
+        "sequence": 2418,
+        "sourceIdentity": "0x794F6080"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=17649|level=6|name=Disobedient Bot",
@@ -40570,20 +40570,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-220400",
-        "captureId": "20260716-220400",
-        "capturedRealmId": 1407006,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-220400|0x79702517|scfu=448",
-        "globalOrdinal": 463,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "captureId": "20260709-222339",
+        "capturedRealmId": 1187842,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x795451D5|scfu=9204",
+        "globalOrdinal": null,
         "level": 25,
         "monsterData": 203730,
         "name": "Neural Burnout",
         "ownerIdentity": "",
-        "packetSha256": "f368f4c3a98fdd348c651a176e25dcda68884074b637b91b382fea63f86dd90f",
+        "packetSha256": "64ec52801ecd76ae1ce5bb3308e040476ef080c71e2cf1200533e06b518ca5bd",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 448,
-        "sourceIdentity": "0x79702517"
+        "sequence": 9204,
+        "sourceIdentity": "0x795451D5"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=203730|level=25|name=Neural Burnout",
@@ -43648,15 +43648,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|3012|34dbbf9f5937",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|4149|34dbbf9f5937",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -43666,7 +43657,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13747|03e34906d728",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14884|03e34906d728",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|3012|34dbbf9f5937",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -44788,7 +44788,7 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4315|01b1d3a721d8",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5452|01b1d3a721d8",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -44797,7 +44797,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5452|01b1d3a721d8",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4315|01b1d3a721d8",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -45156,7 +45156,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4314|2dfa79b394fe",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5451|2dfa79b394fe",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -45165,7 +45165,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5451|2dfa79b394fe",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4314|2dfa79b394fe",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -45656,7 +45656,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1030|c1802e8f9486",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2167|c1802e8f9486",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -45717,7 +45717,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1032|4f7f37b61d0f",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2169|4f7f37b61d0f",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -48844,7 +48844,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1034|d998f895af85",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2171|d998f895af85",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -48906,7 +48906,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1036|e3eab04e9191",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2173|e3eab04e9191",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -51673,15 +51673,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|3003|5a5d26788f25",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|4140|5a5d26788f25",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -51691,7 +51682,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13738|518cab95e507",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14875|518cab95e507",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|3003|5a5d26788f25",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -52723,7 +52723,7 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1590|df231b9e6fb4",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2727|df231b9e6fb4",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -52732,7 +52732,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2727|df231b9e6fb4",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1590|df231b9e6fb4",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -52896,7 +52896,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1589|3725966d46c6",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2726|3725966d46c6",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -52905,7 +52905,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2726|3725966d46c6",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1589|3725966d46c6",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -53446,15 +53446,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|8889|da79cb75536b",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|10026|da79cb75536b",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -53465,6 +53456,15 @@
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12750|143c66c35c3c",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|8889|da79cb75536b",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -54373,7 +54373,7 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14919|a42dc9626fb0",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16056|a42dc9626fb0",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -54382,7 +54382,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16056|a42dc9626fb0",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14919|a42dc9626fb0",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -54514,7 +54514,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14918|103bf51025c8",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16055|103bf51025c8",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -54523,7 +54523,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16055|103bf51025c8",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14918|103bf51025c8",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -60433,7 +60433,7 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11995|f670e28fcddb",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13132|f670e28fcddb",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -60442,7 +60442,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13132|f670e28fcddb",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11995|f670e28fcddb",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -60583,7 +60583,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11994|b647eccdd681",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13131|b647eccdd681",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -60592,7 +60592,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|13131|b647eccdd681",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11994|b647eccdd681",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -61370,15 +61370,6 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14293|064e62050183",
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": null,
-                "WeaponItemFullUpdateDefinitionComplete": null,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "missing"
-              },
-              {
                 "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15430|064e62050183",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
@@ -61389,6 +61380,15 @@
               },
               {
                 "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15485|e32aec38dd5d",
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": null,
+                "WeaponItemFullUpdateDefinitionComplete": null,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "missing"
+              },
+              {
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15596|884e44c474e6",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -61471,15 +61471,6 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14292|f907ff350e78",
-                "WeaponItemFullUpdate": null,
-                "WeaponItemFullUpdateDefinitionComplete": null,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "missing"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
                 "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15429|f907ff350e78",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
@@ -61490,6 +61481,15 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15484|091dfc6ffc4e",
+                "WeaponItemFullUpdate": null,
+                "WeaponItemFullUpdateDefinitionComplete": null,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "missing"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15595|fa7e157176cc",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -62863,20 +62863,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-042205",
-        "captureId": "20260720-042205",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-031855",
+        "captureId": "20260720-031855",
         "capturedRealmId": 1419333,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-042205|0x798037C1|scfu=525",
-        "globalOrdinal": 645,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-031855|0x79803687|scfu=666",
+        "globalOrdinal": 732,
         "level": 17,
         "monsterData": 203743,
         "name": "Architect Striker",
         "ownerIdentity": "",
-        "packetSha256": "6acaa2135e2e8b99f5714fbca0e6c9f07765379ee49f81f08f2363f4a919b6d1",
+        "packetSha256": "5068701aaf8ab52ed60a081a3c15b2672da0c86b236e4fde4662eac452fcbabb",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 525,
-        "sourceIdentity": "0x798037C1"
+        "sequence": 666,
+        "sourceIdentity": "0x79803687"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=203743|level=17|name=Architect Striker",
@@ -63272,7 +63272,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15278|52e86a97a397",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16728|3a0311598370",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -63281,7 +63281,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15591|3a0311598370",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15278|52e86a97a397",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -63577,20 +63577,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439",
-        "captureId": "20260709-220439",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115",
+        "captureId": "20260709-212115",
         "capturedRealmId": 1187842,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-220439|0x7954512E|scfu=6671",
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|0x79545109|scfu=16414",
         "globalOrdinal": null,
         "level": 19,
         "monsterData": 203744,
         "name": "Strike Foreman",
         "ownerIdentity": "",
-        "packetSha256": "052b4d86a544f48de808dbf1e202940eebf45e3943d5339745704394b8efdf8d",
+        "packetSha256": "25c9ff5836ad1eb182e7bad1ee17cae7b82721abe23087476a1533600960b346",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 6671,
-        "sourceIdentity": "0x7954512E"
+        "sequence": 16414,
+        "sourceIdentity": "0x79545109"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=203744|level=19|name=Strike Foreman",
@@ -64777,7 +64777,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1486|8775c90e9b11",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2623|8775c90e9b11",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -64786,7 +64786,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2623|8775c90e9b11",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1486|8775c90e9b11",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -64827,7 +64827,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1494|b930d3ed58ae",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2631|b930d3ed58ae",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -64836,7 +64836,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2631|b930d3ed58ae",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1494|b930d3ed58ae",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -64877,15 +64877,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1266|3d1ef3d9450c",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2403|3d1ef3d9450c",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -64895,7 +64886,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1497|e1293fae6771",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2634|e1293fae6771",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1266|3d1ef3d9450c",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -66880,7 +66880,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1488|b4c423e7ecd3",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2625|b4c423e7ecd3",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -66889,7 +66889,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2625|b4c423e7ecd3",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1488|b4c423e7ecd3",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -66930,7 +66930,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1490|2bc29f82ebfa",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2627|2bc29f82ebfa",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -66939,7 +66939,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2627|2bc29f82ebfa",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1490|2bc29f82ebfa",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -66980,7 +66980,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1492|e2b6d1f02fa9",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2629|e2b6d1f02fa9",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -66989,7 +66989,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|2629|e2b6d1f02fa9",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|1492|e2b6d1f02fa9",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -72627,20 +72627,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-220400",
-        "captureId": "20260716-220400",
-        "capturedRealmId": 1407006,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-220400|0x79702515|scfu=414",
-        "globalOrdinal": 429,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "captureId": "20260709-222339",
+        "capturedRealmId": 1187842,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x795451D2|scfu=4472",
+        "globalOrdinal": null,
         "level": 24,
         "monsterData": 203746,
         "name": "Molested Molecules",
         "ownerIdentity": "",
-        "packetSha256": "b9ec48c8a412c016ece489d55bc5782b47870bf6ae950a2bffe3a310e197dcc2",
+        "packetSha256": "eb664686201a2bb92a6374472e33ce3d6bd701223977aedcedfb9ac4a22db6c4",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 414,
-        "sourceIdentity": "0x79702515"
+        "sequence": 4472,
+        "sourceIdentity": "0x795451D2"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=203746|level=24|name=Molested Molecules",
@@ -80617,20 +80617,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-045926",
-        "captureId": "20260720-045926",
-        "capturedRealmId": 1419333,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-045926|0x798037D5|scfu=1034",
-        "globalOrdinal": 1077,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "captureId": "20260709-222339",
+        "capturedRealmId": 1187842,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x795451E3|scfu=5445",
+        "globalOrdinal": null,
         "level": 30,
         "monsterData": 203748,
         "name": "Vergil Aeneid",
         "ownerIdentity": "",
-        "packetSha256": "8a128cd03964af77940322631622dc3f02e81999723d2702f6184fe46678eac7",
+        "packetSha256": "1b3e55c2c5037225e0ddbd1a9076fa583bf417396bb85aa578908e12e0aeac0a",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 1034,
-        "sourceIdentity": "0x798037D5"
+        "sequence": 5445,
+        "sourceIdentity": "0x795451E3"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=203748|level=30|name=Vergil Aeneid",
@@ -81227,7 +81227,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15174|b0c02ce553c6",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16726|c579fe9267f6",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -81236,7 +81236,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|15589|c579fe9267f6",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16901|957381901826",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -82168,15 +82168,6 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|8396|3e82390a57e9",
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": null,
-                "WeaponItemFullUpdateDefinitionComplete": null,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "missing"
-              },
-              {
                 "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|9533|3e82390a57e9",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
@@ -82187,6 +82178,15 @@
               },
               {
                 "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|9963|59f3fe9285c8",
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": null,
+                "WeaponItemFullUpdateDefinitionComplete": null,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "missing"
+              },
+              {
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|8396|3e82390a57e9",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -82286,7 +82286,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14751|b59f42da5dc1",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16000|d45de705ed02",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -82295,7 +82295,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14863|d45de705ed02",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14751|b59f42da5dc1",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -82498,15 +82498,6 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|8395|92bd5fe9c3b3",
-                "WeaponItemFullUpdate": null,
-                "WeaponItemFullUpdateDefinitionComplete": null,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "missing"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
                 "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|9532|92bd5fe9c3b3",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
@@ -82517,6 +82508,15 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|9962|ee581da1c799",
+                "WeaponItemFullUpdate": null,
+                "WeaponItemFullUpdateDefinitionComplete": null,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "missing"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|8395|92bd5fe9c3b3",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -82616,7 +82616,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14750|1d25220fa764",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15999|fb8eb4605631",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -82625,7 +82625,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14862|fb8eb4605631",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|14750|1d25220fa764",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -82855,7 +82855,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4888|e32d0d666e3b",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|6025|e32d0d666e3b",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -82864,7 +82864,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|6025|e32d0d666e3b",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4888|e32d0d666e3b",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -82906,7 +82906,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4533|0c401612a2eb",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5670|0c401612a2eb",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -82915,7 +82915,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5670|0c401612a2eb",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4533|0c401612a2eb",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -82966,15 +82966,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11568|467c1f0170dc",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12705|467c1f0170dc",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -82984,7 +82975,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11680|40a0d0562ab9",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12817|40a0d0562ab9",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11568|467c1f0170dc",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -83027,15 +83027,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11570|6a41148ed703",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12707|6a41148ed703",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -83045,7 +83036,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11682|f6bec14cd97a",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12819|f6bec14cd97a",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11570|6a41148ed703",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -83088,15 +83088,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11574|bb30b7fe45c6",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12711|bb30b7fe45c6",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -83106,7 +83097,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11686|61a01cd4ee7f",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12823|61a01cd4ee7f",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11574|bb30b7fe45c6",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -85290,7 +85290,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13954|cdc876e076de",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15134|4a1391beddf3",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -85299,7 +85299,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15134|4a1391beddf3",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13954|cdc876e076de",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -85631,7 +85631,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13953|617440e6ac8d",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15133|620bbd5bf483",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -85640,7 +85640,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15133|620bbd5bf483",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13953|617440e6ac8d",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -85923,15 +85923,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13688|2029ccb9af47",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14825|2029ccb9af47",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -85941,7 +85932,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13784|bda1a19c432e",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14921|bda1a19c432e",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16702|f237a4028060",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -85983,15 +85983,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|4520|ebec1ff79bf7",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|5657|ebec1ff79bf7",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -86001,7 +85992,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|5301|3424b7396023",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|6438|3424b7396023",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7258|7dab2394cd01",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -86044,15 +86044,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11566|e1521c2bc271",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12703|e1521c2bc271",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -86062,7 +86053,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11678|a39b72780727",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12815|a39b72780727",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11566|e1521c2bc271",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -87902,7 +87902,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-213711|IN|63|2f9e91805893",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16950|8272d0bf693a",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -87911,7 +87911,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16950|8272d0bf693a",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-213711|IN|63|2f9e91805893",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -88044,7 +88044,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-213711|IN|62|0f927bada1d0",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16949|772e5d5c83ae",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -88053,7 +88053,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|16949|772e5d5c83ae",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-213711|IN|62|0f927bada1d0",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -88233,7 +88233,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13676|ae1de9a0feb1",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14813|ae1de9a0feb1",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -88242,7 +88242,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14813|ae1de9a0feb1",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13676|ae1de9a0feb1",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -88292,7 +88292,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13679|940a876622ce",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14816|940a876622ce",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -88301,7 +88301,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|14816|940a876622ce",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13679|940a876622ce",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -88352,15 +88352,6 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11572|3097c1bc8f8c",
-                "WeaponItemFullUpdateDefinitionComplete": true,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "orphan-prefix"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12709|3097c1bc8f8c",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
@@ -88370,7 +88361,16 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11684|dd0c806b1121",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|12821|dd0c806b1121",
+                "WeaponItemFullUpdateDefinitionComplete": true,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "orphan-prefix"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|11572|3097c1bc8f8c",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -90442,7 +90442,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|13837|9a4ebc93f15d",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15345|4a44c3810dfa",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -90451,7 +90451,7 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15345|4a44c3810dfa",
+                "WeaponItemFullUpdate": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|15739|0cb68294868c",
                 "WeaponItemFullUpdateDefinitionComplete": true,
                 "WeaponItemFullUpdateProblems": [],
                 "WeaponItemFullUpdateResolution": "orphan-prefix"
@@ -98273,7 +98273,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|6592|19a0edf1b722",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7789|6a1e7c1ef192",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -98282,7 +98282,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7789|6a1e7c1ef192",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7890|81e9c235e307",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -98434,7 +98434,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|6591|e57b6c5d298e",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7788|1f93fcc3e62a",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -98443,7 +98443,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7788|1f93fcc3e62a",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|7889|380c671c6569",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -101957,15 +101957,6 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|7180|f50f74af85f2",
-                "AttackInfo": null,
-                "SpecialAttackWeapon": null,
-                "WeaponItemFullUpdate": null,
-                "WeaponItemFullUpdateDefinitionComplete": null,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "missing"
-              },
-              {
                 "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8317|f50f74af85f2",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
@@ -101976,6 +101967,15 @@
               },
               {
                 "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8517|312246842c1a",
+                "AttackInfo": null,
+                "SpecialAttackWeapon": null,
+                "WeaponItemFullUpdate": null,
+                "WeaponItemFullUpdateDefinitionComplete": null,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "missing"
+              },
+              {
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8682|996745b9714e",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -102016,7 +102016,7 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|7112|6caa2cde57a9",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8249|6caa2cde57a9",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -102025,7 +102025,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8249|6caa2cde57a9",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|7112|6caa2cde57a9",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -102066,7 +102066,7 @@
             ],
             "samples": [
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|9616|ee57c682a41b",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|10753|ee57c682a41b",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -102075,7 +102075,7 @@
                 "WeaponItemFullUpdateResolution": "missing"
               },
               {
-                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|10753|ee57c682a41b",
+                "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|9616|ee57c682a41b",
                 "AttackInfo": null,
                 "SpecialAttackWeapon": null,
                 "WeaponItemFullUpdate": null,
@@ -102118,15 +102118,6 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|7179|945150385a20",
-                "WeaponItemFullUpdate": null,
-                "WeaponItemFullUpdateDefinitionComplete": null,
-                "WeaponItemFullUpdateProblems": [],
-                "WeaponItemFullUpdateResolution": "missing"
-              },
-              {
-                "Attack": null,
-                "AttackInfo": null,
                 "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8316|945150385a20",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
@@ -102137,6 +102128,15 @@
                 "Attack": null,
                 "AttackInfo": null,
                 "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8516|0580ef7b396e",
+                "WeaponItemFullUpdate": null,
+                "WeaponItemFullUpdateDefinitionComplete": null,
+                "WeaponItemFullUpdateProblems": [],
+                "WeaponItemFullUpdateResolution": "missing"
+              },
+              {
+                "Attack": null,
+                "AttackInfo": null,
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8681|468141938828",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -102177,7 +102177,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|7111|5a5cf2e385f2",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8248|5a5cf2e385f2",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -102186,7 +102186,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|8248|5a5cf2e385f2",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|7111|5a5cf2e385f2",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -102227,7 +102227,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|9615|1fb272a2b99b",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|10752|1fb272a2b99b",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -102236,7 +102236,7 @@
               {
                 "Attack": null,
                 "AttackInfo": null,
-                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212115|IN|10752|1fb272a2b99b",
+                "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-212336|IN|9615|1fb272a2b99b",
                 "WeaponItemFullUpdate": null,
                 "WeaponItemFullUpdateDefinitionComplete": null,
                 "WeaponItemFullUpdateProblems": [],
@@ -105694,20 +105694,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-031855",
-        "captureId": "20260720-031855",
-        "capturedRealmId": 1419333,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260720-031855|0x798036BC|scfu=612",
-        "globalOrdinal": 671,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "captureId": "20260709-222339",
+        "capturedRealmId": 1187842,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545218|scfu=1829",
+        "globalOrdinal": null,
         "level": 18,
         "monsterData": 31909,
         "name": "Infector",
         "ownerIdentity": "",
-        "packetSha256": "573ba08f05e3b0d8e587588d30ba7295fc1639046b5355e367c7bf9080f379af",
+        "packetSha256": "fdcb2558fcc6487a087ad658ce6dd36ec35ef198c33ab58e074a7d6e3d7a3967",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 612,
-        "sourceIdentity": "0x798036BC"
+        "sequence": 1829,
+        "sourceIdentity": "0x79545218"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=31909|level=18|name=Infector",
@@ -114405,20 +114405,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007",
-        "captureId": "20260716-222007",
-        "capturedRealmId": 1407006,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007|0x797024DA|scfu=215",
-        "globalOrdinal": 230,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339",
+        "captureId": "20260709-222339",
+        "capturedRealmId": 1187842,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260709-222339|0x79545081|scfu=9735",
+        "globalOrdinal": null,
         "level": 20,
         "monsterData": 55648,
         "name": "Slum Runner",
         "ownerIdentity": "",
-        "packetSha256": "b5db884403ed8b7afb28b8adcf1dfaed5c24384b2b06dbdb7229b2b65c4d4112",
+        "packetSha256": "ef8d8b4659477ba3dc19e3ec1ddc02006c11ecbe7ad39b52648e813af44d95ff",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 215,
-        "sourceIdentity": "0x797024DA"
+        "sequence": 9735,
+        "sourceIdentity": "0x79545081"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=127|md=55648|level=20|name=Slum Runner",
@@ -135061,20 +135061,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
-        "captureId": "20260721-032547",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-030515",
+        "captureId": "20260721-030515",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x79834DCE|scfu=685",
-        "globalOrdinal": 826,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-030515|0x7984B36E|scfu=1509",
+        "globalOrdinal": 1723,
         "level": 20,
         "monsterData": 26074,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "2c47b1abd245bcc0126148d20d2c9fd171b1674064bd46cb83ac51c643e3b43e",
+        "packetSha256": "574adf0e167e2ecb5dea3254540eb45438d297915520fc446e8963556636f727",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 685,
-        "sourceIdentity": "0x79834DCE"
+        "sequence": 1509,
+        "sourceIdentity": "0x7984B36E"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26074|level=20|name=Cultist",
@@ -137407,20 +137407,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
-        "captureId": "20260721-032547",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913",
+        "captureId": "20260721-031913",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FC33|scfu=3059",
-        "globalOrdinal": 3434,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|0x7984B381|scfu=1029",
+        "globalOrdinal": 1207,
         "level": 27,
         "monsterData": 26074,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "d9eb094a0d0a3dc38a4dbab68c807807900ab50d18deb7c445afe0f5ced162dd",
+        "packetSha256": "4b8852cb2c13e86b32c8f410de9eb6e47a9439536cf4ce639e048b01d0760927",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 3059,
-        "sourceIdentity": "0x7983FC33"
+        "sequence": 1029,
+        "sourceIdentity": "0x7984B381"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26074|level=27|name=Cultist",
@@ -137797,20 +137797,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
-        "captureId": "20260721-032547",
-        "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FB2A|scfu=728",
-        "globalOrdinal": 869,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
+        "captureId": "20260528-191120",
+        "capturedRealmId": 477565,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E581|scfu=33832",
+        "globalOrdinal": null,
         "level": 28,
         "monsterData": 26074,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "b1bf98c07e8662111a2e8f816ab100f9d17c39bf1031cc9175bf018f578110a0",
-        "projection": "raw-validated scfu-appearance.csv",
+        "packetSha256": "029d264d3d4ffeff6203f0bb984dae9273d341e25bfd5a6a1c48c6bce63ce1b4",
+        "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 728,
-        "sourceIdentity": "0x7983FB2A"
+        "sequence": 33832,
+        "sourceIdentity": "0x7888E581"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26074|level=28|name=Cultist",
@@ -145283,17 +145283,17 @@
         "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032247",
         "captureId": "20260721-032247",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032247|0x7983FBA6|scfu=25",
-        "globalOrdinal": 32,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032247|0x79834D0D|scfu=15",
+        "globalOrdinal": 22,
         "level": 22,
         "monsterData": 26082,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "4c8de0e3886a803360faf5dd23a2a616d7320e42328cea0d919b9f1f8508c816",
+        "packetSha256": "5bf7cd02d9a6054ca00c2843aaf87494704149261240a6905158192af8c12a82",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 25,
-        "sourceIdentity": "0x7983FBA6"
+        "sequence": 15,
+        "sourceIdentity": "0x79834D0D"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26082|level=22|name=Cultist",
@@ -147235,7 +147235,7 @@
         "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
         "captureId": "20260528-191120",
         "capturedRealmId": 477565,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E56E|scfu=1157",
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E56E|scfu=1158",
         "globalOrdinal": null,
         "level": 28,
         "monsterData": 26082,
@@ -147244,7 +147244,7 @@
         "packetSha256": "7757f910b070c999315346fb9a15a8b692eefff28abbf5fd5f622e50ffe93279",
         "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 1157,
+        "sequence": 1158,
         "sourceIdentity": "0x7888E56E"
       },
       "normalCompleteChainCount": 0,
@@ -152334,7 +152334,7 @@
         "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-190456",
         "captureId": "20260528-190456",
         "capturedRealmId": 477565,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-190456|0x7888E553|scfu=1383",
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-190456|0x7888E553|scfu=1384",
         "globalOrdinal": null,
         "level": 32,
         "monsterData": 26088,
@@ -152343,7 +152343,7 @@
         "packetSha256": "d4d39f84ccb9504931afa63b69f016cca38a26787e925bfe93775b53c76ebca6",
         "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 1383,
+        "sequence": 1384,
         "sourceIdentity": "0x7888E553"
       },
       "normalCompleteChainCount": 0,
@@ -160748,20 +160748,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426",
-        "captureId": "20260721-230426",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
+        "captureId": "20260721-032547",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|0x7987F00C|scfu=1199",
-        "globalOrdinal": 1244,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FAE3|scfu=720",
+        "globalOrdinal": 861,
         "level": 29,
         "monsterData": 26103,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "016d1d7e6cd3434beec9d480ec70254cde17105cdabe3d2944e214c8d3c4c8ba",
+        "packetSha256": "8ede74770ede87285de90a093bf4bd51ad213dd4512a45ad2160ad11e3eadf4f",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 1199,
-        "sourceIdentity": "0x7987F00C"
+        "sequence": 720,
+        "sourceIdentity": "0x7983FAE3"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26103|level=29|name=Cultist",
@@ -176243,17 +176243,17 @@
         "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
         "captureId": "20260721-032547",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FC3A|scfu=3067",
-        "globalOrdinal": 3442,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7984B38F|scfu=555",
+        "globalOrdinal": 671,
         "level": 35,
         "monsterData": 26135,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "6919c9ac3d572904668ab3ad166bd485ab171c7bc5323f3a6f1222437fe04e17",
+        "packetSha256": "f5a2e85e7f11031c10faa88ebbeefbd557289a0e61b00b73e888c45dda048b19",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 3067,
-        "sourceIdentity": "0x7983FC3A"
+        "sequence": 555,
+        "sourceIdentity": "0x7984B38F"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26135|level=35|name=Cultist",
@@ -183961,20 +183961,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-041439",
-        "captureId": "20260721-041439",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913",
+        "captureId": "20260721-031913",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-041439|0x7983F938|scfu=2313",
-        "globalOrdinal": 2943,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|0x79834DA8|scfu=94",
+        "globalOrdinal": 97,
         "level": 31,
         "monsterData": 26137,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "8048eb5ccfb23aacdd55f6dd4b687ff66c2516f85874a168399206eb635fc2eb",
+        "packetSha256": "99162240df00a50df1a00ffe22489a076fc02655f4fc6cfc352938206cd8c93b",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 2313,
-        "sourceIdentity": "0x7983F938"
+        "sequence": 94,
+        "sourceIdentity": "0x79834DA8"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26137|level=31|name=Cultist",
@@ -184971,20 +184971,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913",
-        "captureId": "20260721-031913",
-        "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|0x7983FB97|scfu=118",
-        "globalOrdinal": 121,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
+        "captureId": "20260528-191120",
+        "capturedRealmId": 477565,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E413|scfu=33862",
+        "globalOrdinal": null,
         "level": 34,
         "monsterData": 26137,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "31a3f961aaaa0a86e7b6f91d95965acf29c5a4cf76983032dc49046552ac470d",
-        "projection": "raw-validated scfu-appearance.csv",
+        "packetSha256": "590c6126fa3ea05031f972ba87797685b795dd5060e147020a256d0e609fa992",
+        "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 118,
-        "sourceIdentity": "0x7983FB97"
+        "sequence": 33862,
+        "sourceIdentity": "0x7888E413"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26137|level=34|name=Cultist",
@@ -188912,7 +188912,7 @@
         "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
         "captureId": "20260528-191120",
         "capturedRealmId": 477565,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E5A4|scfu=33835",
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E5A4|scfu=33836",
         "globalOrdinal": null,
         "level": 22,
         "monsterData": 26147,
@@ -188921,7 +188921,7 @@
         "packetSha256": "6b79703ca593b09727d3ba97156579600b09470042422a150579c463f9598c34",
         "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 33835,
+        "sequence": 33836,
         "sourceIdentity": "0x7888E5A4"
       },
       "normalCompleteChainCount": 0,
@@ -198338,20 +198338,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
-        "captureId": "20260721-032547",
-        "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FA5D|scfu=715",
-        "globalOrdinal": 856,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-190456",
+        "captureId": "20260528-190456",
+        "capturedRealmId": 477565,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-190456|0x7888E55F|scfu=2644",
+        "globalOrdinal": null,
         "level": 35,
         "monsterData": 26147,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "2c8e2a7597861409dbce21edce9e307229f2d9a1ec3e356e398dddfe72226d7f",
-        "projection": "raw-validated scfu-appearance.csv",
+        "packetSha256": "76fc63815b9b3f49fc46708a62bb8e3429078550808221d7ff726a9ad7dbdc06",
+        "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 715,
-        "sourceIdentity": "0x7983FA5D"
+        "sequence": 2644,
+        "sourceIdentity": "0x7888E55F"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26147|level=35|name=Cultist",
@@ -199949,20 +199949,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
-        "captureId": "20260721-032547",
-        "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FBDA|scfu=3055",
-        "globalOrdinal": 3430,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
+        "captureId": "20260528-191120",
+        "capturedRealmId": 477565,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E423|scfu=33878",
+        "globalOrdinal": null,
         "level": 20,
         "monsterData": 26149,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "d7e232f2339769cd75830a669cd1180a36a2e487ac6382d2ffd3be1d282686c4",
-        "projection": "raw-validated scfu-appearance.csv",
+        "packetSha256": "c2a852c1e366d9c56317684c0d5f10b3dfd741e5f4c73fad9c6e4e9b0d61acde",
+        "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 3055,
-        "sourceIdentity": "0x7983FBDA"
+        "sequence": 33878,
+        "sourceIdentity": "0x7888E423"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26149|level=20|name=Cultist",
@@ -200391,20 +200391,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913",
-        "captureId": "20260721-031913",
-        "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-031913|0x7983FB8F|scfu=100",
-        "globalOrdinal": 103,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
+        "captureId": "20260528-191120",
+        "capturedRealmId": 477565,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x7888E58D|scfu=33870",
+        "globalOrdinal": null,
         "level": 21,
         "monsterData": 26149,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "d611219272635457f81e62466402d6ec81d044442edfa8d70d0af2ce9b0a0766",
-        "projection": "raw-validated scfu-appearance.csv",
+        "packetSha256": "620ce487e2d7da3e7fe48a91bf5b507a8dc6187eef4c91c40b42c0ba8d6ed601",
+        "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 100,
-        "sourceIdentity": "0x7983FB8F"
+        "sequence": 33870,
+        "sourceIdentity": "0x7888E58D"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26149|level=21|name=Cultist",
@@ -201306,17 +201306,17 @@
         "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
         "captureId": "20260721-032547",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FC39|scfu=3065",
-        "globalOrdinal": 3440,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FBA1|scfu=36",
+        "globalOrdinal": 44,
         "level": 22,
         "monsterData": 26149,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "74877daa5db3501bfa8e1a4e2450ea71f568f4c536c0cfa3c900f3f3eab496ac",
+        "packetSha256": "49d18460e4b92f3fbfebcc98eda42472df927c84417cf9d0f0b06c727cfd5121",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 3065,
-        "sourceIdentity": "0x7983FC39"
+        "sequence": 36,
+        "sourceIdentity": "0x7983FBA1"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26149|level=22|name=Cultist",
@@ -206927,20 +206927,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
-        "captureId": "20260721-032547",
-        "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x79834DD0|scfu=689",
-        "globalOrdinal": 830,
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120",
+        "captureId": "20260528-191120",
+        "capturedRealmId": 477565,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-191120|0x78361131|scfu=33904",
+        "globalOrdinal": null,
         "level": 31,
         "monsterData": 26149,
         "name": "Cultist",
         "ownerIdentity": "",
-        "packetSha256": "5fac06787dc7d167034bf187c383d299c6b15d159448550630acf530951724da",
-        "projection": "raw-validated scfu-appearance.csv",
+        "packetSha256": "2304337aa3101cd7f037943e61da6ad08ca11c0fb295f534c598f7b329380dae",
+        "projection": "canonical-raw-via-AOSharpCaptureAnalyzer.exe@sha256:e56997abb1fb752186bcffb9858ff7f1852a2f68754f7677d3bd6f17c1f4f121",
         "scfuSpecialAttacks": "",
-        "sequence": 689,
-        "sourceIdentity": "0x79834DD0"
+        "sequence": 33904,
+        "sourceIdentity": "0x78361131"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=26149|level=31|name=Cultist",
@@ -211037,19 +211037,19 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-041439",
-        "captureId": "20260721-041439",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547",
+        "captureId": "20260721-032547",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-041439|0x7983FF77|scfu=4720",
-        "globalOrdinal": 5530,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-032547|0x7983FF77|scfu=3091",
+        "globalOrdinal": 3466,
         "level": 38,
         "monsterData": 26151,
         "name": "Reverend Cadelly",
         "ownerIdentity": "",
-        "packetSha256": "2f3fd5e6f4908568ed4c975606c97b8056b9b57e34ae415ce3869829ba2d97e8",
+        "packetSha256": "8e4a6c2323721f71720f7b0f00534299cbd6edf955dd79372dae637d79fa9073",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 4720,
+        "sequence": 3091,
         "sourceIdentity": "0x7983FF77"
       },
       "normalCompleteChainCount": 0,
@@ -220634,20 +220634,20 @@
         }
       ],
       "metadata": {
-        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-042930",
-        "captureId": "20260722-042930",
+        "capture": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139",
+        "captureId": "20260721-042139",
         "capturedRealmId": 938000,
-        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-042930|0x7987F621|scfu=2066",
-        "globalOrdinal": 2132,
+        "generationKey": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-042139|0x7983FC7C|scfu=51",
+        "globalOrdinal": 56,
         "level": 48,
         "monsterData": 42981,
         "name": "Deathless Legionnaire",
         "ownerIdentity": "",
-        "packetSha256": "d28dac175cba2374dfd3aeb0bda43455ac9fd8a4cb2fa382fe10d05e0a323b61",
+        "packetSha256": "febbb37949728b16685ef68325614a9bb6d4db899ae5be63d7ee1ed7414ca2f7",
         "projection": "raw-validated scfu-appearance.csv",
         "scfuSpecialAttacks": "",
-        "sequence": 2066,
-        "sourceIdentity": "0x7987F621"
+        "sequence": 51,
+        "sourceIdentity": "0x7983FC7C"
       },
       "normalCompleteChainCount": 0,
       "profileKey": "resource=1931|md=42981|level=48|name=Deathless Legionnaire",

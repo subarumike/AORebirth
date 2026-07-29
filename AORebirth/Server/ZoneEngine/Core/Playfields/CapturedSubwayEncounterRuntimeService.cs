@@ -930,7 +930,10 @@ namespace AORebirth.Core.Playfields
             }
 
             character.DoNotDoTimers = false;
-            CapturedEncounterRuntimeRegistry.Register(character.Identity.Instance, definition);
+            CapturedEncounterRuntimeRegistry.Register(
+                character.Identity.Instance,
+                this.playfield.Identity.Instance,
+                definition);
             this.activateNpc(character);
             this.playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);
             if (ownerIdentity.Instance != 0)
@@ -1446,14 +1449,18 @@ namespace AORebirth.Core.Playfields
     internal static class CapturedEncounterRuntimeRegistry
     {
         private static readonly object Sync = new object();
-        private static readonly Dictionary<int, CapturedEncounterRuntimeDefinition> Definitions =
-            new Dictionary<int, CapturedEncounterRuntimeDefinition>();
+        private static readonly Dictionary<int, RegisteredEncounterDefinition> Definitions =
+            new Dictionary<int, RegisteredEncounterDefinition>();
 
-        internal static void Register(int runtimeInstance, CapturedEncounterRuntimeDefinition definition)
+        internal static void Register(
+            int runtimeInstance,
+            int playfieldInstance,
+            CapturedEncounterRuntimeDefinition definition)
         {
             lock (Sync)
             {
-                Definitions[runtimeInstance] = definition;
+                Definitions[runtimeInstance] =
+                    new RegisteredEncounterDefinition(playfieldInstance, definition);
             }
         }
 
@@ -1463,7 +1470,15 @@ namespace AORebirth.Core.Playfields
         {
             lock (Sync)
             {
-                return Definitions.TryGetValue(runtimeInstance, out definition);
+                RegisteredEncounterDefinition registered;
+                if (Definitions.TryGetValue(runtimeInstance, out registered))
+                {
+                    definition = registered.Definition;
+                    return true;
+                }
+
+                definition = null;
+                return false;
             }
         }
 
@@ -1477,25 +1492,42 @@ namespace AORebirth.Core.Playfields
 
         internal static void RemoveForPlayfield(int playfieldInstance)
         {
-            if (playfieldInstance != CapturedSubwayEncounterRuntimeService.SubwayPlayfieldId)
-            {
-                return;
-            }
-
             lock (Sync)
             {
-                int[] subwayRuntimeInstances = Definitions
+                int[] runtimeInstances = Definitions
                     .Where(
-                        value => value.Value.ProfileKey.StartsWith(
-                            "subway.",
-                            StringComparison.Ordinal))
+                        value => value.Value.PlayfieldInstance == playfieldInstance)
                     .Select(value => value.Key)
                     .ToArray();
-                foreach (int runtimeInstance in subwayRuntimeInstances)
+                foreach (int runtimeInstance in runtimeInstances)
                 {
                     Definitions.Remove(runtimeInstance);
                 }
             }
+        }
+
+        internal static int CountForPlayfield(int playfieldInstance)
+        {
+            lock (Sync)
+            {
+                return Definitions.Count(
+                    value => value.Value.PlayfieldInstance == playfieldInstance);
+            }
+        }
+
+        private sealed class RegisteredEncounterDefinition
+        {
+            internal RegisteredEncounterDefinition(
+                int playfieldInstance,
+                CapturedEncounterRuntimeDefinition definition)
+            {
+                this.PlayfieldInstance = playfieldInstance;
+                this.Definition = definition;
+            }
+
+            internal int PlayfieldInstance { get; private set; }
+
+            internal CapturedEncounterRuntimeDefinition Definition { get; private set; }
         }
     }
 }

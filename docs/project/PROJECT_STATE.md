@@ -4,6 +4,23 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- PF127/PF1931 named encounter completion is authoritative across 18 unique
+  active combat/profile domains: 13 initial stages, two successors, two
+  owned-add domains, and Murial's ordinary-owned named patrol. All active
+  domains have exact capture-backed combat; packet-only nano behavior remains
+  bounded where downstream effects are not proven. The shared registry now
+  owns definitions by playfield instance, and runtime retirement removes
+  combat, movement, patrol, add, successor, respawn, corpse, and visibility
+  work without PF127-specific cleanup assumptions. Full-corpus generation now
+  streams 374 sessions in bounded memory and reproduces 358 canonical sessions,
+  2,827 complete chains, 255 capture-certified profiles, and 303 semantic
+  definitions with zero errors and a second-run no-diff result. Exact
+  unresolved boundaries are post-Aztur full-chain reset/respawn, unproven
+  downstream Temple nano effects, unknown loot probabilities,
+  Murial-specific nano/respawn behavior, and inactive Strike Foreman
+  generation/lifecycle policy. Evidence:
+  `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md`.
+
 - The fixed PF127/PF1931 ordinary-combat checkpoint is complete at `489/0`:
   PF127 `322/0`, PF1931 `167/0`. The final slice restored all 22 Violent
   Vagabonds, Stim Fiend L9 `0x7957E415`, and Eternal Sentinel L18 sources

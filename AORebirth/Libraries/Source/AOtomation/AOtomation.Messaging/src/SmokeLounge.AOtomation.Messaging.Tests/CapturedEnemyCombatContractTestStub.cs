@@ -1135,6 +1135,8 @@ namespace AORebirth.Core.Playfields
         {
             var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
             clone.UsesProductionEquippedWeaponValues = true;
+            clone.UsesEquippedWeaponDamage = true;
+            clone.UsesEquippedWeaponTiming = true;
             return clone;
         }
 
