@@ -361,34 +361,112 @@ namespace ZoneEngine.Core
         {
             ICharacter character =
                 Pool.Instance.GetObject<Character>(
-                    new Identity { Type = IdentityType.CanbeAffected, Instance = chatCommand.CharacterId });
-            if (character != null)
+                    new Identity { Type = IdentityType.CanbeAffected, Instance = chatCommand.CharacterId })
+                ?? LftInviteClientPresence.ResolveOnlinePlayerByInstance(chatCommand.CharacterId);
+            if (character == null)
             {
-                string fullArgs = ChatCommandText.Normalize(chatCommand.ChatCommandString);
-                if (string.IsNullOrWhiteSpace(fullArgs))
+                return;
+            }
+
+            string fullArgs = ChatCommandText.Normalize(chatCommand.ChatCommandString);
+            if (string.IsNullOrWhiteSpace(fullArgs))
+            {
+                return;
+            }
+
+            // ChatEngine LFT Search → pre-seed remote candidates into searcher's client
+            // before Invite click (avoids cross-zone "NoName is too high" Yes-loop).
+            if (fullArgs.StartsWith(LftInviteClientPresence.LftSeedCommandPrefix, StringComparison.Ordinal))
+            {
+                string[] seedArgs = fullArgs.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var candidateIds = new List<int>();
+                var nameOverrides = new Dictionary<int, string>();
+                for (int i = 1; i < seedArgs.Length; i++)
                 {
-                    return;
+                    string token = seedArgs[i];
+                    int colon = token.IndexOf(':');
+                    string idPart = colon >= 0 ? token.Substring(0, colon) : token;
+                    string namePart = colon >= 0 && colon + 1 < token.Length
+                                         ? token.Substring(colon + 1)
+                                         : null;
+
+                    uint uid;
+                    int id;
+                    if (uint.TryParse(idPart, out uid) && uid != 0)
+                    {
+                        id = unchecked((int)uid);
+                    }
+                    else if (!int.TryParse(idPart, out id) || id == 0)
+                    {
+                        continue;
+                    }
+
+                    candidateIds.Add(id);
+                    if (!string.IsNullOrWhiteSpace(namePart))
+                    {
+                        // Chat may encode spaces as underscores in the seed token.
+                        nameOverrides[id] = namePart.Replace('_', ' ');
+                    }
                 }
 
-                string[] cmdArgs = fullArgs.Trim().Split(' ');
+                LftInviteClientPresence.SeedCandidatesForSearcher(character, candidateIds, nameOverrides);
+                LftInviteArm.Arm(character, candidateIds, nameOverrides);
+                PushLivePlayfieldsToChat(candidateIds);
+                PushLivePlayfieldsToChat(new[] { character.Identity.Instance });
+                return;
+            }
 
-                string commandName = cmdArgs[0].ToLower();
-                if ((commandName == "sit") || (commandName == "stand"))
-                {
-                    new Posture().ExecuteCommand(
-                        character,
-                        character.SelectedTarget,
-                        cmdArgs);
-                    return;
-                }
+            string[] cmdArgs = fullArgs.Trim().Split(' ');
 
-                ScriptCompiler.Instance.CallChatCommand(
-                    commandName,
-                    character.Controller.Client,
+            string commandName = cmdArgs[0].ToLower();
+            if ((commandName == "sit") || (commandName == "stand"))
+            {
+                new Posture().ExecuteCommand(
+                    character,
                     character.SelectedTarget,
                     cmdArgs);
+                return;
+            }
+
+            ScriptCompiler.Instance.CallChatCommand(
+                commandName,
+                character.Controller.Client,
+                character.SelectedTarget,
+                cmdArgs);
+        }
+
+        private static void PushLivePlayfieldsToChat(IEnumerable<int> characterInstances)
+        {
+            if (characterInstances == null || Program.ISComClient == null)
+            {
+                return;
+            }
+
+            foreach (int instance in characterInstances)
+            {
+                if (instance == 0)
+                {
+                    continue;
+                }
+
+                ICharacter online = LftInviteClientPresence.ResolveOnlinePlayerByInstance(instance);
+                if (online == null || online.Playfield == null)
+                {
+                    continue;
+                }
+
+                Program.ISComClient.Send(
+                    new ChatCommand
+                    {
+                        CharacterId = online.Identity.Instance,
+                        ChatCommandString =
+                            LftPlayfieldRegistryCommandPrefix + " " + online.Playfield.Identity.Instance
+                    });
             }
         }
+
+        /// <summary>Must match ChatEngine.Lists.LftPlayfieldRegistry.PlayfieldCommandPrefix.</summary>
+        private const string LftPlayfieldRegistryCommandPrefix = "#aorebirth-pf";
 
         /// <summary>
         /// </summary>

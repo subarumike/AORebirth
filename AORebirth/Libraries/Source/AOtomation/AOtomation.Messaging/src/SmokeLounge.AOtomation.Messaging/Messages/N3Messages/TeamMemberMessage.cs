@@ -1,14 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TeamMemberMessage.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
-//   This program is free software. It comes without any warranty, to
-//   the extent permitted by applicable law. You can redistribute it
-//   and/or modify it under the terms of the Do What The Fuck You Want
-//   To Public License, Version 2, as published by Sam Hocevar. See
-//   http://www.wtfpl.net/ for more details.
 // </copyright>
 // <summary>
-//   Defines the TeamMemberMessage type.
+//   TeamMemberMessage — wire matched to capture 20260727-071217.
+//   N3 header already has Identity(viewer) + Unknown(byte=0).
+//   Body: Member, Team, Unknown4(-1), Level, Unknown5, Name.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,32 +29,28 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         #region AoMember Properties
 
+        /// <summary>Team member being announced.</summary>
         [AoMember(0)]
-        public byte Unknown1 { get; set; }
+        public Identity Member { get; set; }
 
+        /// <summary>TeamWindow identity (type 0xDEA9 + team instance).</summary>
         [AoMember(1)]
-        public short Unknown2 { get; set; }
-
-        [AoMember(2)]
-        public Identity Character { get; set; }
-
-        [AoMember(3)]
         public Identity Team { get; set; }
 
-        [AoMember(4)]
-        public uint Unknown3 { get; set; }
-
-        [AoMember(5)]
+        /// <summary>Capture constant -1.</summary>
+        [AoMember(2)]
         public int Unknown4 { get; set; }
 
-        [AoMember(6)]
+        /// <summary>Capture uses character level.</summary>
+        [AoMember(3)]
+        public int Level { get; set; }
+
+        /// <summary>Capture short (profession / side hint).</summary>
+        [AoMember(4)]
         public short Unknown5 { get; set; }
 
-        [AoMember(7, SerializeSize = ArraySizeType.Int32)]
+        [AoMember(5, SerializeSize = ArraySizeType.Int32)]
         public string Name { get; set; }
-
-        [AoMember(8)]
-        public short Unknown6 { get; set; }
 
         #endregion
     }

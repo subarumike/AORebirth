@@ -1,0 +1,14 @@
+---
+description: Always stop AO engines when finishing a task
+alwaysApply: true
+---
+
+# Stop Engines When Finished
+
+When a task ends (success, blocker, or handoff), if ZoneEngine / LoginEngine / ChatEngine / WebEngine were started or restarted during this session, stop them before the final reply:
+
+```cmd
+cmd /d /c stop-engines.cmd
+```
+
+Do not leave engines running after the task is done unless Mike explicitly asks to keep them up.

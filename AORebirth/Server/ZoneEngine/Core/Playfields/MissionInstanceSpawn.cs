@@ -179,28 +179,17 @@ namespace AORebirth.Core.Playfields
                     {
                         spawnedObjective = true;
                     }
-
-                    if (MissionTypeCatalog.IsFindItemFamily(objective)
-                        && findItemCube == null
-                        && def.Role == MissionNpcRole.FindTarget)
-                    {
-                        spawnedObjective = true;
-                        mob.Name = "Mission Cube";
-                        findItemCube = mob;
-                    }
                 }
             }
 
-            // KillPerson: always spawn named target next to entrance (capture pattern: objective in mish).
+            // KillPerson: gold humanoid look (ACG 20260728-001044 Pedro Peasley) near entrance.
+            // Do not remix trash body meshes — that wrong texture also crashes the client on death.
             if (objective == MissionRollType.KillPerson)
             {
-                MissionNpc killDef = BuildFictionalPerson(
-                    string.IsNullOrEmpty(killName) ? MissionTargetNameCatalog.PickKillName(levelRng) : killName,
-                    MissionNpcRole.Trash,
-                    shape,
-                    8f);
-                // Appearance only — never overwrite briefing/kill TargetName.
-                ApplySafeContactAppearance(killDef, appearancePool, levelRng);
+                string contactName = string.IsNullOrEmpty(killName)
+                                         ? MissionTargetNameCatalog.PickKillName(levelRng)
+                                         : killName;
+                MissionNpc killDef = BuildGoldKillPerson(contactName, shape, 8f);
 
                 Character killMob;
                 if (SpawnOne(
@@ -270,8 +259,10 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
-            // FindItem / FindItemReturn: Mission Cube (Use → real item).
-            if (MissionTypeCatalog.IsFindItemFamily(objective) && findItemCube == null)
+            // FindItem (keep only): Mission Cube SimpleChar. FindItemReturn uses world Terminal
+            // only (capture 20260728-095215) — a cube SimpleChar looked like a person on top of
+            // the capsule and blocked PickUp / exit door at spawn.
+            if (objective == MissionRollType.FindItem && findItemCube == null)
             {
                 MissionNpc cubeDef = BuildMissionCube(shape);
                 Character cube;
@@ -299,8 +290,14 @@ namespace AORebirth.Core.Playfields
                 MissionInstanceMobCombat.RegisterFindItemHost(findItemCube.Identity);
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
-                    "MissionInstanceSpawn Mission Cube id=" + findItemCube.Identity
-                    + " name=" + findItemCube.Name);
+                    "MissionInstanceSpawn FindItem objective id=" + findItemCube.Identity
+                    + " name=" + findItemCube.Name
+                    + " type=" + MissionTypeCatalog.TypeName(objective));
+            }
+
+            if (objective == MissionRollType.FindItemReturn)
+            {
+                spawnedObjective = true;
             }
 
             // RepairMachine Broken Machine is a Container (ChestFullUpdate), sent on zone-in by
@@ -497,6 +494,52 @@ namespace AORebirth.Core.Playfields
                             };
             // Head only — body is client MonsterData 26103 (gold Malcom).
             dest.Meshes = new[] { new[] { 0, 40103, 0, 4 } };
+            dest.IsGrey = false;
+        }
+
+        /// <summary>
+        /// Kill Person objective (ACG capture 20260728-001044 Pedro Peasley / Kill icon 11330):
+        /// MonsterData 26097, head mesh 40111, empty textures, head-only mesh layer.
+        /// Body comes from MonsterData — do not invent trash body meshes or remix appearance pools.
+        /// </summary>
+        private static MissionNpc BuildGoldKillPerson(string name, MissionShape shape, float offset)
+        {
+            var dest = new MissionNpc
+                       {
+                           Name = name,
+                           Role = MissionNpcRole.Trash,
+                           Level = 42,
+                           Health = 1773,
+                           X = shape != null ? shape.SpawnX + offset : 0f,
+                           Y = shape != null ? shape.SpawnY : 5.01f,
+                           Z = shape != null ? shape.SpawnZ + (offset * 0.5f) : 0f,
+                           Hx = 0f,
+                           Hy = -0.111751281f,
+                           Hz = 0f,
+                           Hw = 0.9937362f,
+                           IsGrey = false
+                       };
+            ApplyGoldKillPersonLook(dest);
+            return dest;
+        }
+
+        private static void ApplyGoldKillPersonLook(MissionNpc dest)
+        {
+            if (dest == null)
+            {
+                return;
+            }
+
+            dest.MonsterData = 26097;
+            dest.HeadMesh = 40111;
+            dest.Scale = 104;
+            dest.Textures = new[]
+                            {
+                                new[] { 0, 0 }, new[] { 1, 0 }, new[] { 2, 0 },
+                                new[] { 3, 0 }, new[] { 4, 0 }
+                            };
+            // Head only — body is client MonsterData 26097 (gold Pedro Peasley).
+            dest.Meshes = new[] { new[] { 0, 40111, 0, 4 } };
             dest.IsGrey = false;
         }
 
@@ -964,13 +1007,9 @@ namespace AORebirth.Core.Playfields
                     return false;
 
                 case MissionNpcRole.FindTarget:
+                    // Find Person contact only. FindItemReturn uses world Terminal 100361
+                    // (capture 20260728-095215); never spawn catalog humans as the objective.
                     if (objective == MissionRollType.FindPerson && !spawnedObjective)
-                    {
-                        return true;
-                    }
-
-                    // FindItem / FindItemReturn: Mission Cube (or captured FindTarget shell).
-                    if (MissionTypeCatalog.IsFindItemFamily(objective) && !spawnedObjective)
                     {
                         return true;
                     }
@@ -1122,11 +1161,15 @@ namespace AORebirth.Core.Playfields
 
             if (isKillObjective)
             {
+                // Gold Kill Person death (20260728-211947 Zack): Parameter2=503, not trash 501.
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.corpseanimkey, 503u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.dieanim, 503u);
+                mob.Stats.SetBaseValueWithoutTriggering((int)StatIds.itemanim, 503u);
                 MissionTargetTracker.Register(mob.Identity);
                 LogUtil.Debug(
                     DebugInfoDetail.Engine,
                     "MissionInstanceSpawn KillPerson target id=" + mob.Identity + " name=" + def.Name
-                    + " lvl=" + spawnLevel);
+                    + " lvl=" + spawnLevel + " md=" + def.MonsterData + " head=" + def.HeadMesh);
             }
 
             if (def.Role == MissionNpcRole.FindTarget && objective == MissionRollType.FindPerson)

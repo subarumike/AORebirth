@@ -718,10 +718,16 @@ namespace ZoneEngine.Core
                             disconnectCharacter,
                             preservePetRestore);
 
+                        bool isZoneTransfer =
+                            ActiveNanoRuntimeService.Default.HasZoneTransferStash(characterId);
+                        if (!isZoneTransfer)
+                        {
+                            // Leave game / crash: drop from team so others clear the gray slot.
+                            TeamRuntime.OnCharacterDisconnected(disconnectCharacter);
+                        }
+
                         if (!disconnectCharacter.InLogoutTimerPeriod())
                         {
-                            bool isZoneTransfer =
-                                ActiveNanoRuntimeService.Default.HasZoneTransferStash(characterId);
                             if (!isZoneTransfer)
                             {
                                 disconnectCharacter.EnterLogoutSitPosture();

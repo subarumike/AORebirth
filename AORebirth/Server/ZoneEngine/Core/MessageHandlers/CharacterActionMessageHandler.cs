@@ -33,6 +33,7 @@ namespace ZoneEngine.Core.MessageHandlers
 {
     #region Usings ...
 
+    using System.Linq;
     using System.Threading;
 
     using AORebirth.Core.Components;
@@ -40,6 +41,8 @@ namespace ZoneEngine.Core.MessageHandlers
     using AORebirth.Core.Network;
     using AORebirth.Core.Playfields;
     using AORebirth.Enums;
+    using AORebirth.Interfaces;
+    using AORebirth.ObjectManager;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -130,75 +133,42 @@ namespace ZoneEngine.Core.MessageHandlers
                     break;
 
                 case CharacterActionType.InfoRequest:
-
-                    // If action == Info Request
-                    if (ZoneEngine.Core.Missions.MissionAcgObjectiveInteractionService
-                        .TryHandleInfoRequest(client, message.Target))
+                {
+                    ICharacter infoTarget = LftInviteClientPresence.ResolveOnlinePlayer(
+                        client.Controller.Character,
+                        message.Target);
+                    if (infoTarget != null)
                     {
-                        break;
-                    }
+                        if (LftInviteClientPresence.IsRemoteFrom(
+                            client.Controller.Character,
+                            infoTarget))
+                        {
+                            string armedName;
+                            LftInviteArm.TryGetArmedName(
+                                client.Controller.Character,
+                                message.Target,
+                                out armedName);
+                            LftInviteClientPresence.SeedForInviteLookup(
+                                client.Controller.Character,
+                                infoTarget,
+                                armedName);
+                        }
 
-                    IInstancedEntity tPlayer = client.Controller.Character.Playfield.FindByIdentity(message.Target);
-
-                    // TODO: Think of a new method to distinguish players from mobs (NPCFamily for example)
-                    var tChar = tPlayer as Character;
-                    if (tChar != null)
-                    {
-                        // Is it a Character object? (player and npcs)
-                        CharacterInfoPacketMessageHandler.Default.Send(client.Controller.Character, tChar);
-
-                        // Capture 20260724-mission-find-person: InfoRequest on Find Person target completes.
-                        ZoneEngine.Core.Missions.MissionFindPersonService.TryHandleInfoRequest(
-                            client,
-                            message.Target);
+                        CharacterInfoPacketMessageHandler.Default.Send(
+                            client.Controller.Character,
+                            infoTarget);
                     }
                     else
                     {
-                        // TODO: NPC's
-                        /*
-                            var npc =
-                                (NonPlayerCharacterClass)
-                                FindDynel.FindDynelById(packet.Target);
-                            if (npc != null)
-                            {
-                                var infoPacket = new PacketWriter();
-
-                                 Start packet header
-                                infoPacket.PushByte(0xDF);
-                                infoPacket.PushByte(0xDF);
-                                infoPacket.PushShort(10);
-                                infoPacket.PushShort(1);
-                                infoPacket.PushShort(0);
-                                infoPacket.PushInt(3086);  sender (server ID)
-                                infoPacket.PushInt(client.Character.Id.Instance);  receiver 
-                                infoPacket.PushInt(0x4D38242E);  packet ID
-                                infoPacket.PushIdentity(npc.Id);  affected identity
-                                infoPacket.PushByte(0);  ?
-
-                                 End packet header
-                                infoPacket.PushByte(0x50);  npc's just have 0x50
-                                infoPacket.PushByte(1);  esi_001?
-                                infoPacket.PushByte((byte)npc.Stats.Profession.Value);  Profession
-                                infoPacket.PushByte((byte)npc.Stats.Level.Value);  Level
-                                infoPacket.PushByte((byte)npc.Stats.TitleLevel.Value);  Titlelevel
-                                infoPacket.PushByte((byte)npc.Stats.VisualProfession.Value);  Visual Profession
-
-                                infoPacket.PushShort(0);  no idea for npc's
-                                infoPacket.PushUInt(npc.Stats.Health.Value);  Current Health (Health)
-                                infoPacket.PushUInt(npc.Stats.Life.Value);  Max Health (Life)
-                                infoPacket.PushInt(0);  BreedHostility?
-                                infoPacket.PushUInt(0);  org ID
-                                infoPacket.PushShort(0);
-                                infoPacket.PushShort(0);
-                                infoPacket.PushShort(0);
-                                infoPacket.PushShort(0);
-                                infoPacket.PushInt(0x499602d2);
-                                infoPacket.PushInt(0x499602d2);
-                                infoPacket.PushInt(0x499602d2);
-                                var infoPacketA = infoPacket.Finish();
-                                client.SendCompressed(infoPacketA);
-                            }*/
+                        CharacterInfoPacketMessageHandler.Default.Send(
+                            client.Controller.Character,
+                            message.Target);
                     }
+
+                    ZoneEngine.Core.Missions.MissionFindPersonService.TryHandleInfoRequest(
+                        client,
+                        message.Target);
+                }
 
                     break;
 
@@ -333,15 +303,76 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 case CharacterActionType.TeamRequestInvite:
                 {
-                    // Team Join Request
-                    // Send Team Invite Request To Target Player
-                    client.Controller.TeamJoinRequest(message.Target);
+                    // Team invite from Recruit / LFT list (Action=0x1A).
+                    // AOSharp.Core Team.Invite sends Target=player, Parameter1=1 (flag, not char id).
+                    // LFT list invites may use a non-CanbeAffected Target type or put the
+                    // character id in Parameter2 — always resolve to CanbeAffected + char instance.
+                    int charId = 0;
+                    if (message.Target.Type == IdentityType.CanbeAffected && message.Target.Instance != 0)
+                    {
+                        charId = message.Target.Instance;
+                    }
+                    else if (message.Parameter2 > 1)
+                    {
+                        charId = message.Parameter2;
+                    }
+                    else if (message.Parameter1 > 1)
+                    {
+                        // Parameter1==1 is the AOSharp invite flag; real char ids are > 1.
+                        charId = message.Parameter1;
+                    }
+                    else if (message.Target.Instance != 0)
+                    {
+                        charId = message.Target.Instance;
+                    }
+
+                    Identity inviteTarget = new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = charId
+                    };
+
+                    client.Controller.TeamJoinRequest(inviteTarget);
+                }
+
+                    break;
+                case CharacterActionType.ClientTeamInviteReply:
+                {
+                    // Live L60: Accept only Parameter2=1. Decline=20 (also 0 on No).
+                    // Never treat p2=0 as Accept — that joins on every No / dialog noise.
+                    if (message.Parameter2 == 1)
+                    {
+                        client.Controller.TeamJoinReply(true, message.Target);
+                    }
+                    else if (message.Parameter2 == 20 || message.Parameter2 == 0)
+                    {
+                        client.Controller.TeamJoinReply(false, message.Target);
+                    }
                 }
 
                     break;
                 case CharacterActionType.TeamRequestReply:
                 {
-                    client.Controller.TeamJoinReply(message.Parameter1 != 0, message.Target);
+                    // Live gold L60 (20260729-173311 / 173411):
+                    //   Accept: OUT TeamRequestReply (0x15) Parameter2=1 Target=inviter
+                    //   Decline: Parameter2=20 (No also uses 0 on private)
+                    // Parameter2=17 is server→client join-ack only — never Accept.
+                    if (message.Parameter2 == 1)
+                    {
+                        client.Controller.TeamJoinReply(true, message.Target);
+                    }
+                    else if (message.Parameter2 == 20 || message.Parameter2 == 0)
+                    {
+                        client.Controller.TeamJoinReply(false, message.Target);
+                    }
+                }
+
+                    break;
+
+                case CharacterActionType.AcceptTeamRequest:
+                {
+                    // Capture: server→client leadership marker (Target=self, TeamWindow id).
+                    // Never treat as invite accept — echoes were calling TeamJoinReply wrongly.
                 }
 
                     break;
@@ -373,11 +404,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 case CharacterActionType.Split: // Split?
                     InventoryContainerRuntimeService.Default.SplitInventoryItemStackAction(client.Controller.Character, message);
                     // Does it need to Acknowledge? Need to check that - Algorithman
-                    break;
-
-                case CharacterActionType.AcceptTeamRequest:
-                    InventoryContainerRuntimeService.Default.MergeInventoryItemStackAction(client.Controller.Character, message);
-                    this.Acknowledge(client.Controller.Character, message);
                     break;
 
                     // ###################################################################################
@@ -453,6 +479,10 @@ namespace ZoneEngine.Core.MessageHandlers
                     PerkRuntimeService.Default.TryHandleUsePerk(client, message);
                     break;
 
+                case CharacterActionType.Reload:
+                    WeaponReloadRuntimeService.TryHandleReload(client, message);
+                    break;
+
                 default:
                 {
                     // unkown
@@ -487,6 +517,162 @@ namespace ZoneEngine.Core.MessageHandlers
             int unknown2)
         {
             this.Send(character, this.ConstructFinishNanoCasting(character, target, unknown1, unknown2), true);
+        }
+
+        /// <summary>
+        /// Capture 20260727-065826: deliver invite popup to target (Action=TeamRequestInvite / 0x1A).
+        /// </summary>
+        public void SendTeamInviteRequest(ICharacter invitee, ICharacter inviter)
+        {
+            if (invitee == null || inviter == null)
+            {
+                return;
+            }
+
+            this.Send(
+                invitee,
+                x =>
+                {
+                    x.Identity = invitee.Identity;
+                    x.Unknown = 0;
+                    x.Action = CharacterActionType.TeamRequestInvite;
+                    x.Unknown1 = 0;
+                    x.Target = inviter.Identity;
+                    x.Parameter1 = 0;
+                    x.Parameter2 = 0;
+                    x.Unknown2 = 0;
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260728-232300: server→inviter Action=0xA9 after OUT TeamRequestInvite.
+        /// </summary>
+        public void SendTeamInviteAck(ICharacter inviter, ICharacter invitee)
+        {
+            if (inviter == null || invitee == null)
+            {
+                return;
+            }
+
+            this.Send(
+                inviter,
+                x =>
+                {
+                    x.Identity = inviter.Identity;
+                    x.Unknown = 0;
+                    x.Action = CharacterActionType.TeamInviteAck;
+                    x.Unknown1 = 0;
+                    x.Target = invitee.Identity;
+                    x.Parameter1 = 0;
+                    x.Parameter2 = 0;
+                    x.Unknown2 = 0;
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260727-071217: Action=21 TeamRequestReply Parameter2=17 Target=None on successful join.
+        /// </summary>
+        public void SendTeamRequestReplyAck(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Action = CharacterActionType.TeamRequestReply;
+                    x.Unknown1 = 0;
+                    x.Target = Identity.None;
+                    x.Parameter1 = 0;
+                    x.Parameter2 = 17;
+                    x.Unknown2 = 0;
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260727-071217: Action=21 Target=decliner Parameter2=20 to inviter.
+        /// </summary>
+        public void SendTeamRequestDeclined(ICharacter inviter, ICharacter decliner)
+        {
+            if (inviter == null || decliner == null)
+            {
+                return;
+            }
+
+            this.Send(
+                inviter,
+                x =>
+                {
+                    x.Identity = inviter.Identity;
+                    x.Unknown = 0;
+                    x.Action = CharacterActionType.TeamRequestReply;
+                    x.Unknown1 = 0;
+                    x.Target = decliner.Identity;
+                    x.Parameter1 = 0;
+                    x.Parameter2 = 20;
+                    x.Unknown2 = 0;
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260727-065826: AcceptTeamRequest with Parameter1=TeamWindow type, Parameter2=team id.
+        /// </summary>
+        public void SendAcceptTeamRequest(ICharacter character, int teamInstance)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Action = CharacterActionType.AcceptTeamRequest;
+                    x.Unknown1 = 0;
+                    x.Target = character.Identity;
+                    x.Parameter1 = (int)IdentityType.TeamWindow;
+                    x.Parameter2 = teamInstance;
+                    x.Unknown2 = 0;
+                },
+                false);
+        }
+
+        /// <summary>
+        /// Capture 20260727-065826: TeamMemberLeft Action=0x20.
+        /// </summary>
+        public void SendTeamMemberLeft(ICharacter character, Identity leavingMember, int teamInstance)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Action = CharacterActionType.TeamMemberLeft;
+                    x.Unknown1 = 0;
+                    x.Target = leavingMember;
+                    x.Parameter1 = teamInstance;
+                    x.Parameter2 = -1;
+                    x.Unknown2 = 0;
+                },
+                false);
         }
 
         /// <summary>

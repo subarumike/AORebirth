@@ -1,14 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TeamMemberInfoMessage.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
-//   This program is free software. It comes without any warranty, to
-//   the extent permitted by applicable law. You can redistribute it
-//   and/or modify it under the terms of the Do What The Fuck You Want
-//   To Public License, Version 2, as published by Sam Hocevar. See
-//   http://www.wtfpl.net/ for more details.
 // </copyright>
 // <summary>
-//   Defines the TeamMemberInfoMessage type.
+//   TeamMemberInfoMessage — wire matched to capture 20260727-071217.
+//   N3 header already has Identity(viewer) + Unknown(byte=0).
+//   Body: Member, Unknown3..Unknown6.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,29 +28,21 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         #region AoMember Properties
 
+        /// <summary>Team member the info describes.</summary>
         [AoMember(0)]
-        public byte Unknown1 { get; set; }
+        public Identity Member { get; set; }
 
         [AoMember(1)]
-        public short Unknown2 { get; set; }
-
-        [AoMember(2)]
-        public Identity Character { get; set; }
-
-        [AoMember(3)]
         public int Unknown3 { get; set; }
 
-        [AoMember(4)]
+        [AoMember(2)]
         public int Unknown4 { get; set; }
 
-        [AoMember(5)]
+        [AoMember(3)]
         public int Unknown5 { get; set; }
 
-        [AoMember(6)]
+        [AoMember(4)]
         public int Unknown6 { get; set; }
-
-        [AoMember(7)]
-        public short Unknown7 { get; set; }
 
         #endregion
     }

@@ -328,15 +328,38 @@ namespace AORebirth.Core.Playfields
             }
 
             HoloDeckSpawn.SpawnForPlayfield(this.playfield, playfieldIdentity, this.ActivateNpc);
-            if (!ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TrySpawnForPlayfield(
-                this.playfield,
-                playfieldIdentity,
-                this.ActivateNpc))
+            try
             {
-                MissionInstanceSpawn.SpawnForPlayfield(
+                if (!ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TrySpawnForPlayfield(
                     this.playfield,
                     playfieldIdentity,
-                    this.ActivateNpc);
+                    this.ActivateNpc))
+                {
+                    MissionInstanceSpawn.SpawnForPlayfield(
+                        this.playfield,
+                        playfieldIdentity,
+                        this.ActivateNpc);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Mission ACG/instance spawn failed: " + ex.GetType().Name + ": " + ex.Message);
+                try
+                {
+                    MissionInstanceSpawn.SpawnForPlayfield(
+                        this.playfield,
+                        playfieldIdentity,
+                        this.ActivateNpc);
+                }
+                catch (Exception fallbackEx)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "MissionInstanceSpawn fallback failed: "
+                        + fallbackEx.GetType().Name + ": " + fallbackEx.Message);
+                }
             }
             this.worldPopulation.ActivatePlayfield(playfieldIdentity);
             this.capturedSubwayEncounters.ActivatePlayfield(playfieldIdentity);

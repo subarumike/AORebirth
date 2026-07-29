@@ -24,7 +24,22 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         TeamKickMember = 0x00000016,
 
-		LeaveTeam = 0x00000020,
+        /// <summary>
+        /// Client→server: leave team (UI). Capture 20260727-065826 Action=0x18.
+        /// </summary>
+        LeaveTeam = 0x00000018,
+
+        /// <summary>
+        /// Client→server: invitee Accept/Decline. Capture 20260728-234012 Action=0x1C.
+        /// Parameter2=1 accept (Target=inviter); decline uses 0 or 20.
+        /// </summary>
+        ClientTeamInviteReply = 0x0000001C,
+
+        /// <summary>
+        /// Server→client: member left the team. Capture 20260727-065826 Action=0x20.
+        /// Parameter1 = team instance; Parameter2 = -1; Target = leaving character.
+        /// </summary>
+        TeamMemberLeft = 0x00000020,
 
         AcceptTeamRequest = 0x00000023,
 
@@ -119,6 +134,11 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         ClearAllPerks = 0x000000C9,
 
         /// <summary>
+        /// Client→server: Actions → Normal Actions → Reload (hotkey V). Capture 20260728-221109.
+        /// </summary>
+        Reload = 0x000000D2,
+
+        /// <summary>
         /// Client→server: Character Info → Inspect Equipment.
         /// Server replies with InspectMessage. Capture 20260719-182611 (Action=0x105).
         /// </summary>
@@ -159,6 +179,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 		TransferLeader = 0x00000019,
         
 		TeamRequestInvite = 0x0000001A,
+
+        /// <summary>
+        /// Server→inviter ack after TeamRequestInvite. Capture 20260728-232300 (Action=0xA9).
+        /// Same Target as the invite; parameters 0.
+        /// </summary>
+        TeamInviteAck = 0x000000A9,
  
 		Split = 0x00000022,
     }

@@ -1,0 +1,170 @@
+{
+  "Identity": {
+    "Id": "arete-greedy-desert-reet-dialogue-20260725-shiny-sword-nano",
+    "Version": "captured-greedy-desert-reet-shiny-sword-20260725-shiny-sword-nano",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260725-shiny-sword-nano"
+  },
+  "SourceCaptures": [
+    "20260725-shiny-sword-nano"
+  ],
+  "Npcs": [
+    {
+      "Id": "greedy-desert-reet",
+      "NpcIdentity": "SimpleChar:79978BB8",
+      "Name": "Greedy Desert Reet",
+      "RootNodeId": "greedy_greet",
+      "Aliases": [
+        "(SimpleChar:79978BB8)"
+      ],
+      "Nodes": [
+        {
+          "Id": "greedy_greet",
+          "PromptText": "Can I have ur sword?",
+          "PromptTextConfidence": "KnubotAppendText 20260725-shiny-sword-nano packets.hex.log #19",
+          "Options": [
+            {
+              "Id": "greedy_greet_option_0",
+              "Index": 0,
+              "Text": "What?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:15:56.1301423Z",
+              "NextNodeId": "greedy_demand",
+              "Actions": []
+            },
+            {
+              "Id": "greedy_greet_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:15:56.1301423Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "greedy_greet_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "greedy_demand",
+          "PromptText": "UR SWORD!! GIVE IT!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-shiny-sword-nano packets.hex.log #22",
+          "Options": [
+            {
+              "Id": "greedy_demand_option_0",
+              "Index": 0,
+              "Text": "I don't have a sword...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:15:58.7155465Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "greedy_demand_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "No sword branch — EndDialogue (option text captured; NPC reply not taken in capture)"
+                }
+              ]
+            },
+            {
+              "Id": "greedy_demand_option_1",
+              "Index": 1,
+              "Text": "Here, take my sword.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:15:58.7155465Z; Answer=1 → StartTrade 1 slot",
+              "NextNodeId": "greedy_trade",
+              "Actions": []
+            },
+            {
+              "Id": "greedy_demand_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:15:58.7155465Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "greedy_demand_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "greedy_trade",
+          "PromptText": "WAT!??! Shiny stuff for me? Z0mg!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-shiny-sword-nano packets.hex.log #25",
+          "Options": [
+            {
+              "Id": "greedy_trade_option_0",
+              "Index": 0,
+              "Text": "(Continue after trade)",
+              "TextEvidence": "Synthetic; post RejectedItems → greedy_shiny",
+              "NextNodeId": "greedy_shiny",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "greedy_shiny",
+          "PromptText": "Oh so SHINY!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-shiny-sword-nano packets.hex.log #38",
+          "Options": [
+            {
+              "Id": "greedy_shiny_option_0",
+              "Index": 0,
+              "Text": "You are welcome...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:16:06.4447605Z",
+              "NextNodeId": "greedy_has",
+              "Actions": []
+            },
+            {
+              "Id": "greedy_shiny_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:16:06.4447605Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "greedy_shiny_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "greedy_has",
+          "PromptText": "I HAS UR SWORD!!!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-shiny-sword-nano packets.hex.log #43",
+          "Options": [
+            {
+              "Id": "greedy_has_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T20:16:09.0951280Z",
+              "NextNodeId": "close",
+              "Actions": [
+                {
+                  "Id": "greedy_has_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

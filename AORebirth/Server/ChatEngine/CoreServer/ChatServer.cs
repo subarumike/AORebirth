@@ -45,6 +45,7 @@ namespace ChatEngine.CoreServer
 
     using ChatEngine.Channels;
     using ChatEngine.CoreClient;
+    using ChatEngine.Lists;
     using ChatEngine.Packets;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -128,6 +129,7 @@ namespace ChatEngine.CoreServer
             Client cl = (Client)client;
             if (cl.Character.CharacterId != 0)
             {
+                LftRegistry.Remove(cl.Character.CharacterId);
                 CharacterDao.Instance.SetOffline((int)cl.Character.CharacterId);
                 this.ConnectedClients.Remove(cl.Character.CharacterId);
             }
@@ -204,6 +206,34 @@ namespace ChatEngine.CoreServer
             if (message != null)
             {
                 this.DistributeVicinityChat(message);
+                return;
+            }
+
+            var chatCommand = messageObject.DataObject as ChatCommand;
+            if (chatCommand != null)
+            {
+                this.HandleZoneChatCommand(chatCommand);
+            }
+        }
+
+        private void HandleZoneChatCommand(ChatCommand chatCommand)
+        {
+            if (chatCommand == null || string.IsNullOrWhiteSpace(chatCommand.ChatCommandString))
+            {
+                return;
+            }
+
+            string text = chatCommand.ChatCommandString.Trim();
+            if (text.StartsWith(LftPlayfieldRegistry.PlayfieldCommandPrefix, StringComparison.Ordinal))
+            {
+                string[] parts = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                int playfieldId;
+                if (parts.Length >= 2 && int.TryParse(parts[1], out playfieldId) && playfieldId > 0)
+                {
+                    LftPlayfieldRegistry.Set(
+                        unchecked((uint)chatCommand.CharacterId),
+                        playfieldId);
+                }
             }
         }
 

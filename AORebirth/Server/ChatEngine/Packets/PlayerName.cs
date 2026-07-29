@@ -38,27 +38,26 @@ namespace ChatEngine.Packets
     #endregion
 
     /// <summary>
-    /// The player name.
+    /// Chat CharacterName (type 20) — id→name cache used by tell/channel/LFT Invite.
+    /// Missing entry → Invite dialog shows "NoName".
     /// </summary>
     internal static class PlayerName
     {
         #region Public Methods and Operators
 
-        /// <summary>
-        /// The new.
-        /// </summary>
-        /// <param name="client">
-        /// </param>
-        /// <param name="id">
-        /// The id.
-        /// </param>
-        /// <returns>
-        /// </returns>
         public static byte[] Create(Client client, uint id)
+        {
+            string name = client != null && client.Character != null
+                              ? client.Character.characterName
+                              : string.Empty;
+            return Create(id, name);
+        }
+
+        public static byte[] Create(uint id, string name)
         {
             PacketWriter writer = new PacketWriter(20);
             writer.WriteUInt32(id);
-            writer.WriteString(client.Character.characterName);
+            writer.WriteString(name ?? string.Empty);
             return writer.Finish();
         }
 

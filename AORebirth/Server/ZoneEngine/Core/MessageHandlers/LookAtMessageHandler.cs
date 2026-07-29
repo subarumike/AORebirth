@@ -34,13 +34,15 @@ namespace ZoneEngine.Core.MessageHandlers
     #region Usings ...
 
     using AORebirth.Core.Components;
+    using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
+    using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.Core;
-
     using Utility;
+
+    using ZoneEngine.Core;
 
     #endregion
 
@@ -86,7 +88,31 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 if (message.ReturnInfo != 1)
                 {
-                    CharacterInfoPacketMessageHandler.Default.Send(client.Controller.Character, message.Target);
+                    CharacterInfoPacketMessageHandler.Default.Send(
+                        client.Controller.Character,
+                        message.Target);
+                }
+            }
+            else
+            {
+                // Cross-zone LFT: LookAt finds no local dynel. Seed name so Invite is not NoName.
+                var remote = LftInviteClientPresence.ResolveOnlinePlayer(
+                    client.Controller.Character,
+                    message.Target);
+                if (remote != null)
+                {
+                    string armedName;
+                    LftInviteArm.TryGetArmedName(client.Controller.Character, message.Target, out armedName);
+                    LftInviteClientPresence.SeedForInviteLookup(
+                        client.Controller.Character,
+                        remote,
+                        armedName);
+                    if (message.ReturnInfo != 1)
+                    {
+                        CharacterInfoPacketMessageHandler.Default.Send(
+                            client.Controller.Character,
+                            remote);
+                    }
                 }
             }
         }

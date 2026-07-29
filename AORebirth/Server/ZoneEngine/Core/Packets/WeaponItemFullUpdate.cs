@@ -99,27 +99,35 @@ namespace ZoneEngine.Core.Packets
 
         public static void SendWeaponDefinition(ICharacter character, IItem item)
         {
-            if (character == null || item == null)
+            if (character == null || item == null || character.BaseInventory == null)
             {
                 return;
             }
 
-            foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
+            IInventoryPage weaponPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
             {
-                for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
-                {
-                    if (object.ReferenceEquals(page[slot], item))
-                    {
-                        WeaponItemFullUpdateMessage message = CreateForSlot(character, page, slot);
-                        if (message != null)
-                        {
-                            character.Send(message);
-                            LogWeaponDefinition("sent-single", character, null, message, false);
-                        }
+                return;
+            }
 
-                        return;
-                    }
+            // Only hand slots — bag/HUD placements must never emit WIFU (hides Reload / wrong ammotype).
+            int[] handSlots = { (int)WeaponSlots.Righthand, (int)WeaponSlots.LeftHand };
+            for (int i = 0; i < handSlots.Length; i++)
+            {
+                int slot = handSlots[i];
+                if (!object.ReferenceEquals(weaponPage[slot], item))
+                {
+                    continue;
                 }
+
+                WeaponItemFullUpdateMessage message = CreateForSlot(character, weaponPage, slot);
+                if (message != null)
+                {
+                    character.Send(message);
+                    LogWeaponDefinition("sent-single", character, null, message, false);
+                }
+
+                return;
             }
         }
 
@@ -144,16 +152,26 @@ namespace ZoneEngine.Core.Packets
                 return new WeaponItemFullUpdateMessage[0];
             }
 
-            var messages = new List<WeaponItemFullUpdateMessage>();
-            foreach (IInventoryPage page in InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character))
+            // Hand slots only — bag/HUD WIFU hides Actions→Reload / causes Wrong ammotype.
+            if (character.BaseInventory == null)
             {
-                for (int slot = page.FirstSlotNumber; slot < page.FirstSlotNumber + page.MaxSlots; slot++)
+                return new WeaponItemFullUpdateMessage[0];
+            }
+
+            IInventoryPage weaponPage;
+            if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage))
+            {
+                return new WeaponItemFullUpdateMessage[0];
+            }
+
+            var messages = new List<WeaponItemFullUpdateMessage>();
+            int[] handSlots = { (int)WeaponSlots.Righthand, (int)WeaponSlots.LeftHand };
+            for (int i = 0; i < handSlots.Length; i++)
+            {
+                WeaponItemFullUpdateMessage message = CreateForSlot(character, weaponPage, handSlots[i]);
+                if (message != null)
                 {
-                    WeaponItemFullUpdateMessage message = CreateForSlot(character, page, slot);
-                    if (message != null)
-                    {
-                        messages.Add(message);
-                    }
+                    messages.Add(message);
                 }
             }
 
@@ -311,6 +329,9 @@ namespace ZoneEngine.Core.Packets
             int highId,
             int multipleCount)
         {
+            // Energy must not become uint.MaxValue (-1) when the item attribute is missing —
+            // that is the live "energy weapon / NoAmmo" marker and the client hides Actions→Reload.
+            // BANKA (working Reload): always send Energy=0 on WIFU so the client enables Reload.
             var stats = new List<GameTuple<CharacterStat, uint>>
             {
                 StatTuple(CharacterStat.Flags, (uint)NormalizeFlags(item.Flags)),
@@ -319,7 +340,8 @@ namespace ZoneEngine.Core.Packets
                 StatTuple(CharacterStat.ACGItemTemplateID, (uint)lowId),
                 StatTuple(CharacterStat.ACGItemTemplateID2, (uint)highId),
                 StatTuple(CharacterStat.MultipleCount, (uint)multipleCount),
-                StatTuple(CharacterStat.Energy, ResolveEnergy(item))
+                // BANKA working Reload: always Energy=0 (never -1 / uint.MaxValue).
+                StatTuple(CharacterStat.Energy, 0)
             };
             AddStatIfPresent(stats, CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay));
             AddStatIfPresent(stats, CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay));
@@ -337,17 +359,6 @@ namespace ZoneEngine.Core.Packets
             }
 
             stats.Add(StatTuple(stat, unchecked((uint)value)));
-        }
-
-        private static uint ResolveEnergy(IItem item)
-        {
-            int energy = item.GetAttribute((int)StatIds.energy);
-            if (energy == MissingItemStatValue)
-            {
-                return uint.MaxValue;
-            }
-
-            return unchecked((uint)energy);
         }
 
         private static GameTuple<CharacterStat, uint> StatTuple(CharacterStat stat, uint value)

@@ -94,6 +94,9 @@
     <Compile Include="CoreServer\ChatServer.cs" />
     <Compile Include="Lists\BuddyList.cs" />
     <Compile Include="Lists\BuddyListEntry.cs" />
+    <Compile Include="Lists\LftRegistry.cs" />
+    <Compile Include="Lists\LftPlayfieldRegistry.cs" />
+    <Compile Include="Lists\TeamLevelRanges.cs" />
     <Compile Include="PacketHandlers\Authenticate.cs" />
     <Compile Include="PacketHandlers\AuthenticateBot.cs" />
     <Compile Include="PacketHandlers\BuddyAdd.cs" />
@@ -102,6 +105,8 @@
     <Compile Include="PacketHandlers\ChannelMessage.cs" />
     <Compile Include="PacketHandlers\ChannelMode.cs" />
     <Compile Include="PacketHandlers\ChatCommand.cs" />
+    <Compile Include="PacketHandlers\LftRegister.cs" />
+    <Compile Include="PacketHandlers\LftSearch.cs" />
     <Compile Include="PacketHandlers\LoginCharacter.cs" />
     <Compile Include="PacketHandlers\OnlineStatus.cs" />
     <Compile Include="PacketHandlers\PlayerNameLookup.cs" />
@@ -122,6 +127,7 @@
     <Compile Include="Packets\ChannelMessage.cs" />
     <Compile Include="Packets\ClientModeGet.cs" />
     <Compile Include="Packets\ClientModeSet.cs" />
+    <Compile Include="Packets\LftQueryReply.cs" />
     <Compile Include="Packets\LoginError.cs" />
     <Compile Include="Packets\LoginOK.cs" />
     <Compile Include="Packets\MessageType.cs" />

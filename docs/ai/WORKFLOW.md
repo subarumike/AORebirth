@@ -282,10 +282,18 @@ cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <
 
 Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
 
-For mission-terminal and mission-lifecycle captures, use the dedicated x86
-mission analyzer. It shares the live plugin's `MissionFlowCapture` extractor
-and the current AOSharp serializer, preserving the 64-bit geometry analyzer's
-existing architecture:
+For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
+use the dedicated x86 mission analyzer:
+
+`C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe`
+
+Do not substitute ad-hoc Python/log greps, the geometry `AOSharpCaptureAnalyzer`,
+or the legacy server mission decoder as the first analysis step. When Mike hands
+a mission capture folder, run this analyzer immediately, then ground implementation
+in `mission-flow.replay.log` (and errors log if non-empty).
+
+It shares the live plugin's `MissionFlowCapture` extractor and the current AOSharp
+serializer, preserving the 64-bit geometry analyzer's existing architecture:
 
 ```cmd
 cmd /d /c MSBuild.exe tools-temp\AOSharpMissionCaptureAnalyzer\AOSharpMissionCaptureAnalyzer.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
@@ -297,8 +305,7 @@ The analyzer writes `mission-flow.replay.log` and
 `mission-flow.replay.errors.log` into the capture folder. A successful replay
 has zero errors and retains the raw global ordinal, raw directional sequence,
 captured timestamp, direction, and mission identities on every promoted
-mission-flow row. Use it instead of the legacy server mission decoder for
-current-live captures.
+mission-flow row.
 
 After adding a finalized capture to the Subway enemy combat-contract input list,
 regenerate the versioned evidence contract through the repository wrapper:

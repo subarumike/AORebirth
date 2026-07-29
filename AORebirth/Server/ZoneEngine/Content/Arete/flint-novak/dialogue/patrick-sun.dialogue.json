@@ -1,0 +1,444 @@
+{
+  "Identity": {
+    "Id": "arete-patrick-sun-dialogue-20260725-patric",
+    "Version": "captured-patrick-dialog-20260725-patric",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260725-patric"
+  },
+  "SourceCaptures": [
+    "20260725-patric"
+  ],
+  "Npcs": [
+    {
+      "Id": "patrick-sun",
+      "NpcIdentity": "SimpleChar:78E0FC7B",
+      "Name": "Patrick Sun",
+      "RootNodeId": "patrick_001",
+      "Aliases": [
+        "(SimpleChar:78E0FC7B)"
+      ],
+      "Nodes": [
+        {
+          "Id": "patrick_001",
+          "PromptText": "Up with skirts! Down with pants!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #24 U2=0",
+          "Options": [
+            {
+              "Id": "patrick_001_option_0",
+              "Index": 0,
+              "Text": "What did you say?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:28.5483654Z",
+              "NextNodeId": "patrick_002",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:28.5483654Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_002",
+          "PromptText": "Yes.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #54 U2=0",
+          "Options": [
+            {
+              "Id": "patrick_002_option_0",
+              "Index": 0,
+              "Text": "Ok... Do you know anything about that terminal over there?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:31.1367685Z",
+              "NextNodeId": "patrick_003",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:31.1367685Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_003",
+          "PromptText": "Maybe...",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #81 U2=0",
+          "Options": [
+            {
+              "Id": "patrick_003_option_0",
+              "Index": 0,
+              "Text": "Could you tell me about it?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:33.8897447Z",
+              "NextNodeId": "patrick_004",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:33.8897447Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_004",
+          "PromptText": "Yes.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #93 U2=0",
+          "Options": [
+            {
+              "Id": "patrick_004_option_0",
+              "Index": 0,
+              "Text": "Who do I have to bribe around here to get straight answers?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:35.9864514Z",
+              "NextNodeId": "patrick_005",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_004_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:35.9864514Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_004_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_005",
+          "PromptText": "Fine, I will tell you. Just use the terminal, and after I kill you for asking silly questions, you will returned to the blue beacon next to it. Lets test that, shall we?",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #104 U2=0 (capture grammar)",
+          "Options": [
+            {
+              "Id": "patrick_005_option_0",
+              "Index": 0,
+              "Text": "What? Are you going to kill me?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:38.3280072Z",
+              "NextNodeId": "patrick_006_accept",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_005_option_1",
+              "Index": 1,
+              "Text": "I think I will pass.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:38.3280072Z; AppendText for pass branch not in this capture",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_005_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Pass path close (NPC pass prompt not captured)"
+                }
+              ]
+            },
+            {
+              "Id": "patrick_005_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:38.3280072Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_005_option_2_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_006_accept",
+          "PromptText": "It is perfectly safe. Go use the terminal and let me know when you're ready for more of my 'help'.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #120 U2=0; QuestFullUpdate Mission:5565C962",
+          "Options": [
+            {
+              "Id": "patrick_006_accept_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:41.2292200Z",
+              "NextNodeId": "patrick_close_hahaha",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_close_hahaha",
+          "PromptText": "Hahaha...",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #136 U2=0 then KnubotClose",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "patrick_close_hahaha_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after accept"
+            }
+          ]
+        },
+        {
+          "Id": "patrick_scanner_001",
+          "PromptText": "Up with skirts! Down with pants!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #205 U2=0 (Talk tip active)",
+          "Options": [
+            {
+              "Id": "patrick_scanner_001_option_0",
+              "Index": 0,
+              "Text": "I have used the Cell Scanner...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:55.0806762Z",
+              "NextNodeId": "patrick_scanner_002",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_scanner_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:34:55.0806762Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_scanner_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_scanner_002",
+          "PromptText": "Excellent! Now, relax. This won't hurt a bit.",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #217 U2=0; then Yell tip + HealthDamage",
+          "Options": [
+            {
+              "Id": "patrick_scanner_002_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:00.2784710Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_scanner_002_option_0_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Close into death"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_yell_001",
+          "PromptText": "Up with skirts! Down with pants!",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #473 U2=0 (Yell tip active)",
+          "Options": [
+            {
+              "Id": "patrick_yell_001_option_0",
+              "Index": 0,
+              "Text": "You evil son of a...",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:16.8482517Z",
+              "NextNodeId": "patrick_yell_002",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_yell_001_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:16.8482517Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_yell_001_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_yell_002",
+          "PromptSegments": [
+            {
+              "Text": "hahaHaHaHAHAHA...",
+              "Unknown2": 0
+            },
+            {
+              "Text": "Patrick can't stop laughing.",
+              "Unknown2": 1
+            },
+            {
+              "Text": "Dude, I told you not to ask stupid questions.",
+              "Unknown2": 0
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric #490/#491 then #531; AnswerList You owe",
+          "Options": [
+            {
+              "Id": "patrick_yell_002_option_0",
+              "Index": 0,
+              "Text": "You owe me big time for this, Patrick.",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:24.1937215Z",
+              "NextNodeId": "patrick_yell_003",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_yell_002_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:24.1937215Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_yell_002_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_yell_003",
+          "PromptSegments": [
+            {
+              "Text": "Possibly.",
+              "Unknown2": 0
+            },
+            {
+              "Text": "Patrick looks as though he tries to kill himself not to laugh.",
+              "Unknown2": 1
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #575/#576 U2=0/1",
+          "Options": [
+            {
+              "Id": "patrick_yell_003_option_0",
+              "Index": 0,
+              "Text": "You see that ICC guard over there? I bet he has something to say about your demonstrations!",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:26.7431495Z",
+              "NextNodeId": "patrick_yell_reward",
+              "Actions": []
+            },
+            {
+              "Id": "patrick_yell_003_option_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:26.7431495Z",
+              "NextNodeId": "patrick_close",
+              "Actions": [
+                {
+                  "Id": "patrick_yell_003_option_1_end",
+                  "Type": "EndDialogue",
+                  "QuestId": null,
+                  "Text": "Safe close"
+                }
+              ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_yell_reward",
+          "PromptSegments": [
+            {
+              "Text": "Relax! I will hand you a little something to cheer you up, after all, your cloned body looks better than your old. Your soul is the same, no real damage done. Bet you will look great with this now that you lost some weight.",
+              "Unknown2": 0
+            },
+            {
+              "Text": "Patrick hands you a belt.",
+              "Unknown2": 1
+            }
+          ],
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #603/#604 U2=0/1; reward FormatFeedback + TemplateAction",
+          "Options": [
+            {
+              "Id": "patrick_yell_reward_option_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-25T19:35:29.1716523Z",
+              "NextNodeId": "patrick_close_hahaha_end",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "patrick_close_hahaha_end",
+          "PromptText": "Hahaha...",
+          "PromptTextConfidence": "KnubotAppendText 20260725-patric packets.hex.log #652 U2=0 then KnubotClose",
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "patrick_close_hahaha_end_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close after reward"
+            }
+          ]
+        },
+        {
+          "Id": "patrick_close",
+          "PromptText": null,
+          "Options": [],
+          "EnterActions": [
+            {
+              "Id": "patrick_close_end",
+              "Type": "EndDialogue",
+              "QuestId": null,
+              "Text": "Close"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

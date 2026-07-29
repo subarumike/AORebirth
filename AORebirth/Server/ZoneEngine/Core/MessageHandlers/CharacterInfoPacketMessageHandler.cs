@@ -44,6 +44,7 @@ namespace ZoneEngine.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Core;
     using ZoneEngine.Core.PacketHandlers;
     using ZoneEngine.Core.Playfields;
 
@@ -66,6 +67,95 @@ namespace ZoneEngine.Core.MessageHandlers
         public void Send(ICharacter character, ICharacter infoTarget)
         {
             this.Send(character, CharacterInfoPacket(character, infoTarget), false);
+        }
+
+        /// <summary>
+        /// LFT / cross-PF: real display name + level for invite GUI. Classic Unknown=0
+        /// CharacterInfoPacket only — never Unknown=1 (that stuck Info on "Please wait").
+        /// </summary>
+        public void SendForTeamInvite(
+            ICharacter viewer,
+            ICharacter infoTarget,
+            string displayName,
+            int level)
+        {
+            if (viewer == null || infoTarget == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = infoTarget.Name;
+            }
+
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = infoTarget.FirstName;
+            }
+
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                displayName = "Player";
+            }
+
+            if (level < 1)
+            {
+                level = 1;
+            }
+
+            if (level > 220)
+            {
+                level = 220;
+            }
+
+            this.Send(viewer, TeamInviteInfoPacket(infoTarget, displayName, level), false);
+        }
+
+        private static MessageDataFiller TeamInviteInfoPacket(
+            ICharacter tPlayer,
+            string displayName,
+            int level)
+        {
+            return x =>
+            {
+                x.Unknown = 0;
+                x.Type = InfoPacketType.Character;
+                x.Identity = tPlayer.Identity;
+                x.Info = new CharacterInfoPacket
+                         {
+                             Unknown1 = 0x01,
+                             Profession = (Profession)tPlayer.Stats[StatIds.profession].Value,
+                             Level = (byte)level,
+                             TitleLevel = (byte)tPlayer.Stats[StatIds.titlelevel].Value,
+                             VisualProfession =
+                                 (Profession)tPlayer.Stats[StatIds.visualprofession].Value,
+                             SideXp = 0,
+                             Health = tPlayer.Stats[StatIds.health].Value,
+                             MaxHealth = tPlayer.Stats[StatIds.life].Value,
+                             BreedHostility = 0x00000000,
+                             OrganizationId = null,
+                             FirstName = displayName,
+                             LastName = string.Empty,
+                             LegacyTitle = string.Empty,
+                             Unknown2 = 0x0000,
+                             OrganizationRank = null,
+                             TowerFields = null,
+                             CityPlayfieldId = 0,
+                             Towers = null,
+                             InvadersKilled = 0,
+                             KilledByInvaders = 0,
+                             AiLevel = tPlayer.Stats[StatIds.alienlevel].Value,
+                             PvpDuelWins = 0,
+                             PvpDuelLoses = 0,
+                             PvpProfessionDuelLoses = 0,
+                             PvpSoloKills = 0,
+                             PvpTeamKills = 0,
+                             PvpSoloScore = 0,
+                             PvpTeamScore = 0,
+                             PvpDuelScore = 0
+                         };
+            };
         }
 
         /// <summary>
@@ -296,15 +386,14 @@ namespace ZoneEngine.Core.MessageHandlers
         /// </param>
         internal void Send(ICharacter character, Identity identity)
         {
-            // Only for Characters now
-            // Need more info whether to send for non Characters too
-            var obj = Pool.Instance.GetObject(character.Playfield.Identity, identity) as ICharacter;
+            // Cross-PF LFT: Pool on local playfield misses remotes — resolve globally.
+            ICharacter obj = LftInviteClientPresence.ResolveOnlinePlayer(character, identity)
+                             ?? Pool.Instance.GetObject(character.Playfield.Identity, identity) as ICharacter;
 
             if (obj != null)
             {
                 if (obj.Stats[StatIds.npcfamily].Value == 0)
                 {
-                    // !=0 -> Monster
                     this.Send(character, obj);
                 }
             }

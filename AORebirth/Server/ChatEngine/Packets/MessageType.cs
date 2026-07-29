@@ -189,6 +189,21 @@ namespace ChatEngine.Packets
 
         /// <summary>
         /// </summary>
-        PrivateMessage = 30
+        PrivateMessage = 30,
+
+        /// <summary>
+        /// Looking for Team register (client → server). Capture 20260727-104625.
+        /// </summary>
+        LftRegister = 1500,
+
+        /// <summary>
+        /// Looking for Team search reply (server → client). Capture 20260727-104625.
+        /// </summary>
+        LftQueryReply = 1501,
+
+        /// <summary>
+        /// Looking for Team search (client → server). Capture 20260727-104625.
+        /// </summary>
+        LftQuery = 1502
     }
 }
