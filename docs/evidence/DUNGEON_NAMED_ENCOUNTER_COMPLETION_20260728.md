@@ -18,6 +18,7 @@ and combat behavior cross the encounter boundary.
 | 127 | `subway.127.boss.abmouth-supremus` | Abmouth Supremus | 155962 | initial boss | complete |
 | 127 | `subway.127.boss.vergil-aeneid` | Vergil Aeneid | 203748 | initial boss | complete |
 | 127 | `subway.127.named.eumenides` | Eumenides | 203726 | initial named | complete |
+| 127 | `subway.127.named.strike-foreman` | Strike Foreman | 203744 | initial named | complete |
 | 127 | `subway.127.encounter.abmouth-infector` | Infector slots 0 and 1 | 31909 | owned temporary adds | complete |
 | 1931 | `totw.647.boss.defender-of-the-three` | Defender of the Three | 38394 | initial boss | complete |
 | 1931 | `totw.647.named.windcaller-yatila` | Windcaller Yatila | 26151 | initial named | complete with bounded packet-only nano behavior |
@@ -34,19 +35,19 @@ and combat behavior cross the encounter boundary.
 | 1931 | `totw.1931.boss.aztur-the-immortal` | Aztur the Immortal | 159966 | successor stage | complete; NPC despawn owns one policy-timed full-chain reset |
 | 1931 | `totw.ordinary.main-room.murial-the-faithful.26090` | Murial the Faithful | 26090 | ordinary-owned named patrol | complete; ordinary respawn policy retained |
 
-This is 18 unique combat/profile domains: 13 initial stages, two successors,
+This is 19 unique combat/profile domains: 14 initial stages, two successors,
 two owned-add domains, and one ordinary-owned patrol domain. The runtime
-initial population contains three PF127 named actors and ten PF1931 initial
+initial population contains four PF127 named actors and ten PF1931 initial
 named actors plus the two initially materialized Reanimated Corpse add slots.
 Successor stages are not double-counted as initial actors.
 
-Strike Foreman is not an active runtime encounter and therefore is not part of
-the table above. Existing capture evidence proves appearance, a QL19 weapon,
-attack initiation, two normal 18-point other-player results, one 40-point
-critical, chase start, corpse visual, credits, and two positive atomic loot
-outcomes. Exact respawn, leash/reset, acquisition upper bound, loot-bearing
-lifetime, and QL17/QL19 generation selection remain absent. It remains
-inactive rather than receiving invented encounter policy.
+Strike Foreman is active through the PF127 named-encounter owner. Actor level
+selects QL19 inside the exact `122767/122768` template range; capture owns the
+equipped packet semantics while production owns damage, range, cadence,
+Energy, ammunition, and mutable state. The captured L19 spawn uses the shared
+PF127 named lifecycle. Two capture-proven corpse snapshots retain exact atomic
+membership with enemy-level quality bounded by each item's valid QL range.
+Wider loot membership and probabilities remain unresolved.
 
 ## Combat and packet domains
 
@@ -215,7 +216,7 @@ Both flags now propagate while the exact weapon and packet semantics remain
 unchanged. The focused Molested regression and the complete 51-test combat
 catalog sweep pass.
 
-The consolidated named suite passes all six tests and proves the 18-domain
+The consolidated named suite passes all ten tests and proves the 19-domain
 inventory, unique stage classification, exact ready combat domains,
 successor/add ownership, playfield-owned retirement, disposal cancellation,
 and the locked 489/489 ordinary baseline. The combined focused Abmouth, Temple,
@@ -233,21 +234,22 @@ gates.
 
 ## Final completion matrix
 
-- Active runtime combat/profile domains: 18/18 complete.
-- Initial named encounter profiles: 13/13 complete.
+- Active runtime combat/profile domains: 19/19 complete.
+- Initial named encounter profiles: 14/14 complete.
 - Successor profiles: 2/2 complete.
 - Owned-add domains: 2/2 complete.
 - Ordinary-owned named patrol domains: 1/1 complete.
 - Ordinary actors: 489/489 unchanged.
 - Bounded packet-only nano behavior: implemented without invented effects.
 - Explicit gameplay ownership added after this report: Aztur NPC despawn owns
-  one policy-timed Uklesh chain reset; all 18 named respawn domains are
+  one policy-timed Uklesh chain reset; all 19 named respawn domains are
   classified; Murial owns an explicit shared-policy respawn; and Eumenides
-  uses the captured shared empty-corpse cleanup bound.
+  uses the captured shared empty-corpse cleanup bound. Strike Foreman owns an
+  active level-bounded weapon/loot contract through the shared PF127 named
+  lifecycle.
 - Exact unresolved boundaries: downstream effects or scheduling for
   presentation-only Temple nanos, unknown loot probabilities and wider pools,
-  Murial nano/loot behavior, and inactive Strike Foreman
-  generation/lifecycle policy.
+  and Murial nano/loot behavior.
 
 The authoritative gameplay disposition and evidence boundaries are continued
 in `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.

@@ -1000,10 +1000,18 @@ namespace AORebirth.Core.Playfields
                         if (item.GetAttribute((int)StatIds.energy) != expected) return false;
                         break;
                     case CharacterStat.AttackDelay:
-                        if (item.GetAttribute((int)StatIds.itemdelay) != expected) return false;
+                        if (!this.UsesProductionActorValuesForPresentationWeapon
+                            && item.GetAttribute((int)StatIds.itemdelay) != expected)
+                        {
+                            return false;
+                        }
                         break;
                     case CharacterStat.RechargeDelay:
-                        if (item.GetAttribute((int)StatIds.rechargedelay) != expected) return false;
+                        if (!this.UsesProductionActorValuesForPresentationWeapon
+                            && item.GetAttribute((int)StatIds.rechargedelay) != expected)
+                        {
+                            return false;
+                        }
                         break;
                     default:
                         return false;
@@ -1800,6 +1808,38 @@ namespace AORebirth.Core.Playfields
         }
     }
 
+    internal static class EnemyItemQualityPolicy
+    {
+        internal static bool TryResolve(
+            int actorLevel,
+            int lowTemplateId,
+            int highTemplateId,
+            out int quality)
+        {
+            quality = 0;
+            if (actorLevel < 1
+                || lowTemplateId < 1
+                || highTemplateId < 1
+                || !ItemLoader.ItemList.ContainsKey(lowTemplateId)
+                || !ItemLoader.ItemList.ContainsKey(highTemplateId))
+            {
+                return false;
+            }
+
+            int lowQuality = ItemLoader.ItemList[lowTemplateId].Quality;
+            int highQuality = ItemLoader.ItemList[highTemplateId].Quality;
+            if (lowQuality < 1 || highQuality < 1)
+            {
+                return false;
+            }
+
+            int minimumQuality = Math.Min(lowQuality, highQuality);
+            int maximumQuality = Math.Max(lowQuality, highQuality);
+            quality = Math.Max(minimumQuality, Math.Min(maximumQuality, actorLevel));
+            return true;
+        }
+    }
+
     internal static class CapturedEnemyCombatRuntime
     {
         private const int MissingItemStatValue = 1234567890;
@@ -1987,7 +2027,10 @@ namespace AORebirth.Core.Playfields
             {
                 MultipleCount = 1
             };
-            ApplyCapturedWeaponStats(weapon, contract.WeaponDefinition);
+            ApplyCapturedWeaponStats(
+                weapon,
+                contract.WeaponDefinition,
+                contract.UsesProductionActorValuesForPresentationWeapon);
             if (!contract.MatchesCapturedWeapon(weapon))
             {
                 failure = "constructed weapon does not exactly match captured WIFU templates/QL/stats";
@@ -2023,7 +2066,8 @@ namespace AORebirth.Core.Playfields
 
         private static void ApplyCapturedWeaponStats(
             Item weapon,
-            CapturedEnemyWeaponDefinition definition)
+            CapturedEnemyWeaponDefinition definition,
+            bool retainProductionTiming)
         {
             if (weapon == null || definition == null)
             {
@@ -2047,11 +2091,17 @@ namespace AORebirth.Core.Playfields
                 }
                 else if (stat.Stat == CharacterStat.AttackDelay)
                 {
-                    weapon.SetAttribute((int)StatIds.itemdelay, value);
+                    if (!retainProductionTiming)
+                    {
+                        weapon.SetAttribute((int)StatIds.itemdelay, value);
+                    }
                 }
                 else if (stat.Stat == CharacterStat.RechargeDelay)
                 {
-                    weapon.SetAttribute((int)StatIds.rechargedelay, value);
+                    if (!retainProductionTiming)
+                    {
+                        weapon.SetAttribute((int)StatIds.rechargedelay, value);
+                    }
                 }
             }
         }
@@ -2082,6 +2132,8 @@ namespace AORebirth.Core.Playfields
 
     internal static class CapturedSubwayCombatCatalog
     {
+        private const int MissingItemStatValue = 1234567890;
+
         private const int DerangedShopperMonsterData = 203736;
 
         private const int DerangedShopperSourceInstance = unchecked((int)0x79574527);
@@ -2150,6 +2202,12 @@ namespace AORebirth.Core.Playfields
                         NpcCombatAttackRules.CapturedSubwayEumenidesWeaponQuality,
                         (int)WeaponSlots.Righthand,
                         requiresDamageLineOfSight: true);
+                case 203744:
+                    return level.HasValue
+                        ? StrikeForeman(level.Value)
+                        : CapturedEnemyCombatContract.Unresolved(
+                            "Strike Foreman requires its active runtime level",
+                            true);
                 case 203748:
                     return CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(
                         "20260712-232711/234401 and 20260720-053542: Vergil Aeneid QL23 Cast-Off E-Beamer 122123; 22-25 normal player damage with one captured 54 critical, captured attack-start/first-hit timing, and weapon-owned roll/cadence",
@@ -2487,6 +2545,127 @@ namespace AORebirth.Core.Playfields
                         "No captured combat contract for " + name + " monsterData=" + monsterData,
                         false);
             }
+        }
+
+        private static CapturedEnemyCombatContract StrikeForeman(int level)
+        {
+            const int evidenceSourceIdentity = unchecked((int)0x7954512Eu);
+            const string archetypeId =
+                "subway-strike-foreman-122767-equipped-level-bounded-v1";
+            const string evidence =
+                "20260709-212336/220439 exact 122767/122768 equipped WIFU family; "
+                + "20260720-032106/033513 exact empty SAW 154/154/154/117/0, "
+                + "Attack action 0, normal hit wire 3, damage wire 0, slot 6, "
+                + "instance 0, mutable ammunition, and WIFU -> SAW -> Attack -> "
+                + "AttackInfo ordering; actor level owns bounded item QL and the "
+                + "equipped item owns runtime damage, range, and cadence";
+
+            int quality;
+            if (level != 19
+                || !EnemyItemQualityPolicy.TryResolve(
+                    level,
+                    NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponLowTemplate,
+                    NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponHighTemplate,
+                    out quality))
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Strike Foreman combat is bounded to the active L19 "
+                    + "122767/122768 item-quality domain",
+                    true);
+            }
+
+            var productionWeapon = new Item(
+                quality,
+                NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponLowTemplate,
+                NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponHighTemplate)
+            {
+                MultipleCount = 1
+            };
+            int initialEnergy =
+                productionWeapon.GetAttribute((int)CharacterStat.MaxEnergy);
+            if (initialEnergy == MissingItemStatValue || initialEnergy <= 0)
+            {
+                return CapturedEnemyCombatContract.Unresolved(
+                    "Strike Foreman production weapon ammunition capacity is unavailable",
+                    true);
+            }
+
+            CapturedEnemyWeaponDefinition weaponDefinition =
+                new CapturedEnemyWeaponDefinition(
+                    evidence,
+                    evidenceSourceIdentity,
+                    0,
+                    11,
+                    NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponSlot,
+                    1000015,
+                    0,
+                    262,
+                    new[]
+                    {
+                        CapturedWeaponStat(CharacterStat.Flags, 1027),
+                        CapturedWeaponStat(
+                            CharacterStat.StaticInstance,
+                            NpcCombatAttackRules
+                                .CapturedSubwayStrikeForemanWeaponLowTemplate),
+                        CapturedWeaponStat(CharacterStat.ACGItemLevel, quality),
+                        CapturedWeaponStat(
+                            CharacterStat.ACGItemTemplateID,
+                            NpcCombatAttackRules
+                                .CapturedSubwayStrikeForemanWeaponLowTemplate),
+                        CapturedWeaponStat(
+                            CharacterStat.ACGItemTemplateID2,
+                            NpcCombatAttackRules
+                                .CapturedSubwayStrikeForemanWeaponHighTemplate),
+                        CapturedWeaponStat(CharacterStat.MultipleCount, 1),
+                        CapturedWeaponStat(CharacterStat.Energy, initialEnergy),
+                        CapturedWeaponStat(CharacterStat.AttackDelay, 235),
+                        CapturedWeaponStat(CharacterStat.RechargeDelay, 235)
+                    },
+                    0);
+
+            return CapturedEnemyCombatContract
+                .EquippedWeaponWithCapturedPacketSequence(
+                    evidence,
+                    evidenceSourceIdentity,
+                    NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponLowTemplate,
+                    NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponHighTemplate,
+                    quality,
+                    NpcCombatAttackRules.CapturedSubwayStrikeForemanWeaponSlot,
+                    true,
+                    0,
+                    0,
+                    0,
+                    null,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    0.0d,
+                    true,
+                    true,
+                    initialEnergy - 1,
+                    0,
+                    NpcCombatAttackRules
+                        .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown1,
+                    NpcCombatAttackRules
+                        .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown2,
+                    NpcCombatAttackRules
+                        .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown3,
+                    NpcCombatAttackRules
+                        .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown4,
+                    NpcCombatAttackRules
+                        .CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown5,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    true,
+                    true)
+                .WithCapturedWeapon(weaponDefinition)
+                .WithProductionEquippedWeaponValues()
+                .WithProductionWeaponQuality()
+                .WithProductionActorValuesForPresentationWeapon()
+                .WithCaptureProvenArchetype(archetypeId);
         }
 
         private static CapturedEnemyCombatContract ViolentVagabond(int level)

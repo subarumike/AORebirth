@@ -143,7 +143,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = FindRepositoryRoot();
             string globalLoot = File.ReadAllText(Path.Combine(
                 root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"))
+                .Replace("\r\n", "\n");
             Assert.IsTrue(
                 globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260712-232711\",\n                        610,")
                 && globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260712-234401\",\n                        587,")
@@ -154,6 +155,85 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 21605, 21605, 1, 100)")
                 && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 287146, 287146, 200, 1)"),
                 "Vergil runtime loot must retain all three exact linked observed corpse snapshots.");
+        }
+
+        [TestMethod]
+        public void StrikeForemanObservedSnapshotsUseEnemyLevelWithinItemQlBounds()
+        {
+            LootTableDefinition table = BuildStrikeObservedSnapshotTableForTest();
+            var registry = new LootTableRegistry(value => value > 0);
+            registry.RegisterTable(table);
+            registry.RegisterAssignment(new LootAssignmentDefinition
+            {
+                AssignmentKey = "test.strike.snapshots",
+                TargetType = LootAssignmentTargetType.EnemyType,
+                TargetKey = "test.strike",
+                LootTableKey = table.LootTableKey,
+                PlayfieldId = 127,
+                Priority = 0,
+                Conditions = new string[0],
+                Evidence = "test:strike-observed-corpse-snapshots",
+                Confidence = LootEvidenceConfidence.ProvenCapture,
+                Enabled = true
+            });
+            var context = new LootGenerationContext
+            {
+                EnemyProfileKey = "test.strike",
+                MonsterData = 203744,
+                Level = 19,
+                PlayfieldId = 127
+            };
+            LootGenerationService service = Service(registry);
+
+            LootGenerationResult first = service.Generate(
+                context,
+                new FixedIndexLootRandomSource(0));
+            Assert.AreEqual(176, first.Credits);
+            Assert.AreEqual(
+                10,
+                first.Items.Single(value => value.ItemTemplateId == 27199).Quality);
+            Assert.AreEqual(
+                19,
+                first.Items.Single(value => value.ItemTemplateId == 123744).Quality);
+            Assert.AreEqual(
+                1,
+                first.Items.Single(value => value.ItemTemplateId == 301713).Quality);
+
+            LootGenerationResult second = service.Generate(
+                context,
+                new FixedIndexLootRandomSource(1));
+            Assert.AreEqual(176, second.Credits);
+            Assert.AreEqual(
+                19,
+                second.Items.Single(value => value.ItemTemplateId == 85676).Quality);
+            Assert.AreEqual(
+                1,
+                second.Items.Single(value => value.ItemTemplateId == 301707).Quality);
+            Assert.IsTrue(table.ItemPoolUnresolved);
+            Assert.IsTrue(table.ObservedCorpseSnapshots.All(
+                value => value.SelectionProbabilityEvidence
+                         == LootEvidenceConfidence.Unresolved));
+
+            LootTableDefinition invalid = BuildStrikeObservedSnapshotTableForTest();
+            invalid.ObservedCorpseSnapshots[0].Entries[1].FixedQuality = 19;
+            AssertThrows<LootDefinitionValidationException>(() =>
+                new LootTableRegistry(value => value > 0).RegisterTable(invalid));
+
+            string globalLoot = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            Assert.IsTrue(
+                globalLoot.Contains(
+                    "CapturedStrikeForemanCredits = 176")
+                && globalLoot.Contains(
+                    "LevelBoundedObservedCorpseSnapshotEntry(")
+                && globalLoot.Contains(
+                    "\"capture.20260720-032106\"")
+                && globalLoot.Contains(
+                    "\"capture.20260720-033513\"")
+                && globalLoot.Contains(
+                    "\"captured-atomic-membership-enemy-level-bounded-item-ql\""),
+                "Production must retain the two exact Strike Foreman atomic memberships while enemy level owns QL inside each item range.");
         }
 
         [TestMethod]
@@ -353,6 +433,100 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
                 ItemPoolUnresolved = true,
                 Enabled = true
+            };
+        }
+
+        private static LootTableDefinition BuildStrikeObservedSnapshotTableForTest()
+        {
+            return new LootTableDefinition
+            {
+                LootTableKey = "test.strike.observed-corpse-snapshots",
+                DisplayName = "Strike Foreman observed corpse snapshots test",
+                TableType = LootTableType.EnemyType,
+                RollGroups = new LootGroupDefinition[0],
+                ObservedCorpseSnapshots = new[]
+                {
+                    Snapshot(
+                        "capture.20260720-032106",
+                        176,
+                        LevelBoundedSnapshotEntry(
+                            "capture.20260720-032106",
+                            27199,
+                            27199,
+                            10,
+                            10,
+                            1),
+                        LevelBoundedSnapshotEntry(
+                            "capture.20260720-032106",
+                            123744,
+                            123745,
+                            12,
+                            21,
+                            1),
+                        LevelBoundedSnapshotEntry(
+                            "capture.20260720-032106",
+                            301713,
+                            301713,
+                            1,
+                            1,
+                            1)),
+                    Snapshot(
+                        "capture.20260720-033513",
+                        176,
+                        LevelBoundedSnapshotEntry(
+                            "capture.20260720-033513",
+                            85676,
+                            22072,
+                            1,
+                            200,
+                            1),
+                        LevelBoundedSnapshotEntry(
+                            "capture.20260720-033513",
+                            301707,
+                            301707,
+                            1,
+                            1,
+                            1))
+                },
+                CreditsPolicy = new CreditsPolicyDefinition
+                {
+                    Mode = CreditsPolicyMode.Unresolved,
+                    Evidence = LootEvidenceConfidence.Unresolved
+                },
+                QualityPolicy =
+                    "captured-atomic-membership-enemy-level-bounded-item-ql",
+                Evidence = "test:strike-observed-corpse-snapshots",
+                Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                ItemPoolUnresolved = true,
+                Enabled = true
+            };
+        }
+
+        private static LootEntryDefinition LevelBoundedSnapshotEntry(
+            string snapshotKey,
+            int itemTemplateId,
+            int highItemTemplateId,
+            int minimumQuality,
+            int maximumQuality,
+            int quantity)
+        {
+            return new LootEntryDefinition
+            {
+                SelectionKey = snapshotKey,
+                ItemTemplateId = itemTemplateId,
+                HighItemTemplateId = highItemTemplateId,
+                UsesEnemyLevelQuality = true,
+                MinimumQuality = minimumQuality,
+                MaximumQuality = maximumQuality,
+                MinimumQuantity = quantity,
+                MaximumQuantity = quantity,
+                Weight = 0,
+                DropChanceBasisPoints = 0,
+                UniquePerCorpse = true,
+                Semantics = LootSemantics.ObservedAvailable,
+                Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                EvidenceReference = "test:" + snapshotKey,
+                ProbabilityEvidence = "unresolved"
             };
         }
 

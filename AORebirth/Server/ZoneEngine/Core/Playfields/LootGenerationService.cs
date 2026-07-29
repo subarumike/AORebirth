@@ -338,7 +338,12 @@ namespace AORebirth.Core.Playfields
             if (!dropped) return;
             if (entry.UniquePerCorpse && result.Items.Any(x => x.Definition.ItemTemplateId == entry.ItemTemplateId)) return;
 
-            int quality = entry.FixedQuality ?? NextInclusive(random, entry.MinimumQuality, entry.MaximumQuality);
+            int quality = entry.UsesEnemyLevelQuality
+                ? Math.Max(
+                    entry.MinimumQuality,
+                    Math.Min(entry.MaximumQuality, context.Level))
+                : entry.FixedQuality
+                  ?? NextInclusive(random, entry.MinimumQuality, entry.MaximumQuality);
             int quantity = NextInclusive(random, entry.MinimumQuantity, entry.MaximumQuantity);
             result.Items.Add(new GeneratedLootItem
             {

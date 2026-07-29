@@ -12,8 +12,8 @@ before this gameplay slice resumed and remains preserved.
 This pass does not change the locked combat totals:
 
 - PF127/PF1931 ordinary combat: `489/489`.
-- Active named combat/profile domains: `18/18`.
-- Strike Foreman remains outside the active runtime inventory.
+- Active named combat/profile domains: `19/19`.
+- Strike Foreman is active as a PF127 named encounter.
 
 The work below addresses lifecycle, reset, nano-effect ownership, respawn,
 corpse, and loot contracts without inventing missing categorical behavior or
@@ -23,11 +23,11 @@ probabilities.
 
 | Area | Starting gap | Current code owner, evidence, and missing fields | Final disposition |
 |---|---|---|---|
-| Strike Foreman | QL17/QL19 selection, activation, acquisition upper bound, leash/reset, corpse lifetime, respawn | No active owner exists in `CapturedSubwayOrdinaryContentProvider` or `CapturedSubwayEncounterRuntimeService`; evidence is `subway_enemy_combat_contracts.json` plus `20260709-212336`, `220439`, `222339`, `20260720-032106`, and `033513`. Missing: stable generation selector, exact acquisition upper bound, leash/reset, loot-bearing lifetime, and respawn trigger/delay. | Inactive and fail-closed. Combat, corpse visual, credits, and two atomic loot outcomes remain preserved evidence, not a partial runtime actor. |
+| Strike Foreman | QL17/QL19 selection disconnected the captured actor from runtime | `CapturedSubwayEncounterRuntimeService` owns the active L19 spawn and shared named lifecycle. `CapturedSubwayCombatCatalog` owns exact `122767/122768`, slot-6, WIFU/SAW/Attack/AttackInfo semantics. Production selects QL19 from actor level inside the template range and owns damage, range, cadence, Energy, and mutable state. | Implemented. The two capture-proven corpse snapshots retain atomic membership, while item QL follows enemy level inside each valid template range. Wider pool membership and probabilities remain unresolved. |
 | Uklesh -> Khalum -> Aztur reset | No full-chain recreation after Aztur | `CapturedTempleOfThreeWindsEncounterRuntimeService` owns identities and scheduling; `CapturedTempleOfThreeWindsEncounterRules` owns the categorical reset rule. The independently authoritative Temple named policy supplies 600 seconds. No capture supplies an Aztur-to-Uklesh interval. | Implemented. Aztur NPC despawn schedules exactly one Uklesh at `+600s`; living or already scheduled stages reject duplicates, dead corpses remain independent, and runtime disposal clears the schedule. |
 | Temple nanos | Packet identities existed, but effect ownership was not explicit and several observed IDs were unscheduled | `CapturedTempleOfThreeWindsEncounterRuntimeService` owns scheduled named casts; `OrdinaryEnemyRuntimeService` owns fully specified ordinary support nanos; `NanoEventRuntimeService` cannot select hostile/ally targets. Missing per unscheduled nano: categorical target and/or cadence and downstream stat/damage/heal/duration/stack/removal contract. | Exact emitted packet behavior is retained. Only `205604` owns proven gameplay: a Reanimated Corpse add request. Other named IDs are packet-only; identities without a complete schedule remain unscheduled. |
 | Murial | Generic respawn assignment and unresolved nano | `CapturedTempleOfThreeWindsContentProvider` and `WorldRespawnScheduler` own respawn/patrol; sessions `20260721-232051/234614` own anchor, combat, corpse, and 20 waypoints. Missing: nano `70294` target selector/cadence/effect and loot/credits. | Implemented explicit Murial policy: `300s` after NPC despawn, original anchor, full health/movement/aggression reset, and one population-owned patrol. Nano and loot remain fail-closed. |
-| Named respawns | Successor suppression was a boolean and ordinary/default ownership was not explicit | PF127 `CapturedSubwayEncounterRuntimeService`, PF1931 `CapturedTempleOfThreeWindsEncounterRuntimeService`, and ordinary `WorldRespawnScheduler` own the 18 domains. Exact and policy provenance is recorded below; no domain remains ownerless. | All 18 domains classify explicitly as captured independent, policy independent, successor-only, owner-only, or chain-reset. Successors and adds cannot independently respawn. |
+| Named respawns | Successor suppression was a boolean and ordinary/default ownership was not explicit | PF127 `CapturedSubwayEncounterRuntimeService`, PF1931 `CapturedTempleOfThreeWindsEncounterRuntimeService`, and ordinary `WorldRespawnScheduler` own the 19 domains. Exact and policy provenance is recorded below; no domain remains ownerless. | All 19 domains classify explicitly as captured independent, policy independent, successor-only, owner-only, or chain-reset. Successors and adds cannot independently respawn. |
 | Loot/corpse | Eumenides empty cleanup did not use the captured boundary; selection probabilities remain unknown | `GlobalLootRuntimeService`, `CapturedTempleOfThreeWindsLootDefinitions`, `CorpseInventoryService`, and corpse lifecycle own atomic snapshots and retirement. Missing: official probabilities/wider pools for incomplete domains, plus Murial loot. | Eumenides retains a 30-minute loot-bearing corpse and now retires within the shared three-second empty bound. Existing atomic outcomes remain atomic. No unresolved probability became guaranteed or received invented weights. |
 
 ## Strike Foreman
@@ -49,26 +49,31 @@ Strike Foreman is MonsterData `203744`, level `19`.
 - `20260720-033513` proves a separate atomic two-item outcome:
   `85676/22072` QL15 and `301707` QL1.
 
-### Final exclusion
+### Active production ownership
 
-The exact equipped template family is `122767/122768`, but the corpus contains
-both QL17 and QL19 generations. No population row, runtime QL owner, item
-interpolation state, or stable generation field selects one for an active
-spawn. Source identity and capture frequency are not reusable selectors.
+The active level-19 spawn selects QL19 from template family `122767/122768`
+through the shared enemy-level/item-range rule. Capture remains authoritative
+for equipped mode, slot `6`, WIFU structure, `154/154/154/117/0` SAW,
+Attack action `0`, AttackInfo hit/damage wires `3/0`, and instance `0`.
+Production owns QL, damage, range, cadence, Energy, ammunition, and mutable
+weapon state.
 
-The corpus also does not provide:
+`CapturedSubwayEncounterRuntimeService` owns the captured spawn, conservative
+capture-proven automatic acquisition through `20.250672` units, the shared
+100-unit leash, regular 60-second loot-bearing corpse, shared PF127 named
+600-second respawn, and runtime disposal. The observed acquisition distance is
+not claimed as a proven upper bound; behavior beyond it remains fail-closed.
+The actor remains outside `CapturedSubwayOrdinaryContentProvider` and the
+locked `489/489` ordinary denominator.
 
-- an acquisition upper bound;
-- a leash/reset threshold;
-- return-home and health-reset timing;
-- loot-bearing corpse lifetime;
-- respawn eligibility or delay;
-- exact loot-outcome probabilities;
-- an authoritative active population/controller row.
+The QL19 WIFU is exact from `20260709-220439` packet `6672`. The exact
+SAW/Attack/13-point AttackInfo suffix is from `20260720-033513` packets
+`38/39/72`. These are correlated categorical observations across active
+generations, not mislabeled as one capture-local chain.
 
-The actor therefore remains absent from
-`CapturedSubwayOrdinaryContentProvider`. Proven evidence stays available for a
-future authoritative selector, but no partial or random activation was added.
+The two captured loot snapshots remain exact atomic memberships. Item quality
+follows enemy level within each template's valid QL range; exact
+loot-outcome probabilities and wider pool membership remain unresolved.
 
 ## Post-Aztur full-chain reset
 
@@ -393,19 +398,16 @@ still incomplete.
 
 ## Final exact unresolved behaviors
 
-1. Strike Foreman cannot activate until a stable QL17/QL19 generation selector,
-   full acquisition/leash/reset contract, loot-bearing lifetime, and respawn
-   contract exist.
-2. Temple packet-only nano downstream stat/damage/heal/resist/stacking behavior
+1. Temple packet-only nano downstream stat/damage/heal/resist/stacking behavior
    remains disabled where raw and generic ownership cannot establish it.
-3. Defender `209924`, Re-Animator `205592`, Uklesh `204830`, Murial `70294`,
+2. Defender `209924`, Re-Animator `205592`, Uklesh `204830`, Murial `70294`,
    and the listed active ordinary nano families remain unscheduled when their
    complete categorical selector, target rule, cadence, or effect contract is
    absent.
-4. Murial item/credit loot remains unproven.
-5. Named and ordinary wider loot pools and official selection probabilities
+3. Murial item/credit loot remains unproven.
+4. Named and ordinary wider loot pools and official selection probabilities
    remain unresolved unless explicitly identified above as authoritative.
-6. The post-Aztur 600-second delay is inherited from the explicit Temple named
+5. The post-Aztur 600-second delay is inherited from the explicit Temple named
    policy; no capture of the entire Aztur-to-Uklesh reset interval exists.
 
 ## Validation
@@ -429,7 +431,11 @@ still incomplete.
 
 - Named dungeon encounter completion: PASS, `10/10`.
 - Temple ordinary content regression: PASS, `7/7`.
-- Abmouth/Subway named encounter regression: PASS, `26/26`.
+- Abmouth/Subway named encounter regression: PASS, `27/27`.
+- Strike Foreman focused combat/lifecycle/loot: PASS, `3/3`.
+- Shared captured packet factory: PASS, `38/38`.
+- Combat profile catalog: PASS, `51/51`.
+- Global loot foundation: PASS, `10/10`.
 - Eumenides corpse lifecycle regression: PASS, `1/1`.
 - Active coverage: PASS, `3/3`.
 - Clean synchronized-start worktree baseline: `644/723` PASS with `79`

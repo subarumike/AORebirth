@@ -430,6 +430,110 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void StrikeForemanUsesCapturedSpawnExactCombatAndSharedNamedLifecycle()
+        {
+            string root = FindRepositoryRoot();
+            string encounter = ReadPlayfieldSource(
+                root,
+                "CapturedSubwayEncounterRuntimeService.cs");
+            string ordinary = ReadPlayfieldSource(
+                root,
+                "CapturedSubwayOrdinaryContentProvider.cs");
+            string contracts = ReadPlayfieldSource(
+                root,
+                "CapturedEnemyCombatContract.cs");
+            string rules = ReadPlayfieldSource(root, "NpcCombatAttackRules.cs");
+
+            Assert.IsTrue(
+                encounter.Contains("StrikeForemanMonsterData = 203744")
+                && encounter.Contains(
+                    "StrikeForemanProfileKey = \"subway.127.named.strike-foreman\"")
+                && encounter.Contains(
+                    "StrikeForemanEncounterKey = \"subway.127.encounter.strike-foreman\"")
+                && encounter.Contains(
+                    "CapturedStrikeForemanAggroRadius = 20.250672f")
+                && encounter.Contains("CreateStrikeForemanDefinition()")
+                && encounter.Contains("this.ProcessStrikeForemanRespawn(utcNow);")
+                && encounter.Contains(
+                    "diedAtUtc.Add(CapturedNamedBossRespawnDelay)")
+                && encounter.Contains(
+                    "this.strikeForemanIdentity = Identity.None;")
+                && encounter.Contains(
+                    "this.strikeForemanRespawnDueAtUtc = null;")
+                && encounter.Contains(
+                    "maximumNpcLeashDistanceFromHome: 100.0"),
+                "Strike Foreman must use the shared PF127 named lifecycle, ten-minute respawn, captured acquisition radius, and shared leash.");
+            Assert.IsTrue(
+                encounter.Contains(
+                    "StrikeForemanProfileKey,\n                \"subway.127.named.strike-foreman.spawn\",\n                StrikeForemanEncounterKey,\n                \"Strike Foreman\",\n                StrikeForemanMonsterData,\n                false,\n                false,")
+                && encounter.Contains(
+                    "19,\n                736,\n                98,\n                67,\n                66,")
+                && encounter.Contains(
+                    "333.719055f,\n                109.015f,\n                206.525848f,")
+                && encounter.Contains("0.32742402f")
+                && encounter.Contains("0.944877505f")
+                && encounter.Contains(
+                    "1579u,\n                unchecked((int)0x020A4ACB)")
+                && encounter.Contains(
+                    "HexToBytes(\"00000000000000000000000003010001000100010001000000020000\")")
+                && encounter.Contains(
+                    "17870,\n                60.0,\n                0.0,")
+                && encounter.Contains("npcFamily: 149")
+                && encounter.Contains("race: 1")
+                && encounter.Contains("headMesh: 40673")
+                && encounter.Contains(
+                    "new CapturedSubwayMeshDefinition(1, 27723u, 0, 2)"),
+                "Strike Foreman must preserve the exact active L19 SCFU and corpse presentation.");
+            Assert.IsFalse(
+                ordinary.Contains("Strike Foreman") || ordinary.Contains("203744"),
+                "Strike Foreman must remain outside the locked ordinary population denominator.");
+
+            Assert.IsTrue(
+                contracts.Contains("case 203744:")
+                && contracts.Contains("StrikeForeman(level.Value)")
+                && contracts.Contains("level != 19")
+                && contracts.Contains(
+                    "subway-strike-foreman-122767-equipped-level-bounded-v1")
+                && contracts.Contains(
+                    "CapturedWeaponStat(CharacterStat.ACGItemLevel, quality)")
+                && contracts.Contains(
+                    "CapturedWeaponStat(CharacterStat.AttackDelay, 235)")
+                && contracts.Contains(
+                    "CapturedWeaponStat(CharacterStat.RechargeDelay, 235)")
+                && contracts.Contains(".WithProductionEquippedWeaponValues()")
+                && contracts.Contains(".WithProductionWeaponQuality()")
+                && contracts.Contains(
+                    ".WithProductionActorValuesForPresentationWeapon()")
+                && contracts.Contains("bool retainProductionTiming")
+                && contracts.Contains("if (!retainProductionTiming)")
+                && contracts.Contains(
+                    "!this.UsesProductionActorValuesForPresentationWeapon")
+                && contracts.Contains(
+                    "normal hit wire 3, damage wire 0, slot 6")
+                && contracts.Contains("WIFU -> SAW -> Attack -> ")
+                && contracts.Contains(
+                    "AttackInfo ordering; actor level owns"),
+                "The active profile must resolve its exact capture-backed packet semantics while production owns item-derived QL, damage, range, cadence, and mutable state.");
+            Assert.IsTrue(
+                rules.Contains(
+                    "CapturedSubwayStrikeForemanWeaponLowTemplate = 122767")
+                && rules.Contains(
+                    "CapturedSubwayStrikeForemanWeaponHighTemplate = 122768")
+                && rules.Contains("CapturedSubwayStrikeForemanWeaponSlot = 6")
+                && rules.Contains(
+                    "CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown1 = 154")
+                && rules.Contains(
+                    "CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown2 = 154")
+                && rules.Contains(
+                    "CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown3 = 154")
+                && rules.Contains(
+                    "CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown4 = 117")
+                && rules.Contains(
+                    "CapturedSubwayStrikeForemanSpecialAttackWeaponUnknown5 = 0"),
+                "Strike Foreman must retain the exact weapon family, slot, and SAW categorical values.");
+        }
+
+        [TestMethod]
         public void EumenidesUsesCapturedWeaponContextButLeavesDamageAndRechargeItemOwned()
         {
             string root = FindRepositoryRoot();
