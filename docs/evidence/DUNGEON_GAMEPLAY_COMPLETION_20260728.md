@@ -385,16 +385,24 @@ still incomplete.
 ## Shared ownership and cleanup
 
 - Encounter services own named actor identities, pending nanos, successors,
-  adds, and named respawn due times.
+  and adds. One shared `DungeonNamedRespawnScheduler`, backed by the established
+  `WorldRespawnScheduler`, owns PF127/PF1931 named respawn, successor, and reset
+  due times with profile uniqueness and playfield-scoped cancellation.
 - World population owns ordinary actors, Murial's generation, patrol,
   corpse notification, and respawn schedule.
-- Corpse inventory owns one atomic roll and the materialized item/credit state.
+- Corpse inventory rejects duplicate dead-NPC ownership before a second global
+  roll and owns the one materialized item/credit state.
 - Corpse lifecycle owns loot-bearing and empty retirement.
 - Visibility owns registration and removal.
 - Runtime retirement calls each owner's reset path. Pending combat, movement,
   nanos, add work, successor/reset times, respawns, corpses, loot state, and
   visibility cannot execute from a retired playfield runtime.
 - PF127 and PF1931 registries remain isolated by playfield instance.
+
+The task-specific 19-domain classification, main-room phase model, Murial
+result, corpse/loot matrix, worker ownership matrix, and exact remaining
+boundaries are recorded in
+`docs/evidence/DUNGEON_NAMED_LIFECYCLE_COMPLETION_20260729.md`.
 
 ## Final exact unresolved behaviors
 
@@ -429,6 +437,7 @@ still incomplete.
 
 ### Focused and full tests
 
+- Named dungeon lifecycle completion: PASS, `20/20`.
 - Named dungeon encounter completion: PASS, `10/10`.
 - Temple ordinary content regression: PASS, `7/7`.
 - Abmouth/Subway named encounter regression: PASS, `27/27`.

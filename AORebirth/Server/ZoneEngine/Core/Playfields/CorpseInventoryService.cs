@@ -9,6 +9,7 @@ namespace AORebirth.Core.Playfields
     using AORebirth.Enums;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using ZoneEngine.Core;
+    using ZoneEngine.Core.Missions;
 
     internal sealed class CorpseLootItem
     {
@@ -22,6 +23,9 @@ namespace AORebirth.Core.Playfields
     {
         internal Identity CorpseIdentity { get; set; }
         internal Identity DeadNpcIdentity { get; set; }
+        internal bool IsGeneratedMissionCorpse { get; set; }
+        internal MissionAcgIdentityRecord AcceptedQuestIdentity { get; set; }
+        internal MissionAcgIdentityRecord OwnerIdentity { get; set; }
         internal int PlayfieldId { get; set; }
         internal ICharacter VisualSource { get; set; }
         internal HashSet<Identity> VisibleRecipients { get; set; }
@@ -68,6 +72,11 @@ namespace AORebirth.Core.Playfields
             {
                 if (this.states.ContainsKey(state.CorpseIdentity.Instance))
                     throw new InvalidOperationException("Duplicate corpse identity: " + state.CorpseIdentity);
+                if (this.states.Values.Any(
+                    value => value.PlayfieldId == state.PlayfieldId
+                             && value.DeadNpcIdentity == state.DeadNpcIdentity))
+                    throw new InvalidOperationException(
+                        "Duplicate corpse for dead NPC: " + state.DeadNpcIdentity);
                 state.LootItems = state.LootItems ?? new List<CorpseLootItem>();
                 state.VisibleRecipients = state.VisibleRecipients ?? new HashSet<Identity>();
                 state.LastMutationAtUtc = state.CreatedAtUtc;
@@ -85,6 +94,16 @@ namespace AORebirth.Core.Playfields
         {
             CorpseState state;
             return this.TryGet(corpseIdentity, out state) ? state : null;
+        }
+
+        internal bool ContainsDeadNpc(int playfieldId, Identity deadNpcIdentity)
+        {
+            lock (this.sync)
+            {
+                return this.states.Values.Any(
+                    value => value.PlayfieldId == playfieldId
+                             && value.DeadNpcIdentity == deadNpcIdentity);
+            }
         }
 
         internal CorpseLootItem[] EnumerateItems(Identity corpseIdentity)

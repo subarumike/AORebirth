@@ -252,4 +252,9 @@ gates.
   and Murial nano/loot behavior.
 
 The authoritative gameplay disposition and evidence boundaries are continued
-in `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.
+in `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`. The subsequent
+shared lifecycle ownership pass adds one explicit 19-domain classification
+catalog, a playfield-scoped shared named scheduler, an explicit main-room phase
+owner, duplicate dead-NPC corpse rejection before loot generation, and
+replacement-runtime corpse/loot cleanup. See
+`docs/evidence/DUNGEON_NAMED_LIFECYCLE_COMPLETION_20260729.md`.

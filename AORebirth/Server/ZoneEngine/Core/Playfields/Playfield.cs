@@ -3340,6 +3340,15 @@ namespace AORebirth.Core.Playfields
 
         internal void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
         {
+            if (target == null
+                || this.pendingCorpseSpawns.ContainsKey(target.Identity.Instance)
+                || this.corpseInventoryService.ContainsDeadNpc(
+                    this.Identity.Instance,
+                    target.Identity))
+            {
+                return;
+            }
+
             DateTime spawnsAtUtc = DateTime.UtcNow + NpcCorpseLifecycleRules.CorpseSpawnDelay;
             this.pendingCorpseSpawns[target.Identity.Instance] =
                 new CorpseState
@@ -4231,6 +4240,8 @@ namespace AORebirth.Core.Playfields
                 {
                     try
                     {
+                        this.pendingCorpseSpawns.Clear();
+                        this.pendingCorpseCreditAwards.Clear();
                         this.corpseInventoryService.ClearPlayfield(this.Identity.Instance);
                     }
                     finally
