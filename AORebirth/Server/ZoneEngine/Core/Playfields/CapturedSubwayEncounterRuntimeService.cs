@@ -95,6 +95,8 @@ namespace AORebirth.Core.Playfields
         private readonly Action<ICharacter> activateNpc;
         private readonly object spawnRandomSync = new object();
         private readonly Random spawnRandom = new Random();
+        private readonly DungeonNamedRespawnScheduler namedRespawns =
+            new DungeonNamedRespawnScheduler();
         private readonly InfectorSlotState[] infectorSlots =
         {
             new InfectorSlotState(0),
@@ -107,13 +109,9 @@ namespace AORebirth.Core.Playfields
         private Identity strikeForemanIdentity = Identity.None;
         private bool combatActive;
         private bool abmouthDead;
-        private DateTime? abmouthRespawnDueAtUtc;
         private DateTime? abmouthWarpDueAtUtc;
         private bool vergilCombatActive;
         private bool vergilDead;
-        private DateTime? vergilRespawnDueAtUtc;
-        private DateTime? eumenidesRespawnDueAtUtc;
-        private DateTime? strikeForemanRespawnDueAtUtc;
         private DateTime vergilNextHealAtUtc;
         private PendingVergilHeal vergilPendingHeal;
         private int refillDelayIndex;
@@ -135,7 +133,8 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.abmouthIdentity.Instance == 0 && !this.abmouthRespawnDueAtUtc.HasValue)
+            if (this.abmouthIdentity.Instance == 0
+                && !this.namedRespawns.Contains(AbmouthProfileKey))
             {
                 CapturedEncounterRuntimeDefinition definition = CreateBossDefinition();
                 Character boss = this.SpawnCharacter(definition, Identity.None);
@@ -146,7 +145,8 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
-            if (this.vergilAeneidIdentity.Instance == 0 && !this.vergilRespawnDueAtUtc.HasValue)
+            if (this.vergilAeneidIdentity.Instance == 0
+                && !this.namedRespawns.Contains(VergilAeneidProfileKey))
             {
                 Character vergil = this.SpawnCharacter(
                     this.CreateVergilAeneidDefinition(),
@@ -157,7 +157,8 @@ namespace AORebirth.Core.Playfields
                 }
             }
 
-            if (this.eumenidesIdentity.Instance == 0 && !this.eumenidesRespawnDueAtUtc.HasValue)
+            if (this.eumenidesIdentity.Instance == 0
+                && !this.namedRespawns.Contains(EumenidesProfileKey))
             {
                 Character eumenides = this.SpawnCharacter(
                     CreateEumenidesDefinition(),
@@ -169,7 +170,7 @@ namespace AORebirth.Core.Playfields
             }
 
             if (this.strikeForemanIdentity.Instance == 0
-                && !this.strikeForemanRespawnDueAtUtc.HasValue)
+                && !this.namedRespawns.Contains(StrikeForemanProfileKey))
             {
                 Character strikeForeman = this.SpawnCharacter(
                     CreateStrikeForemanDefinition(),
@@ -183,6 +184,7 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearRuntimeState()
         {
+            this.namedRespawns.CancelPlayfield(this.playfield.Identity.Instance);
             CapturedEncounterRuntimeRegistry.RemoveForPlayfield(this.playfield.Identity.Instance);
             this.abmouthIdentity = Identity.None;
             this.vergilAeneidIdentity = Identity.None;
@@ -190,12 +192,8 @@ namespace AORebirth.Core.Playfields
             this.strikeForemanIdentity = Identity.None;
             this.combatActive = false;
             this.abmouthDead = false;
-            this.abmouthRespawnDueAtUtc = null;
             this.abmouthWarpDueAtUtc = null;
             this.ClearVergilCombatState();
-            this.vergilRespawnDueAtUtc = null;
-            this.eumenidesRespawnDueAtUtc = null;
-            this.strikeForemanRespawnDueAtUtc = null;
             this.refillDelayIndex = 0;
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
@@ -482,7 +480,9 @@ namespace AORebirth.Core.Playfields
             {
                 this.ClearVergilCombatState();
                 this.vergilDead = true;
-                this.vergilRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);
+                this.ScheduleNamedRespawn(
+                    VergilAeneidProfileKey,
+                    diedAtUtc.Add(CapturedNamedBossRespawnDelay));
                 return new ICharacter[0];
             }
 
@@ -491,7 +491,9 @@ namespace AORebirth.Core.Playfields
                 EumenidesProfileKey,
                 StringComparison.Ordinal))
             {
-                this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesObservedRespawnDelay);
+                this.ScheduleNamedRespawn(
+                    EumenidesProfileKey,
+                    diedAtUtc.Add(EumenidesObservedRespawnDelay));
                 return new ICharacter[0];
             }
 
@@ -500,8 +502,9 @@ namespace AORebirth.Core.Playfields
                 StrikeForemanProfileKey,
                 StringComparison.Ordinal))
             {
-                this.strikeForemanRespawnDueAtUtc =
-                    diedAtUtc.Add(CapturedNamedBossRespawnDelay);
+                this.ScheduleNamedRespawn(
+                    StrikeForemanProfileKey,
+                    diedAtUtc.Add(CapturedNamedBossRespawnDelay));
                 return new ICharacter[0];
             }
 
@@ -515,7 +518,9 @@ namespace AORebirth.Core.Playfields
 
             this.abmouthDead = true;
             this.combatActive = false;
-            this.abmouthRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);
+            this.ScheduleNamedRespawn(
+                AbmouthProfileKey,
+                diedAtUtc.Add(CapturedNamedBossRespawnDelay));
             var livingSummons = new List<ICharacter>();
             foreach (InfectorSlotState slot in this.infectorSlots)
             {
@@ -538,8 +543,7 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessNamedBossRespawns(DateTime utcNow)
         {
-            if (this.abmouthRespawnDueAtUtc.HasValue
-                && this.abmouthRespawnDueAtUtc.Value <= utcNow
+            if (this.namedRespawns.IsDue(AbmouthProfileKey, utcNow)
                 && this.abmouthIdentity.Instance == 0)
             {
                 Character boss = this.SpawnCharacter(CreateBossDefinition(), Identity.None);
@@ -557,12 +561,11 @@ namespace AORebirth.Core.Playfields
                         slot.Generation = 0;
                     }
 
-                    this.abmouthRespawnDueAtUtc = null;
+                    this.namedRespawns.Cancel(AbmouthProfileKey);
                 }
             }
 
-            if (this.vergilRespawnDueAtUtc.HasValue
-                && this.vergilRespawnDueAtUtc.Value <= utcNow
+            if (this.namedRespawns.IsDue(VergilAeneidProfileKey, utcNow)
                 && this.vergilAeneidIdentity.Instance == 0)
             {
                 Character vergil = this.SpawnCharacter(
@@ -572,15 +575,14 @@ namespace AORebirth.Core.Playfields
                 {
                     this.vergilAeneidIdentity = vergil.Identity;
                     this.ClearVergilCombatState();
-                    this.vergilRespawnDueAtUtc = null;
+                    this.namedRespawns.Cancel(VergilAeneidProfileKey);
                 }
             }
         }
 
         private void ProcessEumenidesRespawn(DateTime utcNow)
         {
-            if (!this.eumenidesRespawnDueAtUtc.HasValue
-                || this.eumenidesRespawnDueAtUtc.Value > utcNow
+            if (!this.namedRespawns.IsDue(EumenidesProfileKey, utcNow)
                 || this.eumenidesIdentity.Instance != 0)
             {
                 return;
@@ -595,13 +597,12 @@ namespace AORebirth.Core.Playfields
             }
 
             this.eumenidesIdentity = eumenides.Identity;
-            this.eumenidesRespawnDueAtUtc = null;
+            this.namedRespawns.Cancel(EumenidesProfileKey);
         }
 
         private void ProcessStrikeForemanRespawn(DateTime utcNow)
         {
-            if (!this.strikeForemanRespawnDueAtUtc.HasValue
-                || this.strikeForemanRespawnDueAtUtc.Value > utcNow
+            if (!this.namedRespawns.IsDue(StrikeForemanProfileKey, utcNow)
                 || this.strikeForemanIdentity.Instance != 0)
             {
                 return;
@@ -616,7 +617,16 @@ namespace AORebirth.Core.Playfields
             }
 
             this.strikeForemanIdentity = strikeForeman.Identity;
-            this.strikeForemanRespawnDueAtUtc = null;
+            this.namedRespawns.Cancel(StrikeForemanProfileKey);
+        }
+
+        private void ScheduleNamedRespawn(string profileKey, DateTime dueAtUtc)
+        {
+            this.namedRespawns.Schedule(
+                this.playfield.Identity.Instance,
+                profileKey,
+                profileKey,
+                dueAtUtc);
         }
 
         internal void NotifyNpcDespawn(ICharacter target, DateTime utcNow)

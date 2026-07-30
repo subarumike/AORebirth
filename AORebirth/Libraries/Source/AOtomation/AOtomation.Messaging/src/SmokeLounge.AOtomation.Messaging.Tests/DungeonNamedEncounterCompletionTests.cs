@@ -234,9 +234,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && temple.Contains("NamedEncounterState uklesh = this.FindNamed(UkleshProfileKey);")
                 && temple.Contains("NamedEncounterState khalum = this.FindNamed(KhalumProfileKey);")
                 && temple.Contains("NamedEncounterState aztur = this.FindNamed(AzturProfileKey);")
-                && temple.Contains("uklesh.RespawnDueAtUtc = resetDueAtUtc;"));
-            Assert.IsFalse(temple.Contains("khalum.RespawnDueAtUtc = resetDueAtUtc;"));
-            Assert.IsFalse(temple.Contains("aztur.RespawnDueAtUtc = resetDueAtUtc;"));
+                && temple.Contains("this.namedRespawns.Schedule(")
+                && temple.Contains("UkleshProfileKey,")
+                && temple.Contains("AzturProfileKey,")
+                && temple.Contains("resetDueAtUtc);"));
+            Assert.AreEqual(
+                DungeonNamedRespawnClassification.ExplicitlyNoIndependentRespawn,
+                DungeonNamedLifecycleCatalog.Get(
+                    DungeonNamedLifecycleCatalog.KhalumProfileKey).Classification);
+            Assert.AreEqual(
+                DungeonNamedRespawnClassification.ExplicitlyNoIndependentRespawn,
+                DungeonNamedLifecycleCatalog.Get(
+                    DungeonNamedLifecycleCatalog.AzturProfileKey).Classification);
             Assert.IsTrue(
                 CapturedTempleOfThreeWindsEncounterRules.TryResolveMainRoomResetDue(
                     resetAtUtc,

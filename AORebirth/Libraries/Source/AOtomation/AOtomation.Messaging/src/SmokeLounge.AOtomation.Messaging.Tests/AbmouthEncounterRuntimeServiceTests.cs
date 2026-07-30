@@ -284,19 +284,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 encounter.Contains("CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10)")
-                && encounter.Contains("private DateTime? abmouthRespawnDueAtUtc;")
-                && encounter.Contains("private DateTime? vergilRespawnDueAtUtc;")
-                && encounter.Contains("this.abmouthRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);")
-                && encounter.Contains("this.vergilRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);")
+                && encounter.Contains("private readonly DungeonNamedRespawnScheduler namedRespawns")
+                && encounter.Contains("this.ScheduleNamedRespawn(\n                AbmouthProfileKey,\n                diedAtUtc.Add(CapturedNamedBossRespawnDelay));")
+                && encounter.Contains("this.ScheduleNamedRespawn(\n                    VergilAeneidProfileKey,\n                    diedAtUtc.Add(CapturedNamedBossRespawnDelay));")
                 && encounter.Contains("this.ProcessNamedBossRespawns(utcNow);")
                 && CountOccurrences(encounter, "CreateBossDefinition()") == 3
                 && CountOccurrences(encounter, "CreateVergilAeneidDefinition()") == 3,
                 "Abmouth and Vergil must use the confirmed ten-minute post-death named-boss respawn path.");
             Assert.IsTrue(
-                encounter.Contains("this.abmouthIdentity.Instance == 0 && !this.abmouthRespawnDueAtUtc.HasValue")
-                && encounter.Contains("this.vergilAeneidIdentity.Instance == 0 && !this.vergilRespawnDueAtUtc.HasValue")
-                && encounter.Contains("this.abmouthRespawnDueAtUtc.Value <= utcNow")
-                && encounter.Contains("this.vergilRespawnDueAtUtc.Value <= utcNow"),
+                encounter.Contains("!this.namedRespawns.Contains(AbmouthProfileKey)")
+                && encounter.Contains("!this.namedRespawns.Contains(VergilAeneidProfileKey)")
+                && encounter.Contains("this.namedRespawns.IsDue(AbmouthProfileKey, utcNow)")
+                && encounter.Contains("this.namedRespawns.IsDue(VergilAeneidProfileKey, utcNow)"),
                 "Playfield activation must not bypass a pending boss timer, and due retries must wait for the dead NPC identity to clear.");
             Assert.IsTrue(
                 npcRuntime.Contains("DateTime diedAtUtc = DateTime.UtcNow;")
@@ -399,7 +398,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && encounter.Contains("EumenidesEncounterKey = \"subway.127.encounter.eumenides\"")
                 && encounter.Contains("CapturedEumenidesAggroRadius = 23.359f")
                 && encounter.Contains("EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10)")
-                && encounter.Contains("this.eumenidesRespawnDueAtUtc = diedAtUtc.Add(EumenidesObservedRespawnDelay)")
+                && encounter.Contains("this.ScheduleNamedRespawn(\n                    EumenidesProfileKey,\n                    diedAtUtc.Add(EumenidesObservedRespawnDelay))")
                 && encounter.Contains("this.ProcessEumenidesRespawn(utcNow);")
                 && encounter.Contains("maximumNpcLeashDistanceFromHome: 100.0"),
                 "Eumenides must use its own named profile, the 23.358918-unit capture-proven acquisition lower bound, and Mike-observed official-live respawn timing.");
@@ -454,12 +453,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "CapturedStrikeForemanAggroRadius = 20.250672f")
                 && encounter.Contains("CreateStrikeForemanDefinition()")
                 && encounter.Contains("this.ProcessStrikeForemanRespawn(utcNow);")
-                && encounter.Contains(
-                    "diedAtUtc.Add(CapturedNamedBossRespawnDelay)")
+                && encounter.Contains("this.ScheduleNamedRespawn(\n                    StrikeForemanProfileKey,\n                    diedAtUtc.Add(CapturedNamedBossRespawnDelay))")
                 && encounter.Contains(
                     "this.strikeForemanIdentity = Identity.None;")
                 && encounter.Contains(
-                    "this.strikeForemanRespawnDueAtUtc = null;")
+                    "this.namedRespawns.Cancel(StrikeForemanProfileKey);")
                 && encounter.Contains(
                     "maximumNpcLeashDistanceFromHome: 100.0"),
                 "Strike Foreman must use the shared PF127 named lifecycle, ten-minute respawn, captured acquisition radius, and shared leash.");
@@ -952,8 +950,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsTrue(
                 encounter.Contains("this.vergilAeneidIdentity = Identity.None;")
-                && encounter.Contains("this.vergilRespawnDueAtUtc = diedAtUtc.Add(CapturedNamedBossRespawnDelay);")
-                && encounter.Contains("this.vergilRespawnDueAtUtc.Value <= utcNow")
+                && encounter.Contains("this.ScheduleNamedRespawn(\n                    VergilAeneidProfileKey,\n                    diedAtUtc.Add(CapturedNamedBossRespawnDelay));")
+                && encounter.Contains("this.namedRespawns.IsDue(VergilAeneidProfileKey, utcNow)")
                 && CountOccurrences(encounter, "CreateVergilAeneidDefinition()") == 3,
                 "Vergil must become absent after despawn and return on the confirmed ten-minute death-based schedule.");
             Assert.IsTrue(

@@ -177,6 +177,10 @@ namespace AORebirth.Core.Playfields
         private readonly Action<ICharacter> activateNpc;
         private readonly NamedEncounterState[] namedEncounters;
         private readonly ReanimatedSlotState[] reanimatedSlots;
+        private readonly DungeonNamedRespawnScheduler namedRespawns =
+            new DungeonNamedRespawnScheduler();
+        private readonly CapturedTempleMainRoomLifecycle mainRoomLifecycle =
+            new CapturedTempleMainRoomLifecycle();
 
         internal CapturedTempleOfThreeWindsEncounterRuntimeService(
             Playfield playfield,
@@ -319,7 +323,9 @@ namespace AORebirth.Core.Playfields
             {
                 if (!state.SpawnOnActivation
                     || state.Identity.Instance != 0
-                    || state.RespawnDueAtUtc.HasValue)
+                    || this.namedRespawns.Contains(state.Definition.ProfileKey)
+                    || (IsMainRoomStage(state.Definition.ProfileKey)
+                        && !this.mainRoomLifecycle.CanSpawn(state.Definition.ProfileKey)))
                 {
                     continue;
                 }
@@ -329,6 +335,7 @@ namespace AORebirth.Core.Playfields
                 {
                     state.Identity = character.Identity;
                     state.Dead = false;
+                    this.mainRoomLifecycle.TryMarkSpawned(state.Definition.ProfileKey);
                 }
             }
 
@@ -337,6 +344,8 @@ namespace AORebirth.Core.Playfields
 
         internal void ClearRuntimeState()
         {
+            this.namedRespawns.CancelPlayfield(this.playfield.Identity.Instance);
+            this.mainRoomLifecycle.Dispose();
             CapturedEncounterRuntimeRegistry.RemoveForPlayfield(this.playfield.Identity.Instance);
             foreach (NamedEncounterState state in this.namedEncounters)
             {
@@ -432,7 +441,12 @@ namespace AORebirth.Core.Playfields
             {
                 state.Dead = true;
                 state.ClearCombat();
-                this.ScheduleMainRoomSuccessor(state, diedAtUtc);
+                bool mainRoomAdvanced =
+                    this.mainRoomLifecycle.TryMarkDeath(state.Definition.ProfileKey);
+                if (!IsMainRoomStage(state.Definition.ProfileKey) || mainRoomAdvanced)
+                {
+                    this.ScheduleMainRoomSuccessor(state, diedAtUtc);
+                }
                 if (string.Equals(
                     state.Definition.ProfileKey,
                     ReAnimatorProfileKey,
@@ -459,16 +473,25 @@ namespace AORebirth.Core.Playfields
             if (state != null)
             {
                 state.Identity = Identity.None;
-                state.RespawnDueAtUtc =
-                    CapturedTempleOfThreeWindsEncounterRules.ResolveNamedRespawnDueAtUtc(
-                    state.RespawnMode,
-                    state.RespawnDueAtUtc,
-                    utcNow);
                 state.ClearCombat();
                 if (state.RespawnMode
                     == CapturedTempleNamedRespawnMode.ChainResetAfterNpcDespawn)
                 {
                     this.ScheduleMainRoomReset(utcNow);
+                }
+                else
+                {
+                    double delaySeconds;
+                    if (CapturedTempleOfThreeWindsEncounterRules.TryResolveNamedRespawnDelay(
+                            state.RespawnMode,
+                            out delaySeconds))
+                    {
+                        this.namedRespawns.Schedule(
+                            this.playfield.Identity.Instance,
+                            state.Definition.ProfileKey,
+                            state.Definition.ProfileKey,
+                            utcNow.AddSeconds(delaySeconds));
+                    }
                 }
 
                 return;
@@ -1131,11 +1154,18 @@ namespace AORebirth.Core.Playfields
 
         private void ProcessNamedRespawns(DateTime utcNow)
         {
-            foreach (NamedEncounterState state in this.namedEncounters)
+            foreach (WorldRespawnSchedule due in this.namedRespawns.TakeDue(
+                utcNow,
+                this.namedEncounters.Length))
             {
-                if (!state.RespawnDueAtUtc.HasValue
-                    || state.RespawnDueAtUtc.Value > utcNow
-                    || state.Identity.Instance != 0)
+                NamedEncounterState state = this.FindNamed(due.SpawnKey);
+                if (state == null || state.Identity.Instance != 0)
+                {
+                    continue;
+                }
+
+                if (IsMainRoomStage(state.Definition.ProfileKey)
+                    && !this.mainRoomLifecycle.CanSpawn(state.Definition.ProfileKey))
                 {
                     continue;
                 }
@@ -1143,13 +1173,18 @@ namespace AORebirth.Core.Playfields
                 Character character = this.SpawnCharacter(state.Definition, state.Combat, Identity.None);
                 if (character == null)
                 {
+                    this.namedRespawns.Schedule(
+                        this.playfield.Identity.Instance,
+                        state.Definition.ProfileKey,
+                        due.GroupKey,
+                        utcNow);
                     continue;
                 }
 
                 state.Identity = character.Identity;
-                state.RespawnDueAtUtc = null;
                 state.Dead = false;
                 state.ClearCombat();
+                this.mainRoomLifecycle.TryMarkSpawned(state.Definition.ProfileKey);
                 if (string.Equals(
                     state.Definition.ProfileKey,
                     ReAnimatorProfileKey,
@@ -1177,12 +1212,16 @@ namespace AORebirth.Core.Playfields
             NamedEncounterState successor = this.FindNamed(successorProfileKey);
             if (successor == null
                 || successor.Identity.Instance != 0
-                || successor.RespawnDueAtUtc.HasValue)
+                || this.namedRespawns.Contains(successorProfileKey))
             {
                 return;
             }
 
-            successor.RespawnDueAtUtc = diedAtUtc.AddSeconds(delaySeconds);
+            this.namedRespawns.Schedule(
+                this.playfield.Identity.Instance,
+                successorProfileKey,
+                state.Definition.ProfileKey,
+                diedAtUtc.AddSeconds(delaySeconds));
         }
 
         internal static bool TryGetMainRoomSuccessor(
@@ -1207,6 +1246,13 @@ namespace AORebirth.Core.Playfields
             successorProfileKey = string.Empty;
             delaySeconds = 0.0;
             return false;
+        }
+
+        private static bool IsMainRoomStage(string profileKey)
+        {
+            return string.Equals(profileKey, UkleshProfileKey, StringComparison.Ordinal)
+                   || string.Equals(profileKey, KhalumProfileKey, StringComparison.Ordinal)
+                   || string.Equals(profileKey, AzturProfileKey, StringComparison.Ordinal);
         }
 
         internal static bool TryResolveNamedRespawnDelay(
@@ -1250,10 +1296,15 @@ namespace AORebirth.Core.Playfields
                     CapturedTempleOfThreeWindsEncounterRules.IsLivingMainRoomStage(
                         aztur.Identity.Instance,
                         aztur.Dead),
-                    uklesh.RespawnDueAtUtc.HasValue,
-                    khalum.RespawnDueAtUtc.HasValue,
-                    aztur.RespawnDueAtUtc.HasValue,
+                    this.namedRespawns.Contains(UkleshProfileKey),
+                    this.namedRespawns.Contains(KhalumProfileKey),
+                    this.namedRespawns.Contains(AzturProfileKey),
                     out resetDueAtUtc))
+            {
+                return;
+            }
+
+            if (!this.mainRoomLifecycle.TryScheduleReset())
             {
                 return;
             }
@@ -1261,7 +1312,13 @@ namespace AORebirth.Core.Playfields
             uklesh.ClearCombat();
             khalum.ClearCombat();
             aztur.ClearCombat();
-            uklesh.RespawnDueAtUtc = resetDueAtUtc;
+            this.namedRespawns.Cancel(KhalumProfileKey);
+            this.namedRespawns.Cancel(AzturProfileKey);
+            this.namedRespawns.Schedule(
+                this.playfield.Identity.Instance,
+                UkleshProfileKey,
+                AzturProfileKey,
+                resetDueAtUtc);
         }
 
         private void ProcessNamedNano(NamedEncounterState state, DateTime utcNow)
@@ -1753,7 +1810,6 @@ namespace AORebirth.Core.Playfields
             internal bool NanoTargetsSelf { get; private set; }
             internal bool SpawnOnActivation { get; private set; }
             internal Identity Identity { get; set; }
-            internal DateTime? RespawnDueAtUtc { get; set; }
             internal DateTime? NextNanoAtUtc { get; set; }
             internal PendingTempleNano PendingNano { get; set; }
             internal bool CombatActive { get; set; }
@@ -1771,7 +1827,6 @@ namespace AORebirth.Core.Playfields
             internal void ResetAll()
             {
                 this.Identity = Identity.None;
-                this.RespawnDueAtUtc = null;
                 this.Dead = false;
                 this.ClearCombat();
             }

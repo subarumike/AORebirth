@@ -19,16 +19,21 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   from Aztur NPC despawn to Uklesh after the explicit 600-second Temple named
   policy, classifies all 19 named respawn domains, gives Murial an explicit
   300-second post-despawn policy reset without duplicating his patrol worker,
-  and applies the captured three-second empty-corpse cleanup bound to
-  Eumenides. Strike Foreman is active as a PF127 named encounter with exact
+  applies the captured three-second empty-corpse cleanup bound to Eumenides,
+  and now routes PF127/PF1931 named, successor, and reset due times through one
+  shared playfield-scoped scheduler. An explicit main-room phase owner blocks
+  re-entry duplication, while duplicate dead-NPC corpse ownership is rejected
+  before a second global loot roll and replacement disposal clears pending and
+  materialized corpse/loot state. Strike Foreman is active as a PF127 named encounter with exact
   capture-backed `122767/122768` equipped semantics, production-owned L19/QL19
   selection, shared encounter lifecycle, and capture-proven atomic loot
   memberships. Exact unresolved boundaries are unproven downstream or
   scheduling behavior for packet-only Temple nanos, unknown loot probabilities
   and wider pools, and Murial nano `70294` and loot. The Aztur reset delay
   remains policy-owned, not capture-timed. Evidence:
-  `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md` and
-  `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.
+  `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md`,
+  `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`, and
+  `docs/evidence/DUNGEON_NAMED_LIFECYCLE_COMPLETION_20260729.md`.
 
 - The fixed PF127/PF1931 ordinary-combat checkpoint is complete at `489/0`:
   PF127 `322/0`, PF1931 `167/0`. The final slice restored all 22 Violent

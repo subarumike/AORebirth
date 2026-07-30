@@ -84,3 +84,13 @@ The captured clean SCFU flags were `0x020A4ACB`; runtime adds the established
   packet identity is retained, but it remains unscheduled rather than being
   emitted with invented gameplay behavior.
 - Exact official-live patrol-loop timing reproduction on the private runtime.
+
+## Completed shared lifecycle ownership
+
+Task `DUNGEON-LIFECYCLE-COMPLETION-001` proves that death clears Murial's
+combat, chase, target, and follow/patrol execution before corpse processing.
+The ordinary source-identity guard and world respawn scheduler create one
+replacement actor at +300 seconds, and the shared movement path applies the 20
+waypoints once. Live re-entry reuses the actor and patrol; replacement-runtime
+cleanup removes the old actor, respawn, movement, patrol, corpse, loot, and
+visibility state. The exact remaining evidence boundaries above are unchanged.

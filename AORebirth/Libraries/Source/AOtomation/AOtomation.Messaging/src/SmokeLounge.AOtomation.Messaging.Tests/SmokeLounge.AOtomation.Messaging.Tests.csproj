@@ -229,6 +229,7 @@
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
     <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
+    <Compile Include="DungeonNamedLifecycleCompletionTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
@@ -313,6 +314,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs">
       <Link>CapturedTempleOfThreeWindsEncounterRules.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DungeonNamedLifecycle.cs">
+      <Link>DungeonNamedLifecycle.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs">
       <Link>CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs</Link>
