@@ -434,6 +434,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadMissionSource("MissionAcgExpiryRuntime.cs");
             StringAssert.Contains(runtime, "AbandonmentClaims");
             StringAssert.Contains(runtime, "AbandonmentOwned");
+            StringAssert.Contains(runtime, "CompletionTransitionClaims");
             StringAssert.Contains(runtime, "TryClaimAbandonment(");
             StringAssert.Contains(
                 runtime,
@@ -469,6 +470,76 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(
                 handler,
                 "MissionAcgExpiryRuntime.ReleaseAbandonmentClaim(");
+
+            string completion =
+                ReadMissionSource("MissionAcgCompletionJournalService.cs");
+            int completionClaim =
+                completion.IndexOf(
+                    "MissionAcgExpiryRuntime.TryClaimCompletionTransition(",
+                    StringComparison.Ordinal);
+            int completionTransition =
+                completion.IndexOf(
+                    "MissionAcgLifecycleState.CompletionStarted",
+                    completionClaim,
+                    StringComparison.Ordinal);
+            int completionRelease =
+                completion.IndexOf(
+                    "MissionAcgExpiryRuntime.ReleaseCompletionTransitionClaim(",
+                    completionTransition,
+                    StringComparison.Ordinal);
+            int objectiveTransition =
+                completion.IndexOf(
+                    "MissionAcgCompletionPhase.CompletionStarted",
+                    completionTransition,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(
+                completionClaim >= 0
+                && completionTransition > completionClaim
+                && objectiveTransition > completionTransition
+                && completionRelease > objectiveTransition
+                && completionRelease > completionTransition);
+        }
+
+        [TestMethod]
+        public void InterruptedCompletionTransitionResumesItsSecondDurableWrite()
+        {
+            string runtime =
+                ReadMissionSource("MissionAcgExpiryRuntime.cs");
+            int claimStart =
+                runtime.IndexOf(
+                    "internal static bool TryClaimCompletionTransition(",
+                    StringComparison.Ordinal);
+            int claimEnd =
+                runtime.IndexOf(
+                    "internal static void ReleaseCompletionTransitionClaim(",
+                    claimStart,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(claimStart >= 0 && claimEnd > claimStart);
+            string claim = runtime.Substring(claimStart, claimEnd - claimStart);
+            StringAssert.Contains(
+                claim,
+                "MissionAcgLifecycleState.CompletionStarted");
+
+            string completion =
+                ReadMissionSource("MissionAcgCompletionJournalService.cs");
+            int persistedCheck =
+                completion.IndexOf(
+                    "bool bindingTransitionPersisted",
+                    StringComparison.Ordinal);
+            int objectiveWrite =
+                completion.IndexOf(
+                    "MissionAcgCompletionPhase.CompletionStarted",
+                    persistedCheck,
+                    StringComparison.Ordinal);
+            int release =
+                completion.IndexOf(
+                    "MissionAcgExpiryRuntime.ReleaseCompletionTransitionClaim(",
+                    objectiveWrite,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(
+                persistedCheck >= 0
+                && objectiveWrite > persistedCheck
+                && release > objectiveWrite);
         }
 
         private static string ReadMissionSource(string fileName)

@@ -191,6 +191,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     before,
                     binding.ExpiryUtc),
                 "An expiry claim must defeat abandonment before either path mutates cleanup.");
+            Assert.IsFalse(
+                MissionAcgExpiryPolicy.CanBeginAbandonment(
+                    MissionAcgLifecycleState.Active,
+                    MissionAcgCompletionPhase.ObjectiveVerified,
+                    false,
+                    true,
+                    false,
+                    before,
+                    binding.ExpiryUtc),
+                "A completion-transition lease must defeat abandonment before either path mutates cleanup.");
             Assert.IsTrue(
                 MissionAcgExpiryPolicy.CanBeginAbandonment(
                     MissionAcgLifecycleState.Abandoned,

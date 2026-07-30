@@ -844,6 +844,17 @@ binding and objective after claiming, and a failed pre-persistence claim is
 released. Durable abandonment remains cleanup-resumable after its original
 deadline without allowing expiry to become a second terminal owner.
 
+Completion takes a short process-local transition lease under that same gate
+before changing the binding from `Accepted` or `Active`. The lease spans the
+durable binding and objective `CompletionStarted` writes and is always released
+afterward. Abandonment and expiry cannot claim inside that interval; if either
+claimed first, the completion transition fails closed. Once the lease is
+released, the persisted lifecycle remains the authority. If a crash separates
+the two writes, restart recognizes only the exact binding
+`CompletionStarted`/objective `ObjectiveVerified` tuple, reacquires the same
+lease before the deadline, skips the already-durable binding write, and
+persists the missing objective transition.
+
 As soon as expiry is claimed, the exact objective becomes `Expired` and all
 new mission entry, objective interaction, item pickup, terminal/machine use,
 door/chest use, target selection, attacks, damage, corpse access, and

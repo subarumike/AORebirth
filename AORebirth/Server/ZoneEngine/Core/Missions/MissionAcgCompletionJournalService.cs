@@ -244,22 +244,47 @@ namespace ZoneEngine.Core.Missions
 
             if (objective.State.Phase == MissionAcgCompletionPhase.ObjectiveVerified)
             {
-                if (!MissionAcgBindingRuntime.TryTransition(
+                int acceptedInstance =
+                    binding.Binding.AcceptedQuestIdentity.Instance;
+                if (!MissionAcgExpiryRuntime.TryClaimCompletionTransition(
                     binding,
-                    MissionAcgLifecycleState.CompletionStarted,
-                    MissionAcgCleanupState.None,
-                    DateTime.UtcNow,
+                    objective,
                     out binding,
-                    out failure)
-                    || !Replace(
-                        objective,
-                        objective.State.Copy(
-                            lifecycle: MissionAcgObjectiveLifecycle.CompletionStarted,
-                            phase: MissionAcgCompletionPhase.CompletionStarted),
-                        out objective,
-                        out failure))
+                    out failure))
                 {
                     return false;
+                }
+
+                try
+                {
+                    bool bindingTransitionPersisted =
+                        binding.State.LifecycleState
+                        == MissionAcgLifecycleState.CompletionStarted;
+                    if ((!bindingTransitionPersisted
+                         && !MissionAcgBindingRuntime.TryTransition(
+                             binding,
+                             MissionAcgLifecycleState.CompletionStarted,
+                             MissionAcgCleanupState.None,
+                             DateTime.UtcNow,
+                             out binding,
+                             out failure))
+                        || !Replace(
+                            objective,
+                            objective.State.Copy(
+                                lifecycle:
+                                    MissionAcgObjectiveLifecycle.CompletionStarted,
+                                phase:
+                                    MissionAcgCompletionPhase.CompletionStarted),
+                            out objective,
+                            out failure))
+                    {
+                        return false;
+                    }
+                }
+                finally
+                {
+                    MissionAcgExpiryRuntime.ReleaseCompletionTransitionClaim(
+                        acceptedInstance);
                 }
             }
 
