@@ -5,6 +5,7 @@ namespace AORebirth.Core.Playfields
     using System;
 
     using AORebirth.Core.Items;
+    using ZoneEngine.Core.Missions;
 
     #endregion
 
@@ -2673,16 +2674,24 @@ namespace AORebirth.Core.Playfields
         /// Mission trash remaps MonsterData via appearance remix, so exact capture MonsterData
         /// almost never matches. Fall back to a captured drop template scaled to mission QL.
         /// </summary>
-        internal static bool TryGetMissionTrashDrop(int monsterData, int missionQl, int salt, out LootDrop drop)
+        internal static bool TryGetMissionTrashDrop(
+            int monsterData,
+            int missionQl,
+            int salt,
+            out LootDrop drop)
         {
             // Always vary by salt — exact MonsterData match made remixed trash share one drop.
             drop = null;
-            if (CapturedDrops == null || CapturedDrops.Length == 0)
+            if (CapturedDrops == null
+                || CapturedDrops.Length == 0
+                || salt == int.MinValue)
             {
                 return false;
             }
 
-            int start = Math.Abs(salt) % CapturedDrops.Length;
+            int start = MissionAcgCorpsePolicy.StableBucket(
+                salt,
+                CapturedDrops.Length);
             LootDrop src = null;
             for (int i = 0; i < CapturedDrops.Length; i++)
             {

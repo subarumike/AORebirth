@@ -66,6 +66,46 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool ResumeForAccepted(
+            IZoneClient client,
+            ICharacter character,
+            int acceptedQuestInstance)
+        {
+            if (client == null || character == null || acceptedQuestInstance <= 0)
+            {
+                return false;
+            }
+
+            MissionAcgObjectiveRecord objective;
+            MissionAcgBindingRecord binding;
+            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    character.Identity.Instance,
+                    acceptedQuestInstance,
+                    out objective)
+                || !MissionAcgLifecyclePolicy.IsCompletionResumeEligible(
+                    objective.State)
+                || !MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
+                    character.Identity.Instance,
+                    acceptedQuestInstance,
+                    out binding))
+            {
+                return false;
+            }
+
+            MissionAcceptedStore.AcceptedMission accepted;
+            MissionAcceptedStore.TryResolve(
+                character.Identity.Instance,
+                ToIdentity(objective.Binding.AcceptedQuestIdentity),
+                out accepted);
+            return TryCompleteVerified(
+                client,
+                character,
+                accepted,
+                binding,
+                objective,
+                "ExactCorpseRetired");
+        }
+
         internal static bool TryVerifyAndComplete(
             IZoneClient client,
             ICharacter character,
@@ -469,6 +509,21 @@ namespace ZoneEngine.Core.Missions
                 {
                     return false;
                 }
+            }
+
+            if (!objective.State.ObjectiveCleanupCompleted
+                && MissionAcgOperationalRuntime.ShouldDeferKillCompletionCleanup(
+                    binding,
+                    objective))
+            {
+                MissionDiagnostics.Log(
+                    "ACG-COMPLETE-DEFER-CORPSE char={0} accepted={1}:{2} livePf2={3} phase={4}",
+                    character.Identity.Instance,
+                    binding.Binding.AcceptedQuestIdentity.Type,
+                    binding.Binding.AcceptedQuestIdentity.Instance,
+                    binding.Binding.AllocatedLivePlayfield2,
+                    objective.State.Phase);
+                return true;
             }
 
             if (!objective.State.ObjectiveCleanupCompleted)

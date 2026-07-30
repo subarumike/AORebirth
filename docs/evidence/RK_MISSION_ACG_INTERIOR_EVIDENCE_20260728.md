@@ -590,8 +590,9 @@ Kill targets and ambient NPCs enter the normal attack, damage, aggro,
 changed-stat, death, and corpse pipelines. A death is persisted before Stage 4
 objective/reward hooks run; a persistence failure blocks completion. Only the
 exact Kill runtime identity can complete its accepted mission, dead state is
-not respawned after restart, and repeated death cannot re-enter the reward
-journal. Find Person uses the same captured NPC materialization but is passive
+not respawned after restart, and repeated death may only retry the idempotent
+Stage 4 verification without repeating combat XP or reward claims. Find Person
+uses the same captured NPC materialization but is passive
 and combat-rejected; only its exact Stage 4 `InfoRequest` contract completes
 it. Repair machines, static objectives, terminals, doors, and chests never
 enter NPC combat registration.
@@ -606,12 +607,37 @@ Corpse identity uses the exact dead NPC runtime instance with identity type
 `Corpse`, making it deterministic, instance-isolated, and reversible for
 diagnostics. A live corpse is created only when the existing production
 MonsterData/CATMesh owner can build a proven visual. Corpse opening and loot
-transfer require the owning PF2 and the existing melee-distance authority.
-The finalized captures do not prove mission corpse items or credits, so Stage
-5 explicitly clears generic drops and records the outcome as unresolved-empty.
-Persistent dead/corpse state survives restart; the current corpse runtime does
-not safely reconstruct an already-visible corpse after process loss, so it
-does not fabricate that visual.
+transfer require the exact accepted quest, solo owner, allocated PF2, runtime
+NPC, corpse identity, active binding, durable `Available` state, finite
+coordinates, and the existing melee-distance authority.
+
+The five Stage 1 layout captures did not establish corpse contents. The
+separately analyzed mission-trash capture `20260725-185432` does establish ten
+corpse-open credit observations with an inclusive observed range of `21-87`
+(currency amounts, not combat contribution or distance), including one
+captured item observation. One item does not prove a pool or probability, so
+generated-ACG corpses use only the captured credit range and keep item contents
+explicitly unresolved-empty. The pre-existing legacy mission sparse/rare paths
+remain separate and unchanged. Persistent dead/corpse identity survives
+restart. A dead Kill target is eligible for restart reconciliation only when
+the same accepted quest already has the durable Stage 4
+`ObjectiveVerified` phase; dead operational state alone never synthesizes
+credit. The narrow crash boundary after death persistence but before objective
+verification therefore fails closed. The current corpse runtime does not
+safely reconstruct an already-visible corpse after process loss, so it does
+not fabricate that visual.
+
+For a live credited Kill, the exact corpse is scheduled before completion
+hooks. After rewards and completion packets are durably recorded, successful
+runtime cleanup pauses only while the exact accepted-quest/PF2/runtime-NPC/
+corpse lease is pending or available in the live playfield. Corpse access
+remains owner-only during `CompletionStarted`. Exact corpse retirement queues
+that one completion journal after corpse lifecycle traversal completes;
+ambient corpse retirement cannot resume it. Missing-dead-NPC or failed
+registration retires the same durable lease fail closed, preventing a stuck
+PF2 without exposing a half-registered corpse. Grant phases are not replayed,
+and the existing cleanup/PF2 release gates run unchanged. Abandonment and
+expiry do not use this successful-completion lease exception.
 
 The captures likewise do not prove chest inventories or transfers. Every
 captured chest therefore has `UnresolvedEmpty` authority: isolated open and
@@ -799,6 +825,40 @@ regressions to the Stage 4 objective suite: `16/16` focused tests and the
 `164/164` mission-filtered suite pass, together with the isolated Debug
 AORebirth.Core and ZoneEngine build.
 
+## Generated-mission Kill/corpse offline repair: 2026-07-29
+
+The prior generated-ACG fallback used
+`20 + (Math.Abs(salt) % 68)`. It therefore emitted `20-87`, and
+`Math.Abs(int.MinValue)` could throw after signed multiplication had already
+wrapped. Sparse captured-item selection repeated the same arithmetic hazard.
+
+`MissionAcgCorpsePolicy` now owns the inclusive `21-87` corpse-credit range.
+It validates an exact reversible runtime NPC identity and allocatable live PF2,
+widens multiplication before retaining the established low 32-bit identity
+mix, rejects the historical `int.MinValue` absolute-value case, and uses a
+bounded modulo over 67 values. Normal legacy salt mapping is preserved; only
+the invalid overflow edge fails closed. Non-finite, negative, or out-of-range
+corpse distances fail closed.
+
+Generated corpses are registered `OwnerOnly` with their accepted quest and
+owner. Open, item transfer, item deletion, delayed credit scheduling, and
+credit award all revalidate the complete durable ownership chain. Exact
+dead-NPC routing replaces newest-corpse selection for generated actors.
+Duplicate operational death callbacks suppress combat XP and corpse creation
+while allowing the exact idempotent Stage 4 target-death contract to reconcile.
+A restored dead Kill target is reconciled before mission re-entry. Failed
+durable corpse availability is not exposed to the client and remains durably
+`Pending` rather than being marked cleaned. Cleanup retires only corpses whose
+runtime NPC identities belong to that accepted mission. Ordinary and authored
+corpse behavior remains on the existing production path.
+
+Focused operational tests cover the credit boundaries, deterministic range,
+invalid/extreme identities, widened hashing, non-finite distance, exact
+owner/quest/PF2/NPC/corpse matching, lifecycle rejection, restart identity,
+cleanup wiring, and ordinary-path preservation. The private-client smoke test
+(kill trash, open corpse, transfer credits once, and complete the mission)
+remains deferred; no additional official capture is required.
+
 ## Deferred Stage 7 behavior
 
 The following work remains intentionally deferred:
@@ -809,13 +869,13 @@ The following work remains intentionally deferred:
   in-envelope movement by a guessed speed constant;
 - reconcile a reward journal left `Pending` across the non-atomic legacy
   character-persistence boundary with operator evidence;
-- obtain direct mission corpse/chest inventory transfer captures before
-  enabling any non-empty container outcome;
+- obtain direct chest inventory transfer captures and any additional corpse
+  item outcomes before enabling content beyond the existing proven observations;
 - add safe restart reconstruction for an already-visible production corpse;
 - emit additional door, chest, machine, or objective state packets only when
   direct capture proves their values and ordering;
-- add live expiry scheduling, safe occupant evacuation, and exact
-  mission-corpse retirement before expired PF2 reuse;
+- add live expiry scheduling and safe occupant evacuation before expired PF2
+  reuse; exact corpse retirement is now part of invoked mission cleanup;
 - implement durable team-owned generated missions and reward distribution
   after stable team persistence exists; and
 - perform private-client end-to-end lifecycle validation.

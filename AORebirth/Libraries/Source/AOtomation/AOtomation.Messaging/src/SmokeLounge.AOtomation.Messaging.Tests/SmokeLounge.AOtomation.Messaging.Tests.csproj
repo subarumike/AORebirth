@@ -133,6 +133,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgOperationalStateStore.cs">
       <Link>MissionAcgOperationalStateStore.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgCorpsePolicy.cs">
+      <Link>MissionAcgCorpsePolicy.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgSpatialAuthority.cs">
       <Link>MissionAcgSpatialAuthority.cs</Link>
     </Compile>

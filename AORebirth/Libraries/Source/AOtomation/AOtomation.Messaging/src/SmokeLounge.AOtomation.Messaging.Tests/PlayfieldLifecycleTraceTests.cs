@@ -1232,7 +1232,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "public CapturedSubwayLootDefinition[] GetLootDefinitions()");
             string corpseRegistration = ExtractMethodBlock(
                 playfieldText,
-                "private void RegisterCorpse(ICharacter target, Identity corpseIdentity)");
+                "private bool RegisterCorpse(ICharacter target, Identity corpseIdentity)");
             string corpseVisualMap = ExtractMethodBlock(
                 corpseRulesText,
                 "public static Dictionary<int, int> BuildMonsterDataToCorpseCatMeshMap()");
@@ -4336,7 +4336,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpsePacketText.Contains("BuildCapturedSubwayThief("),
                 "Accepted Subway Thief must retain the exact captured corpse visual packet path.");
 
-            string registerCorpse = ExtractMethodBlock(playfieldText, "private void RegisterCorpse");
+            string registerCorpse = ExtractMethodBlock(playfieldText, "private bool RegisterCorpse");
             Assert.IsTrue(
                 playfieldText.Contains("CapturedSubwayThiefCorpseCatMesh = 5907")
                 && playfieldText.Contains("private static bool UsesCapturedThiefCorpseProfile(ICharacter target)")
@@ -6015,7 +6015,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("CorpseFullUpdate.Build("),
                 "Playfield intentionally keeps corpse packet emission outside NPCRuntimeService.");
             Assert.IsTrue(
-                playfieldText.Contains("private void RegisterCorpse(ICharacter target, Identity corpseIdentity)")
+                playfieldText.Contains("private bool RegisterCorpse(ICharacter target, Identity corpseIdentity)")
                 && playfieldText.Contains("private void DespawnCorpse(int corpseInstance)")
                 && playfieldText.Contains("this.corpseInventoryService.Create(state);")
                 && playfieldText.Contains("x => this.corpseInventoryService.Remove(x)")
@@ -6144,7 +6144,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string playfieldUseCorpse = ExtractMethodBlock(playfieldText, "public bool TryUseCorpse");
             string playfieldLootCorpseItem = ExtractMethodBlock(playfieldText, "public bool TryLootCorpseItem");
-            string registerCorpse = ExtractMethodBlock(playfieldText, "private void RegisterCorpse");
+            string registerCorpse = ExtractMethodBlock(playfieldText, "private bool RegisterCorpse");
             string playfieldPendingCredits = ExtractMethodBlock(playfieldText, "private void ProcessPendingCorpseCreditAwards");
             string corpseUse = ExtractMethodBlock(corpseAccessText, "internal bool TryUseCorpse<TCorpseState>(");
             string corpseLoot = ExtractMethodBlock(corpseAccessText, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");

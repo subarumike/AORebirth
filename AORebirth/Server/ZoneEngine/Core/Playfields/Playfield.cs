@@ -137,6 +137,10 @@ namespace AORebirth.Core.Playfields
         private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards =
             new Dictionary<int, PendingCorpseCreditAward>();
 
+        private readonly Dictionary<int, MissionAcgIdentityRecord>
+            pendingMissionCorpseCompletionResumes =
+                new Dictionary<int, MissionAcgIdentityRecord>();
+
         private int nextCorpseInstance = 0x00F0F000;
 
         private int nextCorpseInventoryHandle = 0x70;
@@ -2415,15 +2419,10 @@ namespace AORebirth.Core.Playfields
             {
                 itemLootLifetime = selectedCorpse.ItemLootLifetime;
                 emptyCleanupDelay = selectedCorpse.EmptyCleanupDelay;
-                if (MissionAcgOperationalRuntime.IsOperationalNpc(
-                        this.Identity.Instance,
-                        selectedCorpse.DeadNpcIdentity)
-                    && (selectedCorpse.VisualSource == null
-                        || looter == null
-                        || looter.Playfield == null
-                        || looter.Playfield.Identity.Instance != this.Identity.Instance
-                        || GetCombatDistance(looter, selectedCorpse.VisualSource)
-                           > NpcCombatAttackRules.MaxMeleeCombatDistance))
+                if (!this.TryAuthorizeGeneratedMissionCorpse(
+                        looter,
+                        selectedCorpse,
+                        true))
                 {
                     return false;
                 }
@@ -2454,6 +2453,23 @@ namespace AORebirth.Core.Playfields
 
         public bool TryUseDeadNpcCorpse(ICharacter looter, Identity deadNpcIdentity, out Identity corpseIdentity)
         {
+            CorpseState exactMissionCorpse = this.corpses.Values.FirstOrDefault(
+                corpse => corpse.IsGeneratedMissionCorpse
+                          && corpse.DeadNpcIdentity == deadNpcIdentity);
+            if (exactMissionCorpse != null)
+            {
+                corpseIdentity = exactMissionCorpse.CorpseIdentity;
+                return this.TryUseCorpse(looter, corpseIdentity);
+            }
+
+            if (MissionAcgAllocationService.IsAllocatableRange(this.Identity.Instance)
+                && MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                    this.Identity.Instance))
+            {
+                corpseIdentity = Identity.None;
+                return false;
+            }
+
             return this.runtimeSystems.TryUseDeadNpcCorpse(
                 looter,
                 deadNpcIdentity,
@@ -2478,15 +2494,17 @@ namespace AORebirth.Core.Playfields
                 ? CombatCorpseRules.EmptyCorpseCleanupAfterOpenedDelay
                 : selectedCorpse.EmptyCleanupDelay;
             if (selectedCorpse != null
-                && MissionAcgOperationalRuntime.IsOperationalNpc(
-                    this.Identity.Instance,
-                    selectedCorpse.DeadNpcIdentity)
-                && (selectedCorpse.VisualSource == null
-                    || looter == null
-                    || looter.Playfield == null
-                    || looter.Playfield.Identity.Instance != this.Identity.Instance
-                    || GetCombatDistance(looter, selectedCorpse.VisualSource)
-                       > NpcCombatAttackRules.MaxMeleeCombatDistance))
+                && !this.TryAuthorizeGeneratedMissionCorpse(
+                    looter,
+                    selectedCorpse,
+                    true))
+            {
+                return false;
+            }
+
+            if (selectedCorpse != null
+                && selectedCorpse.IsGeneratedMissionCorpse
+                && !selectedCorpse.Opened)
             {
                 return false;
             }
@@ -2577,6 +2595,16 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            if (!this.TryAuthorizeGeneratedMissionCorpse(looter, corpse, true))
+            {
+                return false;
+            }
+
+            if (corpse.IsGeneratedMissionCorpse && !corpse.Opened)
+            {
+                return false;
+            }
+
             CorpseLootItem lootItem = FindCorpseLootItem(corpse, slot);
             if (lootItem == null || lootItem.Looted)
             {
@@ -2613,6 +2641,63 @@ namespace AORebirth.Core.Playfields
                     lootItem.Slot,
                     corpse.LootItems.Count(x => !x.Looted)));
             return true;
+        }
+
+        private bool TryAuthorizeGeneratedMissionCorpse(
+            ICharacter looter,
+            CorpseState corpse,
+            bool requireInteractionDistance)
+        {
+            if (corpse == null)
+            {
+                return false;
+            }
+
+            if (!corpse.IsGeneratedMissionCorpse)
+            {
+                return true;
+            }
+
+            if (looter == null
+                || looter.Playfield == null
+                || looter.Playfield.Identity.Instance != this.Identity.Instance
+                || corpse.VisualSource == null)
+            {
+                return false;
+            }
+
+            double distance = requireInteractionDistance
+                ? GetCombatDistance(looter, corpse.VisualSource)
+                : 0.0;
+            string failure;
+            bool authorized = MissionAcgOperationalRuntime.TryValidateCorpseAccess(
+                looter.Identity.Instance,
+                this.Identity.Instance,
+                corpse.AcceptedQuestIdentity,
+                corpse.OwnerIdentity,
+                corpse.DeadNpcIdentity,
+                corpse.CorpseIdentity,
+                DateTime.UtcNow,
+                requireInteractionDistance,
+                distance,
+                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                out failure);
+            if (!authorized)
+            {
+                MissionDiagnostics.Log(
+                    "ACG-CORPSE-ACCESS-BLOCK accepted={0} owner={1} livePf2={2} corpse={3} reason={4}",
+                    corpse.AcceptedQuestIdentity == null
+                        ? 0
+                        : corpse.AcceptedQuestIdentity.Instance,
+                    looter.Identity.Instance,
+                    this.Identity.Instance,
+                    corpse.CorpseIdentity == null
+                        ? 0
+                        : corpse.CorpseIdentity.Instance,
+                    failure);
+            }
+
+            return authorized;
         }
 
         private void SendCorpseContainerAddItem(ICharacter looter, Identity sourceContainer, int targetPlacement)
@@ -3322,6 +3407,7 @@ namespace AORebirth.Core.Playfields
         {
             DateTime utcNow = DateTime.UtcNow;
             this.runtimeSystems.ProcessDueNpcCorpseDespawns(utcNow, this.DespawnCorpse);
+            this.ResumePendingMissionCorpseCompletions();
             this.runtimeSystems.ProcessDueCapturedSubwayRespawns(utcNow);
         }
 
@@ -3334,8 +3420,10 @@ namespace AORebirth.Core.Playfields
                 corpse => corpse.DeadNpcIdentity,
                 identity => this.FindByIdentity<ICharacter>(identity),
                 this.RegisterCorpse,
+                this.HandleCorpseSpawnFailed,
                 this.TraceCorpseFullUpdate,
                 this.SendCorpseFullUpdate);
+            this.ResumePendingMissionCorpseCompletions();
         }
 
         internal void ScheduleCorpseSpawn(ICharacter target, Identity corpseIdentity)
@@ -3377,6 +3465,31 @@ namespace AORebirth.Core.Playfields
                     (int)NpcCorpseLifecycleRules.CorpseSpawnDelay.TotalMilliseconds));
         }
 
+        internal bool HasExactCorpseLease(
+            Identity deadNpcIdentity,
+            Identity corpseIdentity)
+        {
+            if (deadNpcIdentity == null || corpseIdentity == null)
+            {
+                return false;
+            }
+
+            CorpseState pending;
+            if (this.pendingCorpseSpawns.TryGetValue(
+                    deadNpcIdentity.Instance,
+                    out pending)
+                && pending.DeadNpcIdentity == deadNpcIdentity
+                && pending.CorpseIdentity == corpseIdentity)
+            {
+                return true;
+            }
+
+            CorpseState available;
+            return this.corpses.TryGetValue(corpseIdentity.Instance, out available)
+                   && available.DeadNpcIdentity == deadNpcIdentity
+                   && available.CorpseIdentity == corpseIdentity;
+        }
+
         private static Item TryCreateMissionLootItem(int quality, int lowId, int highId)
         {
             if (lowId <= 0)
@@ -3401,8 +3514,35 @@ namespace AORebirth.Core.Playfields
             }
         }
 
-        private void RegisterCorpse(ICharacter target, Identity corpseIdentity)
+        private bool RegisterCorpse(ICharacter target, Identity corpseIdentity)
         {
+            if (target == null || target.Playfield == null || corpseIdentity == null)
+            {
+                return false;
+            }
+
+            MissionAcgIdentityRecord acceptedQuestIdentity = null;
+            MissionAcgIdentityRecord ownerIdentity = null;
+            bool operationalMissionNpc =
+                MissionAcgOperationalRuntime.IsOperationalNpc(
+                    this.Identity.Instance,
+                    target.Identity);
+            if (operationalMissionNpc
+                && !MissionAcgOperationalRuntime.TryResolveCorpseOwnership(
+                    this.Identity.Instance,
+                    target.Identity,
+                    corpseIdentity,
+                    out acceptedQuestIdentity,
+                    out ownerIdentity))
+            {
+                MissionDiagnostics.Log(
+                    "ACG-CORPSE-REGISTER-BLOCK runtime={0} corpse={1} livePf2={2} reason=ownership-mismatch",
+                    target.Identity.Instance,
+                    corpseIdentity.Instance,
+                    this.Identity.Instance);
+                return false;
+            }
+
             LootGenerationResult generatedLoot = GlobalLootRuntimeService.Generate(target, this.Identity.Instance);
             List<CorpseLootItem> lootItems = generatedLoot.Items
                 .Select((value, index) => new CorpseLootItem
@@ -3418,21 +3558,21 @@ namespace AORebirth.Core.Playfields
                     LootIdentity = this.AllocateCorpseLootItemIdentity()
                 })
                 .ToList();
-            bool operationalMissionNpc =
-                target != null
-                && MissionAcgOperationalRuntime.IsOperationalNpc(
-                    this.Identity.Instance,
-                    target.Identity);
             bool missionInteriorLoot =
-                target != null
-                && (operationalMissionNpc
-                    || ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
-                        this.Identity.Instance));
+                operationalMissionNpc
+                || ZoneEngine.Core.Missions.MissionInstanceService.IsMissionInstancePlayfield(
+                    this.Identity.Instance);
 
-            // Capture-backed mission interior drops (20260719-5-different-shape-fo-mish).
-            // ACG operational trash uses the same credits/sparse-item path — empty
-            // lifetimeSeconds=0 corpses despawn instantly and crash the client on kill.
-            if (missionInteriorLoot)
+            // Legacy mission-interior drops remain on their existing path.
+            // Operational ACG contents stay unresolved-empty; captured currency alone
+            // keeps the corpse lootable instead of lifetimeSeconds=0.
+            if (operationalMissionNpc)
+            {
+                // Captures prove corpse currency, not a generated item pool.
+                // Keep operational ACG corpse contents explicitly unresolved-empty.
+                lootItems.Clear();
+            }
+            else if (missionInteriorLoot)
             {
                 if (ZoneEngine.Core.Missions.MissionInstanceMobCombat.IsFindItemHost(target.Identity))
                 {
@@ -3470,8 +3610,13 @@ namespace AORebirth.Core.Playfields
                         missionQl = stampedQl;
                     }
 
-                    int salt = unchecked(target.Identity.Instance * 397) ^ monsterData;
-                    if ((Math.Abs(salt) % 10) == 0)
+                    int salt;
+                    if (MissionAcgCorpsePolicy.TryResolveLegacySignedSalt(
+                            target.Identity.Instance,
+                            monsterData,
+                            397u,
+                            out salt)
+                        && MissionAcgCorpsePolicy.StableBucket(salt, 10) == 0)
                     {
                         MissionInstanceLootCatalog.LootDrop drop;
                         if (MissionInstanceLootCatalog.TryGetMissionTrashDrop(
@@ -3482,16 +3627,31 @@ namespace AORebirth.Core.Playfields
                             && drop != null)
                         {
                             Item lootItem = TryCreateMissionLootItem(drop.Quality, drop.LowId, drop.HighId);
+                            bool alternateSaltValid = true;
                             if (lootItem == null)
                             {
-                                int salt2 = unchecked(target.Identity.Instance * 911);
-                                for (int attempt = 0; attempt < 8 && lootItem == null; attempt++)
+                                int salt2;
+                                alternateSaltValid =
+                                    MissionAcgCorpsePolicy.TryResolveLegacySignedSalt(
+                                        target.Identity.Instance,
+                                        0,
+                                        911u,
+                                        out salt2);
+                                for (int attempt = 0;
+                                    alternateSaltValid && attempt < 8 && lootItem == null;
+                                    attempt++)
                                 {
+                                    long candidate = (long)salt2 + ((long)attempt * 17L);
+                                    if (candidate < int.MinValue || candidate > int.MaxValue)
+                                    {
+                                        continue;
+                                    }
+
                                     MissionInstanceLootCatalog.LootDrop alt;
                                     if (!MissionInstanceLootCatalog.TryGetMissionTrashDrop(
                                             monsterData,
                                             missionQl,
-                                            salt2 + (attempt * 17),
+                                            (int)candidate,
                                             out alt)
                                         || alt == null)
                                     {
@@ -3502,7 +3662,7 @@ namespace AORebirth.Core.Playfields
                                 }
                             }
 
-                            if (lootItem == null)
+                            if (lootItem == null && alternateSaltValid)
                             {
                                 lootItem = TryCreateMissionLootItem(missionQl, 124444, 124445)
                                            ?? TryCreateMissionLootItem(1, 100010, 100010);
@@ -3570,10 +3730,18 @@ namespace AORebirth.Core.Playfields
             int credits = generatedLoot.Credits;
             // Capture 20260725-185432 mission trash corpses: credits 21–87 even when Items empty.
             // ACG operational NPCs previously forced credits=0 → Empty + instant despawn.
-            if (credits <= 0 && missionInteriorLoot && target != null)
+            if (operationalMissionNpc
+                && !MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                    target.Identity.Instance,
+                    this.Identity.Instance,
+                    out credits))
             {
-                int salt = unchecked(target.Identity.Instance * 131) ^ this.Identity.Instance;
-                credits = 20 + (Math.Abs(salt) % 68);
+                MissionDiagnostics.Log(
+                    "ACG-CORPSE-REGISTER-BLOCK runtime={0} corpse={1} livePf2={2} reason=credit-policy-invalid",
+                    target.Identity.Instance,
+                    corpseIdentity.Instance,
+                    this.Identity.Instance);
+                return false;
             }
             CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);
             TimeSpan lifetime = CorpseLifetimeFor(target, lootClass);
@@ -3614,6 +3782,9 @@ namespace AORebirth.Core.Playfields
             {
                 CorpseIdentity = corpseIdentity,
                 DeadNpcIdentity = target.Identity,
+                IsGeneratedMissionCorpse = operationalMissionNpc,
+                AcceptedQuestIdentity = acceptedQuestIdentity,
+                OwnerIdentity = ownerIdentity,
                 PlayfieldId = this.Identity.Instance,
                 VisualSource = target,
                 VisibleRecipients = new HashSet<Identity>(),
@@ -3624,9 +3795,12 @@ namespace AORebirth.Core.Playfields
                 Credits = credits,
                 GenerationResult = generatedLoot,
                 LootUnresolved =
-                    generatedLoot.LootUnresolved
+                    operationalMissionNpc
+                    || generatedLoot.LootUnresolved
                     || generatedLoot.CreditsUnresolved,
-                RightsPolicy = CorpseLootRightsPolicy.Public,
+                RightsPolicy = operationalMissionNpc
+                    ? CorpseLootRightsPolicy.OwnerOnly
+                    : CorpseLootRightsPolicy.Public,
                 InventoryHandle = this.AllocateCorpseInventoryHandle(),
                 ItemLootLifetime = itemLootLifetime,
                 EmptyCleanupDelay = emptyCleanupDelay,
@@ -3635,7 +3809,24 @@ namespace AORebirth.Core.Playfields
 
             this.corpseInventoryService.Create(state);
             this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);
-            MissionAcgOperationalRuntime.NotifyCorpseAvailable(target, corpseIdentity);
+            if (operationalMissionNpc
+                && !MissionAcgOperationalRuntime.NotifyCorpseAvailable(
+                    target,
+                    corpseIdentity))
+            {
+                // No visibility packet has been emitted yet. Remove only the
+                // process-local registration and leave durable state Pending so
+                // the exact identity can fail closed instead of becoming Cleaned.
+                this.runtimeSystems.ClearNpcCorpseDespawn(corpseIdentity.Instance);
+                this.corpseInventoryService.Remove(corpseIdentity.Instance);
+                this.pendingCorpseCreditAwards.Remove(corpseIdentity.Instance);
+                MissionDiagnostics.Log(
+                    "ACG-CORPSE-REGISTER-BLOCK runtime={0} corpse={1} livePf2={2} reason=availability-persist-failed recovery=durable-pending",
+                    target.Identity.Instance,
+                    corpseIdentity.Instance,
+                    this.Identity.Instance);
+                return false;
+            }
 
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
@@ -3646,6 +3837,7 @@ namespace AORebirth.Core.Playfields
                     (int)lifetime.TotalSeconds,
                     state.LootClass,
                     state.Credits));
+            return true;
         }
 
         private void TraceCorpseFullUpdate(Identity corpseIdentity, Identity deadNpcIdentity)
@@ -3664,9 +3856,6 @@ namespace AORebirth.Core.Playfields
             if (this.corpses.TryGetValue(corpseInstance, out corpse))
             {
                 this.runtimeSystems.NotifyPopulationCorpseRemoved(corpse.CorpseIdentity);
-                MissionAcgOperationalRuntime.NotifyCorpseRemoved(
-                    this.Identity.Instance,
-                    corpse.CorpseIdentity);
             }
 
             this.runtimeSystems.DespawnCorpse(
@@ -3675,6 +3864,84 @@ namespace AORebirth.Core.Playfields
                 this.runtimeSystems.ClearNpcCorpseDespawn,
                 x => this.corpseInventoryService.Remove(x),
                 x => this.pendingCorpseCreditAwards.Remove(x));
+
+            if (corpse != null)
+            {
+                this.RetireGeneratedMissionCorpseLease(
+                    corpse.DeadNpcIdentity,
+                    corpse.CorpseIdentity);
+            }
+        }
+
+        private void HandleCorpseSpawnFailed(
+            Identity deadNpcIdentity,
+            Identity corpseIdentity)
+        {
+            this.RetireGeneratedMissionCorpseLease(
+                deadNpcIdentity,
+                corpseIdentity);
+        }
+
+        private void RetireGeneratedMissionCorpseLease(
+            Identity deadNpcIdentity,
+            Identity corpseIdentity)
+        {
+            MissionAcgIdentityRecord acceptedQuestIdentity;
+            MissionAcgIdentityRecord ownerIdentity;
+            if (!MissionAcgOperationalRuntime.TryRetireCorpseLease(
+                    this.Identity.Instance,
+                    deadNpcIdentity,
+                    corpseIdentity,
+                    out acceptedQuestIdentity,
+                    out ownerIdentity))
+            {
+                return;
+            }
+
+            MissionAcgObjectiveRecord objective;
+            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    ownerIdentity.Instance,
+                    acceptedQuestIdentity.Instance,
+                    out objective)
+                || !MissionAcgCorpsePolicy
+                    .ShouldResumeCompletionAfterCorpseRetirement(
+                        objective,
+                        acceptedQuestIdentity,
+                        ownerIdentity,
+                        this.Identity.Instance,
+                    new MissionAcgIdentityRecord(
+                        (int)deadNpcIdentity.Type,
+                            deadNpcIdentity.Instance)))
+            {
+                return;
+            }
+
+            this.pendingMissionCorpseCompletionResumes[
+                acceptedQuestIdentity.Instance] = ownerIdentity;
+        }
+
+        private void ResumePendingMissionCorpseCompletions()
+        {
+            foreach (KeyValuePair<int, MissionAcgIdentityRecord> pending
+                in this.pendingMissionCorpseCompletionResumes.ToArray())
+            {
+                this.pendingMissionCorpseCompletionResumes.Remove(pending.Key);
+                ICharacter owner =
+                    this.FindByIdentity<ICharacter>(
+                        new Identity
+                        {
+                            Type = (IdentityType)pending.Value.Type,
+                            Instance = pending.Value.Instance
+                        });
+                IZoneClient ownerClient =
+                    owner == null || owner.Controller == null
+                        ? null
+                        : owner.Controller.Client as IZoneClient;
+                MissionAcgCompletionJournalService.ResumeForAccepted(
+                    ownerClient,
+                    owner,
+                    pending.Key);
+            }
         }
 
         private void ScheduleCorpseDespawn(CorpseState corpse, TimeSpan delay, string reason)
@@ -4018,6 +4285,11 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (!this.TryAuthorizeGeneratedMissionCorpse(looter, corpse, false))
+            {
+                return;
+            }
+
             if (this.pendingCorpseCreditAwards.ContainsKey(corpse.CorpseIdentity.Instance))
             {
                 return;
@@ -4060,6 +4332,11 @@ namespace AORebirth.Core.Playfields
         private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)
         {
             if (looter == null || corpse == null || corpse.CreditsLooted || corpse.Credits <= 0)
+            {
+                return;
+            }
+
+            if (!this.TryAuthorizeGeneratedMissionCorpse(looter, corpse, false))
             {
                 return;
             }
@@ -4242,6 +4519,7 @@ namespace AORebirth.Core.Playfields
                     {
                         this.pendingCorpseSpawns.Clear();
                         this.pendingCorpseCreditAwards.Clear();
+                        this.pendingMissionCorpseCompletionResumes.Clear();
                         this.corpseInventoryService.ClearPlayfield(this.Identity.Instance);
                     }
                     finally
