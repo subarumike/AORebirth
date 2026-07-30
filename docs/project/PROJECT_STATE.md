@@ -4,6 +4,16 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Arete Landing capture `20260722-104809` has been recovered from the public
+  handoff and offline-decoded with all `2,581` SCFUs and `275` corpse full
+  updates recovered without errors. Exact identity-linked loot now separates
+  Cleanmeister Intelligence Robot (`17` credits, two atomic snapshots),
+  Supreme Collector of Waste (`35` credits, two atomic snapshots), and
+  Malfunctioning Cleaning Robot (`5` credits, two empty snapshots) from the
+  previous shared MonsterData-only Cleaning Robot/Waste Collector fallbacks.
+  Snapshot probability and wider pools remain unresolved. SimpleChar
+  `78E0FC65` now uses its captured display name `Stanley Goodman`.
+
 - PF127/PF1931 named encounter completion is authoritative across 19 unique
   active combat/profile domains: 14 initial stages, two successors, two
   owned-add domains, and Murial's ordinary-owned named patrol. All active

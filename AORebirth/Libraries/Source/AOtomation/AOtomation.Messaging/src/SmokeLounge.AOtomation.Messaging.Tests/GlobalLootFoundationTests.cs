@@ -258,6 +258,39 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AretePartOneVariantLootRemainsNameScopedAndAtomic()
+        {
+            string source = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+
+            int cleanmeisterNameGate = source.IndexOf(
+                "this.EnsureAreteCleanmeister();",
+                StringComparison.Ordinal);
+            int supremeNameGate = source.IndexOf(
+                "this.EnsureAreteSupremeCollector();",
+                StringComparison.Ordinal);
+            int malfunctioningNameGate = source.IndexOf(
+                "this.EnsureAreteMalfunctioningRobot();",
+                StringComparison.Ordinal);
+            int sharedMonsterDataGate = source.IndexOf(
+                "if (context.MonsterData == AlexWasteMonsterData)",
+                StringComparison.Ordinal);
+
+            Assert.IsTrue(cleanmeisterNameGate >= 0 && cleanmeisterNameGate < sharedMonsterDataGate);
+            Assert.IsTrue(supremeNameGate >= 0 && supremeNameGate < sharedMonsterDataGate);
+            Assert.IsTrue(malfunctioningNameGate >= 0 && malfunctioningNameGate < sharedMonsterDataGate);
+            Assert.IsTrue(source.Contains("capture.20260722-104809.cleanmeister.7988C930"));
+            Assert.IsTrue(source.Contains("capture.20260722-104809.cleanmeister.7988CAD3"));
+            Assert.IsTrue(source.Contains("capture.20260722-104809.supreme-collector.79882C8F"));
+            Assert.IsTrue(source.Contains("capture.20260722-104809.supreme-collector.7988CB09"));
+            Assert.IsTrue(source.Contains("capture.20260722-104809.malfunctioning-robot.7988C9B9"));
+            Assert.IsTrue(source.Contains("capture.20260722-104809.malfunctioning-robot.7988C9BF"));
+            Assert.IsTrue(source.Contains("ObservedCorpseSnapshots = snapshots"));
+            Assert.IsTrue(source.Contains("ItemPoolUnresolved = true"));
+        }
+
+        [TestMethod]
         public void AssignmentPrecedenceAccumulatesStableGlobalFamilyEnemyDynaBossAndEncounterLayers()
         {
             LootTableRegistry registry = Registry();
