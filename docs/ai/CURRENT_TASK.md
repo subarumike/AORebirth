@@ -19,6 +19,11 @@ inventory and client-state reconciliation. Expiry wins before
 `RewardClaimStarted`; durable completion wins at and after that phase.
 Abandonment shares the same atomic owner gate: it may win only before the
 deadline and cannot interleave cleanup after expiry or durable completion owns.
+That gate also holds a short completion-transition lease across both durable
+`CompletionStarted` writes, closing the validation-to-persistence abandonment
+race without changing the persisted lifecycle model. Restart recovery accepts
+only the exact split state of binding `CompletionStarted` plus objective
+`ObjectiveVerified` and finishes the second write before the deadline.
 
 Inside-at-expiry evacuation is a provisional private-server policy: use the
 persisted exterior destination with the existing outdoor standoff when valid,

@@ -40,6 +40,9 @@ namespace ZoneEngine.Core.Missions
 
         private static readonly HashSet<int> CompletionClaims = new HashSet<int>();
 
+        private static readonly HashSet<int> CompletionTransitionClaims =
+            new HashSet<int>();
+
         private static readonly HashSet<int> CompletionOwned = new HashSet<int>();
 
         private static readonly HashSet<int> AbandonmentClaims = new HashSet<int>();
@@ -259,6 +262,7 @@ namespace ZoneEngine.Core.Missions
                     record.Binding.AcceptedQuestIdentity.Instance;
                 RetryAfterUtc.Remove(accepted);
                 CompletionOwned.Remove(accepted);
+                CompletionTransitionClaims.Remove(accepted);
                 AbandonmentClaims.Remove(accepted);
                 AbandonmentOwned.Remove(accepted);
                 ExpiryContext existing;
@@ -337,6 +341,8 @@ namespace ZoneEngine.Core.Missions
                     || context.Journal != null
                     || ExpiryClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
+                    || CompletionTransitionClaims.Contains(
+                        current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentOwned.Contains(
@@ -384,6 +390,8 @@ namespace ZoneEngine.Core.Missions
                     || !ByAccepted.TryGetValue(
                         current.Binding.AcceptedQuestIdentity.Instance,
                         out context)
+                    || CompletionTransitionClaims.Contains(
+                        current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentOwned.Contains(
@@ -405,6 +413,78 @@ namespace ZoneEngine.Core.Missions
             }
 
             return true;
+        }
+
+        internal static bool TryClaimCompletionTransition(
+            MissionAcgBindingRecord suppliedBinding,
+            MissionAcgObjectiveRecord objective,
+            out MissionAcgBindingRecord claimedBinding,
+            out string failure)
+        {
+            claimedBinding = null;
+            failure = string.Empty;
+            MissionAcgBindingRecord current;
+            if (!TryResolveExactCurrent(
+                suppliedBinding,
+                objective,
+                out current,
+                out failure))
+            {
+                return false;
+            }
+
+            int accepted =
+                current.Binding.AcceptedQuestIdentity.Instance;
+            lock (Gate)
+            {
+                ExpiryContext context;
+                if (!initialized
+                    || !ByAccepted.TryGetValue(accepted, out context)
+                    || !SameBindingIdentity(
+                        context.BindingRecord,
+                        current)
+                    || context.Journal != null
+                    || ExpiryClaims.Contains(accepted)
+                    || AbandonmentClaims.Contains(accepted)
+                    || AbandonmentOwned.Contains(accepted)
+                    || CompletionClaims.Contains(accepted)
+                    || CompletionOwned.Contains(accepted)
+                    || MissionAcgExpiryPolicy.IsDue(
+                        DateTime.UtcNow,
+                        current.Binding.ExpiryUtc)
+                    || (current.State.LifecycleState
+                        != MissionAcgLifecycleState.Accepted
+                        && current.State.LifecycleState
+                           != MissionAcgLifecycleState.Active
+                        && current.State.LifecycleState
+                           != MissionAcgLifecycleState.CompletionStarted)
+                    || objective.State.Phase
+                       != MissionAcgCompletionPhase.ObjectiveVerified)
+                {
+                    failure =
+                        "Another terminal lifecycle owns the completion transition.";
+                    return false;
+                }
+
+                if (!CompletionTransitionClaims.Add(accepted))
+                {
+                    failure =
+                        "A completion transition is already in progress.";
+                    return false;
+                }
+            }
+
+            claimedBinding = current;
+            return true;
+        }
+
+        internal static void ReleaseCompletionTransitionClaim(
+            int acceptedQuestInstance)
+        {
+            lock (Gate)
+            {
+                CompletionTransitionClaims.Remove(acceptedQuestInstance);
+            }
         }
 
         internal static bool TryClaimCompletionReward(
@@ -433,6 +513,7 @@ namespace ZoneEngine.Core.Missions
                     || context.Journal != null
                     || ExpiryClaims.Contains(accepted)
                     || CompletionOwned.Contains(accepted)
+                    || CompletionTransitionClaims.Contains(accepted)
                     || AbandonmentClaims.Contains(accepted)
                     || AbandonmentOwned.Contains(accepted)
                     || MissionAcgExpiryPolicy.IsDue(
@@ -519,6 +600,7 @@ namespace ZoneEngine.Core.Missions
                     || ExpiryClaims.Contains(accepted);
                 bool completionOwned =
                     CompletionClaims.Contains(accepted)
+                    || CompletionTransitionClaims.Contains(accepted)
                     || CompletionOwned.Contains(accepted)
                     || MissionAcgExpiryPolicy.IsCompletionOwned(
                         objective.State.Phase);
@@ -1330,6 +1412,7 @@ namespace ZoneEngine.Core.Missions
 
                 if (CompletionOwned.Contains(accepted)
                     || CompletionClaims.Contains(accepted)
+                    || CompletionTransitionClaims.Contains(accepted)
                     || AbandonmentClaims.Contains(accepted)
                     || AbandonmentOwned.Contains(accepted)
                     || !MissionAcgExpiryPolicy.CanBeginExpiry(
@@ -1785,6 +1868,8 @@ namespace ZoneEngine.Core.Missions
             int acceptedQuestInstance =
                 context.BindingRecord.Binding.AcceptedQuestIdentity.Instance;
             if (CompletionOwned.Contains(acceptedQuestInstance)
+                || CompletionTransitionClaims.Contains(
+                    acceptedQuestInstance)
                 || AbandonmentClaims.Contains(acceptedQuestInstance)
                 || AbandonmentOwned.Contains(acceptedQuestInstance))
             {

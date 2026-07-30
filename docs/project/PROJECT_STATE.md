@@ -212,7 +212,12 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   and mission-token progress. Completion wins only at or after durable
   `RewardClaimStarted`; expiry can still win earlier `CompletionStarted`
   records. Abandonment and expiry use one atomic accepted-quest owner gate, so
-  a stale worker cannot create competing terminal cleanup. Connected occupants
+  a stale worker cannot create competing terminal cleanup. The same gate holds
+  a short completion-transition lease until both binding and objective
+  `CompletionStarted` writes are durable, so abandonment cannot claim between
+  completion validation and persistence. The exact partial-write restart tuple
+  (`CompletionStarted` binding plus `ObjectiveVerified` objective) resumes only
+  the missing objective write before the deadline. Connected occupants
   are teleported to the exact validated exterior
   destination plus the existing outdoor standoff, with a side-hub fallback.
   That evacuation policy is private-server provisional, not official capture
