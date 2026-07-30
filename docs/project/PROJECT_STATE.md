@@ -200,8 +200,33 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   cleanup remains retryable. The objective cleanup-complete journal is
   persisted before the binding becomes `Cleaned`, PF2 release requires both
   durable owners, and stale binding state versions cannot overwrite the
-  completion-versus-abandonment winner. Live expiry scheduling,
-  occupant evacuation, and expiry-driven corpse retirement remain deferred.
+  completion-versus-abandonment winner.
+
+- Generated-terminal expiry is now live and restart-resumable. The immutable
+  absolute UTC `ExpiryUtc` persisted by the accepted binding is the sole
+  deadline authority; equality is expired and gameplay activity never extends
+  it. One process-wide one-second scheduler restores version-1 SHA-256
+  `mission-state/acg-expiry/*.expiry` journals before scanning and reconstructs
+  any incomplete cleaned-release PF2 hold before new allocation is exposed. Expiry
+  immediately blocks entry, objectives, interactions, combat, corpse access,
+  and mission-token progress. Completion wins only at or after durable
+  `RewardClaimStarted`; expiry can still win earlier `CompletionStarted`
+  records. Abandonment and expiry use one atomic accepted-quest owner gate, so
+  a stale worker cannot create competing terminal cleanup. Connected occupants
+  are teleported to the exact validated exterior
+  destination plus the existing outdoor standoff, with a side-hub fallback.
+  That evacuation policy is private-server provisional, not official capture
+  evidence. Cleanup removes only the accepted mission's NPCs, objective,
+  containers, corpses, spatial/materialized state, key/tool/item artifacts,
+  process registrations, and accepted sidecar. It sends Quest Delete but no
+  completion Action 59 or rewards. Offline owners retain
+  `RequiresOwnerReconciliation` and their PF2 reservation until reconnect.
+  PF2 release requires durable checkpoint completion, zero occupants, zero
+  residual runtime state, exact allocator ownership, and verified reservation
+  removal. Return stamps include accepted-quest and live-PF2 ownership so an
+  older same-marker mission cannot clear a newer mission's return route. No
+  schema, reward, slider, loot, token persistence, graph-loader,
+  ACG payload, or procedural-generation behavior changed.
 
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
   `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the

@@ -86,7 +86,9 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            if (!allocator.TryReservePlayfield(out livePlayfield2))
+            if (!allocator.TryReservePlayfield(
+                acceptedIdentity,
+                out livePlayfield2))
             {
                 allocator.RollbackUnpersisted(acceptedIdentity, null, 0);
                 failure = "Mission PF2 allocation range is exhausted.";

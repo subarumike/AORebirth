@@ -521,9 +521,9 @@ allowing a later stale write to resurrect the loser. Failed cleanup remains
 durable `CleanupPending` work for retry. Server shutdown preserves active or
 in-progress records.
 
-This pass does not add a live expiry scheduler, evacuate an occupant from an
-expiring PF2, or retire every mission-owned corpse before PF2 reuse. Those
-expiry/corpse boundaries remain deferred and must not be inferred from the
+Live expiry, occupant evacuation, exact corpse retirement, and verified PF2
+release are now implemented in the later live-expiry section below. The
+inside-at-expiry policy remains provisional and must not be inferred from the
 user-driven abandonment result.
 
 Stage 2 currently persists generated missions as explicit solo ownership, so
@@ -784,6 +784,129 @@ objective state, Stage 5 operational state, then Stage 6 spatial state.
 Completion, abandonment, expiry, and cleanup delete only the exact mission's
 spatial registration and sidecar. The envelope is never serialized or rerolled.
 
+## Live generated-mission expiry and verified cleanup
+
+### Deadline authority and scheduler
+
+The accepted `MissionAcgInstanceBinding.ExpiryUtc` is the sole deadline
+authority. It is stored as an absolute round-trip UTC timestamp, restored
+without recomputation, and never extended by entry, combat, interaction,
+logout, zoning, or server activity. The deadline comparison is inclusive:
+`nowUtc >= ExpiryUtc` is expired.
+
+`MissionAcgExpiryRuntime` owns one process-wide, non-reentrant one-second timer.
+Startup restores Stage 2 through Stage 6 durable state, loads and validates all
+expiry journals, reconstructs a conservative journal for a binding already
+marked expired, and processes overdue missions before normal reconnect
+completion recovery. Shutdown stops the timer, drains active expiry work before
+client/zone teardown, and preserves unfinished work.
+
+### Version-1 expiry journal
+
+Each generated mission uses one
+`mission-state/acg-expiry/<accepted-quest>.expiry` record. Format version 1
+snapshots the exact accepted quest, original offer, owner/team state, mission
+key, exterior and issuing-terminal identities, bundle ID and payload hash,
+building, allocated live PF2, accepted/expiry/detection/update times, status,
+retry count, last failure, and immutable `RequiresOwnerReconciliation`.
+
+Canonical invariant UTF-8 `key=value` fields are deterministically ordered,
+protected by `RecordSha256`, written through a same-directory temporary file,
+strictly read back, and atomically replaced. Unknown versions, truncation,
+integrity failures, duplicate accepted quests, orphan journals, or any binding,
+bundle, building, hash, owner, entrance, key, terminal, timestamp, or PF2
+mismatch fail closed.
+
+Cleanup checkpoints are monotonic and dependency-validated:
+`ExpiryDetected`, `CleanupStarted`, `InteractionsBlocked`,
+`OccupantsEvacuated`, `NpcsRemoved`, `ObjectivesRemoved`,
+`ContainersRemoved`, `CorpsesRemoved`, `InventoryArtifactsRemoved`,
+`RuntimeRegistrationsRemoved`, `OperationalStateFinalized`,
+`ClientMissionRemoved`, `ObjectiveCorpseCleanupVerified`,
+`BindingReleaseReady`, `Pf2ReleaseAttempted`, `Pf2ReleaseConfirmed`, and
+`CleanupComplete`. Journal status is `InProgress`, `RetryPending`,
+`TerminalFailure`, or `Complete`. Identical retry failures are persisted and
+logged at most once per 30 seconds so an offline owner does not cause
+one-second disk churn.
+
+### Race ownership and immediate blocking
+
+Expiry and completion share one accepted-quest claim boundary. Expiry may win
+for `Reserved`, `Accepted`, `Active`, or `CompletionStarted` work before
+`RewardClaimStarted`. Once `RewardClaimStarted` is durably owned, completion
+continues and expiry cannot take over. The winning state is persisted; stale
+writes cannot resurrect the loser.
+
+Abandonment uses the same accepted-quest owner gate. A pre-deadline
+abandonment claim blocks a stale expiry snapshot until `Abandoned` is durable;
+an expiry claim or journal blocks abandonment. The handler refreshes the exact
+binding and objective after claiming, and a failed pre-persistence claim is
+released. Durable abandonment remains cleanup-resumable after its original
+deadline without allowing expiry to become a second terminal owner.
+
+As soon as expiry is claimed, the exact objective becomes `Expired` and all
+new mission entry, objective interaction, item pickup, terminal/machine use,
+door/chest use, target selection, attacks, damage, corpse access, and
+mission-token progress fail closed. A completion-owned objective-corpse lease
+is permitted only after the durable reward-claim boundary; a pre-claim
+`CompletionStarted` corpse is not an expiry bypass.
+
+### Occupants, exact cleanup, and client state
+
+Connected occupants in the allocated PF2 are evacuated before release. The
+private-server policy uses the binding's finite, non-mission exterior
+destination plus the existing 12-unit outdoor marker standoff. If that exact
+destination is unsafe, the existing side-specific hub is used. Fighting and
+selected targets are cleared before teleport. This is a deterministic safety
+policy, not confirmed official inside-at-expiry behavior; an official capture
+is still required to replace it.
+
+Cleanup is scoped by accepted quest, owner, allocated PF2, runtime identity,
+and persisted artifact identity. It removes only that mission's NPC/combat
+registrations, objective, doors/chests/terminals/machines, corpse leases,
+container state, spatial/materialized state, process-local routing/token state,
+exact mission key, and exact Return Item or Repair artifact. Inventory writes
+are rollback-safe: a failed owner inventory persistence restores the removed
+instance to its original slot. Accepted-sidecar removal uses a strict
+type-and-instance match and refuses malformed input rather than treating it as
+an empty list. Template-only deletion, newest-mission fallback, character-wide
+token clearing, and another mission's same-template artifacts are not used.
+
+The exact accepted sidecar is atomically removed only after durable cleanup.
+The server sends the exact Quest Delete and records that send; it does not send
+completion Action 59 and grants no credits, XP, or item reward. “Sent” is not
+described as client-acknowledged because no acknowledgement exists.
+
+If the owner is offline, server-owned runtime content may be removed, but exact
+owner inventory/client reconciliation remains pending. The durable
+`RequiresOwnerReconciliation` flag survives restart and the PF2 remains
+reserved until the owner reconnects. Retryable absence or transient
+persistence/teleport failure remains `RetryPending`; malformed identity,
+ownership, or integrity state fails closed instead of releasing the PF2.
+Process-local outdoor return stamps carry accepted-quest and allocated-live-PF2
+ownership in addition to the exterior coordinate, so expiry cleanup for an
+older same-marker mission cannot clear a newer mission's return route.
+
+### PF2 release proof
+
+The binding may become `Cleaned` and its allocator reservation may be released
+only after all journal checkpoints are durable, no eligible occupant remains,
+all Stage 3 through Stage 6 runtime owners report no residual state, exact
+objective/corpse cleanup is verified, owner artifacts and client mission state
+are reconciled, and allocator ownership still maps that live PF2 to the exact
+accepted quest. Release is idempotent for the same accepted quest and rejects a
+different owner. The journal records attempted release before the allocator
+mutation and before the binding becomes `Cleaned`, verifies that both
+reservation and reverse owner mapping are absent, then records
+`Pf2ReleaseConfirmed` and `CleanupComplete`. A process-local allocator
+tombstone prevents reuse between reservation removal and durable journal
+confirmation. If restart occurs after the release mutation but before
+confirmation, startup reconstructs that hold from the incomplete cleaned
+journal before allocator access or new acceptance is exposed. Attempted intent
+plus verified total allocator/index absence may then complete the journal; a
+write failure retains the hold, and any reservation or live binding for that
+PF2 fails closed. Server shutdown never releases active persistent bindings.
+
 ## Live validation repair: 2026-07-29
 
 A level-4 neutral character at terminal PF `655` successfully rolled, accepted,
@@ -874,8 +997,8 @@ The following work remains intentionally deferred:
 - add safe restart reconstruction for an already-visible production corpse;
 - emit additional door, chest, machine, or objective state packets only when
   direct capture proves their values and ordering;
-- add live expiry scheduling and safe occupant evacuation before expired PF2
-  reuse; exact corpse retirement is now part of invoked mission cleanup;
+- capture official inside-at-expiry behavior before replacing the documented
+  provisional exterior-or-side-hub evacuation policy;
 - implement durable team-owned generated missions and reward distribution
   after stable team persistence exists; and
 - perform private-client end-to-end lifecycle validation.

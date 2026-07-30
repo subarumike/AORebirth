@@ -19,6 +19,10 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
+            MissionAcgExpiryRuntime.ProcessForCharacter(
+                client,
+                character);
+
             MissionAcgCompletionJournalService.ResumeForCharacter(
                 client,
                 character);
@@ -29,6 +33,11 @@ namespace ZoneEngine.Core.Missions
             for (int i = 0; i < work.Count; i++)
             {
                 MissionAcgBindingRecord record = work[i];
+                if (MissionAcgExpiryRuntime.OwnsCleanup(record))
+                {
+                    continue;
+                }
+
                 MissionAcgBindingRecord cleaned;
                 string failure;
                 if (!TryCleanupOwnedRecord(

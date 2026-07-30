@@ -94,11 +94,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void TwoAcceptedMissionsAndTwoOwnersReceiveDistinctLivePlayfields()
         {
             var allocator = new MissionAcgAllocationService(this.catalog);
+            MissionAcgIdentityRecord firstAccepted;
+            MissionAcgIdentityRecord secondAccepted;
             int first;
             int second;
-            Assert.IsTrue(allocator.TryReservePlayfield(out first));
-            Assert.IsTrue(allocator.TryReservePlayfield(out second));
+            Assert.IsTrue(
+                allocator.TryReserveAcceptedQuestIdentity(out firstAccepted));
+            Assert.IsTrue(
+                allocator.TryReservePlayfield(firstAccepted, out first));
+            Assert.IsTrue(
+                allocator.TryReserveAcceptedQuestIdentity(out secondAccepted));
+            Assert.IsTrue(
+                allocator.TryReservePlayfield(secondAccepted, out second));
             Assert.AreNotEqual(first, second);
+            Assert.IsTrue(allocator.IsReservedBy(first, firstAccepted));
+            Assert.IsTrue(allocator.IsReservedBy(second, secondAccepted));
 
             MissionAcgBindingRecord ownerOne = this.CreateRecord(3, 10, first, 3);
             MissionAcgBindingRecord ownerTwo = this.CreateRecord(4, 20, second, 4);
@@ -192,8 +202,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var allocator = new MissionAcgAllocationService(this.catalog);
             for (int i = 0; i < 32; i++)
             {
+                MissionAcgIdentityRecord accepted;
                 int live;
-                Assert.IsTrue(allocator.TryReservePlayfield(out live));
+                Assert.IsTrue(
+                    allocator.TryReserveAcceptedQuestIdentity(out accepted));
+                Assert.IsTrue(
+                    allocator.TryReservePlayfield(accepted, out live));
                 Assert.AreNotEqual(
                     MissionAcgAllocationService.LegacySharedPlayfield2,
                     live);
@@ -326,7 +340,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             MissionAcgIdentityRecord key;
             int live;
             Assert.IsTrue(allocator.TryReserveAcceptedQuestIdentity(out accepted));
-            Assert.IsTrue(allocator.TryReservePlayfield(out live));
+            Assert.IsTrue(allocator.TryReservePlayfield(accepted, out live));
             Assert.IsTrue(allocator.TryReserveMissionKeyIdentity(out key));
             allocator.RollbackUnpersisted(accepted, key, live);
             Assert.IsFalse(allocator.IsReserved(live));
@@ -341,9 +355,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 - MissionAcgAllocationService.MinimumLivePlayfield2
                 + 1;
             int allocatedCount = 0;
-            int live;
-            while (allocator.TryReservePlayfield(out live))
+            int live = 0;
+            while (true)
             {
+                MissionAcgIdentityRecord accepted;
+                Assert.IsTrue(
+                    allocator.TryReserveAcceptedQuestIdentity(out accepted));
+                if (!allocator.TryReservePlayfield(accepted, out live))
+                {
+                    allocator.RollbackUnpersisted(accepted, null, 0);
+                    break;
+                }
+
                 allocatedCount++;
                 Assert.AreNotEqual(
                     MissionAcgAllocationService.LegacySharedPlayfield2,
@@ -364,8 +387,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var allocator = new MissionAcgAllocationService(this.catalog);
             string failure;
             Assert.IsTrue(allocator.TryRestore(new[] { record }, out failure), failure);
+            MissionAcgIdentityRecord accepted;
             int allocated;
-            Assert.IsTrue(allocator.TryReservePlayfield(out allocated));
+            Assert.IsTrue(
+                allocator.TryReserveAcceptedQuestIdentity(out accepted));
+            Assert.IsTrue(
+                allocator.TryReservePlayfield(accepted, out allocated));
             Assert.AreNotEqual(restoredPf, allocated);
         }
 
@@ -411,11 +438,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void PlayfieldReleaseRequiresTerminalCleanupAndAffectsOnlyOwnBinding()
         {
             var allocator = new MissionAcgAllocationService(this.catalog);
-            int first;
-            int second;
-            Assert.IsTrue(allocator.TryReservePlayfield(out first));
-            Assert.IsTrue(allocator.TryReservePlayfield(out second));
-            MissionAcgBindingRecord record = this.CreateRecord(20, 79, first, 20);
+            MissionAcgBindingRecord record =
+                this.CreateRecord(20, 79, FirstLivePf(), 20);
+            MissionAcgBindingRecord other =
+                this.CreateRecord(21, 80, NextLivePf(FirstLivePf()), 21);
+            string failure;
+            Assert.IsTrue(
+                allocator.TryRestore(new[] { record, other }, out failure),
+                failure);
             Assert.IsFalse(allocator.ReleaseAfterCleanup(record));
             MissionAcgInstanceState abandoned =
                 record.State.Transition(
@@ -433,9 +463,228 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     MissionAcgCleanupState.Completed,
                     DateTime.UtcNow);
             Assert.IsTrue(
-                allocator.ReleaseAfterCleanup(record.WithState(cleaned)));
-            Assert.IsFalse(allocator.IsReserved(first));
-            Assert.IsTrue(allocator.IsReserved(second));
+                allocator.ReleaseAfterCleanup(
+                    record.WithState(cleaned),
+                    true));
+            Assert.IsTrue(
+                allocator.ReleaseAfterCleanup(
+                    record.WithState(cleaned),
+                    true));
+            Assert.IsTrue(
+                allocator.IsReleasePendingJournalConfirmation(
+                    record.Binding.AllocatedLivePlayfield2));
+            Assert.IsFalse(
+                allocator.IsReserved(record.Binding.AllocatedLivePlayfield2));
+            Assert.IsTrue(
+                allocator.IsReserved(other.Binding.AllocatedLivePlayfield2));
+            Assert.IsTrue(
+                allocator.ConfirmReleaseAfterDurableJournal(
+                    record.WithState(cleaned)));
+            Assert.IsFalse(
+                allocator.IsReleasePendingJournalConfirmation(
+                    record.Binding.AllocatedLivePlayfield2));
+            Assert.IsTrue(
+                allocator.ReleaseAfterCleanup(other.WithState(cleaned)));
+            Assert.IsFalse(
+                allocator.IsReleasePendingJournalConfirmation(
+                    other.Binding.AllocatedLivePlayfield2));
+        }
+
+        [TestMethod]
+        public void RestartRestoresPendingReleaseHoldBeforePf2Reuse()
+        {
+            MissionAcgBindingRecord active =
+                this.CreateRecord(22, 81, FirstLivePf(), 22);
+            MissionAcgInstanceState abandoned =
+                active.State.Transition(
+                    MissionAcgLifecycleState.Abandoned,
+                    MissionAcgCleanupState.KeyRemovalPending,
+                    DateTime.UtcNow);
+            MissionAcgInstanceState pending =
+                abandoned.Transition(
+                    MissionAcgLifecycleState.CleanupPending,
+                    MissionAcgCleanupState.InstanceReleasePending,
+                    DateTime.UtcNow);
+            MissionAcgBindingRecord cleaned =
+                active.WithState(
+                    pending.Transition(
+                        MissionAcgLifecycleState.Cleaned,
+                        MissionAcgCleanupState.Completed,
+                        DateTime.UtcNow));
+            var allocator = new MissionAcgAllocationService(this.catalog);
+            string failure;
+            Assert.IsTrue(
+                allocator.TryRestore(new[] { cleaned }, out failure),
+                failure);
+            Assert.IsTrue(
+                allocator.TryRestoreReleasePendingJournalConfirmation(
+                    cleaned,
+                    out failure),
+                failure);
+            Assert.IsTrue(
+                allocator.IsReleasePendingJournalConfirmation(
+                    cleaned.Binding.AllocatedLivePlayfield2));
+            Assert.IsFalse(
+                allocator.IsReserved(
+                    cleaned.Binding.AllocatedLivePlayfield2));
+            Assert.IsTrue(
+                allocator.ConfirmReleaseAfterDurableJournal(cleaned));
+            Assert.IsFalse(
+                allocator.IsReleasePendingJournalConfirmation(
+                    cleaned.Binding.AllocatedLivePlayfield2));
+
+            MissionAcgBindingRecord conflicting =
+                this.CreateRecord(
+                    23,
+                    82,
+                    cleaned.Binding.AllocatedLivePlayfield2,
+                    23);
+            var conflictAllocator =
+                new MissionAcgAllocationService(this.catalog);
+            Assert.IsTrue(
+                conflictAllocator.TryRestore(
+                    new[] { cleaned, conflicting },
+                    out failure),
+                failure);
+            Assert.IsFalse(
+                conflictAllocator.TryRestoreReleasePendingJournalConfirmation(
+                    cleaned,
+                    out failure));
+            StringAssert.Contains(failure, "actively reserved");
+        }
+
+        [TestMethod]
+        public void OutdoorReturnStampRequiresExactAcceptedQuestAndLivePf2()
+        {
+            MissionAcgBindingRecord older =
+                this.CreateRecord(24, 83, FirstLivePf(), 24);
+            MissionAcgBindingRecord newer =
+                this.CreateRecord(
+                    25,
+                    83,
+                    NextLivePf(FirstLivePf()),
+                    25);
+            MissionAcgOutdoorReturnStamp olderStamp =
+                MissionAcgOutdoorReturnStamp.CreateGenerated(older.Binding);
+            MissionAcgOutdoorReturnStamp newerStamp =
+                MissionAcgOutdoorReturnStamp.CreateGenerated(newer.Binding);
+
+            Assert.IsTrue(olderStamp.Matches(older.Binding));
+            Assert.IsFalse(olderStamp.Matches(newer.Binding));
+            Assert.IsTrue(newerStamp.Matches(newer.Binding));
+            Assert.IsFalse(newerStamp.Matches(older.Binding));
+            Assert.AreEqual(
+                older.Binding.ExteriorEntranceIdentity.Instance,
+                newer.Binding.ExteriorEntranceIdentity.Instance);
+            Assert.AreEqual(older.Binding.ExteriorX, newer.Binding.ExteriorX);
+            Assert.AreEqual(older.Binding.ExteriorY, newer.Binding.ExteriorY);
+            Assert.AreEqual(older.Binding.ExteriorZ, newer.Binding.ExteriorZ);
+            Assert.IsFalse(
+                MissionAcgOutdoorReturnStamp.CreateLegacy(
+                    older.Binding.ExteriorEntranceIdentity.Instance,
+                    older.Binding.ExteriorX,
+                    older.Binding.ExteriorY,
+                    older.Binding.ExteriorZ)
+                    .Matches(older.Binding));
+        }
+
+        [TestMethod]
+        public void SameAcceptedQuestReservationRetryReturnsTheSamePlayfield()
+        {
+            var allocator = new MissionAcgAllocationService(this.catalog);
+            MissionAcgIdentityRecord accepted;
+            int first;
+            int retry;
+            Assert.IsTrue(
+                allocator.TryReserveAcceptedQuestIdentity(out accepted));
+            Assert.IsTrue(allocator.TryReservePlayfield(accepted, out first));
+            Assert.IsTrue(allocator.TryReservePlayfield(accepted, out retry));
+            Assert.AreEqual(first, retry);
+
+            MissionAcgIdentityRecord owner;
+            Assert.IsTrue(
+                allocator.TryGetReservationOwner(first, out owner));
+            Assert.AreEqual(accepted, owner);
+        }
+
+        [TestMethod]
+        public void WrongAcceptedQuestCannotReleaseAnotherReservation()
+        {
+            MissionAcgBindingRecord owner =
+                this.CreateRecord(22, 81, FirstLivePf(), 22);
+            MissionAcgBindingRecord other =
+                this.CreateRecord(23, 82, NextLivePf(FirstLivePf()), 23);
+            var allocator = new MissionAcgAllocationService(this.catalog);
+            string failure;
+            Assert.IsTrue(
+                allocator.TryRestore(new[] { owner, other }, out failure),
+                failure);
+
+            MissionAcgInstanceState abandoned =
+                other.State.Transition(
+                    MissionAcgLifecycleState.Abandoned,
+                    MissionAcgCleanupState.KeyRemovalPending,
+                    DateTime.UtcNow);
+            MissionAcgInstanceState pending =
+                abandoned.Transition(
+                    MissionAcgLifecycleState.CleanupPending,
+                    MissionAcgCleanupState.InstanceReleasePending,
+                    DateTime.UtcNow);
+            MissionAcgInstanceState cleaned =
+                pending.Transition(
+                    MissionAcgLifecycleState.Cleaned,
+                    MissionAcgCleanupState.Completed,
+                    DateTime.UtcNow);
+            MissionAcgInstanceBinding wrongOwnerBinding =
+                MissionAcgInstanceBinding.CreateDurable(
+                    other.Binding.AcceptedQuestIdentity,
+                    other.Binding.OriginalOfferIdentity,
+                    other.Binding.OwnerIdentity,
+                    other.Binding.TeamIdentity,
+                    other.Binding.MissionType,
+                    other.Binding.MissionQuality,
+                    other.Binding.DeterministicSeed,
+                    other.Binding.MissionKeyIdentity,
+                    other.Binding.ExteriorEntranceIdentity,
+                    other.Binding.ExteriorEntranceLow,
+                    other.Binding.ExteriorEntranceHigh,
+                    other.Binding.ExteriorX,
+                    other.Binding.ExteriorY,
+                    other.Binding.ExteriorZ,
+                    other.Binding.IssuingTerminalIdentity,
+                    this.catalog.FindByLayoutId(
+                        other.Binding.SelectedBundleId),
+                    owner.Binding.AllocatedLivePlayfield2,
+                    other.Binding.AcceptedUtc,
+                    other.Binding.ExpiryUtc);
+            MissionAcgBindingRecord wrongOwner =
+                new MissionAcgBindingRecord(
+                    wrongOwnerBinding,
+                    cleaned,
+                    "wrong-owner.acg");
+
+            Assert.IsFalse(allocator.ReleaseAfterCleanup(wrongOwner));
+            Assert.IsTrue(
+                allocator.IsReserved(owner.Binding.AllocatedLivePlayfield2));
+            Assert.IsTrue(
+                allocator.IsReserved(other.Binding.AllocatedLivePlayfield2));
+        }
+
+        [TestMethod]
+        public void FailedRestoreDoesNotLeavePartialReservations()
+        {
+            int live = FirstLivePf();
+            var allocator = new MissionAcgAllocationService(this.catalog);
+            string failure;
+            Assert.IsFalse(
+                allocator.TryRestore(
+                    new[]
+                    {
+                        this.CreateRecord(24, 83, live, 24),
+                        this.CreateRecord(25, 84, live, 25)
+                    },
+                    out failure));
+            Assert.IsFalse(allocator.IsReserved(live));
         }
 
         [TestMethod]

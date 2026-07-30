@@ -88,6 +88,8 @@
     <Compile Include="MissionAcgObjectiveCompletionTests.cs" />
     <Compile Include="MissionAcgOperationalRuntimeTests.cs" />
     <Compile Include="MissionAcgSpatialRuntimeTests.cs" />
+    <Compile Include="MissionAcgExpiryStateStoreTests.cs" />
+    <Compile Include="MissionAcgExpiryRuntimeContractTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
@@ -114,6 +116,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingStore.cs">
       <Link>MissionAcgBindingStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgExpiryState.cs">
+      <Link>MissionAcgExpiryState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgExpiryStateStore.cs">
+      <Link>MissionAcgExpiryStateStore.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAllocationService.cs">
       <Link>MissionAcgAllocationService.cs</Link>

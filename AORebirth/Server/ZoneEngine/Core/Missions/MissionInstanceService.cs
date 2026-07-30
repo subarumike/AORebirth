@@ -78,19 +78,9 @@ namespace ZoneEngine.Core.Missions
         /// Outdoor return stamped at enter (character id → marker/outdoor). Survives mission
         /// complete deleting AcceptedStore — otherwise exit falls back to Rome Blue.
         /// </summary>
-        private static readonly Dictionary<int, OutdoorReturn> ReturnByCharacter =
-            new Dictionary<int, OutdoorReturn>();
-
-        private sealed class OutdoorReturn
-        {
-            public int Playfield;
-
-            public float X;
-
-            public float Y;
-
-            public float Z;
-        }
+        private static readonly Dictionary<int, MissionAcgOutdoorReturnStamp>
+            ReturnByCharacter =
+                new Dictionary<int, MissionAcgOutdoorReturnStamp>();
 
 
         internal static bool IsMissionInstancePlayfield(int playfieldInstance)
@@ -638,10 +628,7 @@ namespace ZoneEngine.Core.Missions
                     materialized.Bundle.SourcePlayfield2);
                 StampOutdoorReturn(
                     character.Identity.Instance,
-                    exact.Binding.ExteriorEntranceIdentity.Instance,
-                    exact.Binding.ExteriorX,
-                    exact.Binding.ExteriorY,
-                    exact.Binding.ExteriorZ);
+                    exact.Binding);
                 MissionTokenProgressTracker.BindCharacter(
                     exact.Binding.AllocatedLivePlayfield2,
                     character.Identity.Instance);
@@ -920,6 +907,185 @@ namespace ZoneEngine.Core.Missions
         }
 
         /// <summary>
+        /// Evacuates one connected occupant from the exact expired generated mission PF2.
+        /// The persisted exterior marker is authoritative when it is a finite outdoor
+        /// destination; malformed or unsafe destinations fall back to the character's
+        /// side hub without consulting another accepted mission.
+        /// </summary>
+        internal static bool TryEvacuateExpiredMissionOccupant(
+            ICharacter character,
+            MissionAcgBindingRecord record,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (character == null
+                || character.Playfield == null
+                || record == null
+                || record.Binding == null)
+            {
+                failure = "Expired mission evacuation requires a character and exact binding.";
+                return false;
+            }
+
+            MissionAcgInstanceBinding binding = record.Binding;
+            int livePlayfield = binding.AllocatedLivePlayfield2;
+            if (!MissionAcgAllocationService.IsAllocatableRange(livePlayfield)
+                || character.Playfield.Identity.Instance != livePlayfield)
+            {
+                failure = "Character is not inside the exact generated mission PF2.";
+                return false;
+            }
+
+            int destinationPlayfield = 0;
+            float destinationX = 0;
+            float destinationY = 0;
+            float destinationZ = 0;
+            bool usedFallback = true;
+            if (binding.ExteriorEntranceIdentity != null)
+            {
+                int exteriorPlayfield = binding.ExteriorEntranceIdentity.Instance;
+                if (exteriorPlayfield != 0
+                    && exteriorPlayfield != MissionAcgAllocationService.LegacySharedPlayfield2
+                    && !IsMissionInstancePlayfield(exteriorPlayfield)
+                    && IsFinite(binding.ExteriorX)
+                    && IsFinite(binding.ExteriorY)
+                    && IsFinite(binding.ExteriorZ))
+                {
+                    destinationPlayfield = exteriorPlayfield;
+                    destinationX = binding.ExteriorX;
+                    destinationY = binding.ExteriorY;
+                    destinationZ = binding.ExteriorZ;
+                    usedFallback = false;
+                }
+            }
+
+            if (!usedFallback)
+            {
+                destinationX += OutdoorExitMarkerStandoff;
+            }
+
+            if (usedFallback)
+            {
+                ApplySideHubFallback(
+                    character,
+                    out destinationPlayfield,
+                    out destinationX,
+                    out destinationY,
+                    out destinationZ);
+            }
+
+            if (destinationPlayfield == 0
+                || destinationPlayfield == MissionAcgAllocationService.LegacySharedPlayfield2
+                || IsMissionInstancePlayfield(destinationPlayfield)
+                || !IsFinite(destinationX)
+                || !IsFinite(destinationY)
+                || !IsFinite(destinationZ))
+            {
+                failure = "Expired mission evacuation has no safe outdoor destination.";
+                return false;
+            }
+
+            character.DoNotDoTimers = false;
+            character.FightingTarget = Identity.None;
+            character.SelectedTarget = Identity.None;
+            character.Teleport(
+                new Coordinate
+                {
+                    x = destinationX,
+                    y = destinationY,
+                    z = destinationZ
+                },
+                character.Heading,
+                new Identity
+                {
+                    Type = IdentityType.Playfield,
+                    Instance = destinationPlayfield
+                });
+            AORebirth.Core.Playfields.Playfield.ArmPostZoneCollisionGrace(character);
+            ClearOutdoorReturnIfMatches(
+                character.Identity.Instance,
+                binding);
+
+            MissionDiagnostics.Log(
+                "EXPIRY-EVACUATE char={0} accepted={1}:{2} fromPf2={3} destPf={4} dest=({5},{6},{7}) fallback={8}",
+                character.Identity.Instance,
+                binding.AcceptedQuestIdentity.Type,
+                binding.AcceptedQuestIdentity.Instance,
+                livePlayfield,
+                destinationPlayfield,
+                destinationX,
+                destinationY,
+                destinationZ,
+                usedFallback);
+            return true;
+        }
+
+        /// <summary>
+        /// Removes only process-local compatibility state owned by the exact generated
+        /// mission binding. Durable binding, layout, objective and operational state
+        /// remain owned by their dedicated stores.
+        /// </summary>
+        internal static bool ClearGeneratedInstanceProcessState(MissionAcgBindingRecord record)
+        {
+            if (record == null || record.Binding == null)
+            {
+                return false;
+            }
+
+            MissionAcgInstanceBinding binding = record.Binding;
+            int livePlayfield = binding.AllocatedLivePlayfield2;
+            if (!MissionAcgAllocationService.IsAllocatableRange(livePlayfield))
+            {
+                return false;
+            }
+
+            lock (ObjectiveGate)
+            {
+                ObjectiveByPlayfield.Remove(livePlayfield);
+                QualityByPlayfield.Remove(livePlayfield);
+                TargetNameByPlayfield.Remove(livePlayfield);
+                TargetSideByPlayfield.Remove(livePlayfield);
+                ShapeSourceByPlayfield.Remove(livePlayfield);
+                MissionAcgOutdoorReturnStamp outdoorReturn;
+                if (ReturnByCharacter.TryGetValue(
+                        binding.OwnerIdentity.Instance,
+                        out outdoorReturn)
+                    && outdoorReturn != null
+                    && outdoorReturn.Matches(binding))
+                {
+                    ReturnByCharacter.Remove(binding.OwnerIdentity.Instance);
+                }
+            }
+
+            MissionTokenProgressTracker.ClearPlayfield(livePlayfield);
+            return true;
+        }
+
+        internal static bool HasGeneratedInstanceProcessState(
+            MissionAcgBindingRecord record)
+        {
+            if (record == null || record.Binding == null)
+            {
+                return true;
+            }
+
+            int livePlayfield = record.Binding.AllocatedLivePlayfield2;
+            bool hasProcessState;
+            lock (ObjectiveGate)
+            {
+                hasProcessState =
+                    ObjectiveByPlayfield.ContainsKey(livePlayfield)
+                    || QualityByPlayfield.ContainsKey(livePlayfield)
+                    || TargetNameByPlayfield.ContainsKey(livePlayfield)
+                    || TargetSideByPlayfield.ContainsKey(livePlayfield)
+                    || ShapeSourceByPlayfield.ContainsKey(livePlayfield);
+            }
+
+            return hasProcessState
+                   || MissionTokenProgressTracker.HasPlayfield(livePlayfield);
+        }
+
+        /// <summary>
         /// True when the use-target is an interior door usable for exit (any Door/MissionEntrance inside instance).
         /// </summary>
         internal static bool IsMissionExitDoorTarget(Identity target)
@@ -1049,7 +1215,7 @@ namespace ZoneEngine.Core.Missions
 
             if (character != null)
             {
-                OutdoorReturn stamped;
+                MissionAcgOutdoorReturnStamp stamped;
                 if (TryGetOutdoorReturn(character.Identity.Instance, out stamped)
                     && stamped != null
                     && stamped.Playfield != 0)
@@ -1091,12 +1257,29 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
-            OutdoorReturn existing;
+            MissionAcgOutdoorReturnStamp existing;
             if (TryGetOutdoorReturn(character.Identity.Instance, out existing)
                 && existing != null
                 && existing.Playfield != 0)
             {
                 return;
+            }
+
+            if (character.Playfield != null)
+            {
+                MissionAcgBindingRecord exact;
+                if (MissionAcgBindingRuntime.TryResolveByLivePlayfield(
+                        character.Playfield.Identity.Instance,
+                        out exact)
+                    && exact != null
+                    && exact.Binding.OwnerIdentity.Instance
+                       == character.Identity.Instance)
+                {
+                    StampOutdoorReturn(
+                        character.Identity.Instance,
+                        exact.Binding);
+                    return;
+                }
             }
 
             List<MissionAcceptedStore.AcceptedMission> all =
@@ -1157,6 +1340,11 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        private static bool IsFinite(float value)
+        {
+            return !float.IsNaN(value) && !float.IsInfinity(value);
+        }
+
         internal static int ResolveFindPersonSideForCharacter(ICharacter character)
         {
             int side = (int)Side.Clan;
@@ -1187,17 +1375,34 @@ namespace ZoneEngine.Core.Missions
 
             lock (ObjectiveGate)
             {
-                ReturnByCharacter[characterInstance] = new OutdoorReturn
-                                                       {
-                                                           Playfield = playfield,
-                                                           X = x,
-                                                           Y = y,
-                                                           Z = z
-                                                       };
+                ReturnByCharacter[characterInstance] =
+                    MissionAcgOutdoorReturnStamp.CreateLegacy(
+                        playfield,
+                        x,
+                        y,
+                        z);
             }
         }
 
-        private static bool TryGetOutdoorReturn(int characterInstance, out OutdoorReturn value)
+        private static void StampOutdoorReturn(
+            int characterInstance,
+            MissionAcgInstanceBinding binding)
+        {
+            if (characterInstance == 0 || binding == null)
+            {
+                return;
+            }
+
+            lock (ObjectiveGate)
+            {
+                ReturnByCharacter[characterInstance] =
+                    MissionAcgOutdoorReturnStamp.CreateGenerated(binding);
+            }
+        }
+
+        private static bool TryGetOutdoorReturn(
+            int characterInstance,
+            out MissionAcgOutdoorReturnStamp value)
         {
             lock (ObjectiveGate)
             {
@@ -1215,6 +1420,31 @@ namespace ZoneEngine.Core.Missions
             lock (ObjectiveGate)
             {
                 ReturnByCharacter.Remove(characterInstance);
+            }
+        }
+
+        private static void ClearOutdoorReturnIfMatches(
+            int characterInstance,
+            MissionAcgInstanceBinding binding)
+        {
+            if (characterInstance == 0
+                || binding == null
+                || binding.ExteriorEntranceIdentity == null)
+            {
+                return;
+            }
+
+            lock (ObjectiveGate)
+            {
+                MissionAcgOutdoorReturnStamp current;
+                if (ReturnByCharacter.TryGetValue(
+                        characterInstance,
+                        out current)
+                    && current != null
+                    && current.Matches(binding))
+                {
+                    ReturnByCharacter.Remove(characterInstance);
+                }
             }
         }
 

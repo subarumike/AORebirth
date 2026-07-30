@@ -204,6 +204,15 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            if (!LifecycleCanAdvance(
+                current.Lifecycle,
+                next.Lifecycle,
+                current.Phase,
+                out failure))
+            {
+                return false;
+            }
+
             if (next.Phase < current.Phase
                 || (int)next.Phase > (int)current.Phase + 1)
             {
@@ -236,6 +245,60 @@ namespace ZoneEngine.Core.Missions
                     && !next.MissionCleanupCompleted))
             {
                 failure = "Durable completion acknowledgement cannot regress.";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool LifecycleCanAdvance(
+            MissionAcgObjectiveLifecycle current,
+            MissionAcgObjectiveLifecycle next,
+            MissionAcgCompletionPhase phase,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (current == next)
+            {
+                return true;
+            }
+
+            if ((next == MissionAcgObjectiveLifecycle.Expired
+                 || next == MissionAcgObjectiveLifecycle.Abandoned)
+                && phase >= MissionAcgCompletionPhase.RewardClaimStarted)
+            {
+                failure =
+                    "Durable reward claim owns the completion-versus-cleanup race.";
+                return false;
+            }
+
+            if (current == MissionAcgObjectiveLifecycle.Expired
+                || current == MissionAcgObjectiveLifecycle.Abandoned)
+            {
+                if (next == MissionAcgObjectiveLifecycle.CleanupCompleted)
+                {
+                    return true;
+                }
+
+                failure = "Expired or abandoned objective state cannot be resurrected.";
+                return false;
+            }
+
+            if (current == MissionAcgObjectiveLifecycle.Completed)
+            {
+                if (next == MissionAcgObjectiveLifecycle.CleanupCompleted)
+                {
+                    return true;
+                }
+
+                failure = "Completed objective state cannot be replaced.";
+                return false;
+            }
+
+            if (current == MissionAcgObjectiveLifecycle.CleanupCompleted
+                || current == MissionAcgObjectiveLifecycle.Invalid)
+            {
+                failure = "Terminal objective state cannot be replaced.";
                 return false;
             }
 

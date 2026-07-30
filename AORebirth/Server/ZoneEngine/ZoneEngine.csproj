@@ -361,6 +361,9 @@
     <Compile Include="Core\Missions\MissionAcgBindingStore.cs" />
     <Compile Include="Core\Missions\MissionAcgAllocationService.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingRuntime.cs" />
+    <Compile Include="Core\Missions\MissionAcgExpiryState.cs" />
+    <Compile Include="Core\Missions\MissionAcgExpiryStateStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgExpiryRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingResolver.cs" />
     <Compile Include="Core\Missions\MissionAcgEntryResolver.cs" />
     <Compile Include="Core\Missions\MissionAcgAcceptanceCoordinator.cs" />

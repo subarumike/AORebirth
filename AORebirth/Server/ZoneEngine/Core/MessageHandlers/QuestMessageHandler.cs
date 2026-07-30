@@ -170,111 +170,149 @@ namespace ZoneEngine.Core.MessageHandlers
                 return false;
             }
 
-            MissionAcgObjectiveLifecycle targetObjectiveLifecycle;
-            switch (generatedBinding.State.LifecycleState)
+            bool abandonmentClaimCreated;
+            if (!MissionAcgExpiryRuntime.TryClaimAbandonment(
+                generatedBinding,
+                objective,
+                out abandonmentClaimCreated,
+                out failure))
             {
-                case MissionAcgLifecycleState.Accepted:
-                case MissionAcgLifecycleState.Active:
-                case MissionAcgLifecycleState.Abandoned:
-                    targetObjectiveLifecycle = MissionAcgObjectiveLifecycle.Abandoned;
-                    break;
-                case MissionAcgLifecycleState.Expired:
-                    targetObjectiveLifecycle = MissionAcgObjectiveLifecycle.Expired;
-                    break;
-                case MissionAcgLifecycleState.CleanupPending:
-                case MissionAcgLifecycleState.Cleaned:
-                    if (objective.State.Lifecycle
-                        != MissionAcgObjectiveLifecycle.Abandoned
-                        && objective.State.Lifecycle
-                        != MissionAcgObjectiveLifecycle.Expired
-                        && objective.State.Lifecycle
-                        != MissionAcgObjectiveLifecycle.CleanupCompleted)
-                    {
+                return false;
+            }
+
+            int acceptedQuestInstance =
+                generatedBinding.Binding.AcceptedQuestIdentity.Instance;
+            bool abandonmentConfirmed = !abandonmentClaimCreated;
+            try
+            {
+                if (!MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
+                        character.Identity.Instance,
+                        acceptedQuestInstance,
+                        out generatedBinding)
+                    || !MissionAcgObjectiveRuntime.TryGetByAccepted(
+                        character.Identity.Instance,
+                        acceptedQuestInstance,
+                        out objective))
+                {
+                    failure =
+                        "Exact generated-mission state became unavailable after abandonment claim.";
+                    return false;
+                }
+
+                MissionAcgObjectiveLifecycle targetObjectiveLifecycle;
+                switch (generatedBinding.State.LifecycleState)
+                {
+                    case MissionAcgLifecycleState.Accepted:
+                    case MissionAcgLifecycleState.Active:
+                    case MissionAcgLifecycleState.Abandoned:
+                        targetObjectiveLifecycle =
+                            MissionAcgObjectiveLifecycle.Abandoned;
+                        break;
+                    case MissionAcgLifecycleState.CleanupPending:
+                    case MissionAcgLifecycleState.Cleaned:
+                        if (objective.State.Lifecycle
+                            != MissionAcgObjectiveLifecycle.Abandoned
+                            && objective.State.Lifecycle
+                               != MissionAcgObjectiveLifecycle.CleanupCompleted)
+                        {
+                            failure =
+                                "Generated-mission cleanup has no durable abandonment owner.";
+                            return false;
+                        }
+
+                        targetObjectiveLifecycle = objective.State.Lifecycle;
+                        break;
+                    default:
                         failure =
-                            "Generated-mission cleanup has no durable abandonment or expiry owner.";
+                            "Generated-mission lifecycle is owned by completion or expiry.";
+                        return false;
+                }
+
+                bool objectiveNeedsTransition =
+                    objective.State.Lifecycle != targetObjectiveLifecycle
+                    && objective.State.Lifecycle
+                       != MissionAcgObjectiveLifecycle.CleanupCompleted;
+                if (objectiveNeedsTransition
+                    && (objective.State.Phase
+                            >= MissionAcgCompletionPhase.RewardClaimStarted
+                        || objective.State.Lifecycle
+                           == MissionAcgObjectiveLifecycle.CompletionStarted
+                        || objective.State.Lifecycle
+                           == MissionAcgObjectiveLifecycle.Completed
+                        || objective.State.Lifecycle
+                           == MissionAcgObjectiveLifecycle.Abandoned
+                        || objective.State.Lifecycle
+                           == MissionAcgObjectiveLifecycle.Expired
+                        || objective.State.Lifecycle
+                           == MissionAcgObjectiveLifecycle.Invalid))
+                {
+                    failure =
+                        "Generated-mission objective lifecycle is owned by completion or another terminal outcome.";
+                    return false;
+                }
+
+                MissionAcgBindingRecord terminal = generatedBinding;
+                if (generatedBinding.State.LifecycleState
+                    == MissionAcgLifecycleState.Accepted
+                    || generatedBinding.State.LifecycleState
+                       == MissionAcgLifecycleState.Active)
+                {
+                    if (!MissionAcgBindingRuntime.TryTransition(
+                        generatedBinding,
+                        MissionAcgLifecycleState.Abandoned,
+                        MissionAcgCleanupState.KeyRemovalPending,
+                        DateTime.UtcNow,
+                        out terminal,
+                        out failure))
+                    {
                         return false;
                     }
+                }
 
-                    targetObjectiveLifecycle = objective.State.Lifecycle;
-                    break;
-                default:
+                MissionAcgExpiryRuntime.ConfirmAbandonmentClaim(
+                    acceptedQuestInstance);
+                abandonmentConfirmed = true;
+
+                if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    character.Identity.Instance,
+                    acceptedQuestInstance,
+                    out objective))
+                {
                     failure =
-                        "Generated-mission lifecycle is owned by completion or is not abandonable.";
-                    return false;
-            }
-
-            bool objectiveNeedsTransition =
-                objective.State.Lifecycle != targetObjectiveLifecycle
-                && objective.State.Lifecycle
-                   != MissionAcgObjectiveLifecycle.CleanupCompleted;
-            if (objectiveNeedsTransition
-                && (objective.State.Phase
-                        >= MissionAcgCompletionPhase.RewardClaimStarted
-                    || objective.State.Lifecycle
-                       == MissionAcgObjectiveLifecycle.CompletionStarted
-                    || objective.State.Lifecycle
-                       == MissionAcgObjectiveLifecycle.Completed
-                    || objective.State.Lifecycle
-                       == MissionAcgObjectiveLifecycle.Abandoned
-                    || objective.State.Lifecycle
-                       == MissionAcgObjectiveLifecycle.Expired
-                    || objective.State.Lifecycle
-                       == MissionAcgObjectiveLifecycle.Invalid))
-            {
-                failure =
-                    "Generated-mission objective lifecycle is owned by completion or another terminal outcome.";
-                return false;
-            }
-
-            MissionAcgBindingRecord terminal = generatedBinding;
-            if (generatedBinding.State.LifecycleState
-                == MissionAcgLifecycleState.Accepted
-                || generatedBinding.State.LifecycleState
-                == MissionAcgLifecycleState.Active)
-            {
-                if (!MissionAcgBindingRuntime.TryTransition(
-                    generatedBinding,
-                    MissionAcgLifecycleState.Abandoned,
-                    MissionAcgCleanupState.KeyRemovalPending,
-                    DateTime.UtcNow,
-                    out terminal,
-                    out failure))
-                {
+                        "Exact generated-mission objective record became unavailable.";
                     return false;
                 }
-            }
 
-            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
-                character.Identity.Instance,
-                generatedBinding.Binding.AcceptedQuestIdentity.Instance,
-                out objective))
-            {
-                failure =
-                    "Exact generated-mission objective record became unavailable.";
-                return false;
-            }
-
-            if (objective.State.Lifecycle != targetObjectiveLifecycle
-                && objective.State.Lifecycle
-                   != MissionAcgObjectiveLifecycle.CleanupCompleted)
-            {
-                MissionAcgObjectiveRecord updatedObjective;
-                if (!MissionAcgObjectiveRuntime.TrySetLifecycle(
-                    objective,
-                    targetObjectiveLifecycle,
-                    out updatedObjective,
-                    out failure))
+                if (objective.State.Lifecycle != targetObjectiveLifecycle
+                    && objective.State.Lifecycle
+                       != MissionAcgObjectiveLifecycle.CleanupCompleted)
                 {
-                    return false;
+                    MissionAcgObjectiveRecord updatedObjective;
+                    if (!MissionAcgObjectiveRuntime.TrySetLifecycle(
+                        objective,
+                        targetObjectiveLifecycle,
+                        out updatedObjective,
+                        out failure))
+                    {
+                        return false;
+                    }
+                }
+
+                return MissionAcgLifecycleService.TryCleanupOwnedRecord(
+                    client,
+                    character,
+                    terminal,
+                    out cleaned,
+                    out failure);
+            }
+            finally
+            {
+                if (abandonmentClaimCreated && !abandonmentConfirmed)
+                {
+                    MissionAcgExpiryRuntime.ReleaseAbandonmentClaim(
+                        acceptedQuestInstance);
                 }
             }
-
-            return MissionAcgLifecycleService.TryCleanupOwnedRecord(
-                client,
-                character,
-                terminal,
-                out cleaned,
-                out failure);
         }
 
         private static void SendDeleteAcknowledgement(
