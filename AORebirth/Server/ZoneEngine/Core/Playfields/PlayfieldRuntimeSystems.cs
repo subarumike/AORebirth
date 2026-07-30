@@ -364,7 +364,8 @@ namespace ZoneEngine.Core.Playfields
             Func<TCorpseState, Identity> corpseIdentity,
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<Identity, ICharacter> findDeadNpc,
-            Action<ICharacter, Identity> registerCorpse,
+            Func<ICharacter, Identity, bool> registerCorpse,
+            Action<Identity, Identity> corpseSpawnFailed,
             Action<Identity, Identity> traceCorpseFullUpdate,
             Action<ICharacter, Identity> sendCorpseFullUpdate)
         {
@@ -375,6 +376,7 @@ namespace ZoneEngine.Core.Playfields
                 deadNpcIdentity,
                 findDeadNpc,
                 registerCorpse,
+                corpseSpawnFailed,
                 traceCorpseFullUpdate,
                 sendCorpseFullUpdate);
         }

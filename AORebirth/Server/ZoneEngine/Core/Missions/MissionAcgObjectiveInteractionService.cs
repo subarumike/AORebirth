@@ -215,6 +215,84 @@ namespace ZoneEngine.Core.Missions
                 "KillTarget");
         }
 
+        internal static bool TryResumePersistedTargetDeath(
+            IZoneClient client,
+            ICharacter character,
+            MissionAcgBindingRecord binding,
+            MissionAcgOperationalState operational,
+            out bool completed)
+        {
+            completed = false;
+            if (client == null
+                || character == null
+                || binding == null
+                || operational == null
+                || binding.Binding.MissionType != MissionRollType.KillPerson
+                || binding.Binding.OwnerIdentity.Instance != character.Identity.Instance
+                || operational.OwnerIdentity.Instance != character.Identity.Instance
+                || !operational.AcceptedQuestIdentity.Equals(
+                    binding.Binding.AcceptedQuestIdentity)
+                || operational.AllocatedLivePlayfield2
+                   != binding.Binding.AllocatedLivePlayfield2)
+            {
+                return false;
+            }
+
+            MissionAcgObjectiveRecord objective;
+            if (!MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    character.Identity.Instance,
+                    binding.Binding.AcceptedQuestIdentity.Instance,
+                    out objective)
+                || objective.Binding.MissionType != MissionRollType.KillPerson)
+            {
+                return false;
+            }
+
+            MissionAcgNpcRuntimeState exactTarget = null;
+            for (int i = 0; i < operational.Npcs.Count; i++)
+            {
+                MissionAcgNpcRuntimeState candidate = operational.Npcs[i];
+                if (candidate.RuntimeIdentity.Equals(
+                        objective.Binding.RuntimeObjectiveIdentity))
+                {
+                    exactTarget = candidate;
+                    break;
+                }
+            }
+
+            if (!MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
+                    objective,
+                    exactTarget))
+            {
+                return false;
+            }
+
+            MissionAcceptedStore.AcceptedMission acceptedMission;
+            if (!MissionAcceptedStore.TryResolve(
+                    character.Identity.Instance,
+                    new Identity
+                    {
+                        Type =
+                            (IdentityType)objective.Binding
+                                .AcceptedQuestIdentity.Type,
+                        Instance =
+                            objective.Binding.AcceptedQuestIdentity.Instance
+                    },
+                    out acceptedMission))
+            {
+                return true;
+            }
+
+            completed = MissionAcgCompletionJournalService.TryCompleteVerified(
+                client,
+                character,
+                acceptedMission,
+                binding,
+                objective,
+                "KillTargetRestartRecovery");
+            return true;
+        }
+
         internal static bool TryHandleUseItemOnItem(
             IZoneClient client,
             GenericCmdMessage message)

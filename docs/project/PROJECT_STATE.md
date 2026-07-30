@@ -168,6 +168,26 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   atomically migrated without losing proportional health or mutable lifecycle
   state; the post-repair live destination/NPC recheck remains pending.
 
+- Generated-ACG mission corpses now use the later-analyzed
+  `20260725-185432` mission-trash credit evidence as an inclusive `21-87`
+  currency range; it is not a combat contribution threshold. The previous
+  `20 + Math.Abs(...) % 68` path could emit 20 and throw for `int.MinValue`.
+  A centralized policy now validates reversible runtime identity plus
+  allocated PF2, widens hashing before multiplication, and rejects invalid or
+  non-finite access arithmetic. Generated corpse open, item transfer/deletion,
+  delayed credit award, duplicate death, and cleanup require the exact accepted
+  quest, owner, live PF2, runtime NPC, durable corpse identity/state, active
+  or completion-started corpse lease, and production interaction range.
+  Ordinary/authored corpses and
+  reward formulas remain unchanged. Operational corpse item contents stay
+  explicitly unresolved-empty; the existing legacy mission sparse/rare paths
+  are not used or rerolled. Successful Kill completion defers runtime cleanup
+  only while the exact pending/available corpse lease exists, then resumes the
+  same journal after exact corpse retirement. A persisted exact Kill death is
+  reconciled only when its Stage 4 `ObjectiveVerified` phase also exists; the
+  death-to-verification crash gap fails closed. Visible-corpse reconstruction
+  after process restart remains deferred.
+
 - Generated-terminal abandonment is now exact and restart-resumable. Inbound
   Quest Delete proves ownership before acknowledging the client; unknown and
   authored quests do not enter generated/terminal fallback cleanup. Bound
@@ -180,8 +200,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   cleanup remains retryable. The objective cleanup-complete journal is
   persisted before the binding becomes `Cleaned`, PF2 release requires both
   durable owners, and stale binding state versions cannot overwrite the
-  completion-versus-abandonment winner. Live expiry scheduling, occupant
-  evacuation, and exact mission-corpse retirement remain deferred.
+  completion-versus-abandonment winner. Live expiry scheduling,
+  occupant evacuation, and expiry-driven corpse retirement remain deferred.
 
 - Stim Fiend MonsterData `203739` now uses the bounded mathematical setup
   `floor((11 * actorLevel - 2) / 2)` for SAW numeric fields 1-4 across the

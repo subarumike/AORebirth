@@ -423,12 +423,28 @@ namespace AORebirth.Core.Playfields
             this.ordinaryEnemies.NotifyCharacterDied(target);
             Identity corpseIdentity = Identity.None;
             bool isOperationalNpc;
+            bool operationalDeathAlreadyPersisted;
             bool operationalDeathPersisted =
                 ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TryPrepareNpcDeath(
                     target,
                     this.playfield.CanBuildKnownCorpseVisual(target),
                     out corpseIdentity,
-                    out isOperationalNpc);
+                    out isOperationalNpc,
+                    out operationalDeathAlreadyPersisted);
+            if (isOperationalNpc && operationalDeathAlreadyPersisted)
+            {
+                bool completionResumed =
+                    attacker != null
+                    && ZoneEngine.Core.Missions.MissionAcgObjectiveInteractionService
+                        .TryHandleTargetDeath(attacker, target);
+                ZoneEngine.Core.Missions.MissionDiagnostics.Log(
+                    "ACG-OPERATIONAL-DEATH-DUPLICATE runtime={0} livePf2={1} completionResumed={2} action=corpse-and-combat-reward-suppressed",
+                    target.Identity.Instance,
+                    this.playfield.Identity.Instance,
+                    completionResumed);
+                return;
+            }
+
             if (!isOperationalNpc && this.playfield.CanBuildKnownCorpseVisual(target))
             {
                 corpseIdentity = this.playfield.AllocateCorpseIdentity();
@@ -443,8 +459,8 @@ namespace AORebirth.Core.Playfields
             this.playfield.SendNpcDeathAnimation(target);
             if (!isOperationalNpc || operationalDeathPersisted)
             {
-                this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
                 this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
+                this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
             }
             else
             {

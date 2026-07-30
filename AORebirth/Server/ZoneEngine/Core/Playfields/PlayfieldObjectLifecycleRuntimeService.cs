@@ -81,7 +81,8 @@ namespace AORebirth.Core.Playfields
             Func<TCorpseState, Identity> corpseIdentity,
             Func<TCorpseState, Identity> deadNpcIdentity,
             Func<Identity, ICharacter> findDeadNpc,
-            Action<ICharacter, Identity> registerCorpse,
+            Func<ICharacter, Identity, bool> registerCorpse,
+            Action<Identity, Identity> corpseSpawnFailed,
             Action<Identity, Identity> traceCorpseFullUpdate,
             Action<ICharacter, Identity> sendCorpseFullUpdate)
         {
@@ -103,10 +104,28 @@ namespace AORebirth.Core.Playfields
                             "Skipping corpse spawn corpse={0}; dead NPC no longer exists deadNpc={1}",
                             corpseId,
                             deadNpcId));
+                    if (corpseSpawnFailed != null)
+                    {
+                        corpseSpawnFailed(deadNpcId, corpseId);
+                    }
                     continue;
                 }
 
-                registerCorpse(target, corpseId);
+                if (!registerCorpse(target, corpseId))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Network,
+                        string.Format(
+                            "Skipping corpse visibility corpse={0}; registration failed deadNpc={1}",
+                            corpseId,
+                            deadNpcId));
+                    if (corpseSpawnFailed != null)
+                    {
+                        corpseSpawnFailed(deadNpcId, corpseId);
+                    }
+                    continue;
+                }
+
                 traceCorpseFullUpdate(corpseId, deadNpcId);
                 sendCorpseFullUpdate(target, corpseId);
             }

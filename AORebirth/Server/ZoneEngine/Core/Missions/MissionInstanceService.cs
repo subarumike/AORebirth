@@ -568,6 +568,23 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
+                bool recoveredKillCompletion;
+                if (MissionAcgObjectiveInteractionService.TryResumePersistedTargetDeath(
+                    client,
+                    character,
+                    exact,
+                    operational,
+                    out recoveredKillCompletion))
+                {
+                    MissionDiagnostics.Log(
+                        "ENTRY-RECOVER-KILL char={0} accepted={1}:{2} completed={3}",
+                        character.Identity.Instance,
+                        exact.Binding.AcceptedQuestIdentity.Type,
+                        exact.Binding.AcceptedQuestIdentity.Instance,
+                        recoveredKillCompletion);
+                    return true;
+                }
+
                 MissionAcgSpatialState spatialState;
                 MissionAcgSpatialEnvelope spatialEnvelope;
                 if (!MissionAcgSpatialRuntime.TryEnsureState(

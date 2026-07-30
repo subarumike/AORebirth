@@ -191,6 +191,521 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CapturedCorpseCreditRangeIsInclusiveAndNamedAsCurrency()
+        {
+            Assert.IsFalse(MissionAcgCorpsePolicy.IsCapturedCorpseCreditAmount(20));
+            Assert.IsTrue(MissionAcgCorpsePolicy.IsCapturedCorpseCreditAmount(21));
+            Assert.IsTrue(MissionAcgCorpsePolicy.IsCapturedCorpseCreditAmount(44));
+            Assert.IsTrue(MissionAcgCorpsePolicy.IsCapturedCorpseCreditAmount(87));
+            Assert.IsFalse(MissionAcgCorpsePolicy.IsCapturedCorpseCreditAmount(88));
+            Assert.AreEqual(21, MissionAcgCorpsePolicy.MinimumCapturedCorpseCredits);
+            Assert.AreEqual(87, MissionAcgCorpsePolicy.MaximumCapturedCorpseCredits);
+        }
+
+        [TestMethod]
+        public void CapturedCorpseCreditsAreDeterministicAndAlwaysWithinRange()
+        {
+            int livePf2 = this.FirstPf();
+            for (int ordinal = 1; ordinal <= 64; ordinal++)
+            {
+                int runtimeNpc = RuntimeIdentity(livePf2, ordinal);
+                int first;
+                int second;
+                Assert.IsTrue(
+                    MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                        runtimeNpc,
+                        livePf2,
+                        out first));
+                Assert.IsTrue(
+                    MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                        runtimeNpc,
+                        livePf2,
+                        out second));
+                Assert.AreEqual(first, second);
+                Assert.IsTrue(MissionAcgCorpsePolicy.IsCapturedCorpseCreditAmount(first));
+            }
+        }
+
+        [TestMethod]
+        public void CapturedCorpseCreditArithmeticRejectsInvalidAndExtremeIdentities()
+        {
+            int credits;
+            int livePf2 = this.FirstPf();
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                    0,
+                    livePf2,
+                    out credits));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                    -1,
+                    livePf2,
+                    out credits));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                    int.MinValue,
+                    livePf2,
+                    out credits));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                    int.MaxValue,
+                    livePf2,
+                    out credits));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveCapturedCorpseCredits(
+                    RuntimeIdentity(livePf2, 1),
+                    MissionAcgAllocationService.LegacySharedPlayfield2,
+                    out credits));
+        }
+
+        [TestMethod]
+        public void CapturedCorpseHashingWidensBeforeMultiplication()
+        {
+            int mixed;
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveLegacySignedSalt(
+                    int.MinValue,
+                    int.MaxValue,
+                    uint.MaxValue,
+                    out mixed));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryResolveLegacySignedSalt(
+                    1,
+                    0,
+                    0x80000000u,
+                    out mixed));
+
+            int left = 123456;
+            int right = 789;
+            uint multiplier = 397u;
+            int expected =
+                unchecked(
+                    (int)(
+                        (uint)(((ulong)(uint)left * multiplier) & uint.MaxValue)
+                        ^ (uint)right));
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.TryResolveLegacySignedSalt(
+                    left,
+                    right,
+                    multiplier,
+                    out mixed));
+            Assert.AreEqual(expected, mixed);
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.TryResolveLegacySignedSalt(
+                    int.MaxValue,
+                    int.MaxValue,
+                    uint.MaxValue,
+                    out mixed));
+            Assert.AreEqual(
+                (int)(Math.Abs((long)mixed) % 67L),
+                MissionAcgCorpsePolicy.StableBucket(mixed, 67));
+        }
+
+        [TestMethod]
+        public void CorpseInteractionDistanceFailsClosedForNonFiniteAndExtremeValues()
+        {
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(0.0, 5.0));
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(5.0, 5.0));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(5.0001, 5.0));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(-1.0, 5.0));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(double.NaN, 5.0));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(
+                    double.PositiveInfinity,
+                    5.0));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(
+                    double.NegativeInfinity,
+                    5.0));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsInteractionDistanceAllowed(
+                    double.MaxValue,
+                    5.0));
+        }
+
+        [TestMethod]
+        public void ExactGeneratedMissionCorpseAccessRequiresFullOwnershipChain()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(31, this.FirstPf());
+            MissionAcgOperationalState state = this.CreateState(record, true, false);
+            MissionAcgNpcRuntimeState npc = state.Npcs[0];
+            string failure;
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.TryValidateAccess(
+                    state,
+                    state.AcceptedQuestIdentity,
+                    state.OwnerIdentity,
+                    state.AllocatedLivePlayfield2,
+                    npc.RuntimeIdentity,
+                    npc.CorpseIdentity,
+                    state.OwnerIdentity.Instance,
+                    true,
+                    true,
+                    2.0,
+                    5.0,
+                    out failure),
+                failure);
+
+            AssertAccessRejected(
+                state,
+                new MissionAcgIdentityRecord(
+                    state.AcceptedQuestIdentity.Type,
+                    state.AcceptedQuestIdentity.Instance + 1),
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                npc.RuntimeIdentity,
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance,
+                true,
+                2.0);
+            AssertAccessRejected(
+                state,
+                state.AcceptedQuestIdentity,
+                new MissionAcgIdentityRecord(
+                    state.OwnerIdentity.Type,
+                    state.OwnerIdentity.Instance + 1),
+                state.AllocatedLivePlayfield2,
+                npc.RuntimeIdentity,
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance,
+                true,
+                2.0);
+            AssertAccessRejected(
+                state,
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2 + 1,
+                npc.RuntimeIdentity,
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance,
+                true,
+                2.0);
+            AssertAccessRejected(
+                state,
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                npc.RuntimeIdentity,
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance + 1,
+                true,
+                2.0);
+        }
+
+        [TestMethod]
+        public void GeneratedMissionCorpseAccessRejectsStaleLifecycleAndIdentity()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(32, this.FirstPf());
+            MissionAcgOperationalState state = this.CreateState(record, true, false);
+            MissionAcgNpcRuntimeState npc = state.Npcs[0];
+            AssertAccessRejected(
+                state,
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                new MissionAcgIdentityRecord(
+                    npc.RuntimeIdentity.Type,
+                    npc.RuntimeIdentity.Instance + 1),
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance,
+                true,
+                2.0);
+            AssertAccessRejected(
+                state,
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                npc.RuntimeIdentity,
+                new MissionAcgIdentityRecord(
+                    npc.CorpseIdentity.Type,
+                    npc.CorpseIdentity.Instance + 1),
+                state.OwnerIdentity.Instance,
+                true,
+                2.0);
+            AssertAccessRejected(
+                state,
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                npc.RuntimeIdentity,
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance,
+                false,
+                2.0);
+            AssertAccessRejected(
+                state.BeginCleanup(DateTime.UtcNow),
+                state.AcceptedQuestIdentity,
+                state.OwnerIdentity,
+                state.AllocatedLivePlayfield2,
+                npc.RuntimeIdentity,
+                npc.CorpseIdentity,
+                state.OwnerIdentity.Instance,
+                true,
+                2.0);
+        }
+
+        [TestMethod]
+        public void GeneratedMissionCorpseAccessSurvivesRestartWithoutReroll()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(33, this.FirstPf());
+            MissionAcgOperationalState restored =
+                this.RoundTrip(record, this.CreateState(record, true, false));
+            MissionAcgNpcRuntimeState npc = restored.Npcs[0];
+            string failure;
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.TryValidateAccess(
+                    restored,
+                    restored.AcceptedQuestIdentity,
+                    restored.OwnerIdentity,
+                    restored.AllocatedLivePlayfield2,
+                    npc.RuntimeIdentity,
+                    npc.CorpseIdentity,
+                    restored.OwnerIdentity.Instance,
+                    true,
+                    true,
+                    1.0,
+                    5.0,
+                    out failure),
+                failure);
+        }
+
+        [TestMethod]
+        public void PersistedKillDeathRequiresDurableObjectiveVerificationToResume()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(34, this.FirstPf());
+            MissionAcgOperationalState state = this.CreateState(record, true, false);
+            MissionAcgNpcRuntimeState target = state.Npcs[0];
+            MissionAcgObjectiveRecord objective =
+                CreateKillObjective(
+                    record,
+                    target,
+                    MissionAcgObjectiveLifecycle.Exposed,
+                    MissionAcgCompletionPhase.None);
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
+                    objective,
+                    target));
+
+            MissionAcgObjectiveRecord verified =
+                CreateKillObjective(
+                    record,
+                    target,
+                    MissionAcgObjectiveLifecycle.Verified,
+                    MissionAcgCompletionPhase.ObjectiveVerified);
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
+                    verified,
+                    target));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
+                    verified,
+                    target.WithCleanup()));
+        }
+
+        [TestMethod]
+        public void ExactLiveKillCorpseLeaseDefersOnlySuccessfulCompletionCleanup()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(35, this.FirstPf());
+            MissionAcgOperationalState state = this.CreateState(record, true, false);
+            MissionAcgNpcRuntimeState target = state.Npcs[0];
+            MissionAcgObjectiveRecord objective =
+                CreateKillObjective(
+                    record,
+                    target,
+                    MissionAcgObjectiveLifecycle.CompletionStarted,
+                    MissionAcgCompletionPhase.QuestDeleteSent);
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.ShouldDeferKillCompletionCleanup(
+                    state,
+                    objective,
+                    record.Binding.AcceptedQuestIdentity,
+                    record.Binding.AllocatedLivePlayfield2,
+                    true));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.ShouldDeferKillCompletionCleanup(
+                    state,
+                    objective,
+                    record.Binding.AcceptedQuestIdentity,
+                    record.Binding.AllocatedLivePlayfield2,
+                    false));
+
+            MissionAcgOperationalState despawned =
+                state.ReplaceNpc(
+                    target.WithCorpseState(MissionAcgCorpseState.Despawned),
+                    DateTime.UtcNow);
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.ShouldDeferKillCompletionCleanup(
+                    despawned,
+                    objective,
+                    record.Binding.AcceptedQuestIdentity,
+                    record.Binding.AllocatedLivePlayfield2,
+                    true));
+        }
+
+        [TestMethod]
+        public void CompletionStartedCorpseAccessRequiresReservedPf2AndNoCleanup()
+        {
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
+                    false,
+                    MissionAcgLifecycleState.CompletionStarted,
+                    MissionAcgCleanupState.None,
+                    true));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
+                    false,
+                    MissionAcgLifecycleState.CleanupPending,
+                    MissionAcgCleanupState.InstanceReleasePending,
+                    true));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
+                    false,
+                    MissionAcgLifecycleState.CompletionStarted,
+                    MissionAcgCleanupState.None,
+                    false));
+        }
+
+        [TestMethod]
+        public void OnlyExactObjectiveCorpseRetirementCanResumeCompletion()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(36, this.FirstPf());
+            MissionAcgOperationalState state = this.CreateState(record, true, false);
+            MissionAcgNpcRuntimeState target = state.Npcs[0];
+            MissionAcgObjectiveRecord objective =
+                CreateKillObjective(
+                    record,
+                    target,
+                    MissionAcgObjectiveLifecycle.CompletionStarted,
+                    MissionAcgCompletionPhase.QuestDeleteSent);
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy
+                    .ShouldResumeCompletionAfterCorpseRetirement(
+                        objective,
+                        state.AcceptedQuestIdentity,
+                        state.OwnerIdentity,
+                        state.AllocatedLivePlayfield2,
+                        target.RuntimeIdentity));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy
+                    .ShouldResumeCompletionAfterCorpseRetirement(
+                        objective,
+                        state.AcceptedQuestIdentity,
+                        state.OwnerIdentity,
+                        state.AllocatedLivePlayfield2,
+                        new MissionAcgIdentityRecord(
+                            target.RuntimeIdentity.Type,
+                            target.RuntimeIdentity.Instance + 1)));
+        }
+
+        [TestMethod]
+        public void GeneratedMissionCorpsePolicyIsWiredWithoutChangingOrdinaryCorpseAccess()
+        {
+            string playfield = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+            string operational = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
+            string npcRuntime = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
+            string lifecycle = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs");
+            string catalog = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\MissionInstanceShapeCatalog.cs");
+            string completion = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgCompletionJournalService.cs");
+
+            StringAssert.Contains(playfield, "TryAuthorizeGeneratedMissionCorpse");
+            StringAssert.Contains(playfield, "TryResolveCapturedCorpseCredits");
+            StringAssert.Contains(playfield, "CorpseLootRightsPolicy.OwnerOnly");
+            StringAssert.Contains(playfield, "if (operationalMissionNpc)");
+            StringAssert.Contains(playfield, "lootItems.Clear();");
+            StringAssert.Contains(playfield, "generatedLoot.LootUnresolved");
+            StringAssert.Contains(playfield, "if (!corpse.IsGeneratedMissionCorpse)");
+            StringAssert.Contains(playfield, "CorpseLootRightsPolicy.Public");
+            StringAssert.Contains(playfield, "HasExactCorpseLease");
+            StringAssert.Contains(playfield, "ResumeForAccepted");
+            StringAssert.Contains(playfield, "HandleCorpseSpawnFailed");
+            StringAssert.Contains(
+                playfield,
+                "pendingMissionCorpseCompletionResumes");
+            StringAssert.Contains(operational, "TryValidateCorpseAccess");
+            StringAssert.Contains(operational, "concrete.DespawnCorpses");
+            StringAssert.Contains(
+                completion,
+                "ShouldDeferKillCompletionCleanup");
+            StringAssert.Contains(
+                operational,
+                "A generated mission PF2 may never fall through to the ordinary");
+            StringAssert.Contains(npcRuntime, "operationalDeathAlreadyPersisted");
+            StringAssert.Contains(npcRuntime, "action=corpse-and-combat-reward-suppressed");
+            Assert.IsTrue(
+                npcRuntime.IndexOf(
+                    "this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);",
+                    StringComparison.Ordinal)
+                < npcRuntime.IndexOf(
+                    "this.rewards.RunNpcDeathRewardHooks",
+                    StringComparison.Ordinal));
+            StringAssert.Contains(lifecycle, "if (!registerCorpse(target, corpseId))");
+            Assert.IsFalse(playfield.Contains("Math.Abs(salt)"));
+            Assert.IsFalse(playfield.Contains("credits = 20 +"));
+            Assert.IsFalse(catalog.Contains("Math.Abs(salt)"));
+        }
+
+        [TestMethod]
+        public void BoundMissionPfRejectsEveryUnregisteredDeathAndGenericCorpseFallback()
+        {
+            string operational = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
+            string playfield = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+
+            StringAssert.Contains(
+                operational,
+                "A generated mission PF2 may never fall through to the ordinary");
+            StringAssert.Contains(
+                operational,
+                "if (!state.TryGetNpc(target.Identity.Instance, out npc))");
+            StringAssert.Contains(
+                playfield,
+                "MissionAcgBindingRuntime.IsBoundLivePlayfield(");
+        }
+
+        [TestMethod]
+        public void PersistedKillDeathReconcilesOnlyExactCompletionWithoutDuplicateCombatRewards()
+        {
+            string npcRuntime = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
+            string objective = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveInteractionService.cs");
+            string instance = ReadSource(
+                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionInstanceService.cs");
+
+            StringAssert.Contains(
+                npcRuntime,
+                "MissionAcgObjectiveInteractionService");
+            StringAssert.Contains(
+                npcRuntime,
+                "action=corpse-and-combat-reward-suppressed");
+            StringAssert.Contains(
+                objective,
+                "TryResumePersistedTargetDeath");
+            StringAssert.Contains(
+                objective,
+                "IsVerifiedKillDeathRecoveryEligible");
+            StringAssert.Contains(
+                objective,
+                "\"KillTargetRestartRecovery\"");
+            StringAssert.Contains(
+                instance,
+                "MissionAcgObjectiveInteractionService.TryResumePersistedTargetDeath(");
+            StringAssert.Contains(instance, "ENTRY-RECOVER-KILL");
+        }
+
+        [TestMethod]
         public void UnresolvedChestIsExplicitlyEmptyAndCannotRefillOnRestart()
         {
             MissionAcgBindingRecord record = this.CreateBinding(5, this.FirstPf());
@@ -381,6 +896,89 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(incomplete == null || !incomplete.IsSelectable);
             Assert.IsFalse(
                 this.catalog.SelectableLayouts.Any(x => x.SourcePlayfield2 == 1441804));
+        }
+
+        private static MissionAcgObjectiveRecord CreateKillObjective(
+            MissionAcgBindingRecord record,
+            MissionAcgNpcRuntimeState target,
+            MissionAcgObjectiveLifecycle lifecycle,
+            MissionAcgCompletionPhase phase)
+        {
+            var binding =
+                new MissionAcgObjectiveBinding(
+                    MissionAcgObjectiveBinding.CurrentFormatVersion,
+                    record.Binding.AcceptedQuestIdentity,
+                    record.Binding.OwnerIdentity,
+                    null,
+                    true,
+                    MissionRollType.KillPerson,
+                    record.Binding.AllocatedLivePlayfield2,
+                    record.Binding.SelectedBundleId,
+                    record.Binding.SelectedBundlePayloadSha256,
+                    record.Binding.AcgBuildingIdentity,
+                    target.CapturedSlot,
+                    target.CapturedIdentity,
+                    target.RuntimeIdentity,
+                    target.TemplateId,
+                    target.Name,
+                    MissionAcgObjectiveInteraction.TargetDeath,
+                    null,
+                    0,
+                    0);
+            var state =
+                new MissionAcgObjectiveState(
+                    lifecycle,
+                    phase,
+                    null,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    MissionAcgGrantState.NotStarted,
+                    MissionAcgGrantState.NotStarted,
+                    MissionAcgGrantState.NotStarted,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    0,
+                    false,
+                    phase >= MissionAcgCompletionPhase.Action59Sent,
+                    phase >= MissionAcgCompletionPhase.QuestDeleteSent,
+                    phase >= MissionAcgCompletionPhase.ObjectiveCleanupCompleted,
+                    phase >= MissionAcgCompletionPhase.MissionCleanupCompleted,
+                    DateTime.UtcNow);
+            return new MissionAcgObjectiveRecord(binding, state, string.Empty);
+        }
+
+        private static void AssertAccessRejected(
+            MissionAcgOperationalState state,
+            MissionAcgIdentityRecord acceptedQuest,
+            MissionAcgIdentityRecord owner,
+            int livePlayfield2,
+            MissionAcgIdentityRecord runtimeNpc,
+            MissionAcgIdentityRecord corpse,
+            int looterInstance,
+            bool bindingAccessible,
+            double distance)
+        {
+            string failure;
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.TryValidateAccess(
+                    state,
+                    acceptedQuest,
+                    owner,
+                    livePlayfield2,
+                    runtimeNpc,
+                    corpse,
+                    looterInstance,
+                    bindingAccessible,
+                    true,
+                    distance,
+                    5.0,
+                    out failure));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
         }
 
         private MissionAcgOperationalState RoundTrip(

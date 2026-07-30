@@ -321,6 +321,173 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool TryResolveCorpseOwnership(
+            int allocatedLivePlayfield2,
+            Identity runtimeNpcIdentity,
+            Identity corpseIdentity,
+            out MissionAcgIdentityRecord acceptedQuestIdentity,
+            out MissionAcgIdentityRecord ownerIdentity)
+        {
+            acceptedQuestIdentity = null;
+            ownerIdentity = null;
+            if (runtimeNpcIdentity == null || corpseIdentity == null)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgOperationalState state;
+                MissionAcgNpcRuntimeState npc;
+                if (!ByPlayfield.TryGetValue(allocatedLivePlayfield2, out state)
+                    || state.CleanupState != MissionAcgOperationalCleanupState.Active
+                    || !state.TryGetNpc(runtimeNpcIdentity.Instance, out npc)
+                    || !npc.RuntimeIdentity.Equals(ToRecord(runtimeNpcIdentity))
+                    || npc.LifeState != MissionAcgNpcLifeState.Dead
+                    || npc.CleanupCompleted
+                    || npc.CorpseIdentity == null
+                    || !npc.CorpseIdentity.Equals(ToRecord(corpseIdentity))
+                    || (npc.CorpseState != MissionAcgCorpseState.Pending
+                        && npc.CorpseState != MissionAcgCorpseState.Available))
+                {
+                    return false;
+                }
+
+                acceptedQuestIdentity = state.AcceptedQuestIdentity;
+                ownerIdentity = state.OwnerIdentity;
+                return true;
+            }
+        }
+
+        internal static bool TryValidateCorpseAccess(
+            int looterInstance,
+            int allocatedLivePlayfield2,
+            MissionAcgIdentityRecord registeredAcceptedQuest,
+            MissionAcgIdentityRecord registeredOwner,
+            Identity registeredDeadNpc,
+            Identity registeredCorpse,
+            DateTime nowUtc,
+            bool requireInteractionDistance,
+            double interactionDistance,
+            double maximumInteractionDistance,
+            out string failure)
+        {
+            failure = string.Empty;
+            MissionAcgOperationalState state;
+            EnsureInitialized();
+            lock (Sync)
+            {
+                if (!ByPlayfield.TryGetValue(allocatedLivePlayfield2, out state))
+                {
+                    failure = "Generated-mission operational state is missing.";
+                    return false;
+                }
+            }
+
+            MissionAcgBindingRecord bindingRecord;
+            bool ordinarilyAccessible =
+                MissionAcgBindingRuntime.TryResolveByAcceptedQuest(
+                    looterInstance,
+                    state.AcceptedQuestIdentity.Instance,
+                    nowUtc,
+                    out bindingRecord)
+                && bindingRecord.Binding.AllocatedLivePlayfield2
+                   == allocatedLivePlayfield2;
+            if (!ordinarilyAccessible
+                && !MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
+                    looterInstance,
+                    state.AcceptedQuestIdentity.Instance,
+                    out bindingRecord))
+            {
+                bindingRecord = null;
+            }
+
+            bool bindingAccessible =
+                bindingRecord != null
+                && bindingRecord.Binding.AllocatedLivePlayfield2
+                   == allocatedLivePlayfield2
+                && MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
+                    ordinarilyAccessible,
+                    bindingRecord.State.LifecycleState,
+                    bindingRecord.State.CleanupState,
+                    bindingRecord.State.ReservesPlayfield);
+
+            lock (Sync)
+            {
+                MissionAcgOperationalState current;
+                if (!ByPlayfield.TryGetValue(allocatedLivePlayfield2, out current)
+                    || current.AcceptedQuestIdentity.Instance
+                       != state.AcceptedQuestIdentity.Instance)
+                {
+                    failure = "Generated-mission operational state changed.";
+                    return false;
+                }
+
+                return MissionAcgCorpsePolicy.TryValidateAccess(
+                    current,
+                    registeredAcceptedQuest,
+                    registeredOwner,
+                    allocatedLivePlayfield2,
+                    ToRecord(registeredDeadNpc),
+                    ToRecord(registeredCorpse),
+                    looterInstance,
+                    bindingAccessible,
+                    requireInteractionDistance,
+                    interactionDistance,
+                    maximumInteractionDistance,
+                    out failure);
+            }
+        }
+
+        internal static bool ShouldDeferKillCompletionCleanup(
+            MissionAcgBindingRecord binding,
+            MissionAcgObjectiveRecord objective)
+        {
+            if (binding == null || objective == null)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgOperationalState state;
+                MissionAcgNpcRuntimeState exactTarget;
+                if (!ByAccepted.TryGetValue(
+                        binding.Binding.AcceptedQuestIdentity.Instance,
+                        out state)
+                    || !state.TryGetNpc(
+                        objective.Binding.RuntimeObjectiveIdentity.Instance,
+                        out exactTarget)
+                    || exactTarget.CorpseIdentity == null)
+                {
+                    return false;
+                }
+
+                IPlayfield playfield =
+                    Pool.Instance.GetObject<IPlayfield>(
+                        Identity.None,
+                        new Identity
+                        {
+                            Type = IdentityType.Playfield2,
+                            Instance = state.AllocatedLivePlayfield2
+                        });
+                Playfield concrete = playfield as Playfield;
+                bool hasExactLiveCorpseLease =
+                    concrete != null
+                    && concrete.HasExactCorpseLease(
+                        ToIdentity(exactTarget.RuntimeIdentity),
+                        ToIdentity(exactTarget.CorpseIdentity));
+                return MissionAcgCorpsePolicy.ShouldDeferKillCompletionCleanup(
+                    state,
+                    objective,
+                    binding.Binding.AcceptedQuestIdentity,
+                    binding.Binding.AllocatedLivePlayfield2,
+                    hasExactLiveCorpseLease);
+            }
+        }
+
         internal static bool ShouldSuppressCapturedNpcPacket(
             MissionAcgMaterializedInstance instance,
             MissionAcgRuntimeObject runtimeObject)
@@ -384,10 +551,12 @@ namespace ZoneEngine.Core.Missions
             ICharacter target,
             bool createCorpse,
             out Identity corpseIdentity,
-            out bool isOperationalNpc)
+            out bool isOperationalNpc,
+            out bool deathAlreadyPersisted)
         {
             corpseIdentity = Identity.None;
             isOperationalNpc = false;
+            deathAlreadyPersisted = false;
             if (target == null || target.Playfield == null)
             {
                 return false;
@@ -398,10 +567,24 @@ namespace ZoneEngine.Core.Missions
             {
                 MissionAcgOperationalState state;
                 MissionAcgNpcRuntimeState npc;
-                if (!ByPlayfield.TryGetValue(target.Playfield.Identity.Instance, out state)
-                    || !state.TryGetNpc(target.Identity.Instance, out npc))
+                if (!ByPlayfield.TryGetValue(target.Playfield.Identity.Instance, out state))
                 {
+                    if (MissionAcgAllocationService.IsAllocatableRange(
+                            target.Playfield.Identity.Instance))
+                    {
+                        isOperationalNpc = true;
+                        return false;
+                    }
+
                     return true;
+                }
+
+                if (!state.TryGetNpc(target.Identity.Instance, out npc))
+                {
+                    // A generated mission PF2 may never fall through to the ordinary
+                    // public-corpse path, even for a stale/non-retargeted identity.
+                    isOperationalNpc = true;
+                    return false;
                 }
 
                 isOperationalNpc = true;
@@ -409,6 +592,7 @@ namespace ZoneEngine.Core.Missions
                     && npc.CorpseIdentity != null)
                 {
                     corpseIdentity = ToIdentity(npc.CorpseIdentity);
+                    deathAlreadyPersisted = true;
                     return true;
                 }
 
@@ -435,29 +619,34 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        internal static void NotifyCorpseAvailable(
+        internal static bool NotifyCorpseAvailable(
             ICharacter sourceNpc,
             Identity corpseIdentity)
         {
             if (sourceNpc == null || sourceNpc.Playfield == null || corpseIdentity == null)
             {
-                return;
+                return false;
             }
 
-            UpdateCorpseState(
+            return UpdateCorpseState(
                 sourceNpc.Playfield.Identity.Instance,
                 sourceNpc.Identity.Instance,
                 corpseIdentity,
                 MissionAcgCorpseState.Available);
         }
 
-        internal static void NotifyCorpseRemoved(
+        internal static bool TryRetireCorpseLease(
             int allocatedLivePlayfield2,
-            Identity corpseIdentity)
+            Identity deadNpcIdentity,
+            Identity corpseIdentity,
+            out MissionAcgIdentityRecord acceptedQuestIdentity,
+            out MissionAcgIdentityRecord ownerIdentity)
         {
-            if (corpseIdentity == null)
+            acceptedQuestIdentity = null;
+            ownerIdentity = null;
+            if (deadNpcIdentity == null || corpseIdentity == null)
             {
-                return;
+                return false;
             }
 
             EnsureInitialized();
@@ -466,25 +655,38 @@ namespace ZoneEngine.Core.Missions
                 MissionAcgOperationalState state;
                 if (!ByPlayfield.TryGetValue(allocatedLivePlayfield2, out state))
                 {
-                    return;
+                    return false;
                 }
 
                 for (int i = 0; i < state.Npcs.Count; i++)
                 {
                     MissionAcgNpcRuntimeState npc = state.Npcs[i];
-                    if (npc.CorpseIdentity != null
+                    if (npc.RuntimeIdentity.Type == (int)deadNpcIdentity.Type
+                        && npc.RuntimeIdentity.Instance == deadNpcIdentity.Instance
+                        && npc.CorpseIdentity != null
                         && npc.CorpseIdentity.Type == (int)corpseIdentity.Type
-                        && npc.CorpseIdentity.Instance == corpseIdentity.Instance)
+                        && npc.CorpseIdentity.Instance == corpseIdentity.Instance
+                        && (npc.CorpseState == MissionAcgCorpseState.Pending
+                            || npc.CorpseState == MissionAcgCorpseState.Available))
                     {
-                        TryReplaceStateLocked(
-                            state,
-                            state.ReplaceNpc(
-                                npc.WithCorpseState(MissionAcgCorpseState.Despawned),
-                                DateTime.UtcNow),
-                            "corpse-despawn");
-                        return;
+                        if (!TryReplaceStateLocked(
+                                state,
+                                state.ReplaceNpc(
+                                    npc.WithCorpseState(
+                                        MissionAcgCorpseState.Despawned),
+                                    DateTime.UtcNow),
+                                "corpse-despawn"))
+                        {
+                            return false;
+                        }
+
+                        acceptedQuestIdentity = state.AcceptedQuestIdentity;
+                        ownerIdentity = state.OwnerIdentity;
+                        return true;
                     }
                 }
+
+                return false;
             }
         }
 
@@ -577,9 +779,11 @@ namespace ZoneEngine.Core.Missions
                             Instance = state.AllocatedLivePlayfield2
                         });
                 Playfield concrete = playfield as Playfield;
+                var missionNpcInstances = new HashSet<int>();
                 for (int i = 0; i < state.Npcs.Count; i++)
                 {
                     MissionAcgNpcRuntimeState npc = state.Npcs[i];
+                    missionNpcInstances.Add(npc.RuntimeIdentity.Instance);
                     CapturedEnemyCombatRuntimeRegistry.Remove(npc.RuntimeIdentity.Instance);
                     MissionInstanceMobCombat.UnregisterAggressive(ToIdentity(npc.RuntimeIdentity));
                     if (concrete != null)
@@ -593,6 +797,14 @@ namespace ZoneEngine.Core.Missions
                             concrete.DespawnNpcImmediately(character);
                         }
                     }
+                }
+
+                if (concrete != null)
+                {
+                    concrete.DespawnCorpses(
+                        (name, deadNpc) =>
+                            deadNpc != null
+                            && missionNpcInstances.Contains(deadNpc.Instance));
                 }
 
                 MissionAcgOperationalState completed =
@@ -937,7 +1149,7 @@ namespace ZoneEngine.Core.Missions
             return true;
         }
 
-        private static void UpdateCorpseState(
+        private static bool UpdateCorpseState(
             int allocatedLivePlayfield2,
             int runtimeNpcInstance,
             Identity corpseIdentity,
@@ -954,14 +1166,23 @@ namespace ZoneEngine.Core.Missions
                     || npc.CorpseIdentity.Type != (int)corpseIdentity.Type
                     || npc.CorpseIdentity.Instance != corpseIdentity.Instance)
                 {
-                    return;
+                    return false;
                 }
 
-                TryReplaceStateLocked(
+                return TryReplaceStateLocked(
                     state,
                     state.ReplaceNpc(npc.WithCorpseState(corpseState), DateTime.UtcNow),
                     "corpse-state");
             }
+        }
+
+        private static MissionAcgIdentityRecord ToRecord(Identity identity)
+        {
+            return identity == null
+                ? null
+                : new MissionAcgIdentityRecord(
+                    (int)identity.Type,
+                    identity.Instance);
         }
 
         private static void ApplyCapturedNpc(
