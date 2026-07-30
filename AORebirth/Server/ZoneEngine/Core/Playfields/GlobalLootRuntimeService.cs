@@ -30,8 +30,18 @@ namespace AORebirth.Core.Playfields
         private const string AlexFleaProfileKey = "captured.arete.alex-garbage-flea";
         private const int AlexFleaMonsterData = 17657;
         private const int AlexFleaCredits = 11;
+        private const string AreteCleanmeisterProfileKey =
+            "captured.arete.cleanmeister-intelligence-robot";
+        private const string AreteSupremeCollectorProfileKey =
+            "captured.arete.supreme-collector-of-waste";
+        private const string AreteMalfunctioningRobotProfileKey =
+            "captured.arete.malfunctioning-cleaning-robot";
         private const string AlexPadLootEvidence =
             "AOSharpLiveCapture 20260722-cap-mob-drop-cred corpse-loot-observations; Docker credits=4; Waste credits=11; Flea credits=5|11; Cleaning Robot credits=5";
+        private const string AretePartOneLootEvidence =
+            "AOSharpLiveCapture 20260722-104809 corpse-loot-observations.csv; "
+            + "identity-linked atomic snapshots for Cleanmeister Intelligence Robot, "
+            + "Supreme Collector of Waste, and Malfunctioning Cleaning Robot";
         private const string CleaningRobotLootEvidence =
             "AOSharpLiveCapture 20260722-cap-mob-drop-cred; Cleaning Robot credits=5; Robot Junk 42620 / empty / misc";
         // Capture 20260723-221330 Nascence Life corpses.
@@ -214,6 +224,36 @@ namespace AORebirth.Core.Playfields
                     out encounter))
                 {
                     this.EnsureCapturedEncounter(encounter);
+                    return;
+                }
+
+                if (string.Equals(
+                    target.Name,
+                    "Cleanmeister Intelligence Robot",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureAreteCleanmeister();
+                    context.EnemyProfileKey = AreteCleanmeisterProfileKey;
+                    return;
+                }
+
+                if (string.Equals(
+                    target.Name,
+                    "Supreme Collector of Waste",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureAreteSupremeCollector();
+                    context.EnemyProfileKey = AreteSupremeCollectorProfileKey;
+                    return;
+                }
+
+                if (string.Equals(
+                    target.Name,
+                    "Malfunctioning Cleaning Robot",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    this.EnsureAreteMalfunctioningRobot();
+                    context.EnemyProfileKey = AreteMalfunctioningRobotProfileKey;
                     return;
                 }
 
@@ -781,6 +821,151 @@ namespace AORebirth.Core.Playfields
                 "Garbage Flea captured corpse",
                 AlexFleaProfileKey,
                 snapshots);
+        }
+
+        private void EnsureAreteCleanmeister()
+        {
+            if (this.registry.ContainsTable(AreteCleanmeisterProfileKey))
+            {
+                return;
+            }
+
+            const string first = "capture.20260722-104809.cleanmeister.7988C930";
+            const string second = "capture.20260722-104809.cleanmeister.7988CAD3";
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        AretePartOneLootEvidence,
+                        first,
+                        17,
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 42620, 42619, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 85517, 27360, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 85740, 85739, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 123514, 123515, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 154069, 150213, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 161609, 161610, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 162736, 162736, 7, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 206656, 206657, 2, 1)),
+                    ObservedCorpseSnapshot(
+                        AretePartOneLootEvidence,
+                        second,
+                        17,
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 85693, 27389, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 135719, 135719, 1, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 123789, 123790, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 129064, 129065, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 160338, 160339, 2, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 162736, 162736, 7, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 201045, 201046, 2, 1))
+                };
+
+            this.RegisterObservedAreteVariantTable(
+                AreteCleanmeisterProfileKey,
+                "Cleanmeister Intelligence Robot captured corpses",
+                snapshots);
+        }
+
+        private void EnsureAreteSupremeCollector()
+        {
+            if (this.registry.ContainsTable(AreteSupremeCollectorProfileKey))
+            {
+                return;
+            }
+
+            const string first = "capture.20260722-104809.supreme-collector.79882C8F";
+            const string second = "capture.20260722-104809.supreme-collector.7988CB09";
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        AretePartOneLootEvidence,
+                        first,
+                        35,
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 42620, 42619, 4, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 123038, 123039, 5, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 160216, 160217, 5, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 160603, 160603, 20, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, first, 160704, 160704, 24, 1)),
+                    ObservedCorpseSnapshot(
+                        AretePartOneLootEvidence,
+                        second,
+                        35,
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 85761, 85760, 3, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 85533, 85532, 3, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 124383, 124384, 3, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 121629, 121630, 3, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 160603, 160603, 20, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 162736, 162736, 7, 1),
+                        ObservedCorpseSnapshotEntry(AretePartOneLootEvidence, second, 201068, 201069, 3, 1))
+                };
+
+            this.RegisterObservedAreteVariantTable(
+                AreteSupremeCollectorProfileKey,
+                "Supreme Collector of Waste captured corpses",
+                snapshots);
+        }
+
+        private void EnsureAreteMalfunctioningRobot()
+        {
+            if (this.registry.ContainsTable(AreteMalfunctioningRobotProfileKey))
+            {
+                return;
+            }
+
+            ObservedCorpseSnapshotDefinition[] snapshots =
+                {
+                    ObservedCorpseSnapshot(
+                        AretePartOneLootEvidence,
+                        "capture.20260722-104809.malfunctioning-robot.7988C9B9",
+                        5),
+                    ObservedCorpseSnapshot(
+                        AretePartOneLootEvidence,
+                        "capture.20260722-104809.malfunctioning-robot.7988C9BF",
+                        5)
+                };
+
+            this.RegisterObservedAreteVariantTable(
+                AreteMalfunctioningRobotProfileKey,
+                "Malfunctioning Cleaning Robot captured corpses",
+                snapshots);
+        }
+
+        private void RegisterObservedAreteVariantTable(
+            string tableKey,
+            string displayName,
+            ObservedCorpseSnapshotDefinition[] snapshots)
+        {
+            this.registry.RegisterTable(
+                new LootTableDefinition
+                {
+                    LootTableKey = tableKey,
+                    DisplayName = displayName,
+                    TableType = LootTableType.EnemyType,
+                    RollGroups = new LootGroupDefinition[0],
+                    ObservedCorpseSnapshots = snapshots,
+                    CreditsPolicy = new CreditsPolicyDefinition
+                    {
+                        Mode = CreditsPolicyMode.Unresolved,
+                        Evidence = LootEvidenceConfidence.Unresolved
+                    },
+                    QualityPolicy = "captured-observed-corpse-snapshots",
+                    Evidence = AretePartOneLootEvidence,
+                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                    ItemPoolUnresolved = true,
+                    Enabled = true
+                });
+            this.registry.RegisterAssignment(
+                new LootAssignmentDefinition
+                {
+                    AssignmentKey = tableKey,
+                    TargetType = LootAssignmentTargetType.EnemyType,
+                    TargetKey = tableKey,
+                    LootTableKey = tableKey,
+                    Priority = 0,
+                    Conditions = new string[0],
+                    Evidence = AretePartOneLootEvidence,
+                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
+                    Enabled = true
+                });
         }
 
         private void RegisterAlexPadTable(

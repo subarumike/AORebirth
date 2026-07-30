@@ -982,7 +982,7 @@ namespace AORebirth.Core.Playfields
             {
                 // Capture 20260720-goldman 78E0FC65 (scfu)
                 CaptureInstance = unchecked((int)0x78E0FC65),
-                Name = "Stan Goodman",
+                Name = "Stanley Goodman",
                 Level = 20, Health = 559, MonsterData = 26084, Scale = 110, VisualFlags = 31, HeadMesh = 40689, RunSpeed = 69,
                 NpcFamily = 137, LosHeight = 0, CharacterFlags = 277352961, AppearanceValue = 1576,
                 Side = 0, Breed = 1, Gender = 2, Race = 1, Fatness = 1, MovementMode = 3,
