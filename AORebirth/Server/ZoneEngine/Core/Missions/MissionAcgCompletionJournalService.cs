@@ -115,7 +115,12 @@ namespace ZoneEngine.Core.Missions
             string reason)
         {
             string failure;
-            if (!MissionAcgObjectiveContract.TryVerify(
+            if (!MissionAcgExpiryRuntime.CanBeginObjectiveAction(
+                    bindingRecord,
+                    objectiveRecord,
+                    DateTime.UtcNow,
+                    out failure)
+                || !MissionAcgObjectiveContract.TryVerify(
                 objectiveRecord,
                 observation,
                 out failure))
@@ -178,6 +183,16 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            string expiryFailure;
+            if (!MissionAcgExpiryRuntime.CanContinueCompletion(
+                bindingRecord,
+                objectiveRecord,
+                DateTime.UtcNow,
+                out expiryFailure))
+            {
+                return false;
+            }
+
             int acceptedInstance =
                 bindingRecord.Binding.AcceptedQuestIdentity.Instance;
             lock (Gate)
@@ -218,6 +233,15 @@ namespace ZoneEngine.Core.Missions
             string failure;
             MissionAcgBindingRecord binding = bindingRecord;
             MissionAcgObjectiveRecord objective = objectiveRecord;
+            if (!MissionAcgExpiryRuntime.CanContinueCompletion(
+                binding,
+                objective,
+                DateTime.UtcNow,
+                out failure))
+            {
+                return false;
+            }
+
             if (objective.State.Phase == MissionAcgCompletionPhase.ObjectiveVerified)
             {
                 if (!MissionAcgBindingRuntime.TryTransition(
@@ -241,6 +265,15 @@ namespace ZoneEngine.Core.Missions
 
             if (objective.State.Phase == MissionAcgCompletionPhase.CompletionStarted)
             {
+                if (!MissionAcgExpiryRuntime.CanContinueCompletion(
+                    binding,
+                    objective,
+                    DateTime.UtcNow,
+                    out failure))
+                {
+                    return false;
+                }
+
                 if (accepted == null)
                 {
                     return false;
@@ -292,6 +325,16 @@ namespace ZoneEngine.Core.Missions
 
             if (objective.State.Phase == MissionAcgCompletionPhase.RewardCalculationFrozen)
             {
+                int acceptedInstance =
+                    binding.Binding.AcceptedQuestIdentity.Instance;
+                if (!MissionAcgExpiryRuntime.TryClaimCompletionReward(
+                    binding,
+                    objective,
+                    out failure))
+                {
+                    return false;
+                }
+
                 if (!Replace(
                     objective,
                     objective.State.Copy(
@@ -299,8 +342,13 @@ namespace ZoneEngine.Core.Missions
                     out objective,
                     out failure))
                 {
+                    MissionAcgExpiryRuntime.ReleaseCompletionRewardClaim(
+                        acceptedInstance);
                     return false;
                 }
+
+                MissionAcgExpiryRuntime.ConfirmCompletionRewardClaim(
+                    acceptedInstance);
             }
 
             if (objective.State.CreditsState == MissionAcgGrantState.NotStarted)
@@ -691,10 +739,20 @@ namespace ZoneEngine.Core.Missions
             out string failure)
         {
             failure = string.Empty;
-            MissionKeyGrantService.TryRemoveMissionKey(
-                client,
-                character,
-                binding.MissionKeyIdentity.Instance);
+            bool keyPresent =
+                MissionKeyGrantService.HasMissionKeyInstance(
+                    character,
+                    binding.MissionKeyIdentity.Instance);
+            if (keyPresent
+                && !MissionKeyGrantService.TryRemoveMissionKey(
+                    client,
+                    character,
+                    binding.MissionKeyIdentity.Instance))
+            {
+                failure = "Exact mission key persistence failed.";
+                return false;
+            }
+
             if (MissionKeyGrantService.HasMissionKeyInstance(
                 character,
                 binding.MissionKeyIdentity.Instance))

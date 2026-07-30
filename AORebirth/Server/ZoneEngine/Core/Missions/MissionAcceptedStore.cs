@@ -302,6 +302,80 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool TryRemoveExactPersisted(
+            int characterInstance,
+            Identity questIdentity,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (characterInstance <= 0
+                || questIdentity == null
+                || questIdentity.Instance <= 0)
+            {
+                failure = "Exact accepted mission identity is required.";
+                return false;
+            }
+
+            lock (Sync)
+            {
+                List<AcceptedMission> list;
+                bool sidecarExists;
+                if (!TryReadSidecarForExactRemoval(
+                    characterInstance,
+                    out list,
+                    out sidecarExists,
+                    out failure))
+                {
+                    return false;
+                }
+
+                if (!sidecarExists)
+                {
+                    List<AcceptedMission> current;
+                    if (ByCharacter.TryGetValue(characterInstance, out current)
+                        && current != null)
+                    {
+                        list = new List<AcceptedMission>(current);
+                    }
+                }
+
+                int index = FindExactIndex_NoLock(list, questIdentity);
+                if (index == -2)
+                {
+                    failure =
+                        "Duplicate exact accepted mission identities make removal ambiguous.";
+                    return false;
+                }
+
+                if (index >= 0)
+                {
+                    list.RemoveAt(index);
+                }
+
+                if (!TryWriteSidecarAtomic(characterInstance, list, out failure))
+                {
+                    return false;
+                }
+
+                if (FindExactIndex_NoLock(list, questIdentity) != -1)
+                {
+                    failure = "Exact accepted mission remains after durable removal.";
+                    return false;
+                }
+
+                if (list.Count == 0)
+                {
+                    ByCharacter.Remove(characterInstance);
+                }
+                else
+                {
+                    ByCharacter[characterInstance] = list;
+                }
+
+                return true;
+            }
+        }
+
         public static void Clear(int characterInstance)
         {
             lock (Sync)
@@ -368,6 +442,38 @@ namespace ZoneEngine.Core.Missions
             }
 
             return -1;
+        }
+
+        private static int FindExactIndex_NoLock(
+            List<AcceptedMission> list,
+            Identity questIdentity)
+        {
+            if (list == null || questIdentity == null || questIdentity.Instance == 0)
+            {
+                return -1;
+            }
+
+            int found = -1;
+            for (int i = 0; i < list.Count; i++)
+            {
+                AcceptedMission mission = list[i];
+                if (mission == null
+                    || mission.QuestIdentity == null
+                    || mission.QuestIdentity.Type != questIdentity.Type
+                    || mission.QuestIdentity.Instance != questIdentity.Instance)
+                {
+                    continue;
+                }
+
+                if (found >= 0)
+                {
+                    return -2;
+                }
+
+                found = i;
+            }
+
+            return found;
         }
 
         private static void PruneExpired_NoLock(List<AcceptedMission> list)
@@ -534,6 +640,236 @@ namespace ZoneEngine.Core.Missions
                        MarkerY = markerY,
                        MarkerZ = markerZ
                    };
+        }
+
+        private static bool TryReadSidecarForExactRemoval(
+            int characterInstance,
+            out List<AcceptedMission> list,
+            out bool sidecarExists,
+            out string failure)
+        {
+            list = new List<AcceptedMission>();
+            sidecarExists = false;
+            failure = string.Empty;
+            try
+            {
+                string path = SidecarPath(characterInstance);
+                if (!File.Exists(path))
+                {
+                    return true;
+                }
+
+                sidecarExists = true;
+                string[] lines = File.ReadAllLines(path);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string line =
+                        lines[i] == null ? string.Empty : lines[i].Trim();
+                    if (line.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    AcceptedMission mission;
+                    if (!TryParseSidecarLineForExactRemoval(
+                        characterInstance,
+                        line,
+                        out mission,
+                        out failure))
+                    {
+                        failure =
+                            path + " line " + (i + 1) + ": " + failure;
+                        list = new List<AcceptedMission>();
+                        return false;
+                    }
+
+                    list.Add(mission);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                list = new List<AcceptedMission>();
+                failure = ex.GetType().Name + ": " + ex.Message;
+                return false;
+            }
+        }
+
+        private static bool TryParseSidecarLineForExactRemoval(
+            int characterInstance,
+            string line,
+            out AcceptedMission mission,
+            out string failure)
+        {
+            mission = null;
+            failure = string.Empty;
+            string[] parts = line.Split('|');
+            if (parts.Length != 6
+                && parts.Length != 7
+                && parts.Length != 13
+                && parts.Length != 15
+                && parts.Length != 17)
+            {
+                failure = "Unsupported or truncated accepted-mission field set.";
+                return false;
+            }
+
+            int storedCharacter;
+            int type;
+            int instance;
+            int icon;
+            int quality;
+            long ticks;
+            if (!int.TryParse(
+                    parts[0],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out storedCharacter)
+                || storedCharacter != characterInstance
+                || !int.TryParse(
+                    parts[1],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out type)
+                || !int.TryParse(
+                    parts[2],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out instance)
+                || !int.TryParse(
+                    parts[3],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out icon)
+                || !int.TryParse(
+                    parts[4],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out quality)
+                || !long.TryParse(
+                    parts[5],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out ticks))
+            {
+                failure = "Malformed accepted-mission identity or required field.";
+                return false;
+            }
+
+            int markerPf = 0;
+            int entranceLow = 0;
+            int entranceHigh = 0;
+            float markerX = 0;
+            float markerY = 0;
+            float markerZ = 0;
+            string shortInfo = parts.Length >= 7 ? parts[6] : string.Empty;
+            string targetName = string.Empty;
+            int targetSide = 0;
+            int cashReward = 0;
+            int experienceReward = 0;
+            if (parts.Length >= 13)
+            {
+                if (!int.TryParse(
+                        parts[6],
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out markerPf)
+                    || !int.TryParse(
+                        parts[7],
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out entranceLow)
+                    || !int.TryParse(
+                        parts[8],
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out entranceHigh)
+                    || !float.TryParse(
+                        parts[9],
+                        NumberStyles.Float,
+                        CultureInfo.InvariantCulture,
+                        out markerX)
+                    || !float.TryParse(
+                        parts[10],
+                        NumberStyles.Float,
+                        CultureInfo.InvariantCulture,
+                        out markerY)
+                    || !float.TryParse(
+                        parts[11],
+                        NumberStyles.Float,
+                        CultureInfo.InvariantCulture,
+                        out markerZ)
+                    || float.IsNaN(markerX)
+                    || float.IsInfinity(markerX)
+                    || float.IsNaN(markerY)
+                    || float.IsInfinity(markerY)
+                    || float.IsNaN(markerZ)
+                    || float.IsInfinity(markerZ))
+                {
+                    failure = "Malformed accepted-mission exterior marker.";
+                    return false;
+                }
+
+                shortInfo = parts[12];
+            }
+
+            if (parts.Length >= 15)
+            {
+                targetName = parts[13] ?? string.Empty;
+                if (!int.TryParse(
+                    parts[14],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out targetSide))
+                {
+                    failure = "Malformed accepted-mission target side.";
+                    return false;
+                }
+            }
+
+            if (parts.Length >= 17
+                && (!int.TryParse(
+                        parts[15],
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out cashReward)
+                    || !int.TryParse(
+                        parts[16],
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out experienceReward)))
+            {
+                failure = "Malformed accepted-mission reward fields.";
+                return false;
+            }
+
+            mission =
+                new AcceptedMission
+                {
+                    QuestIdentity =
+                        new Identity
+                        {
+                            Type = (IdentityType)type,
+                            Instance = instance
+                        },
+                    MissionIconId = icon,
+                    Quality = quality,
+                    ExpiryUtc = new DateTime(ticks, DateTimeKind.Utc),
+                    ShortInfo = shortInfo,
+                    TargetName = targetName,
+                    TargetSide = targetSide,
+                    CashReward = cashReward,
+                    ExperienceReward = experienceReward,
+                    Offer = null,
+                    MarkerPlayfield = markerPf,
+                    EntranceLow = entranceLow,
+                    EntranceHigh = entranceHigh,
+                    MarkerX = markerX,
+                    MarkerY = markerY,
+                    MarkerZ = markerZ
+                };
+            return true;
         }
 
         private static bool TryReadSidecar(int characterInstance, out List<AcceptedMission> list)

@@ -174,7 +174,8 @@ namespace ZoneEngine.Core.Missions
                            out record)
                        && record.Binding.OwnerIdentity.Instance == ownerInstance
                        && record.Binding.AllocatedLivePlayfield2
-                          == allocatedLivePlayfield2;
+                          == allocatedLivePlayfield2
+                       && IsInteractionEligible(record.State);
             }
         }
 
@@ -192,6 +193,7 @@ namespace ZoneEngine.Core.Missions
                 {
                     if (candidate.Binding.OwnerIdentity.Instance != ownerInstance
                         || candidate.Binding.MissionType != MissionRollType.FindItemReturn
+                        || !IsInteractionEligible(candidate.State)
                         || candidate.State.MissionItemIdentity == null
                         || missionItemIdentity == null
                         || !candidate.State.MissionItemIdentity.Equals(missionItemIdentity)
@@ -608,6 +610,14 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord identity)
         {
             return playfield + "|" + identity.Type + ":" + identity.Instance;
+        }
+
+        private static bool IsInteractionEligible(MissionAcgObjectiveState state)
+        {
+            return state != null
+                   && (state.Lifecycle == MissionAcgObjectiveLifecycle.Reserved
+                       || state.Lifecycle == MissionAcgObjectiveLifecycle.Exposed
+                       || state.Lifecycle == MissionAcgObjectiveLifecycle.ItemPossessed);
         }
 
         private static void EnsureInitialized()

@@ -291,6 +291,7 @@ namespace ZoneEngine
             if (zoneServer != null)
             {
                 exited = true;
+                MissionAcgExpiryRuntime.Stop();
                 ISComClient.ShutDown();
                 zoneServer.DisconnectAllClients();
                 LogUtil.Debug(DebugInfoDetail.Engine, "Shutting down ZoneEngine hard");
@@ -836,6 +837,7 @@ namespace ZoneEngine
         /// </param>
         private static void ShutDownServer(string[] parts)
         {
+            MissionAcgExpiryRuntime.Stop();
             if (zoneServer.IsRunning)
             {
                 zoneServer.Stop();
@@ -899,6 +901,7 @@ namespace ZoneEngine
             ScriptCompiler.Instance.Compile(true);
             Console.WriteLine(ScriptCompiler.Instance.AddScriptMembers() + " chat commands loaded");
             zoneServer.Start(true, false);
+            MissionAcgExpiryRuntime.Start();
         }
 
         /// <summary>
@@ -915,6 +918,7 @@ namespace ZoneEngine
             }
             else
             {
+                MissionAcgExpiryRuntime.Stop();
                 zoneServer.Stop();
             }
         }

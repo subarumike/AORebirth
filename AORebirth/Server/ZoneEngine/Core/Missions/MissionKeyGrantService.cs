@@ -308,10 +308,28 @@ namespace ZoneEngine.Core.Missions
                         return false;
                     }
 
-                    pageEntry.Value.Remove(itemEntry.Key);
-                    if (!character.BaseInventory.Write())
+                    bool persisted = false;
+                    try
                     {
-                        failure = "Exact inventory artifact persistence failed.";
+                        pageEntry.Value.Remove(itemEntry.Key);
+                        persisted = character.BaseInventory.Write();
+                    }
+                    catch
+                    {
+                        persisted = false;
+                    }
+
+                    if (!persisted)
+                    {
+                        bool restored =
+                            TryRestoreRemovedInventoryItem(
+                                pageEntry.Value,
+                                itemEntry.Key,
+                                item);
+                        failure =
+                            restored
+                                ? "Exact inventory artifact persistence failed; in-memory removal was rolled back."
+                                : "Exact inventory artifact persistence failed and in-memory rollback failed.";
                         return false;
                     }
 
@@ -747,6 +765,7 @@ namespace ZoneEngine.Core.Missions
                                    };
 
             bool removedFromInventory = false;
+            bool persistenceFailed = false;
             int inventoryPageType = 0;
             int inventorySlot = -1;
             foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
@@ -777,14 +796,28 @@ namespace ZoneEngine.Core.Missions
                     inventoryPageType = pageEntry.Key;
                     inventorySlot = itemEntry.Key;
 
+                    bool persisted = false;
                     try
                     {
                         pageEntry.Value.Remove(itemEntry.Key);
-                        character.BaseInventory.Write();
-                        removedFromInventory = true;
+                        persisted = character.BaseInventory.Write();
                     }
                     catch
                     {
+                        persisted = false;
+                    }
+
+                    if (!persisted)
+                    {
+                        persistenceFailed = true;
+                        TryRestoreRemovedInventoryItem(
+                            pageEntry.Value,
+                            itemEntry.Key,
+                            item);
+                    }
+                    else
+                    {
+                        removedFromInventory = true;
                     }
 
                     break;
@@ -798,6 +831,11 @@ namespace ZoneEngine.Core.Missions
 
             if (!removedFromInventory)
             {
+                if (persistenceFailed)
+                {
+                    return false;
+                }
+
                 // Still notify client with the stored instance so a ghost icon can clear.
                 NotifyMissionItemDeleted(client, character, keyIdentity);
                 return false;
@@ -1069,6 +1107,34 @@ namespace ZoneEngine.Core.Missions
             }
             catch
             {
+            }
+        }
+
+        private static bool TryRestoreRemovedInventoryItem(
+            IInventoryPage inventoryPage,
+            int inventorySlot,
+            IItem item)
+        {
+            if (inventoryPage == null || inventorySlot < 0 || item == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                IItem current = inventoryPage[inventorySlot];
+                if (current != null)
+                {
+                    return current.Identity != null
+                           && item.Identity != null
+                           && current.Identity.Instance == item.Identity.Instance;
+                }
+
+                return inventoryPage.Add(inventorySlot, item) == InventoryError.OK;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

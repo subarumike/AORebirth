@@ -453,14 +453,19 @@ namespace ZoneEngine.Core.Missions
             failure = string.Empty;
             int firstPf = ResolvePlayfield(first);
             int secondPf = ResolvePlayfield(second);
+            bool firstManaged =
+                MissionAcgAllocationService.IsAllocatableRange(firstPf);
+            bool secondManaged =
+                MissionAcgAllocationService.IsAllocatableRange(secondPf);
+            if (!firstManaged && !secondManaged)
+            {
+                return true;
+            }
+
             bool firstBound =
                 firstPf > 0 && MissionAcgBindingRuntime.IsBoundLivePlayfield(firstPf);
             bool secondBound =
                 secondPf > 0 && MissionAcgBindingRuntime.IsBoundLivePlayfield(secondPf);
-            if (!firstBound && !secondBound)
-            {
-                return true;
-            }
 
             EnsureInitialized();
             lock (Sync)
@@ -757,6 +762,23 @@ namespace ZoneEngine.Core.Missions
                 InvalidAccepted.Remove(record.Binding.AcceptedQuestIdentity.Instance);
                 NextDiagnosticUtc.Remove(record.Binding.OwnerIdentity.Instance);
                 return true;
+            }
+        }
+
+        internal static bool HasRuntimeState(MissionAcgBindingRecord record)
+        {
+            if (record == null)
+            {
+                return true;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return ByAccepted.ContainsKey(
+                           record.Binding.AcceptedQuestIdentity.Instance)
+                       || ByPlayfield.ContainsKey(
+                           record.Binding.AllocatedLivePlayfield2);
             }
         }
 

@@ -381,6 +381,27 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool HasRuntimeState(MissionAcgBindingRecord record)
+        {
+            if (record == null)
+            {
+                return true;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgMaterializedInstance byAccepted;
+                MissionAcgMaterializedInstance byPlayfield;
+                return Registry.TryGetByAcceptedQuest(
+                           record.Binding.AcceptedQuestIdentity.Instance,
+                           out byAccepted)
+                       || Registry.TryGetByPlayfield(
+                           record.Binding.AllocatedLivePlayfield2,
+                           out byPlayfield);
+            }
+        }
+
         internal static void OnBindingStateChanged(MissionAcgBindingRecord record)
         {
             if (!initialized || record == null)

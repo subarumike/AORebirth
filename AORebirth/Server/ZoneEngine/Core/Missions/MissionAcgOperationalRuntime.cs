@@ -403,12 +403,21 @@ namespace ZoneEngine.Core.Missions
                 bindingRecord = null;
             }
 
+            MissionAcgObjectiveRecord objectiveRecord;
+            bool completionOwned =
+                MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    looterInstance,
+                    state.AcceptedQuestIdentity.Instance,
+                    out objectiveRecord)
+                && objectiveRecord.State.Phase
+                   >= MissionAcgCompletionPhase.RewardClaimStarted;
             bool bindingAccessible =
                 bindingRecord != null
                 && bindingRecord.Binding.AllocatedLivePlayfield2
                    == allocatedLivePlayfield2
                 && MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
                     ordinarilyAccessible,
+                    completionOwned,
                     bindingRecord.State.LifecycleState,
                     bindingRecord.State.CleanupState,
                     bindingRecord.State.ReservesPlayfield);
@@ -821,6 +830,23 @@ namespace ZoneEngine.Core.Missions
                 ByPlayfield.Remove(record.Binding.AllocatedLivePlayfield2);
                 InvalidAccepted.Remove(record.Binding.AcceptedQuestIdentity.Instance);
                 return true;
+            }
+        }
+
+        internal static bool HasRuntimeState(MissionAcgBindingRecord record)
+        {
+            if (record == null)
+            {
+                return true;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return ByAccepted.ContainsKey(
+                           record.Binding.AcceptedQuestIdentity.Instance)
+                       || ByPlayfield.ContainsKey(
+                           record.Binding.AllocatedLivePlayfield2);
             }
         }
 

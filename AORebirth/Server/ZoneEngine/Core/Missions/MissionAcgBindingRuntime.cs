@@ -29,6 +29,8 @@ namespace ZoneEngine.Core.Missions
 
         private static bool initialized;
 
+        private static bool expiryRestorationComplete;
+
         internal static MissionAcgLayoutCatalog Catalog
         {
             get
@@ -43,12 +45,36 @@ namespace ZoneEngine.Core.Missions
             get
             {
                 EnsureInitialized();
-                return allocator;
+                lock (Sync)
+                {
+                    if (!expiryRestorationComplete)
+                    {
+                        throw new InvalidOperationException(
+                            "Mission ACG allocation is unavailable until "
+                            + "durable expiry restoration completes.");
+                    }
+
+                    return allocator;
+                }
+            }
+        }
+
+        internal static MissionAcgAllocationService AllocatorDuringExpiryRecovery
+        {
+            get
+            {
+                EnsureInitialized();
+                lock (Sync)
+                {
+                    return allocator;
+                }
             }
         }
 
         internal static void Initialize()
         {
+            IList<MissionAcgBindingRecord> restoredForExpiry = null;
+            string restoredMissionStateDirectory = string.Empty;
             lock (Sync)
             {
                 if (initialized)
@@ -79,85 +105,46 @@ namespace ZoneEngine.Core.Missions
                         + allocationFailure);
                 }
 
-                MissionAcgObjectiveLoadResult objectiveProbe =
-                    new MissionAcgObjectiveStore(
-                        missionStateDirectory,
-                        catalog).LoadAll();
-                if (!objectiveProbe.IsValid)
-                {
-                    throw new InvalidOperationException(
-                        "Mission objective restoration failed closed before expiry reconciliation: "
-                        + string.Join(" | ", objectiveProbe.Diagnostics));
-                }
-
-                var completionOwned =
-                    new HashSet<int>();
-                for (int i = 0; i < objectiveProbe.Records.Count; i++)
-                {
-                    if (objectiveProbe.Records[i].State.Phase
-                        >= MissionAcgCompletionPhase.RewardClaimStarted)
-                    {
-                        completionOwned.Add(
-                            objectiveProbe.Records[i].Binding.AcceptedQuestIdentity.Instance);
-                    }
-                }
-
-                DateTime now = DateTime.UtcNow;
                 for (int i = 0; i < loaded.Records.Count; i++)
                 {
-                    MissionAcgBindingRecord record = loaded.Records[i];
-                    if (record.Binding.ExpiryUtc <= now
-                        && !completionOwned.Contains(
-                            record.Binding.AcceptedQuestIdentity.Instance)
-                        && (record.State.LifecycleState
-                            == MissionAcgLifecycleState.Accepted
-                            || record.State.LifecycleState
-                            == MissionAcgLifecycleState.Active))
-                    {
-                        MissionAcgInstanceState expired =
-                            record.State.Transition(
-                                MissionAcgLifecycleState.Expired,
-                                MissionAcgCleanupState.KeyRemovalPending,
-                                now);
-                        MissionAcgBindingRecord updated;
-                        string updateFailure;
-                        if (!store.TryReplace(
-                            record.WithState(expired),
-                            out updated,
-                            out updateFailure))
-                        {
-                            throw new InvalidOperationException(
-                                "Mission ACG expiry restoration failed for accepted quest "
-                                + IdentityKey(record.Binding.AcceptedQuestIdentity)
-                                + " at "
-                                + record.RecordPath
-                                + ": "
-                                + updateFailure);
-                        }
-
-                        record = updated;
-                    }
-
-                    AddIndexes(record);
+                    AddIndexes(loaded.Records[i]);
                 }
 
+                IList<MissionAcgBindingRecord> restored =
+                    new List<MissionAcgBindingRecord>(
+                        ByAcceptedInstance.Values).AsReadOnly();
                 MissionAcgRuntimeManager.Initialize(
-                    new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
+                    restored,
                     catalog,
                     missionStateDirectory);
                 MissionAcgObjectiveRuntime.Initialize(
-                    new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
+                    restored,
                     catalog,
                     missionStateDirectory);
                 MissionAcgOperationalRuntime.Initialize(
-                    new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
+                    restored,
                     catalog,
                     missionStateDirectory);
                 MissionAcgSpatialRuntime.Initialize(
-                    new List<MissionAcgBindingRecord>(ByAcceptedInstance.Values).AsReadOnly(),
+                    restored,
                     catalog,
                     missionStateDirectory);
                 initialized = true;
+                restoredForExpiry =
+                    new List<MissionAcgBindingRecord>(
+                        ByAcceptedInstance.Values).AsReadOnly();
+                restoredMissionStateDirectory = missionStateDirectory;
+            }
+
+            if (restoredForExpiry != null)
+            {
+                MissionAcgExpiryRuntime.Initialize(
+                    restoredForExpiry,
+                    restoredMissionStateDirectory);
+                lock (Sync)
+                {
+                    expiryRestorationComplete = true;
+                }
             }
         }
 
@@ -167,10 +154,19 @@ namespace ZoneEngine.Core.Missions
             out string failure)
         {
             EnsureInitialized();
+            bool created = false;
             lock (Sync)
             {
                 persisted = null;
                 failure = string.Empty;
+                if (!expiryRestorationComplete)
+                {
+                    failure =
+                        "Durable expiry restoration must complete before "
+                        + "accepting a generated mission.";
+                    return false;
+                }
+
                 if (ByAcceptedInstance.ContainsKey(
                     record.Binding.AcceptedQuestIdentity.Instance))
                 {
@@ -190,8 +186,15 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 AddIndexes(persisted);
-                return true;
+                created = true;
             }
+
+            if (created)
+            {
+                MissionAcgExpiryRuntime.OnBindingCreated(persisted);
+            }
+
+            return created;
         }
 
         internal static bool TryTransition(
@@ -203,10 +206,31 @@ namespace ZoneEngine.Core.Missions
             out string failure)
         {
             EnsureInitialized();
+            updated = null;
+            failure = string.Empty;
+            bool verifyCleanup =
+                MissionAcgLifecyclePolicy.RequiresVerifiedRuntimeCleanup(
+                    lifecycle,
+                    cleanup);
+            MissionAcgBindingRecord cleanupRecord = record;
+            if (verifyCleanup)
+            {
+                lock (Sync)
+                {
+                    if (!TryGetCurrentRecord(record, out cleanupRecord, out failure))
+                    {
+                        return false;
+                    }
+                }
+
+                if (!TryVerifyRuntimeCleanup(cleanupRecord, out failure))
+                {
+                    return false;
+                }
+            }
+
             lock (Sync)
             {
-                updated = null;
-                failure = string.Empty;
                 MissionAcgBindingRecord current;
                 if (!TryGetCurrentRecord(record, out current, out failure))
                 {
@@ -225,14 +249,6 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
-                if (MissionAcgLifecyclePolicy.RequiresVerifiedRuntimeCleanup(
-                        lifecycle,
-                        cleanup)
-                    && !TryVerifyRuntimeCleanup(record, out failure))
-                {
-                    return false;
-                }
-
                 if (!store.TryReplace(
                     record.WithState(state),
                     out updated,
@@ -242,11 +258,13 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 ReplaceIndexes(updated);
-                MissionAcgSpatialRuntime.OnBindingStateChanged(updated);
-                MissionAcgOperationalRuntime.OnBindingStateChanged(updated);
-                MissionAcgRuntimeManager.OnBindingStateChanged(updated);
-                return true;
             }
+
+            MissionAcgSpatialRuntime.OnBindingStateChanged(updated);
+            MissionAcgOperationalRuntime.OnBindingStateChanged(updated);
+            MissionAcgRuntimeManager.OnBindingStateChanged(updated);
+            MissionAcgExpiryRuntime.OnBindingStateChanged(updated);
+            return true;
         }
 
         internal static bool TryCompleteRuntimeCleanup(
@@ -254,16 +272,16 @@ namespace ZoneEngine.Core.Missions
             out string failure)
         {
             EnsureInitialized();
+            MissionAcgBindingRecord current;
             lock (Sync)
             {
-                MissionAcgBindingRecord current;
                 if (!TryGetCurrentRecord(record, out current, out failure))
                 {
                     return false;
                 }
-
-                return TryVerifyRuntimeCleanup(current, out failure);
             }
+
+            return TryVerifyRuntimeCleanup(current, out failure);
         }
 
         internal static bool TryReleaseAfterDurableCleanup(
@@ -297,21 +315,50 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
+                if (!MissionAcgExpiryRuntime.IsReleaseReady(current, out failure))
+                {
+                    return false;
+                }
+
+                bool holdForDurableJournalConfirmation =
+                    MissionAcgExpiryRuntime.OwnsCleanup(current);
                 MissionAcgBindingRecord mapped;
                 if (!ByLivePlayfield.TryGetValue(
                     current.Binding.AllocatedLivePlayfield2,
                     out mapped))
                 {
+                    if (allocator.IsReservedBy(
+                        current.Binding.AllocatedLivePlayfield2,
+                        current.Binding.AcceptedQuestIdentity))
+                    {
+                        return ReleaseCurrentPlayfield(
+                            current,
+                            holdForDurableJournalConfirmation,
+                            out failure);
+                    }
+
+                    if (allocator.IsReserved(
+                        current.Binding.AllocatedLivePlayfield2))
+                    {
+                        failure =
+                            "PF2 allocator reservation is owned by another accepted mission.";
+                        return false;
+                    }
+
                     return true;
                 }
 
                 if (mapped.Binding.AcceptedQuestIdentity.Instance
                     != current.Binding.AcceptedQuestIdentity.Instance)
                 {
-                    return true;
+                    failure = "PF2 is owned by another accepted mission.";
+                    return false;
                 }
 
-                return ReleaseCurrentPlayfield(current);
+                return ReleaseCurrentPlayfield(
+                    current,
+                    holdForDurableJournalConfirmation,
+                    out failure);
             }
         }
 
@@ -353,14 +400,61 @@ namespace ZoneEngine.Core.Missions
                 MissionAcgBindingRecord mapped;
                 if (!ByLivePlayfield.TryGetValue(
                     current.Binding.AllocatedLivePlayfield2,
-                    out mapped)
-                    || mapped.Binding.AcceptedQuestIdentity.Instance
-                       != current.Binding.AcceptedQuestIdentity.Instance)
+                    out mapped))
                 {
+                    if (allocator.IsReservedBy(
+                        current.Binding.AllocatedLivePlayfield2,
+                        current.Binding.AcceptedQuestIdentity))
+                    {
+                        return ReleaseCurrentPlayfield(
+                            current,
+                            false,
+                            out failure);
+                    }
+
+                    if (allocator.IsReserved(
+                        current.Binding.AllocatedLivePlayfield2))
+                    {
+                        failure =
+                            "Failed acceptance PF2 is reserved by another accepted mission.";
+                        return false;
+                    }
+
                     return true;
                 }
 
-                return ReleaseCurrentPlayfield(current);
+                if (mapped.Binding.AcceptedQuestIdentity.Instance
+                    != current.Binding.AcceptedQuestIdentity.Instance)
+                {
+                    failure =
+                        "Failed acceptance PF2 is indexed to another accepted mission.";
+                    return false;
+                }
+
+                return ReleaseCurrentPlayfield(current, false, out failure);
+            }
+        }
+
+        internal static IList<MissionAcgBindingRecord> GetSnapshot()
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return new List<MissionAcgBindingRecord>(
+                    ByAcceptedInstance.Values).AsReadOnly();
+            }
+        }
+
+        internal static bool TryGetByAcceptedQuest(
+            int acceptedQuestInstance,
+            out MissionAcgBindingRecord record)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return ByAcceptedInstance.TryGetValue(
+                    acceptedQuestInstance,
+                    out record);
             }
         }
 
@@ -630,11 +724,30 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static bool ReleaseCurrentPlayfield(
-            MissionAcgBindingRecord current)
+            MissionAcgBindingRecord current,
+            bool holdForDurableJournalConfirmation,
+            out string failure)
         {
-            ByLivePlayfield.Remove(
-                current.Binding.AllocatedLivePlayfield2);
-            allocator.ReleaseAfterCleanup(current);
+            failure = string.Empty;
+            if (!allocator.ReleaseAfterCleanup(
+                current,
+                holdForDurableJournalConfirmation))
+            {
+                failure = "PF2 allocator rejected exact-owner cleanup release.";
+                return false;
+            }
+
+            MissionAcgBindingRecord mapped;
+            if (ByLivePlayfield.TryGetValue(
+                    current.Binding.AllocatedLivePlayfield2,
+                    out mapped)
+                && mapped.Binding.AcceptedQuestIdentity.Instance
+                   == current.Binding.AcceptedQuestIdentity.Instance)
+            {
+                ByLivePlayfield.Remove(
+                    current.Binding.AllocatedLivePlayfield2);
+            }
+
             return true;
         }
 

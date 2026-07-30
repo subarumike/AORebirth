@@ -79,7 +79,7 @@ namespace ZoneEngine.Core.Missions
 
         public static void Begin(int playfieldInstance, int totalTrash)
         {
-            if (playfieldInstance == 0)
+            if (playfieldInstance == 0 || !IsActiveMissionPlayfield(playfieldInstance))
             {
                 return;
             }
@@ -108,7 +108,9 @@ namespace ZoneEngine.Core.Missions
 
         public static void BindCharacter(int playfieldInstance, int characterInstance)
         {
-            if (playfieldInstance == 0 || characterInstance == 0)
+            if (playfieldInstance == 0
+                || characterInstance == 0
+                || !IsActiveMissionPlayfield(playfieldInstance))
             {
                 return;
             }
@@ -166,6 +168,11 @@ namespace ZoneEngine.Core.Missions
             }
 
             int pf = victim.Playfield.Identity.Instance;
+            if (!IsActiveMissionPlayfield(pf))
+            {
+                return;
+            }
+
             int percent;
             bool changed;
             lock (Sync)
@@ -246,6 +253,8 @@ namespace ZoneEngine.Core.Missions
 
         public static bool HasFullTokenChance(int characterInstance)
         {
+            int playfieldInstance;
+            int percent;
             lock (Sync)
             {
                 Session session;
@@ -255,9 +264,13 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
-                // Mike rule / plan Phase 5: grant at >=86% trash clear (not only 100%).
-                return session.Percent >= 86;
+                playfieldInstance = session.PlayfieldInstance;
+                percent = session.Percent;
             }
+
+            // Allocator-range PF2 sessions fail closed unless their exact binding is
+            // still active and unexpired. Legacy non-ACG mission tracking is unchanged.
+            return percent >= 86 && IsActiveMissionPlayfield(playfieldInstance);
         }
 
         public static void ClearCharacter(int characterInstance)
@@ -278,15 +291,48 @@ namespace ZoneEngine.Core.Missions
         {
             lock (Sync)
             {
-                Session session;
-                if (ByPlayfield.TryGetValue(playfieldInstance, out session) && session != null
-                    && session.CharacterInstance != 0)
+                var characterInstances = new List<int>();
+                foreach (KeyValuePair<int, Session> entry in ByCharacter)
                 {
-                    ByCharacter.Remove(session.CharacterInstance);
+                    if (entry.Value != null
+                        && entry.Value.PlayfieldInstance == playfieldInstance)
+                    {
+                        characterInstances.Add(entry.Key);
+                    }
+                }
+
+                for (int i = 0; i < characterInstances.Count; i++)
+                {
+                    ByCharacter.Remove(characterInstances[i]);
                 }
 
                 ByPlayfield.Remove(playfieldInstance);
             }
+        }
+
+        internal static bool HasPlayfield(int playfieldInstance)
+        {
+            lock (Sync)
+            {
+                return ByPlayfield.ContainsKey(playfieldInstance);
+            }
+        }
+
+        private static bool IsActiveMissionPlayfield(int playfieldInstance)
+        {
+            if (!MissionAcgAllocationService.IsAllocatableRange(playfieldInstance))
+            {
+                return true;
+            }
+
+            MissionAcgBindingRecord record;
+            return MissionAcgBindingRuntime.TryResolveByLivePlayfield(
+                       playfieldInstance,
+                       out record)
+                   && record != null
+                   && record.Binding != null
+                   && record.State != null
+                   && record.State.CanEnter(DateTime.UtcNow, record.Binding.ExpiryUtc);
         }
     }
 }

@@ -25,6 +25,95 @@ namespace ZoneEngine.Core.Missions
         Failed = 4
     }
 
+    internal sealed class MissionAcgOutdoorReturnStamp
+    {
+        private MissionAcgOutdoorReturnStamp(
+            int acceptedQuestType,
+            int acceptedQuestInstance,
+            int livePlayfield2,
+            int playfield,
+            float x,
+            float y,
+            float z)
+        {
+            this.AcceptedQuestType = acceptedQuestType;
+            this.AcceptedQuestInstance = acceptedQuestInstance;
+            this.LivePlayfield2 = livePlayfield2;
+            this.Playfield = playfield;
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
+
+        internal int AcceptedQuestType { get; private set; }
+
+        internal int AcceptedQuestInstance { get; private set; }
+
+        internal int LivePlayfield2 { get; private set; }
+
+        internal int Playfield { get; private set; }
+
+        internal float X { get; private set; }
+
+        internal float Y { get; private set; }
+
+        internal float Z { get; private set; }
+
+        internal static MissionAcgOutdoorReturnStamp CreateGenerated(
+            MissionAcgInstanceBinding binding)
+        {
+            if (binding == null
+                || binding.AcceptedQuestIdentity == null
+                || binding.ExteriorEntranceIdentity == null)
+            {
+                throw new ArgumentNullException("binding");
+            }
+
+            return new MissionAcgOutdoorReturnStamp(
+                binding.AcceptedQuestIdentity.Type,
+                binding.AcceptedQuestIdentity.Instance,
+                binding.AllocatedLivePlayfield2,
+                binding.ExteriorEntranceIdentity.Instance,
+                binding.ExteriorX,
+                binding.ExteriorY,
+                binding.ExteriorZ);
+        }
+
+        internal static MissionAcgOutdoorReturnStamp CreateLegacy(
+            int playfield,
+            float x,
+            float y,
+            float z)
+        {
+            return new MissionAcgOutdoorReturnStamp(
+                0,
+                0,
+                0,
+                playfield,
+                x,
+                y,
+                z);
+        }
+
+        internal bool Matches(MissionAcgInstanceBinding binding)
+        {
+            return binding != null
+                   && binding.AcceptedQuestIdentity != null
+                   && binding.ExteriorEntranceIdentity != null
+                   && this.AcceptedQuestType
+                      == binding.AcceptedQuestIdentity.Type
+                   && this.AcceptedQuestInstance
+                      == binding.AcceptedQuestIdentity.Instance
+                   && this.LivePlayfield2
+                      == binding.AllocatedLivePlayfield2
+                   && this.Playfield
+                      == binding.ExteriorEntranceIdentity.Instance
+                   && this.X.Equals(binding.ExteriorX)
+                   && this.Y.Equals(binding.ExteriorY)
+                   && this.Z.Equals(binding.ExteriorZ);
+        }
+    }
+
     /// <summary>
     /// Minimal mutable state for one durable ACG binding. Captured layout evidence remains immutable.
     /// </summary>
@@ -147,6 +236,7 @@ namespace ZoneEngine.Core.Missions
                            || next == MissionAcgLifecycleState.Invalid;
                 case MissionAcgLifecycleState.CompletionStarted:
                     return next == MissionAcgLifecycleState.Completed
+                           || next == MissionAcgLifecycleState.Expired
                            || next == MissionAcgLifecycleState.CleanupPending
                            || next == MissionAcgLifecycleState.Invalid;
                 case MissionAcgLifecycleState.Completed:

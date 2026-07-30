@@ -49,6 +49,16 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
+            string expiryFailure;
+            if (!MissionAcgExpiryRuntime.CanBeginObjectiveAction(
+                instance.BindingRecord,
+                objective,
+                System.DateTime.UtcNow,
+                out expiryFailure))
+            {
+                return true;
+            }
+
             if (objective.State.MissionItemIdentity != null)
             {
                 return true;

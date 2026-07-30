@@ -2,26 +2,30 @@
 
 ## Active
 
-TASK ID: DUNGEON-LIFECYCLE-COMPLETION-001
+TASK ID: GENERATED-MISSION-LIVE-EXPIRY-001
 
-Complete the remaining shared named-dungeon lifecycle system across PF127 and PF1931.
+Generated-terminal missions now use their persisted absolute `ExpiryUtc` as
+live authority. A process-wide scheduler immediately blocks expired objective,
+combat, corpse, chest, door, terminal, machine, entry, and token activity;
+evacuates connected occupants; durably cleans only the exact accepted
+mission's runtime state and inventory artifacts; sends exact Quest Delete
+without completion rewards; and releases the allocated PF2 only after every
+cleanup predicate is independently verified.
 
-## Preserved concurrent mission work
+The version-1 SHA-256 expiry journal is restart-resumable. Startup restores
+incomplete cleaned-release PF2 holds before new mission allocation is exposed.
+Offline owners keep the exact PF2 reserved until reconnect permits owner
+inventory and client-state reconciliation. Expiry wins before
+`RewardClaimStarted`; durable completion wins at and after that phase.
+Abandonment shares the same atomic owner gate: it may win only before the
+deadline and cannot interleave cleanup after expiry or durable completion owns.
 
-### ACG mission kill — empty corpse crash / no loot
+Inside-at-expiry evacuation is a provisional private-server policy: use the
+persisted exterior destination with the existing outdoor standoff when valid,
+otherwise use the side hub. It is not claimed as official behavior.
 
-Operational ACG NPCs registered corpses as `lootClass=Empty credits=0 lifetimeSeconds=0` and despawned in ~20ms (`RegisterCorpse` forced empty for `IsOperationalNpc`). Client disconnects on kill; no loot window.
-
-**Offline repair complete:** operational ACG corpse currency now uses the
-capture-backed inclusive `21–87` range with overflow-safe deterministic
-arithmetic. Corpse registration, opening, transfer, deletion, delayed credits,
-duplicate death, and cleanup are scoped to the exact accepted quest, owner,
-live PF2, runtime NPC, and corpse. A verified Kill completion retains only its
-exact pending/available corpse until that corpse retires, then resumes the
-existing durable cleanup without replaying rewards. Restart reconciliation
-requires both persisted dead state and the Stage 4 `ObjectiveVerified` phase.
-Ordinary/authored corpses are unchanged.
-
-**Deferred live smoke:** restart Zone → kill trash in mish → corpse with
-capture-backed credits and explicitly unresolved-empty item contents → open
-once → no client crash → mission remains completable.
+Deferred live smoke: use a short-lived test mission or persisted fixture to
+verify expiry while outside and inside the mission, reconnect cleanup, exact
+Quest Delete, exact key/item removal, and PF2 release. The existing
+capture-backed `21–87` generated-mission corpse-credit repair remains intact;
+ordinary/authored corpses are unchanged.

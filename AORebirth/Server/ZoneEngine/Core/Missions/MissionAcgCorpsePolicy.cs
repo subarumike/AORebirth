@@ -225,12 +225,14 @@ namespace ZoneEngine.Core.Missions
 
         internal static bool IsBindingAccessibleForCorpse(
             bool ordinarilyAccessible,
+            bool completionOwned,
             MissionAcgLifecycleState lifecycleState,
             MissionAcgCleanupState cleanupState,
             bool reservesPlayfield)
         {
             return ordinarilyAccessible
-                   || (reservesPlayfield
+                   || (completionOwned
+                       && reservesPlayfield
                        && lifecycleState
                           == MissionAcgLifecycleState.CompletionStarted
                        && cleanupState == MissionAcgCleanupState.None);

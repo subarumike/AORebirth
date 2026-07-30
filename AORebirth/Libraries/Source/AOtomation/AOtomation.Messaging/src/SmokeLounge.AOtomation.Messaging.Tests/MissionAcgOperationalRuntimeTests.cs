@@ -553,21 +553,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
                     false,
+                    true,
                     MissionAcgLifecycleState.CompletionStarted,
                     MissionAcgCleanupState.None,
                     true));
             Assert.IsFalse(
                 MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
                     false,
+                    true,
                     MissionAcgLifecycleState.CleanupPending,
                     MissionAcgCleanupState.InstanceReleasePending,
                     true));
             Assert.IsFalse(
                 MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
                     false,
+                    true,
                     MissionAcgLifecycleState.CompletionStarted,
                     MissionAcgCleanupState.None,
                     false));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsBindingAccessibleForCorpse(
+                    false,
+                    false,
+                    MissionAcgLifecycleState.CompletionStarted,
+                    MissionAcgCleanupState.None,
+                    true));
         }
 
         [TestMethod]
