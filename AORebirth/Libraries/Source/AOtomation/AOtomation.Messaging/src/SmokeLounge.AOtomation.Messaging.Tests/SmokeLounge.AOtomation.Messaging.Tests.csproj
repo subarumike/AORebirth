@@ -241,6 +241,7 @@
       <Link>MissionRareLootCatalog.cs</Link>
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
+    <Compile Include="OfficialDungeonNavigationTests.cs" />
     <Compile Include="CapturedAreteMovementRuntimeTests.cs" />
     <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
@@ -437,6 +438,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseRouteState.cs">
       <Link>NpcChaseRouteState.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\OfficialDungeonChaseNavigationProvider.cs">
+      <Link>OfficialDungeonChaseNavigationProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\OfficialDungeonGeometry.cs">
+      <Link>OfficialDungeonGeometry.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\Pf127ChaseNavigationProvider.cs">
       <Link>Pf127ChaseNavigationProvider.cs</Link>
     </Compile>
@@ -477,6 +484,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json">
+      <Link>Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json">
       <Link>Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

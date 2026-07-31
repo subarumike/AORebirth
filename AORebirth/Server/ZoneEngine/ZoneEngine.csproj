@@ -498,6 +498,8 @@
     <Compile Include="Core\Navigation\NpcChaseNavigationRuntimeService.cs" />
     <Compile Include="Core\Navigation\NpcChaseRouteFollower.cs" />
     <Compile Include="Core\Navigation\NpcChaseRouteState.cs" />
+    <Compile Include="Core\Navigation\OfficialDungeonChaseNavigationProvider.cs" />
+    <Compile Include="Core\Navigation\OfficialDungeonGeometry.cs" />
     <Compile Include="Core\Navigation\Pf127ChaseNavigationProvider.cs" />
     <Compile Include="Core\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Core\PacketHandlers\OrgClient.cs" />
@@ -758,6 +760,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Subway\pf127-geometry.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Arete\rex-larsson\manifest.json">
