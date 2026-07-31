@@ -256,6 +256,7 @@
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
+    <Compile Include="TempleDoorStatusRuntimeTests.cs" />
     <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
     <Compile Include="DungeonNamedLifecycleCompletionTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />

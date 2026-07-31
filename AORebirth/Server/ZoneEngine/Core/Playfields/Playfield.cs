@@ -1067,6 +1067,18 @@ namespace AORebirth.Core.Playfields
             {
                 SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
             }
+
+            int doorStatuses = new CapturedPlayfieldDoorStatusRuntimeService().SendInitialStatuses(
+                character,
+                this.Identity.Instance,
+                this.statels);
+            if (doorStatuses > 0)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Database,
+                    "SendStaticDynelsToClient pf=" + this.Identity.Instance
+                    + " doorStatuses=" + doorStatuses);
+            }
         }
 
         public void AnnouncePlayerVisibility(ICharacter character)
@@ -1539,10 +1551,7 @@ namespace AORebirth.Core.Playfields
             this.SendSCFUsToClient(sendSCFUs);
             this.RefreshCharacterVisibility(character);
 
-            foreach (StaticDynel staticDynel in this.runtimeSystems.StaticDynels())
-            {
-                SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
-            }
+            this.SendStaticDynelsToClient(character);
 
             WeaponItemFullUpdate.SendWeaponDefinitions(character);
             this.SendDeathRespawnGameTime(character);
