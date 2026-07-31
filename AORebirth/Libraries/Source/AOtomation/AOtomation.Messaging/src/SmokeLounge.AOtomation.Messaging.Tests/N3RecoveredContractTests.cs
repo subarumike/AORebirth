@@ -95,6 +95,42 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void DoorStatusUpdateMatchesCapturedTemplePacketBody()
+        {
+            var message = new DoorStatusUpdateMessage
+                          {
+                              Identity =
+                                  new Identity
+                                  {
+                                      Type = IdentityType.Door,
+                                      Instance = 277657466
+                                  },
+                              Unknown = 0,
+                              Unknown1 = 2,
+                              Unknown2 = 0,
+                              Unknown3 = 0,
+                              Unknown4 = 0,
+                              Unknown5 = 0,
+                              Unknown6 = new Identity[0]
+                          };
+
+            byte[] capturedBody = HexToBytes(
+                "4C7D403B0000C748108CB77A000000000200000000000000000003F1");
+            CollectionAssert.AreEqual(capturedBody, Serialize(message));
+
+            var decoded = (DoorStatusUpdateMessage)Deserialize<DoorStatusUpdateMessage>(capturedBody);
+            Assert.AreEqual(IdentityType.Door, decoded.Identity.Type);
+            Assert.AreEqual(277657466, decoded.Identity.Instance);
+            Assert.AreEqual(0, decoded.Unknown);
+            Assert.AreEqual(2, decoded.Unknown1);
+            Assert.AreEqual(0, decoded.Unknown2);
+            Assert.AreEqual(0, decoded.Unknown3);
+            Assert.AreEqual(0, decoded.Unknown4);
+            Assert.AreEqual(0, decoded.Unknown5);
+            Assert.AreEqual(0, decoded.Unknown6.Length);
+        }
+
+        [TestMethod]
         public void CapturedCombatAndInventoryPacketsUseStandardN3Envelope()
         {
             Identity actor = new Identity { Type = IdentityType.CanbeAffected, Instance = 0x12 };

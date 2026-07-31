@@ -431,6 +431,7 @@
     <Compile Include="Core\MessageHandlers\CorpseInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\CorpseInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\DespawnMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\DoorStatusUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\DropDynelMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FeedbackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FollowTargetMessageHandler.cs" />
@@ -559,6 +560,7 @@
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs" />
+    <Compile Include="Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs" />
     <Compile Include="Core\Playfields\DungeonNamedLifecycle.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs" />
