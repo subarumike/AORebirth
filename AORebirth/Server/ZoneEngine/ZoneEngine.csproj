@@ -378,6 +378,9 @@
     <Compile Include="Core\Missions\MissionAcgOperationalState.cs" />
     <Compile Include="Core\Missions\MissionAcgOperationalStateStore.cs" />
     <Compile Include="Core\Missions\MissionAcgOperationalRuntime.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenProgressState.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenProgressStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenProgressRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgCorpsePolicy.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialAuthority.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialStateStore.cs" />
@@ -525,6 +528,8 @@
     <Compile Include="Core\Playfields\Content\SubwayContentModule.cs" />
     <Compile Include="Core\Playfields\Content\TempleOfThreeWindsContentModule.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMovementCatalog.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMovementRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerContentProvider.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerSpawnOrchestrator.cs" />
@@ -750,6 +755,12 @@
     <Content Include="Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Captured\Arete\movement\*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Captured\Arete\movement\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Captured\Subway\pf127-geometry.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -928,9 +939,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Refined.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XML Data\MissionRewards\MissionRewardNanoNames.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Rest.json">

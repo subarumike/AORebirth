@@ -90,6 +90,8 @@
     <Compile Include="MissionAcgSpatialRuntimeTests.cs" />
     <Compile Include="MissionAcgExpiryStateStoreTests.cs" />
     <Compile Include="MissionAcgExpiryRuntimeContractTests.cs" />
+    <Compile Include="MissionAcgTokenProgressStoreTests.cs" />
+    <Compile Include="MissionAcgTokenProgressRuntimeContractTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
@@ -140,6 +142,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgOperationalStateStore.cs">
       <Link>MissionAcgOperationalStateStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgTokenProgressState.cs">
+      <Link>MissionAcgTokenProgressState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgTokenProgressStore.cs">
+      <Link>MissionAcgTokenProgressStore.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgCorpsePolicy.cs">
       <Link>MissionAcgCorpsePolicy.cs</Link>
@@ -226,6 +234,7 @@
       <Link>MissionRareLootCatalog.cs</Link>
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
+    <Compile Include="CapturedAreteMovementRuntimeTests.cs" />
     <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
@@ -313,6 +322,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs">
       <Link>CapturedAreteRobotContentProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteMovementCatalog.cs">
+      <Link>CapturedAreteMovementCatalog.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs">
       <Link>CapturedSubwayContentProvider.cs</Link>
@@ -466,6 +478,14 @@
       <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement\*.csv">
+      <Link>Content\Captured\Arete\movement\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement\manifest.json">
+      <Link>Content\Captured\Arete\movement\manifest.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json">
       <Link>Content\Arete\rex-larsson\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -559,10 +579,6 @@
     </None>
     <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Rest.json">
       <Link>XML Data\MissionRewards\ItemDb_Rest.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\MissionRewardNanoNames.txt">
-      <Link>XML Data\MissionRewards\MissionRewardNanoNames.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -161,6 +161,25 @@ namespace ZoneEngine.Core
             return true;
         }
 
+        public static bool TryResolveFinishNanoCastingParameter(
+            NanoLandingResult landingResult,
+            out int parameter)
+        {
+            switch (landingResult)
+            {
+                case NanoLandingResult.NotRequired:
+                case NanoLandingResult.Landed:
+                    parameter = 1;
+                    return true;
+                case NanoLandingResult.Resisted:
+                    parameter = 3;
+                    return true;
+                default:
+                    parameter = 0;
+                    return false;
+            }
+        }
+
         public void RecordModifier(
             Character target,
             int statId,

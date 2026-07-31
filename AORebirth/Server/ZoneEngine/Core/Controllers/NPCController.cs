@@ -125,6 +125,8 @@ namespace ZoneEngine.Core.Controllers
 
             public DateTime StartedUtc;
 
+            public double DurationSeconds;
+
             public bool Active;
         }
 
@@ -193,6 +195,19 @@ namespace ZoneEngine.Core.Controllers
             }
 
             double elapsedSeconds = Math.Max(0.0, (now - this.followMotionSegment.StartedUtc).TotalSeconds);
+            if (this.followMotionSegment.DurationSeconds > 0.0)
+            {
+                double distance = this.followMotionSegment.Start.Distance2D(
+                    this.followMotionSegment.End);
+                return MoveToward(
+                    this.followMotionSegment.Start,
+                    this.followMotionSegment.End,
+                    distance
+                    * Math.Min(
+                        1.0,
+                        elapsedSeconds / this.followMotionSegment.DurationSeconds));
+            }
+
             return MoveToward(
                 this.followMotionSegment.Start,
                 this.followMotionSegment.End,
@@ -300,6 +315,27 @@ namespace ZoneEngine.Core.Controllers
             this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
         }
 
+        public void SendCapturedAreteMovementSegment(
+            Vector3 start,
+            Vector3 destination,
+            DateTime now,
+            double durationSeconds)
+        {
+            this.followIdentity = Identity.None;
+            lock (this.followCoordinates)
+            {
+                this.followCoordinates = new Vector3();
+            }
+
+            this.Character.Coordinates(start);
+            this.FaceToward(start, destination);
+            FollowTargetMessageHandler.Default.Send(this.Character, start, destination);
+            this.SetMotionSegment(start, destination, now, durationSeconds);
+            this.lastMotionPacketUtc = now;
+            this.lastMotionPacketDestination = destination;
+            this.hasMotionPacket = true;
+        }
+
         private bool HasCapturedPatrolReplay()
         {
             return this.capturedPatrolReplaySegments != null && this.capturedPatrolReplaySegments.Length > 0;
@@ -405,11 +441,21 @@ namespace ZoneEngine.Core.Controllers
 
         private void SetMotionSegment(Vector3 start, Vector3 destination, DateTime now)
         {
+            this.SetMotionSegment(start, destination, now, 0.0);
+        }
+
+        private void SetMotionSegment(
+            Vector3 start,
+            Vector3 destination,
+            DateTime now,
+            double durationSeconds)
+        {
             this.followMotionSegment = new NpcMotionSegment
                                        {
                                            Start = start,
                                            End = destination,
                                            StartedUtc = now,
+                                           DurationSeconds = Math.Max(0.0, durationSeconds),
                                            Active = true
                                        };
         }

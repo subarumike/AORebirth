@@ -43,6 +43,12 @@ namespace ZoneEngine.Core.Missions
         private static readonly HashSet<int> CompletionTransitionClaims =
             new HashSet<int>();
 
+        private static readonly HashSet<int> TokenProgressClaims =
+            new HashSet<int>();
+
+        private static readonly HashSet<int> ObjectiveVerificationClaims =
+            new HashSet<int>();
+
         private static readonly HashSet<int> CompletionOwned = new HashSet<int>();
 
         private static readonly HashSet<int> AbandonmentClaims = new HashSet<int>();
@@ -263,6 +269,8 @@ namespace ZoneEngine.Core.Missions
                 RetryAfterUtc.Remove(accepted);
                 CompletionOwned.Remove(accepted);
                 CompletionTransitionClaims.Remove(accepted);
+                TokenProgressClaims.Remove(accepted);
+                ObjectiveVerificationClaims.Remove(accepted);
                 AbandonmentClaims.Remove(accepted);
                 AbandonmentOwned.Remove(accepted);
                 ExpiryContext existing;
@@ -343,6 +351,10 @@ namespace ZoneEngine.Core.Missions
                         current.Binding.AcceptedQuestIdentity.Instance)
                     || CompletionTransitionClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
+                    || TokenProgressClaims.Contains(
+                        current.Binding.AcceptedQuestIdentity.Instance)
+                    || ObjectiveVerificationClaims.Contains(
+                        current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentOwned.Contains(
@@ -391,6 +403,10 @@ namespace ZoneEngine.Core.Missions
                         current.Binding.AcceptedQuestIdentity.Instance,
                         out context)
                     || CompletionTransitionClaims.Contains(
+                        current.Binding.AcceptedQuestIdentity.Instance)
+                    || TokenProgressClaims.Contains(
+                        current.Binding.AcceptedQuestIdentity.Instance)
+                    || ObjectiveVerificationClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
                     || AbandonmentClaims.Contains(
                         current.Binding.AcceptedQuestIdentity.Instance)
@@ -449,6 +465,8 @@ namespace ZoneEngine.Core.Missions
                     || AbandonmentOwned.Contains(accepted)
                     || CompletionClaims.Contains(accepted)
                     || CompletionOwned.Contains(accepted)
+                    || TokenProgressClaims.Contains(accepted)
+                    || ObjectiveVerificationClaims.Contains(accepted)
                     || MissionAcgExpiryPolicy.IsDue(
                         DateTime.UtcNow,
                         current.Binding.ExpiryUtc)
@@ -487,6 +505,182 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool TryClaimTokenProgress(
+            MissionAcgBindingRecord suppliedBinding,
+            MissionAcgObjectiveRecord objective,
+            out MissionAcgBindingRecord claimedBinding,
+            out MissionAcgObjectiveRecord claimedObjective,
+            out string failure)
+        {
+            claimedBinding = null;
+            claimedObjective = null;
+            failure = string.Empty;
+            MissionAcgBindingRecord current;
+            if (!TryResolveExactCurrent(
+                suppliedBinding,
+                objective,
+                out current,
+                out failure))
+            {
+                return false;
+            }
+
+            MissionAcgObjectiveRecord currentObjective;
+            if (!TryResolveExactCurrentObjective(
+                    current,
+                    objective,
+                    out currentObjective,
+                    out failure))
+            {
+                return false;
+            }
+
+            int accepted =
+                current.Binding.AcceptedQuestIdentity.Instance;
+            lock (Gate)
+            {
+                ExpiryContext context;
+                if (!initialized
+                    || !ByAccepted.TryGetValue(accepted, out context)
+                    || !SameBindingIdentity(context.BindingRecord, current)
+                    || context.Journal != null
+                    || ExpiryClaims.Contains(accepted)
+                    || CompletionTransitionClaims.Contains(accepted)
+                    || CompletionClaims.Contains(accepted)
+                    || CompletionOwned.Contains(accepted)
+                    || AbandonmentClaims.Contains(accepted)
+                    || AbandonmentOwned.Contains(accepted)
+                    || TokenProgressClaims.Contains(accepted)
+                    || ObjectiveVerificationClaims.Contains(accepted)
+                    || MissionAcgExpiryPolicy.IsDue(
+                        DateTime.UtcNow,
+                        current.Binding.ExpiryUtc)
+                    || (current.State.LifecycleState
+                        != MissionAcgLifecycleState.Accepted
+                        && current.State.LifecycleState
+                           != MissionAcgLifecycleState.Active)
+                    || (currentObjective.State.Lifecycle
+                        != MissionAcgObjectiveLifecycle.Exposed
+                        && currentObjective.State.Lifecycle
+                           != MissionAcgObjectiveLifecycle.ItemPossessed)
+                    || currentObjective.State.Phase
+                       != MissionAcgCompletionPhase.None)
+                {
+                    failure =
+                        "Another terminal lifecycle owns token progress.";
+                    return false;
+                }
+
+                if (!TokenProgressClaims.Add(accepted))
+                {
+                    failure =
+                        "Token progress is already being persisted.";
+                    return false;
+                }
+            }
+
+            claimedBinding = current;
+            claimedObjective = currentObjective;
+            return true;
+        }
+
+        internal static void ReleaseTokenProgressClaim(
+            int acceptedQuestInstance)
+        {
+            lock (Gate)
+            {
+                TokenProgressClaims.Remove(acceptedQuestInstance);
+            }
+        }
+
+        internal static bool TryClaimObjectiveVerification(
+            MissionAcgBindingRecord suppliedBinding,
+            MissionAcgObjectiveRecord objective,
+            out MissionAcgBindingRecord claimedBinding,
+            out MissionAcgObjectiveRecord claimedObjective,
+            out string failure)
+        {
+            claimedBinding = null;
+            claimedObjective = null;
+            failure = string.Empty;
+            MissionAcgBindingRecord current;
+            if (!TryResolveExactCurrent(
+                    suppliedBinding,
+                    objective,
+                    out current,
+                    out failure))
+            {
+                return false;
+            }
+
+            MissionAcgObjectiveRecord currentObjective;
+            if (!TryResolveExactCurrentObjective(
+                    current,
+                    objective,
+                    out currentObjective,
+                    out failure))
+            {
+                return false;
+            }
+
+            int accepted =
+                current.Binding.AcceptedQuestIdentity.Instance;
+            lock (Gate)
+            {
+                ExpiryContext context;
+                if (!initialized
+                    || !ByAccepted.TryGetValue(accepted, out context)
+                    || !SameBindingIdentity(context.BindingRecord, current)
+                    || context.Journal != null
+                    || ExpiryClaims.Contains(accepted)
+                    || CompletionTransitionClaims.Contains(accepted)
+                    || CompletionClaims.Contains(accepted)
+                    || CompletionOwned.Contains(accepted)
+                    || AbandonmentClaims.Contains(accepted)
+                    || AbandonmentOwned.Contains(accepted)
+                    || TokenProgressClaims.Contains(accepted)
+                    || ObjectiveVerificationClaims.Contains(accepted)
+                    || MissionAcgExpiryPolicy.IsDue(
+                        DateTime.UtcNow,
+                        current.Binding.ExpiryUtc)
+                    || (current.State.LifecycleState
+                        != MissionAcgLifecycleState.Accepted
+                        && current.State.LifecycleState
+                           != MissionAcgLifecycleState.Active)
+                    || (currentObjective.State.Lifecycle
+                        != MissionAcgObjectiveLifecycle.Exposed
+                        && currentObjective.State.Lifecycle
+                           != MissionAcgObjectiveLifecycle.ItemPossessed)
+                    || currentObjective.State.Phase
+                       != MissionAcgCompletionPhase.None)
+                {
+                    failure =
+                        "Another lifecycle owns objective verification.";
+                    return false;
+                }
+
+                if (!ObjectiveVerificationClaims.Add(accepted))
+                {
+                    failure =
+                        "Objective verification is already being persisted.";
+                    return false;
+                }
+            }
+
+            claimedBinding = current;
+            claimedObjective = currentObjective;
+            return true;
+        }
+
+        internal static void ReleaseObjectiveVerificationClaim(
+            int acceptedQuestInstance)
+        {
+            lock (Gate)
+            {
+                ObjectiveVerificationClaims.Remove(acceptedQuestInstance);
+            }
+        }
+
         internal static bool TryClaimCompletionReward(
             MissionAcgBindingRecord suppliedBinding,
             MissionAcgObjectiveRecord objective,
@@ -514,6 +708,8 @@ namespace ZoneEngine.Core.Missions
                     || ExpiryClaims.Contains(accepted)
                     || CompletionOwned.Contains(accepted)
                     || CompletionTransitionClaims.Contains(accepted)
+                    || TokenProgressClaims.Contains(accepted)
+                    || ObjectiveVerificationClaims.Contains(accepted)
                     || AbandonmentClaims.Contains(accepted)
                     || AbandonmentOwned.Contains(accepted)
                     || MissionAcgExpiryPolicy.IsDue(
@@ -601,6 +797,8 @@ namespace ZoneEngine.Core.Missions
                 bool completionOwned =
                     CompletionClaims.Contains(accepted)
                     || CompletionTransitionClaims.Contains(accepted)
+                    || TokenProgressClaims.Contains(accepted)
+                    || ObjectiveVerificationClaims.Contains(accepted)
                     || CompletionOwned.Contains(accepted)
                     || MissionAcgExpiryPolicy.IsCompletionOwned(
                         objective.State.Phase);
@@ -1413,6 +1611,8 @@ namespace ZoneEngine.Core.Missions
                 if (CompletionOwned.Contains(accepted)
                     || CompletionClaims.Contains(accepted)
                     || CompletionTransitionClaims.Contains(accepted)
+                    || TokenProgressClaims.Contains(accepted)
+                    || ObjectiveVerificationClaims.Contains(accepted)
                     || AbandonmentClaims.Contains(accepted)
                     || AbandonmentOwned.Contains(accepted)
                     || !MissionAcgExpiryPolicy.CanBeginExpiry(
@@ -1723,6 +1923,43 @@ namespace ZoneEngine.Core.Missions
             return true;
         }
 
+        private static bool TryResolveExactCurrentObjective(
+            MissionAcgBindingRecord currentBinding,
+            MissionAcgObjectiveRecord suppliedObjective,
+            out MissionAcgObjectiveRecord currentObjective,
+            out string failure)
+        {
+            currentObjective = null;
+            failure = string.Empty;
+            if (currentBinding == null
+                || currentBinding.Binding == null
+                || suppliedObjective == null
+                || !MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    currentBinding.Binding.OwnerIdentity.Instance,
+                    currentBinding.Binding.AcceptedQuestIdentity.Instance,
+                    out currentObjective)
+                || currentObjective == null
+                || currentObjective.Binding == null
+                || currentObjective.State == null
+                || !string.Equals(
+                    currentObjective.RecordPath,
+                    suppliedObjective.RecordPath,
+                    StringComparison.OrdinalIgnoreCase)
+                || currentObjective.State.UpdatedUtc
+                   != suppliedObjective.State.UpdatedUtc
+                || currentObjective.State.Lifecycle
+                   != suppliedObjective.State.Lifecycle
+                || currentObjective.State.Phase
+                   != suppliedObjective.State.Phase)
+            {
+                failure =
+                    "Exact current objective state is required for lifecycle arbitration.";
+                return false;
+            }
+
+            return true;
+        }
+
         private static bool TryGetConnectedOwner(
             int ownerInstance,
             out IZoneClient client,
@@ -1869,6 +2106,9 @@ namespace ZoneEngine.Core.Missions
                 context.BindingRecord.Binding.AcceptedQuestIdentity.Instance;
             if (CompletionOwned.Contains(acceptedQuestInstance)
                 || CompletionTransitionClaims.Contains(
+                    acceptedQuestInstance)
+                || TokenProgressClaims.Contains(acceptedQuestInstance)
+                || ObjectiveVerificationClaims.Contains(
                     acceptedQuestInstance)
                 || AbandonmentClaims.Contains(acceptedQuestInstance)
                 || AbandonmentOwned.Contains(acceptedQuestInstance))

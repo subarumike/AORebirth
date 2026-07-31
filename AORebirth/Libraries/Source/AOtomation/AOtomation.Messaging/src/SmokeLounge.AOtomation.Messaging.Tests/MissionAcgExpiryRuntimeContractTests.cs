@@ -100,7 +100,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ReadMissionSource("MissionAcgObjectiveInteractionService.cs");
             StringAssert.Contains(
                 completion,
-                "MissionAcgExpiryRuntime.CanBeginObjectiveAction(");
+                "MissionAcgExpiryRuntime.TryClaimObjectiveVerification(");
+            StringAssert.Contains(
+                completion,
+                "MissionAcgExpiryRuntime.ReleaseObjectiveVerificationClaim(");
             StringAssert.Contains(
                 completion,
                 "MissionAcgExpiryRuntime.CanContinueCompletion(");

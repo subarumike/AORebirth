@@ -137,6 +137,19 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
+            if (!MissionTokenProgressTracker.EnsureGeneratedProgress(
+                    bindingRecord,
+                    out failure))
+            {
+                MissionDiagnostics.Log(
+                    "ACG-TOKEN-SPAWN-BLOCK accepted={0}:{1} livePf2={2} reason={3}",
+                    bindingRecord.Binding.AcceptedQuestIdentity.Type,
+                    bindingRecord.Binding.AcceptedQuestIdentity.Instance,
+                    bindingRecord.Binding.AllocatedLivePlayfield2,
+                    failure);
+                return true;
+            }
+
             MissionAcgLayoutBundle bundle =
                 catalog.FindByLayoutId(bindingRecord.Binding.SelectedBundleId);
             int spawned = 0;
@@ -318,6 +331,153 @@ namespace ZoneEngine.Core.Missions
                 return runtimeIdentity != null
                        && ByPlayfield.TryGetValue(allocatedLivePlayfield2, out state)
                        && state.TryGetNpc(runtimeIdentity.Instance, out npc);
+            }
+        }
+
+        internal static bool TryGetTokenProgressShape(
+            MissionAcgBindingRecord binding,
+            out int totalCountableAmbientSlots,
+            out bool hasPriorCountableDeath,
+            out string failure)
+        {
+            totalCountableAmbientSlots = 0;
+            hasPriorCountableDeath = false;
+            failure = string.Empty;
+            if (binding == null || binding.Binding == null)
+            {
+                failure = "Exact binding is required for token-progress shape.";
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgOperationalState state;
+                if (!ByAccepted.TryGetValue(
+                        binding.Binding.AcceptedQuestIdentity.Instance,
+                        out state)
+                    || !MatchesTokenProgressBinding(state, binding)
+                    || state.CleanupState
+                       != MissionAcgOperationalCleanupState.Active)
+                {
+                    failure =
+                        "Exact active operational state is required for token progress.";
+                    return false;
+                }
+
+                for (int i = 0; i < state.Npcs.Count; i++)
+                {
+                    MissionAcgNpcRuntimeState npc = state.Npcs[i];
+                    if (npc.Role != MissionAcgNpcRole.Ambient
+                        || !npc.IsMaterializable
+                        || npc.CleanupCompleted)
+                    {
+                        continue;
+                    }
+
+                    totalCountableAmbientSlots++;
+                    if (npc.LifeState == MissionAcgNpcLifeState.Dead)
+                    {
+                        hasPriorCountableDeath = true;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        internal static bool TryGetTokenProgressSources(
+            MissionAcgBindingRecord binding,
+            out IList<MissionAcgNpcRuntimeState> sources,
+            out string failure)
+        {
+            sources = null;
+            failure = string.Empty;
+            if (binding == null || binding.Binding == null)
+            {
+                failure =
+                    "Exact binding is required for token-progress sources.";
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgOperationalState state;
+                if (!ByAccepted.TryGetValue(
+                        binding.Binding.AcceptedQuestIdentity.Instance,
+                        out state)
+                    || !MatchesTokenProgressBinding(state, binding)
+                    || state.CleanupState
+                       != MissionAcgOperationalCleanupState.Active)
+                {
+                    failure =
+                        "Exact active operational state is required for token-progress sources.";
+                    return false;
+                }
+
+                var result = new List<MissionAcgNpcRuntimeState>();
+                for (int i = 0; i < state.Npcs.Count; i++)
+                {
+                    MissionAcgNpcRuntimeState npc = state.Npcs[i];
+                    if (npc.Role == MissionAcgNpcRole.Ambient
+                        && npc.IsMaterializable
+                        && !npc.CleanupCompleted)
+                    {
+                        result.Add(npc);
+                    }
+                }
+
+                sources = result.AsReadOnly();
+                return true;
+            }
+        }
+
+        internal static bool TryResolveTokenProgressSource(
+            MissionAcgBindingRecord binding,
+            Identity runtimeIdentity,
+            out int capturedSlot,
+            out int spawnGeneration,
+            out string failure)
+        {
+            capturedSlot = -1;
+            spawnGeneration = 0;
+            failure = string.Empty;
+            if (binding == null
+                || binding.Binding == null
+                || runtimeIdentity == null)
+            {
+                failure =
+                    "Exact binding and runtime identity are required for token progress.";
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgOperationalState state;
+                MissionAcgNpcRuntimeState npc;
+                if (!ByAccepted.TryGetValue(
+                        binding.Binding.AcceptedQuestIdentity.Instance,
+                        out state)
+                    || !MatchesTokenProgressBinding(state, binding)
+                    || state.CleanupState
+                       != MissionAcgOperationalCleanupState.Active
+                    || !state.TryGetNpc(runtimeIdentity.Instance, out npc)
+                    || !npc.RuntimeIdentity.Equals(ToRecord(runtimeIdentity))
+                    || npc.Role != MissionAcgNpcRole.Ambient
+                    || !npc.IsMaterializable
+                    || npc.LifeState != MissionAcgNpcLifeState.Dead
+                    || npc.CleanupCompleted)
+                {
+                    failure =
+                        "Exact dead ambient NPC ownership is required for token progress.";
+                    return false;
+                }
+
+                capturedSlot = npc.CapturedSlot;
+                spawnGeneration = npc.SpawnGeneration;
+                return true;
             }
         }
 
@@ -1031,6 +1191,30 @@ namespace ZoneEngine.Core.Missions
                 restored,
                 expected,
                 out failure);
+        }
+
+        private static bool MatchesTokenProgressBinding(
+            MissionAcgOperationalState state,
+            MissionAcgBindingRecord binding)
+        {
+            return state != null
+                   && binding != null
+                   && binding.Binding != null
+                   && state.AcceptedQuestIdentity.Equals(
+                       binding.Binding.AcceptedQuestIdentity)
+                   && state.OwnerIdentity.Equals(binding.Binding.OwnerIdentity)
+                   && state.AllocatedLivePlayfield2
+                      == binding.Binding.AllocatedLivePlayfield2
+                   && string.Equals(
+                       state.BundleId,
+                       binding.Binding.SelectedBundleId,
+                       StringComparison.Ordinal)
+                   && string.Equals(
+                       state.BundlePayloadSha256,
+                       binding.Binding.SelectedBundlePayloadSha256,
+                       StringComparison.OrdinalIgnoreCase)
+                   && state.BuildingIdentity.Equals(
+                       binding.Binding.AcgBuildingIdentity);
         }
 
         private static bool TryEnsureStateLocked(

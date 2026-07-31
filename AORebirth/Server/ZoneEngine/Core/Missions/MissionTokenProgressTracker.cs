@@ -79,7 +79,10 @@ namespace ZoneEngine.Core.Missions
 
         public static void Begin(int playfieldInstance, int totalTrash)
         {
-            if (playfieldInstance == 0 || !IsActiveMissionPlayfield(playfieldInstance))
+            if (MissionAcgAllocationService.IsAllocatableRange(
+                    playfieldInstance)
+                || playfieldInstance == 0
+                || !IsActiveMissionPlayfield(playfieldInstance))
             {
                 return;
             }
@@ -108,6 +111,30 @@ namespace ZoneEngine.Core.Missions
 
         public static void BindCharacter(int playfieldInstance, int characterInstance)
         {
+            if (MissionAcgAllocationService.IsAllocatableRange(
+                    playfieldInstance))
+            {
+                MissionAcgBindingRecord binding;
+                string failure =
+                    "Exact generated mission binding is unavailable.";
+                if (!MissionAcgBindingRuntime.TryResolveByLivePlayfield(
+                        playfieldInstance,
+                        out binding)
+                    || !MissionAcgTokenProgressRuntime.RegisterCharacter(
+                        binding,
+                        characterInstance,
+                        out failure))
+                {
+                    MissionDiagnostics.Log(
+                        "ACG-TOKEN-BIND-REJECT char={0} livePf2={1} reason={2}",
+                        characterInstance,
+                        playfieldInstance,
+                        failure);
+                }
+
+                return;
+            }
+
             if (playfieldInstance == 0
                 || characterInstance == 0
                 || !IsActiveMissionPlayfield(playfieldInstance))
@@ -139,6 +166,15 @@ namespace ZoneEngine.Core.Missions
         {
             if (attacker == null || victim == null || victim.Playfield == null)
             {
+                return;
+            }
+
+            if (MissionAcgAllocationService.IsAllocatableRange(
+                    victim.Playfield.Identity.Instance))
+            {
+                MissionAcgTokenProgressRuntime.TryObserveDeath(
+                    attacker,
+                    victim);
                 return;
             }
 
@@ -289,6 +325,13 @@ namespace ZoneEngine.Core.Missions
 
         public static void ClearPlayfield(int playfieldInstance)
         {
+            if (MissionAcgAllocationService.IsAllocatableRange(
+                    playfieldInstance))
+            {
+                MissionAcgTokenProgressRuntime.ClearPlayfieldRegistration(
+                    playfieldInstance);
+            }
+
             lock (Sync)
             {
                 var characterInstances = new List<int>();
@@ -312,10 +355,44 @@ namespace ZoneEngine.Core.Missions
 
         internal static bool HasPlayfield(int playfieldInstance)
         {
+            if (MissionAcgAllocationService.IsAllocatableRange(
+                    playfieldInstance))
+            {
+                return MissionAcgTokenProgressRuntime
+                    .HasPlayfieldRegistration(playfieldInstance);
+            }
+
             lock (Sync)
             {
                 return ByPlayfield.ContainsKey(playfieldInstance);
             }
+        }
+
+        internal static bool EnsureGeneratedProgress(
+            MissionAcgBindingRecord binding,
+            out string failure)
+        {
+            return MissionAcgTokenProgressRuntime.TryEnsureState(
+                binding,
+                out failure);
+        }
+
+        internal static bool SealGeneratedProgress(
+            MissionAcgBindingRecord binding,
+            MissionAcgObjectiveRecord objective,
+            out string failure)
+        {
+            return MissionAcgTokenProgressRuntime.SealGeneratedProgress(
+                binding,
+                objective,
+                out failure);
+        }
+
+        internal static void TryResumePendingClientUpdates(
+            ICharacter character)
+        {
+            MissionAcgTokenProgressRuntime.TryResumePendingClientUpdates(
+                character);
         }
 
         private static bool IsActiveMissionPlayfield(int playfieldInstance)
