@@ -15,6 +15,7 @@ namespace AORebirth.Core.Playfields
     internal enum CapturedTempleNanoEffectOwnership
     {
         PacketOnly,
+        InstantSelfNanoData,
         ReanimatedAddLifecycle
     }
 
@@ -110,6 +111,12 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
+            if (nanoId == GulardNanoId)
+            {
+                ownership = CapturedTempleNanoEffectOwnership.InstantSelfNanoData;
+                return true;
+            }
+
             switch (nanoId)
             {
                 case DefenderPrimaryNanoId:
@@ -118,7 +125,6 @@ namespace AORebirth.Core.Playfields
                 case YatilaPrimaryNanoId:
                 case YatilaSecondaryNanoId:
                 case YatilaTertiaryNanoId:
-                case GulardNanoId:
                 case BetanyNanoId:
                 case CuratorNanoId:
                 case NematetPrimaryNanoId:

@@ -317,7 +317,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void TempleNanoEffectsRemainExactAndOnlyReanimationOwnsGameplay()
+        public void TempleNanoEffectsRemainExactAndOnlyOwnedEffectsReachGameplay()
         {
             string temple = File.ReadAllText(
                 Path.Combine(
@@ -325,7 +325,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
             int[] packetOnlyNanoIds =
             {
-                205389, 205561, 205600, 205594, 205592, 205584,
+                205389, 205561, 205600, 205594, 205592,
                 205383, 205565, 205395, 205563, 205590,
                 209924, 204830, 70294
             };
@@ -342,6 +342,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     nanoId.ToString());
             }
 
+            CapturedTempleNanoEffectOwnership gulardOwnership;
+            Assert.IsTrue(
+                CapturedTempleOfThreeWindsEncounterRules.TryGetCapturedNanoEffectOwnership(
+                    205584,
+                    out gulardOwnership));
+            Assert.AreEqual(
+                CapturedTempleNanoEffectOwnership.InstantSelfNanoData,
+                gulardOwnership);
             CapturedTempleNanoEffectOwnership reanimationOwnership;
             Assert.IsTrue(
                 CapturedTempleOfThreeWindsEncounterRules.TryGetCapturedNanoEffectOwnership(
@@ -356,9 +364,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     1,
                     out unknownOwnership));
             Assert.IsTrue(temple.Contains("this.RequestNextReanimation(pending.FinishAtUtc);"));
-            Assert.IsFalse(
-                temple.Contains("NanoEventRuntimeService.Default.ExecuteOnUseEvents"),
-                "Unproven Temple named and Murial nano stat effects must remain packet-only.");
+            Assert.IsTrue(
+                temple.Contains("NanoLoader.NanoList.TryGetValue(pending.NanoId, out nano)")
+                && temple.Contains("NanoEventRuntimeService.Default.ExecuteOnUseEvents(actor, nano)"),
+                "The exact instant Gulard self-heal must use the shared nano-data runtime.");
             Assert.IsFalse(
                 temple.Contains("new[] { DefenderUnscheduledNanoId }")
                 || temple.Contains("new[] { UkleshUnscheduledNanoId }")
