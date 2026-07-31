@@ -6,6 +6,7 @@ namespace AORebirth.Core.Playfields
     using System.Linq;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Nanos;
     using AORebirth.Core.Textures;
     using AORebirth.Core.Vector;
     using AORebirth.Enums;
@@ -1386,11 +1387,18 @@ namespace AORebirth.Core.Playfields
             {
                 this.RequestNextReanimation(pending.FinishAtUtc);
             }
+            else if (ownership == CapturedTempleNanoEffectOwnership.InstantSelfNanoData)
+            {
+                NanoFormula nano;
+                if (NanoLoader.NanoList.TryGetValue(pending.NanoId, out nano))
+                {
+                    NanoEventRuntimeService.Default.ExecuteOnUseEvents(actor, nano);
+                }
+            }
 
-            // Captures prove the cast IDs and finish timing. Gulard's nearby
-            // health changes, the reported 23-point poison tick, and the
-            // Curator/Nematet nano effects do not have safe packet ownership,
-            // so no unproven stat effect is applied.
+            // Captures prove the remaining cast IDs and finish timing, but
+            // their downstream target/effect packet ownership is incomplete.
+            // Those effects remain fail-closed.
         }
 
         private void RequestNextReanimation(DateTime finishedAtUtc)
