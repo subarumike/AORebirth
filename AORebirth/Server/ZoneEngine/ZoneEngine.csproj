@@ -753,6 +753,9 @@
     <Content Include="Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Captured\Arete\aggro.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Captured\Arete\movement\*.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -496,6 +496,10 @@
       <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\aggro.csv">
+      <Link>Content\Captured\Arete\aggro.csv</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement\*.csv">
       <Link>Content\Captured\Arete\movement\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

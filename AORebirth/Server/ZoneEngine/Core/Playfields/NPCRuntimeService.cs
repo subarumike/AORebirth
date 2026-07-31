@@ -50,6 +50,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly CapturedAreteMovementRuntimeService capturedAreteMovement;
 
+        private readonly CapturedAreteAggroCatalog capturedAreteAggro;
+
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
         private readonly OrdinaryEnemyRuntimeService ordinaryEnemies;
@@ -95,6 +97,13 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "Captured Arete movement disabled reason=" + this.capturedAreteMovement.FailureReason);
+            }
+            this.capturedAreteAggro = CapturedAreteAggroCatalog.LoadDefault();
+            if (!this.capturedAreteAggro.IsValid)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Captured Arete aggro disabled reason=" + this.capturedAreteAggro.FailureReason);
             }
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
@@ -918,7 +927,8 @@ namespace AORebirth.Core.Playfields
                 this.AcquireAggro(defenseHostile, character, false);
             }
 
-            ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
+            ICharacter automaticTarget = this.FindCapturedAreteAggroTarget(character)
+                                         ?? this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.capturedTempleEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
@@ -980,6 +990,50 @@ namespace AORebirth.Core.Playfields
             {
                 character.Controller.StartPatrolling();
             }
+        }
+
+        private ICharacter FindCapturedAreteAggroTarget(ICharacter npc)
+        {
+            if (npc == null
+                || npc.Playfield == null
+                || npc.Playfield.Identity.Instance != 6553
+                || npc.FightingTarget.Instance != 0
+                || npc.Stats[StatIds.health].Value <= 0)
+            {
+                return null;
+            }
+
+            double radius;
+            if (!this.capturedAreteAggro.TryGetRadius(
+                    new CapturedAreteMovementActorEvidence
+                    {
+                        RuntimeIdentity = npc.Identity.Instance,
+                        SpawnGeneration = 1,
+                        NpcFamily = npc.Stats[StatIds.npcfamily].Value,
+                        MonsterData = npc.Stats[StatIds.monsterdata].Value,
+                        Level = npc.Stats[StatIds.level].Value,
+                        PlayfieldId = npc.Playfield.Identity.Instance,
+                        Name = npc.Name,
+                        Position = new CapturedAreteMovementPoint(0.0d, 0.0d, 0.0d)
+                    },
+                    out radius))
+            {
+                return null;
+            }
+
+            return this.dynelRegistry
+                .FindCharactersInRange(npc, (float)radius)
+                .Where(
+                    candidate => candidate != null
+                                 && candidate.Identity != npc.Identity
+                                 && candidate.Controller is PlayerController
+                                 && candidate.Stats[StatIds.health].Value > 0)
+                .OrderBy(
+                    candidate =>
+                        candidate.Coordinates().coordinate.Distance2D(
+                            npc.Coordinates().coordinate))
+                .ThenBy(candidate => candidate.Identity.Instance)
+                .FirstOrDefault();
         }
 
         internal void ClearCombatTracking(Identity identity)
