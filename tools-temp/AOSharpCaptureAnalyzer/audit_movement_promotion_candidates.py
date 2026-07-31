@@ -47,8 +47,18 @@ DEFAULT_DATASET_DIR = (
     / "generated"
     / "arete_20260722_152454_movement"
 )
+DEFAULT_RUNTIME_DATASET_DIR = (
+    REPO_ROOT
+    / "AORebirth"
+    / "Server"
+    / "ZoneEngine"
+    / "Content"
+    / "Captured"
+    / "Arete"
+    / "movement"
+)
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 BEHAVIORS = ("patrol", "spawn", "chase", "flee", "leash", "scripted")
 DISPOSITIONS = ("Promotable", "Ambiguous", "Rejected")
 ROUTE_QUANTIZATION_METERS = 0.5
@@ -124,6 +134,32 @@ DATASET_COLUMNS = (
     "HorizontalDistance",
     "PathCount",
 )
+RUNTIME_DATASET_COLUMNS = (
+    "ObservationId",
+    "EquivalentObservationCount",
+    "CapturedUtc",
+    "Sequence",
+    "Behavior",
+    "NpcFamily",
+    "MonsterData",
+    "Level",
+    "CapturedPlayfieldId",
+    "RuntimePlayfieldId",
+    "Name",
+    "SourceIdentity",
+    "SourceGeneration",
+    "RouteSignature",
+    "StartX",
+    "StartY",
+    "StartZ",
+    "EndX",
+    "EndY",
+    "EndZ",
+    "DelayAfterSeconds",
+    "PathCount",
+)
+CAPTURED_ARETE_PLAYFIELD_ID = 1044525
+RUNTIME_ARETE_PLAYFIELD_ID = 6553
 
 
 @dataclass(frozen=True)
@@ -234,6 +270,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--capture-folder", type=Path, default=DEFAULT_CAPTURE)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--dataset-dir", type=Path, default=DEFAULT_DATASET_DIR)
+    parser.add_argument(
+        "--runtime-dataset-dir",
+        type=Path,
+        default=DEFAULT_RUNTIME_DATASET_DIR,
+    )
     return parser.parse_args(argv)
 
 
@@ -1043,6 +1084,152 @@ def partition_observations(
     return partitions
 
 
+def runtime_equivalence_key(observation: Observation) -> tuple[Any, ...]:
+    metadata = observation.metadata
+    return (
+        observation.behavior,
+        metadata.family if metadata else None,
+        metadata.template if metadata else None,
+        metadata.level if metadata else None,
+        metadata.playfield if metadata else None,
+        clean_text(metadata.name if metadata else observation.row.source_name),
+        observation.row.source_identity,
+        observation.generation,
+        observation.row.captured_utc,
+        observation.route_signature,
+        observation.row.start,
+        observation.row.end,
+        observation.row.path_count,
+    )
+
+
+def build_runtime_rows(
+    observations: list[Observation],
+) -> tuple[dict[str, list[dict[str, str]]], int]:
+    selected = [
+        observation
+        for observation in observations
+        if observation.disposition == "Promotable"
+        and observation.behavior in BEHAVIORS
+        and observation.behavior != "scripted"
+    ]
+    by_key: dict[tuple[Any, ...], list[Observation]] = defaultdict(list)
+    for observation in selected:
+        by_key[runtime_equivalence_key(observation)].append(observation)
+
+    unique = [
+        (
+            min(
+                values,
+                key=lambda value: (
+                    value.row.sequence,
+                    value.observation_id,
+                ),
+            ),
+            len(values),
+        )
+        for values in by_key.values()
+    ]
+    unique.sort(
+        key=lambda item: (
+            item[0].behavior,
+            item[0].row.source_identity,
+            item[0].generation,
+            item[0].row.captured_utc,
+            item[0].row.sequence,
+            item[0].observation_id,
+        )
+    )
+
+    variant_rows: dict[
+        tuple[str, str, int, int, int, int, int, str],
+        list[tuple[Observation, int]],
+    ] = defaultdict(list)
+    for observation, equivalent_count in unique:
+        metadata = observation.metadata
+        if metadata is None:
+            raise RuntimeError("promotable runtime observation has no metadata")
+        variant_key = (
+            observation.behavior,
+            observation.row.source_identity,
+            observation.generation,
+            metadata.family,
+            metadata.template,
+            metadata.level,
+            metadata.playfield,
+            clean_text(metadata.name),
+        )
+        variant_rows[variant_key].append((observation, equivalent_count))
+
+    result = {behavior: [] for behavior in BEHAVIORS if behavior != "scripted"}
+    for variant_key in sorted(variant_rows):
+        values = sorted(
+            variant_rows[variant_key],
+            key=lambda item: (
+                item[0].row.captured_utc,
+                item[0].row.sequence,
+                item[0].observation_id,
+            ),
+        )
+        for index, (observation, equivalent_count) in enumerate(values):
+            metadata = observation.metadata
+            next_observation = (
+                values[index + 1][0] if index + 1 < len(values) else None
+            )
+            delay = (
+                max(
+                    0.0,
+                    (
+                        next_observation.row.captured_utc
+                        - observation.row.captured_utc
+                    ).total_seconds(),
+                )
+                if next_observation is not None
+                else 0.0
+            )
+            result[observation.behavior].append(
+                {
+                    "ObservationId": observation.observation_id,
+                    "EquivalentObservationCount": str(equivalent_count),
+                    "CapturedUtc": observation.row.captured_utc.isoformat().replace(
+                        "+00:00", "Z"
+                    ),
+                    "Sequence": str(observation.row.sequence),
+                    "Behavior": observation.behavior,
+                    "NpcFamily": str(metadata.family),
+                    "MonsterData": str(metadata.template),
+                    "Level": str(metadata.level),
+                    "CapturedPlayfieldId": str(metadata.playfield),
+                    "RuntimePlayfieldId": str(RUNTIME_ARETE_PLAYFIELD_ID),
+                    "Name": clean_text(metadata.name),
+                    "SourceIdentity": observation.row.source_identity,
+                    "SourceGeneration": str(observation.generation),
+                    "RouteSignature": observation.route_signature,
+                    "StartX": format_float(observation.row.start.x),
+                    "StartY": format_float(observation.row.start.y),
+                    "StartZ": format_float(observation.row.start.z),
+                    "EndX": format_float(observation.row.end.x),
+                    "EndY": format_float(observation.row.end.y),
+                    "EndZ": format_float(observation.row.end.z),
+                    "DelayAfterSeconds": format_float(delay),
+                    "PathCount": str(observation.row.path_count),
+                }
+            )
+    return result, len(selected)
+
+
+def render_runtime_dataset(rows: list[dict[str, str]]) -> bytes:
+    stream = io.StringIO(newline="")
+    writer = csv.DictWriter(
+        stream,
+        fieldnames=RUNTIME_DATASET_COLUMNS,
+        lineterminator="\n",
+    )
+    writer.writeheader()
+    writer.writerows(rows)
+    return stream.getvalue().encode("utf-8")
+
+
 def input_manifest(capture: Path) -> list[dict[str, Any]]:
     return [
         {
@@ -1117,6 +1304,9 @@ def render_report(
     observations: list[Observation],
     groups: list[RouteGroup],
     datasets: dict[str, Path],
+    runtime_datasets: dict[str, Path],
+    runtime_rows: dict[str, list[dict[str, str]]],
+    runtime_source_count: int,
     inputs: list[dict[str, Any]],
 ) -> bytes:
     expected = int(
@@ -1208,6 +1398,30 @@ def render_report(
     lines.extend(
         [
             "",
+            "## Runtime promotion datasets",
+            "",
+            f"- Promotable source observations represented: **{runtime_source_count:,}**.",
+            f"- Deduplicated runtime rows: **{sum(len(rows) for rows in runtime_rows.values()):,}**.",
+            "- Scripted observations included in runtime: **0**.",
+            "",
+            "| Behavior | Source observations | Runtime rows | Runtime dataset |",
+            "| --- | ---: | ---: | --- |",
+        ]
+    )
+    for behavior in BEHAVIORS:
+        if behavior == "scripted":
+            continue
+        source_count = matrix[(behavior, "Promotable")]
+        runtime_path = runtime_datasets[behavior]
+        lines.append(
+            f"| {behavior} | {source_count:,} | "
+            f"{len(runtime_rows[behavior]):,} | "
+            f"`{relative_path(runtime_path)}` |"
+        )
+
+    lines.extend(
+        [
+            "",
             "## Largest promotable route groups",
             "",
         ]
@@ -1263,10 +1477,12 @@ def build_artifacts(
     capture: Path,
     report: Path,
     dataset_dir: Path,
+    runtime_dataset_dir: Path,
 ) -> tuple[dict[Path, bytes], dict[str, int]]:
     capture = capture.resolve()
     report = report.resolve()
     dataset_dir = dataset_dir.resolve()
+    runtime_dataset_dir = runtime_dataset_dir.resolve()
     validation = validate_capture(capture)
     lifecycle, spawn_times = load_lifecycle(capture)
     generation_index = build_generation_index(lifecycle)
@@ -1308,6 +1524,41 @@ def build_artifacts(
     artifacts: dict[Path, bytes] = {}
     for behavior, path in datasets.items():
         artifacts[path] = render_dataset(partitions[behavior])
+    runtime_rows, runtime_source_count = build_runtime_rows(observations)
+    runtime_datasets = {
+        behavior: runtime_dataset_dir / f"{behavior}.csv"
+        for behavior in BEHAVIORS
+        if behavior != "scripted"
+    }
+    for behavior, path in runtime_datasets.items():
+        artifacts[path] = render_runtime_dataset(runtime_rows[behavior])
+    runtime_manifest = {
+        "schemaVersion": SCHEMA_VERSION,
+        "captureId": capture.name,
+        "capturedPlayfieldId": CAPTURED_ARETE_PLAYFIELD_ID,
+        "runtimePlayfieldId": RUNTIME_ARETE_PLAYFIELD_ID,
+        "sourcePromotableObservations": runtime_source_count,
+        "deduplicatedRuntimeRows": sum(
+            len(rows) for rows in runtime_rows.values()
+        ),
+        "scriptedRuntimeRows": 0,
+        "behaviors": {
+            behavior: {
+                "path": relative_path(runtime_datasets[behavior]),
+                "sourceObservations": sum(
+                    value.behavior == behavior
+                    and value.disposition == "Promotable"
+                    for value in observations
+                ),
+                "runtimeRows": len(runtime_rows[behavior]),
+            }
+            for behavior in runtime_datasets
+        },
+    }
+    runtime_manifest_path = runtime_dataset_dir / "manifest.json"
+    artifacts[runtime_manifest_path] = (
+        json.dumps(runtime_manifest, indent=2, sort_keys=True) + "\n"
+    ).encode("utf-8")
     groups = group_routes(observations)
     inputs = input_manifest(capture)
     manifest = {
@@ -1353,7 +1604,15 @@ def build_artifacts(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     ).encode("utf-8")
     artifacts[report] = render_report(
-        capture, validation, observations, groups, datasets, inputs
+        capture,
+        validation,
+        observations,
+        groups,
+        datasets,
+        runtime_datasets,
+        runtime_rows,
+        runtime_source_count,
+        inputs,
     )
     return artifacts, {
         "observations": len(observations),
@@ -1409,6 +1668,7 @@ def main(argv: list[str]) -> int:
             args.capture_folder,
             args.report,
             args.dataset_dir,
+            args.runtime_dataset_dir,
         )
         if args.write:
             write_artifacts(artifacts)

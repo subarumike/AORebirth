@@ -66,6 +66,20 @@ Every path is classified and scored before grouping. A rejected observation cann
 | `preceding_scfu_same_generation` | 1,085 |
 | `unresolved` | 90 |
 
+## Runtime promotion datasets
+
+- Promotable source observations represented: **8,229**.
+- Deduplicated runtime rows: **8,121**.
+- Scripted observations included in runtime: **0**.
+
+| Behavior | Source observations | Runtime rows | Runtime dataset |
+| --- | ---: | ---: | --- |
+| patrol | 7,305 | 7,208 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/patrol.csv` |
+| spawn | 608 | 597 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/spawn.csv` |
+| chase | 98 | 98 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/chase.csv` |
+| flee | 22 | 22 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/flee.csv` |
+| leash | 196 | 196 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/leash.csv` |
+
 ## Largest promotable route groups
 
 | Behavior | Disposition | Family | Template | Level | PF | Signature | Observations | Confidence | Names |
@@ -118,4 +132,4 @@ Every path is classified and scored before grouping. A rejected observation cann
 - SCFU pending/errors: `0/0`
 - Movement decode errors: `0`
 - Dataset manifest: [`manifest.json`](arete_20260722_152454_movement/manifest.json)
-- Report schema: `2`
+- Report schema: `3`

@@ -231,6 +231,59 @@ class CorrectedMovementAuditTests(unittest.TestCase):
         self.assertTrue(all(len(values) == 1 for values in partitions.values()))
         self.assertEqual(sum(map(len, partitions.values())), len(observations))
 
+    def test_runtime_export_deduplicates_exact_equivalents_and_excludes_scripted(
+        self,
+    ) -> None:
+        row = movement()
+        common = (
+            row,
+            1,
+            metadata(),
+            "preceding_scfu_same_generation",
+        )
+        observations = [
+            audit.Observation(
+                "m00001",
+                *common,
+                "patrol",
+                "Promotable",
+                95,
+                ("complete_decoded_path",),
+                (),
+                audit.route_signature(row.start, row.end),
+                5.0,
+            ),
+            audit.Observation(
+                "m00002",
+                *common,
+                "patrol",
+                "Promotable",
+                95,
+                ("complete_decoded_path",),
+                (),
+                audit.route_signature(row.start, row.end),
+                5.0,
+            ),
+            audit.Observation(
+                "m00003",
+                *common,
+                "scripted",
+                "Promotable",
+                95,
+                ("complete_decoded_path",),
+                (),
+                audit.route_signature(row.start, row.end),
+                5.0,
+            ),
+        ]
+
+        rows, source_count = audit.build_runtime_rows(observations)
+
+        self.assertEqual(2, source_count)
+        self.assertEqual(1, len(rows["patrol"]))
+        self.assertEqual("2", rows["patrol"][0]["EquivalentObservationCount"])
+        self.assertNotIn("scripted", rows)
+
 
 if __name__ == "__main__":
     unittest.main()
