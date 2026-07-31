@@ -4,6 +4,22 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
+- Arete Landing capture `20260722-152454` has been imported from the public
+  handoff and fully recovered offline: `2,407/2,407` SCFUs and `213/213`
+  corpse full updates decode without errors, all `56` corpse-loot rows are
+  identity-linked, and lifecycle processing is allowed. Production now
+  preserves `50` additional exact atomic corpse snapshots (`59` item rows,
+  including `19` empty snapshots) for Arete Rollerrat, Desert Reet, Angry
+  Minibull, Gnarl the Roller, Kneebreaker Alfonzo Rizzolo, 32-V Docker, Waste
+  Collector, Cleanmeister Intelligence Robot, and Supreme Collector of Waste.
+  Ordinary wildlife is playfield/name/MonsterData scoped and named variants
+  remain name scoped. The capture also contains `9,526` usable FollowTarget
+  paths, but raw ambient/chase branches and respawn-generation identities are
+  not promoted as interchangeable patrol routes; the existing captured robot
+  replay already covers the two highest-volume stable robot identities.
+  Snapshot probabilities, wider loot pools, and two corpse snapshots lacking
+  captured enemy name/level context remain unresolved.
+
 - Arete Landing capture `20260722-104809` has been recovered from the public
   handoff and offline-decoded with all `2,581` SCFUs and `275` corpse full
   updates recovered without errors. Exact identity-linked loot now separates

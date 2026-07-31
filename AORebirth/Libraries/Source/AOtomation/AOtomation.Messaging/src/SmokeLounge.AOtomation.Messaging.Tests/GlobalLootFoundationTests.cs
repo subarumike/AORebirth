@@ -291,6 +291,33 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AretePartTwoLootRemainsPlayfieldScopedIdentityLinkedAndAtomic()
+        {
+            string source = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+
+            Assert.IsTrue(source.Contains("context.PlayfieldId == AretePlayfieldId"));
+            Assert.IsTrue(source.Contains("context.MonsterData == AreteRollerratMonsterData"));
+            Assert.IsTrue(source.Contains("context.MonsterData == AreteDesertReetMonsterData"));
+            Assert.IsTrue(source.Contains("context.MonsterData == AreteAngryMinibullMonsterData"));
+            Assert.IsTrue(source.Contains("this.EnsureAreteGnarl();"));
+            Assert.IsTrue(source.Contains("this.EnsureAreteKneebreaker();"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.rollerrat.798915D0"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.desert-reet.798828E7"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.angry-minibull.79891779"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.gnarl.79891671"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.kneebreaker.7989147B"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.cleanmeister.798915E0"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.supreme-collector.7989146B"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.waste.798913CD"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.docker.798914DC"));
+            Assert.IsTrue(source.Contains("RegisterObservedAretePartTwoTable("));
+            Assert.IsTrue(source.Contains("ObservedCorpseSnapshots = snapshots"));
+            Assert.IsTrue(source.Contains("ItemPoolUnresolved = true"));
+        }
+
+        [TestMethod]
         public void AssignmentPrecedenceAccumulatesStableGlobalFamilyEnemyDynaBossAndEncounterLayers()
         {
             LootTableRegistry registry = Registry();
