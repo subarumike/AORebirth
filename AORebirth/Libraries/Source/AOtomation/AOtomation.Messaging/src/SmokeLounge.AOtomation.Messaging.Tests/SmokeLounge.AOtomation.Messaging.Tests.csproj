@@ -93,6 +93,7 @@
     <Compile Include="MissionAcgTokenProgressStoreTests.cs" />
     <Compile Include="MissionAcgTokenProgressRuntimeContractTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
+    <Compile Include="MissionLevelGraphTests.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutRecords.cs">
@@ -220,6 +221,12 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelTable.cs">
       <Link>MissionLevelTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelGraph.cs">
+      <Link>MissionLevelGraph.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelGraphData.g.cs">
+      <Link>MissionLevelGraphData.g.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLocationPool.cs">
       <Link>MissionLocationPool.cs</Link>

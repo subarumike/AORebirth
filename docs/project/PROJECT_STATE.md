@@ -194,6 +194,23 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   atomically migrated without losing proportional health or mutable lifecycle
   state; the post-repair live destination/NPC recheck remains pending.
 
+- The generated-terminal mission-level graph is now a compiled, deterministic
+  artifact generated from the canonical exact
+  `AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv`. The graph requires
+  every level `1..220` and all eleven `Q0..Q10` positions, validates strict
+  numeric syntax, exact header/row/column shape, uniqueness, QL/token bounds,
+  monotonic rows and columns, and `Q5 == level`, and verifies canonical
+  SHA-256
+  `295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f`
+  before atomically publishing one immutable snapshot. Production no longer
+  searches runtime paths for a CSV or ODS, silently skips bad rows, publishes
+  default cells, or falls back after an invalid graph. Mission rolling reports
+  the graph failure and charges no fee. The upstream ODS hash is
+  `5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`;
+  it matches levels `1..133`, while `134..220` are lossy scientific-notation
+  cells and remain provenance only. Mission locations, sliders, rewards, token
+  progress, ACG, and authored quests are unchanged.
+
 - Generated-ACG mission corpses now use the later-analyzed
   `20260725-185432` mission-trash credit evidence as an inclusive `21-87`
   currency range; it is not a combat contribution threshold. The previous

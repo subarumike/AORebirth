@@ -85,11 +85,44 @@ namespace ZoneEngine.Core.MessageHandlers
                 int missionQuality;
                 MissionSliderProfile sliderProfile;
                 string sliderError = null;
+                string graphError;
                 if (!MissionLevelTable.TryGetMissionQuality(
                         characterLevel,
                         message.LevelSlider,
-                        out missionQuality)
-                    || !MissionSliderProfile.TryCreate(message, out sliderProfile, out sliderError))
+                        out missionQuality,
+                        out graphError))
+                {
+                    bool graphUnavailable =
+                        !string.IsNullOrEmpty(graphError);
+                    client.Server.Info(
+                        client,
+                        graphUnavailable
+                            ? "QuestAlternative roll blocked — official mission-level graph unavailable lvl={0} slider={1} err={2}"
+                            : "QuestAlternative roll blocked — unsupported difficulty detent lvl={0} slider={1}",
+                        characterLevel,
+                        message.LevelSlider,
+                        graphUnavailable
+                            ? graphError
+                            : string.Empty);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                graphUnavailable
+                                    ? "The mission terminal's official level table is unavailable or invalid. No credits were deducted."
+                                    : "The mission terminal rejected an unsupported difficulty value.")
+                        });
+                    return;
+                }
+
+                if (!MissionSliderProfile.TryCreate(
+                        message,
+                        out sliderProfile,
+                        out sliderError))
                 {
                     client.Server.Info(
                         client,

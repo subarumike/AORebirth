@@ -86,6 +86,56 @@ Captured/table anchors are:
 
 The character level used to select a table row is bounded to the table's supported range, `1..220`. This boundary behavior is an implementation safeguard; the captures directly exercise levels 60 and 220.
 
+### Official mission-level graph ownership
+
+The canonical exact source table is
+`AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv`. After normalizing
+repository text line endings to LF, its SHA-256 is
+`295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f`.
+It contains one exact header plus 220 level rows, eleven mission-quality
+positions per row, and the existing token column.
+
+`Mission_Tables_Level_Restrictions_Teaming_Levels.ods` remains upstream
+provenance with SHA-256
+`5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`.
+Its expanded ODF cells match the canonical mission positions and token values
+through level 133. The mission cells for levels 134–220 were coerced to
+floating-point scientific notation and lost low-order digits. The ODS therefore
+cannot reproduce the exact complete graph and is not a production or generation
+dependency.
+
+`tools/generate_mission_level_graph.cmd` validates the canonical CSV and emits
+`Core/Missions/MissionLevelGraphData.g.cs`. A `--check` invocation performs a
+byte-for-byte reproducibility check. The generated artifact embeds the source
+path, canonical source/payload hash, ODS provenance hash and limitation, and
+the complete canonical rows. Production does not read either spreadsheet file.
+
+Before mission rolling can use a QL, the runtime loader requires:
+
+- exactly levels `1..220`, with no missing, duplicate, conflicting, or extra
+  level row;
+- exactly unique difficulty positions `Q0..Q10`, in canonical order, with no
+  missing, duplicate, out-of-range, malformed, or extra header cell;
+- exactly `Level + 11 QL values + Tokens` for every row;
+- canonical unsigned-decimal tokens without signs, whitespace, or leading
+  zeroes;
+- mission QLs in `1..250` and the unchanged token values in `1..9`;
+- nondecreasing QLs within every row and down every difficulty column;
+- the official neutral invariant `Q5 == level`;
+- nondecreasing existing token values;
+- exact payload SHA-256 and byte-identical canonical reserialization.
+
+Only after every check passes does one immutable graph snapshot become visible
+through an atomic reference exchange. Failed validation publishes nothing; a
+failed test reload cannot replace an already valid snapshot. There is no partial
+row admission, default row, interpolation, guessed value, runtime file search,
+or legacy QL formula fallback. If no valid graph exists, the roll path emits a
+specific diagnostic and player message and returns before credits are charged.
+
+This hardening does not alter the official values, character-level clamp,
+one-based difficulty wire mapping, location selection, slider behavior,
+rewards, token progress, ACG layout selection, or authored quests.
+
 ### Continuous sliders
 
 The six continuous sliders are decoded as signed bytes:
