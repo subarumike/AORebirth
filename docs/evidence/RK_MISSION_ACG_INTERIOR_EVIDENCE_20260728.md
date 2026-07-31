@@ -21,6 +21,101 @@ regenerating or substituting layout evidence.
 
 No database schema or destructive database operation is part of this stage.
 
+## Durable generated-mission token progress
+
+The earlier `MissionTokenProgressTracker` kept generated-mission progress in
+process-local character/playfield dictionaries. That state did not prove which
+accepted quest or objective owned a callback, disappeared on restart, and could
+not safely distinguish a duplicate callback from a new token event.
+
+Generated missions therefore use a version-1 sidecar under
+`mission-state/acg-token-progress`. Serialization has deterministic key ordering
+where practical, a SHA-256 integrity field, and atomic temp-file replacement.
+Unknown versions, malformed content, integrity mismatch, duplicate accepted
+quest records, and ownership mismatches fail closed; no record is rerolled or
+silently replaced.
+
+Each progress record is bound to:
+
+- the exact accepted quest identity, never the rolled offer identity;
+- the explicit no-team owner and mission type;
+- the exact persisted objective binding and allocated live PF2;
+- the exact runtime death-source identity;
+- the captured materializable `Ambient` slot and spawn generation;
+- a deterministic token event identity derived from the accepted quest, live
+  PF2, captured slot, spawn generation, and runtime source identity.
+
+Objective roles such as `KillTarget` and `FindPerson` are excluded from token
+progress. The frozen denominator is the set of captured materializable
+`Ambient` slots for that accepted bundle. Legacy missions keep their existing
+aggressive/non-grey tracker path; generated missions do not infer a grey
+classification that Stage 5 capture evidence does not contain. They require
+the exact persisted dead `Ambient` source and its existing production combat
+registration instead. No ambient slot or token amount is fabricated.
+
+The captured/code-owned progress calculation is retained:
+
+```text
+percent = floor(applied * 100 / total)
+known exact total == 0 => 100 percent
+```
+
+This is progress accounting only. It does not change token item amounts,
+probabilities, reward rules, reward formulas, accepted-QFU fields, mission
+sliders, loot, or authored-quest token behavior.
+
+### Exactly-once event phases and arbitration
+
+The durable event journal distinguishes:
+
+1. `NotObserved`
+2. `Validated`
+3. `DurablyApplied`
+4. `ClientUpdatePending`
+5. `ClientUpdateSent`
+6. `TerminalFailure`
+
+Validation first resolves the full accepted quest, solo owner, objective,
+allocated PF2, exact dead runtime source, captured Ambient slot, and spawn
+generation. The deterministic event identity is persisted at `Validated`.
+Advancing to `DurablyApplied` changes the counter once. Later recovery may
+resume an incomplete phase, but the same event identity cannot apply again.
+`ClientUpdatePending` is durable before feedback is attempted.
+`ClientUpdateSent` means only that the server performed the send; the protocol
+does not provide a client acknowledgement, so reconnect recovery may safely
+retry a still-pending update without changing the applied counter.
+
+Token application, objective verification, completion, abandonment, and expiry
+use mutually exclusive lifecycle claims against the exact current binding and
+objective. New token events are rejected after completion, expiry, abandonment,
+or cleanup begins. The same gate prevents completion from applying a second
+token event when the objective death path already durably applied it, and gives
+completion-versus-expiry one persisted lifecycle winner.
+
+### Startup, migration, and cleanup
+
+Startup restores exact sidecars before accepting new progress. Reconnect
+reconstructs the frozen counter and resumes only pending feedback; it does not
+reroll a denominator or replay a durably applied event.
+
+Migration without an existing token sidecar is intentionally restricted:
+
+- when every countable Ambient source is still alive, the exact active mission
+  can safely initialize at zero applied events;
+- when any countable Ambient source is already dead, prior progress is
+  ambiguous, so an invalid terminal record is persisted and progress fails
+  closed;
+- when an exact sidecar already exists, a persisted dead source can be
+  reconciled through the exact quest, PF2, runtime source, captured slot, and
+  spawn generation while already-applied events remain unchanged.
+
+Mission cleanup removes only transient token runtime registration. The durable
+terminal/audit record remains available to reject a delayed or replayed
+callback. Team distribution is not inferred: generated bindings currently have
+authoritative explicit no-team ownership, so team-owned token behavior remains
+deferred. Authored quests and unrelated token systems keep their existing
+owners and persistence.
+
 ## Authoritative captures
 
 The source directories are under

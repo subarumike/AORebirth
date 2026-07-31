@@ -129,6 +129,9 @@ namespace ZoneEngine.Core.Missions
                     restored,
                     catalog,
                     missionStateDirectory);
+                MissionAcgTokenProgressRuntime.Initialize(
+                    restored,
+                    missionStateDirectory);
                 initialized = true;
                 restoredForExpiry =
                     new List<MissionAcgBindingRecord>(
@@ -263,6 +266,7 @@ namespace ZoneEngine.Core.Missions
             MissionAcgSpatialRuntime.OnBindingStateChanged(updated);
             MissionAcgOperationalRuntime.OnBindingStateChanged(updated);
             MissionAcgRuntimeManager.OnBindingStateChanged(updated);
+            MissionAcgTokenProgressRuntime.OnBindingStateChanged(updated);
             MissionAcgExpiryRuntime.OnBindingStateChanged(updated);
             return true;
         }
@@ -652,6 +656,16 @@ namespace ZoneEngine.Core.Missions
             if (!MissionAcgRuntimeManager.Cleanup(record, out subsystemFailure))
             {
                 failure = "Materialized runtime cleanup did not complete: " + subsystemFailure;
+                return false;
+            }
+
+            if (!MissionInstanceService.ClearGeneratedInstanceProcessState(
+                    record)
+                || MissionInstanceService.HasGeneratedInstanceProcessState(
+                    record))
+            {
+                failure =
+                    "Generated mission process-local cleanup did not complete.";
                 return false;
             }
 

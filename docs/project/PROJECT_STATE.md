@@ -1003,6 +1003,39 @@ Final runtime third-party attribution is documented in the root `NOTICE`: CellAO
 - `600 Varmint Woods` static vendor coverage was expanded with 1 approved mapping. Commit `e197b9f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, query-back confirmed `39321612 | 600 | 93063 | AdvOA`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`. Total uncovered statel vendors dropped from `571` to `570`, and `600 Varmint Woods` dropped from `3` to `2`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`. Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered until matching `vendortemplate.ItemTemplate` evidence is found. No runtime vendor behavior changed.
 - Surgery clinic and implant flows have documented repaired behavior.
 
+# Generated Terminal Mission Token Progress
+
+Generated-terminal mission token progress has an accepted-quest-scoped
+version-1 sidecar under `mission-state/acg-token-progress`. The record uses
+deterministic key ordering, SHA-256 integrity, atomic replacement, and
+fail-closed loading. Its immutable ownership tuple is the exact accepted quest,
+explicit no-team owner, mission type, objective binding, allocated live PF2,
+runtime source identity, captured materializable Ambient slot, spawn generation,
+and deterministic token event identity. It does not resolve through an offer
+ID, newest mission, mission type alone, template alone, or process-local player
+state.
+
+The event journal distinguishes `NotObserved`, `Validated`, `DurablyApplied`,
+`ClientUpdatePending`, `ClientUpdateSent`, and `TerminalFailure`. Durable apply
+precedes feedback notification, and notification retries do not reapply
+progress. Objective verification, completion, expiry, abandonment, and token
+application share lifecycle/race gates; expired, abandoned, cleanup-started, or
+completed missions reject new progress. Cleanup removes transient
+registrations while retaining durable audit state that prevents replay.
+
+Only captured materializable `Ambient` slots form the denominator, and objective
+slots are excluded. The preserved calculation is
+`floor(applied * 100 / total)`; a known exact zero denominator is `100`. No token
+amount, token reward, reward formula, QFU field, slider, loot, schema, or authored
+quest behavior changes here. Feedback state records server send only; there is
+no client acknowledgement.
+
+Legacy active-state migration is safe only when all countable Ambient sources
+are alive. A prior dead Ambient source without a sidecar is ambiguous and fails
+closed. An existing exact sidecar can reconcile its exact persisted dead source
+without replaying an applied event. Team distribution remains deferred; current
+generated mission bindings use authoritative explicit no-team ownership.
+
 # Partially Working Systems
 
 - Inventory, corpse item loot, corpse credit loot, player trade item/credit/cancel, and vendor buy/sell/close persistence flows have passing source assertion coverage where available and completed live-client relog verification for the documented repaired paths.
