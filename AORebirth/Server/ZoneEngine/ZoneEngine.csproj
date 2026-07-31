@@ -284,6 +284,7 @@
     <Compile Include="Core\MongoSlamRuntimeService.cs" />
     <Compile Include="Core\PetRuntimeService.cs" />
     <Compile Include="Core\PetCommandService.cs" />
+    <Compile Include="Core\PetSystemChatLines.cs" />
     <Compile Include="Core\PetHealNanoCatalog.cs" />
     <Compile Include="Core\PetCombatRules.cs" />
     <Compile Include="Core\PlayerVersusPlayerCombatRules.cs" />

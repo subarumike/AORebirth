@@ -67,20 +67,7 @@ namespace ZoneEngine.Core
 
         // Capture 20260731-054922 / 20260731-pet-chat: owner-only brown chat type 35
         // (AOSharp NpcMessage). Not Vicinity (34). Not Zone ChatText.
-        private const string ChatSpawnReady =
-            "Hello master. I'm ready to obey your commands...";
-
-        private const string ChatFollow =
-            "I will follow you wherever you go, master.";
-
-        private const string ChatWait = "I will wait here.";
-
-        private const string ChatAttack = "Charge!";
-
-        private const string ChatGuard = "I will protect you to the best of my ability.";
-
-        private const string ChatBehind =
-            "I will stay out of it until you need me again, master.";
+        // Per-pet lines: PetSystemChatLines (Carlo / CEO from 20260731-072612).
 
         // Capture 20260731-054922: PetCommand Attack with invalid/wrong target.
         private const string ChatAfraidCantDoThat = "I'm afraid I can't do that.";
@@ -88,8 +75,6 @@ namespace ZoneEngine.Core
         // Capture 20260730-234537: Heal on attack pet (Worker).
         private const string ChatManyTasksUnsupported =
             "Many tasks I am able to undertake, this is not one of them...";
-
-        private const string ChatTerminate = "Deactivating...";
 
         public static void HandleChatPetCommand(IZoneClient client, string[] cmdArgs)
         {
@@ -161,6 +146,39 @@ namespace ZoneEngine.Core
             int commandId,
             Identity commandTarget)
         {
+            // Capture 20260731-072612: all-pets terminate announces farewell for each pet,
+            // then deactivation for each (CEO wish/Ciao before Deactivating/appointment).
+            if (commandId == CommandTerminate)
+            {
+                var pets = new List<ICharacter>();
+                foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
+                {
+                    ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
+                    if (pet != null)
+                    {
+                        pets.Add(pet);
+                    }
+                }
+
+                foreach (ICharacter pet in pets)
+                {
+                    string farewell;
+                    string deactivation;
+                    PetSystemChatLines.GetTerminateLines(pet, out farewell, out deactivation);
+                    if (!string.IsNullOrEmpty(farewell))
+                    {
+                        AnnouncePetSystemChat(owner, pet, farewell);
+                    }
+                }
+
+                foreach (ICharacter pet in pets)
+                {
+                    ExecuteTerminatePet(owner, pet, announceFarewell: false);
+                }
+
+                return;
+            }
+
             foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
             {
                 ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
@@ -217,7 +235,7 @@ namespace ZoneEngine.Core
                     ClearPetCombatState(pet, petController, playfield);
                     ApplyPetFollowDesiredDistance(pet, 0);
                     petController.Follow(owner.Identity, 2.0);
-                    AnnouncePetSystemChat(owner, pet, ChatFollow);
+                    AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Follow(pet));
                     return;
 
                 case CommandGuard:
@@ -226,7 +244,7 @@ namespace ZoneEngine.Core
                     ClearPetCombatState(pet, petController, playfield);
                     ApplyPetFollowDesiredDistance(pet, 0);
                     petController.Follow(owner.Identity, 2.0);
-                    AnnouncePetSystemChat(owner, pet, ChatGuard);
+                    AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Guard(pet));
                     return;
 
                 case CommandBehind:
@@ -235,7 +253,7 @@ namespace ZoneEngine.Core
                     ClearPetCombatState(pet, petController, playfield);
                     ApplyPetFollowDesiredDistance(pet, 0);
                     petController.Follow(owner.Identity, 4.0);
-                    AnnouncePetSystemChat(owner, pet, ChatBehind);
+                    AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Behind(pet));
                     return;
 
                 case CommandWait:
@@ -270,12 +288,35 @@ namespace ZoneEngine.Core
                     return;
 
                 case CommandTerminate:
-                    ActiveHealCommands.Remove(pet.Identity.Instance);
-                    PetsHoldingWaitStance.Remove(pet.Identity.Instance);
-                    AnnouncePetSystemChat(owner, pet, ChatTerminate);
-                    PetRuntimeService.Default.TerminatePetByIdentity(owner, pet.Identity);
+                    ExecuteTerminatePet(owner, pet, announceFarewell: true);
                     return;
             }
+        }
+
+        /// <summary>
+        /// Capture 20260731-072612: Carlo/CEO send farewell then deactivation;
+        /// Worker sends only Deactivating.
+        /// </summary>
+        private static void ExecuteTerminatePet(ICharacter owner, ICharacter pet, bool announceFarewell)
+        {
+            ActiveHealCommands.Remove(pet.Identity.Instance);
+            PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+
+            string farewell;
+            string deactivation;
+            PetSystemChatLines.GetTerminateLines(pet, out farewell, out deactivation);
+
+            if (announceFarewell && !string.IsNullOrEmpty(farewell))
+            {
+                AnnouncePetSystemChat(owner, pet, farewell);
+            }
+
+            if (!string.IsNullOrEmpty(deactivation))
+            {
+                AnnouncePetSystemChat(owner, pet, deactivation);
+            }
+
+            PetRuntimeService.Default.TerminatePetByIdentity(owner, pet.Identity);
         }
 
         /// <summary>
@@ -283,7 +324,7 @@ namespace ZoneEngine.Core
         /// </summary>
         internal static void AnnouncePetSpawnChat(ICharacter owner, ICharacter pet)
         {
-            AnnouncePetSystemChat(owner, pet, ChatSpawnReady);
+            AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Spawn(pet));
         }
 
         /// <summary>
@@ -417,7 +458,7 @@ namespace ZoneEngine.Core
             AnnouncePetAttackedByFeedback(owner, pet, attackTargetCharacter);
             if (announceCharge)
             {
-                AnnouncePetSystemChat(owner, pet, ChatAttack);
+                AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Attack(pet));
             }
         }
 
@@ -478,7 +519,7 @@ namespace ZoneEngine.Core
             PetsHoldingWaitStance.Add(pet.Identity.Instance);
             ClearPetCombatState(pet, petController, playfield);
             FollowTargetMessageHandler.Default.Send(pet, pet.RawCoordinates);
-            AnnouncePetSystemChat(owner, pet, ChatWait);
+            AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Wait(pet));
         }
 
         internal static void ReturnPetToOwner(ICharacter pet)
