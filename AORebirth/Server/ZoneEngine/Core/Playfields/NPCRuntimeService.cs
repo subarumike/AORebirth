@@ -126,6 +126,30 @@ namespace AORebirth.Core.Playfields
 
         internal void ActivateNpc(ICharacter character)
         {
+            if (character != null
+                && this.playfield.Identity.Instance
+                == Pf1931OfficialDungeonGeometryLoader.TemplePlayfieldResource)
+            {
+                var coordinate = character.Coordinates().coordinate;
+                var reference = new ChaseNavigationPoint(
+                    coordinate.x,
+                    coordinate.y,
+                    coordinate.z);
+                ChaseNavigationPoint grounded;
+                if (!this.chaseNavigation.TryProjectToSurface(reference, out grounded))
+                {
+                    throw new InvalidOperationException(
+                        "PF1931 NPC spawn is outside official dungeon geometry: "
+                        + character.Identity.ToString(true));
+                }
+
+                character.Coordinates(
+                    new Coordinate(
+                        (float)grounded.X,
+                        (float)grounded.Y + 0.01f,
+                        (float)grounded.Z));
+            }
+
             this.dynelRegistry.Register(character);
             this.RegisterNpcHome(character);
             this.capturedAreteMovement.Activate(character);
