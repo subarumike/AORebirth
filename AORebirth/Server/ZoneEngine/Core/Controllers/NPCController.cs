@@ -316,7 +316,6 @@ namespace ZoneEngine.Core.Controllers
         }
 
         public void SendCapturedAreteMovementSegment(
-            CapturedAreteMovementBehavior behavior,
             Vector3 start,
             Vector3 destination,
             DateTime now,
@@ -326,16 +325,6 @@ namespace ZoneEngine.Core.Controllers
             lock (this.followCoordinates)
             {
                 this.followCoordinates = new Vector3();
-            }
-
-            if (behavior == CapturedAreteMovementBehavior.Patrol
-                || behavior == CapturedAreteMovementBehavior.Spawn)
-            {
-                this.Walk();
-            }
-            else
-            {
-                this.Run();
             }
 
             this.Character.Coordinates(start);
