@@ -221,7 +221,7 @@ namespace ZoneEngine.Core.MessageHandlers
 
             // Mission interiors: re-send exact instance-local captured objects after CharInPlay.
             if (client.Controller.Character.Playfield != null
-                && ZoneEngine.Core.Missions.MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                && ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))
             {
                 ZoneEngine.Core.Missions.MissionAcgRuntimeManager.ClearSent(

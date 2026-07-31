@@ -211,6 +211,20 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   cells and remain provenance only. Mission locations, sliders, rewards, token
   progress, ACG, and authored quests are unchanged.
 
+- Generated-terminal runtime ownership is fail-closed across spawn, entry,
+  interaction, combat, completion, payload, exit, corpse, and cleanup routing.
+  Exact accepted bindings, allocator reservations, reversible runtime
+  identities, mission-owned inventory identities, and exterior markers claim
+  generated traffic before any legacy handler can run. A claimed PF2 with a
+  missing binding or runtime record is rejected; it cannot receive legacy NPC
+  or database population, captured-default payload/building substitution,
+  newest/type/template objective selection, global target completion, or legacy
+  artifact cleanup. The fence does not classify by numeric PF2 range alone
+  because legacy mission instances share that allocation namespace. True
+  legacy missions and authored quests retain their existing paths. ACG
+  payloads, rewards, sliders, loot, token progress, expiry, schema, and
+  procedural-generation behavior are unchanged.
+
 - Generated-ACG mission corpses now use the later-analyzed
   `20260725-185432` mission-trash credit evidence as an inclusive `21-87`
   currency range; it is not a combat contribution threshold. The previous

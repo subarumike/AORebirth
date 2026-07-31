@@ -2,9 +2,27 @@
 
 ## Active
 
+TASK ID: GENERATED-MISSION-LEGACY-FALLTHROUGH-001
+
+Generated-terminal mission runtime ownership is being made fail-closed at every
+legacy boundary. An allocated PF2, reversibly encoded runtime identity, exact
+accepted mission artifact, or exact exterior marker that belongs to a generated
+mission may dispatch only through its accepted binding and instance-scoped
+runtime. Missing or invalid generated state is an explicit rejection, never
+permission to continue into replay-era spawn, global/newest mission selection,
+template-only interaction, shared-playfield routing, or legacy completion.
+
+The ownership fence is deliberately exact. The allocator's numeric PF2 range is
+not sufficient because legacy mission instances also allocate within that
+range. True legacy and authored-quest traffic retains its existing handlers.
+This stage does not alter ACG payloads, rewards, sliders, loot, token progress,
+expiry behavior, database schema, or procedural generation.
+
+## Previous completed status
+
 TASK ID: OFFICIAL-MISSION-LEVEL-GRAPH-001
 
-Generated-terminal mission rolling now requires one complete validated official
+Generated-terminal mission rolling requires one complete validated official
 mission-level graph before it can resolve a mission QL. Runtime data is compiled
 from the canonical checked-in `XML Data/MissionLevels.csv` by
 `tools/generate_mission_level_graph.cmd`; the production ZoneEngine no longer
@@ -31,9 +49,9 @@ without a valid snapshot, mission rolling fails explicitly before any fee is
 charged.
 
 No mission-location selection, sliders, rewards, token progress, expiry, corpse
-state, ACG layout, authored quest, or database behavior changes in this task.
+state, ACG layout, authored quest, or database behavior changes in that task.
 
-## Previous completed status
+## Earlier completed status
 
 TASK ID: GENERATED-MISSION-TOKEN-PROGRESS-001
 

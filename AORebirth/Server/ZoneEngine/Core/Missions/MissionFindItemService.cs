@@ -89,7 +89,8 @@ namespace ZoneEngine.Core.Missions
                 MissionAcceptedStore.GetAll(character.Identity.Instance);
             for (int i = all.Count - 1; i >= 0; i--)
             {
-                if (IsFindItemReturnMission(all[i]))
+                if (!MissionCompleteService.IsGeneratedAcceptedMission(all[i])
+                    && IsFindItemReturnMission(all[i]))
                 {
                     return true;
                 }
@@ -328,6 +329,12 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                character.Playfield.Identity.Instance))
+            {
+                return false;
+            }
+
             MissionAcceptedStore.AcceptedMission entry = ResolveActiveFindItemMission(character);
             if (entry == null || !IsFindItemReturnMission(entry))
             {
@@ -518,6 +525,15 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            if ((character.Playfield != null
+                 && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                     character.Playfield.Identity.Instance))
+                || (looted != null
+                    && IsGeneratedOwnedObjectiveItem(character, looted)))
+            {
+                return false;
+            }
+
             if (looted != null && !IsObjectiveItem(looted))
             {
                 return false;
@@ -548,7 +564,8 @@ namespace ZoneEngine.Core.Missions
             {
                 foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List())
                 {
-                    if (IsObjectiveItem(itemEntry.Value))
+                    if (IsObjectiveItem(itemEntry.Value)
+                        && !IsGeneratedOwnedObjectiveItem(character, itemEntry.Value))
                     {
                         return true;
                     }
@@ -586,7 +603,8 @@ namespace ZoneEngine.Core.Missions
                 MissionAcceptedStore.GetAll(character.Identity.Instance);
             for (int i = all.Count - 1; i >= 0; i--)
             {
-                if (IsFindItemReturnMission(all[i]))
+                if (!MissionCompleteService.IsGeneratedAcceptedMission(all[i])
+                    && IsFindItemReturnMission(all[i]))
                 {
                     entry = all[i];
                     break;
@@ -705,7 +723,8 @@ namespace ZoneEngine.Core.Missions
             for (int i = all.Count - 1; i >= 0; i--)
             {
                 MissionAcceptedStore.AcceptedMission entry = all[i];
-                if (IsFindItemKeepMission(entry) || IsFindItemReturnMission(entry))
+                if (!MissionCompleteService.IsGeneratedAcceptedMission(entry)
+                    && (IsFindItemKeepMission(entry) || IsFindItemReturnMission(entry)))
                 {
                     return entry;
                 }
@@ -776,6 +795,21 @@ namespace ZoneEngine.Core.Missions
             return null;
         }
 
+        private static bool IsGeneratedOwnedObjectiveItem(
+            ICharacter character,
+            IItem item)
+        {
+            if (character == null || item == null || item.Identity == null)
+            {
+                return false;
+            }
+
+            return MissionAcgObjectiveRuntime.IsGeneratedMissionItem(
+                new MissionAcgIdentityRecord(
+                    (int)item.Identity.Type,
+                    item.Identity.Instance));
+        }
+
         private static int TryConsumeAllObjectiveItems(IZoneClient client, ICharacter character)
         {
             if (client == null || character == null || character.BaseInventory == null)
@@ -795,7 +829,9 @@ namespace ZoneEngine.Core.Missions
                 foreach (KeyValuePair<int, IItem> itemEntry in page.List().ToList())
                 {
                     IItem candidate = itemEntry.Value;
-                    if (candidate == null || !IsObjectiveItem(candidate))
+                    if (candidate == null
+                        || !IsObjectiveItem(candidate)
+                        || IsGeneratedOwnedObjectiveItem(character, candidate))
                     {
                         continue;
                     }

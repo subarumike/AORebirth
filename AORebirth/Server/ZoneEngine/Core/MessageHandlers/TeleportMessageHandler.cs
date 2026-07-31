@@ -254,10 +254,25 @@ namespace ZoneEngine.Core.MessageHandlers
                 // Match Teleport/PAF: stamped shape building (never a foreign fog-only building).
                 if (IsMissionInstanceDestination(playfield))
                 {
+                    bool generatedMission =
+                        MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                            playfield.Instance);
                     // Match PlayfieldAnarchyF: stamped shape ACG building for this enter.
                     int buildingInstance =
                         ZoneEngine.Core.Missions.MissionInstanceService.GetLiveBuildingInstance(
                             playfield.Instance);
+                    byte[] generatorPayload = generatedMission
+                        ? MissionInstanceService.GetLiveGeneratorPayload(playfield.Instance)
+                        : null;
+                    if (generatedMission
+                        && (buildingInstance == 0
+                            || generatorPayload == null
+                            || generatorPayload.Length == 0))
+                    {
+                        throw new InvalidOperationException(
+                            "Generated ACG mission has no exact building identity or generator payload.");
+                    }
+
                     if (buildingInstance == 0)
                     {
                         buildingInstance = CapturedMissionBuildingInstance;
@@ -291,8 +306,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                    {
                                        Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
                                        Instance =
-                                           MissionAcgBindingRuntime.IsBoundLivePlayfield(
-                                               playfield.Instance)
+                                           generatedMission
                                                ? playfield.Instance
                                                : CapturedMissionTeleportPlayfield2Instance
                                    };

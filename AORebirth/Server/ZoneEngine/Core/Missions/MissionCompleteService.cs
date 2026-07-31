@@ -82,8 +82,16 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            MissionAcceptedStore.AcceptedMission entry = all[all.Count - 1];
-            return TryComplete(client, character, entry, reason);
+            for (int i = all.Count - 1; i >= 0; i--)
+            {
+                MissionAcceptedStore.AcceptedMission entry = all[i];
+                if (!IsGeneratedAcceptedMission(entry))
+                {
+                    return TryComplete(client, character, entry, reason);
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -109,6 +117,7 @@ namespace ZoneEngine.Core.Missions
             {
                 MissionAcceptedStore.AcceptedMission candidate = all[i];
                 if (candidate != null
+                    && !IsGeneratedAcceptedMission(candidate)
                     && MissionTypeCatalog.TypeFromIcon(candidate.MissionIconId) == MissionRollType.FindPerson)
                 {
                     findEntry = candidate;
@@ -134,6 +143,12 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                character.Playfield.Identity.Instance))
+            {
+                return false;
+            }
+
             if (!MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
             {
                 return false;
@@ -155,6 +170,15 @@ namespace ZoneEngine.Core.Missions
                 victim))
             {
                 return true;
+            }
+
+            if (IsInClaimedGeneratedPlayfield(attacker)
+                || IsInClaimedGeneratedPlayfield(victim)
+                || (victim != null
+                    && MissionAcgRuntimeInteractionService.ClaimsGeneratedRuntimeIdentity(
+                        victim.Identity)))
+            {
+                return false;
             }
 
             if (attacker == null || victim == null || !MissionTargetTracker.IsMissionTarget(victim.Identity))
@@ -194,11 +218,21 @@ namespace ZoneEngine.Core.Missions
                 MissionAcceptedStore.GetAll(player.Identity.Instance);
             if (accepted != null && accepted.Count > 0)
             {
-                MissionAcceptedStore.AcceptedMission latest = accepted[accepted.Count - 1];
-                if (latest != null
-                    && MissionTypeCatalog.TypeFromIcon(latest.MissionIconId) != MissionRollType.KillPerson)
+                for (int i = accepted.Count - 1; i >= 0; i--)
                 {
-                    return false;
+                    MissionAcceptedStore.AcceptedMission latest = accepted[i];
+                    if (IsGeneratedAcceptedMission(latest))
+                    {
+                        continue;
+                    }
+
+                    if (latest != null
+                        && MissionTypeCatalog.TypeFromIcon(latest.MissionIconId) != MissionRollType.KillPerson)
+                    {
+                        return false;
+                    }
+
+                    break;
                 }
             }
 
@@ -211,29 +245,19 @@ namespace ZoneEngine.Core.Missions
             MissionAcceptedStore.AcceptedMission entry,
             string reason)
         {
-            if (client == null || character == null || entry == null)
+            if (client == null || character == null || entry == null
+                || entry.QuestIdentity == null)
             {
                 return false;
             }
 
-            MissionAcgBindingRecord generatedBinding;
-            MissionAcgObjectiveRecord generatedObjective;
-            if (MissionAcgBindingRuntime.TryGetOwnedByAcceptedQuest(
-                    character.Identity.Instance,
-                    entry.QuestIdentity.Instance,
-                    out generatedBinding)
-                && MissionAcgObjectiveRuntime.TryGetByAccepted(
-                    character.Identity.Instance,
-                    entry.QuestIdentity.Instance,
-                    out generatedObjective))
+            // Generated objectives own their durable completion journal and call it
+            // directly. A generated accepted mission reaching this legacy owner is
+            // therefore an explicit rejection, including when its runtime state is
+            // missing or invalid.
+            if (IsGeneratedAcceptedMission(entry))
             {
-                return MissionAcgCompletionJournalService.TryCompleteVerified(
-                    client,
-                    character,
-                    entry,
-                    generatedBinding,
-                    generatedObjective,
-                    reason);
+                return false;
             }
 
             string flightKey = character.Identity.Instance.ToString("X") + ":"
@@ -299,8 +323,15 @@ namespace ZoneEngine.Core.Missions
                 int keyInstance;
                 bool keyRemoved = false;
                 // Prefer mission-keyed take; fall back to latest, then any template in bag.
-                if (MissionKeyStore.TryTake(character.Identity.Instance, entry.QuestIdentity, out keyInstance)
-                    || MissionKeyStore.TryTakeLatest(character.Identity.Instance, out keyInstance))
+                if (MissionKeyStore.TryTakeExactNonGenerated(
+                        character.Identity.Instance,
+                        entry.QuestIdentity,
+                        MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance,
+                        out keyInstance)
+                    || MissionKeyStore.TryTakeLatestNonGenerated(
+                        character.Identity.Instance,
+                        MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance,
+                        out keyInstance))
                 {
                     keyRemoved = MissionKeyGrantService.TryRemoveMissionKey(client, character, keyInstance);
                 }
@@ -347,6 +378,35 @@ namespace ZoneEngine.Core.Missions
                     InFlight.Remove(flightKey);
                 }
             }
+        }
+
+        internal static bool IsGeneratedAcceptedMission(
+            MissionAcceptedStore.AcceptedMission entry)
+        {
+            if (entry == null || entry.QuestIdentity == null)
+            {
+                return false;
+            }
+
+            if (MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                (int)entry.QuestIdentity.Type,
+                entry.QuestIdentity.Instance))
+            {
+                return true;
+            }
+
+            MissionAcgBindingRecord ignored;
+            return MissionAcgBindingRuntime.TryGetByAcceptedQuest(
+                entry.QuestIdentity.Instance,
+                out ignored);
+        }
+
+        private static bool IsInClaimedGeneratedPlayfield(ICharacter character)
+        {
+            return character != null
+                   && character.Playfield != null
+                   && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                       character.Playfield.Identity.Instance);
         }
 
         internal static int ResolveCashReward(MissionAcceptedStore.AcceptedMission entry)

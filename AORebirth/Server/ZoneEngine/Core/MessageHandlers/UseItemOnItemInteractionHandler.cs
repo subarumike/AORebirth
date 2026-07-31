@@ -30,6 +30,22 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
+            if (MissionAcgObjectiveInteractionService.ClaimsGeneratedUseItemOnItem(
+                client,
+                message))
+            {
+                if (client != null
+                    && client.Controller != null
+                    && client.Controller.Character != null)
+                {
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(
+                        client.Controller.Character,
+                        message);
+                }
+
+                return true;
+            }
+
             if (MissionRepairService.TryHandleUseItemOnItem(client, message))
             {
                 return true;

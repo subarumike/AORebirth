@@ -588,6 +588,40 @@ namespace ZoneEngine.Core.Missions
             return TryResolveByLivePlayfield(livePlayfield2, out ignored);
         }
 
+        internal static bool ClaimsGeneratedLivePlayfield(int livePlayfield2)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return ByLivePlayfield.ContainsKey(livePlayfield2)
+                       || allocator.IsReserved(livePlayfield2);
+            }
+        }
+
+        internal static bool HasOwnedExteriorMarker(
+            int ownerInstance,
+            int exteriorPlayfieldInstance,
+            double x,
+            double y,
+            double z,
+            double horizontalRadius,
+            double verticalRadius)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return MissionAcgBindingResolver.HasOwnedExteriorMarker(
+                    ByAcceptedInstance.Values,
+                    ownerInstance,
+                    exteriorPlayfieldInstance,
+                    x,
+                    y,
+                    z,
+                    horizontalRadius,
+                    verticalRadius);
+            }
+        }
+
         internal static bool HasAnyBindingForOwner(int ownerInstance)
         {
             EnsureInitialized();
@@ -597,6 +631,69 @@ namespace ZoneEngine.Core.Missions
                 {
                     if (record.Binding.OwnerIdentity.Instance == ownerInstance
                         && record.State.ReservesPlayfield)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        internal static bool IsOwnedMissionKey(
+            int ownerInstance,
+            MissionAcgIdentityRecord itemIdentity)
+        {
+            if (itemIdentity == null)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgBindingRecord record
+                    in ByAcceptedInstance.Values)
+                {
+                    if (record != null
+                        && record.Binding != null
+                        && record.Binding.OwnerIdentity != null
+                        && record.Binding.MissionKeyIdentity != null
+                        && record.Binding.OwnerIdentity.Instance == ownerInstance
+                        && record.Binding.MissionKeyIdentity.Equals(itemIdentity))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        internal static bool IsGeneratedMissionKey(
+            MissionAcgIdentityRecord itemIdentity)
+        {
+            return itemIdentity != null
+                   && IsGeneratedMissionKeyInstance(itemIdentity.Instance);
+        }
+
+        internal static bool IsGeneratedMissionKeyInstance(int itemInstance)
+        {
+            if (itemInstance == 0)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgBindingRecord record
+                    in ByAcceptedInstance.Values)
+                {
+                    if (record != null
+                        && record.Binding != null
+                        && record.Binding.MissionKeyIdentity != null
+                        && record.Binding.MissionKeyIdentity.Instance == itemInstance)
                     {
                         return true;
                     }

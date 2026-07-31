@@ -83,6 +83,42 @@ namespace ZoneEngine.Core.Missions
             return resolved != null;
         }
 
+        internal static bool HasOwnedExteriorMarker(
+            IEnumerable<MissionAcgBindingRecord> records,
+            int ownerInstance,
+            int exteriorPlayfieldInstance,
+            double x,
+            double y,
+            double z,
+            double horizontalRadius,
+            double verticalRadius)
+        {
+            double radiusSquared = horizontalRadius * horizontalRadius;
+            foreach (MissionAcgBindingRecord record in records)
+            {
+                if (record == null
+                    || record.Binding == null
+                    || !record.State.ReservesPlayfield
+                    || record.Binding.OwnerIdentity.Instance != ownerInstance)
+                {
+                    continue;
+                }
+
+                MissionAcgInstanceBinding binding = record.Binding;
+                double dx = x - binding.ExteriorX;
+                double dz = z - binding.ExteriorZ;
+                if (binding.ExteriorEntranceIdentity.Instance
+                    == exteriorPlayfieldInstance
+                    && ((dx * dx) + (dz * dz)) <= radiusSquared
+                    && Math.Abs(y - binding.ExteriorY) <= verticalRadius)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal static bool IsAccessible(
             MissionAcgBindingRecord record,
             int ownerInstance,

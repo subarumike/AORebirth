@@ -33,6 +33,16 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (AORebirth.Core.Playfields.Playfield.ClaimsGeneratedMissionCorpseContainer(
+                    character.Playfield,
+                    message.SourceContainer)
+                || (message.SourceContainer.Type == IdentityType.Corpse
+                    && ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                        character.Playfield.Identity.Instance)))
+            {
+                return;
+            }
+
             InventoryContainerRuntimeService.Default.HandleClientMoveItemToInventory(client, message);
         }
     }

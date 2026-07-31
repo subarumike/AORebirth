@@ -288,6 +288,12 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                playfieldIdentity.Instance))
+            {
+                return;
+            }
+
             if (this.TryHandleCapturedSubwayProxyEntry(
                 dynel,
                 playfieldIdentity,
@@ -501,9 +507,23 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            bool generatedExteriorClaim =
+                MissionAcgBindingRuntime.HasOwnedExteriorMarker(
+                    character.Identity.Instance,
+                    playfieldIdentity.Instance,
+                    character.RawCoordinates.X,
+                    character.RawCoordinates.Y,
+                    character.RawCoordinates.Z,
+                    8.0,
+                    12.0)
+                || MissionInstanceService.HasGeneratedAcceptedExteriorClaim(
+                    character,
+                    Identity.None,
+                    8.0,
+                    12.0);
             if (!MissionKeyGrantService.HasMissionKey(character))
             {
-                return false;
+                return generatedExteriorClaim;
             }
 
             float sourceX = character.RawCoordinates.X;
@@ -601,7 +621,7 @@ namespace AORebirth.Core.Playfields
             stopMovement(character);
             if (!MissionInstanceService.TryEnterMissionInstance(character.Controller.Client))
             {
-                return false;
+                return generatedExteriorClaim;
             }
 
             LogUtil.Debug(
@@ -648,11 +668,14 @@ namespace AORebirth.Core.Playfields
             float doorX;
             float doorY;
             float doorZ;
-            MissionInstanceService.ResolveInteriorExitDoor(
-                playfieldIdentity.Instance,
-                out doorX,
-                out doorY,
-                out doorZ);
+            if (!MissionInstanceService.ResolveInteriorExitDoor(
+                    playfieldIdentity.Instance,
+                    out doorX,
+                    out doorY,
+                    out doorZ))
+            {
+                return false;
+            }
 
             float sourceX = character.RawCoordinates.X;
             float sourceY = character.RawCoordinates.Y;
