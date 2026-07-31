@@ -271,8 +271,11 @@ namespace ZoneEngine.Core
                 requestPlayfieldList.PlayfieldIds.Add(pf.Identity);
             }
 
-            // Now send it back to ChatEngine
-            Program.ISComClient.Send(requestPlayfieldList);
+            // Now send it back to ChatEngine (optional — skip if ISCom is down)
+            if (Program.ISComClient != null)
+            {
+                Program.ISComClient.TrySend(requestPlayfieldList);
+            }
         }
 
         /// <summary>
@@ -437,7 +440,8 @@ namespace ZoneEngine.Core
 
         private static void PushLivePlayfieldsToChat(IEnumerable<int> characterInstances)
         {
-            if (characterInstances == null || Program.ISComClient == null)
+            if (characterInstances == null || Program.ISComClient == null
+                || !Program.ISComClient.IsConnected)
             {
                 return;
             }
@@ -455,7 +459,7 @@ namespace ZoneEngine.Core
                     continue;
                 }
 
-                Program.ISComClient.Send(
+                Program.ISComClient.TrySend(
                     new ChatCommand
                     {
                         CharacterId = online.Identity.Instance,

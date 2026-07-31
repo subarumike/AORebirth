@@ -148,12 +148,43 @@ namespace AORebirth.Communication.ISComV2Client
         #region Public Properties
 
         /// <summary>
+        /// True only while TCP is live. Half-open peers (ChatEngine exit without RST)
+        /// leave Socket.Connected==true; Poll+Available==0 detects that.
+        /// Side-effect free — never close/replace the socket from this getter
+        /// (that raced ReceiveAsync and left Zone permanently unable to reconnect).
         /// </summary>
         public bool IsConnected
         {
             get
             {
-                return this._tcpSock != null && this._tcpSock.Connected;
+                if (this._tcpSock == null)
+                {
+                    return false;
+                }
+
+                try
+                {
+                    if (!this._tcpSock.Connected)
+                    {
+                        return false;
+                    }
+
+                    // Peer closed: readable and no data queued.
+                    if (this._tcpSock.Poll(0, SelectMode.SelectRead) && this._tcpSock.Available == 0)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
+                catch (SocketException)
+                {
+                    return false;
+                }
             }
         }
 
@@ -259,6 +290,9 @@ namespace AORebirth.Communication.ISComV2Client
         }
 
         /// <summary>
+        /// Always use a fresh Socket. After a failed Connect the instance is unusable
+        /// (MSDN); reusing it left Zone permanently "ISCom disconnected" after
+        /// ChatEngine restart — owner pet SystemChat never recovered.
         /// </summary>
         /// <param name="addr">
         /// </param>
@@ -266,17 +300,42 @@ namespace AORebirth.Communication.ISComV2Client
         /// </param>
         public void Connect(IPAddress addr, int port)
         {
-            if (this._tcpSock != null)
+            this.CloseSocketQuietly();
+
+            this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this._tcpSock.NoDelay = true;
+            this._tcpSock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            // Windows: enable keepalive probes sooner than the 2h default so a dead
+            // ChatEngine is detected before pet chat silently vanishes.
+            try
             {
-                if (this._tcpSock.Connected)
-                {
-                    this._tcpSock.Disconnect(true);
-                }
-
-                this._tcpSock.Connect(addr, port);
-
-                this.BeginReceive();
+                // struct tcp_keepalive: on/off, keepalivetime(ms), keepaliveinterval(ms)
+                byte[] keepAliveValues = new byte[12];
+                BitConverter.GetBytes(1u).CopyTo(keepAliveValues, 0);
+                BitConverter.GetBytes(5000u).CopyTo(keepAliveValues, 4);
+                BitConverter.GetBytes(1000u).CopyTo(keepAliveValues, 8);
+                this._tcpSock.IOControl(IOControlCode.KeepAliveValues, keepAliveValues, null);
             }
+            catch (SocketException)
+            {
+                // KeepAlive option above still applies with OS defaults.
+            }
+
+            this._tcpSock.Connect(addr, port);
+            this._offset = 0;
+            this._remainingLength = 0;
+            this.BeginReceive();
+        }
+
+        /// <summary>
+        /// Drop a zombie/half-open socket so the next Connect can dial ChatEngine.
+        /// </summary>
+        public void ResetForReconnect()
+        {
+            this.CloseSocketQuietly();
+            this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this._offset = 0;
+            this._remainingLength = 0;
         }
 
         /// <summary>
@@ -617,10 +676,49 @@ namespace AORebirth.Communication.ISComV2Client
         /// </summary>
         private void ServerDisconnected()
         {
+            // Peer close / 0-byte receive. Replace socket so Connector can redial.
+            // Capture gap: Zone "PetSystemChat sent" while ChatEngineLog had zero delivery.
+            this.CloseSocketQuietly();
+            this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this._offset = 0;
+            this._remainingLength = 0;
+
             if (this.Disconnected != null)
             {
                 this.Disconnected(this, EventArgs.Empty);
             }
+        }
+
+        private void CloseSocketQuietly()
+        {
+            if (this._tcpSock == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (this._tcpSock.Connected)
+                {
+                    this._tcpSock.Shutdown(SocketShutdown.Both);
+                }
+            }
+            catch (SocketException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+
+            try
+            {
+                this._tcpSock.Close();
+            }
+            catch (Exception)
+            {
+            }
+
+            this._tcpSock = null;
         }
 
         #endregion

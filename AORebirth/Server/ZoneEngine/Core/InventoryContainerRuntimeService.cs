@@ -965,6 +965,18 @@ namespace ZoneEngine.Core
                 return true;
             }
 
+            // Capture 20260730-214622 / 20260726-073341: Use inventory credit card → steal 15000 credits.
+            if (LeonoraMartyQuestRuntime.TryHandleCreditCardStealUse(character, itemPosition, item))
+            {
+                return true;
+            }
+
+            // Capture 20260726-finish leonora: Use Vacuum Packed Omni-Med Suit → armor pieces.
+            if (LeonoraMartyQuestRuntime.TryHandleVacuumPackedOmniMedSuitUse(character, itemPosition, item))
+            {
+                return true;
+            }
+
             // Capture 20260721-nano-enforcer-arete: Use Marco Enforcer crystal → Overflow nanos + tip.
             if (CapturedAreteMarcoSpidaNanoPackageRuntime.TryHandleCrystalUse(character, itemPosition, item))
             {

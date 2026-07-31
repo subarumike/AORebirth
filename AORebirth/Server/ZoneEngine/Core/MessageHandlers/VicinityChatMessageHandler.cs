@@ -129,7 +129,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                                        SenderId = character.Identity.Instance
                                                    };
 
-                Program.ISComClient.Send(vicinityChat);
+                Program.ISComClient.TrySend(vicinityChat);
             }
         }
 

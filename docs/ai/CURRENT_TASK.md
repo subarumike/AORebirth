@@ -2,35 +2,55 @@
 
 ## Active
 
-TASK ID: GENERATED-MISSION-LIVE-EXPIRY-001
+### Pet owner SystemChat (capture 20260731-005116) — ISCom link fixed; client lines NOT yet proven
 
-Generated-terminal missions now use their persisted absolute `ExpiryUtc` as
-live authority. A process-wide scheduler immediately blocks expired objective,
-combat, corpse, chest, door, terminal, machine, entry, and token activity;
-evacuates connected occupants; durably cleans only the exact accepted
-mission's runtime state and inventory artifacts; sends exact Quest Delete
-without completion rewards; and releases the allocated PF2 only after every
-cleanup predicate is independently verified.
+**Do not claim fixed until Mike sees the 6 owner lines after restart-engines + full login, and ChatEngineLog shows `DistributeSystemChat ok … wire=0024…`.**
 
-The version-1 SHA-256 expiry journal is restart-resumable. Startup restores
-incomplete cleaned-release PF2 holds before new mission allocation is exposed.
-Offline owners keep the exact PF2 reserved until reconnect permits owner
-inventory and client-state reconciliation. Expiry wins before
-`RewardClaimStarted`; durable completion wins at and after that phase.
-Abandonment shares the same atomic owner gate: it may win only before the
-deadline and cannot interleave cleanup after expiry or durable completion owns.
-That gate also holds a short completion-transition lease across both durable
-`CompletionStarted` writes, closing the validation-to-persistence abandonment
-race without changing the persisted lifecycle model. Restart recovery accepts
-only the exact split state of binding `CompletionStarted` plus objective
-`ObjectiveVerified` and finishes the second write before the deadline.
+Clarification (Mike): these are **owner-only** type-36 SystemMessages (CharacterId-targeted). They may appear under Default Window tab labeled [Vicinity]; they are **not** playfield/vicinity broadcast.
 
-Inside-at-expiry evacuation is a provisional private-server policy: use the
-persisted exterior destination with the existing outdoor standoff when valid,
-otherwise use the side hub. It is not claimed as official behavior.
+#### Exact owner-only lines (`{Owner}'s pet, {PetName}: …`)
 
-Deferred live smoke: use a short-lived test mission or persisted fixture to
-verify expiry while outside and inside the mission, reconnect cleanup, exact
-Quest Delete, exact key/item removal, and PF2 release. The existing
-capture-backed `21–87` generated-mission corpse-credit repair remains intact;
-ordinary/authored corpses are unchanged.
+| Trigger | Line |
+|---------|------|
+| Spawn | `Hello master. I'm ready to obey your commands...` |
+| Follow | `I will follow you wherever you go, master.` |
+| Behind | `I will stay out of it until you need me again, master.` |
+| Wait | `I will wait here.` |
+| Guard | `I will protect you to the best of my ability.` |
+| Attack | `Charge!` |
+
+Attacked-by FormatFeedback (Zone N3, keep second `s` before `\x1e`) is separate and must not regress.
+
+#### Prior failure (proven)
+
+- Zone `PetSystemChat: ISCom disconnected` while ChatEngineLog frozen ~00:05 (no `ISCom ready`, no `DistributeSystemChat`).
+- Earlier zombie: Zone `PetSystemChat sent` into half-open TCP after ChatEngine died.
+
+#### ISCom architecture (this pass)
+
+- ChatEngine **listens** ISCom on `CommPort` **6996** during `InitializeISCom` (before chat client port 7012).
+- Zone **dials** `ChatIP:CommPort` from connector thread; keepalive ping every 5s.
+- `start-engines.ps1`: ChatEngine first → wait 6996+7012 → Zone → require Established on 6996.
+
+#### Code this pass
+
+- `IsConnected` side-effect free (Poll detect only; no socket replace in getter — that raced ReceiveAsync).
+- Fresh socket + TCP keepalive (5s/1s) on Connect; `ResetForReconnect` before redial.
+- ChatEngine: silent Ping; `DistributeSystemChat` owner CharacterId only; `ISCom ready` log.
+- `SystemChatMessage` in Communication.dll; DynamicMessage type resolve hardened.
+- Attacked-by FormatFeedback still `…s{0}{1}s{2}{3}~` (second `s` before `\x1e`).
+
+#### Log proof after rebuild + restart-engines (link only — not pet delivery)
+
+- ChatEngineLog: `ISCom ready; SystemChatMessage type=… asm=AORebirth.Communication` @ 01:15:22
+- ZoneEngineLog: `Trying to connect…` then `ISCom connected to ChatEngine` @ 01:15:31
+- start-engines: `Zone-ChatEngine ISCom link established on port 6996`
+- Engines stopped after verify (`stop-engines.cmd`). **No** `DistributeSystemChat ok` / client pet lines yet — needs Mike login + pet commands.
+
+#### Mike retest
+
+1. `cmd /d /c restart-engines.cmd` (expect `ISCom ready`, `ISCom connected`, Established 6996)
+2. Full logout/login (chat client on ConnectedClients)
+3. Spawn → Follow → Behind → Wait → Guard → Attack
+4. Pass: owner sees 6 lines **and** ChatEngineLog `DistributeSystemChat ok … wire=0024…` **and** Zone `PetSystemChat sent`
+5. Fail: Zone `ISCom disconnected` / ChatEngine miss / ok log but no orange → next capture

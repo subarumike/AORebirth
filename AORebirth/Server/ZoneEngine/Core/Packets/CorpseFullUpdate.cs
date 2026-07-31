@@ -69,6 +69,15 @@ namespace ZoneEngine.Core.Packets
         private const int CapturedAreteWasteOriginalSuffixOffset =
             NameOffset + CapturedAreteWasteOriginalEncodedNameLength;
 
+        // Capture 20260730-220951: Remains of Garbage Flea PacketLength=459, MonsterScale=125,
+        // CatMesh=15231, Material #9 tail. Mission-trash path must not steal this (tiny corpse).
+        private const int CapturedAreteGarbageFleaMonsterData = 17657;
+        private const int CapturedAreteGarbageFleaOriginalNameLength = 24;
+        private const int CapturedAreteGarbageFleaMonsterDataOffset = 327;
+        private const int CapturedAreteGarbageFleaTailDeadNpcInstanceOffset = 339;
+        private const int CapturedAreteGarbageFleaOriginalSuffixOffset =
+            NameOffset + CapturedAreteGarbageFleaOriginalNameLength + 1;
+
         // Capture 20260723-225021 corpse-full-updates Remains of Barking Chimera (PacketLength=462).
         // Generic Rhinoman template ends without the ExtTex/material tail; CatMesh 208966 then skins
         // as default lava orange/red. Live corpse packet carries the same "low2" ExtTex as living SCFU.
@@ -168,6 +177,17 @@ namespace ZoneEngine.Core.Packets
             + "000000010000000000000000000000000000000000000000000001F6000000010000000400004532000000000000C350798A239E000017A60000000000"
             + "00000000000000000000010000000000000000000000020000000000000000000000030000000000000000000000040000000000000000000000010000"
             + "07E24D6174657269616C2023323200000000000000000000000000000000000000000001768D0000000000000001");
+
+        // Capture 20260730-220951 Remains of Garbage Flea (459). Seq word swapped for 0000 pad.
+        private static readonly byte[] CapturedAreteGarbageFleaTemplate = HexToBytes(
+            "0000000A000101CB00000DC179AA68074F474E050000C76A00F5F81400000000080000000B00000000000000004557B9503C23D70A444A3D4300000000"
+            + "BF777517000000003E832960000FF02D0000000000000000006F000046F200000000001818050000001700000000000002BD00000000000002BE000000"
+            + "00000002BF000000000000019C00000001000001680000007D000000DF000000000000003B00000001000000040000000600000059000000010000019F"
+            + "0000C350000001A079ABE9EC0000002A00003B7F0000003D0000001D0000000800004650000000220000003C0000001852656D61696E73206F66204761"
+            + "726261676520466C6561000000000200000032000003F100000003000007E20000CF2739A2678A00000004000000000000000100000000000000000000"
+            + "00000000000000000000000001F70000000100000004000044F9000000000000C35079ABE9EC000017A600000000000000000000000000000001000000"
+            + "000000000000000002000000000000000000000003000000000000000000000004000000000000000000000001000007E24D6174657269616C20233900"
+            + "00000000000000000000000000000000000000000001768B0000000000000001");
 
         // Capture 20260723-225021 corpse-full-updates row 798C1F4F. Leading 0000 pads AOSharp
         // seq-stripped 000A… frame. Tail ExtTex "low2" + 0x33049 matches living Barking Chimera SCFU.
@@ -285,6 +305,21 @@ namespace ZoneEngine.Core.Packets
             if (deadNpc != null && corpseMonsterData == CapturedBarkingChimeraMonsterData)
             {
                 return BuildCapturedBarkingChimera(
+                    deadNpc,
+                    corpseIdentity,
+                    receiver,
+                    serverId,
+                    corpseCatMesh,
+                    corpseMonsterData,
+                    corpseCredits);
+            }
+
+            // Arete Garbage Flea (MD 17657): never use mission-trash human corpse.
+            // Alex fleas call MissionInstanceMobCombat.RegisterAggressive for 2m AOS, which
+            // would otherwise route here and spawn a tiny unlootable Tilda-body corpse.
+            if (deadNpc != null && corpseMonsterData == CapturedAreteGarbageFleaMonsterData)
+            {
+                return BuildCapturedAreteGarbageFlea(
                     deadNpc,
                     corpseIdentity,
                     receiver,
@@ -639,6 +674,68 @@ namespace ZoneEngine.Core.Packets
             WriteInt32(
                 buffer,
                 CapturedAreteWasteTailDeadNpcInstanceOffset + afterNameDelta,
+                deadNpc.Identity.Instance);
+
+            return buffer;
+        }
+
+        /// <summary>
+        /// Capture 20260730-220951 Garbage Flea corpse with Material #9 + MonsterScale 125/200.
+        /// </summary>
+        private static byte[] BuildCapturedAreteGarbageFlea(
+            ICharacter deadNpc,
+            Identity corpseIdentity,
+            Identity receiver,
+            int serverId,
+            int corpseCatMesh,
+            int corpseMonsterData,
+            int corpseCredits)
+        {
+            string corpseName = "Remains of " + (deadNpc.Name ?? "Garbage Flea");
+            byte[] nameBytes = Encoding.ASCII.GetBytes(corpseName);
+            // Capture NameLength is string length (not +1); payload still includes trailing null.
+            int nameLengthField = nameBytes.Length;
+            int encodedPayloadLength = nameBytes.Length + 1;
+            int newSuffixOffset = NameOffset + encodedPayloadLength;
+            int afterNameDelta = newSuffixOffset - CapturedAreteGarbageFleaOriginalSuffixOffset;
+            byte[] buffer = new byte[CapturedAreteGarbageFleaTemplate.Length + afterNameDelta];
+
+            Buffer.BlockCopy(CapturedAreteGarbageFleaTemplate, 0, buffer, 0, NameOffset);
+            Buffer.BlockCopy(nameBytes, 0, buffer, NameOffset, nameBytes.Length);
+            Buffer.BlockCopy(
+                CapturedAreteGarbageFleaTemplate,
+                CapturedAreteGarbageFleaOriginalSuffixOffset,
+                buffer,
+                newSuffixOffset,
+                CapturedAreteGarbageFleaTemplate.Length - CapturedAreteGarbageFleaOriginalSuffixOffset);
+
+            bool mutated = AlexAreaMobRuntime.IsMutatedGarbageFlea(deadNpc.Name);
+            int scale = mutated ? 200 : 125;
+            int mesh = corpseCatMesh > 0 && corpseCatMesh != 1234567890 ? corpseCatMesh : 15231;
+
+            WritePacketLength(buffer, buffer.Length);
+            WriteInt32(buffer, ServerIdOffset, serverId);
+            WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);
+            WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);
+            WriteSingle(buffer, PositionXOffset, deadNpc.RawCoordinates.X);
+            WriteSingle(buffer, PositionYOffset, deadNpc.RawCoordinates.Y);
+            WriteSingle(buffer, PositionZOffset, deadNpc.RawCoordinates.Z);
+            WriteInt32(buffer, PlayfieldIdOffset, deadNpc.Playfield.Identity.Instance);
+            WriteInt32(buffer, MonsterScaleOffset, scale);
+            WriteInt32(buffer, SexOffset, deadNpc.Stats[StatIds.sex].Value);
+            WriteInt32(buffer, BreedOffset, deadNpc.Stats[StatIds.breed].Value);
+            WriteInt32(buffer, RaceOffset, deadNpc.Stats[StatIds.race].Value);
+            WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);
+            WriteInt32(buffer, CorpseCatMeshOffset, mesh);
+            WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));
+            WriteInt32(buffer, NameLengthOffset, nameLengthField);
+            WriteInt32(
+                buffer,
+                CapturedAreteGarbageFleaMonsterDataOffset + afterNameDelta,
+                CapturedAreteGarbageFleaMonsterData);
+            WriteInt32(
+                buffer,
+                CapturedAreteGarbageFleaTailDeadNpcInstanceOffset + afterNameDelta,
                 deadNpc.Identity.Instance);
 
             return buffer;

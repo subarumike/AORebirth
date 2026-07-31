@@ -1,8 +1,8 @@
 {
   "Identity": {
     "Id": "arete-marcus-stone-dialogue-20260614-195107",
-    "Version": "captured-marcus-wounded-20260719-224226",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107 + 20260719-Rex-Markus-stone/chat-dialogue.log"
+    "Version": "captured-marcus-post-flint-20260730-142434",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107 + 20260719-Rex-Markus-stone + 20260730-142434/chat-dialogue.log"
   },
   "SourceCaptures": [
     "20260614-195107",
@@ -11,7 +11,8 @@
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log",
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log",
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-Rex-Markus-stone/chat-dialogue.log",
-    "20260719-224226"
+    "20260719-224226",
+    "20260730-142434"
   ],
   "Npcs": [
     {
@@ -222,6 +223,46 @@
               "Index": 3,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:16.0746449Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_post_flint_001",
+          "PromptText": "Was there anything else?",
+          "PromptTextConfidence": "Capture 20260730-142434 reopen after fire return / Flint tip — AnswerList order wounded-first",
+          "Options": [
+            {
+              "Id": "marcus_post_flint_001_option_0",
+              "Index": 0,
+              "Text": "Are those wounded workers your guys?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "marcus_wounded_001",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_post_flint_001_option_1",
+              "Index": 1,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_post_flint_001_option_2",
+              "Index": 2,
+              "Text": "Where am I?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_post_flint_001_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
               "NextNodeId": "marcus_goodbye",
               "Actions": []
             }

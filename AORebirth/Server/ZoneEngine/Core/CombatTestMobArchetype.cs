@@ -104,6 +104,7 @@ namespace ZoneEngine.Core
             new[] { 551, 585, 4582 },
             NpcAiProfile.Passive);
 
+        // Capture 20260730-220951: living + corpse MonsterScale=125 (Mutated=200 via slot).
         public static readonly Entry DuneFlea = new Entry(
             "duneflea",
             new[] { "duneflea", "flea" },
@@ -113,7 +114,7 @@ namespace ZoneEngine.Core
             58,
             17657,
             15231,
-            93,
+            125,
             25,
             6,
             5,

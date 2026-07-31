@@ -18,7 +18,6 @@ namespace ZoneEngine.Core.Playfields
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Controllers;
-    using ZoneEngine.Core.Missions;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
 
@@ -65,6 +64,14 @@ namespace ZoneEngine.Core.Playfields
 
             public float Z { get; private set; }
 
+            public bool HasPatrol { get; private set; }
+
+            public float PatrolEndX { get; private set; }
+
+            public float PatrolEndY { get; private set; }
+
+            public float PatrolEndZ { get; private set; }
+
             public MobSlot(
                 string name,
                 MobKind kind,
@@ -79,6 +86,43 @@ namespace ZoneEngine.Core.Playfields
                 float x,
                 float y,
                 float z)
+                : this(
+                    name,
+                    kind,
+                    monsterData,
+                    level,
+                    health,
+                    npcFamily,
+                    scale,
+                    runSpeed,
+                    aiProfile,
+                    aggroRadiusMeters,
+                    x,
+                    y,
+                    z,
+                    float.NaN,
+                    float.NaN,
+                    float.NaN)
+            {
+            }
+
+            public MobSlot(
+                string name,
+                MobKind kind,
+                int monsterData,
+                int level,
+                int health,
+                int npcFamily,
+                int scale,
+                int runSpeed,
+                NpcAiProfile aiProfile,
+                float aggroRadiusMeters,
+                float x,
+                float y,
+                float z,
+                float patrolEndX,
+                float patrolEndY,
+                float patrolEndZ)
             {
                 this.Name = name;
                 this.Kind = kind;
@@ -93,6 +137,10 @@ namespace ZoneEngine.Core.Playfields
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
+                this.HasPatrol = !float.IsNaN(patrolEndX);
+                this.PatrolEndX = patrolEndX;
+                this.PatrolEndY = patrolEndY;
+                this.PatrolEndZ = patrolEndZ;
             }
         }
 
@@ -169,6 +217,19 @@ namespace ZoneEngine.Core.Playfields
                 0x00, 0x02, 0x00, 0x00
             };
 
+        // Capture 20260730-220951 Mutated Garbage Flea ScfuUnknown1Hex (zeros + body tail).
+        private static readonly byte[] MutatedGarbageFleaCapturedScfuUnknown1 =
+            {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x03, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+                0x00, 0x02, 0x00, 0x00
+            };
+
+        // Capture FollowTarget NpcPath Unknown1=24; flea walk ~1.5 m/s.
+        private const double FleaPatrolWalkSpeedPerSecond = 1.5;
+
+        private const double FleaPatrolEarlyTurnFactor = 0.85;
+
         // Capture 20260720-212302 SCFU TextureOverrides Material #1 / 295519.
         private static readonly byte[] CleaningRobotExtendedTextureOverrideData =
             {
@@ -210,27 +271,28 @@ namespace ZoneEngine.Core.Playfields
                 new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3558.766f, 8.575f, 927.072f),
                 new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3567.060f, 8.218f, 918.754f),
                 new MobSlot("Waste Collector", MobKind.WasteCollector, 17714, 2, 29, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3585.885f, 6.998f, 921.242f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.315f, 5.110f, 902.829f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3502.761f, 5.110f, 891.211f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3509.731f, 7.394f, 926.952f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3529.015f, 5.110f, 891.201f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3541.526f, 8.190f, 892.471f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3549.231f, 9.371f, 938.996f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3554.468f, 8.074f, 919.910f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3562.391f, 5.110f, 864.537f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3565.514f, 8.356f, 913.615f),
+                // Capture 20260730-220951: flea aggro ~2m; FollowTarget NpcPath 2-point loops.
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3502.315f, 5.110f, 902.829f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 2.0f, 3502.761f, 5.110f, 891.211f, 3503.10352f, 5.110f, 896.0185f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3509.731f, 7.394f, 926.952f, 3513.91138f, 8.024651f, 931.679749f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 2.0f, 3529.015f, 5.110f, 891.201f, 3518.65234f, 5.110f, 890.2141f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3541.526f, 8.190f, 892.471f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3549.231f, 9.371f, 938.996f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3554.468f, 8.074f, 919.910f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 2.0f, 3562.391f, 5.110f, 864.537f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3565.514f, 8.356f, 913.615f),
                 new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 100, 13, NpcAiProfile.Passive, 0.0f, 3549.280f, 5.110f, 864.321f),
                 new MobSlot("IIV-X Advanced Docker", MobKind.Docker, 17649, 4, 323, 1019, 110, 15, NpcAiProfile.Passive, 0.0f, 3515.109f, 5.305f, 904.289f),
                 new MobSlot("Supreme Collector of Waste", MobKind.WasteCollector, 17714, 4, 370, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3506.573f, 11.074f, 943.099f),
-                // Prior oasis fleas (outside this capture cluster).
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3452.36f, 0.01f, 809.73f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3452.59f, 0.01f, 858.98f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3452.62f, 0.01f, 884.29f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3426.74f, 0.01f, 835.28f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3422.32f, 0.01f, 866.07f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3425.29f, 0.01f, 818.4f),
-                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 24, 25, 125, 8, NpcAiProfile.Aggressive, 1.0f, 3437.13f, 0.01f, 803.59f),
-                new MobSlot("Mutated Garbage Flea", MobKind.GarbageFlea, 17657, 7, 559, 25, 200, 23, NpcAiProfile.Aggressive, 1.0f, 3422.907f, 0.01f, 878.7842f),
+                // Capture 20260730-220951 oasis CHAR-SEEN + dock Y=9.115 (was under floor at Y=0.01).
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 58, 25, 125, 17, NpcAiProfile.Aggressive, 2.0f, 3449.311f, 0.01f, 820.1572f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 69, 25, 125, 20, NpcAiProfile.Aggressive, 2.0f, 3453.175f, 0.01f, 849.0463f, 3452.00659f, 1.28450942f, 864.9944f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 69, 25, 125, 20, NpcAiProfile.Aggressive, 2.0f, 3453.673f, 0.01f, 875.0504f, 3453.75146f, 1.02560616f, 873.9211f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 5, 58, 25, 125, 17, NpcAiProfile.Aggressive, 2.0f, 3426.683f, 0.01f, 851.6213f, 3426.757f, 0.01f, 830.225f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 69, 25, 125, 20, NpcAiProfile.Aggressive, 2.0f, 3421.959f, 0.01f, 865.7231f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 69, 25, 125, 20, NpcAiProfile.Aggressive, 2.0f, 3425.365f, 0.01f, 818.3955f),
+                new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 6, 69, 25, 125, 20, NpcAiProfile.Aggressive, 2.0f, 3437.673f, 9.115f, 802.2896f),
+                new MobSlot("Mutated Garbage Flea", MobKind.GarbageFlea, 17657, 7, 559, 25, 200, 23, NpcAiProfile.Aggressive, 2.0f, 3425.06f, 0.01f, 887.946f),
             };
 
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
@@ -273,6 +335,12 @@ namespace ZoneEngine.Core.Playfields
 
         internal static bool TryGetCapturedScfuUnknown1(string name, out byte[] data)
         {
+            if (string.Equals(name, "Mutated Garbage Flea", StringComparison.Ordinal))
+            {
+                data = (byte[])MutatedGarbageFleaCapturedScfuUnknown1.Clone();
+                return true;
+            }
+
             if (string.Equals(name, "Garbage Flea", StringComparison.Ordinal))
             {
                 data = (byte[])GarbageFleaCapturedScfuUnknown1.Clone();
@@ -291,6 +359,39 @@ namespace ZoneEngine.Core.Playfields
 
             data = null;
             return false;
+        }
+
+        internal static bool IsMutatedGarbageFlea(string name)
+        {
+            return string.Equals(name, "Mutated Garbage Flea", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Capture 20260730-220951: corpse MonsterScale=125 (Mutated=200), CatMesh=15231, MD=17657.
+        /// Re-assert before CorpseFullUpdate so death cannot shrink to DuneFlea archetype 93.
+        /// </summary>
+        internal static void EnsureFleaCorpseVisuals(ICharacter target)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            string name = target.Name ?? string.Empty;
+            bool isMutated = IsMutatedGarbageFlea(name);
+            bool isFlea = isMutated
+                          || string.Equals(name, "Garbage Flea", StringComparison.Ordinal)
+                          || target.Stats[StatIds.monsterdata].Value == 17657;
+            if (!isFlea)
+            {
+                return;
+            }
+
+            int scale = isMutated ? 200 : 125;
+            SetStat(target, StatIds.monsterscale, scale);
+            SetStat(target, StatIds.catmesh, 15231);
+            SetStat(target, StatIds.displaycatmesh, 15231);
+            SetStat(target, StatIds.monsterdata, 17657);
         }
 
         public static ICharacter FindAutomaticAggroTarget(ICharacter npc)
@@ -320,10 +421,13 @@ namespace ZoneEngine.Core.Playfields
                 return null;
             }
 
+            // Capture 20260730-220951 ~2m; wide search pool then 2D gate at slot radius.
+            // Gate floor 2.5m so walk-up edge cases still aggro (slot radius is 2.0).
+            float aggroGate = Math.Max(radius, 2.5f);
             Coordinate npcCoord = npc.Coordinates();
             ICharacter best = null;
-            double bestDistance = radius;
-            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, radius);
+            double bestDistance = aggroGate;
+            List<ICharacter> inRange = playfield.FindCharacterInRange(npc, Math.Max(aggroGate, 12.0f));
             for (int i = 0; i < inRange.Count; i++)
             {
                 ICharacter candidate = inRange[i];
@@ -335,8 +439,8 @@ namespace ZoneEngine.Core.Playfields
                     continue;
                 }
 
-                double distance = candidate.Coordinates().Distance3D(npcCoord);
-                if (distance < bestDistance)
+                double distance = candidate.Coordinates().coordinate.Distance2D(npcCoord.coordinate);
+                if (distance <= bestDistance)
                 {
                     bestDistance = distance;
                     best = candidate;
@@ -467,41 +571,165 @@ namespace ZoneEngine.Core.Playfields
             ApplyCaptureStats(mob, slot);
             controller.AiProfile = slot.AiProfile;
 
-            // Capture 20260722-cap-mob-drop-cred AttackInfo vs player:
-            // Amount=6.. AmmoCount=-1 WeaponSlot=1 HitType=Normal WeaponInstance=1279612721/22
-            // → client red "You got hit … damage" text.
+            // Capture 20260730-220951 flea→player AttackInfo:
+            // Amount=6.. AmmoCount=-1 WeaponSlot=1 HitType=Normal(3) WeaponInstance=LEW2
+            // SAW: LEW2(0x1D851/0x1D852)+LEW1(0x1D84E/0x1D84F), unknowns 30/30/30/30/0
+            // Prior FixedAttackOnSight invented (0,0,LEW1,"fixed-aos") → client
+            // "attacked with nanobots … unknown damage".
             int minDamage;
             int maxDamage;
             ResolveCaptureDamage(slot, out minDamage, out maxDamage);
+            CapturedEnemySpecialAttackDefinition[] fleaSpecials =
+                slot.Kind == MobKind.GarbageFlea
+                    ? CreateAlexGarbageFleaSpecialAttacks()
+                    : null;
+            int lew2 = unchecked((int)0x4C455732); // "LEW2"
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "alex-area-20260722-cap-mob-drop-cred",
+                "alex-area-20260730-220951",
                 minDamage,
                 maxDamage,
                 2.0,
                 1,
                 0,
-                1279612721,
+                slot.Kind == MobKind.GarbageFlea ? lew2 : 1279612721,
+                -1,
+                NpcCombatAttackRules.NormalAttackInfoHitType,
                 0,
                 0,
                 0,
                 0,
-                0,
+                fleaSpecials,
+                slot.Kind == MobKind.GarbageFlea ? 30 : 0,
+                slot.Kind == MobKind.GarbageFlea ? 30 : 0,
+                slot.Kind == MobKind.GarbageFlea ? 30 : 0,
+                slot.Kind == MobKind.GarbageFlea ? 30 : 0,
                 0);
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
             // FixedAttackOnSight sets Aggressive; restore capture AI (Passive except fleas).
             controller.AiProfile = slot.AiProfile;
+            // Force combat-ready registry entry for fleas — Prepare may still quarantine via
+            // corpus TryResolve, which makes AcquireAggro refuse 2m AOS entirely.
+            if (slot.Kind == MobKind.GarbageFlea)
+            {
+                CapturedEnemyCombatContract ready = CapturedEnemyCombatContract.FixedAttackOnSight(
+                    "alex-area-20260730-220951",
+                    minDamage,
+                    maxDamage,
+                    2.0,
+                    1,
+                    0,
+                    lew2,
+                    -1,
+                    NpcCombatAttackRules.NormalAttackInfoHitType,
+                    0,
+                    0,
+                    0,
+                    0,
+                    CreateAlexGarbageFleaSpecialAttacks(),
+                    30,
+                    30,
+                    30,
+                    30,
+                    0);
+                CapturedEnemyCombatRuntimeRegistry.Register(mob.Identity.Instance, ready);
+                controller.AiProfile = NpcAiProfile.Aggressive;
+                if (!ready.IsCombatReady)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "Alex flea FixedAttackOnSight still not combat-ready: " + ready.QuarantineReason);
+                }
+            }
+
+            // Re-assert capture visuals after combat prepare (scale/mesh must survive for corpse).
+            if (slot.Kind == MobKind.GarbageFlea)
+            {
+                SetStat(mob, StatIds.monsterscale, slot.Scale);
+                SetStat(mob, StatIds.catmesh, 15231);
+                SetStat(mob, StatIds.displaycatmesh, 15231);
+                SetStat(mob, StatIds.monsterdata, slot.MonsterData);
+            }
+
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             if (slot.Kind == MobKind.GarbageFlea && slot.AggroRadiusMeters > 0f)
             {
                 RegisterAggro(mob.Identity.Instance, slot.AggroRadiusMeters);
-                MissionInstanceMobCombat.RegisterAggressive(mob.Identity);
+                // Do NOT MissionInstanceMobCombat.RegisterAggressive — that routes flea death
+                // into BuildCapturedMissionTrashCorpse (tiny human corpse). Aggro is Alex-only.
+            }
+
+            if (slot.Kind == MobKind.GarbageFlea && slot.HasPatrol)
+            {
+                ApplyFleaPatrol(mob, controller, slot);
             }
 
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
             return mob;
+        }
+
+        private static CapturedEnemySpecialAttackDefinition[] CreateAlexGarbageFleaSpecialAttacks()
+        {
+            // Capture 20260730-220951 SpecialAttackWeapon for Garbage Flea 79ABE9EC.
+            return new[]
+                   {
+                       new CapturedEnemySpecialAttackDefinition(
+                           0x1D851,
+                           0x1D852,
+                           unchecked((int)0x4C455732),
+                           "LEW2"),
+                       new CapturedEnemySpecialAttackDefinition(
+                           0x1D84E,
+                           0x1D84F,
+                           unchecked((int)0x4C455731),
+                           "LEW1")
+                   };
+        }
+
+        private static void ApplyFleaPatrol(Character mob, NPCController controller, MobSlot slot)
+        {
+            if (mob == null || controller == null || slot == null || !slot.HasPatrol)
+            {
+                return;
+            }
+
+            var start = new AORebirth.Core.Vector.Vector3(slot.X, slot.Y, slot.Z);
+            var end = new AORebirth.Core.Vector.Vector3(slot.PatrolEndX, slot.PatrolEndY, slot.PatrolEndZ);
+            if (mob.Waypoints != null)
+            {
+                mob.Waypoints.Clear();
+            }
+
+            mob.AddWaypoint(start, false);
+            mob.AddWaypoint(end, false);
+            controller.SetCapturedPatrolReplaySegments(
+                BuildOutAndBackPatrol(slot.X, slot.Y, slot.Z, slot.PatrolEndX, slot.PatrolEndY, slot.PatrolEndZ),
+                true,
+                false,
+                false);
+            controller.State = CharacterState.Patrolling;
+            controller.StartPatrolling();
+        }
+
+        private static NpcPatrolReplaySegment[] BuildOutAndBackPatrol(
+            float startX,
+            float startY,
+            float startZ,
+            float endX,
+            float endY,
+            float endZ)
+        {
+            double dx = endX - startX;
+            double dz = endZ - startZ;
+            double distance = Math.Sqrt((dx * dx) + (dz * dz));
+            double delay = Math.Max(0.25, (distance / FleaPatrolWalkSpeedPerSecond) * FleaPatrolEarlyTurnFactor);
+            return new[]
+                {
+                    new NpcPatrolReplaySegment(delay, startX, startY, startZ, endX, endY, endZ),
+                    new NpcPatrolReplaySegment(delay, endX, endY, endZ, startX, startY, startZ)
+                };
         }
 
         private static void ResolveCaptureDamage(MobSlot slot, out int minDamage, out int maxDamage)
@@ -619,6 +847,20 @@ namespace ZoneEngine.Core.Playfields
             lock (AggroGate)
             {
                 AggroRadiusByNpcInstance[npcInstance] = radiusMeters;
+            }
+        }
+
+        internal static bool IsRegisteredForAggro(int npcInstance)
+        {
+            if (npcInstance == 0)
+            {
+                return false;
+            }
+
+            float radius;
+            lock (AggroGate)
+            {
+                return AggroRadiusByNpcInstance.TryGetValue(npcInstance, out radius) && radius > 0f;
             }
         }
 

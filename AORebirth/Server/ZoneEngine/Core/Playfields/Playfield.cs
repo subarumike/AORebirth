@@ -3152,6 +3152,9 @@ namespace AORebirth.Core.Playfields
 
         private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)
         {
+            // Capture 20260730-220951: flea corpse must keep living scale/mesh (125 / 15231).
+            AlexAreaMobRuntime.EnsureFleaCorpseVisuals(target);
+
             int corpseCatMesh = CorpseCatMeshFor(target);
             int corpseMonsterData = CorpseMonsterDataFor(target);
             int recipientCount = 0;

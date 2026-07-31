@@ -656,14 +656,18 @@ namespace AORebirth.Core.Playfields
             if (CapturedEnemyCombatRuntimeRegistry.TryGet(target.Identity.Instance, out capturedContract)
                 && !capturedContract.IsCombatReady)
             {
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    string.Format(
-                        "Captured enemy combat refused npc={0} attacker={1} reason=contract-incomplete evidence={2}",
-                        target.Identity,
-                        attacker.Identity,
-                        capturedContract.Evidence));
-                return;
+                // Alex Garbage Flea AOS: never block on quarantine — proximity aggro is capture-proven.
+                if (!AlexAreaMobRuntime.IsRegisteredForAggro(target.Identity.Instance))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        string.Format(
+                            "Captured enemy combat refused npc={0} attacker={1} reason=contract-incomplete evidence={2}",
+                            target.Identity,
+                            attacker.Identity,
+                            capturedContract.Evidence));
+                    return;
+                }
             }
 
             OrdinaryEnemyRuntimeDefinition ordinaryDefinition;
@@ -897,6 +901,15 @@ namespace AORebirth.Core.Playfields
             {
                 if (!missionStationary && character.Controller.IsFollowing())
                 {
+                    var fightingPetController = character.Controller as NPCController;
+                    if (this.IsPlayerControlledPet(character)
+                        && fightingPetController != null
+                        && !fightingPetController.IsFollowing(character.FightingTarget))
+                    {
+                        // Do not resume owner-follow mid-fight; chase only the fight target.
+                        return;
+                    }
+
                     character.Controller.DoFollow();
                 }
 

@@ -186,6 +186,11 @@ foreach ($engine in $engines) {
             $failures.Add("$processName did not open port $port within $StartupTimeoutSeconds seconds.")
         }
     }
+
+    # ChatEngine ISCom (6996) is optional. Zone does not dial it at startup.
+    if ($processName -eq "ChatEngine") {
+        Write-Host "ChatEngine ISCom listen ready on port 6996 (Zone links only when needed)."
+    }
 }
 
 if ($failures.Count -gt 0) {

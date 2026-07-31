@@ -26,7 +26,11 @@ namespace ZoneEngine.Core.Playfields
 
         internal const int DoctorNanoCrystalItemId = 248258;
 
-        // Capture 20260721-nanoprogramsvendor: tip complete grants Overflow 223373 QL25.
+        // Capture 20260730-212921: Bureaucrat Nanoprogram Container open.
+        internal const int BureaucratNanoCrystalItemId = 248257;
+
+        // Capture 20260730-212921: tip complete grants Overflow 223373 QL25
+        // Nano Crystal (Composite Attribute Boost).
         internal const int BuyNanoTipRewardItemId = 223373;
 
         internal const int BuyNanoTipRewardQuality = 25;
@@ -87,10 +91,28 @@ namespace ZoneEngine.Core.Playfields
                     new CapturedAreteMarcoSpidaNanoPackageContentEntry(43978, 4)
                 });
 
+        // Capture 20260730-212921: Use 248257 → Overflow Winter's Bite, Momentary Daze,
+        // Distracted Gaze QL10, Temporary Glamor QL20, Limited Worker-Droid, Faithful Worker-Droid QL4.
+        private static readonly CapturedAreteMarcoSpidaNanoPackageContent BureaucratPackage =
+            new CapturedAreteMarcoSpidaNanoPackageContent(
+                BureaucratNanoCrystalItemId,
+                "Bureaucrat",
+                "AOSharpLiveCapture/20260730-212921",
+                new[]
+                {
+                    new CapturedAreteMarcoSpidaNanoPackageContentEntry(29625, 1),
+                    new CapturedAreteMarcoSpidaNanoPackageContentEntry(43381, 1),
+                    new CapturedAreteMarcoSpidaNanoPackageContentEntry(30110, 10),
+                    new CapturedAreteMarcoSpidaNanoPackageContentEntry(99212, 20),
+                    new CapturedAreteMarcoSpidaNanoPackageContentEntry(46430, 1),
+                    new CapturedAreteMarcoSpidaNanoPackageContentEntry(46438, 4)
+                });
+
         private static readonly CapturedAreteMarcoSpidaNanoPackageContent[] CapturedPackages =
             {
                 EnforcerPackage,
-                DoctorPackage
+                DoctorPackage,
+                BureaucratPackage
             };
 
         internal static ReadOnlyCollection<CapturedAreteAlexAreaVendorStockDefinition> Stock

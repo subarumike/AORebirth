@@ -50,6 +50,26 @@ namespace ZoneEngine.Core
 
         public const int AttackPetAttackInfoHitType = 1;
 
+        // Capture 20260730-151431 / 20260730-144520: Worker SpecialAttackWeapon BUW1 + AttackInfo.
+        public const int BureaucratWorkerWeaponLowTemplate = 0x0001D752;
+
+        public const int BureaucratWorkerWeaponHighTemplate = 0x0001D753;
+
+        public const int BureaucratWorkerWeaponTag = 0x42555731;
+
+        public const string BureaucratWorkerWeaponName = "BUW1";
+
+        public const int BureaucratWorkerSpecialAttackWeaponValue = 16;
+
+        public const int BureaucratWorkerAttackInfoWeaponSlot = 0;
+
+        // Capture 20260730-162433 AttackInfo Unk1=0 HitType=Normal/Critical WeaponInstance=BUW1.
+        public const int BureaucratWorkerAttackInfoUnk1 = 0;
+
+        public const int BureaucratWorkerAttackInfoHitType = 3;
+
+        public const int BureaucratWorkerMonsterData = 96056;
+
         public const double AttackPetRechargeSeconds = 2.0;
 
         public const double HealCastRange = 20.0;
@@ -163,14 +183,46 @@ namespace ZoneEngine.Core
             return PetBureaucratGuardianAppearance.IsGuardianPet(pet);
         }
 
+        /// <summary>
+        /// Capture 20260730-151431: Worker/Helper use BUW1 combat packets (no briefcase).
+        /// Detect by monsterdata/name; A020 remains Regular attack-pet strain.
+        /// </summary>
+        public static bool UsesBureaucratWorkerBuw1CombatPackets(ICharacter pet)
+        {
+            return IsPlayerOwnedPet(pet)
+                   && !IsPlayerOwnedBureaucratGuardianPet(pet)
+                   && IsBureaucratWorkerCombatSignature(pet);
+        }
+
+        public static bool IsBureaucratWorkerCombatSignature(ICharacter pet)
+        {
+            if (pet == null)
+            {
+                return false;
+            }
+
+            if (pet.Stats[StatIds.monsterdata].Value == BureaucratWorkerMonsterData)
+            {
+                return true;
+            }
+
+            string name = pet.Name ?? string.Empty;
+            return name.StartsWith("Bureaucrat Worker", StringComparison.OrdinalIgnoreCase)
+                   || name.StartsWith("Bureaucrat Helper", StringComparison.OrdinalIgnoreCase);
+        }
+
         public static bool IsPlayerOwnedMewAttackPet(ICharacter pet)
         {
-            return IsPlayerOwnedAttackPet(pet) && !IsPlayerOwnedBureaucratGuardianPet(pet);
+            return IsPlayerOwnedAttackPet(pet)
+                   && !IsPlayerOwnedBureaucratGuardianPet(pet)
+                   && !UsesBureaucratWorkerBuw1CombatPackets(pet);
         }
 
         public static bool IsPlayerOwnedMeleeCombatPet(ICharacter pet)
         {
-            return IsPlayerOwnedAttackPet(pet) || IsPlayerOwnedBureaucratCompanionPet(pet);
+            return IsPlayerOwnedAttackPet(pet)
+                   || IsPlayerOwnedBureaucratCompanionPet(pet)
+                   || UsesBureaucratWorkerBuw1CombatPackets(pet);
         }
 
         public static bool IsPlayerOwnedHealingPet(ICharacter pet)

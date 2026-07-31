@@ -40,6 +40,7 @@ namespace ChatEngine
     using System.Threading.Tasks;
 
     using AORebirth.Communication.ISComV2Server;
+    using AORebirth.Communication.Messages;
 
     using ChatEngine.CoreServer;
 
@@ -398,6 +399,15 @@ namespace ChatEngine
                         IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP),
                         Config.Instance.CurrentConfig.CommPort);
                 }
+
+                // Prove DynamicMessage can resolve Zone→Chat owner pet SystemChatMessage.
+                Type systemChatType = typeof(SystemChatMessage);
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "ISCom ready; SystemChatMessage type="
+                    + systemChatType.FullName
+                    + " asm="
+                    + systemChatType.Assembly.GetName().Name);
 
                 ISCom.Start(true, false);
             }
