@@ -18,8 +18,6 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class CapturedAreteMovementRuntimeService
     {
-        private const double FleeHealthFraction = 0.20;
-
         private readonly CapturedAreteMovementCatalog catalog;
 
         private readonly CapturedAreteMovementRuntimeCoordinator coordinator;
@@ -130,20 +128,25 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
-            int maximumHealth = character.Stats[StatIds.life].Value;
-            int currentHealth = character.Stats[StatIds.health].Value;
-            bool shouldFlee =
-                maximumHealth > 0
-                && currentHealth > 0
-                && currentHealth <= (int)Math.Ceiling(maximumHealth * FleeHealthFraction);
-            CapturedAreteMovementBehavior behavior = shouldFlee
-                                                        ? CapturedAreteMovementBehavior.Flee
-                                                        : CapturedAreteMovementBehavior.Chase;
+            CapturedAreteMovementPoint targetPosition =
+                ToPoint(target.Coordinates().coordinate);
+            CapturedAreteMovementDecisionKind chase = this.Process(
+                character,
+                CapturedAreteMovementBehavior.Chase,
+                false,
+                targetPosition,
+                null,
+                utcNow);
+            if (chase != CapturedAreteMovementDecisionKind.Fallback)
+            {
+                return true;
+            }
+
             return this.Process(
                        character,
-                       behavior,
+                       CapturedAreteMovementBehavior.Flee,
                        false,
-                       ToPoint(target.Coordinates().coordinate),
+                       targetPosition,
                        null,
                        utcNow)
                    != CapturedAreteMovementDecisionKind.Fallback;
@@ -233,7 +236,6 @@ namespace AORebirth.Core.Playfields
             }
 
             controller.SendCapturedAreteMovementSegment(
-                behavior,
                 ToVector(observation.Start),
                 ToVector(observation.End),
                 utcNow,
