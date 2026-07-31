@@ -375,6 +375,9 @@
     <Compile Include="Core\Missions\MissionAcgOperationalState.cs" />
     <Compile Include="Core\Missions\MissionAcgOperationalStateStore.cs" />
     <Compile Include="Core\Missions\MissionAcgOperationalRuntime.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenProgressState.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenProgressStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenProgressRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgCorpsePolicy.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialAuthority.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialStateStore.cs" />
