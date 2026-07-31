@@ -561,10 +561,6 @@
       <Link>XML Data\MissionRewards\ItemDb_Rest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\MissionRewardNanoNames.txt">
-      <Link>XML Data\MissionRewards\MissionRewardNanoNames.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
