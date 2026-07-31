@@ -1,0 +1,696 @@
+CapturedUtc,Sequence,LiveIdentity,Name,StartX,StartY,StartZ,EndX,EndY,EndZ,RouteResult,PromotedObservationIds,IntervalSincePreviousSeconds,ExpectedCapturedDelaySeconds,TimingResult
+2026-07-31T08:07:03.685619Z,2,SimpleChar:000F4279,Malfunctioning Cleaning Robot,3594.75879,51.7449989,799.413818,3601.70142,52.5,787.971985,live_identity_metadata_unresolved,,,,not_comparable
+2026-07-31T08:07:03.716616Z,3,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:03.716616Z,4,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.03003,52.2449989,784.119568,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:03.747615Z,5,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,,,not_comparable
+2026-07-31T08:07:03.757614Z,6,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.93042,52.1349983,779.034119,3611.12207,52.5,778.274048,live_identity_metadata_unresolved,,,,not_comparable
+2026-07-31T08:07:03.777614Z,7,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3599.75732,51.7449989,787.622009,3610.80078,52.5,778.224243,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:03.787615Z,8,SimpleChar:000F4282,Malfunctioning Cleaning Robot,3597.56616,51.7449989,772.938416,3597.26538,52.5,772.140076,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:05.736167Z,14,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,2.019551,,not_comparable
+2026-07-31T08:07:05.756168Z,15,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10205,52.2449989,783.878418,exact_legacy_robot_route,,2.039552,,not_comparable
+2026-07-31T08:07:05.786165Z,16,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3602.15918,52.5,788.254333,3612.84326,52.1349983,787.514221,live_identity_metadata_unresolved,,2.038550,,not_comparable
+2026-07-31T08:07:05.786165Z,17,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.64941,52.1349983,778.958679,3610.92285,52.5,778.289917,exact_legacy_robot_route,,2.028551,,not_comparable
+2026-07-31T08:07:05.796164Z,18,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3603.15552,52.1349983,787.776733,3602.17773,52.5,788.241638,live_identity_metadata_unresolved,,2.018550,,not_comparable
+2026-07-31T08:07:05.816165Z,19,SimpleChar:000F4282,Malfunctioning Cleaning Robot,3597.56616,51.7449989,772.938416,3597.03662,52.5,772.297729,exact_legacy_robot_route,,2.028550,,not_comparable
+2026-07-31T08:07:07.670207Z,25,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.934040,,not_comparable
+2026-07-31T08:07:07.690206Z,26,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10522,51.7449989,783.924805,exact_legacy_robot_route,,1.934038,,not_comparable
+2026-07-31T08:07:07.720206Z,27,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,1.934041,,not_comparable
+2026-07-31T08:07:07.720206Z,28,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.93042,52.1349983,779.034119,3611.12207,52.5,778.274048,live_identity_metadata_unresolved,,1.934041,,not_comparable
+2026-07-31T08:07:07.750209Z,29,SimpleChar:000F4282,Malfunctioning Cleaning Robot,3597.56616,51.7449989,772.938416,3597.1167,52.5,772.276428,exact_legacy_robot_route,,1.934044,,not_comparable
+2026-07-31T08:07:09.592242Z,37,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.922035,,not_comparable
+2026-07-31T08:07:09.612242Z,38,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10205,52.2449989,783.878418,exact_legacy_robot_route,,1.922036,,not_comparable
+2026-07-31T08:07:09.622242Z,39,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3595.18262,51.7449989,799.737305,3593.98999,52.5,799.700195,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:09.642244Z,40,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3602.15918,52.5,788.254333,3612.09326,52.1349983,787.764221,live_identity_metadata_unresolved,,1.922038,,not_comparable
+2026-07-31T08:07:09.662243Z,41,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.64941,52.1349983,778.958679,3610.70166,52.5,778.031738,exact_legacy_robot_route,,1.942037,,not_comparable
+2026-07-31T08:07:09.662243Z,42,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3602.93848,52.1349983,787.879822,3610.80908,52.5,778.231384,live_identity_metadata_unresolved,,3.866079,,not_comparable
+2026-07-31T08:07:09.692247Z,43,SimpleChar:000F4282,Malfunctioning Cleaning Robot,3597.56616,51.7449989,772.938416,3596.74829,52.5,772.16333,exact_legacy_robot_route,,1.942038,,not_comparable
+2026-07-31T08:07:11.540281Z,58,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.948039,,not_comparable
+2026-07-31T08:07:11.540281Z,59,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.05933,52.2449989,783.761475,exact_legacy_robot_route,,1.928039,,not_comparable
+2026-07-31T08:07:11.570279Z,60,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.01563,52.5,799.700439,exact_legacy_robot_route,,1.948037,,not_comparable
+2026-07-31T08:07:11.571279Z,61,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,1.929035,,not_comparable
+2026-07-31T08:07:11.580278Z,62,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.93042,52.1349983,779.034119,3611.12207,52.5,778.274048,live_identity_metadata_unresolved,,1.918035,,not_comparable
+2026-07-31T08:07:11.600279Z,63,SimpleChar:000F4281,Malfunctioning Cleaning Robot,3621.86304,51.7449989,798.693726,3622.70044,52.5,798.983826,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:13.477806Z,70,SimpleChar:000F4279,Malfunctioning Cleaning Robot,3594.16284,51.7449989,798.968323,3594.29736,52.5,800.038818,exact_legacy_robot_route,,9.792187,,not_comparable
+2026-07-31T08:07:13.493809Z,71,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.953528,,not_comparable
+2026-07-31T08:07:13.509808Z,72,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10205,52.2449989,783.878418,exact_legacy_robot_route,,1.969527,,not_comparable
+2026-07-31T08:07:13.509808Z,73,SimpleChar:000F427C,Malfunctioning Cleaning Robot,3597.6626,51.7449989,772.967896,3597.18408,52.5,772.236816,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:13.524808Z,74,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.23462,52.5,800.187073,exact_legacy_robot_route,,1.954529,,not_comparable
+2026-07-31T08:07:13.539808Z,76,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3602.15918,52.5,788.254333,3612.84326,52.1349983,787.514221,live_identity_metadata_unresolved,,1.968529,,not_comparable
+2026-07-31T08:07:13.539808Z,77,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.64941,52.1349983,778.958679,3610.74902,52.5,778.164185,exact_legacy_robot_route,,1.959530,,not_comparable
+2026-07-31T08:07:13.569807Z,78,SimpleChar:000F4281,Malfunctioning Cleaning Robot,3621.86304,51.7449989,798.693726,3622.99243,52.5,798.700073,exact_legacy_robot_route,,1.969528,,not_comparable
+2026-07-31T08:07:15.421334Z,86,SimpleChar:000F4278,Malfunctioning Cleaning Robot,3613.0542,52.1349983,787.425842,3612.2229,52.5,787.799194,exact_legacy_robot_route,,,,not_comparable
+2026-07-31T08:07:15.435337Z,87,SimpleChar:000F4279,Malfunctioning Cleaning Robot,3594.75879,51.7449989,799.413818,3601.70142,52.5,787.971985,live_identity_metadata_unresolved,,1.957531,,not_comparable
+2026-07-31T08:07:15.435337Z,88,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.941528,,not_comparable
+2026-07-31T08:07:15.449336Z,89,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.02808,52.2449989,783.720337,exact_legacy_robot_route,,1.939528,,not_comparable
+2026-07-31T08:07:15.472333Z,90,SimpleChar:000F427C,Malfunctioning Cleaning Robot,3597.6626,51.7449989,772.967896,3597.27979,52.5,771.891968,exact_legacy_robot_route,,1.962525,,not_comparable
+2026-07-31T08:07:15.472333Z,91,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.29834,52.5,800.032471,exact_legacy_robot_route,,1.947525,,not_comparable
+2026-07-31T08:07:15.484848Z,92,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,1.945040,,not_comparable
+2026-07-31T08:07:15.484848Z,93,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.93042,52.1349983,779.034119,3611.12207,52.5,778.274048,live_identity_metadata_unresolved,,1.945040,,not_comparable
+2026-07-31T08:07:15.519846Z,94,SimpleChar:000F4281,Malfunctioning Cleaning Robot,3621.99268,51.7449989,798.694458,3622.82617,52.5,799.244446,exact_legacy_robot_route,,1.950039,,not_comparable
+2026-07-31T08:07:17.411867Z,105,SimpleChar:000F4278,Malfunctioning Cleaning Robot,3612.92139,52.1349983,787.756897,3597.21167,52.5,771.787476,live_identity_metadata_unresolved,,1.990533,,not_comparable
+2026-07-31T08:07:17.434871Z,106,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.999534,,not_comparable
+2026-07-31T08:07:17.445865Z,107,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10205,52.2449989,783.878418,exact_legacy_robot_route,,1.996529,,not_comparable
+2026-07-31T08:07:17.445865Z,108,SimpleChar:000F427C,Malfunctioning Cleaning Robot,3597.61401,51.7449989,772.831238,3596.8291,52.5,772.246521,exact_legacy_robot_route,,1.973532,,not_comparable
+2026-07-31T08:07:17.467865Z,109,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.2854,52.5,800.092163,exact_legacy_robot_route,,1.995532,,not_comparable
+2026-07-31T08:07:17.477865Z,110,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3602.15918,52.5,788.254333,3612.09326,52.1349983,787.764221,live_identity_metadata_unresolved,,1.993017,,not_comparable
+2026-07-31T08:07:17.477865Z,111,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.64941,52.1349983,778.958679,3611.18408,52.5,778.236877,exact_legacy_robot_route,,1.993017,,not_comparable
+2026-07-31T08:07:17.511379Z,112,SimpleChar:000F4281,Malfunctioning Cleaning Robot,3621.99268,51.7449989,798.694458,3622.86938,52.5,799.270142,exact_legacy_robot_route,,1.991533,,not_comparable
+2026-07-31T08:07:17.511379Z,113,SimpleChar:000F4282,Malfunctioning Cleaning Robot,3597.45752,51.7449989,772.835449,3598.79712,52.5,786.778992,exact_legacy_robot_route,,7.819132,,not_comparable
+2026-07-31T08:07:19.458393Z,114,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,2.023522,,not_comparable
+2026-07-31T08:07:19.472394Z,115,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10522,51.7449989,783.924805,exact_legacy_robot_route,,2.026529,,not_comparable
+2026-07-31T08:07:19.472394Z,116,SimpleChar:000F427C,Malfunctioning Cleaning Robot,3597.61401,51.7449989,772.831238,3597.03613,52.5,772.297852,exact_legacy_robot_route,,2.026529,,not_comparable
+2026-07-31T08:07:19.485394Z,117,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.21753,52.5,800.206604,exact_legacy_robot_route,,2.017529,,not_comparable
+2026-07-31T08:07:19.498907Z,118,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,2.021042,,not_comparable
+2026-07-31T08:07:19.511905Z,119,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.93042,52.1349983,779.034119,3611.12207,52.5,778.274048,live_identity_metadata_unresolved,,2.034040,,not_comparable
+2026-07-31T08:07:19.511905Z,120,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3610.06763,52.1349983,778.847717,3610.73877,52.5,777.852295,exact_legacy_robot_route,,9.849662,,not_comparable
+2026-07-31T08:07:21.383949Z,134,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.925556,,not_comparable
+2026-07-31T08:07:21.397947Z,135,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10205,52.2449989,783.878418,exact_legacy_robot_route,,1.925553,,not_comparable
+2026-07-31T08:07:21.409949Z,136,SimpleChar:000F427C,Malfunctioning Cleaning Robot,3597.61401,51.7449989,772.831238,3597.24219,52.5,771.822998,exact_legacy_robot_route,,1.937555,,not_comparable
+2026-07-31T08:07:21.433948Z,137,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.28442,52.5,799.904663,exact_legacy_robot_route,,1.948554,,not_comparable
+2026-07-31T08:07:21.433948Z,138,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3602.15918,52.5,788.254333,3612.84326,52.1349983,787.514221,live_identity_metadata_unresolved,,1.935041,,not_comparable
+2026-07-31T08:07:21.445946Z,139,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.64941,52.1349983,778.958679,3610.71338,52.5,777.911316,exact_legacy_robot_route,,1.934041,,not_comparable
+2026-07-31T08:07:21.457947Z,140,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3610.26611,52.1349983,778.898193,3610.9209,52.5,778.289429,live_identity_metadata_unresolved,,1.946042,,not_comparable
+2026-07-31T08:07:23.344486Z,147,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.960537,,not_comparable
+2026-07-31T08:07:23.357488Z,148,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.09229,52.2449989,784.00824,exact_legacy_robot_route,,1.959541,,not_comparable
+2026-07-31T08:07:23.384488Z,149,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.28638,52.5,799.910889,exact_legacy_robot_route,,1.950540,,not_comparable
+2026-07-31T08:07:23.384488Z,150,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,1.950540,,not_comparable
+2026-07-31T08:07:23.396484Z,151,SimpleChar:000F427F,Malfunctioning Cleaning Robot,3610.93042,52.1349983,779.034119,3611.12207,52.5,778.274048,live_identity_metadata_unresolved,,1.950538,,not_comparable
+2026-07-31T08:07:23.420486Z,152,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3610.18872,52.1349983,778.667725,3610.93896,52.5,778.293701,exact_legacy_robot_route,,1.962539,,not_comparable
+2026-07-31T08:07:25.325506Z,187,SimpleChar:000F4279,Malfunctioning Cleaning Robot,3594.17407,51.7449989,799.059143,3601.70068,52.5,787.978455,exact_legacy_robot_route,,9.890169,,not_comparable
+2026-07-31T08:07:25.337504Z,188,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.993018,,not_comparable
+2026-07-31T08:07:25.360505Z,189,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.10205,52.2449989,783.878418,exact_legacy_robot_route,,2.003017,,not_comparable
+2026-07-31T08:07:25.372504Z,190,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.19214,52.5,800.230469,exact_legacy_robot_route,,1.988016,,not_comparable
+2026-07-31T08:07:25.385503Z,191,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3602.15918,52.5,788.254333,3612.09326,52.1349983,787.764221,live_identity_metadata_unresolved,,2.001015,,not_comparable
+2026-07-31T08:07:25.410507Z,192,SimpleChar:000F4280,Malfunctioning Cleaning Robot,3611.3772,52.1349983,778.939209,3611.23682,52.5,778.184021,live_identity_metadata_unresolved,,1.990021,,not_comparable
+2026-07-31T08:07:25.813020Z,208,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,,,not_comparable
+2026-07-31T08:07:25.813020Z,209,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:25.813020Z,210,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:25.813020Z,211,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:25.813020Z,212,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:27.317534Z,228,SimpleChar:000F427A,Malfunctioning Cleaning Robot,3596.81177,51.7449989,788.208923,3596.05518,51.7449989,788.482483,exact_legacy_robot_route,,1.980030,,not_comparable
+2026-07-31T08:07:27.328531Z,229,SimpleChar:000F427B,Malfunctioning Cleaning Robot,3596.979,51.7449989,783.935852,3596.05176,52.2449989,783.750183,exact_legacy_robot_route,,1.968026,,not_comparable
+2026-07-31T08:07:27.351529Z,230,SimpleChar:000F427D,Malfunctioning Cleaning Robot,3594.98755,51.7449989,799.731201,3594.17651,52.5,800.242554,exact_legacy_robot_route,,1.979025,,not_comparable
+2026-07-31T08:07:27.363530Z,231,SimpleChar:000F427E,Malfunctioning Cleaning Robot,3603.08081,52.1349983,787.729126,3602.15918,52.5,788.254333,live_identity_metadata_unresolved,,1.978027,,not_comparable
+2026-07-31T08:07:27.408529Z,232,SimpleChar:000F4282,Malfunctioning Cleaning Robot,3598.7041,51.7449989,785.809021,3598.85498,52.5,786.737427,exact_legacy_robot_route,,9.897150,,not_comparable
+2026-07-31T08:07:31.781088Z,286,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,5.968068,,not_comparable
+2026-07-31T08:07:31.781088Z,287,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,288,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,289,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,290,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,291,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,292,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,293,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.781088Z,294,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.782088Z,295,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.001000,,not_comparable
+2026-07-31T08:07:31.782088Z,296,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.782088Z,297,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:31.782088Z,298,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,331,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,,,not_comparable
+2026-07-31T08:07:33.824245Z,332,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,333,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,334,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,335,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,336,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,337,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,338,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,339,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,340,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,341,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,342,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,343,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,344,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,345,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,346,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,347,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,348,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,349,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,350,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,351,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.824245Z,352,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:33.837242Z,353,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,2.055154,,not_comparable
+2026-07-31T08:07:35.900762Z,356,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.076517,,not_comparable
+2026-07-31T08:07:37.884306Z,367,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,4.047064,3.189943,captured_timing_deviation
+2026-07-31T08:07:37.884306Z,368,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,369,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,370,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,371,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,372,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,373,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,374,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,375,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,376,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,377,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,378,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:37.884306Z,379,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,383,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.950560,3.147145,captured_timing_deviation
+2026-07-31T08:07:39.851322Z,384,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,385,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,386,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,387,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,388,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,389,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,390,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,391,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,392,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,393,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,394,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,395,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,396,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,397,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,398,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,399,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,400,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,401,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,402,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,403,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.851322Z,404,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:39.883322Z,405,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.999016,,not_comparable
+2026-07-31T08:07:41.811841Z,408,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,1.960519,,not_comparable
+2026-07-31T08:07:43.763359Z,412,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.880037,3.189943,captured_timing_deviation
+2026-07-31T08:07:43.763359Z,413,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,414,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,415,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,416,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,417,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,418,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,419,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,420,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,421,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.763359Z,422,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:43.764359Z,423,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.001000,,not_comparable
+2026-07-31T08:07:43.764359Z,424,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,429,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.848045,3.147145,captured_timing_deviation
+2026-07-31T08:07:45.659886Z,430,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,431,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,432,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,433,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,434,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,435,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,436,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,437,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,438,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,439,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,440,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.659886Z,441,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,442,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.013000,,not_comparable
+2026-07-31T08:07:45.672886Z,443,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,444,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,445,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,446,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,447,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,448,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,449,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.672886Z,450,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:45.685888Z,451,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.921529,,not_comparable
+2026-07-31T08:07:47.577395Z,475,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,1.904509,,not_comparable
+2026-07-31T08:07:47.577395Z,476,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,477,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,478,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,479,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,480,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,481,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,482,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,483,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,484,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,485,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,486,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,487,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,488,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,489,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,490,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.577395Z,491,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.578395Z,492,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.001000,,not_comparable
+2026-07-31T08:07:47.578395Z,493,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.578395Z,494,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.578395Z,495,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:47.578395Z,496,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.640333Z,510,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.061938,,not_comparable
+2026-07-31T08:07:49.654330Z,511,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.968442,3.189943,captured_timing_deviation
+2026-07-31T08:07:49.654330Z,512,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,513,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,514,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,515,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,516,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,517,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,518,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,519,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,520,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,521,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,522,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:49.654330Z,523,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:51.658479Z,530,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,2.004149,,not_comparable
+2026-07-31T08:07:53.597797Z,555,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.957464,3.147145,captured_timing_deviation
+2026-07-31T08:07:53.597797Z,556,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.597797Z,557,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.597797Z,558,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.597797Z,559,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.597797Z,560,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.597797Z,561,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.597797Z,562,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,563,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.001000,,not_comparable
+2026-07-31T08:07:53.598797Z,564,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,565,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,568,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,570,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,571,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,572,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,573,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,574,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,575,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,576,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,577,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,578,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:53.598797Z,579,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.868300Z,603,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.269503,,not_comparable
+2026-07-31T08:07:55.907301Z,604,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,4.248822,3.189943,captured_timing_deviation
+2026-07-31T08:07:55.907301Z,605,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.907301Z,606,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.907301Z,607,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.907301Z,608,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,609,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000999,,not_comparable
+2026-07-31T08:07:55.908300Z,610,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,611,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,612,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,613,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,614,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,615,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:55.908300Z,616,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:57.939237Z,621,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,2.030937,,not_comparable
+2026-07-31T08:07:59.980763Z,631,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,4.112463,3.147145,captured_timing_deviation
+2026-07-31T08:07:59.980763Z,632,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,633,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,634,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,635,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,636,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,637,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,638,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,639,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.980763Z,640,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,641,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.001000,,not_comparable
+2026-07-31T08:07:59.981763Z,642,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,643,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,644,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,645,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,646,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,647,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,648,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,649,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,650,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,651,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:07:59.981763Z,652,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.028816Z,656,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.047053,,not_comparable
+2026-07-31T08:08:02.057817Z,657,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,4.118580,3.189943,captured_timing_deviation
+2026-07-31T08:08:02.057817Z,658,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,659,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,660,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,661,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,662,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,663,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,664,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,665,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,666,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,667,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,668,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:02.057817Z,669,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:04.026352Z,689,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.968535,,not_comparable
+2026-07-31T08:08:05.963392Z,694,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.934576,3.147145,captured_timing_deviation
+2026-07-31T08:08:05.963392Z,695,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.963392Z,696,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.963392Z,697,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.963392Z,698,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.963392Z,699,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.963392Z,700,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.963392Z,701,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,702,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.001001,,not_comparable
+2026-07-31T08:08:05.964393Z,703,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,704,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,705,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,706,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,707,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,708,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,709,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,710,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,711,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,712,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,713,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,714,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:05.964393Z,715,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.951435Z,721,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,1.987042,,not_comparable
+2026-07-31T08:08:07.993436Z,722,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.967084,3.189943,captured_timing_deviation
+2026-07-31T08:08:07.993436Z,723,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,724,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,725,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,726,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,727,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,728,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,729,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.993436Z,730,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.994438Z,731,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.001002,,not_comparable
+2026-07-31T08:08:07.994438Z,732,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.994438Z,733,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:07.994438Z,734,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:09.951017Z,736,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.956579,,not_comparable
+2026-07-31T08:08:11.879063Z,740,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.927628,3.147145,captured_timing_deviation
+2026-07-31T08:08:11.879063Z,741,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,742,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,743,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,744,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,745,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,746,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,747,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,748,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,749,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,750,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,751,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,752,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,753,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,754,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,755,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,756,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,757,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,758,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,759,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,760,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:11.879063Z,761,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.874110Z,767,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,1.995047,,not_comparable
+2026-07-31T08:08:13.888111Z,768,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.937094,3.189943,captured_timing_deviation
+2026-07-31T08:08:13.888111Z,769,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,770,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,771,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,772,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,773,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,774,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,775,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,776,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,777,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,778,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,779,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:13.888111Z,780,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:15.895153Z,785,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,2.007042,,not_comparable
+2026-07-31T08:08:17.853219Z,790,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.979109,3.147145,captured_timing_deviation
+2026-07-31T08:08:17.853219Z,791,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,792,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,793,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,794,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,795,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,796,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,797,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,798,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,799,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,800,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,801,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,802,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,803,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,804,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,805,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,806,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,807,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,808,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,809,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,810,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:17.853219Z,811,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.851238Z,812,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,1.998019,,not_comparable
+2026-07-31T08:08:19.867238Z,813,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.972085,3.189943,captured_timing_deviation
+2026-07-31T08:08:19.867238Z,814,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,815,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,816,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,817,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,818,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,819,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,820,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,821,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,822,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,823,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,824,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:19.867238Z,825,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:21.842766Z,827,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.975528,,not_comparable
+2026-07-31T08:08:23.800273Z,835,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.949035,3.147145,captured_timing_deviation
+2026-07-31T08:08:23.800273Z,836,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,837,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,838,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,839,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,840,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,841,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,842,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,843,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,844,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,845,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,846,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,847,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,848,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,849,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,850,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,851,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,852,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,853,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,854,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,855,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:23.800273Z,856,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.805289Z,859,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.005016,,not_comparable
+2026-07-31T08:08:25.817802Z,860,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.975036,3.189943,captured_timing_deviation
+2026-07-31T08:08:25.817802Z,861,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,862,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,863,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,864,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,865,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,866,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,867,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,868,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,869,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,870,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,871,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:25.817802Z,872,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:27.804331Z,880,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.986529,,not_comparable
+2026-07-31T08:08:29.787350Z,885,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.982061,3.147145,captured_timing_deviation
+2026-07-31T08:08:29.787350Z,886,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,887,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,888,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,889,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,890,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,891,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,892,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,893,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,894,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,895,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,896,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,897,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,898,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,899,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,900,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,901,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,902,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,903,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,904,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,905,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:29.787350Z,906,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,907,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.037500,,not_comparable
+2026-07-31T08:08:31.824850Z,908,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,4.020519,3.189943,captured_timing_deviation
+2026-07-31T08:08:31.824850Z,909,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,910,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,911,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,912,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,913,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,914,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,915,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,916,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,917,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,918,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,919,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:31.824850Z,920,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:33.810222Z,921,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.985372,,not_comparable
+2026-07-31T08:08:35.660544Z,922,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.835694,3.147145,captured_timing_deviation
+2026-07-31T08:08:35.660544Z,923,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,924,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,925,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,926,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,927,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,928,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,929,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,930,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,931,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,932,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,933,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,934,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,935,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,936,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,937,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,938,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,939,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,940,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,941,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,942,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:35.660544Z,943,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,944,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,1.796520,,not_comparable
+2026-07-31T08:08:37.457064Z,945,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,946,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,947,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,948,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,949,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,950,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,951,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,952,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,953,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,954,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,955,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,956,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,957,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,958,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,959,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,960,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,961,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,962,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,963,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,964,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.457064Z,965,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,966,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.713841,3.189943,captured_timing_deviation
+2026-07-31T08:08:37.524063Z,967,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,968,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,969,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,970,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,971,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,972,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,973,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,974,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,975,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,976,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,977,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:37.524063Z,978,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,980,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,1.867932,,not_comparable
+2026-07-31T08:08:39.324996Z,981,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,982,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,983,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,984,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,985,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,986,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,987,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,988,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,989,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,990,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,991,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,992,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,993,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,994,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,995,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,996,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,997,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,998,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,999,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,1000,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.324996Z,1001,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1002,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,1.867189,,not_comparable
+2026-07-31T08:08:39.391252Z,1003,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1004,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1005,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1006,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1007,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1008,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1009,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1010,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1011,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1012,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1013,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:39.391252Z,1014,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1016,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,1.931279,,not_comparable
+2026-07-31T08:08:41.256275Z,1017,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1018,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1019,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1020,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1021,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1022,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1023,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1024,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1025,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1026,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1027,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1028,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1029,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1030,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1031,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1032,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1033,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1034,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1035,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1036,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1037,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:41.256275Z,1038,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.865023,,not_comparable
+2026-07-31T08:08:43.297519Z,1039,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.041244,,not_comparable
+2026-07-31T08:08:45.295047Z,1043,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,4.038772,3.189943,captured_timing_deviation
+2026-07-31T08:08:45.295047Z,1044,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1045,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1046,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1047,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1048,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1049,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1050,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1051,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1052,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1053,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1054,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:45.295047Z,1055,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.222618Z,1061,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.925099,3.147145,captured_timing_deviation
+2026-07-31T08:08:47.222618Z,1062,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.222618Z,1063,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.222618Z,1064,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.222618Z,1065,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1066,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.017000,,not_comparable
+2026-07-31T08:08:47.239618Z,1067,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1068,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1069,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1070,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1071,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1072,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1073,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1074,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.239618Z,1075,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.240620Z,1076,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.001002,,not_comparable
+2026-07-31T08:08:47.240620Z,1077,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.240620Z,1078,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.240620Z,1079,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.240620Z,1080,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.240620Z,1081,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.240620Z,1082,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:47.256619Z,1083,SimpleChar:000F42A8,ICC Peacekeeper,3411.87207,3.91000009,772.811707,3409.90723,4.69720316,778.801086,exact_promoted_route,m03177,1.961572,,not_comparable
+2026-07-31T08:08:49.124156Z,1084,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,1.883536,,not_comparable
+2026-07-31T08:08:49.124156Z,1085,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1086,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1087,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1088,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1089,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1090,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1091,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1092,SimpleChar:000F42A6,ICC Peacekeeper,3389.948,13.6999998,803.258972,3385.9021,15.7229996,803.281006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1093,SimpleChar:000F42A6,ICC Peacekeeper,3385.9021,15.7229996,803.281006,3384.125,15.7810001,806.142029,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1094,SimpleChar:000F42A6,ICC Peacekeeper,3384.125,15.7810001,806.142029,3383.28906,15.7810001,809.822998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1095,SimpleChar:000F42A6,ICC Peacekeeper,3383.28906,15.7810001,809.822998,3378.2439,17.1100006,814.338989,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1096,SimpleChar:000F42A6,ICC Peacekeeper,3378.2439,17.1100006,814.338989,3378.23706,17.1100006,812.47998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1097,SimpleChar:000F42A6,ICC Peacekeeper,3378.23706,17.1100006,812.47998,3378.64795,17.1100006,808.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1098,SimpleChar:000F42A6,ICC Peacekeeper,3378.64795,17.1100006,808.104004,3379.23608,17.1100006,802.273987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1099,SimpleChar:000F42A6,ICC Peacekeeper,3379.23608,17.1100006,802.273987,3381.99292,15.0179996,800.572998,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1100,SimpleChar:000F42A6,ICC Peacekeeper,3381.99292,15.0179996,800.572998,3381.95898,15.0530005,793.69397,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1101,SimpleChar:000F42A6,ICC Peacekeeper,3381.95898,15.0530005,793.69397,3383.9751,15.7810001,801.231995,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1102,SimpleChar:000F42A6,ICC Peacekeeper,3383.9751,15.7810001,801.231995,3386.4519,15.3920002,801.755981,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1103,SimpleChar:000F42A6,ICC Peacekeeper,3386.4519,15.3920002,801.755981,3389.78003,13.7840004,801.335022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1104,SimpleChar:000F42A6,ICC Peacekeeper,3389.78003,13.7840004,801.335022,3392.58301,12.6479998,802.104004,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:49.124156Z,1105,SimpleChar:000F42A6,ICC Peacekeeper,3392.58301,12.6479998,802.104004,3399.39111,9.32999992,801.210022,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.141203Z,1143,SimpleChar:000F42A6,ICC Peacekeeper,3397.94287,10.1048613,801.337341,3403.46973,9.01033878,803.082397,exact_promoted_route,m08994,2.017047,,not_comparable
+2026-07-31T08:08:51.175200Z,1144,SimpleChar:000F42A8,ICC Peacekeeper,3410.7229,3.39299989,773.750977,3409.90698,4.69700003,778.801025,coordinates_not_in_promoted_dataset,,3.918581,3.189943,captured_timing_deviation
+2026-07-31T08:08:51.175200Z,1145,SimpleChar:000F42A8,ICC Peacekeeper,3409.90698,4.69700003,778.801025,3413.10205,4.96099997,782.013977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1146,SimpleChar:000F42A8,ICC Peacekeeper,3413.10205,4.96099997,782.013977,3416.90308,5.03200006,782.054993,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1147,SimpleChar:000F42A8,ICC Peacekeeper,3416.90308,5.03200006,782.054993,3421.4541,5.11000013,781.221008,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1148,SimpleChar:000F42A8,ICC Peacekeeper,3421.4541,5.11000013,781.221008,3422.51196,5.11000013,781.172974,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1149,SimpleChar:000F42A8,ICC Peacekeeper,3422.51196,5.11000013,781.172974,3426.89209,5.11000013,781.125,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1150,SimpleChar:000F42A8,ICC Peacekeeper,3426.89209,5.11000013,781.125,3435.73511,5.11000013,780.870972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1151,SimpleChar:000F42A8,ICC Peacekeeper,3435.73511,5.11000013,780.870972,3439.74707,4.80999994,781.018982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1152,SimpleChar:000F42A8,ICC Peacekeeper,3439.74707,4.80999994,781.018982,3446.07397,4.80999994,780.16803,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1153,SimpleChar:000F42A8,ICC Peacekeeper,3446.07397,4.80999994,780.16803,3430.72192,3.00999999,768.148987,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1154,SimpleChar:000F42A8,ICC Peacekeeper,3430.72192,3.00999999,768.148987,3422.93188,3.00999999,766.849976,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1155,SimpleChar:000F42A8,ICC Peacekeeper,3422.93188,3.00999999,766.849976,3415.63599,3.00999999,769.05603,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:51.175200Z,1156,SimpleChar:000F42A8,ICC Peacekeeper,3415.63599,3.00999999,769.05603,3410.7229,3.39299989,773.750977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1189,SimpleChar:000F42A6,ICC Peacekeeper,3399.39111,9.32999992,801.210022,3403.46997,9.01000023,803.08197,coordinates_not_in_promoted_dataset,,3.758099,3.147145,captured_timing_deviation
+2026-07-31T08:08:54.899302Z,1190,SimpleChar:000F42A6,ICC Peacekeeper,3403.46997,9.01000023,803.08197,3410.12891,9.01000023,802.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1191,SimpleChar:000F42A6,ICC Peacekeeper,3410.12891,9.01000023,802.544006,3414.69702,9.01000023,807.255005,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1192,SimpleChar:000F42A6,ICC Peacekeeper,3414.69702,9.01000023,807.255005,3405.30298,9.01000023,806.513977,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1193,SimpleChar:000F42A6,ICC Peacekeeper,3405.30298,9.01000023,806.513977,3399.95996,9.03100014,805.98999,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1194,SimpleChar:000F42A6,ICC Peacekeeper,3399.95996,9.03100014,805.98999,3396.375,10.9130001,805.544006,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1195,SimpleChar:000F42A6,ICC Peacekeeper,3396.375,10.9130001,805.544006,3393.54395,12.2150002,803.781982,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable
+2026-07-31T08:08:54.899302Z,1196,SimpleChar:000F42A6,ICC Peacekeeper,3393.54395,12.2150002,803.781982,3389.948,13.6999998,803.258972,coordinates_not_in_promoted_dataset,,0.000000,,not_comparable

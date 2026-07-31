@@ -1,0 +1,99 @@
+LiveIdentity,Name,NpcFamily,MonsterData,Level,PlayfieldId,PositionX,PositionY,PositionZ,PatrolRows,SpawnRows,ChaseRows,FleeRows,LeashRows,NearestPatrolStartMeters,PatrolActivationEligible,SelectedSourceIdentity,SelectedSourceGeneration,SelectedVariantDistanceMeters,SelectedPatrolRows,SelectedPatrolNearestMeters,FirstPatrolDecisionEligible,ObservedNpcPathPackets,ExactReason
+SimpleChar:000F4283,Alex Gibbs,137,263050,20,6553,3520.78442,5.11000061,856.6935,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F4284,ICC Immigration Officer Bill,137,26088,25,6553,3510.2,5.11000061,826.2723,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F4287,Barry the Food Vendor,0,26139,10,6553,3516.73145,6.80500031,826.9838,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F4289,Bruiser,103,26088,5,6553,3525.66,5.11000061,829.66,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F4291,Protester,103,203740,2,6553,3523.32,6.52,780.9,0,19,0,0,0,,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F429B,Antonio Stacklund,137,26088,20,6553,3443.073,9.145,832.652649,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F429C,Carol Schieffer,103,26090,21,6553,3470.92017,9.01,858.4814,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F429D,Cedric Harding,0,165188,6,6553,3501.87085,5.11000061,825.5927,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F429E,Chauncey Varela,103,26139,1,6553,3438.50854,9.01,846.927063,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F429F,Dion Giscombe,103,26097,7,6553,3429.213,9.215,800.1055,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A0,Lorelei the Bartender,0,26137,10,6553,3369.1416,17.315,794.4232,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A1,Omni-AF Private,2,26151,10,6553,3393.15747,18.545,854.9975,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A2,Dr. Mason,137,26147,20,6553,3430.51563,9.215,795.449158,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A3,Eliseo Ye,103,26139,19,6553,3436.187,9.01,887.3641,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A4,Food Provider,0,26090,10,6553,3439.04688,9.01,849.458069,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A5,Furniture Merchant,0,26137,104,6553,3438.173,9.165,892.195251,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42A6,ICC Peacekeeper,0,26092,40,6553,3401.45532,9.409285,802.44635,336,44,1,1,2,0.807865,true,SimpleChar:797D337E,5,0.691960,5,3.668421,false,394,selected_patrol_start_exceeds_2_5m_continuation
+SimpleChar:000F42A7,ICC Peacekeeper,0,26092,40,6553,3481.32544,8.018829,786.583069,336,44,1,1,2,1.036449,true,SimpleChar:7962A325,11,1.036449,54,1.036449,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F42A8,ICC Peacekeeper,0,26092,40,6553,3435.735,5.11,780.871,336,44,1,1,2,1.264300,true,SimpleChar:7962A3F9,2,1.264300,13,1.264300,true,213,live_movement_packet_observed
+SimpleChar:000F42A9,ICC Peacekeeper,0,26092,40,6553,3456.158,9.145,834.197754,336,44,1,1,2,4.484199,true,SimpleChar:79882D97,11,4.484199,10,4.484199,false,0,selected_patrol_start_exceeds_2_5m_continuation
+SimpleChar:000F42AA,Jamison Clasen,103,26097,6,6553,3404.147,9.01,811.6471,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42AB,Janae Seaman,103,26149,23,6553,3463.00171,9.01,889.49884,0,15,0,0,0,,false,SimpleChar:78E0FD08,11,5.052963,0,,false,0,selected_source_variant_has_no_patrol_observation
+SimpleChar:000F42AC,Janee Forejt,103,26090,6,6553,3413.605,9.01,848.813843,0,16,0,0,0,,false,SimpleChar:78E0FD07,1,4.292638,0,,false,0,selected_source_variant_has_no_patrol_observation
+SimpleChar:000F42AD,Joseph Schuemann,103,26139,8,6553,3405.26953,9.01,834.66,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42AE,Keesha McKesson,103,26149,19,6553,3441.17188,9.01,860.7495,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42AF,Lady Sheila Black,137,26137,15,6553,3411.6333,9.205,903.6198,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B0,Leonora Marty,137,26125,10,6553,3448.84668,9.050667,862.5369,0,20,0,0,0,,false,SimpleChar:78E0FC74,2,1.236945,0,,false,0,selected_source_variant_has_no_patrol_observation
+SimpleChar:000F42B1,Logistics Manager Fausto,137,26101,20,6553,3408.101,9.01,866.9548,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B2,Luna Erke,103,26090,21,6553,3437.89746,9.01,834.5817,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B3,Marco Spida,0,26092,10,6553,3407.67676,9.01,831.262451,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B4,Max Barchus,103,26097,20,6553,3463.823,9.01,858.8283,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B5,Mitchell Dorph,103,26139,29,6553,3423.436,9.135,806.42865,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B6,Neutral Clothing Salesman,0,26092,10,6553,3464.07764,9.01,861.159546,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B7,Patrick Sun,137,26092,20,6553,3462.502,9.01,812.4979,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B8,Rashida Ardman,103,26149,20,6553,3439.935,9.01,860.554932,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42B9,Remi Gallois,137,26084,10,6553,3433.65186,9.01,832.7955,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42BA,Robotic Guard Dog,1019,17720,13,6553,3405.59521,9.01,885.640259,0,0,5,0,0,,false,SimpleChar:78E0FCE9,6,2.830351,0,,false,0,selected_source_variant_has_no_patrol_observation
+SimpleChar:000F42BB,Russel Aronstein,103,26139,1,6553,3472.17114,9.01,851.716248,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42BC,Sarah Greene,137,295889,20,6553,3471.26025,9.01,840.8831,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42BD,Secondhand Peddler,0,26090,200,6553,3440.286,9.01,863.595459,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42BE,Shady Guy,137,26074,20,6553,3540.858,6.085,748.305237,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42BF,Shane Streller,103,26097,8,6553,3420.938,9.165,811.621948,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C0,Sherwood Bannister,103,26097,21,6553,3470.66479,9.01,831.8767,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C1,Shipping Manifest Terminal,0,279184,25,6553,3551.00586,8.315,832.852,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C2,Stanley Goodman,137,26084,20,6553,3463.06055,9.01,880.1275,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C3,Tailor,0,26076,122,6553,3471.41919,9.01,861.150452,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C4,Trinh Alsaqri,103,26149,28,6553,3465.02344,9.01,849.869141,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C5,Velva Age,103,26149,30,6553,3459.96021,9.135,801.8846,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C6,Vernon Godfray,137,295564,15,6553,3433.95337,12.285,825.898254,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C7,Vaughn Hammond,137,281855,25,6553,3369.26465,18.1111526,828.5384,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C8,Omni-Trans Equipment Vendor,88,250380,40,6553,3392.456,18.545,876.7765,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42C9,Omni-AF Officer Milne,2,165186,35,6553,3390.00366,18.545,856.0561,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42CA,Omni-Pol Guard,2,26097,20,6553,3381.43726,17.11,850.484131,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42CB,Omni-Med Surgeon,105,26092,20,6553,3372.307,18.525,855.9362,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42CC,Omni-Med Guard,2,26139,20,6553,3375.78125,18.525,854.6186,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42CD,Clan Protester,104,26139,20,6553,3381.953,17.11,842.000061,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42CE,Clan Protester,104,26090,20,6553,3385.4978,17.11,842.0052,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42CF,Clan Protester,104,26103,20,6553,3377.99951,17.11,842.001,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42DE,Cleaning Robot,1019,297023,1,6553,3549.58447,5.110001,855.8112,219,34,0,0,0,47.472110,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F42DF,32-V Docker,1019,17649,3,6553,3489.426,5.11,875.835,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E0,32-V Docker,1019,17649,3,6553,3493.492,5.11,892.886,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E1,32-V Docker,1019,17649,3,6553,3494.314,5.223,906.4,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E2,32-V Docker,1019,17649,3,6553,3495.097,5.11,880.632,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E3,32-V Docker,1019,17649,3,6553,3495.464,5.11,890.018,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E4,32-V Docker,1019,17649,3,6553,3496.017,5.11,903.404,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E5,32-V Docker,1019,17649,3,6553,3498.525,7.73,913.251,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E6,32-V Docker,1019,17649,3,6553,3499.633,5.11,855.734,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E7,32-V Docker,1019,17649,3,6553,3503.399,5.11,888.679,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E8,32-V Docker,1019,17649,3,6553,3512.169,5.11,892.637,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42E9,32-V Docker,1019,17649,3,6553,3516.197,5.11,914.061,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42EA,32-V Docker,1019,17649,3,6553,3523.44,5.11,898.358,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42EB,32-V Docker,1019,17649,3,6553,3524.225,5.11,879.666,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42EC,Waste Collector,1019,17714,2,6553,3492.532,5.11,866.601,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42ED,Waste Collector,1019,17714,2,6553,3497.703,9.38,918.384,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42EE,Waste Collector,1019,17714,2,6553,3506.614,5.11,891.661,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42EF,Waste Collector,1019,17714,2,6553,3507.345,8.185,930.825,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42F0,Waste Collector,1019,17714,2,6553,3510.761,5.11,864.661,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42F1,Waste Collector,1019,17714,2,6553,3510.884,7.982,923.173,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F42FB,Garbage Flea,25,17657,1,6553,3502.315,5.11,902.829,470,42,0,0,0,1.001005,true,SimpleChar:79891482,1,1.001005,6,1.001005,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F42FC,Garbage Flea,25,17657,2,6553,3502.761,5.11,891.211,306,34,0,0,0,0.518710,true,SimpleChar:7989156D,1,0.518710,107,0.518710,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F42FD,Garbage Flea,25,17657,1,6553,3509.731,7.394,926.952,470,42,0,0,0,1.340656,true,SimpleChar:798915AB,2,1.340656,5,1.340656,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F42FE,Garbage Flea,25,17657,2,6553,3529.015,5.11,891.201,306,34,0,0,0,1.101935,true,SimpleChar:798915AA,1,1.101935,8,1.101935,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F4305,IIV-X Advanced Docker,1019,17649,4,6553,3515.109,5.305,904.289,0,0,0,0,1,,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F4307,Garbage Flea,25,17657,6,6553,3452.36,0.01,809.73,181,30,2,2,0,0.744614,true,SimpleChar:7989164B,2,0.744614,16,0.744614,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F4308,Garbage Flea,25,17657,6,6553,3451.56519,0.892165,852.2598,181,30,2,2,0,1.270598,true,SimpleChar:798917F7,1,1.270598,45,1.270598,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F4309,Garbage Flea,25,17657,5,6553,3452.62,0.01,884.29,242,24,4,1,3,0.721933,true,SimpleChar:798917FB,2,0.721933,34,0.721933,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F430A,Garbage Flea,25,17657,6,6553,3426.74,0.01,835.28,181,30,2,2,0,3.652403,true,SimpleChar:7989162E,3,3.652403,18,3.652403,false,0,selected_patrol_start_exceeds_2_5m_continuation
+SimpleChar:000F430B,Garbage Flea,25,17657,6,6553,3422.32,0.01,866.07,181,30,2,2,0,4.555359,true,SimpleChar:7989162E,3,4.555359,18,4.555359,false,0,selected_patrol_start_exceeds_2_5m_continuation
+SimpleChar:000F430C,Garbage Flea,25,17657,5,6553,3425.29,0.01,818.4,242,24,4,1,3,6.422250,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F430D,Garbage Flea,25,17657,6,6553,3437.13,0.01,803.59,181,30,2,2,0,2.000960,true,SimpleChar:7989162E,2,2.000960,12,2.000960,true,0,eligible_selected_patrol_but_no_live_movement_packet
+SimpleChar:000F430E,Mutated Garbage Flea,25,17657,7,6553,3422.907,0.01,878.7842,0,2,0,0,1,,false,SimpleChar:79891578,5,4.570129,0,,false,0,selected_source_variant_has_no_patrol_observation
+SimpleChar:000F4327,Rollerrat,55,17687,5,6553,3392.27124,3.01,755.309631,0,0,3,0,0,,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F4329,Rollerrat,55,17687,5,6553,3417.22949,2.11,718.296631,0,0,3,0,0,,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F432D,Rollerrat,55,17687,6,6553,3457.39575,4.289871,746.9633,0,0,5,1,0,,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F432E,Rollerrat,55,17687,5,6553,3387.48,3.01,744.358,0,0,3,0,0,,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F432F,Gnarl the Roller,55,17687,7,6553,3396.06787,2.460354,721.5289,2,1,0,0,0,65.113082,false,,,,0,,false,0,no_source_variant_within_6m
+SimpleChar:000F4331,Engineer Automaton I,95,17649,5,6553,3439.90454,11.965,813.694,0,0,0,0,0,,false,,,,0,,false,0,no_exact_promoted_metadata_constraint
+SimpleChar:000F4333,Garbage Flea,25,17657,6,6553,3452.59,0.01,858.98,181,30,2,2,0,1.474298,true,SimpleChar:798917F7,1,1.474298,45,1.474298,true,0,eligible_selected_patrol_but_no_live_movement_packet

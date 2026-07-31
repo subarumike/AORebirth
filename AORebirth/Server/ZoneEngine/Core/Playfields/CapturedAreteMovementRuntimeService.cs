@@ -99,9 +99,9 @@ namespace AORebirth.Core.Playfields
         internal bool TryProcessPatrol(ICharacter character, DateTime utcNow)
         {
             NPCController controller = character == null ? null : character.Controller as NPCController;
-            if (controller == null
-                || controller.State != CharacterState.Patrolling
-                || character.FightingTarget.Instance != 0)
+            if (!CapturedAreteMovementRuntimeCoordinator.PatrolConditionMatches(
+                    controller != null,
+                    character != null && character.FightingTarget.Instance != 0))
             {
                 return false;
             }

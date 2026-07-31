@@ -497,6 +497,13 @@ namespace ZoneEngine.Core.Playfields
     {
         public const double ActivationDistance = 6.0;
 
+        public static bool PatrolConditionMatches(
+            bool hasNpcController,
+            bool hasFightingTarget)
+        {
+            return hasNpcController && !hasFightingTarget;
+        }
+
         public const double ContinuationDistance = 2.5;
 
         private readonly CapturedAreteMovementCatalog catalog;
@@ -778,6 +785,187 @@ namespace ZoneEngine.Core.Playfields
                        && actor.PlayfieldId == this.Identity.PlayfieldId
                        && string.Equals(actor.Name, this.Identity.Name, StringComparison.Ordinal);
             }
+        }
+    }
+
+    public sealed class CapturedAreteAggroObservation
+    {
+        public string Name { get; set; }
+
+        public int NpcFamily { get; set; }
+
+        public int MonsterData { get; set; }
+
+        public int Level { get; set; }
+
+        public int RuntimePlayfieldId { get; set; }
+
+        public int NpcFirstAttackStarts { get; set; }
+
+        public double ObservedAutomaticAggroRadiusMeters { get; set; }
+
+        public bool Matches(CapturedAreteMovementActorEvidence actor)
+        {
+            return actor != null
+                   && actor.NpcFamily == this.NpcFamily
+                   && actor.MonsterData == this.MonsterData
+                   && actor.Level == this.Level
+                   && actor.PlayfieldId == this.RuntimePlayfieldId
+                   && string.Equals(actor.Name, this.Name, StringComparison.Ordinal);
+        }
+    }
+
+    public sealed class CapturedAreteAggroCatalog
+    {
+        private const string RuntimeRelativePath =
+            @"Content\Captured\Arete\aggro.csv";
+
+        private const string SourceRelativePath =
+            @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\aggro.csv";
+
+        private readonly CapturedAreteAggroObservation[] observations;
+
+        private CapturedAreteAggroCatalog(
+            CapturedAreteAggroObservation[] observations,
+            bool isValid,
+            string failureReason)
+        {
+            this.observations = observations ?? new CapturedAreteAggroObservation[0];
+            this.IsValid = isValid;
+            this.FailureReason = failureReason ?? string.Empty;
+        }
+
+        public bool IsValid { get; private set; }
+
+        public string FailureReason { get; private set; }
+
+        public int Count
+        {
+            get { return this.observations.Length; }
+        }
+
+        public static CapturedAreteAggroCatalog LoadDefault()
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string[] candidates =
+            {
+                Path.Combine(baseDirectory, RuntimeRelativePath),
+                Path.Combine(baseDirectory, SourceRelativePath),
+                RuntimeRelativePath,
+                SourceRelativePath
+            };
+            foreach (string candidate in candidates)
+            {
+                if (File.Exists(candidate))
+                {
+                    return Load(candidate);
+                }
+            }
+
+            return Invalid("aggro-dataset-missing");
+        }
+
+        public static CapturedAreteAggroCatalog Load(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                return Invalid("aggro-dataset-missing");
+            }
+
+            try
+            {
+                string[] lines = File.ReadAllLines(path);
+                const string expectedHeader =
+                    "Name,NpcFamily,MonsterData,Level,CapturedPlayfieldId,"
+                    + "RuntimePlayfieldId,NpcFirstAttackStarts,"
+                    + "ObservedAutomaticAggroRadiusMeters,EvidenceCapturedUtc,"
+                    + "EvidenceSequence";
+                if (lines.Length == 0
+                    || !string.Equals(lines[0], expectedHeader, StringComparison.Ordinal))
+                {
+                    return Invalid("aggro-header-mismatch");
+                }
+
+                var rows = new List<CapturedAreteAggroObservation>();
+                for (int index = 1; index < lines.Length; index++)
+                {
+                    if (string.IsNullOrWhiteSpace(lines[index]))
+                    {
+                        continue;
+                    }
+
+                    string[] columns = lines[index].Split(',');
+                    int family;
+                    int template;
+                    int level;
+                    int runtimePlayfield;
+                    int starts;
+                    double radius;
+                    if (columns.Length != 10
+                        || !int.TryParse(columns[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out family)
+                        || !int.TryParse(columns[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out template)
+                        || !int.TryParse(columns[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out level)
+                        || !int.TryParse(columns[5], NumberStyles.Integer, CultureInfo.InvariantCulture, out runtimePlayfield)
+                        || !int.TryParse(columns[6], NumberStyles.Integer, CultureInfo.InvariantCulture, out starts)
+                        || !double.TryParse(columns[7], NumberStyles.Float, CultureInfo.InvariantCulture, out radius)
+                        || starts <= 0
+                        || radius <= 0.0d
+                        || double.IsNaN(radius)
+                        || double.IsInfinity(radius))
+                    {
+                        return Invalid("aggro-row-invalid:" + index);
+                    }
+
+                    rows.Add(
+                        new CapturedAreteAggroObservation
+                        {
+                            Name = columns[0],
+                            NpcFamily = family,
+                            MonsterData = template,
+                            Level = level,
+                            RuntimePlayfieldId = runtimePlayfield,
+                            NpcFirstAttackStarts = starts,
+                            ObservedAutomaticAggroRadiusMeters = radius
+                        });
+                }
+
+                return rows.Count == 0
+                    ? Invalid("aggro-dataset-empty")
+                    : new CapturedAreteAggroCatalog(rows.ToArray(), true, string.Empty);
+            }
+            catch (Exception exception)
+            {
+                return Invalid("aggro-load-failed:" + exception.GetType().Name);
+            }
+        }
+
+        public bool TryGetRadius(
+            CapturedAreteMovementActorEvidence actor,
+            out double radius)
+        {
+            radius = 0.0d;
+            if (!this.IsValid || actor == null)
+            {
+                return false;
+            }
+
+            CapturedAreteAggroObservation match =
+                this.observations.SingleOrDefault(value => value.Matches(actor));
+            if (match == null)
+            {
+                return false;
+            }
+
+            radius = match.ObservedAutomaticAggroRadiusMeters;
+            return true;
+        }
+
+        private static CapturedAreteAggroCatalog Invalid(string reason)
+        {
+            return new CapturedAreteAggroCatalog(
+                new CapturedAreteAggroObservation[0],
+                false,
+                reason);
         }
     }
 }

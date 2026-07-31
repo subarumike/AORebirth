@@ -216,6 +216,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void IdleControllerCanEnterCapturedPatrolWithoutWaypointState()
+        {
+            Assert.IsTrue(
+                CapturedAreteMovementRuntimeCoordinator.PatrolConditionMatches(
+                    true,
+                    false));
+            Assert.IsFalse(
+                CapturedAreteMovementRuntimeCoordinator.PatrolConditionMatches(
+                    false,
+                    false));
+            Assert.IsFalse(
+                CapturedAreteMovementRuntimeCoordinator.PatrolConditionMatches(
+                    true,
+                    true));
+        }
+
+        [TestMethod]
+        public void CapturedAggroCatalogLoadsNpcFirstDistancesAndFailsClosed()
+        {
+            CapturedAreteAggroCatalog catalog = CapturedAreteAggroCatalog.LoadDefault();
+            var rollerrat = new CapturedAreteMovementActorEvidence
+                            {
+                                RuntimeIdentity = 1,
+                                SpawnGeneration = 1,
+                                NpcFamily = 55,
+                                MonsterData = 17687,
+                                Level = 5,
+                                PlayfieldId = 6553,
+                                Name = "Rollerrat",
+                                Position = Point(0, 0)
+                            };
+            double radius;
+
+            Assert.IsTrue(catalog.IsValid, catalog.FailureReason);
+            Assert.AreEqual(11, catalog.Count);
+            Assert.IsTrue(catalog.TryGetRadius(rollerrat, out radius));
+            Assert.AreEqual(16.639269, radius, 0.000001);
+
+            rollerrat.Level = 4;
+            Assert.IsFalse(catalog.TryGetRadius(rollerrat, out radius));
+            rollerrat.Level = 5;
+            rollerrat.Name = "Uncaptured Rollerrat";
+            Assert.IsFalse(catalog.TryGetRadius(rollerrat, out radius));
+        }
+
+        [TestMethod]
         public void TimingInterruptionAndGeometryMismatchFallBackWithoutInventingRoute()
         {
             string directory = CreateDataset(
