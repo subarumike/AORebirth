@@ -350,6 +350,8 @@ namespace AORebirth.Core.Playfields
             CapturedEncounterRuntimeRegistry.RemoveForPlayfield(this.playfield.Identity.Instance);
             foreach (NamedEncounterState state in this.namedEncounters)
             {
+                this.ClearEncounterNanoState(
+                    this.playfield.FindByIdentity<ICharacter>(state.Identity));
                 state.ResetAll();
             }
 
@@ -420,6 +422,7 @@ namespace AORebirth.Core.Playfields
             }
 
             state.ClearCombat();
+            this.ClearEncounterNanoState(npc);
             if (!string.Equals(state.Definition.ProfileKey, ReAnimatorProfileKey, StringComparison.Ordinal))
             {
                 return new ICharacter[0];
@@ -440,6 +443,7 @@ namespace AORebirth.Core.Playfields
             NamedEncounterState state = this.FindNamed(target);
             if (state != null)
             {
+                this.ClearEncounterNanoState(target);
                 state.Dead = true;
                 state.ClearCombat();
                 bool mainRoomAdvanced =
@@ -473,6 +477,7 @@ namespace AORebirth.Core.Playfields
             NamedEncounterState state = this.FindNamed(target);
             if (state != null)
             {
+                this.ClearEncounterNanoState(target);
                 state.Identity = Identity.None;
                 state.ClearCombat();
                 if (state.RespawnMode
@@ -1313,6 +1318,12 @@ namespace AORebirth.Core.Playfields
             uklesh.ClearCombat();
             khalum.ClearCombat();
             aztur.ClearCombat();
+            this.ClearEncounterNanoState(
+                this.playfield.FindByIdentity<ICharacter>(uklesh.Identity));
+            this.ClearEncounterNanoState(
+                this.playfield.FindByIdentity<ICharacter>(khalum.Identity));
+            this.ClearEncounterNanoState(
+                this.playfield.FindByIdentity<ICharacter>(aztur.Identity));
             this.namedRespawns.Cancel(KhalumProfileKey);
             this.namedRespawns.Cancel(AzturProfileKey);
             this.namedRespawns.Schedule(
@@ -1320,6 +1331,19 @@ namespace AORebirth.Core.Playfields
                 UkleshProfileKey,
                 AzturProfileKey,
                 resetDueAtUtc);
+        }
+
+        private void ClearEncounterNanoState(ICharacter actor)
+        {
+            if (actor == null)
+            {
+                return;
+            }
+
+            NanoEventRuntimeService.Default.RemoveModifiersCastBy(
+                actor.Identity.Instance);
+            NanoEventRuntimeService.Default.RemoveAllModifiers(actor);
+            ActiveNanoRuntimeService.Default.ClearAllActiveNanos(actor, false);
         }
 
         private void ProcessNamedNano(NamedEncounterState state, DateTime utcNow)
@@ -1395,10 +1419,77 @@ namespace AORebirth.Core.Playfields
                     NanoEventRuntimeService.Default.ExecuteOnUseEvents(actor, nano);
                 }
             }
+            else if (ownership == CapturedTempleNanoEffectOwnership.ExplicitTargetNanoData)
+            {
+                ICharacter target = this.playfield.FindByIdentity<ICharacter>(
+                    pending.TargetIdentity);
+                NanoFormula nano;
+                if (target != null
+                    && target.Stats[StatIds.health].Value > 0
+                    && NanoLoader.NanoList.TryGetValue(pending.NanoId, out nano))
+                {
+                    int duration = nano.getItemAttribute(8);
+                    int strain = ActiveNanoRuntimeService.Default.ResolveNanoStrain(
+                        target,
+                        pending.NanoId);
+                    bool refreshing =
+                        ActiveNanoRuntimeService.Default.HasActiveNanoInStrain(
+                            target,
+                            pending.NanoId,
+                            strain);
+                    if (refreshing)
+                    {
+                        BuffMessageHandler.Default.SendRemoveNanoBuff(
+                            target,
+                            pending.NanoId);
+                    }
 
-            // Captures prove the remaining cast IDs and finish timing, but
-            // their downstream target/effect packet ownership is incomplete.
-            // Those effects remain fail-closed.
+                    if (duration > 0
+                        && ActiveNanoRuntimeService.Default.ApplyActiveNano(
+                            target,
+                            pending.NanoId,
+                            duration,
+                            target.Identity,
+                            strain,
+                            true))
+                    {
+                        CharacterActionMessageHandler.Default
+                            .NotifyActiveNanoDurationToPlayfield(
+                                actor,
+                                target.Identity,
+                                pending.NanoId,
+                                duration);
+                    }
+
+                    int healthBefore = target.Stats[StatIds.health].Value;
+                    if (NanoEventRuntimeService.Default.ExecuteCapturedOnUseEvents(
+                            actor,
+                            target,
+                            nano,
+                            NanoLandingResult.NotRequired))
+                    {
+                        int healthAfter = target.Stats[StatIds.health].Value;
+                        int appliedHeal = Math.Max(0, healthAfter - healthBefore);
+                        if (appliedHeal > 0)
+                        {
+                            this.playfield.Announce(
+                                new HealthDamageMessage
+                                {
+                                    Identity = target.Identity,
+                                    Unknown1 = healthAfter,
+                                    Unknown2 = appliedHeal,
+                                    Unknown3 = 0,
+                                    Unknown4 = 0,
+                                    Target = actor.Identity,
+                                    Unknown5 = 0
+                                });
+                        }
+                    }
+                }
+            }
+
+            // All other captured IDs remain fail-closed when their resist
+            // outcome, trigger, source owner, or categorical selector is absent.
         }
 
         private void RequestNextReanimation(DateTime finishedAtUtc)

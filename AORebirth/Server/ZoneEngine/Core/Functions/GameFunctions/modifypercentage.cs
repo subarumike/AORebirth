@@ -118,8 +118,24 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 return true;
             }
 
-            Character ch = (Character)Self;
-            ch.Stats[statId].PercentageModifier += Arguments[1].AsInt32();
+            Character affected = Target as Character;
+            if (affected == null)
+            {
+                affected = Self as Character;
+            }
+
+            if (affected == null)
+            {
+                return false;
+            }
+
+            int delta = Arguments[1].AsInt32();
+            affected.Stats[statId].PercentageModifier += delta;
+            NanoEventRuntimeService.Default.RecordModifier(
+                affected,
+                statId,
+                delta,
+                true);
             return true;
         }
 

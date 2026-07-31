@@ -785,8 +785,7 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             int strain = ActiveNanoRuntimeService.Default.ResolveNanoStrain(recipient, unknown1);
-            if (duration > 0
-                && !ActiveNanoRuntimeService.Default.HasActiveNanoInStrain(recipient, unknown1, strain))
+            if (duration > 0)
             {
                 // Perk pet buffs (Channel Rage) must land on the pet even if NCU gate is tight.
                 if (!ActiveNanoRuntimeService.Default.ApplyActiveNano(

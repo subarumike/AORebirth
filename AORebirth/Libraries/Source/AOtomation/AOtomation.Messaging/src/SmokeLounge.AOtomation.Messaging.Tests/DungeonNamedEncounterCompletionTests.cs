@@ -326,7 +326,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int[] packetOnlyNanoIds =
             {
                 205389, 205561, 205600, 205594, 205592,
-                205383, 205565, 205395, 205563, 205590,
+                205383, 205565, 205395, 205563,
                 209924, 204830, 70294
             };
             foreach (int nanoId in packetOnlyNanoIds)
@@ -350,6 +350,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 CapturedTempleNanoEffectOwnership.InstantSelfNanoData,
                 gulardOwnership);
+            CapturedTempleNanoEffectOwnership gartuaOwnership;
+            Assert.IsTrue(
+                CapturedTempleOfThreeWindsEncounterRules.TryGetCapturedNanoEffectOwnership(
+                    205590,
+                    out gartuaOwnership));
+            Assert.AreEqual(
+                CapturedTempleNanoEffectOwnership.ExplicitTargetNanoData,
+                gartuaOwnership);
             CapturedTempleNanoEffectOwnership reanimationOwnership;
             Assert.IsTrue(
                 CapturedTempleOfThreeWindsEncounterRules.TryGetCapturedNanoEffectOwnership(
@@ -368,11 +376,55 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 temple.Contains("NanoLoader.NanoList.TryGetValue(pending.NanoId, out nano)")
                 && temple.Contains("NanoEventRuntimeService.Default.ExecuteOnUseEvents(actor, nano)"),
                 "The exact instant Gulard self-heal must use the shared nano-data runtime.");
+            Assert.IsTrue(
+                temple.Contains("NanoLandingResult.NotRequired")
+                && temple.Contains("ExecuteCapturedOnUseEvents(")
+                && temple.Contains("NotifyActiveNanoDurationToPlayfield(")
+                && temple.Contains("BuffMessageHandler.Default.SendRemoveNanoBuff(")
+                && temple.Contains("new HealthDamageMessage"),
+                "Gartua must use the explicit shared target path with captured refresh, duration, and heal packets.");
             Assert.IsFalse(
                 temple.Contains("new[] { DefenderUnscheduledNanoId }")
                 || temple.Contains("new[] { UkleshUnscheduledNanoId }")
                 || temple.Contains("new[] { MurialNanoId }"),
                 "Captured nano identities without a proven schedule must remain unscheduled.");
+
+            string root = FindRepositoryRoot();
+            string nanoRuntime = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Server\ZoneEngine\Core\NanoEventRuntimeService.cs"));
+            string activeNanoRuntime = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Server\ZoneEngine\Core\ActiveNanoRuntimeService.cs"));
+            string modify = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\modify.cs"));
+            string modifyPercentage = File.ReadAllText(
+                Path.Combine(
+                    root,
+                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\modifypercentage.cs"));
+            Assert.IsTrue(
+                nanoRuntime.Contains("target.Stats[modifier.StatId].Modifier -= modifier.Delta;")
+                && nanoRuntime.Contains("target.Stats[modifier.StatId].PercentageModifier -= modifier.Delta;")
+                && nanoRuntime.Contains("execution.PreparedTargets.Add(target.Identity.Instance)")
+                && nanoRuntime.Contains("landingResult == NanoLandingResult.Unresolved")
+                && nanoRuntime.Contains("landingResult == NanoLandingResult.Resisted")
+                && nanoRuntime.Contains("FunctionCollection.Instance.GetFunctionByNumber(function.FunctionType) == null")
+                && nanoRuntime.Contains("RemoveModifiersCastBy(")
+                && nanoRuntime.Contains("RemoveAllModifiers("),
+                "Landing must fail closed before partial effects, and modifiers must reverse exact contributions.");
+            Assert.IsTrue(
+                modify.Contains("RecordModifier(")
+                && modifyPercentage.Contains("RecordModifier(")
+                && modifyPercentage.Contains("Character affected = Target as Character;"),
+                "Both modifier functions must record the actual target contribution.");
+            Assert.IsTrue(
+                activeNanoRuntime.Contains("NanoEventRuntimeService.Default.RemoveModifiers(character, nanoId);")
+                && activeNanoRuntime.Contains("ClearAllActiveNanos("),
+                "Expiry, overwrite, reset, and disposal must share modifier cleanup.");
         }
 
         [TestMethod]
