@@ -19,6 +19,14 @@ namespace ZoneEngine.Core.Playfields
     {
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
+            bool generatedPlayfield =
+                MissionAcgRuntimeInteractionService.ClaimsCurrentGeneratedPlayfield(client);
+            if (generatedPlayfield
+                && CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             // Persisted ACG missions route every interaction by owner + allocated PF2 + runtime
             // identity before any legacy global tracker can claim the target.
             if (MissionAcgRuntimeInteractionService.TryHandleUse(client, message, target))
@@ -146,7 +154,8 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
-            if (CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
+            if (!generatedPlayfield
+                && CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

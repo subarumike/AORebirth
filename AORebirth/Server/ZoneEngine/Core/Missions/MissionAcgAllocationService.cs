@@ -696,6 +696,15 @@ namespace ZoneEngine.Core.Missions
                    && playfield2 <= MaximumLivePlayfield2;
         }
 
+        internal static bool IsGeneratedAcceptedQuestIdentity(
+            int identityType,
+            int identityInstance)
+        {
+            return identityType == AcceptedQuestIdentityType
+                   && identityInstance >= MinimumAcceptedQuestInstance
+                   && identityInstance <= MaximumAcceptedQuestInstance;
+        }
+
         private bool TryReserveIdentity(
             ISet<int> reservations,
             ref int cursor,
@@ -770,9 +779,9 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord identity)
         {
             return identity != null
-                   && identity.Type == AcceptedQuestIdentityType
-                   && identity.Instance >= MinimumAcceptedQuestInstance
-                   && identity.Instance <= MaximumAcceptedQuestInstance;
+                   && IsGeneratedAcceptedQuestIdentity(
+                       identity.Type,
+                       identity.Instance);
         }
 
         private static bool IsMissionKeyIdentity(

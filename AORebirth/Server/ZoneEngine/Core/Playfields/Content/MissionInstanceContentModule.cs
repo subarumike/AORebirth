@@ -39,7 +39,8 @@ namespace ZoneEngine.Core.Playfields.Content
 
         public bool ShouldSuppressDbMobSpawn(int playfieldInstance, int mobSpawnId)
         {
-            return false;
+            return MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                playfieldInstance);
         }
     }
 }

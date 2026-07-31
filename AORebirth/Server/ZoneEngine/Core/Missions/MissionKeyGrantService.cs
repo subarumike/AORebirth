@@ -718,6 +718,33 @@ namespace ZoneEngine.Core.Missions
             return false;
         }
 
+        public static bool HasNonGeneratedMissionKey(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List().ToList())
+                {
+                    IItem item = itemEntry.Value;
+                    if (item != null
+                        && item.LowID == MissionKeyTemplateId
+                        && item.HighID == MissionKeyTemplateId
+                        && (item.Identity == null
+                            || !MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance(
+                                item.Identity.Instance)))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public static bool HasMissionKeyInstance(ICharacter character, int keyInstance)
         {
             if (character == null || character.BaseInventory == null || keyInstance == 0)
@@ -880,7 +907,9 @@ namespace ZoneEngine.Core.Missions
                 {
                     IItem item = itemEntry.Value;
                     if (item == null || item.Identity == null || item.LowID != MissionKeyTemplateId
-                        || item.HighID != MissionKeyTemplateId)
+                        || item.HighID != MissionKeyTemplateId
+                        || MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance(
+                            item.Identity.Instance))
                     {
                         continue;
                     }

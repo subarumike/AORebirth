@@ -1088,6 +1088,27 @@ cleanup wiring, and ordinary-path preservation. The private-client smoke test
 (kill trash, open corpse, transfer credits once, and complete the mission)
 remains deferred; no additional official capture is required.
 
+## Generated-runtime legacy fallthrough boundary
+
+Generated runtime ownership is now an outer dispatch boundary rather than an
+ordinary boolean handler result. Exact ownership may be established by the
+persisted accepted binding, a restored PF2 reservation, a reversibly encoded
+runtime identity whose PF2 is claimed, an exact mission-owned inventory
+identity, or an exact exterior marker for that owner. Once claimed, a failed
+runtime lookup or lifecycle check is an explicit rejection and cannot continue
+into replay-era spawn, global target tables, newest/type/template objective
+selection, shared mission payloads, or legacy completion and cleanup.
+
+The numeric allocator range alone is intentionally not an ownership signal:
+legacy mission instances also allocate PF2 values inside that range. This keeps
+non-generated missions and authored quests on their existing handlers while
+preventing a missing generated binding/runtime record from silently changing
+systems. Generated completion remains owned only by the Stage 4 exact objective
+and completion journal; legacy callbacks cannot bridge into it.
+
+No capture-derived bundle, payload byte, building identity, reward, slider,
+loot, token, expiry, or objective contract changes in this boundary repair.
+
 ## Deferred Stage 7 behavior
 
 The following work remains intentionally deferred:

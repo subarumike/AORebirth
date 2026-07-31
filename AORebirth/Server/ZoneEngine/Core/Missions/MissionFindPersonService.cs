@@ -78,14 +78,19 @@ namespace ZoneEngine.Core.Missions
             }
 
             ICharacter character = client.Controller != null ? client.Controller.Character : null;
-            if (character != null
-                && character.Playfield != null
-                && MissionAcgBindingRuntime.IsBoundLivePlayfield(
-                    character.Playfield.Identity.Instance)
-                && MissionAcgRuntimeManager.IsRuntimeIdentityCandidate(
-                    character.Playfield.Identity.Instance,
-                    target))
+            bool currentPlayfieldClaimed =
+                MissionAcgRuntimeInteractionService.ClaimsCurrentGeneratedPlayfield(
+                    client);
+            bool targetClaimed =
+                MissionAcgRuntimeInteractionService.ClaimsGeneratedRuntimeIdentity(
+                    target);
+            if (currentPlayfieldClaimed || targetClaimed)
             {
+                if (!currentPlayfieldClaimed)
+                {
+                    return false;
+                }
+
                 return MissionAcgObjectiveInteractionService.TryHandleInfoRequest(
                     client,
                     target);

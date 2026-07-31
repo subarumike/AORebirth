@@ -218,6 +218,67 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool IsOwnedMissionItem(
+            int ownerInstance,
+            MissionAcgIdentityRecord missionItemIdentity)
+        {
+            if (missionItemIdentity == null)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgObjectiveRecord candidate
+                    in ByAccepted.Values)
+                {
+                    if (candidate != null
+                        && candidate.Binding != null
+                        && candidate.Binding.OwnerIdentity != null
+                        && candidate.State != null
+                        && candidate.Binding.OwnerIdentity.Instance
+                        == ownerInstance
+                        && candidate.State.MissionItemIdentity != null
+                        && candidate.State.MissionItemIdentity.Equals(
+                            missionItemIdentity))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        internal static bool IsGeneratedMissionItem(
+            MissionAcgIdentityRecord missionItemIdentity)
+        {
+            if (missionItemIdentity == null)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgObjectiveRecord candidate
+                    in ByAccepted.Values)
+                {
+                    if (candidate != null
+                        && candidate.State != null
+                        && candidate.State.MissionItemIdentity != null
+                        && candidate.State.MissionItemIdentity.Equals(
+                            missionItemIdentity))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         internal static IList<MissionAcgObjectiveRecord> GetOwnedCompletionWork(
             int ownerInstance)
         {

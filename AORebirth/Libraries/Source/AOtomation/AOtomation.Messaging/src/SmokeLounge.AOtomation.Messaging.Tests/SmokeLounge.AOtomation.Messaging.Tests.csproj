@@ -92,6 +92,7 @@
     <Compile Include="MissionAcgExpiryRuntimeContractTests.cs" />
     <Compile Include="MissionAcgTokenProgressStoreTests.cs" />
     <Compile Include="MissionAcgTokenProgressRuntimeContractTests.cs" />
+    <Compile Include="MissionAcgLegacyFallthroughContractTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
     <Compile Include="MissionLevelGraphTests.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />

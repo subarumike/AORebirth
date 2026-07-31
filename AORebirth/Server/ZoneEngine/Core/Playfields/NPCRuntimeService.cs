@@ -377,7 +377,9 @@ namespace AORebirth.Core.Playfields
                 if (!ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TrySpawnForPlayfield(
                     this.playfield,
                     playfieldIdentity,
-                    this.ActivateNpc))
+                    this.ActivateNpc)
+                    && !ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                        playfieldIdentity.Instance))
                 {
                     MissionInstanceSpawn.SpawnForPlayfield(
                         this.playfield,
@@ -390,19 +392,23 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "Mission ACG/instance spawn failed: " + ex.GetType().Name + ": " + ex.Message);
-                try
+                if (!ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    playfieldIdentity.Instance))
                 {
-                    MissionInstanceSpawn.SpawnForPlayfield(
-                        this.playfield,
-                        playfieldIdentity,
-                        this.ActivateNpc);
-                }
-                catch (Exception fallbackEx)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        "MissionInstanceSpawn fallback failed: "
-                        + fallbackEx.GetType().Name + ": " + fallbackEx.Message);
+                    try
+                    {
+                        MissionInstanceSpawn.SpawnForPlayfield(
+                            this.playfield,
+                            playfieldIdentity,
+                            this.ActivateNpc);
+                    }
+                    catch (Exception fallbackEx)
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Error,
+                            "MissionInstanceSpawn fallback failed: "
+                            + fallbackEx.GetType().Name + ": " + fallbackEx.Message);
+                    }
                 }
             }
             this.worldPopulation.ActivatePlayfield(playfieldIdentity);
@@ -1121,7 +1127,8 @@ namespace AORebirth.Core.Playfields
                     ToNavigationPoint(home.Coordinates.coordinate),
                     ToNavigationPoint(npc.Coordinates().coordinate),
                     ToNavigationPoint(target.Coordinates().coordinate),
-                    home.MaximumNpcDistanceFromHome))
+                    home.MaximumNpcDistanceFromHome,
+                    this.capturedAreteMovement.HasLeashEvidence(npc)))
             {
                 return false;
             }

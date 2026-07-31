@@ -90,7 +90,9 @@ namespace ZoneEngine.Core.Missions
                 // Sidecar-only Repair (Offer null) was crashing clients: Kill-template QFU + Repair icon.
                 // Drop those until a Repair capture template exists.
                 MissionRollType type = MissionTypeCatalog.TypeFromIcon(entry.MissionIconId);
-                if (entry.Offer == null && type == MissionRollType.RepairMachine)
+                if (entry.Offer == null
+                    && type == MissionRollType.RepairMachine
+                    && !MissionCompleteService.IsGeneratedAcceptedMission(entry))
                 {
                     MissionAcceptedStore.Remove(character.Identity.Instance, entry.QuestIdentity);
                     MissionDiagnostics.Log(
@@ -318,6 +320,18 @@ namespace ZoneEngine.Core.Missions
                         offer ?? (stored == null ? null : stored.Offer),
                         stored,
                         acgBinding);
+                }
+
+                if (MissionCompleteService.IsGeneratedAcceptedMission(stored)
+                    || MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                        (int)questId.Type,
+                        questId.Instance))
+                {
+                    MissionDiagnostics.Log(
+                        "ACCEPT-WINDOW-REJECT char={0} quest={1:X8} reason=missing-generated-binding",
+                        character.Identity.Instance,
+                        questId.Instance);
+                    return false;
                 }
 
                 int remainingSeconds = MissionDurationSeconds;

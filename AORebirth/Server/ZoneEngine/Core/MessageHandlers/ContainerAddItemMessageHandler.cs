@@ -89,10 +89,25 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.Target,
                 message.TargetPlacement))
             {
-                MissionFindItemService.TryHandleAfterLoot(
-                    client,
-                    client.Controller.Character,
-                    null);
+                if (!MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    client.Controller.Character.Playfield.Identity.Instance))
+                {
+                    MissionFindItemService.TryHandleAfterLoot(
+                        client,
+                        client.Controller.Character,
+                        null);
+                }
+
+                return;
+            }
+
+            if (AORebirth.Core.Playfields.Playfield.ClaimsGeneratedMissionCorpseContainer(
+                    client.Controller.Character.Playfield,
+                    message.SourceContainer)
+                || (message.SourceContainer.Type == IdentityType.Corpse
+                    && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                        client.Controller.Character.Playfield.Identity.Instance)))
+            {
                 return;
             }
 

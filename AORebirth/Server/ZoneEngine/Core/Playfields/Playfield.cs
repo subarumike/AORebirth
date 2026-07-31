@@ -2471,9 +2471,8 @@ namespace AORebirth.Core.Playfields
                 return this.TryUseCorpse(looter, corpseIdentity);
             }
 
-            if (MissionAcgAllocationService.IsAllocatableRange(this.Identity.Instance)
-                && MissionAcgBindingRuntime.IsBoundLivePlayfield(
-                    this.Identity.Instance))
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                this.Identity.Instance))
             {
                 corpseIdentity = Identity.None;
                 return false;
@@ -2552,6 +2551,69 @@ namespace AORebirth.Core.Playfields
                 this.DespawnCorpse,
                 itemLootLifetime,
                 emptyCleanupDelay);
+        }
+
+        public bool ClaimsGeneratedMissionCorpseContainer(
+            Identity target,
+            int parameter1 = 0,
+            int parameter2 = 0)
+        {
+            if (target == null)
+            {
+                return false;
+            }
+
+            CorpseState corpse = null;
+            if (target.Type == IdentityType.Corpse
+                && this.corpses.TryGetValue(target.Instance, out corpse))
+            {
+                return corpse != null && corpse.IsGeneratedMissionCorpse;
+            }
+
+            if (target.Type == IdentityType.Backpack
+                || target.Type == IdentityType.Corpse)
+            {
+                int handle = (target.Instance >> 16) & 0xffff;
+                if (handle != 0)
+                {
+                    corpse = this.corpses.Values.FirstOrDefault(
+                        candidate => candidate.InventoryHandle == handle);
+                    if (corpse != null)
+                    {
+                        return corpse.IsGeneratedMissionCorpse;
+                    }
+                }
+            }
+
+            int slot = target.Type == IdentityType.Inventory
+                ? target.Instance
+                : (parameter1 > 0
+                    ? parameter1
+                    : (parameter2 > 0 ? parameter2 : target.Instance & 0xffff));
+            if (target.Type != IdentityType.Inventory
+                && target.Type != IdentityType.Corpse)
+            {
+                return false;
+            }
+
+            corpse = this.corpses.Values.FirstOrDefault(
+                candidate => candidate.Opened
+                             && FindCorpseLootItem(candidate, slot) != null);
+            return corpse != null && corpse.IsGeneratedMissionCorpse;
+        }
+
+        internal static bool ClaimsGeneratedMissionCorpseContainer(
+            IPlayfield playfield,
+            Identity target,
+            int parameter1 = 0,
+            int parameter2 = 0)
+        {
+            var concrete = playfield as Playfield;
+            return concrete != null
+                   && concrete.ClaimsGeneratedMissionCorpseContainer(
+                       target,
+                       parameter1,
+                       parameter2);
         }
 
         /// <summary>

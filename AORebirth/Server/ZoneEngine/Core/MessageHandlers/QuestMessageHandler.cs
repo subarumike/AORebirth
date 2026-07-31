@@ -92,6 +92,18 @@ namespace ZoneEngine.Core.MessageHandlers
                     return;
                 }
 
+                if (MissionCompleteService.IsGeneratedAcceptedMission(stored)
+                    || MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                        (int)deleteMission.Type,
+                        deleteMission.Instance))
+                {
+                    MissionDiagnostics.Log(
+                        "JOURNAL-DELETE-REJECT char={0} mission={1:X8} reason=missing-generated-binding",
+                        character.Identity.Instance,
+                        deleteMission.Instance);
+                    return;
+                }
+
                 if (stored == null)
                 {
                     MissionDiagnostics.Log(
@@ -110,7 +122,11 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 int keyInstance;
                 bool keyRemoved = false;
-                if (MissionKeyStore.TryTakeExact(character.Identity.Instance, deleteMission, out keyInstance))
+                if (MissionKeyStore.TryTakeExactNonGenerated(
+                    character.Identity.Instance,
+                    deleteMission,
+                    MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance,
+                    out keyInstance))
                 {
                     keyRemoved = MissionKeyGrantService.TryRemoveMissionKey(client, character, keyInstance);
                 }

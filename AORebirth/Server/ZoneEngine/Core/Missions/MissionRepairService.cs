@@ -52,6 +52,12 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                character.Playfield.Identity.Instance))
+            {
+                return false;
+            }
+
             if (!MissionMachineTracker.IsMissionMachine(message.Target[1]))
             {
                 return false;
@@ -70,7 +76,8 @@ namespace ZoneEngine.Core.Missions
             }
 
             IItem item = sourcePage[message.Target[0].Instance];
-            if (!MissionKeyGrantService.IsRepairTool(item))
+            if (!MissionKeyGrantService.IsRepairTool(item)
+                || IsGeneratedOwnedRepairTool(character, item))
             {
                 return false;
             }
@@ -95,16 +102,16 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            IItem kit;
-            if (!MissionKeyGrantService.HasRepairTool(character))
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                character.Playfield.Identity.Instance))
             {
-                client.Server.Info(client, "Mission repair: Broken Machine requires Mission Repair Kit");
-                return true;
+                return false;
             }
 
-            // Prefer the held kit for consume; HasRepairTool already proved one exists.
+            IItem kit;
             if (!TryGetAnyRepairTool(character, out kit))
             {
+                client.Server.Info(client, "Mission repair: Broken Machine requires Mission Repair Kit");
                 return true;
             }
 
@@ -123,7 +130,8 @@ namespace ZoneEngine.Core.Missions
             {
                 foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List())
                 {
-                    if (MissionKeyGrantService.IsRepairTool(itemEntry.Value))
+                    if (MissionKeyGrantService.IsRepairTool(itemEntry.Value)
+                        && !IsGeneratedOwnedRepairTool(character, itemEntry.Value))
                     {
                         kit = itemEntry.Value;
                         return true;
@@ -132,6 +140,21 @@ namespace ZoneEngine.Core.Missions
             }
 
             return false;
+        }
+
+        private static bool IsGeneratedOwnedRepairTool(
+            ICharacter character,
+            IItem item)
+        {
+            if (character == null || item == null || item.Identity == null)
+            {
+                return false;
+            }
+
+            return MissionAcgObjectiveRuntime.IsGeneratedMissionItem(
+                new MissionAcgIdentityRecord(
+                    (int)item.Identity.Type,
+                    item.Identity.Instance));
         }
 
         private static bool TryCompleteRepair(
@@ -171,7 +194,8 @@ namespace ZoneEngine.Core.Missions
             List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(characterInstance);
             for (int i = all.Count - 1; i >= 0; i--)
             {
-                if (IsRepairMission(all[i]))
+                if (!MissionCompleteService.IsGeneratedAcceptedMission(all[i])
+                    && IsRepairMission(all[i]))
                 {
                     return all[i];
                 }

@@ -262,11 +262,17 @@ namespace ZoneEngine.Core.Missions
                 return IsNearAcceptedMarker(character, 10.0, 14.0);
             }
 
+            int currentPlayfield =
+                character.Playfield == null
+                    ? 0
+                    : character.Playfield.Identity.Instance;
             List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(character.Identity.Instance);
             for (int i = 0; i < all.Count; i++)
             {
                 MissionAcceptedStore.AcceptedMission entry = all[i];
-                if (entry == null)
+                if (entry == null
+                    || currentPlayfield == 0
+                    || entry.MarkerPlayfield != currentPlayfield)
                 {
                     continue;
                 }
@@ -314,6 +320,69 @@ namespace ZoneEngine.Core.Missions
                 double dx = x - entry.MarkerX;
                 double dz = z - entry.MarkerZ;
                 if (((dx * dx) + (dz * dz)) <= radiusSq && Math.Abs(y - entry.MarkerY) <= verticalRadius)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool HasGeneratedAcceptedExteriorClaim(
+            ICharacter character,
+            Identity target,
+            double horizontalRadius,
+            double verticalRadius)
+        {
+            if (character == null)
+            {
+                return false;
+            }
+
+            int playfield =
+                character.Playfield == null
+                    ? 0
+                    : character.Playfield.Identity.Instance;
+            double radiusSquared = horizontalRadius * horizontalRadius;
+            List<MissionAcceptedStore.AcceptedMission> all =
+                MissionAcceptedStore.GetAll(character.Identity.Instance);
+            for (int i = 0; i < all.Count; i++)
+            {
+                MissionAcceptedStore.AcceptedMission entry = all[i];
+                if (!MissionCompleteService.IsGeneratedAcceptedMission(entry))
+                {
+                    continue;
+                }
+
+                if (playfield != 0
+                    && entry.MarkerPlayfield == playfield
+                    && target != null
+                    && (target.Type == IdentityType.Door
+                        || target.Type == IdentityType.MissionEntrance)
+                    && ((entry.EntranceLow != 0
+                         && (target.Instance == entry.EntranceLow
+                             || (target.Instance & 0xFFFF)
+                                == (entry.EntranceLow & 0xFFFF)))
+                        || (entry.EntranceHigh != 0
+                            && (target.Instance == entry.EntranceHigh
+                                || (target.Instance & 0xFFFF)
+                                   == (entry.EntranceHigh & 0xFFFF)))))
+                {
+                    return true;
+                }
+
+                if (playfield == 0
+                    || entry.MarkerPlayfield == 0
+                    || entry.MarkerPlayfield != playfield)
+                {
+                    continue;
+                }
+
+                double dx = character.RawCoordinates.X - entry.MarkerX;
+                double dz = character.RawCoordinates.Z - entry.MarkerZ;
+                if (((dx * dx) + (dz * dz)) <= radiusSquared
+                    && Math.Abs(character.RawCoordinates.Y - entry.MarkerY)
+                       <= verticalRadius)
                 {
                     return true;
                 }
@@ -398,6 +467,12 @@ namespace ZoneEngine.Core.Missions
                 return bundle == null ? new byte[0] : bundle.CopyGeneratorPayload();
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                livePlayfieldInstance))
+            {
+                return new byte[0];
+            }
+
             int shapePf;
             if (TryGetShapeSource(livePlayfieldInstance, out shapePf) && shapePf > 0)
             {
@@ -419,6 +494,12 @@ namespace ZoneEngine.Core.Missions
                 return binding.Binding.AcgBuildingIdentity.Instance;
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                livePlayfieldInstance))
+            {
+                return 0;
+            }
+
             // Must follow ShapeSource stamp — looking up livePf alone returns default/foreign
             // building (capture 20260725-202953: D74192) and opens the grey map.
             byte[] payload = GetLiveGeneratorPayload(livePlayfieldInstance);
@@ -427,20 +508,8 @@ namespace ZoneEngine.Core.Missions
 
         internal static MissionRollType ResolveCharacterObjective(ICharacter character)
         {
-            if (character == null)
-            {
-                return MissionRollType.KillPerson;
-            }
-
-            List<MissionAcceptedStore.AcceptedMission> all =
-                MissionAcceptedStore.GetAll(character.Identity.Instance);
-            if (all == null || all.Count == 0)
-            {
-                return MissionRollType.KillPerson;
-            }
-
-            // Most recently accepted entry is last.
-            MissionAcceptedStore.AcceptedMission latest = all[all.Count - 1];
+            MissionAcceptedStore.AcceptedMission latest =
+                ResolveLatestLegacyAcceptedMission(character);
             if (latest == null)
             {
                 return MissionRollType.KillPerson;
@@ -451,19 +520,8 @@ namespace ZoneEngine.Core.Missions
 
         internal static int ResolveCharacterMissionQuality(ICharacter character)
         {
-            if (character == null)
-            {
-                return 1;
-            }
-
-            List<MissionAcceptedStore.AcceptedMission> all =
-                MissionAcceptedStore.GetAll(character.Identity.Instance);
-            if (all == null || all.Count == 0)
-            {
-                return 1;
-            }
-
-            MissionAcceptedStore.AcceptedMission latest = all[all.Count - 1];
+            MissionAcceptedStore.AcceptedMission latest =
+                ResolveLatestLegacyAcceptedMission(character);
             if (latest == null || latest.Quality <= 0)
             {
                 return 1;
@@ -472,7 +530,32 @@ namespace ZoneEngine.Core.Missions
             return latest.Quality;
         }
 
-        internal static bool TryEnterMissionInstance(IZoneClient client)
+        private static MissionAcceptedStore.AcceptedMission ResolveLatestLegacyAcceptedMission(
+            ICharacter character)
+        {
+            if (character == null)
+            {
+                return null;
+            }
+
+            List<MissionAcceptedStore.AcceptedMission> all =
+                MissionAcceptedStore.GetAll(character.Identity.Instance);
+            for (int i = all.Count - 1; i >= 0; i--)
+            {
+                MissionAcceptedStore.AcceptedMission entry = all[i];
+                if (entry != null
+                    && !MissionCompleteService.IsGeneratedAcceptedMission(entry))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        internal static bool TryEnterMissionInstance(
+            IZoneClient client,
+            Identity entranceTarget)
         {
             if (!EntryEnabled || client == null || client.Controller == null)
             {
@@ -490,8 +573,20 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            if (MissionAcgBindingRuntime.HasAnyBindingForOwner(
-                character.Identity.Instance))
+            bool generatedAcceptedExteriorClaim =
+                HasGeneratedAcceptedExteriorClaim(
+                    character,
+                    entranceTarget,
+                    10.0,
+                    14.0);
+            if (MissionAcgBindingRuntime.HasOwnedExteriorMarker(
+                character.Identity.Instance,
+                character.Playfield.Identity.Instance,
+                character.RawCoordinates.X,
+                character.RawCoordinates.Y,
+                character.RawCoordinates.Z,
+                10.0,
+                14.0))
             {
                 MissionAcgBindingRecord exact;
                 bool resolved =
@@ -685,28 +780,25 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
-            if (!MissionKeyGrantService.HasMissionKey(character))
+            if (generatedAcceptedExteriorClaim)
+            {
+                return false;
+            }
+
+            MissionAcceptedStore.AcceptedMission latest =
+                ResolveLatestLegacyAcceptedMission(character);
+            if (latest == null
+                || !MissionKeyGrantService.HasNonGeneratedMissionKey(character))
             {
                 return false;
             }
 
             int fromPf = character.Playfield.Identity.Instance;
             int pfId = ResolveInstancePlayfieldId(character);
-            MissionRollType objective = ResolveCharacterObjective(character);
+            MissionRollType objective = MissionTypeCatalog.TypeFromIcon(latest.MissionIconId);
             StampObjective(pfId, objective);
 
-            int missionQl = 1;
-            MissionAcceptedStore.AcceptedMission latest = null;
-            List<MissionAcceptedStore.AcceptedMission> accepted =
-                MissionAcceptedStore.GetAll(character.Identity.Instance);
-            if (accepted.Count > 0 && accepted[accepted.Count - 1] != null)
-            {
-                latest = accepted[accepted.Count - 1];
-                if (latest.Quality > 0)
-                {
-                    missionQl = latest.Quality;
-                }
-            }
+            int missionQl = latest.Quality > 0 ? latest.Quality : 1;
 
             StampMissionQuality(pfId, missionQl);
 
@@ -876,6 +968,15 @@ namespace ZoneEngine.Core.Missions
                 destY = exactBinding.Binding.ExteriorY;
                 destZ = exactBinding.Binding.ExteriorZ;
             }
+            else if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                character.Playfield.Identity.Instance))
+            {
+                MissionDiagnostics.Log(
+                    "EXIT-REJECT char={0} livePf2={1} reason=missing-exact-binding",
+                    character.Identity.Instance,
+                    character.Playfield.Identity.Instance);
+                return false;
+            }
             else
             {
                 ResolveOutdoorExitDestination(
@@ -904,6 +1005,11 @@ namespace ZoneEngine.Core.Missions
                 destY,
                 destZ);
             return true;
+        }
+
+        internal static bool TryEnterMissionInstance(IZoneClient client)
+        {
+            return TryEnterMissionInstance(client, Identity.None);
         }
 
         /// <summary>
@@ -1096,7 +1202,7 @@ namespace ZoneEngine.Core.Missions
         /// <summary>
         /// Raw shape spawn (exit door) without clearance nudge — used for exit proximity / use.
         /// </summary>
-        internal static void ResolveInteriorExitDoor(
+        internal static bool ResolveInteriorExitDoor(
             int playfieldId,
             out float x,
             out float y,
@@ -1115,7 +1221,12 @@ namespace ZoneEngine.Core.Missions
                 x = materialized.Exit.Position.X;
                 y = materialized.Exit.Position.Y;
                 z = materialized.Exit.Position.Z;
-                return;
+                return true;
+            }
+
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(playfieldId))
+            {
+                return false;
             }
 
             AORebirth.Core.Playfields.MissionShape shape =
@@ -1126,6 +1237,8 @@ namespace ZoneEngine.Core.Missions
                 y = shape.SpawnY;
                 z = shape.SpawnZ;
             }
+
+            return true;
         }
 
         internal static bool IsNearInteriorExitDoor(
@@ -1141,7 +1254,14 @@ namespace ZoneEngine.Core.Missions
             float doorX;
             float doorY;
             float doorZ;
-            ResolveInteriorExitDoor(character.Playfield.Identity.Instance, out doorX, out doorY, out doorZ);
+            if (!ResolveInteriorExitDoor(
+                character.Playfield.Identity.Instance,
+                out doorX,
+                out doorY,
+                out doorZ))
+            {
+                return false;
+            }
             double dx = character.RawCoordinates.X - doorX;
             double dz = character.RawCoordinates.Z - doorZ;
             double dy = Math.Abs(character.RawCoordinates.Y - doorY);
@@ -1232,7 +1352,9 @@ namespace ZoneEngine.Core.Missions
                     for (int i = all.Count - 1; i >= 0; i--)
                     {
                         MissionAcceptedStore.AcceptedMission entry = all[i];
-                        if (entry != null && entry.MarkerPlayfield != 0)
+                        if (entry != null
+                            && !MissionCompleteService.IsGeneratedAcceptedMission(entry)
+                            && entry.MarkerPlayfield != 0)
                         {
                             destPf = entry.MarkerPlayfield;
                             destX = entry.MarkerX;
@@ -1280,6 +1402,12 @@ namespace ZoneEngine.Core.Missions
                         exact.Binding);
                     return;
                 }
+
+                if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    character.Playfield.Identity.Instance))
+                {
+                    return;
+                }
             }
 
             List<MissionAcceptedStore.AcceptedMission> all =
@@ -1287,7 +1415,9 @@ namespace ZoneEngine.Core.Missions
             for (int i = all.Count - 1; i >= 0; i--)
             {
                 MissionAcceptedStore.AcceptedMission entry = all[i];
-                if (entry != null && entry.MarkerPlayfield != 0)
+                if (entry != null
+                    && !MissionCompleteService.IsGeneratedAcceptedMission(entry)
+                    && entry.MarkerPlayfield != 0)
                 {
                     StampOutdoorReturn(
                         character.Identity.Instance,

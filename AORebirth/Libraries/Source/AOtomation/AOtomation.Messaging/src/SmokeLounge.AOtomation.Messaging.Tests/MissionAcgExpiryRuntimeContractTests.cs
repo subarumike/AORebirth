@@ -313,19 +313,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void ReleasedAllocatorRangeCombatFailsClosed()
+        public void ClaimedGeneratedCombatFailsClosedWithoutTreatingRangeAsOwnership()
         {
             string source = ReadMissionSource("MissionAcgSpatialRuntime.cs");
             StringAssert.Contains(
                 source,
-                "MissionAcgAllocationService.IsAllocatableRange(firstPf)");
+                "MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(firstPf)");
             StringAssert.Contains(
                 source,
-                "MissionAcgAllocationService.IsAllocatableRange(secondPf)");
+                "MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(secondPf)");
             string normalized = source.Replace("\r\n", "\n");
             Assert.IsFalse(
                 normalized.Contains(
                     "if (!firstBound && !secondBound)\n            {\n                return true;"));
+            Assert.IsFalse(
+                normalized.Contains(
+                    "MissionAcgAllocationService.IsAllocatableRange(firstPf)"));
+            Assert.IsFalse(
+                normalized.Contains(
+                    "MissionAcgAllocationService.IsAllocatableRange(secondPf)"));
         }
 
         [TestMethod]
