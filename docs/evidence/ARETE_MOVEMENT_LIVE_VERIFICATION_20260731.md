@@ -1,5 +1,7 @@
 # Arete Movement Live Verification — 20260731-030702
 
+> Historical classifier notice: the 6 m activation and 2.5 m continuation rules below were false runtime assumptions. Exact packet/manual observations remain evidence; distance-gated eligibility and rejection conclusions are superseded by the corrected verifier and full-corpus completion report.
+
 This report reconciles the complete live observation capture against every behavior-specific promoted runtime row. Regenerated live identities are evidence labels only and are not used as promotion keys.
 
 ## Post-fix result — capture `20260731-035230`
@@ -7,18 +9,17 @@ This report reconciles the complete live observation capture against every behav
 - The original client was observed only; no client input was automated.
 - Mike visually confirmed that NPCs now move.
 - Garbage Flea `SimpleChar:000F42D1` entered captured patrol from an idle controller and emitted the exact promoted route `m09445`: `(3453.60864, 0.01, 875.229919)` to `(3453.51245, 0.636055, 879.729492)`.
-- Three visible Garbage Fleas were exact metadata and activation matches. One emitted the exact promoted route; two emitted no path during the 30-second window despite reproducing as first-decision eligible. They remain recorded as `eligible_selected_patrol_but_no_live_movement_packet`, not falsely counted as matches.
+- Three visible Garbage Fleas matched exact metadata. One emitted the exact promoted route; two emitted no path during the 30-second window. That short-window absence is retained as an observation and does not reject their existing corpus-backed patrol evidence.
 - Post-fix packet reconciliation: **346 / 346** packets. Exact promoted routes: recorded in [`arete-movement-live-paths-20260731-post-fix.csv`](arete-movement-live-paths-20260731-post-fix.csv).
-- Exact identity constraints, selected source variants, activation distance, continuation decision, packet count, and failure reason are recorded in [`arete-movement-live-identities-20260731-post-fix.csv`](arete-movement-live-identities-20260731-post-fix.csv).
+- Exact identity constraints, historical source selections, and packet counts are recorded in [`arete-movement-live-identities-20260731-post-fix.csv`](arete-movement-live-identities-20260731-post-fix.csv). Its distance-gated decision columns are superseded by the corrected verifier.
 - The proven runtime defect was the circular requirement that an NPC already be in `Patrolling` state before captured patrol could start. That gate was removed.
 - No stuck or invalid captured movement was observed for the exact promoted Garbage Flea route.
 
 ## Captured automatic-aggro evidence
 
-- The complete source capture `20260722-152454` contains **51** exact enemy-to-local-player `Attack` starts; **43** have no local-player attack to the same NPC in the preceding 30 seconds.
-- **40** starts have both decoded outbound local-player `CharDCMove` coordinates and NPC `enemy-state` coordinates.
-- Runtime automatic aggro is promoted only for the **11 exact name/family/template/level constraints** with a measured NPC-first attack distance. Unmatched identities fail closed.
-- Exact events and distances are documented in [`ARETE_AGGRO_EVIDENCE_20260722_152454.md`](ARETE_AGGRO_EVIDENCE_20260722_152454.md) and [`arete-aggro-events-20260722-152454.csv`](arete-aggro-events-20260722-152454.csv).
+- The reconciled Arete corpus contains **69** enemy-to-player attack starts and **50** NPC-first starts across **19** exact name/family/template/level constraints.
+- **14** constraints have measured lower-bound radii. The remaining **5** prove automatic-aggro eligibility but not an exact radius; runtime promotes only a contact-safe floor for those five and does not claim a captured radius.
+- Exact aggregate events and derivation are documented in [`ARETE_AGGRO_EVIDENCE_AGGREGATE_20260722.md`](ARETE_AGGRO_EVIDENCE_AGGREGATE_20260722.md) and the per-capture event CSVs.
 - This post-fix movement capture did not exercise combat. The aggro promotion is source-capture-backed and build/test verified, but not represented as post-deployment live combat verification.
 
 ## Verdict

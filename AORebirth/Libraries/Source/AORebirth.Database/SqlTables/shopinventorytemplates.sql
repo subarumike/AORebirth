@@ -16404,6 +16404,21 @@ INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL
 INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('N5PM', 165876, 165876, 300, 300, 1, 'Live Neutral ICC implants 20260613-170220 NeutralRefinedICCShinyClusters template 297407', 1);
 
 -- ============================================================
+-- Arete Bronto Burgers vending machine
+-- Source: AOSharp capture 20260614-214819
+-- ShopHash: BRBG; TemplateId: 121036; Capture identity: (VendingMachine:12D1BF27); exact ShopUpdate order retained.
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130621, 130621, 1, 1, 1, 'Live Arete 20260614-214819 A Beer Jug template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130593, 130593, 1, 1, 1, 'Live Arete 20260614-214819 Bottle of Fresh Water template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130623, 130623, 1, 1, 1, 'Live Arete 20260614-214819 Bronto Burger template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130624, 130624, 1, 1, 1, 'Live Arete 20260614-214819 Bronto Cheese template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130581, 130581, 1, 1, 1, 'Live Arete 20260614-214819 Chocolate Chip Muffin template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130612, 130612, 1, 1, 1, 'Live Arete 20260614-214819 Cup of Coffee template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130625, 130625, 1, 1, 1, 'Live Arete 20260614-214819 Double Bronto Cheese template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130606, 130606, 1, 1, 1, 'Live Arete 20260614-214819 Ice-Coffee Can template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130602, 130602, 1, 1, 1, 'Live Arete 20260614-214819 Joka-Poka Can template 121036', 1);
+INSERT INTO `shopinventorytemplates` (`HASH`, `lowID`, `highID`, `minQL`, `maxQL`, `multiplecount`, `admindescription`, `active`) VALUES ('BRBG', 130603, 130603, 1, 1, 1, 'Live Arete 20260614-214819 Vanilla Ice-cream template 121036', 1);
+
+-- ============================================================
 -- Arete ICC implant/cluster import
 -- Source: AOSharp capture 20260613-172753
 -- Coverage: 147 -> 142 (5 reduction)

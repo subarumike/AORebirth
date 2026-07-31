@@ -18,8 +18,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1512;
-        private const int ExpectedBindingRecordCount = 1498;
+        private const int ExpectedInitialActorCount = 1583;
+        private const int ExpectedBindingRecordCount = 1565;
         private static readonly Lazy<Dictionary<string, object>> CoverageDocument =
             new Lazy<Dictionary<string, object>>(LoadCoverageDocument);
 
@@ -40,7 +40,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1498, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1585, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -65,7 +65,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         Convert.ToString(value, CultureInfo.InvariantCulture)
                             .Replace('/', Path.DirectorySeparatorChar))),
                 StringComparer.Ordinal);
-            int unavailableContentEvidenceProfiles = 0;
+            int contentEvidenceOutsideCombatInventoryProfiles = 0;
             bool missingNascenceCitationDocumented = false;
             foreach (Dictionary<string, object> profile in profiles.Values)
             {
@@ -81,30 +81,37 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     continue;
                 }
 
-                unavailableContentEvidenceProfiles++;
+                contentEvidenceOutsideCombatInventoryProfiles++;
                 missingNascenceCitationDocumented |= unknownContentEvidence.Contains(
                     "20260716-071407",
                     StringComparer.Ordinal);
-                Assert.AreEqual("unresolved", StringMember(profile, "classification"));
                 CollectionAssert.AreEqual(
                     unknownContentEvidence,
-                    ArrayMember(profile, "unavailableContentEvidenceCaptureIds")
+                    ArrayMember(profile, "contentEvidenceCaptureIdsOutsideCombatInventory")
                         .Select(value => Convert.ToString(value, CultureInfo.InvariantCulture))
                         .OrderBy(value => value, StringComparer.Ordinal)
                         .ToArray());
-                string missingEvidence = string.Join(
-                    "\n",
-                    ArrayMember(profile, "missingEvidence")
-                        .Select(value => Convert.ToString(value, CultureInfo.InvariantCulture)));
-                foreach (string captureId in unknownContentEvidence)
+                if (StringMember(profile, "classification") == "unresolved")
                 {
-                    StringAssert.Contains(missingEvidence, captureId);
+                    string missingEvidence = string.Join(
+                        "\n",
+                        ArrayMember(profile, "missingEvidence")
+                            .Select(value => Convert.ToString(value, CultureInfo.InvariantCulture)));
+                    foreach (string captureId in unknownContentEvidence)
+                    {
+                        StringAssert.Contains(missingEvidence, captureId);
+                    }
+                }
+                else
+                {
+                    Assert.AreEqual("certified", StringMember(profile, "classification"));
+                    Assert.IsTrue(BoolMember(profile, "runtimeContractReady"));
                 }
             }
 
             Assert.IsTrue(
-                unavailableContentEvidenceProfiles > 0,
-                "Every absent content-cited capture must remain explicitly unresolved.");
+                contentEvidenceOutsideCombatInventoryProfiles > 0,
+                "Content provenance outside the combat inventory must remain explicit.");
             Assert.IsTrue(
                 missingNascenceCitationDocumented,
                 "The absent Nascence capture citation must be explicit in the quarantine audit.");
@@ -211,8 +218,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 .ToDictionary(value => value.Key, value => value.ToArray(), StringComparer.Ordinal);
             Assert.AreEqual(155, recordsByFamily["dynamic-mission-mobs"].Length);
             Assert.AreEqual(14, recordsByFamily["cleaning-robots"].Length);
+            Assert.AreEqual(1, recordsByFamily["elysium-east-captured-population"].Length);
             Assert.AreEqual(1, recordsByFamily["scripted-hostiles"].Length);
-            Assert.AreEqual(170, records.Length);
+            Assert.AreEqual(171, records.Length);
             Assert.AreEqual(
                 27,
                 recordsByFamily["cleaning-robots"].Sum(
@@ -303,6 +311,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(
                 new[] { "20260718-185306" },
                 StringArrayMember(cursed, "unavailableContentEvidenceCaptureIds"));
+
+            Dictionary<string, object> elysium =
+                recordsByFamily["elysium-east-captured-population"].Single();
+            Assert.AreEqual(1328, IntMember(elysium, "slotCount"));
+            Assert.AreEqual(420, IntMember(elysium, "profileIdentityCount"));
+            Assert.AreEqual(232, IntMember(elysium, "hecklerSlotCount"));
+            CollectionAssert.AreEqual(
+                new object[] { 4540, 4543 },
+                ArrayMember(elysium, "runtimePlayfieldOrResource"));
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "20260727-182451",
+                    "20260727-190145",
+                    "20260727-193914",
+                    "20260727-201436"
+                },
+                StringArrayMember(elysium, "contentEvidenceCaptureIds"));
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs"
+                },
+                StringArrayMember(elysium, "contentSources"));
             CollectionAssert.AreEqual(
                 new[]
                 {
@@ -325,6 +357,62 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Dictionary<string, object> totals = ObjectMember(document, "totals");
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
+        }
+
+        [TestMethod]
+        public void AretePrepareSurfacesRetainEveryExactCapturedActorDefinition()
+        {
+            Dictionary<string, object> document = ReadCoverageDocument();
+            Dictionary<string, object>[] bindings = ArrayMember(document, "bindings")
+                .Select(value => JsonObject(value, "active coverage binding"))
+                .ToArray();
+
+            Dictionary<string, object>[] landing = bindings
+                .Where(
+                    value => value["runtimeProfileSelector"] as string
+                        == "arete-landing-exact-captured-automatic-combat")
+                .ToArray();
+            Assert.AreEqual(2, landing.Length);
+            CollectionAssert.AreEquivalent(
+                new[] { "Kneebreaker Alfonzo Rizzolo", "Violent Protester" },
+                landing.Select(value => StringMember(value, "name")).ToArray());
+            Assert.IsTrue(
+                landing.All(
+                    value => StringArrayMember(value, "contentSources").Single()
+                        == "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs"));
+
+            Dictionary<string, object>[] alienArea = bindings
+                .Where(value => StringMember(value, "surface") == "arete-alien-area")
+                .ToArray();
+            Assert.AreEqual(64, alienArea.Length);
+            Assert.AreEqual(64, alienArea.Sum(value => IntMember(value, "actorCount")));
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "Alien Spider - Zix",
+                    "Scout - Jaax'Sinuh",
+                    "Specialist - Cha'Heru",
+                    "Saltworm",
+                    "Rollerrat",
+                    "Angry Minibull",
+                    "Harvey the Bully"
+                },
+                alienArea.Select(value => StringMember(value, "name")).Distinct().ToArray());
+            Assert.IsTrue(
+                alienArea.All(
+                    value => StringArrayMember(value, "contentEvidenceCaptureIds")
+                        .Contains("20260726-spawn-mob-tll-alien")));
+
+            Dictionary<string, object> sandstorm = bindings.Single(
+                value => StringMember(value, "surface")
+                    == "arete-sandstorm-marauders");
+            Assert.AreEqual("SANDSTORM Marauder", StringMember(sandstorm, "name"));
+            Assert.AreEqual(265822, IntMember(sandstorm, "monsterData"));
+            Assert.AreEqual(7, Convert.ToInt32(ArrayMember(sandstorm, "levelCandidates").Single()));
+            Assert.AreEqual(5, IntMember(sandstorm, "actorCount"));
+            CollectionAssert.AreEqual(
+                new[] { "20260727-204902" },
+                StringArrayMember(sandstorm, "contentEvidenceCaptureIds"));
         }
 
         [TestMethod]
@@ -371,8 +459,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
             Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
             Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(18, discovered.Count);
-            Assert.AreEqual(20, discovered.Values.Sum());
+            Assert.AreEqual(22, discovered.Count);
+            Assert.AreEqual(24, discovered.Values.Sum());
             foreach (KeyValuePair<string, int> entryPoint in discovered)
             {
                 Dictionary<string, object> record = recorded[entryPoint.Key];
@@ -398,6 +486,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(
                 new[] { "scripted-hostiles" },
                 StringArrayMember(cursedEntry, "auditReferences"));
+            Dictionary<string, object> elysiumEntry = recorded[
+                "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs"];
+            Assert.AreEqual(
+                "non-denominator-audit",
+                StringMember(elysiumEntry, "auditKind"));
+            CollectionAssert.AreEqual(
+                new[] { "elysium-east-captured-population" },
+                StringArrayMember(elysiumEntry, "auditReferences"));
         }
 
         private static void AssertCertifiedBindingResolves(
@@ -613,7 +709,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "nascence-core-hecklers", 40 },
                 { "nascence-life", 837 },
                 { "arete-family", 96 },
-                { "arete-additional-captured-actors", 12 },
+                { "arete-additional-captured-actors", 14 },
+                { "arete-alien-area", 64 },
+                { "arete-sandstorm-marauders", 5 },
                 { "subway-merchants", 6 },
                 { "rome-blue-city", 22 },
                 { "thrak-omni-garden", 10 }

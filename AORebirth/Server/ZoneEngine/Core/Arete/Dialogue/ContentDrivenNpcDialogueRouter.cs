@@ -41,6 +41,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         private const int MarcusStoneInstance = unchecked((int)0x782DE567);
 
+        private const int BarryFoodVendorInstance = unchecked((int)0x782DE582);
+
+        private const int BorisPeacekeeperInstance = unchecked((int)0x782DE699);
+
+        private const int DesmondCalitriInstance = unchecked((int)0x782DE57C);
+
         private const int FlintNovakInstance = unchecked((int)0x78E0FC64);
 
         private const int AlexGibbsInstance = unchecked((int)0x78E0FC61);
@@ -60,6 +66,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
 
         private const string MarcusStoneNpcIdentity = "SimpleChar:782DE567";
+
+        private const string BarryFoodVendorNpcIdentity = "SimpleChar:782DE582";
+
+        private const string BorisPeacekeeperNpcIdentity = "SimpleChar:782DE699";
+
+        private const string DesmondCalitriNpcIdentity = "SimpleChar:782DE57C";
 
         private const string FlintNovakNpcIdentity = "SimpleChar:78E0FC64";
 
@@ -111,6 +123,57 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 PlayfieldId = AreteLandingPlayfieldId,
                 GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
                 LogPrefix = "ARETE_MARCUS_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration BarryFoodVendorRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Barry the Food Vendor",
+                ExpectedNpcName = "Barry the Food Vendor",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = BarryFoodVendorInstance
+                    },
+                NpcIdentityText = BarryFoodVendorNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_BARRY_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration BorisPeacekeeperRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Boris the Peacekeeper",
+                ExpectedNpcName = "Boris the Peacekeeper",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = BorisPeacekeeperInstance
+                    },
+                NpcIdentityText = BorisPeacekeeperNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_BORIS_DIALOGUE"
+            };
+
+        private static readonly ContentDrivenNpcDialogueRegistration DesmondCalitriRegistration =
+            new ContentDrivenNpcDialogueRegistration
+            {
+                Name = "Desmond Calitri",
+                ExpectedNpcName = "Desmond Calitri",
+                NpcIdentity =
+                    new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = DesmondCalitriInstance
+                    },
+                NpcIdentityText = DesmondCalitriNpcIdentity,
+                PlayfieldId = AreteLandingPlayfieldId,
+                GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                LogPrefix = "ARETE_DESMOND_DIALOGUE"
             };
 
         private static readonly ContentDrivenNpcDialogueRegistration FlintNovakRegistration =
@@ -509,6 +572,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
         {
             RexLarssonRegistration,
             MarcusStoneRegistration,
+            BarryFoodVendorRegistration,
+            BorisPeacekeeperRegistration,
+            DesmondCalitriRegistration,
             FlintNovakRegistration,
             AlexGibbsRegistration,
             BillRegistration,

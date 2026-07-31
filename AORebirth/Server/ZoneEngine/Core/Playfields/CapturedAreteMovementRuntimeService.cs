@@ -130,6 +130,9 @@ namespace AORebirth.Core.Playfields
 
             CapturedAreteMovementPoint targetPosition =
                 ToPoint(target.Coordinates().coordinate);
+            bool continuingCapturedChase = this.coordinator.HasActiveSequence(
+                character.Identity.Instance,
+                CapturedAreteMovementBehavior.Chase);
             CapturedAreteMovementDecisionKind chase = this.Process(
                 character,
                 CapturedAreteMovementBehavior.Chase,
@@ -140,6 +143,11 @@ namespace AORebirth.Core.Playfields
             if (chase != CapturedAreteMovementDecisionKind.Fallback)
             {
                 return true;
+            }
+
+            if (continuingCapturedChase)
+            {
+                return false;
             }
 
             return this.Process(
@@ -167,10 +175,30 @@ namespace AORebirth.Core.Playfields
                    != CapturedAreteMovementDecisionKind.Fallback;
         }
 
+        internal bool HasLeashEvidence(ICharacter character)
+        {
+            int generation;
+            return character != null
+                   && this.IsAvailable
+                   && this.runtimeSpawnGenerations.TryGetValue(
+                       character.Identity.Instance,
+                       out generation)
+                   && this.catalog.Matching(
+                       this.BuildEvidence(character, generation, false, null, null),
+                       CapturedAreteMovementBehavior.Leash).Length != 0;
+        }
+
         internal void Interrupt(ICharacter character)
         {
             if (character != null)
             {
+                if (this.coordinator.HasActiveSequence(
+                        character.Identity.Instance,
+                        CapturedAreteMovementBehavior.Spawn))
+                {
+                    this.completedSpawnMovement.Add(character.Identity.Instance);
+                }
+
                 this.coordinator.Interrupt(character.Identity.Instance);
             }
         }

@@ -7,6 +7,7 @@ namespace ZoneEngine.Core.Playfields
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Web.Script.Serialization;
 
     #endregion
 
@@ -53,6 +54,7 @@ namespace ZoneEngine.Core.Playfields
     {
         internal CapturedAreteMovementObservation(
             string observationId,
+            string captureId,
             int equivalentObservationCount,
             DateTime capturedUtc,
             long sequence,
@@ -72,6 +74,7 @@ namespace ZoneEngine.Core.Playfields
             int pathCount)
         {
             this.ObservationId = observationId;
+            this.CaptureId = captureId;
             this.EquivalentObservationCount = equivalentObservationCount;
             this.CapturedUtc = capturedUtc;
             this.Sequence = sequence;
@@ -92,6 +95,8 @@ namespace ZoneEngine.Core.Playfields
         }
 
         public string ObservationId { get; private set; }
+
+        public string CaptureId { get; private set; }
 
         public int EquivalentObservationCount { get; private set; }
 
@@ -155,21 +160,47 @@ namespace ZoneEngine.Core.Playfields
         public CapturedAreteMovementPoint HomePosition { get; set; }
     }
 
+    internal sealed class CapturedAreteMovementManifest
+    {
+        public int schemaVersion { get; set; }
+
+        public int capturedPlayfieldId { get; set; }
+
+        public int runtimePlayfieldId { get; set; }
+
+        public int sourcePromotableObservations { get; set; }
+
+        public int deduplicatedRuntimeRows { get; set; }
+
+        public int scriptedRuntimeRows { get; set; }
+
+        public string[] captureIds { get; set; }
+
+        public Dictionary<string, CapturedAreteMovementManifestBehavior> behaviors { get; set; }
+    }
+
+    internal sealed class CapturedAreteMovementManifestBehavior
+    {
+        public int sourceObservations { get; set; }
+
+        public int runtimeRows { get; set; }
+    }
+
     public sealed class CapturedAreteMovementCatalog
     {
         public const int CapturedPlayfieldId = 1044525;
 
         public const int RuntimePlayfieldId = 6553;
 
-        public const int PromotableObservationCount = 8229;
+        public const int PromotableObservationCount = 20573;
 
-        public const int RuntimeRowCount = 8121;
+        public const int RuntimeRowCount = 20267;
 
         public const string RuntimeDatasetRelativePath =
-            @"Content\Captured\Arete\movement";
+            @"Content\Captured\Arete\movement-full";
 
         public const string RuntimeDatasetSourceRelativePath =
-            @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\movement";
+            @"AORebirth\Server\ZoneEngine\Content\Captured\Arete\movement-full";
 
         private static readonly CapturedAreteMovementBehavior[] Behaviors =
         {
@@ -225,11 +256,91 @@ namespace ZoneEngine.Core.Playfields
             {
                 if (Directory.Exists(candidate))
                 {
-                    return Load(candidate, PromotableObservationCount, RuntimeRowCount);
+                    return Load(candidate);
                 }
             }
 
             return Invalid("runtime-dataset-directory-missing");
+        }
+
+        public static CapturedAreteMovementCatalog Load(string directory)
+        {
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+            {
+                return Invalid("runtime-dataset-directory-missing");
+            }
+
+            string manifestPath = Path.Combine(directory, "manifest.json");
+            if (!File.Exists(manifestPath))
+            {
+                return Invalid("runtime-dataset-manifest-missing");
+            }
+
+            try
+            {
+                var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+                CapturedAreteMovementManifest manifest =
+                    serializer.Deserialize<CapturedAreteMovementManifest>(
+                        File.ReadAllText(manifestPath));
+                if (manifest == null
+                    || manifest.schemaVersion != 4
+                    || manifest.capturedPlayfieldId != CapturedPlayfieldId
+                    || manifest.runtimePlayfieldId != RuntimePlayfieldId
+                    || manifest.sourcePromotableObservations <= 0
+                    || manifest.deduplicatedRuntimeRows <= 0
+                    || manifest.scriptedRuntimeRows != 0
+                    || manifest.captureIds == null
+                    || manifest.captureIds.Length == 0
+                    || manifest.captureIds.Any(string.IsNullOrWhiteSpace))
+                {
+                    return Invalid("runtime-dataset-manifest-invalid");
+                }
+
+                CapturedAreteMovementCatalog catalog = Load(
+                    directory,
+                    manifest.sourcePromotableObservations,
+                    manifest.deduplicatedRuntimeRows);
+                if (!catalog.IsValid)
+                {
+                    return catalog;
+                }
+
+                var captureIds = new HashSet<string>(
+                    manifest.captureIds,
+                    StringComparer.Ordinal);
+                if (captureIds.Count != manifest.captureIds.Length
+                    || catalog.observations.Any(x => !captureIds.Contains(x.CaptureId)))
+                {
+                    return Invalid("runtime-dataset-manifest-capture-mismatch");
+                }
+
+                if (manifest.behaviors == null)
+                {
+                    return Invalid("runtime-dataset-manifest-behaviors-missing");
+                }
+
+                foreach (CapturedAreteMovementBehavior behavior in Behaviors)
+                {
+                    CapturedAreteMovementManifestBehavior evidence;
+                    string key = behavior.ToString().ToLowerInvariant();
+                    if (!manifest.behaviors.TryGetValue(key, out evidence)
+                        || evidence == null
+                        || evidence.runtimeRows != catalog.Count(behavior)
+                        || evidence.sourceObservations
+                           != catalog.observations
+                               .Where(x => x.Behavior == behavior)
+                               .Sum(x => x.EquivalentObservationCount))
+                    {
+                        return Invalid("runtime-dataset-manifest-behavior-mismatch:" + key);
+                    }
+                }
+
+                return catalog;
+            }
+            catch (Exception ex)
+            {
+                return Invalid("runtime-dataset-manifest-invalid:" + ex.GetType().Name + ":" + ex.Message);
+            }
         }
 
         public static CapturedAreteMovementCatalog Load(
@@ -259,6 +370,13 @@ namespace ZoneEngine.Core.Playfields
                 }
 
                 int sourceCount = observations.Sum(x => x.EquivalentObservationCount);
+                if (observations
+                    .GroupBy(x => x.ObservationId, StringComparer.Ordinal)
+                    .Any(x => x.Count() != 1))
+                {
+                    return Invalid("runtime-observation-id-duplicate");
+                }
+
                 if (observations.Count != expectedRuntimeRowCount)
                 {
                     return Invalid(
@@ -281,6 +399,7 @@ namespace ZoneEngine.Core.Playfields
 
                 CapturedAreteMovementObservation[] ordered = observations
                     .OrderBy(x => x.Behavior)
+                    .ThenBy(x => x.CaptureId, StringComparer.Ordinal)
                     .ThenBy(x => x.SourceIdentity, StringComparer.Ordinal)
                     .ThenBy(x => x.SourceGeneration)
                     .ThenBy(x => x.CapturedUtc)
@@ -342,11 +461,11 @@ namespace ZoneEngine.Core.Playfields
 
             string[] expectedHeader =
             {
-                "ObservationId", "EquivalentObservationCount", "CapturedUtc", "Sequence",
-                "Behavior", "NpcFamily", "MonsterData", "Level", "CapturedPlayfieldId",
-                "RuntimePlayfieldId", "Name", "SourceIdentity", "SourceGeneration",
-                "RouteSignature", "StartX", "StartY", "StartZ", "EndX", "EndY", "EndZ",
-                "DelayAfterSeconds", "PathCount"
+                "ObservationId", "CaptureId", "EquivalentObservationCount", "CapturedUtc",
+                "Sequence", "Behavior", "NpcFamily", "MonsterData", "Level",
+                "CapturedPlayfieldId", "RuntimePlayfieldId", "Name", "SourceIdentity",
+                "SourceGeneration", "RouteSignature", "StartX", "StartY", "StartZ",
+                "EndX", "EndY", "EndZ", "DelayAfterSeconds", "PathCount"
             };
             string[] header = SplitCsvLine(lines[0]);
             if (!header.SequenceEqual(expectedHeader))
@@ -368,27 +487,28 @@ namespace ZoneEngine.Core.Playfields
                 }
 
                 CapturedAreteMovementBehavior behavior;
-                if (!Enum.TryParse(columns[4], true, out behavior)
+                if (!Enum.TryParse(columns[5], true, out behavior)
                     || behavior != expectedBehavior)
                 {
                     throw new InvalidDataException("behavior-mismatch:" + Path.GetFileName(path));
                 }
 
-                int capturedPlayfield = ParseInt(columns[8]);
-                int runtimePlayfield = ParseInt(columns[9]);
-                string sourceIdentity = columns[11];
+                int capturedPlayfield = ParseInt(columns[9]);
+                int runtimePlayfield = ParseInt(columns[10]);
+                string sourceIdentity = columns[12];
                 if (capturedPlayfield != CapturedPlayfieldId
                     || runtimePlayfield != RuntimePlayfieldId
                     || !sourceIdentity.StartsWith("SimpleChar:", StringComparison.Ordinal)
-                    || string.IsNullOrWhiteSpace(columns[10]))
+                    || string.IsNullOrWhiteSpace(columns[1])
+                    || string.IsNullOrWhiteSpace(columns[11]))
                 {
                     throw new InvalidDataException("identity-evidence-mismatch:" + Path.GetFileName(path));
                 }
 
-                int equivalentCount = ParseInt(columns[1]);
-                int sourceGeneration = ParseInt(columns[12]);
-                int pathCount = ParseInt(columns[21]);
-                double delay = ParseDouble(columns[20]);
+                int equivalentCount = ParseInt(columns[2]);
+                int sourceGeneration = ParseInt(columns[13]);
+                int pathCount = ParseInt(columns[22]);
+                double delay = ParseDouble(columns[21]);
                 if (equivalentCount <= 0
                     || sourceGeneration < 0
                     || pathCount <= 0
@@ -398,8 +518,8 @@ namespace ZoneEngine.Core.Playfields
                         string.Format(
                             CultureInfo.InvariantCulture,
                             "invalid-observation:{0}:{1}:equivalent={2}:generation={3}:pathCount={4}:delay={5}",
-                            Path.GetFileName(path),
-                            columns[0],
+                        Path.GetFileName(path),
+                        columns[0],
                             equivalentCount,
                             sourceGeneration,
                             pathCount,
@@ -409,30 +529,31 @@ namespace ZoneEngine.Core.Playfields
                 destination.Add(
                     new CapturedAreteMovementObservation(
                         columns[0],
+                        columns[1],
                         equivalentCount,
                         DateTime.Parse(
-                            columns[2],
+                            columns[3],
                             CultureInfo.InvariantCulture,
                             DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal),
-                        long.Parse(columns[3], CultureInfo.InvariantCulture),
+                        long.Parse(columns[4], CultureInfo.InvariantCulture),
                         behavior,
-                        ParseInt(columns[5]),
                         ParseInt(columns[6]),
                         ParseInt(columns[7]),
+                        ParseInt(columns[8]),
                         capturedPlayfield,
                         runtimePlayfield,
-                        columns[10],
+                        columns[11],
                         sourceIdentity,
                         sourceGeneration,
-                        columns[13],
+                        columns[14],
                         new CapturedAreteMovementPoint(
-                            ParseDouble(columns[14]),
                             ParseDouble(columns[15]),
-                            ParseDouble(columns[16])),
+                            ParseDouble(columns[16]),
+                            ParseDouble(columns[17])),
                         new CapturedAreteMovementPoint(
-                            ParseDouble(columns[17]),
                             ParseDouble(columns[18]),
-                            ParseDouble(columns[19])),
+                            ParseDouble(columns[19]),
+                            ParseDouble(columns[20])),
                         delay,
                         pathCount));
             }
@@ -495,16 +616,12 @@ namespace ZoneEngine.Core.Playfields
 
     public sealed class CapturedAreteMovementRuntimeCoordinator
     {
-        public const double ActivationDistance = 6.0;
-
         public static bool PatrolConditionMatches(
             bool hasNpcController,
             bool hasFightingTarget)
         {
             return hasNpcController && !hasFightingTarget;
         }
-
-        public const double ContinuationDistance = 2.5;
 
         private readonly CapturedAreteMovementCatalog catalog;
 
@@ -521,39 +638,16 @@ namespace ZoneEngine.Core.Playfields
             CapturedAreteMovementObservation[] matches = this.catalog.Matching(actor, null);
             if (matches.Length == 0)
             {
-                this.states.Remove(actor == null ? 0 : actor.RuntimeIdentity);
+                if (actor != null)
+                {
+                    this.states.Remove(actor.RuntimeIdentity);
+                }
+
                 return false;
             }
 
-            var variants = matches
-                .GroupBy(x => x.SourceIdentity + "|" + x.SourceGeneration.ToString(CultureInfo.InvariantCulture))
-                .Select(
-                    group =>
-                        new
-                        {
-                            Key = group.Key,
-                            SourceIdentity = group.First().SourceIdentity,
-                            SourceGeneration = group.First().SourceGeneration,
-                            Distance = group.Min(x => x.Start.Distance2D(actor.Position))
-                        })
-                .Where(x => x.Distance <= ActivationDistance)
-                .OrderBy(x => x.Distance)
-                .ThenBy(x => x.SourceIdentity, StringComparer.Ordinal)
-                .ThenBy(x => x.SourceGeneration)
-                .ToArray();
-            if (variants.Length == 0)
-            {
-                this.states.Remove(actor.RuntimeIdentity);
-                return false;
-            }
-
-            int selectedIndex = PositiveModulo(actor.SpawnGeneration - 1, variants.Length);
-            var selected = variants[selectedIndex];
             this.states[actor.RuntimeIdentity] =
-                new RuntimeState(
-                    CopyIdentity(actor),
-                    selected.SourceIdentity,
-                    selected.SourceGeneration);
+                new RuntimeState(CopyIdentity(actor));
             return true;
         }
 
@@ -566,19 +660,30 @@ namespace ZoneEngine.Core.Playfields
             observation = null;
             RuntimeState state;
             if (actor == null
-                || !this.states.TryGetValue(actor.RuntimeIdentity, out state)
-                || !state.IdentityMatches(actor)
-                || !ConditionMatches(actor, behavior))
+                || !this.states.TryGetValue(actor.RuntimeIdentity, out state))
+            {
+                return CapturedAreteMovementDecisionKind.Fallback;
+            }
+
+            if (!state.IdentityMatches(actor))
+            {
+                this.states.Remove(actor.RuntimeIdentity);
+                return CapturedAreteMovementDecisionKind.Fallback;
+            }
+
+            if (!ConditionMatches(actor, behavior))
+            {
+                return CapturedAreteMovementDecisionKind.Fallback;
+            }
+
+            if (state.InterruptedBehavior == behavior)
             {
                 return CapturedAreteMovementDecisionKind.Fallback;
             }
 
             if (state.ActiveBehavior != behavior)
             {
-                state.ActiveBehavior = behavior;
-                state.NextIndex = -1;
-                state.NextEligibleUtc = DateTime.MinValue;
-                state.LastEnd = null;
+                state.BeginBehavior(behavior);
             }
 
             if (utcNow < state.NextEligibleUtc)
@@ -586,11 +691,51 @@ namespace ZoneEngine.Core.Playfields
                 return CapturedAreteMovementDecisionKind.Waiting;
             }
 
-            CapturedAreteMovementObservation[] candidates = this.catalog
-                .Matching(actor, behavior)
+            CapturedAreteMovementObservation[] behaviorCandidates =
+                this.catalog.Matching(actor, behavior);
+            if (behaviorCandidates.Length == 0)
+            {
+                return CapturedAreteMovementDecisionKind.Fallback;
+            }
+
+            if (!state.HasSelectedVariant)
+            {
+                var variants = behaviorCandidates
+                    .GroupBy(
+                        x =>
+                            x.CaptureId + "|" + x.SourceIdentity + "|"
+                            + x.SourceGeneration.ToString(CultureInfo.InvariantCulture))
+                    .Select(
+                        group =>
+                            new
+                            {
+                                CaptureId = group.First().CaptureId,
+                                SourceIdentity = group.First().SourceIdentity,
+                                SourceGeneration = group.First().SourceGeneration,
+                                Distance = group.Min(x => x.Start.Distance2D(actor.Position))
+                            })
+                    .OrderBy(x => x.Distance)
+                    .ThenBy(x => x.CaptureId, StringComparer.Ordinal)
+                    .ThenBy(x => x.SourceIdentity, StringComparer.Ordinal)
+                    .ThenBy(x => x.SourceGeneration)
+                    .ToArray();
+                double nearestVariantDistance = variants[0].Distance;
+                var nearestVariants = variants
+                    .Where(x => Math.Abs(x.Distance - nearestVariantDistance) <= 0.001)
+                    .ToArray();
+                var selectedVariant = nearestVariants[
+                    PositiveModulo(actor.SpawnGeneration - 1, nearestVariants.Length)];
+                state.SelectVariant(
+                    selectedVariant.CaptureId,
+                    selectedVariant.SourceIdentity,
+                    selectedVariant.SourceGeneration);
+            }
+
+            CapturedAreteMovementObservation[] candidates = behaviorCandidates
                 .Where(
                     x =>
-                        string.Equals(x.SourceIdentity, state.SourceIdentity, StringComparison.Ordinal)
+                        string.Equals(x.CaptureId, state.CaptureId, StringComparison.Ordinal)
+                        && string.Equals(x.SourceIdentity, state.SourceIdentity, StringComparison.Ordinal)
                         && x.SourceGeneration == state.SourceGeneration)
                 .OrderBy(x => x.CapturedUtc)
                 .ThenBy(x => x.Sequence)
@@ -598,6 +743,7 @@ namespace ZoneEngine.Core.Playfields
                 .ToArray();
             if (candidates.Length == 0)
             {
+                state.ClearVariant();
                 return CapturedAreteMovementDecisionKind.Fallback;
             }
 
@@ -615,25 +761,23 @@ namespace ZoneEngine.Core.Playfields
             }
             else if (candidateIndex >= candidates.Length)
             {
-                candidateIndex = 0;
+                return CapturedAreteMovementDecisionKind.Fallback;
             }
 
             CapturedAreteMovementObservation selected = candidates[candidateIndex];
-            if (selected.Start.Distance2D(actor.Position) > ContinuationDistance
-                || (state.LastEnd != null
-                    && state.LastEnd.Distance2D(selected.Start) > 0.5)
-                || !DirectionMatches(actor, selected))
+            if (!DirectionMatches(actor, selected))
             {
-                state.NextIndex = -1;
-                state.NextEligibleUtc = DateTime.MinValue;
-                state.LastEnd = null;
+                state.ClearVariant();
                 return CapturedAreteMovementDecisionKind.Fallback;
             }
 
             observation = selected;
             state.NextIndex = candidateIndex + 1;
-            state.NextEligibleUtc = utcNow + TimeSpan.FromSeconds(selected.DelayAfterSeconds);
-            state.LastEnd = selected.End;
+            DateTime scheduleAnchor = state.NextEligibleUtc == DateTime.MinValue
+                ? utcNow
+                : state.NextEligibleUtc;
+            state.NextEligibleUtc =
+                scheduleAnchor + TimeSpan.FromSeconds(selected.DelayAfterSeconds);
             return CapturedAreteMovementDecisionKind.Movement;
         }
 
@@ -642,10 +786,7 @@ namespace ZoneEngine.Core.Playfields
             RuntimeState state;
             if (this.states.TryGetValue(runtimeIdentity, out state))
             {
-                state.ActiveBehavior = null;
-                state.NextIndex = -1;
-                state.NextEligibleUtc = DateTime.MinValue;
-                state.LastEnd = null;
+                state.Reset();
             }
         }
 
@@ -665,7 +806,8 @@ namespace ZoneEngine.Core.Playfields
             out int sourceGeneration)
         {
             RuntimeState state;
-            if (this.states.TryGetValue(runtimeIdentity, out state))
+            if (this.states.TryGetValue(runtimeIdentity, out state)
+                && state.HasSelectedVariant)
             {
                 sourceIdentity = state.SourceIdentity;
                 sourceGeneration = state.SourceGeneration;
@@ -675,6 +817,16 @@ namespace ZoneEngine.Core.Playfields
             sourceIdentity = string.Empty;
             sourceGeneration = 0;
             return false;
+        }
+
+        public bool HasActiveSequence(
+            int runtimeIdentity,
+            CapturedAreteMovementBehavior behavior)
+        {
+            RuntimeState state;
+            return this.states.TryGetValue(runtimeIdentity, out state)
+                   && state.ActiveBehavior == behavior
+                   && state.HasSelectedVariant;
         }
 
         private static bool ConditionMatches(
@@ -750,18 +902,15 @@ namespace ZoneEngine.Core.Playfields
 
         private sealed class RuntimeState
         {
-            internal RuntimeState(
-                CapturedAreteMovementActorEvidence identity,
-                string sourceIdentity,
-                int sourceGeneration)
+            internal RuntimeState(CapturedAreteMovementActorEvidence identity)
             {
                 this.Identity = identity;
-                this.SourceIdentity = sourceIdentity;
-                this.SourceGeneration = sourceGeneration;
                 this.NextIndex = -1;
             }
 
             internal CapturedAreteMovementActorEvidence Identity { get; private set; }
+
+            internal string CaptureId { get; private set; }
 
             internal string SourceIdentity { get; private set; }
 
@@ -769,11 +918,59 @@ namespace ZoneEngine.Core.Playfields
 
             internal CapturedAreteMovementBehavior? ActiveBehavior { get; set; }
 
+            internal CapturedAreteMovementBehavior? InterruptedBehavior { get; private set; }
+
             internal int NextIndex { get; set; }
 
             internal DateTime NextEligibleUtc { get; set; }
 
-            internal CapturedAreteMovementPoint LastEnd { get; set; }
+            internal bool HasSelectedVariant
+            {
+                get
+                {
+                    return !string.IsNullOrWhiteSpace(this.CaptureId)
+                           && !string.IsNullOrWhiteSpace(this.SourceIdentity);
+                }
+            }
+
+            internal void BeginBehavior(CapturedAreteMovementBehavior behavior)
+            {
+                if (this.InterruptedBehavior != behavior)
+                {
+                    this.InterruptedBehavior = null;
+                }
+
+                this.ActiveBehavior = behavior;
+                this.ClearVariant();
+            }
+
+            internal void SelectVariant(
+                string captureId,
+                string sourceIdentity,
+                int sourceGeneration)
+            {
+                this.CaptureId = captureId;
+                this.SourceIdentity = sourceIdentity;
+                this.SourceGeneration = sourceGeneration;
+                this.NextIndex = -1;
+                this.NextEligibleUtc = DateTime.MinValue;
+            }
+
+            internal void ClearVariant()
+            {
+                this.CaptureId = string.Empty;
+                this.SourceIdentity = string.Empty;
+                this.SourceGeneration = 0;
+                this.NextIndex = -1;
+                this.NextEligibleUtc = DateTime.MinValue;
+            }
+
+            internal void Reset()
+            {
+                this.InterruptedBehavior = this.ActiveBehavior;
+                this.ActiveBehavior = null;
+                this.ClearVariant();
+            }
 
             internal bool IdentityMatches(CapturedAreteMovementActorEvidence actor)
             {
@@ -798,11 +995,21 @@ namespace ZoneEngine.Core.Playfields
 
         public int Level { get; set; }
 
+        public int CapturedPlayfieldId { get; set; }
+
         public int RuntimePlayfieldId { get; set; }
 
         public int NpcFirstAttackStarts { get; set; }
 
-        public double ObservedAutomaticAggroRadiusMeters { get; set; }
+        public bool AutomaticAggroEligible { get; set; }
+
+        public double? ObservedAutomaticAggroRadiusMeters { get; set; }
+
+        public string RadiusEvidenceKind { get; set; }
+
+        public string RadiusEvidenceCaptureId { get; set; }
+
+        public string ContributingCaptureIds { get; set; }
 
         public bool Matches(CapturedAreteMovementActorEvidence actor)
         {
@@ -878,8 +1085,10 @@ namespace ZoneEngine.Core.Playfields
                 const string expectedHeader =
                     "Name,NpcFamily,MonsterData,Level,CapturedPlayfieldId,"
                     + "RuntimePlayfieldId,NpcFirstAttackStarts,"
-                    + "ObservedAutomaticAggroRadiusMeters,EvidenceCapturedUtc,"
-                    + "EvidenceSequence";
+                    + "AutomaticAggroEligible,ObservedAutomaticAggroRadiusMeters,"
+                    + "RadiusEvidenceKind,RadiusEvidenceCaptureId,"
+                    + "RadiusEvidenceCapturedUtc,RadiusEvidenceSequence,"
+                    + "ContributingCaptureIds";
                 if (lines.Length == 0
                     || !string.Equals(lines[0], expectedHeader, StringComparison.Ordinal))
                 {
@@ -898,22 +1107,83 @@ namespace ZoneEngine.Core.Playfields
                     int family;
                     int template;
                     int level;
+                    int capturedPlayfield;
                     int runtimePlayfield;
                     int starts;
-                    double radius;
-                    if (columns.Length != 10
+                    bool eligible;
+                    double parsedRadius;
+                    double? radius = null;
+                    long evidenceSequence;
+                    DateTime evidenceCapturedUtc;
+                    if (columns.Length != 14
+                        || string.IsNullOrWhiteSpace(columns[0])
                         || !int.TryParse(columns[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out family)
                         || !int.TryParse(columns[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out template)
                         || !int.TryParse(columns[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out level)
+                        || !int.TryParse(columns[4], NumberStyles.Integer, CultureInfo.InvariantCulture, out capturedPlayfield)
                         || !int.TryParse(columns[5], NumberStyles.Integer, CultureInfo.InvariantCulture, out runtimePlayfield)
                         || !int.TryParse(columns[6], NumberStyles.Integer, CultureInfo.InvariantCulture, out starts)
-                        || !double.TryParse(columns[7], NumberStyles.Float, CultureInfo.InvariantCulture, out radius)
+                        || !bool.TryParse(columns[7], out eligible)
+                        || family <= 0
+                        || template <= 0
+                        || level <= 0
                         || starts <= 0
-                        || radius <= 0.0d
-                        || double.IsNaN(radius)
-                        || double.IsInfinity(radius))
+                        || !eligible
+                        || capturedPlayfield != CapturedAreteMovementCatalog.CapturedPlayfieldId
+                        || runtimePlayfield != CapturedAreteMovementCatalog.RuntimePlayfieldId
+                        || string.IsNullOrWhiteSpace(columns[9])
+                        || string.IsNullOrWhiteSpace(columns[13]))
                     {
                         return Invalid("aggro-row-invalid:" + index);
+                    }
+
+                    string[] contributingCaptureIds = columns[13].Split(
+                        new[] { ';' },
+                        StringSplitOptions.RemoveEmptyEntries);
+                    if (contributingCaptureIds.Length == 0
+                        || contributingCaptureIds.Any(string.IsNullOrWhiteSpace)
+                        || contributingCaptureIds.Distinct(StringComparer.Ordinal).Count()
+                           != contributingCaptureIds.Length)
+                    {
+                        return Invalid("aggro-row-invalid:" + index);
+                    }
+
+                    if (string.Equals(columns[9], "measured-lower-bound", StringComparison.Ordinal))
+                    {
+                        if (!double.TryParse(
+                                columns[8],
+                                NumberStyles.Float,
+                                CultureInfo.InvariantCulture,
+                                out parsedRadius)
+                            || parsedRadius <= 0.0d
+                            || double.IsNaN(parsedRadius)
+                            || double.IsInfinity(parsedRadius)
+                            || string.IsNullOrWhiteSpace(columns[10])
+                            || !contributingCaptureIds.Contains(columns[10], StringComparer.Ordinal)
+                            || !DateTime.TryParse(
+                                columns[11],
+                                CultureInfo.InvariantCulture,
+                                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                                out evidenceCapturedUtc)
+                            || !long.TryParse(
+                                columns[12],
+                                NumberStyles.Integer,
+                                CultureInfo.InvariantCulture,
+                                out evidenceSequence)
+                            || evidenceSequence <= 0)
+                        {
+                            return Invalid("aggro-radius-evidence-invalid:" + index);
+                        }
+
+                        radius = parsedRadius;
+                    }
+                    else if (!string.Equals(columns[9], "eligibility-only", StringComparison.Ordinal)
+                             || !string.IsNullOrWhiteSpace(columns[8])
+                             || !string.IsNullOrWhiteSpace(columns[10])
+                             || !string.IsNullOrWhiteSpace(columns[11])
+                             || !string.IsNullOrWhiteSpace(columns[12]))
+                    {
+                        return Invalid("aggro-radius-evidence-invalid:" + index);
                     }
 
                     rows.Add(
@@ -923,10 +1193,31 @@ namespace ZoneEngine.Core.Playfields
                             NpcFamily = family,
                             MonsterData = template,
                             Level = level,
+                            CapturedPlayfieldId = capturedPlayfield,
                             RuntimePlayfieldId = runtimePlayfield,
                             NpcFirstAttackStarts = starts,
-                            ObservedAutomaticAggroRadiusMeters = radius
+                            AutomaticAggroEligible = eligible,
+                            ObservedAutomaticAggroRadiusMeters = radius,
+                            RadiusEvidenceKind = columns[9],
+                            RadiusEvidenceCaptureId = columns[10],
+                            ContributingCaptureIds = columns[13]
                         });
+                }
+
+                if (rows
+                    .GroupBy(
+                        value => new
+                                 {
+                                     value.Name,
+                                     value.NpcFamily,
+                                     value.MonsterData,
+                                     value.Level,
+                                     value.CapturedPlayfieldId,
+                                     value.RuntimePlayfieldId
+                                 })
+                    .Any(group => group.Count() != 1))
+                {
+                    return Invalid("aggro-duplicate-constraint");
                 }
 
                 return rows.Count == 0
@@ -949,15 +1240,40 @@ namespace ZoneEngine.Core.Playfields
                 return false;
             }
 
-            CapturedAreteAggroObservation match =
-                this.observations.SingleOrDefault(value => value.Matches(actor));
-            if (match == null)
+            CapturedAreteAggroObservation match = this.FindMatch(actor);
+            if (match == null || !match.ObservedAutomaticAggroRadiusMeters.HasValue)
             {
                 return false;
             }
 
-            radius = match.ObservedAutomaticAggroRadiusMeters;
+            radius = match.ObservedAutomaticAggroRadiusMeters.Value;
             return true;
+        }
+
+        public bool TryGetEligibility(
+            CapturedAreteMovementActorEvidence actor,
+            out int npcFirstAttackStarts)
+        {
+            npcFirstAttackStarts = 0;
+            if (!this.IsValid || actor == null)
+            {
+                return false;
+            }
+
+            CapturedAreteAggroObservation match = this.FindMatch(actor);
+            if (match == null || !match.AutomaticAggroEligible)
+            {
+                return false;
+            }
+
+            npcFirstAttackStarts = match.NpcFirstAttackStarts;
+            return true;
+        }
+
+        private CapturedAreteAggroObservation FindMatch(
+            CapturedAreteMovementActorEvidence actor)
+        {
+            return this.observations.FirstOrDefault(value => value.Matches(actor));
         }
 
         private static CapturedAreteAggroCatalog Invalid(string reason)

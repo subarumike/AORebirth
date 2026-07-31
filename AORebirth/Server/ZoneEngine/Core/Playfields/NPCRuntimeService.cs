@@ -26,6 +26,12 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class NPCRuntimeService
     {
+        // NPC-first attack starts prove automatic aggression even when the
+        // player coordinate needed for an exact trigger distance is absent.
+        // Use a contact-only floor for that proven eligibility; measured
+        // radii continue to take precedence and the exact radius stays unresolved.
+        private const double CapturedEligibilityOnlyAggroRadiusMeters = 1.0d;
+
         private readonly Playfield playfield;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
@@ -1009,22 +1015,29 @@ namespace AORebirth.Core.Playfields
                 return null;
             }
 
+            var evidence = new CapturedAreteMovementActorEvidence
+                           {
+                               RuntimeIdentity = npc.Identity.Instance,
+                               SpawnGeneration = 1,
+                               NpcFamily = npc.Stats[StatIds.npcfamily].Value,
+                               MonsterData = npc.Stats[StatIds.monsterdata].Value,
+                               Level = npc.Stats[StatIds.level].Value,
+                               PlayfieldId = npc.Playfield.Identity.Instance,
+                               Name = npc.Name,
+                               Position = new CapturedAreteMovementPoint(0.0d, 0.0d, 0.0d)
+                           };
             double radius;
-            if (!this.capturedAreteAggro.TryGetRadius(
-                    new CapturedAreteMovementActorEvidence
-                    {
-                        RuntimeIdentity = npc.Identity.Instance,
-                        SpawnGeneration = 1,
-                        NpcFamily = npc.Stats[StatIds.npcfamily].Value,
-                        MonsterData = npc.Stats[StatIds.monsterdata].Value,
-                        Level = npc.Stats[StatIds.level].Value,
-                        PlayfieldId = npc.Playfield.Identity.Instance,
-                        Name = npc.Name,
-                        Position = new CapturedAreteMovementPoint(0.0d, 0.0d, 0.0d)
-                    },
-                    out radius))
+            if (!this.capturedAreteAggro.TryGetRadius(evidence, out radius))
             {
-                return null;
+                int npcFirstAttackStarts;
+                if (!this.capturedAreteAggro.TryGetEligibility(
+                        evidence,
+                        out npcFirstAttackStarts))
+                {
+                    return null;
+                }
+
+                radius = CapturedEligibilityOnlyAggroRadiusMeters;
             }
 
             return this.dynelRegistry
