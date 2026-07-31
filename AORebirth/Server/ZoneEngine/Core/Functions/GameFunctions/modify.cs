@@ -130,7 +130,13 @@ namespace ZoneEngine.Core.Functions.GameFunctions
                 return false;
             }
 
-            affected.Stats[statId].Modifier += Arguments[1].AsInt32();
+            int delta = Arguments[1].AsInt32();
+            affected.Stats[statId].Modifier += delta;
+            NanoEventRuntimeService.Default.RecordModifier(
+                affected,
+                statId,
+                delta,
+                false);
             return true;
         }
 

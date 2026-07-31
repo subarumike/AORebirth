@@ -61,7 +61,8 @@ namespace ZoneEngine.Core
             int nanoId,
             int durationCentiseconds,
             Identity durationPacketIdentity = default(Identity),
-            int activeStrain = 0)
+            int activeStrain = 0,
+            bool bypassNcu = false)
         {
             if (character == null || !NanoLoader.NanoList.ContainsKey(nanoId))
             {
@@ -69,7 +70,9 @@ namespace ZoneEngine.Core
             }
 
             bool isSurgeryClinicNano = nanoId == SurgeryClinicInteractionRules.SurgeryClinicNanoId;
-            if (!isSurgeryClinicNano && !this.CanActivateNano(character, nanoId))
+            if (!bypassNcu
+                && !isSurgeryClinicNano
+                && !this.CanActivateNano(character, nanoId))
             {
                 return false;
             }
@@ -444,6 +447,19 @@ namespace ZoneEngine.Core
             }
         }
 
+        public void ClearAllActiveNanos(ICharacter character, bool notifyClient)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            foreach (int strain in character.ActiveNanos.Keys.ToArray())
+            {
+                this.RemoveActiveNanoByStrain(character, strain, notifyClient);
+            }
+        }
+
         public void RemoveActiveNanoInStrain(ICharacter character, int strain, bool notifyClient)
         {
             this.RemoveActiveNanoByStrain(character, strain, notifyClient);
@@ -768,6 +784,7 @@ namespace ZoneEngine.Core
 
             int nanoId = activeNano.ID;
             int nanoInstance = activeNano.Instance;
+            NanoEventRuntimeService.Default.RemoveModifiers(character, nanoId);
             character.ActiveNanos.Remove(strain);
             this.CancelExpiryTimer(character.Identity.Instance, strain);
 

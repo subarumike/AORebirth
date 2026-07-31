@@ -16,6 +16,7 @@ namespace AORebirth.Core.Playfields
     {
         PacketOnly,
         InstantSelfNanoData,
+        ExplicitTargetNanoData,
         ReanimatedAddLifecycle
     }
 
@@ -117,6 +118,12 @@ namespace AORebirth.Core.Playfields
                 return true;
             }
 
+            if (nanoId == GartuaNanoId)
+            {
+                ownership = CapturedTempleNanoEffectOwnership.ExplicitTargetNanoData;
+                return true;
+            }
+
             switch (nanoId)
             {
                 case DefenderPrimaryNanoId:
@@ -129,7 +136,6 @@ namespace AORebirth.Core.Playfields
                 case CuratorNanoId:
                 case NematetPrimaryNanoId:
                 case NematetSecondaryNanoId:
-                case GartuaNanoId:
                 case UkleshUnscheduledNanoId:
                 case MurialUnscheduledNanoId:
                     ownership = CapturedTempleNanoEffectOwnership.PacketOnly;
