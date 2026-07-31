@@ -89,7 +89,7 @@
   ],
   "reconciledObservations": 9526,
   "routeGroups": 2754,
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "totals": {
     "ambiguous": 944,
     "promotable": 8229,

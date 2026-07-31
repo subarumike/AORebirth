@@ -522,6 +522,8 @@
     <Compile Include="Core\Playfields\Content\SubwayContentModule.cs" />
     <Compile Include="Core\Playfields\Content\TempleOfThreeWindsContentModule.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMovementCatalog.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteMovementRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerContentProvider.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerSpawnOrchestrator.cs" />
@@ -742,6 +744,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Captured\Arete\movement\*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Captured\Arete\movement\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Subway\pf127-geometry.json">

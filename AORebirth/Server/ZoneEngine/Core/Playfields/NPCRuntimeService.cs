@@ -48,6 +48,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
+        private readonly CapturedAreteMovementRuntimeService capturedAreteMovement;
+
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
         private readonly OrdinaryEnemyRuntimeService ordinaryEnemies;
@@ -87,6 +89,13 @@ namespace AORebirth.Core.Playfields
                     new CapturedTempleOfThreeWindsContentProvider());
             this.patrolReplay =
                 new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
+            this.capturedAreteMovement = new CapturedAreteMovementRuntimeService();
+            if (!this.capturedAreteMovement.IsAvailable)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Captured Arete movement disabled reason=" + this.capturedAreteMovement.FailureReason);
+            }
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
                     this.capturedAreteRobotContent,
@@ -119,6 +128,7 @@ namespace AORebirth.Core.Playfields
         {
             this.dynelRegistry.Register(character);
             this.RegisterNpcHome(character);
+            this.capturedAreteMovement.Activate(character);
         }
 
         internal void EnsureAreteCapturePopulation()
@@ -149,6 +159,7 @@ namespace AORebirth.Core.Playfields
             }
 
             this.combatTick.ClearRuntimeState();
+            this.capturedAreteMovement.Clear();
             this.corpseLifecycle.ClearRuntimeState();
             this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance);
             this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance);
@@ -522,6 +533,7 @@ namespace AORebirth.Core.Playfields
             this.capturedSubwayEncounters.NotifyNpcDespawn(target, utcNow);
             this.nascenceCoreHecklers.NotifyNpcDespawn(target);
             this.capturedTempleEncounters.NotifyNpcDespawn(target, utcNow);
+            this.capturedAreteMovement.Remove(target);
             this.corpseLifecycle.FinalizeNpcDespawn(target);
             this.dynelRegistry.Unregister(target.Identity);
             OrdinaryEnemyRuntimeRegistry.Remove(target.Identity.Instance);
@@ -564,6 +576,7 @@ namespace AORebirth.Core.Playfields
         internal void ClearFightingTarget(ICharacter character)
         {
             character.SetFightingTarget(Identity.None);
+            this.capturedAreteMovement.Interrupt(character);
             this.ClearCombatTracking(
                 character.Identity,
                 NpcChaseInvalidationReason.TargetLost);
@@ -585,6 +598,7 @@ namespace AORebirth.Core.Playfields
         {
             target.SetTarget(Identity.None);
             target.SetFightingTarget(Identity.None);
+            this.capturedAreteMovement.Interrupt(target);
             this.ClearCombatTracking(
                 target.Identity,
                 NpcChaseInvalidationReason.Death);
@@ -895,6 +909,17 @@ namespace AORebirth.Core.Playfields
 
             if (character.FightingTarget.Instance != 0)
             {
+                ICharacter capturedMovementTarget =
+                    this.dynelRegistry.FindByIdentity<ICharacter>(character.FightingTarget);
+                if (!missionStationary
+                    && this.capturedAreteMovement.TryProcessCombat(
+                        character,
+                        capturedMovementTarget,
+                        utcNow))
+                {
+                    return;
+                }
+
                 if (!missionStationary && character.Controller.IsFollowing())
                 {
                     character.Controller.DoFollow();
@@ -908,6 +933,18 @@ namespace AORebirth.Core.Playfields
                 NpcChaseInvalidationReason.LeashReset);
 
             this.ordinaryEnemies.TryReturnToSpawn(character);
+
+            if (!missionStationary
+                && this.capturedAreteMovement.TryProcessSpawn(character, utcNow))
+            {
+                return;
+            }
+
+            if (!missionStationary
+                && this.capturedAreteMovement.TryProcessPatrol(character, utcNow))
+            {
+                return;
+            }
 
             if (character.Controller.IsFollowing())
             {
@@ -942,6 +979,7 @@ namespace AORebirth.Core.Playfields
             this.chaseNavigation.Clear(
                 target.Identity.Instance,
                 NpcChaseInvalidationReason.TargetReplaced);
+            this.capturedAreteMovement.Interrupt(target);
             target.SetTarget(attacker.Identity);
             target.SetFightingTarget(attacker.Identity);
 
@@ -1020,6 +1058,7 @@ namespace AORebirth.Core.Playfields
             home.ReturningHome = true;
             npc.SetTarget(Identity.None);
             npc.SetFightingTarget(Identity.None);
+            this.capturedAreteMovement.Interrupt(npc);
             this.ClearCombatTracking(
                 npc.Identity,
                 NpcChaseInvalidationReason.LeashReset);
@@ -1074,6 +1113,14 @@ namespace AORebirth.Core.Playfields
 
             NPCController controller = npc.Controller as NPCController;
             if (controller == null)
+            {
+                return true;
+            }
+
+            if (this.capturedAreteMovement.TryProcessLeash(
+                npc,
+                home.Coordinates.coordinate,
+                utcNow))
             {
                 return true;
             }
