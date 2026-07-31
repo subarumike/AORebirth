@@ -202,17 +202,58 @@ namespace ChatEngine.CoreServer
         /// </param>
         internal void ISComDataReceived(object sender, DynamicMessage messageObject)
         {
-            var message = messageObject.DataObject as VicinityChatMessage;
-            if (message != null)
+            if (messageObject == null)
             {
-                this.DistributeVicinityChat(message);
                 return;
             }
 
-            var chatCommand = messageObject.DataObject as ChatCommand;
-            if (chatCommand != null)
+            try
             {
-                this.HandleZoneChatCommand(chatCommand);
+                var ping = messageObject.DataObject as Ping;
+                if (ping != null)
+                {
+                    // Zone keepalive — no client delivery.
+                    return;
+                }
+
+                var message = messageObject.DataObject as VicinityChatMessage;
+                if (message != null)
+                {
+                    this.DistributeVicinityChat(message);
+                    return;
+                }
+
+                var systemChat = messageObject.DataObject as SystemChatMessage;
+                if (systemChat != null)
+                {
+                    // Owner-only pet SystemMessage (CharacterId match). Not playfield broadcast.
+                    this.DistributeSystemChat(systemChat);
+                    return;
+                }
+
+                var chatCommand = messageObject.DataObject as ChatCommand;
+                if (chatCommand != null)
+                {
+                    this.HandleZoneChatCommand(chatCommand);
+                    return;
+                }
+
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    "ISComDataReceived: unhandled type="
+                    + (messageObject.TypeName ?? (messageObject.DataObject == null
+                                                      ? "null"
+                                                      : messageObject.DataObject.GetType().FullName)));
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "ISComDataReceived failed type="
+                    + (messageObject.TypeName ?? "?")
+                    + " err="
+                    + e.Message);
+                LogUtil.ErrorException(e);
             }
         }
 
@@ -312,9 +353,124 @@ namespace ChatEngine.CoreServer
         }
 
         /// <summary>
+        /// Owner-only brown pet announce on the owner's chat client.
+        /// Capture 20260731-054922: AOSharp NpcMessage type=35 Unk1=0 Text=… Unk2=1.
+        /// CharacterId match only — never Vicinity (34) / never playfield broadcast.
         /// </summary>
-        /// <param name="vicinityChatMessage">
+        /// <param name="systemChatMessage">
         /// </param>
+        private void DistributeSystemChat(SystemChatMessage systemChatMessage)
+        {
+            if (systemChatMessage == null || string.IsNullOrEmpty(systemChatMessage.Text))
+            {
+                return;
+            }
+
+            // Type 35 NpcMessage (AOSharp SystemMessage). Live capture Unk1=0 Unk2=1.
+            // Type 36 SimpleSystemMessage was wrong — client showed it under Vicinity.
+            byte[] packet = MsgSystem.Create(
+                systemChatMessage.Text,
+                systemChatMessage.Unk1,
+                systemChatMessage.Unk2 == 0 ? 1 : systemChatMessage.Unk2);
+            if (packet == null || packet.Length < 2 || packet[0] != 0x00 || packet[1] != 0x23)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "DistributeSystemChat refused non-type-35 packet (need 0023 NpcMessage, not Vicinity 0022 / SimpleSystem 0024)");
+                return;
+            }
+
+            string hexPrefix = "????";
+            if (packet.Length > 0)
+            {
+                int take = Math.Min(16, packet.Length);
+                var sb = new System.Text.StringBuilder(take * 2);
+                for (int i = 0; i < take; i++)
+                {
+                    sb.AppendFormat(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        "{0:X2}",
+                        packet[i]);
+                }
+
+                hexPrefix = sb.ToString();
+            }
+
+            Client cli;
+            uint characterId = unchecked((uint)systemChatMessage.CharacterId);
+            if (this.ConnectedClients.TryGetValue(characterId, out cli)
+                && cli != null
+                && cli.Character != null)
+            {
+                cli.Send(packet);
+                string ok = "DistributeSystemChat ok key="
+                            + characterId
+                            + " wire="
+                            + hexPrefix
+                            + " len="
+                            + (packet == null ? 0 : packet.Length)
+                            + " text="
+                            + systemChatMessage.Text;
+                LogUtil.Debug(DebugInfoDetail.Error, ok);
+                Console.WriteLine(ok);
+                return;
+            }
+
+            string wantName = systemChatMessage.CharacterName ?? string.Empty;
+            foreach (Client connected in this.ConnectedClients.Values)
+            {
+                if (connected == null || connected.Character == null)
+                {
+                    continue;
+                }
+
+                if (connected.Character.CharacterId == characterId)
+                {
+                    connected.Send(packet);
+                    string ok = "DistributeSystemChat ok scanId="
+                                + characterId
+                                + " wire="
+                                + hexPrefix
+                                + " len="
+                                + (packet == null ? 0 : packet.Length)
+                                + " text="
+                                + systemChatMessage.Text;
+                    LogUtil.Debug(DebugInfoDetail.Error, ok);
+                    Console.WriteLine(ok);
+                    return;
+                }
+
+                if (wantName.Length > 0
+                    && string.Equals(
+                        connected.Character.characterName,
+                        wantName,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    connected.Send(packet);
+                    string ok = "DistributeSystemChat ok name="
+                                + wantName
+                                + " wire="
+                                + hexPrefix
+                                + " len="
+                                + (packet == null ? 0 : packet.Length)
+                                + " text="
+                                + systemChatMessage.Text;
+                    LogUtil.Debug(DebugInfoDetail.Error, ok);
+                    Console.WriteLine(ok);
+                    return;
+                }
+            }
+
+            string miss = "DistributeSystemChat: no connected chat client for CharacterId="
+                          + systemChatMessage.CharacterId
+                          + " name="
+                          + wantName
+                          + " clients="
+                          + this.ConnectedClients.Count;
+            LogUtil.Debug(DebugInfoDetail.Error, miss);
+            Console.WriteLine(miss);
+        }
+
         private void DistributeVicinityChat(VicinityChatMessage vicinityChatMessage)
         {
             byte[] packet = MsgVicinity.Create(

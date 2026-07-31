@@ -396,6 +396,8 @@ namespace ZoneEngine.Core.Playfields
             int? previousTargetInstance,
             int targetInstance)
         {
+            // Capture 20260730-151431: SpecialAttackWeapon+Attack once per engage.
+            // Re-sending SAW every swing resets the fight anim (hit → stop → hit).
             return isPlayerOwnedAttackPet
                    && (!previousTargetInstance.HasValue || previousTargetInstance.Value != targetInstance);
         }

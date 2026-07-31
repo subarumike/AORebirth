@@ -1,0 +1,1147 @@
+{
+  "source": [
+    "arete part 1",
+    "arete part 2"
+  ],
+  "playfieldHint": 1044525,
+  "mobs": [
+    {
+      "name": "(unnamed)",
+      "monsterData": "17687",
+      "corpses": 1,
+      "empty": 0,
+      "levels": [],
+      "creditsMin": 0,
+      "creditsMax": 0,
+      "creditsAvg": 0.0,
+      "drops": [
+        {
+          "lowId": 85548,
+          "highId": 22258,
+          "ql": 7,
+          "name": "Inferior Heated Plasteel Armor Helmet",
+          "label": "85548-22258 Inferior Heated Plasteel Armor Helmet QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85596,
+          "highId": 85595,
+          "ql": 7,
+          "name": "Worn Metaplast Armor Gloves",
+          "label": "85596-85595 Worn Metaplast Armor Gloves QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 125343,
+          "highId": 125344,
+          "ql": 7,
+          "name": "Splintered Protector Squibber",
+          "label": "125343-125344 Splintered Protector Squibber QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160264,
+          "highId": 160265,
+          "ql": 7,
+          "name": "Cheap Kaen-Archibald Kolt",
+          "label": "160264-160265 Cheap Kaen-Archibald Kolt QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 161487,
+          "highId": 161488,
+          "ql": 7,
+          "name": "Adapted Notum Crystal - Polymorphing I",
+          "label": "161487-161488 Adapted Notum Crystal - Polymorphing I QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 162715,
+          "highId": 162715,
+          "ql": 7,
+          "name": "NanoCrystal (Relieving Salve)",
+          "label": "162715 NanoCrystal (Relieving Salve) QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201139,
+          "highId": 201140,
+          "ql": 7,
+          "name": "Pilgrim Seeker Armor Boots",
+          "label": "201139-201140 Pilgrim Seeker Armor Boots QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "(unnamed)",
+      "monsterData": "17714",
+      "corpses": 1,
+      "empty": 0,
+      "levels": [],
+      "creditsMin": 35,
+      "creditsMax": 35,
+      "creditsAvg": 35.0,
+      "drops": [
+        {
+          "lowId": 70558,
+          "highId": 85640,
+          "ql": 5,
+          "name": "Battered Low-Tech Armor Boots",
+          "label": "70558-85640 Battered Low-Tech Armor Boots QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70559,
+          "highId": 85689,
+          "ql": 5,
+          "name": "Battered Low-Tech Body Armor",
+          "label": "70559-85689 Battered Low-Tech Body Armor QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 122886,
+          "highId": 122887,
+          "ql": 5,
+          "name": "Irreparable Minielectronium",
+          "label": "122886-122887 Irreparable Minielectronium QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 123057,
+          "highId": 123058,
+          "ql": 5,
+          "name": "Unbalanced Ritual Krys Knife",
+          "label": "123057-123058 Unbalanced Ritual Krys Knife QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 162497,
+          "highId": 162497,
+          "ql": 14,
+          "name": "NanoCrystal (Lesser Suppressor)",
+          "label": "162497 NanoCrystal (Lesser Suppressor) QL14",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 163318,
+          "highId": 163319,
+          "ql": 5,
+          "name": "Cheap Division 9 Plasmaprojector",
+          "label": "163318-163319 Cheap Division 9 Plasmaprojector QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201076,
+          "highId": 201077,
+          "ql": 5,
+          "name": "Omni-Scout Desert Armor Pants",
+          "label": "201076-201077 Omni-Scout Desert Armor Pants QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "32-V Docker",
+      "monsterData": "17649",
+      "corpses": 2,
+      "empty": 1,
+      "levels": [
+        3
+      ],
+      "creditsMin": 4,
+      "creditsMax": 4,
+      "creditsAvg": 4.0,
+      "drops": [
+        {
+          "lowId": 248318,
+          "highId": 248318,
+          "ql": 1,
+          "name": "Optical Enhancer",
+          "label": "248318 Optical Enhancer QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 50.0,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Angry Minibull",
+      "monsterData": "30360",
+      "corpses": 8,
+      "empty": 3,
+      "levels": [
+        8,
+        9,
+        10,
+        12,
+        13
+      ],
+      "creditsMin": 47,
+      "creditsMax": 79,
+      "creditsAvg": 60.38,
+      "drops": [
+        {
+          "lowId": 248310,
+          "highId": 248310,
+          "ql": 1,
+          "name": "Bone Plates",
+          "label": "248310 Bone Plates QL1",
+          "observedOnCorpses": 2,
+          "ratePct": 25.0,
+          "totalQty": 2
+        },
+        {
+          "lowId": 84156,
+          "highId": 84155,
+          "ql": 7,
+          "name": "Ring of Power - Energy",
+          "label": "84156-84155 Ring of Power - Energy QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 12.5,
+          "totalQty": 1
+        },
+        {
+          "lowId": 248325,
+          "highId": 248325,
+          "ql": 1,
+          "name": "Leather Hide",
+          "label": "248325 Leather Hide QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 12.5,
+          "totalQty": 1
+        },
+        {
+          "lowId": 248330,
+          "highId": 248330,
+          "ql": 1,
+          "name": "Large Skull",
+          "label": "248330 Large Skull QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 12.5,
+          "totalQty": 2
+        }
+      ]
+    },
+    {
+      "name": "Cleaning Robot",
+      "monsterData": "297023",
+      "corpses": 16,
+      "empty": 6,
+      "levels": [
+        1
+      ],
+      "creditsMin": 5,
+      "creditsMax": 5,
+      "creditsAvg": 5.0,
+      "drops": [
+        {
+          "lowId": 42620,
+          "highId": 42620,
+          "ql": 1,
+          "name": "Robot Junk",
+          "label": "42620 Robot Junk QL1",
+          "observedOnCorpses": 8,
+          "ratePct": 50.0,
+          "totalQty": 8
+        },
+        {
+          "lowId": 70559,
+          "highId": 70559,
+          "ql": 1,
+          "name": "Battered Low-Tech Body Armor",
+          "label": "70559 Battered Low-Tech Body Armor QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70560,
+          "highId": 70560,
+          "ql": 1,
+          "name": "Battered Low-Tech Female Body Armor",
+          "label": "70560 Battered Low-Tech Female Body Armor QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70563,
+          "highId": 70563,
+          "ql": 1,
+          "name": "Battered Low-Tech Armor Helmet",
+          "label": "70563 Battered Low-Tech Armor Helmet QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        },
+        {
+          "lowId": 84144,
+          "highId": 84144,
+          "ql": 1,
+          "name": "Ring of Luck - Offensive",
+          "label": "84144 Ring of Luck - Offensive QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        },
+        {
+          "lowId": 155685,
+          "highId": 155685,
+          "ql": 1,
+          "name": "Large and partly fused lump of strange tetrahedral CPU bundles",
+          "label": "155685 Large and partly fused lump of strange tetrahedral CPU bundles QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Cleanmeister Intelligence Robot",
+      "monsterData": "297023",
+      "corpses": 3,
+      "empty": 0,
+      "levels": [
+        2
+      ],
+      "creditsMin": 17,
+      "creditsMax": 17,
+      "creditsAvg": 17.0,
+      "drops": [
+        {
+          "lowId": 162736,
+          "highId": 162736,
+          "ql": 7,
+          "name": "Instruction Disc (Relieving Salve)",
+          "label": "162736 Instruction Disc (Relieving Salve) QL7",
+          "observedOnCorpses": 3,
+          "ratePct": 100.0,
+          "totalQty": 3
+        },
+        {
+          "lowId": 42620,
+          "highId": 42619,
+          "ql": 2,
+          "name": "Robot Junk",
+          "label": "42620-42619 Robot Junk QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70562,
+          "highId": 85597,
+          "ql": 2,
+          "name": "Battered Low-Tech Armor Gloves",
+          "label": "70562-85597 Battered Low-Tech Armor Gloves QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85517,
+          "highId": 27360,
+          "ql": 2,
+          "name": "Battered Flak Armor Pants",
+          "label": "85517-27360 Battered Flak Armor Pants QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85691,
+          "highId": 22004,
+          "ql": 2,
+          "name": "Inferior Kevlar Vest",
+          "label": "85691-22004 Inferior Kevlar Vest QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85693,
+          "highId": 27389,
+          "ql": 2,
+          "name": "Battered Flak Body Armor",
+          "label": "85693-27389 Battered Flak Body Armor QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85740,
+          "highId": 85739,
+          "ql": 2,
+          "name": "Inferior Nail Armor Sleeves",
+          "label": "85740-85739 Inferior Nail Armor Sleeves QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 122981,
+          "highId": 122982,
+          "ql": 2,
+          "name": "Irreparable Kolt 58 Magnum",
+          "label": "122981-122982 Irreparable Kolt 58 Magnum QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 123514,
+          "highId": 123515,
+          "ql": 2,
+          "name": "Irreparable Khemo-Tech Model 200",
+          "label": "123514-123515 Irreparable Khemo-Tech Model 200 QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 123789,
+          "highId": 123790,
+          "ql": 2,
+          "name": "Leaking MTI VP300 Caseless",
+          "label": "123789-123790 Leaking MTI VP300 Caseless QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 129064,
+          "highId": 129065,
+          "ql": 2,
+          "name": "3rd level Ninja Tanto",
+          "label": "129064-129065 3rd level Ninja Tanto QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 130042,
+          "highId": 130043,
+          "ql": 2,
+          "name": "Apprentice G-Staff",
+          "label": "130042-130043 Apprentice G-Staff QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 135719,
+          "highId": 135719,
+          "ql": 1,
+          "name": "Omni-Tek Suit",
+          "label": "135719 Omni-Tek Suit QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 154069,
+          "highId": 150213,
+          "ql": 2,
+          "name": "Fayalite Flamberge",
+          "label": "154069-150213 Fayalite Flamberge QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160338,
+          "highId": 160339,
+          "ql": 2,
+          "name": "Kirch Kevlar Armor Vest",
+          "label": "160338-160339 Kirch Kevlar Armor Vest QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160604,
+          "highId": 160604,
+          "ql": 20,
+          "name": "Hologram PD: Rock Block",
+          "label": "160604 Hologram PD: Rock Block QL20",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 161609,
+          "highId": 161610,
+          "ql": 2,
+          "name": "Fazekas Crystal I",
+          "label": "161609-161610 Fazekas Crystal I QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201045,
+          "highId": 201046,
+          "ql": 2,
+          "name": "Omni-Scout Forest Armor Gloves",
+          "label": "201045-201046 Omni-Scout Forest Armor Gloves QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201072,
+          "highId": 201073,
+          "ql": 2,
+          "name": "Omni-Scout Desert Armor Gloves",
+          "label": "201072-201073 Omni-Scout Desert Armor Gloves QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 206656,
+          "highId": 206657,
+          "ql": 2,
+          "name": "Boots of the Dancing King",
+          "label": "206656-206657 Boots of the Dancing King QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Desert Reet",
+      "monsterData": "30365",
+      "corpses": 9,
+      "empty": 2,
+      "levels": [
+        5,
+        6
+      ],
+      "creditsMin": 29,
+      "creditsMax": 35,
+      "creditsAvg": 31.67,
+      "drops": [
+        {
+          "lowId": 42640,
+          "highId": 42641,
+          "ql": 5,
+          "name": "Monster Parts",
+          "label": "42640-42641 Monster Parts QL5",
+          "observedOnCorpses": 3,
+          "ratePct": 33.3,
+          "totalQty": 3
+        },
+        {
+          "lowId": 42640,
+          "highId": 42641,
+          "ql": 6,
+          "name": "Monster Parts",
+          "label": "42640-42641 Monster Parts QL6",
+          "observedOnCorpses": 2,
+          "ratePct": 22.2,
+          "totalQty": 2
+        },
+        {
+          "lowId": 248328,
+          "highId": 248328,
+          "ql": 1,
+          "name": "Reet Beak",
+          "label": "248328 Reet Beak QL1",
+          "observedOnCorpses": 2,
+          "ratePct": 22.2,
+          "totalQty": 2
+        },
+        {
+          "lowId": 42640,
+          "highId": 42641,
+          "ql": 7,
+          "name": "Monster Parts",
+          "label": "42640-42641 Monster Parts QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 11.1,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70558,
+          "highId": 85640,
+          "ql": 5,
+          "name": "Battered Low-Tech Armor Boots",
+          "label": "70558-85640 Battered Low-Tech Armor Boots QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 11.1,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70561,
+          "highId": 85744,
+          "ql": 6,
+          "name": "Battered Low-Tech Armor Sleeves",
+          "label": "70561-85744 Battered Low-Tech Armor Sleeves QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 11.1,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Garbage Flea",
+      "monsterData": "17657",
+      "corpses": 11,
+      "empty": 6,
+      "levels": [
+        1,
+        2
+      ],
+      "creditsMin": 5,
+      "creditsMax": 11,
+      "creditsAvg": 7.73,
+      "drops": [
+        {
+          "lowId": 248322,
+          "highId": 248322,
+          "ql": 1,
+          "name": "Venom Sample",
+          "label": "248322 Venom Sample QL1",
+          "observedOnCorpses": 5,
+          "ratePct": 45.5,
+          "totalQty": 5
+        },
+        {
+          "lowId": 70560,
+          "highId": 85688,
+          "ql": 2,
+          "name": "Battered Low-Tech Female Body Armor",
+          "label": "70560-85688 Battered Low-Tech Female Body Armor QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 9.1,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Gnarl the Roller",
+      "monsterData": "17687",
+      "corpses": 1,
+      "empty": 0,
+      "levels": [
+        7
+      ],
+      "creditsMin": 62,
+      "creditsMax": 62,
+      "creditsAvg": 62.0,
+      "drops": [
+        {
+          "lowId": 85512,
+          "highId": 85511,
+          "ql": 6,
+          "name": "Worn Metaplast Armor Pants",
+          "label": "85512-85511 Worn Metaplast Armor Pants QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85750,
+          "highId": 85749,
+          "ql": 6,
+          "name": "Battered Leather Armor Sleeves",
+          "label": "85750-85749 Battered Leather Armor Sleeves QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 122064,
+          "highId": 122065,
+          "ql": 6,
+          "name": "Unbalanced Clean Slay Axe",
+          "label": "122064-122065 Unbalanced Clean Slay Axe QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 124106,
+          "highId": 124107,
+          "ql": 6,
+          "name": "Worn Kalo-BBI Model 55",
+          "label": "124106-124107 Worn Kalo-BBI Model 55 QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160103,
+          "highId": 160104,
+          "ql": 6,
+          "name": "Zastaba Velocity ST",
+          "label": "160103-160104 Zastaba Velocity ST QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 162736,
+          "highId": 162736,
+          "ql": 7,
+          "name": "Instruction Disc (Relieving Salve)",
+          "label": "162736 Instruction Disc (Relieving Salve) QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201087,
+          "highId": 201088,
+          "ql": 6,
+          "name": "Omni Life Guard Body Armor",
+          "label": "201087-201088 Omni Life Guard Body Armor QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Kneebreaker Alfonzo Rizzolo",
+      "monsterData": "165196",
+      "corpses": 1,
+      "empty": 0,
+      "levels": [
+        4
+      ],
+      "creditsMin": 23,
+      "creditsMax": 23,
+      "creditsAvg": 23.0,
+      "drops": [
+        {
+          "lowId": 70561,
+          "highId": 85744,
+          "ql": 4,
+          "name": "Battered Low-Tech Armor Sleeves",
+          "label": "70561-85744 Battered Low-Tech Armor Sleeves QL4",
+          "observedOnCorpses": 1,
+          "ratePct": 100.0,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Malfunctioning Cleaning Robot",
+      "monsterData": "297023",
+      "corpses": 2,
+      "empty": 2,
+      "levels": [
+        1
+      ],
+      "creditsMin": 5,
+      "creditsMax": 5,
+      "creditsAvg": 5.0,
+      "drops": []
+    },
+    {
+      "name": "Rollerrat",
+      "monsterData": "17687",
+      "corpses": 26,
+      "empty": 14,
+      "levels": [
+        5,
+        6
+      ],
+      "creditsMin": 29,
+      "creditsMax": 35,
+      "creditsAvg": 32.92,
+      "drops": [
+        {
+          "lowId": 248333,
+          "highId": 248333,
+          "ql": 1,
+          "name": "Rollerrat Intestines",
+          "label": "248333 Rollerrat Intestines QL1",
+          "observedOnCorpses": 7,
+          "ratePct": 26.9,
+          "totalQty": 7
+        },
+        {
+          "lowId": 70559,
+          "highId": 85689,
+          "ql": 7,
+          "name": "Battered Low-Tech Body Armor",
+          "label": "70559-85689 Battered Low-Tech Body Armor QL7",
+          "observedOnCorpses": 2,
+          "ratePct": 7.7,
+          "totalQty": 2
+        },
+        {
+          "lowId": 70558,
+          "highId": 85640,
+          "ql": 6,
+          "name": "Battered Low-Tech Armor Boots",
+          "label": "70558-85640 Battered Low-Tech Armor Boots QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 3.8,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70559,
+          "highId": 85689,
+          "ql": 5,
+          "name": "Battered Low-Tech Body Armor",
+          "label": "70559-85689 Battered Low-Tech Body Armor QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 3.8,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70560,
+          "highId": 85688,
+          "ql": 7,
+          "name": "Battered Low-Tech Female Body Armor",
+          "label": "70560-85688 Battered Low-Tech Female Body Armor QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 3.8,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70561,
+          "highId": 85744,
+          "ql": 7,
+          "name": "Battered Low-Tech Armor Sleeves",
+          "label": "70561-85744 Battered Low-Tech Armor Sleeves QL7",
+          "observedOnCorpses": 1,
+          "ratePct": 3.8,
+          "totalQty": 1
+        },
+        {
+          "lowId": 84150,
+          "highId": 84149,
+          "ql": 4,
+          "name": "Ring of Power - Physics",
+          "label": "84150-84149 Ring of Power - Physics QL4",
+          "observedOnCorpses": 1,
+          "ratePct": 3.8,
+          "totalQty": 1
+        },
+        {
+          "lowId": 84158,
+          "highId": 84157,
+          "ql": 6,
+          "name": "Ring of Power - Elements",
+          "label": "84158-84157 Ring of Power - Elements QL6",
+          "observedOnCorpses": 1,
+          "ratePct": 3.8,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Supreme Collector of Waste",
+      "monsterData": "17714",
+      "corpses": 3,
+      "empty": 0,
+      "levels": [
+        4
+      ],
+      "creditsMin": 35,
+      "creditsMax": 35,
+      "creditsAvg": 35.0,
+      "drops": [
+        {
+          "lowId": 160603,
+          "highId": 160603,
+          "ql": 20,
+          "name": "Hologram PD: Mossy Rock",
+          "label": "160603 Hologram PD: Mossy Rock QL20",
+          "observedOnCorpses": 2,
+          "ratePct": 66.7,
+          "totalQty": 2
+        },
+        {
+          "lowId": 162736,
+          "highId": 162736,
+          "ql": 7,
+          "name": "Instruction Disc (Relieving Salve)",
+          "label": "162736 Instruction Disc (Relieving Salve) QL7",
+          "observedOnCorpses": 2,
+          "ratePct": 66.7,
+          "totalQty": 2
+        },
+        {
+          "lowId": 42620,
+          "highId": 42619,
+          "ql": 4,
+          "name": "Robot Junk",
+          "label": "42620-42619 Robot Junk QL4",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70565,
+          "highId": 85514,
+          "ql": 3,
+          "name": "Battered Low-Tech Armor Shorts",
+          "label": "70565-85514 Battered Low-Tech Armor Shorts QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85533,
+          "highId": 85532,
+          "ql": 3,
+          "name": "Battered Light Combat Armor Pants",
+          "label": "85533-85532 Battered Light Combat Armor Pants QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 85761,
+          "highId": 85760,
+          "ql": 3,
+          "name": "Battered Light Combat Armor Sleeves",
+          "label": "85761-85760 Battered Light Combat Armor Sleeves QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 121629,
+          "highId": 121630,
+          "ql": 3,
+          "name": "Rusty Spiked Axe",
+          "label": "121629-121630 Rusty Spiked Axe QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 123038,
+          "highId": 123039,
+          "ql": 5,
+          "name": "Ill-Treated Medium Shotgun",
+          "label": "123038-123039 Ill-Treated Medium Shotgun QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 124383,
+          "highId": 124384,
+          "ql": 3,
+          "name": "HSR Arms F-59",
+          "label": "124383-124384 HSR Arms F-59 QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 124391,
+          "highId": 124392,
+          "ql": 3,
+          "name": "OT Rancho Colonial Carbine",
+          "label": "124391-124392 OT Rancho Colonial Carbine QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 135719,
+          "highId": 135719,
+          "ql": 1,
+          "name": "Omni-Tek Suit",
+          "label": "135719 Omni-Tek Suit QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 153083,
+          "highId": 153084,
+          "ql": 3,
+          "name": "Obtuse G-Staff",
+          "label": "153083-153084 Obtuse G-Staff QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160216,
+          "highId": 160217,
+          "ql": 5,
+          "name": "East Wind Katana",
+          "label": "160216-160217 East Wind Katana QL5",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160704,
+          "highId": 160704,
+          "ql": 24,
+          "name": "Nano Crystal (Total Concentration)",
+          "label": "160704 Nano Crystal (Total Concentration) QL24",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 160736,
+          "highId": 160737,
+          "ql": 3,
+          "name": "Head Skinchip - ICC Engineer",
+          "label": "160736-160737 Head Skinchip - ICC Engineer QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201068,
+          "highId": 201069,
+          "ql": 3,
+          "name": "Omni-Scout Desert Armor Sleeves",
+          "label": "201068-201069 Omni-Scout Desert Armor Sleeves QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        },
+        {
+          "lowId": 201076,
+          "highId": 201077,
+          "ql": 3,
+          "name": "Omni-Scout Desert Armor Pants",
+          "label": "201076-201077 Omni-Scout Desert Armor Pants QL3",
+          "observedOnCorpses": 1,
+          "ratePct": 33.3,
+          "totalQty": 1
+        }
+      ]
+    },
+    {
+      "name": "Waste Collector",
+      "monsterData": "17714",
+      "corpses": 16,
+      "empty": 4,
+      "levels": [
+        2
+      ],
+      "creditsMin": 11,
+      "creditsMax": 11,
+      "creditsAvg": 11.0,
+      "drops": [
+        {
+          "lowId": 42620,
+          "highId": 42619,
+          "ql": 2,
+          "name": "Robot Junk",
+          "label": "42620-42619 Robot Junk QL2",
+          "observedOnCorpses": 8,
+          "ratePct": 50.0,
+          "totalQty": 8
+        },
+        {
+          "lowId": 248315,
+          "highId": 248315,
+          "ql": 1,
+          "name": "Fluid Sample",
+          "label": "248315 Fluid Sample QL1",
+          "observedOnCorpses": 4,
+          "ratePct": 25.0,
+          "totalQty": 4
+        },
+        {
+          "lowId": 248319,
+          "highId": 248319,
+          "ql": 1,
+          "name": "Fuel Chamber",
+          "label": "248319 Fuel Chamber QL1",
+          "observedOnCorpses": 4,
+          "ratePct": 25.0,
+          "totalQty": 4
+        },
+        {
+          "lowId": 70558,
+          "highId": 85640,
+          "ql": 2,
+          "name": "Battered Low-Tech Armor Boots",
+          "label": "70558-85640 Battered Low-Tech Armor Boots QL2",
+          "observedOnCorpses": 2,
+          "ratePct": 12.5,
+          "totalQty": 2
+        },
+        {
+          "lowId": 248334,
+          "highId": 248334,
+          "ql": 1,
+          "name": "Compression Chamber",
+          "label": "248334 Compression Chamber QL1",
+          "observedOnCorpses": 2,
+          "ratePct": 12.5,
+          "totalQty": 2
+        },
+        {
+          "lowId": 70561,
+          "highId": 85744,
+          "ql": 2,
+          "name": "Battered Low-Tech Armor Sleeves",
+          "label": "70561-85744 Battered Low-Tech Armor Sleeves QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        },
+        {
+          "lowId": 70562,
+          "highId": 85597,
+          "ql": 2,
+          "name": "Battered Low-Tech Armor Gloves",
+          "label": "70562-85597 Battered Low-Tech Armor Gloves QL2",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        },
+        {
+          "lowId": 297289,
+          "highId": 297289,
+          "ql": 1,
+          "name": "Shiny Sword",
+          "label": "297289 Shiny Sword QL1",
+          "observedOnCorpses": 1,
+          "ratePct": 6.2,
+          "totalQty": 1
+        }
+      ]
+    }
+  ]
+}

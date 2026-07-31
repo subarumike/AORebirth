@@ -32,23 +32,32 @@
 namespace ChatEngine.Packets
 {
     /// <summary>
-    /// The msg system.
+    /// Owner-only brown pet announce — AOSharp NpcMessage / ChatMessageType.NpcMessage = 35.
+    /// Not Vicinity (34). Not wiki SimpleSystemMessage (36).
     /// </summary>
     public static class MsgSystem
     {
         #region Public Methods and Operators
 
         /// <summary>
-        /// The create.
+        /// Capture 20260731-054922 / 20260731-pet-chat:
+        /// AOSharp NpcMessage [AoContract(35)]: short Unk1, string Text, short Unk2.
+        /// Live values Unk1=0 Unk2=1. Owner chat client only.
         /// </summary>
-        /// <param name="message">
-        /// </param>
-        /// <returns>
-        /// </returns>
         public static byte[] Create(string message)
         {
-            PacketWriter writer = new PacketWriter(36);
-            writer.WriteString(message);
+            return Create(message, 0, 1);
+        }
+
+        /// <summary>
+        /// Wire: type 35 | payloadLen | i16be Unk1 | AO string | i16be Unk2.
+        /// </summary>
+        public static byte[] Create(string message, int unk1, int unk2)
+        {
+            PacketWriter writer = new PacketWriter((ushort)MessageType.AnonymousMessage);
+            writer.WriteUInt16(unchecked((ushort)(short)unk1));
+            writer.WriteString(message ?? string.Empty);
+            writer.WriteUInt16(unchecked((ushort)(short)unk2));
             return writer.Finish();
         }
 

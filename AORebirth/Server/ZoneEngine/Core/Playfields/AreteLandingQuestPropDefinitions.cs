@@ -14,7 +14,7 @@ namespace ZoneEngine.Core.Playfields
     using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
 
     /// <summary>
-    /// Capture-backed Arete Landing quest world props (cargo box + gas fires).
+    /// Capture-backed Arete Landing quest world props (cargo box + gas fires + credit card).
     /// Cargo: Terminal:56D9B4AF / template 297277 (rex_b18d_cargo_box_staticdynel_result).
     /// Gas fires around Marcus pad (template 295883):
     ///   57961EAA (3599.267, 42.754, 843.976),
@@ -23,6 +23,7 @@ namespace ZoneEngine.Core.Playfields
     ///   579BA8B4 (3636.222, 43.587, 845.991) — capture 20260720-061810;
     ///   plus near-pad 579ADB41 / extinguish 579ADB38.
     /// Capture 20260720-064523 did not re-send Gas Fire SIFUs; pad positions remain from 061810.
+    /// Credit card: Terminal:57A9CCBE / template 297315 — capture 20260730-214622.
     /// </summary>
     internal static class AreteLandingQuestPropDefinitions
     {
@@ -43,6 +44,9 @@ namespace ZoneEngine.Core.Playfields
         // Capture 20260721-sara: Remains of Shop Thief (itemnames 295620).
         private const int RemainsOfShopThiefTemplateId = 295620;
 
+        // Capture 20260730-214622: Bank of Rubi-Ka Credit Card on floor (instance rotates on live).
+        private const int CreditCardWorldTemplateId = 297315;
+
         private const int CargoBoxFlags = 139265;
 
         // Capture Flags=-2146819551 for Gas Fire SIFU.
@@ -58,6 +62,9 @@ namespace ZoneEngine.Core.Playfields
         private const int MerchantsStrongboxFlags = unchecked((int)0x80003201);
 
         private const int RemainsOfShopThiefFlags = unchecked((int)0x80003201);
+
+        // Capture 20260730-214622 SIFU Flags=201326593 (0x0C000001).
+        private const int CreditCardWorldFlags = 201326593;
 
         private sealed class PropDefinition
         {
@@ -263,6 +270,21 @@ namespace ZoneEngine.Core.Playfields
                 Hz = 0f,
                 Hw = 1f,
                 Evidence = "20260721-sara Remains of Shop Thief Terminal:574187CF"
+            },
+            new PropDefinition
+            {
+                // Capture 20260730-214622 Terminal:57A9CCBE — Leonora credit card floor prop.
+                Instance = unchecked((int)0x57A9CCBE),
+                TemplateId = CreditCardWorldTemplateId,
+                Flags = CreditCardWorldFlags,
+                X = 3449.29f,
+                Y = 0.01f,
+                Z = 889.0669f,
+                Hx = 0f,
+                Hy = 0.9866799f,
+                Hz = 0f,
+                Hw = 0.1626736f,
+                Evidence = "20260730-214622 Bank of Rubi-Ka Credit Card Terminal:57A9CCBE"
             },
             // Exit Arete Landing is playfields.dat Terminal:C0001999 (tpl 297303) — do not inject
             // a second StaticDynel (duplicate + wrong facing). Use is wired in VaughnHammondQuestRuntime.

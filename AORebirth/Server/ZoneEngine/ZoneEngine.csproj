@@ -151,6 +151,8 @@
     <Compile Include="Core\Arete\Quests\KneecappingQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\StanGoodmanQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\SarahGreeneQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\LeonoraMartyQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\LeonoraMartyTipSender.cs" />
     <Compile Include="Core\Arete\Quests\VernonGodfrayQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\DoctorMasonQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\DoctorMasonTipSender.cs" />
@@ -544,6 +546,8 @@
     <Compile Include="Core\Playfields\AreteFinishCaptureMobRuntime.cs" />
     <Compile Include="Core\Playfields\LoreleiOasisMobRuntime.cs" />
     <Compile Include="Core\Playfields\SurveillanceDroidRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteMobDiagnosticSwitches.cs" />
+    <Compile Include="Core\Playfields\AreteLeonoraMartyPatrolRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingQuestPropDefinitions.cs" />
     <Compile Include="Core\Playfields\HoloDeckSpawn.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
@@ -554,6 +558,7 @@
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteLandingLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
     <Compile Include="Core\Playfields\CapturedIntObservationCursor.cs" />

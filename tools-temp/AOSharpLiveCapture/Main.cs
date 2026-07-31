@@ -238,7 +238,6 @@ namespace AOSharpLiveCapture
         private bool respawnCaptureRequested;
         private bool lootCaptureRequested;
 
-        [Obsolete]
         public override void Run(string pluginDir)
         {
             bool initializationAttempted = false;

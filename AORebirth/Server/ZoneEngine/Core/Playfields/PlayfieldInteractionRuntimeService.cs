@@ -76,6 +76,12 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            // Capture 20260730-214622: Use Bank of Rubi-Ka Credit Card floor Terminal → tips + item.
+            if (LeonoraMartyQuestRuntime.TryHandleCreditCardPickup(client, message, target))
+            {
+                return true;
+            }
+
             // Capture 20260719-224226: Use Health Regeneration Stim on selected Wounded Dockworker.
             if (MarcusWoundedWorkersQuestRuntime.TryHandleStimUse(client, message, target))
             {
