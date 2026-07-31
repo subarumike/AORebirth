@@ -327,6 +327,8 @@
     <Compile Include="Core\Missions\MissionRollFeeRules.cs" />
     <Compile Include="Core\Missions\MissionRollFeeService.cs" />
     <Compile Include="Core\Missions\MissionOfferStore.cs" />
+    <Compile Include="Core\Missions\MissionLevelGraph.cs" />
+    <Compile Include="Core\Missions\MissionLevelGraphData.g.cs" />
     <Compile Include="Core\Missions\MissionLevelTable.cs" />
     <Compile Include="Core\Missions\MissionKeyStore.cs" />
     <Compile Include="Core\Missions\MissionDiagnostics.cs" />
@@ -918,9 +920,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\PerkActions.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XML Data\MissionLevels.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Clusters.json">

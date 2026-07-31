@@ -2,6 +2,39 @@
 
 ## Active
 
+TASK ID: OFFICIAL-MISSION-LEVEL-GRAPH-001
+
+Generated-terminal mission rolling now requires one complete validated official
+mission-level graph before it can resolve a mission QL. Runtime data is compiled
+from the canonical checked-in `XML Data/MissionLevels.csv` by
+`tools/generate_mission_level_graph.cmd`; the production ZoneEngine no longer
+searches for or partially reads an external CSV or ODS at runtime.
+
+The generated format contains exactly levels `1..220`, exactly difficulty
+positions `Q0..Q10`, and the unchanged official token column. Its canonical
+LF-normalized source and payload SHA-256 is
+`295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f`.
+The upstream ODS SHA-256 is
+`5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`;
+its mission cells match the canonical table through level 133, but levels
+134–220 were spreadsheet-coerced into lossy scientific notation, so the ODS is
+provenance rather than an exact full-table regeneration source.
+
+The loader rejects malformed headers or decimal tokens, duplicate rows or
+difficulty cells, missing or extra rows/columns, levels or difficulty indexes
+outside their exact ranges, mission QLs outside `1..250`, token counts outside
+the unchanged `1..9` table range, row/column/token decreases, and any row whose
+neutral `Q5` value does not equal its level. It validates the embedded payload
+hash and full deterministic serialization before atomically publishing one
+immutable snapshot. A failed reload cannot partially replace a valid snapshot;
+without a valid snapshot, mission rolling fails explicitly before any fee is
+charged.
+
+No mission-location selection, sliders, rewards, token progress, expiry, corpse
+state, ACG layout, authored quest, or database behavior changes in this task.
+
+## Previous completed status
+
 TASK ID: GENERATED-MISSION-TOKEN-PROGRESS-001
 
 Generated-terminal mission token progress is being moved from the process-local
@@ -44,7 +77,7 @@ Durable team token distribution remains deferred because generated mission
 bindings currently have authoritative explicit no-team ownership only. Authored
 quests and unrelated token systems retain their existing paths.
 
-## Previous completed status
+## Earlier completed status
 
 TASK ID: GENERATED-MISSION-LIVE-EXPIRY-001
 

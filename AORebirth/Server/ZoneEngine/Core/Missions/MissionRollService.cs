@@ -73,14 +73,15 @@ namespace ZoneEngine.Core.Missions
         {
             EnsureInitialized();
 
-            int missionQuality;
-            if (request == null
-                || !MissionLevelTable.TryGetMissionQuality(characterLevel, request.LevelSlider, out missionQuality))
+            if (request == null)
             {
-                throw new ArgumentOutOfRangeException(
-                    "request",
-                    "Mission roll contains an unsupported difficulty detent.");
+                throw new ArgumentNullException("request");
             }
+
+            int missionQuality =
+                ResolveMissionQualityForRoll(
+                    characterLevel,
+                    request.LevelSlider);
 
             MissionSliderProfile sliders;
             string sliderError;
@@ -121,14 +122,15 @@ namespace ZoneEngine.Core.Missions
         {
             EnsureInitialized();
 
-            int missionQuality;
-            if (request == null
-                || !MissionLevelTable.TryGetMissionQuality(characterLevel, request.LevelSlider, out missionQuality))
+            if (request == null)
             {
-                throw new ArgumentOutOfRangeException(
-                    "request",
-                    "Mission roll contains an unsupported difficulty detent.");
+                throw new ArgumentNullException("request");
             }
+
+            int missionQuality =
+                ResolveMissionQualityForRoll(
+                    characterLevel,
+                    request.LevelSlider);
 
             MissionSliderProfile sliders;
             string sliderError;
@@ -157,6 +159,26 @@ namespace ZoneEngine.Core.Missions
                     nextQuestInstance++;
                     return allocated;
                 });
+        }
+
+        internal static int ResolveMissionQualityForRoll(
+            int characterLevel,
+            int difficultyWireValue)
+        {
+            return MissionLevelTable.GetRequiredMissionQualityForRoll(
+                characterLevel,
+                difficultyWireValue);
+        }
+
+        internal static int ResolveMissionQualityForRoll(
+            MissionLevelGraphPublication publication,
+            int characterLevel,
+            int difficultyWireValue)
+        {
+            return MissionLevelTable.GetRequiredMissionQualityForRoll(
+                publication,
+                characterLevel,
+                difficultyWireValue);
         }
 
         private static QuestAlternativeMessage BuildRollResponseCore(

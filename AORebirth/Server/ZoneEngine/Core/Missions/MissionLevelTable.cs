@@ -3,56 +3,42 @@ namespace ZoneEngine.Core.Missions
     #region Usings ...
 
     using System;
-    using System.Globalization;
-    using System.IO;
 
     #endregion
 
     /// <summary>
-    /// Maps a character level plus the mission-terminal Easy/Hard (level) slider position to the mission QL
-    /// that should be rolled, and to the token reward for that level. The data is the authoritative
-    /// per-level table shipped in <c>XML Data/MissionLevels.csv</c> (levels 1-220, 11 slider columns from
-    /// easiest/left to hardest/right, plus the token count).
+    /// Maps character level plus the mission-terminal Easy/Hard detent to the
+    /// exact official mission quality. Runtime data is compiled from the
+    /// canonical checked-in source by <c>tools/generate_mission_level_graph.cmd</c>.
+    /// The complete 220-level by 11-position graph is validated before one
+    /// immutable snapshot is published.
     ///
-    /// The Easy/Hard slider has 11 detents; finalized requests prove that the client sends its position in
-    /// <see cref="SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAlternativeMessage.LevelSlider"/>
-    /// as a one-based wire value (1..11). QL = table[clampedCharacterLevel][wireValue - 1].
+    /// The client sends the difficulty detent as the captured one-based wire
+    /// value 1..11. QL = graph[clampedCharacterLevel][wireValue - 1].
     /// </summary>
     internal static class MissionLevelTable
     {
-        internal const int SliderPositions = 11;
+        internal const int SliderPositions =
+            MissionLevelGraph.DifficultyCount;
 
         internal const byte MinimumDifficultyWireValue = 1;
 
         internal const byte MaximumDifficultyWireValue = 11;
 
-        private const int MinLevel = 1;
-
-        private const int MaxLevel = 220;
-
         private static readonly object InitLock = new object();
 
-        // [level-1][sliderIndex] mission QL; tokens[level-1] reward count. Null until loaded.
-        private static int[][] qualityByLevel;
+        private static readonly MissionLevelGraphPublication Publication =
+            new MissionLevelGraphPublication();
 
-        private static int[] tokensByLevel;
+        private static volatile bool initialized;
 
-        /// <summary>
-        /// Returns the mission QL for a character level and one-based difficulty wire value. Character level
-        /// is clamped to the table's 1..220 range. Unsupported wire values and missing rows fail closed.
-        /// </summary>
-        public static int GetMissionQuality(int characterLevel, int difficultyWireValue)
+        public static int GetMissionQuality(
+            int characterLevel,
+            int difficultyWireValue)
         {
-            int quality;
-            if (!TryGetMissionQuality(characterLevel, difficultyWireValue, out quality))
-            {
-                throw new ArgumentOutOfRangeException(
-                    "difficultyWireValue",
-                    difficultyWireValue,
-                    "Mission difficulty must be a captured one-based detent from 1 through 11.");
-            }
-
-            return quality;
+            return GetRequiredMissionQualityForRoll(
+                characterLevel,
+                difficultyWireValue);
         }
 
         internal static bool TryGetMissionQuality(
@@ -60,166 +46,236 @@ namespace ZoneEngine.Core.Missions
             int difficultyWireValue,
             out int missionQuality)
         {
+            string failure;
+            return TryGetMissionQuality(
+                characterLevel,
+                difficultyWireValue,
+                out missionQuality,
+                out failure);
+        }
+
+        internal static bool TryGetMissionQuality(
+            int characterLevel,
+            int difficultyWireValue,
+            out int missionQuality,
+            out string failure)
+        {
             missionQuality = 0;
-            int sliderIndex;
-            if (!TryDecodeDifficultySlider(difficultyWireValue, out sliderIndex))
+            failure = string.Empty;
+
+            int difficultyIndex;
+            if (!TryDecodeDifficultySlider(
+                    difficultyWireValue,
+                    out difficultyIndex))
             {
                 return false;
             }
 
             EnsureLoaded();
-            if (qualityByLevel == null)
+            MissionLevelGraph graph;
+            if (!Publication.TryGet(out graph, out failure))
             {
                 return false;
             }
 
             int level = ClampCharacterLevel(characterLevel);
-            int[] row = qualityByLevel[level - 1];
-            if (row == null || sliderIndex < 0 || sliderIndex >= row.Length)
+            if (!graph.TryGetMissionQuality(
+                    level,
+                    difficultyIndex,
+                    out missionQuality))
             {
+                failure =
+                    "The validated official mission-level graph lacks the requested cell.";
+                missionQuality = 0;
                 return false;
             }
 
-            missionQuality = row[sliderIndex];
-            return missionQuality > 0;
+            return true;
         }
 
-        internal static bool TryDecodeDifficultySlider(int difficultyWireValue, out int sliderIndex)
+        internal static int GetRequiredMissionQualityForRoll(
+            int characterLevel,
+            int difficultyWireValue)
         {
-            sliderIndex = -1;
+            EnsureLoaded();
+            return GetRequiredMissionQualityForRoll(
+                Publication,
+                characterLevel,
+                difficultyWireValue);
+        }
+
+        internal static int GetRequiredMissionQualityForRoll(
+            MissionLevelGraphPublication publication,
+            int characterLevel,
+            int difficultyWireValue)
+        {
+            int difficultyIndex;
+            if (!TryDecodeDifficultySlider(
+                    difficultyWireValue,
+                    out difficultyIndex))
+            {
+                throw new ArgumentOutOfRangeException(
+                    "difficultyWireValue",
+                    difficultyWireValue,
+                    "Mission difficulty must be a captured one-based detent from 1 through 11.");
+            }
+
+            if (publication == null)
+            {
+                throw new ArgumentNullException("publication");
+            }
+
+            MissionLevelGraph graph;
+            string failure;
+            if (!publication.TryGet(out graph, out failure))
+            {
+                throw new InvalidOperationException(
+                    "The official mission-level graph is unavailable or invalid: "
+                    + failure);
+            }
+
+            int missionQuality;
+            int level = ClampCharacterLevel(characterLevel);
+            if (!graph.TryGetMissionQuality(
+                    level,
+                    difficultyIndex,
+                    out missionQuality))
+            {
+                throw new InvalidOperationException(
+                    "The validated official mission-level graph lacks the requested cell.");
+            }
+
+            return missionQuality;
+        }
+
+        internal static bool TryDecodeDifficultySlider(
+            int difficultyWireValue,
+            out int difficultyIndex)
+        {
+            difficultyIndex = -1;
             if (difficultyWireValue < MinimumDifficultyWireValue
                 || difficultyWireValue > MaximumDifficultyWireValue)
             {
                 return false;
             }
 
-            sliderIndex = difficultyWireValue - MinimumDifficultyWireValue;
+            difficultyIndex =
+                difficultyWireValue - MinimumDifficultyWireValue;
             return true;
         }
 
         internal static int ClampCharacterLevel(int characterLevel)
         {
-            return Clamp(characterLevel, MinLevel, MaxLevel);
+            if (characterLevel < MissionLevelGraph.MinimumLevel)
+            {
+                return MissionLevelGraph.MinimumLevel;
+            }
+
+            return characterLevel > MissionLevelGraph.MaximumLevel
+                       ? MissionLevelGraph.MaximumLevel
+                       : characterLevel;
+        }
+
+        internal static bool IsGraphAvailable
+        {
+            get
+            {
+                EnsureLoaded();
+                MissionLevelGraph graph;
+                string failure;
+                return Publication.TryGet(out graph, out failure);
+            }
+        }
+
+        internal static string LastLoadError
+        {
+            get
+            {
+                EnsureLoaded();
+                MissionLevelGraph graph;
+                string failure;
+                return Publication.TryGet(out graph, out failure)
+                           ? string.Empty
+                           : failure;
+            }
         }
 
         /// <summary>
-        /// Returns the token reward for completing a mission rolled at the given character level.
+        /// Returns the unchanged official token reward column for a mission
+        /// rolled at the supplied character level.
         /// </summary>
         public static int GetTokenReward(int characterLevel)
         {
             EnsureLoaded();
-
-            if (tokensByLevel == null)
+            MissionLevelGraph graph;
+            string failure;
+            if (!Publication.TryGet(out graph, out failure))
             {
                 return 0;
             }
 
-            int level = ClampCharacterLevel(characterLevel);
-            return tokensByLevel[level - 1];
-        }
-
-        private static int Clamp(int value, int min, int max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
+            int tokenCount;
+            return graph.TryGetTokenCount(
+                       ClampCharacterLevel(characterLevel),
+                       out tokenCount)
+                       ? tokenCount
+                       : 0;
         }
 
         private static void EnsureLoaded()
         {
-            if (qualityByLevel != null)
+            if (initialized)
             {
                 return;
             }
 
             lock (InitLock)
             {
-                if (qualityByLevel != null)
+                if (initialized)
                 {
                     return;
                 }
 
-                var quality = new int[MaxLevel][];
-                var tokens = new int[MaxLevel];
+                string sourceProvenance =
+                    MissionLevelGraphData.SourceRepositoryPath
+                    + " SHA-256 "
+                    + MissionLevelGraphData.SourceSha256
+                    + "; upstream "
+                    + MissionLevelGraphData.UpstreamOdsFileName
+                    + " SHA-256 "
+                    + MissionLevelGraphData.UpstreamOdsSha256
+                    + " ("
+                    + MissionLevelGraphData.UpstreamOdsVerification
+                    + ")";
+                string failure;
+                bool loaded = Publication.TryPublish(
+                    MissionLevelGraphData.CanonicalCsv,
+                    MissionLevelGraphData.CanonicalPayloadSha256,
+                    MissionLevelGraphData.SourceSha256,
+                    sourceProvenance,
+                    out failure);
 
-                string path = FindDataFile("MissionLevels.csv");
-                if (path == null || !File.Exists(path))
+                initialized = true;
+                if (loaded)
                 {
-                    return;
+                    MissionDiagnostics.Log(
+                        "MISSION-LEVEL-GRAPH loaded format={0} levels={1} positions={2} sourceSha256={3} payloadSha256={4}",
+                        MissionLevelGraphData.FormatVersion,
+                        MissionLevelGraph.MaximumLevel,
+                        MissionLevelGraph.DifficultyCount,
+                        MissionLevelGraphData.SourceSha256,
+                        MissionLevelGraphData.CanonicalPayloadSha256);
                 }
-
-                foreach (string rawLine in File.ReadAllLines(path))
+                else
                 {
-                    string line = rawLine == null ? string.Empty : rawLine.Trim();
-                    if (line.Length == 0 || line.StartsWith("Level", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    string[] parts = line.Split(',');
-                    if (parts.Length < 2 + SliderPositions)
-                    {
-                        continue;
-                    }
-
-                    int level;
-                    if (!int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out level)
-                        || level < MinLevel || level > MaxLevel)
-                    {
-                        continue;
-                    }
-
-                    var row = new int[SliderPositions];
-                    bool ok = true;
-                    for (int i = 0; i < SliderPositions; i++)
-                    {
-                        if (!int.TryParse(parts[1 + i], NumberStyles.Integer, CultureInfo.InvariantCulture, out row[i]))
-                        {
-                            ok = false;
-                            break;
-                        }
-                    }
-
-                    if (!ok)
-                    {
-                        continue;
-                    }
-
-                    int token;
-                    int.TryParse(parts[1 + SliderPositions], NumberStyles.Integer, CultureInfo.InvariantCulture, out token);
-
-                    quality[level - 1] = row;
-                    tokens[level - 1] = token;
-                }
-
-                tokensByLevel = tokens;
-                qualityByLevel = quality;
-            }
-        }
-
-        private static string FindDataFile(string fileName)
-        {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string[] candidates =
-                {
-                    Path.Combine(baseDir, "XML Data", fileName),
-                    Path.Combine(baseDir, fileName),
-                    Path.Combine(Directory.GetCurrentDirectory(), "XML Data", fileName),
-                    Path.Combine(Directory.GetCurrentDirectory(), fileName)
-                };
-
-            foreach (string candidate in candidates)
-            {
-                if (File.Exists(candidate))
-                {
-                    return candidate;
+                    MissionDiagnostics.Log(
+                        "MISSION-LEVEL-GRAPH INVALID source={0} sourceSha256={1} payloadSha256={2} reason={3}",
+                        MissionLevelGraphData.SourceRepositoryPath,
+                        MissionLevelGraphData.SourceSha256,
+                        MissionLevelGraphData.CanonicalPayloadSha256,
+                        failure);
                 }
             }
-
-            return null;
         }
     }
 }
