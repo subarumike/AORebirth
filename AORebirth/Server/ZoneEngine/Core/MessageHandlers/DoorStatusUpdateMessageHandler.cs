@@ -12,7 +12,7 @@ namespace ZoneEngine.Core.MessageHandlers
     public sealed class DoorStatusUpdateMessageHandler :
         BaseMessageHandler<DoorStatusUpdateMessage, DoorStatusUpdateMessageHandler>
     {
-        public void SendStatus(ICharacter character, Identity door, bool open)
+        public void SendStatus(ICharacter character, Identity door, bool isOpen)
         {
             if (character == null)
             {
@@ -32,7 +32,9 @@ namespace ZoneEngine.Core.MessageHandlers
                     message.Unknown = 0;
                     message.Unknown1 = 2;
                     message.Unknown2 = 0;
-                    message.Unknown3 = open ? (byte)1 : (byte)0;
+                    // Gamecode.dll DoorStatusUpdateIIR_t::PollStatus dispatches this
+                    // exact member to the client DoorOpened/DoorClosed paths.
+                    message.Unknown3 = isOpen ? (byte)1 : (byte)0;
                     message.Unknown4 = 0;
                     message.Unknown5 = 0;
                     message.Unknown6 = new Identity[0];

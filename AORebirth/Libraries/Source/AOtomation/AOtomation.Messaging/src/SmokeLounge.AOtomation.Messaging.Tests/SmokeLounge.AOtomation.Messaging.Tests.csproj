@@ -461,6 +461,9 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\TempleDoorProximityRuntime.cs">
+      <Link>TempleDoorProximityRuntime.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
       <Link>PlayfieldCollisionGeometry.cs</Link>
     </Compile>
