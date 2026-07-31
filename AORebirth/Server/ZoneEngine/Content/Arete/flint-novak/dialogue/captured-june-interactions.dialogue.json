@@ -1,0 +1,526 @@
+{
+  "Identity": {
+    "Id": "arete-captured-june-interactions",
+    "Version": "1.0.0",
+    "Source": "tools-temp/arete-analysis/dialogue_trees.md:74-147"
+  },
+  "SourceCaptures": [
+    "20260614-214819",
+    "20260614-221915"
+  ],
+  "Npcs": [
+    {
+      "Id": "barry_the_food_vendor_782DE582",
+      "NpcIdentity": "SimpleChar:782DE582",
+      "Name": "Barry the Food Vendor",
+      "RootNodeId": "barry_root",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "barry_root",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured",
+          "Options": [
+            {
+              "Id": "barry_root_0",
+              "Index": 0,
+              "Text": "Desmond Calitri sent me here for a Bronto Burger.",
+              "TextEvidence": "dialogue_trees.md:83; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "barry_root_1",
+              "Index": 1,
+              "Text": "What do you have to sell?",
+              "TextEvidence": "dialogue_trees.md:83; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "barry_root_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:83; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "barry_evidence_burger_question",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "barry_burger_0",
+              "Index": 0,
+              "Text": "What is in these Bronto burgers?",
+              "TextEvidence": "dialogue_trees.md:86; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "barry_burger_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:86; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "barry_evidence_goodbye",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "barry_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:88; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "boris_the_peacekeeper_782DE699",
+      "NpcIdentity": "SimpleChar:782DE699",
+      "Name": "Boris the Peacekeeper",
+      "RootNodeId": "boris_root",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "boris_root",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured",
+          "Options": [
+            {
+              "Id": "boris_root_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "dialogue_trees.md:101; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_root_1",
+              "Index": 1,
+              "Text": "I haven't seen any violence...",
+              "TextEvidence": "dialogue_trees.md:101; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_root_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:101; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "boris_evidence_roles",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "boris_roles_0",
+              "Index": 0,
+              "Text": "What kinds of roles were those?",
+              "TextEvidence": "dialogue_trees.md:103; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_roles_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:103; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "boris_evidence_tournament",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "boris_tournament_0",
+              "Index": 0,
+              "Text": "Underground fighting tournament?",
+              "TextEvidence": "dialogue_trees.md:105; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_tournament_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:105; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "boris_evidence_suppression",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "boris_suppression_0",
+              "Index": 0,
+              "Text": "What is Suppresion Gas?",
+              "TextEvidence": "dialogue_trees.md:107; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_suppression_1",
+              "Index": 1,
+              "Text": "Are there any areas of low suppression gas around here?",
+              "TextEvidence": "dialogue_trees.md:107; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_suppression_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:107; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "boris_evidence_values",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "boris_values_0",
+              "Index": 0,
+              "Text": "Tell me more about the different Suppression Gas values.",
+              "TextEvidence": "dialogue_trees.md:109; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_values_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:109; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "boris_evidence_low_suppression",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "boris_low_0",
+              "Index": 0,
+              "Text": "Are there any areas of low suppression gas around here?",
+              "TextEvidence": "dialogue_trees.md:111; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "boris_low_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:111; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "boris_evidence_goodbye",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "boris_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:113; 20260614-221915",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    },
+    {
+      "Id": "desmond_calitri_782DE57C",
+      "NpcIdentity": "SimpleChar:782DE57C",
+      "Name": "Desmond Calitri",
+      "RootNodeId": "desmond_root",
+      "Aliases": [],
+      "Nodes": [
+        {
+          "Id": "desmond_root",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured",
+          "Options": [
+            {
+              "Id": "desmond_root_0",
+              "Index": 0,
+              "Text": "Do you have any work around here?",
+              "TextEvidence": "dialogue_trees.md:126; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_root_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "dialogue_trees.md:126; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_root_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:126; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_initial_goodbye",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_initial_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:128; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_burger_delivery",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; mission-state-link-observed-but-runtime-key-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_burger_0",
+              "Index": 0,
+              "Text": "I have your Bronto Burger.",
+              "TextEvidence": "dialogue_trees.md:133; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_burger_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "dialogue_trees.md:133; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_burger_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:133; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_help",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_help_0",
+              "Index": 0,
+              "Text": "What do you need help with?",
+              "TextEvidence": "dialogue_trees.md:136; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_help_1",
+              "Index": 1,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:136; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_help_goodbye",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_help_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:138; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_protester_return",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; mission-state-link-observed-but-runtime-key-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_protester_0",
+              "Index": 0,
+              "Text": "I took care of those protesters.",
+              "TextEvidence": "dialogue_trees.md:142; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_protester_1",
+              "Index": 1,
+              "Text": "I have some questions...",
+              "TextEvidence": "dialogue_trees.md:142; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_protester_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:142; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_decision",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_decision_0",
+              "Index": 0,
+              "Text": "I'll take care of it.",
+              "TextEvidence": "dialogue_trees.md:144; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_decision_1",
+              "Index": 1,
+              "Text": "Something about this doesn't seem right...",
+              "TextEvidence": "dialogue_trees.md:144; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            },
+            {
+              "Id": "desmond_decision_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:144; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "desmond_evidence_final_goodbye",
+          "PromptText": "",
+          "PromptTextConfidence": "not-captured; answer-index-semantics-unresolved",
+          "Options": [
+            {
+              "Id": "desmond_final_goodbye_0",
+              "Index": 0,
+              "Text": "Goodbye",
+              "TextEvidence": "dialogue_trees.md:146; 20260614-214819",
+              "NextNodeId": "close",
+              "Conditions": [],
+              "Actions": [ { "Type": "EndDialogue" } ]
+            }
+          ],
+          "EnterActions": []
+        }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,8 @@
     "dialogue/lolly-the-reet.dialogue.json",
     "dialogue/shipping-manifest-terminal.dialogue.json",
     "dialogue/marco-spida.dialogue.json",
-    "dialogue/vaughn-hammond.dialogue.json"
+    "dialogue/vaughn-hammond.dialogue.json",
+    "dialogue/captured-june-interactions.dialogue.json"
   ],
   "QuestPacks": [
     "quests/flint-novak.quests.json"

@@ -109,8 +109,13 @@ namespace ZoneEngine.Core.Playfields
 
         private const int MissingVisualId = 1234567890;
 
-        // Capture complete respawns ~40–152s; use 60s soft timer until more complete rows.
-        private const double RespawnSeconds = 60.0;
+        // Alien-family timings remain unresolved and retain the prior 60-second soft timer.
+        private const double DefaultRespawnSeconds = 60.0;
+
+        // Captures 20260722-104809/152454: ordinary Rollerrats and Angry
+        // Minibulls respawn at approximately 40 seconds. Harvey and alien
+        // families retain the prior default because their timing is unresolved.
+        private const double CapturedWildlifeRespawnSeconds = 40.0;
 
         // Minibull / Saltworm / Harvey / Rollerrat AOS at 5m.
         // Capture 20260726-230559: Spider / Scout / Specialist are passive until player attacks.
@@ -441,7 +446,8 @@ namespace ZoneEngine.Core.Playfields
                 }
                 else if (timers[i] == DateTime.MaxValue)
                 {
-                    timers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(RespawnSeconds);
+                    timers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(
+                        ResolveRespawnSeconds(Slots[i]));
                 }
                 else if (!(timers[i] > DateTime.UtcNow)
                          && SpawnSlot(playfield, playfieldIdentity, activateNpc, i) != null)
@@ -449,6 +455,23 @@ namespace ZoneEngine.Core.Playfields
                     timers[i] = DateTime.MaxValue;
                 }
             }
+        }
+
+        private static double ResolveRespawnSeconds(MobSlot slot)
+        {
+            if (slot == null)
+            {
+                return DefaultRespawnSeconds;
+            }
+
+            if (slot.Kind == MobKind.Rollerrat
+                || (slot.Kind == MobKind.Minibull
+                    && string.Equals(slot.Name, "Angry Minibull", StringComparison.Ordinal)))
+            {
+                return CapturedWildlifeRespawnSeconds;
+            }
+
+            return DefaultRespawnSeconds;
         }
 
         private static Character SpawnSlot(

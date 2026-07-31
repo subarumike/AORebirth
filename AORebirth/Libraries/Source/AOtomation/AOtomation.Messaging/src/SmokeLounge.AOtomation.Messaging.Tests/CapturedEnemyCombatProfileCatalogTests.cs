@@ -21,6 +21,227 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public TestContext TestContext { get; set; }
 
         [TestMethod]
+        public void AreteFixedNaturalAttackContractsResolveCapturedPacketStreamsWithoutPhysicalWifu()
+        {
+            CapturedEnemyCombatProfileDefinition[] areteProfiles =
+                CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
+                    value => value.ResourceId == 6553).ToArray();
+            Assert.AreEqual(43, areteProfiles.Length);
+            Assert.AreEqual(
+                43,
+                areteProfiles.Count(value => value.CaptureEvidenceSafe));
+
+            var cases = new[]
+            {
+                new { Name = "Garbage Flea", MonsterData = 17657, Level = 1, Min = 6, Max = 8, RequestedSlot = 1, RequestedInstance = 1279612721, ExpectedSlot = 1, ExpectedInstance = 1279612722 },
+                new { Name = "Rollerrat", MonsterData = 17687, Level = 6, Min = 5, Max = 7, RequestedSlot = 0, RequestedInstance = 1279612721, ExpectedSlot = 0, ExpectedInstance = 1279612721 },
+                new { Name = "Gnarl the Roller", MonsterData = 17687, Level = 7, Min = 5, Max = 9, RequestedSlot = 0, RequestedInstance = 1279612721, ExpectedSlot = 0, ExpectedInstance = 1380931377 },
+                new { Name = "Waste Collector", MonsterData = 17714, Level = 2, Min = 8, Max = 8, RequestedSlot = 1, RequestedInstance = 1279612721, ExpectedSlot = 1, ExpectedInstance = 1279612722 },
+                new { Name = "Cleaning Robot", MonsterData = 297023, Level = 1, Min = 4, Max = 6, RequestedSlot = 0, RequestedInstance = 1279612721, ExpectedSlot = 0, ExpectedInstance = 1279612721 },
+                new { Name = "Cleanmeister Intelligence Robot", MonsterData = 297023, Level = 2, Min = 6, Max = 6, RequestedSlot = 1, RequestedInstance = 1279612721, ExpectedSlot = 1, ExpectedInstance = 1279612722 },
+                new { Name = "Malfunctioning Cleaning Robot", MonsterData = 297023, Level = 1, Min = 6, Max = 12, RequestedSlot = 0, RequestedInstance = 0, ExpectedSlot = 0, ExpectedInstance = 1279874865 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 8, Min = 5, Max = 20, RequestedSlot = 0, RequestedInstance = 1279612721, ExpectedSlot = 0, ExpectedInstance = 1279612721 },
+                new { Name = "32-V Docker", MonsterData = 17649, Level = 3, Min = 4, Max = 14, RequestedSlot = 1, RequestedInstance = 1279612721, ExpectedSlot = 1, ExpectedInstance = 1279612722 },
+                new { Name = "Desert Reet", MonsterData = 30365, Level = 5, Min = 6, Max = 8, RequestedSlot = 0, RequestedInstance = 1279612721, ExpectedSlot = 0, ExpectedInstance = 1380276017 },
+                new { Name = "Supreme Collector of Waste", MonsterData = 17714, Level = 4, Min = 8, Max = 8, RequestedSlot = 1, RequestedInstance = 1279612721, ExpectedSlot = 1, ExpectedInstance = 1279612722 }
+            };
+
+            foreach (var item in cases)
+            {
+                CapturedEnemyCombatContract baseline =
+                    CreateAreteFixedNaturalAttackBaseline(
+                        "capture-backed Arete fixed natural attack",
+                        item.Min,
+                        item.Max,
+                        2.0d,
+                        item.RequestedSlot,
+                        0,
+                        item.RequestedInstance,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0);
+                Assert.IsFalse(baseline.UsesProductionSpecializedValues);
+
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        6553,
+                        item.Name,
+                        item.MonsterData,
+                        item.Level,
+                        0,
+                        baseline,
+                        out resolved,
+                        out failure),
+                    item.Name + " L" + item.Level + ": " + failure);
+                Assert.IsTrue(resolved.IsCombatReady, item.Name);
+                Assert.IsTrue(resolved.UsesCaptureProvenArchetype, item.Name);
+                Assert.IsTrue(resolved.UsesProductionSpecializedValues, item.Name);
+                StringAssert.Contains(resolved.Evidence, "wifu=natural-none");
+                StringAssert.Contains(
+                    resolved.CaptureProvenArchetypeId,
+                    "resource=6553|name=" + item.Name + "|MonsterData="
+                    + item.MonsterData);
+                StringAssert.Contains(
+                    resolved.CaptureProvenArchetypeId,
+                    "|streamSlot=" + item.ExpectedSlot);
+                Assert.IsNotNull(resolved.SpecialAttackSequence, item.Name);
+                Assert.IsNull(resolved.SpecialAttackSequence.OpeningAttack, item.Name);
+                CapturedEnemyCombatAttackDefinition attack =
+                    resolved.SpecialAttackSequence.RepeatingAttack;
+                Assert.AreEqual(item.Min, attack.MinDamage, item.Name);
+                Assert.AreEqual(item.Max, attack.MaxDamage, item.Name);
+                Assert.AreEqual(2.0d, attack.RechargeSeconds, item.Name);
+                Assert.AreEqual(item.ExpectedSlot, attack.AttackInfoWeaponSlot, item.Name);
+                Assert.AreEqual(0, attack.AttackInfoUnknown, item.Name);
+                Assert.AreEqual(3, attack.AttackInfoHitType, item.Name);
+                Assert.AreEqual(
+                    item.ExpectedInstance,
+                    attack.AttackInfoWeaponInstance,
+                    item.Name);
+            }
+        }
+
+        [TestMethod]
+        public void AreteNaturalAttackSelectionFailsClosedWithoutAnExactSafeStream()
+        {
+            CapturedEnemyCombatContract baseline =
+                CreateAreteFixedNaturalAttackBaseline(
+                    "capture-backed Arete fixed natural attack",
+                    6,
+                    8,
+                    2.0d,
+                    6,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Garbage Flea",
+                    17657,
+                    1,
+                    0,
+                    baseline,
+                    out resolved,
+                    out failure));
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    127,
+                    "Garbage Flea",
+                    17657,
+                    1,
+                    0,
+                    baseline,
+                    out resolved,
+                    out failure));
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Engineer Automaton I",
+                    17649,
+                    5,
+                    0,
+                    baseline,
+                    out resolved,
+                    out failure));
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Marcus Stone",
+                    258744,
+                    15,
+                    0,
+                    baseline,
+                    out resolved,
+                    out failure));
+        }
+
+        [TestMethod]
+        public void AreteLandingCombatUsesOnlyExactEligibleCaptureContracts()
+        {
+            CapturedEnemyCombatContract violent;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog
+                    .TryCreateExactCapturedAttackOnSightContract(
+                        6553,
+                        "Violent Protester",
+                        203740,
+                        3,
+                        out violent,
+                        out failure),
+                failure);
+            Assert.IsTrue(violent.IsCombatReady);
+            Assert.AreEqual(
+                CapturedEnemyAttackModel.EquippedWeapon,
+                violent.AttackModel);
+            Assert.AreEqual(
+                ZoneEngine.Core.NpcAiProfile.Aggressive,
+                violent.AiProfile);
+            Assert.IsNotNull(violent.WeaponDefinition);
+            Assert.AreEqual(6, violent.WeaponInventorySlot);
+            Assert.IsTrue(violent.UsesCaptureProvenArchetype);
+            StringAssert.Contains(violent.Evidence, "20260614-024525");
+
+            CapturedEnemyCombatContract kneebreaker;
+            Assert.IsFalse(
+                CapturedEnemyCombatProfileCatalog
+                    .TryCreateExactCapturedAttackOnSightContract(
+                        6553,
+                        "Kneebreaker Alfonzo Rizzolo",
+                        165196,
+                        4,
+                        out kneebreaker,
+                        out failure));
+            Assert.AreEqual("no exact capture-safe combat profile", failure);
+            Assert.IsNull(kneebreaker);
+
+            string landingSource = File.ReadAllText(
+                Path.Combine(
+                    FindRepositoryRoot(),
+                    "AORebirth",
+                    "Server",
+                    "ZoneEngine",
+                    "Core",
+                    "Playfields",
+                    "AreteLandingSpawn.cs"));
+            string preparation = Slice(
+                landingSource,
+                "private static void PrepareCapturedLandingCombat",
+                "private static void ApplyAppearance");
+            StringAssert.Contains(preparation, "\"Violent Protester\"");
+            StringAssert.Contains(
+                preparation,
+                "\"Kneebreaker Alfonzo Rizzolo\"");
+            Assert.AreEqual(
+                2,
+                Regex.Matches(preparation, "string\\.Equals\\(").Count,
+                "Landing combat preparation must remain limited to the two exact captured eligibility constraints.");
+            StringAssert.Contains(
+                preparation,
+                "TryCreateExactCapturedAttackOnSightContract");
+            StringAssert.Contains(
+                preparation,
+                "CapturedEnemyCombatContract.Unresolved");
+            StringAssert.Contains(
+                landingSource,
+                "supersedes the older contradictory landing literal 103");
+            StringAssert.Contains(landingSource, "NpcFamily = 137");
+        }
+
+        [TestMethod]
         public void GeneratedCatalogMatchesTheVersionedInventoryAndFailsClosedOnAmbiguousExactBindings()
         {
             string root = FindRepositoryRoot();
@@ -6211,6 +6432,46 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual((byte)0, resolved.SpecialAttackSequence.AttackAction);
             Assert.AreEqual(0, resolved.WeaponLowId);
             Assert.AreEqual(0, resolved.WeaponHighId);
+        }
+
+        private static CapturedEnemyCombatContract CreateAreteFixedNaturalAttackBaseline(
+            string evidence,
+            int minDamage,
+            int maxDamage,
+            double rechargeSeconds,
+            int weaponSlot,
+            int attackInfoUnknown,
+            int weaponInstance,
+            int attackInfoAmmoCount,
+            int attackInfoHitType,
+            byte attackInfoN3Unknown,
+            byte specialAttackWeaponN3Unknown,
+            byte attackN3Unknown,
+            byte attackAction)
+        {
+            return new CapturedEnemyCombatContract
+            {
+                Evidence = evidence,
+                Retaliates = true,
+                AiProfile = ZoneEngine.Core.NpcAiProfile.Aggressive,
+                AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
+                MinDamage = minDamage,
+                MaxDamage = maxDamage,
+                RechargeSeconds = rechargeSeconds,
+                AttackInfoWeaponSlot = weaponSlot,
+                AttackInfoUnknown = attackInfoUnknown,
+                AttackInfoWeaponInstance = weaponInstance,
+                AttackInfoAmmoCount = attackInfoAmmoCount,
+                AttackInfoHitType = attackInfoHitType,
+                AttackInfoN3Unknown = attackInfoN3Unknown,
+                SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown,
+                AttackN3Unknown = attackN3Unknown,
+                AttackAction = attackAction,
+                HasCapturedAttackStartContext = true,
+                HasEmptySpecialAttackWeaponContext = true,
+                HasCapturedSpecialAttackWeaponContext = true,
+                CapturedSpecialAttacks = new CapturedEnemySpecialAttackDefinition[0]
+            };
         }
 
         private static string FindRepositoryRoot()

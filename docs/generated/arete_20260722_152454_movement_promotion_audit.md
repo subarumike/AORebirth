@@ -74,11 +74,11 @@ Every path is classified and scored before grouping. A rejected observation cann
 
 | Behavior | Source observations | Runtime rows | Runtime dataset |
 | --- | ---: | ---: | --- |
-| patrol | 7,305 | 7,208 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/patrol.csv` |
-| spawn | 608 | 597 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/spawn.csv` |
-| chase | 98 | 98 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/chase.csv` |
-| flee | 22 | 22 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/flee.csv` |
-| leash | 196 | 196 | `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/leash.csv` |
+| patrol | 7,305 | 7,208 | `docs/generated/arete_20260722_152454_movement/runtime/patrol.csv` |
+| spawn | 608 | 597 | `docs/generated/arete_20260722_152454_movement/runtime/spawn.csv` |
+| chase | 98 | 98 | `docs/generated/arete_20260722_152454_movement/runtime/chase.csv` |
+| flee | 22 | 22 | `docs/generated/arete_20260722_152454_movement/runtime/flee.csv` |
+| leash | 196 | 196 | `docs/generated/arete_20260722_152454_movement/runtime/leash.csv` |
 
 ## Largest promotable route groups
 

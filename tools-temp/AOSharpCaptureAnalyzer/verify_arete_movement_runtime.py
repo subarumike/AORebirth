@@ -26,15 +26,15 @@ DEFAULT_RUNTIME_DATASET_DIR = (
     / "Content"
     / "Captured"
     / "Arete"
-    / "movement"
+    / "movement-full"
 )
 DEFAULT_LEGACY_ROBOT_DATASET = (
     DEFAULT_RUNTIME_DATASET_DIR.parent / "cleaning_robot_patrol_replay.csv"
 )
 BEHAVIORS = ("patrol", "spawn", "chase", "flee", "leash")
-ACTIVATION_DISTANCE = 6.0
 COORDINATE_TOLERANCE = 0.001
 TIMING_TOLERANCE_SECONDS = 0.250
+NEAREST_VARIANT_TOLERANCE = 0.001
 
 
 @dataclass(frozen=True)
@@ -58,6 +58,7 @@ class RuntimeRow:
     behavior: str
     constraint: Constraint
     observation_id: str
+    capture_id: str
     source_identity: str
     source_generation: int
     start: Point
@@ -189,6 +190,7 @@ def load_runtime_rows(directory: Path) -> list[RuntimeRow]:
             playfield = parse_int(row.get("RuntimePlayfieldId"))
             generation = parse_int(row.get("SourceGeneration"))
             delay = parse_float(row.get("DelayAfterSeconds"))
+            capture_id = (row.get("CaptureId") or "").strip()
             start = point_from(row, "Start")
             end = point_from(row, "End")
             if (
@@ -198,6 +200,7 @@ def load_runtime_rows(directory: Path) -> list[RuntimeRow]:
                 or playfield is None
                 or generation is None
                 or delay is None
+                or not capture_id
                 or start is None
                 or end is None
             ):
@@ -213,6 +216,7 @@ def load_runtime_rows(directory: Path) -> list[RuntimeRow]:
                         (row.get("Name") or "").strip(),
                     ),
                     observation_id=(row.get("ObservationId") or "").strip(),
+                    capture_id=capture_id,
                     source_identity=(row.get("SourceIdentity") or "").strip(),
                     source_generation=generation,
                     start=start,
@@ -333,23 +337,34 @@ def select_source_variant(
     npc: LiveNpc,
     candidates: list[RuntimeRow],
     spawn_generation: int = 1,
-) -> tuple[str, int, float] | None:
-    distances: dict[tuple[str, int], float] = {}
+) -> tuple[str, str, int, float] | None:
+    distances: dict[tuple[str, str, int], float] = {}
     for row in candidates:
-        key = (row.source_identity, row.source_generation)
+        if row.behavior != "patrol":
+            continue
+        key = (row.capture_id, row.source_identity, row.source_generation)
         distance = horizontal_distance(npc.position, row.start)
         distances[key] = min(distance, distances.get(key, float("inf")))
     variants = sorted(
         (
-            (source_identity, source_generation, distance)
-            for (source_identity, source_generation), distance in distances.items()
-            if distance <= ACTIVATION_DISTANCE
+            (capture_id, source_identity, source_generation, distance)
+            for (
+                capture_id,
+                source_identity,
+                source_generation,
+            ), distance in distances.items()
         ),
-        key=lambda value: (value[2], value[0], value[1]),
+        key=lambda value: (value[3], value[0], value[1], value[2]),
     )
     if not variants:
         return None
-    return variants[(spawn_generation - 1) % len(variants)]
+    nearest_distance = variants[0][3]
+    nearest_variants = [
+        variant
+        for variant in variants
+        if abs(variant[3] - nearest_distance) <= NEAREST_VARIANT_TOLERANCE
+    ]
+    return nearest_variants[(spawn_generation - 1) % len(nearest_variants)]
 
 
 def matching_paths(
@@ -401,7 +416,7 @@ def build_results(
         constraint_rows[row.constraint].append(row)
 
     identities_with_any_candidate = 0
-    identities_with_bindable_patrol = 0
+    identities_with_promoted_patrol = 0
     identities_with_packets = 0
     reason_counts: Counter[str] = Counter(identity_failures.values())
     family_summary: dict[Constraint, Counter[str]] = defaultdict(Counter)
@@ -423,9 +438,7 @@ def build_results(
                 else None
             )
         patrol_nearest = nearest_by_behavior["patrol"]
-        bindable_patrol = (
-            patrol_nearest is not None and patrol_nearest <= ACTIVATION_DISTANCE
-        )
+        bindable_patrol = patrol_nearest is not None
         selected_variant = select_source_variant(npc, candidates)
         selected_patrol_rows = (
             []
@@ -434,8 +447,9 @@ def build_results(
                 row
                 for row in candidates
                 if row.behavior == "patrol"
-                and row.source_identity == selected_variant[0]
-                and row.source_generation == selected_variant[1]
+                and row.capture_id == selected_variant[0]
+                and row.source_identity == selected_variant[1]
+                and row.source_generation == selected_variant[2]
             ]
         )
         selected_patrol_nearest = (
@@ -446,23 +460,19 @@ def build_results(
                 for row in selected_patrol_rows
             )
         )
-        first_patrol_eligible = (
-            selected_patrol_nearest is not None
-            and selected_patrol_nearest <= 2.5
-        )
         if bindable_patrol:
-            identities_with_bindable_patrol += 1
+            identities_with_promoted_patrol += 1
 
         if not candidates:
             reason = "no_exact_promoted_metadata_constraint"
+        elif not bindable_patrol:
+            reason = "no_promoted_patrol_for_exact_metadata_constraint"
         elif selected_variant is None:
-            reason = "no_source_variant_within_6m"
+            reason = "promoted_patrol_variant_unresolved"
         elif not selected_patrol_rows:
             reason = "selected_source_variant_has_no_patrol_observation"
-        elif not first_patrol_eligible:
-            reason = "selected_patrol_start_exceeds_2_5m_continuation"
         elif not observed_paths:
-            reason = "eligible_selected_patrol_but_no_live_movement_packet"
+            reason = "promoted_patrol_no_packet_in_observation_window"
         else:
             reason = "live_movement_packet_observed"
         reason_counts[reason] += 1
@@ -494,15 +504,18 @@ def build_results(
                     if patrol_nearest is None
                     else format(patrol_nearest, ".6f")
                 ),
-                "PatrolActivationEligible": str(bindable_patrol).lower(),
-                "SelectedSourceIdentity": (
+                "PromotedPatrolEvidence": str(bindable_patrol).lower(),
+                "SelectedCaptureId": (
                     "" if selected_variant is None else selected_variant[0]
                 ),
+                "SelectedSourceIdentity": (
+                    "" if selected_variant is None else selected_variant[1]
+                ),
                 "SelectedSourceGeneration": (
-                    "" if selected_variant is None else str(selected_variant[1])
+                    "" if selected_variant is None else str(selected_variant[2])
                 ),
                 "SelectedVariantDistanceMeters": (
-                    "" if selected_variant is None else format(selected_variant[2], ".6f")
+                    "" if selected_variant is None else format(selected_variant[3], ".6f")
                 ),
                 "SelectedPatrolRows": str(len(selected_patrol_rows)),
                 "SelectedPatrolNearestMeters": (
@@ -510,7 +523,6 @@ def build_results(
                     if selected_patrol_nearest is None
                     else format(selected_patrol_nearest, ".6f")
                 ),
-                "FirstPatrolDecisionEligible": str(first_patrol_eligible).lower(),
                 "ObservedNpcPathPackets": str(len(observed_paths)),
                 "ExactReason": reason,
             }
@@ -597,7 +609,7 @@ def build_results(
         f"- Live NPC identities with complete stable metadata: **{len(live_npcs):,}**.",
         f"- Live identities rejected as incomplete or regenerated/conflicting: **{len(identity_failures):,}**.",
         f"- Live identities with any exact promoted metadata constraint: **{identities_with_any_candidate:,}**.",
-        f"- Live identities within the 6 m patrol activation radius: **{identities_with_bindable_patrol:,}**.",
+        f"- Live identities with an exact promoted patrol constraint: **{identities_with_promoted_patrol:,}**.",
         f"- Live identities that emitted `FollowTarget/NpcPath`: **{identities_with_packets:,}**.",
         f"- Live path packets reconciled: **{len(live_paths):,} / {len(live_paths):,}**.",
         "",
@@ -614,7 +626,7 @@ def build_results(
             "",
             "## Family and constraint coverage",
             "",
-            "| Exact constraint | Live identities | Metadata candidates | Bindable patrol | Packet emitters |",
+            "| Exact constraint | Live identities | Metadata candidates | Promoted patrol | Packet emitters |",
             "| --- | ---: | ---: | ---: | ---: |",
         ]
     )
@@ -674,9 +686,9 @@ def build_results(
             "",
             "## Evidence boundary",
             "",
-            "- `PatrolActivationEligible` records whether any patrol row is within the 6 m activation radius.",
-            "- `FirstPatrolDecisionEligible` reproduces source-variant selection for spawn generation 1 and the runtime's 2.5 m continuation check.",
-            "- A loaded row is not considered active merely because it exists in the dataset.",
+            "- Exact family, template, level, playfield, and name metadata activates catalog eligibility; no invented distance gate is applied.",
+            "- Patrol source selection is behavior-specific, capture-scoped, nearest-cohort based, and deterministic per spawn generation.",
+            "- A promoted patrol with no packet in this observation window remains corpus-backed evidence; window absence does not reject it.",
             "- Spawn, chase, flee, and leash rows are reported as exact metadata evidence; this baseline did not force their lifecycle conditions.",
             "- Attack absence is recorded separately because movement datasets do not prove aggression or attack initiation semantics.",
             "",
@@ -692,7 +704,7 @@ def build_results(
         "live_npcs": len(live_npcs),
         "identity_failures": len(identity_failures),
         "candidate_identities": identities_with_any_candidate,
-        "bindable_patrol_identities": identities_with_bindable_patrol,
+        "bindable_patrol_identities": identities_with_promoted_patrol,
         "packet_identities": identities_with_packets,
         "live_paths": len(live_paths),
         "timing_exact": timing_exact,
@@ -741,6 +753,7 @@ def run_self_test() -> None:
         "patrol",
         constraint,
         "m00001",
+        "20260722-104809",
         "SimpleChar:ABCDEF01",
         2,
         Point(0, 0, 0),
@@ -749,11 +762,12 @@ def run_self_test() -> None:
     )
     assert exact_constraint_rows(npc, [row]) == [row]
     assert select_source_variant(npc, [row]) == (
+        row.capture_id,
         row.source_identity,
         row.source_generation,
         0.0,
     )
-    assert select_source_variant(
+    far_variant = select_source_variant(
         LiveNpc(
             npc.captured_utc,
             npc.identity,
@@ -761,7 +775,37 @@ def run_self_test() -> None:
             Point(7, 0, 0),
         ),
         [row],
-    ) is None
+    )
+    assert far_variant is not None and far_variant[3] == 7.0
+    chase = RuntimeRow(
+        "chase",
+        constraint,
+        "m00002",
+        "20260722-152454",
+        "SimpleChar:ABCDEF02",
+        1,
+        Point(0, 0, 0),
+        Point(2, 0, 0),
+        1.0,
+    )
+    assert select_source_variant(npc, [chase]) is None
+    tied = RuntimeRow(
+        "patrol",
+        constraint,
+        "m00003",
+        "20260722-152454",
+        "SimpleChar:ABCDEF02",
+        1,
+        Point(0, 0, 0),
+        Point(3, 0, 0),
+        1.0,
+    )
+    assert select_source_variant(npc, [row, tied], spawn_generation=2) == (
+        tied.capture_id,
+        tied.source_identity,
+        tied.source_generation,
+        0.0,
+    )
     regenerated = LiveNpc(
         npc.captured_utc,
         "SimpleChar:99999999",

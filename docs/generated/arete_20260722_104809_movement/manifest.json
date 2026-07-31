@@ -1,0 +1,98 @@
+{
+  "behaviors": {
+    "chase": {
+      "ambiguous": 163,
+      "observations": 380,
+      "path": "docs/generated/arete_20260722_104809_movement/chase.csv",
+      "promotable": 66,
+      "rejected": 151
+    },
+    "flee": {
+      "ambiguous": 0,
+      "observations": 42,
+      "path": "docs/generated/arete_20260722_104809_movement/flee.csv",
+      "promotable": 32,
+      "rejected": 10
+    },
+    "leash": {
+      "ambiguous": 0,
+      "observations": 68,
+      "path": "docs/generated/arete_20260722_104809_movement/leash.csv",
+      "promotable": 67,
+      "rejected": 1
+    },
+    "patrol": {
+      "ambiguous": 0,
+      "observations": 12481,
+      "path": "docs/generated/arete_20260722_104809_movement/patrol.csv",
+      "promotable": 11388,
+      "rejected": 1093
+    },
+    "scripted": {
+      "ambiguous": 746,
+      "observations": 746,
+      "path": "docs/generated/arete_20260722_104809_movement/scripted.csv",
+      "promotable": 0,
+      "rejected": 0
+    },
+    "spawn": {
+      "ambiguous": 0,
+      "observations": 799,
+      "path": "docs/generated/arete_20260722_104809_movement/spawn.csv",
+      "promotable": 791,
+      "rejected": 8
+    }
+  },
+  "captureId": "20260722-104809",
+  "expectedObservations": 14516,
+  "inputs": [
+    {
+      "bytes": 9176,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/capture_info.json",
+      "sha256": "9fb26887405925fe6fb84ccb28a2d672a5ae39a854ef48ed31bfa6fc535b4596"
+    },
+    {
+      "bytes": 483,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/movement-summary.json",
+      "sha256": "d53120d8e0f26514d626e299d1c34cd4baaa4cbf87e7fde9a846a935282b5b40"
+    },
+    {
+      "bytes": 6994,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/npc-lifecycle-summary.json",
+      "sha256": "10efcbc1ba950481b706b721de088b677a2835a1bf7342b611c8dfbfb8aee030"
+    },
+    {
+      "bytes": 9476388,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/movement-packets.csv",
+      "sha256": "971a1db73804e50ce3bc66dd0125ce306d9c591daa490eca34f8b8a8e470defb"
+    },
+    {
+      "bytes": 5094953,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/scfu-appearance.csv",
+      "sha256": "995675740d4db81f491af3a32f5f3303265bdb5605271f0f5b0eeb16bf1da6c5"
+    },
+    {
+      "bytes": 4094954,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "sha256": "143b6690d4a74727c100a55a8c47f726118ba6f3c4ce89f7d3130823b8f23494"
+    },
+    {
+      "bytes": 36831310,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-state.csv",
+      "sha256": "355dc045181b0d44fd254ec070f63776fdc9d271d7323532af7a509c910d6d30"
+    },
+    {
+      "bytes": 1968185,
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/npc-lifecycle.csv",
+      "sha256": "9f8d7b99b1be563b643adcf1892900de8590dfa1ed975ce114cc6fb637e2feba"
+    }
+  ],
+  "reconciledObservations": 14516,
+  "routeGroups": 2884,
+  "schemaVersion": 3,
+  "totals": {
+    "ambiguous": 909,
+    "promotable": 12344,
+    "rejected": 1263
+  }
+}

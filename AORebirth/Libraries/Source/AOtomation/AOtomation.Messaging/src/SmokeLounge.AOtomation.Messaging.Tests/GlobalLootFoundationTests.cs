@@ -291,12 +291,109 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void Arete104809OrdinaryLootPreservesEveryIdentityLinkedAtomicSnapshot()
+        {
+            string source = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            string docker = SourceSlice(
+                source,
+                "internal static ObservedCorpseSnapshotDefinition[] BuildArete104809DockerSnapshots()",
+                "private void EnsureAlexDocker()");
+            string waste = SourceSlice(
+                source,
+                "internal static ObservedCorpseSnapshotDefinition[] BuildArete104809WasteCollectorSnapshots()",
+                "private void EnsureAlexWasteCollector()");
+            string flea = SourceSlice(
+                source,
+                "internal static ObservedCorpseSnapshotDefinition[] BuildArete104809GarbageFleaSnapshots()",
+                "private void EnsureAlexGarbageFlea()");
+            string cleaning = SourceSlice(
+                source,
+                "internal static ObservedCorpseSnapshotDefinition[] BuildArete104809CleaningRobotSnapshots()",
+                "private void EnsureCleaningRobot()");
+            string cleaningRegistration = SourceSlice(
+                source,
+                "private void EnsureCleaningRobot()",
+                "private void EnsureNascenceBarkingChimera()");
+
+            Assert.AreEqual(1, CountOccurrences(docker, "capture.20260722-104809.docker."));
+            Assert.AreEqual(14, CountOccurrences(waste, "capture.20260722-104809.waste."));
+            Assert.AreEqual(11, CountOccurrences(flea, "capture.20260722-104809.garbage-flea."));
+            Assert.AreEqual(15, CountOccurrences(cleaning, "capture.20260722-104809.cleaning-robot."));
+            Assert.IsFalse(source.Contains("capture.20260722.docker."));
+            Assert.IsFalse(source.Contains("capture.20260722.waste."));
+            Assert.IsFalse(source.Contains("capture.20260722.flea."));
+            Assert.IsFalse(source.Contains("20260722-cap-mob-drop-cred"));
+            Assert.IsTrue(docker.Contains("capture.20260722-104809.docker.7988284D"));
+            Assert.IsTrue(docker.Contains("ObservedCorpseSnapshot(AretePartOneLootEvidence, key, 4)"));
+
+            Assert.IsTrue(waste.Contains("capture.20260722-104809.waste.7988CADF"));
+            Assert.IsTrue(waste.Contains("ObservedCorpseSnapshotEntry(e, eleventh, 248315, 248315, 1, 1)"));
+            Assert.IsTrue(waste.Contains("ObservedCorpseSnapshotEntry(e, eleventh, 248319, 248319, 1, 1)"));
+            Assert.IsTrue(waste.Contains("ObservedCorpseSnapshotEntry(e, eleventh, 42620, 42619, 2, 1)"));
+
+            Assert.IsTrue(flea.Contains("capture.20260722-104809.garbage-flea.7988CAED"));
+            Assert.IsTrue(flea.Contains("ObservedCorpseSnapshotEntry(e, seventh, 70560, 85688, 2, 1)"));
+            Assert.IsTrue(flea.Contains("ObservedCorpseSnapshotEntry(e, seventh, 248322, 248322, 1, 1)"));
+
+            Assert.IsTrue(cleaning.Contains("capture.20260722-104809.cleaning-robot.7988C84C"));
+            Assert.IsTrue(cleaning.Contains("ObservedCorpseSnapshotEntry(e, eighth, 155685, 155685, 1, 1)"));
+            Assert.IsTrue(cleaning.Contains("ObservedCorpseSnapshotEntry(e, eighth, 84144, 84144, 1, 1)"));
+            Assert.IsTrue(cleaning.Contains("ObservedCorpseSnapshotEntry(e, eighth, 70559, 70559, 1, 1)"));
+            Assert.IsTrue(cleaning.Contains("ObservedCorpseSnapshotEntry(e, eleventh, 70560, 70560, 1, 1)"));
+            Assert.IsTrue(cleaning.Contains("ObservedCorpseSnapshotEntry(e, eleventh, 42620, 42620, 1, 1)"));
+            Assert.IsFalse(cleaning.Contains("155666"));
+            Assert.IsFalse(cleaning.Contains("84148"));
+            Assert.IsFalse(cleaning.Contains("36783"));
+            Assert.IsTrue(cleaningRegistration.Contains("BuildArete104809CleaningRobotSnapshots()"));
+            Assert.IsFalse(cleaningRegistration.Contains("LootRollMode.WeightedOne"));
+            Assert.IsFalse(cleaningRegistration.Contains("155666"));
+            Assert.IsFalse(cleaningRegistration.Contains("84148"));
+            Assert.IsFalse(cleaningRegistration.Contains("36783"));
+        }
+
+        [TestMethod]
+        public void Arete152454BlankNameCorpseRowsRemainCorrelatedAndAtomic()
+        {
+            string source = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+            string supreme = SourceSlice(
+                source,
+                "internal static ObservedCorpseSnapshotDefinition BuildArete152454ResolvedSupremeCollectorSnapshot()",
+                "private void EnsureAreteSupremeCollector()");
+            string gnarl = SourceSlice(
+                source,
+                "internal static ObservedCorpseSnapshotDefinition BuildArete152454ResolvedGnarlSnapshot()",
+                "private void EnsureAreteGnarl()");
+
+            Assert.IsTrue(supreme.Contains("capture.20260722-152454.supreme-collector.798911CF"));
+            Assert.AreEqual(7, CountOccurrences(supreme, "ObservedCorpseSnapshotEntry("));
+            Assert.IsTrue(supreme.Contains("key,\n                35,"));
+            Assert.IsTrue(supreme.Contains("key, 70558, 85640, 5, 1"));
+            Assert.IsTrue(supreme.Contains("key, 162497, 162497, 14, 1"));
+            Assert.IsTrue(supreme.Contains("key, 201076, 201077, 5, 1"));
+
+            Assert.IsTrue(gnarl.Contains("capture.20260722-152454.gnarl.79891585"));
+            Assert.AreEqual(7, CountOccurrences(gnarl, "ObservedCorpseSnapshotEntry("));
+            Assert.IsTrue(gnarl.Contains("key,\n                0,"));
+            Assert.IsTrue(gnarl.Contains("key, 85548, 22258, 7, 1"));
+            Assert.IsTrue(gnarl.Contains("key, 162715, 162715, 7, 1"));
+            Assert.IsTrue(gnarl.Contains("key, 201139, 201140, 7, 1"));
+            Assert.IsTrue(source.Contains(
+                "SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved"));
+        }
+
+        [TestMethod]
         public void AretePartTwoLootRemainsPlayfieldScopedIdentityLinkedAndAtomic()
         {
             string source = File.ReadAllText(Path.Combine(
                 FindRepositoryRoot(),
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
 
+            Assert.IsTrue(source.Contains("private const int AretePlayfieldId = 6553;"));
+            Assert.IsFalse(source.Contains("private const int AretePlayfieldId = 1044525;"));
             Assert.IsTrue(source.Contains("context.PlayfieldId == AretePlayfieldId"));
             Assert.IsTrue(source.Contains("context.MonsterData == AreteRollerratMonsterData"));
             Assert.IsTrue(source.Contains("context.MonsterData == AreteDesertReetMonsterData"));
@@ -310,6 +407,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(source.Contains("capture.20260722-152454.kneebreaker.7989147B"));
             Assert.IsTrue(source.Contains("capture.20260722-152454.cleanmeister.798915E0"));
             Assert.IsTrue(source.Contains("capture.20260722-152454.supreme-collector.7989146B"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.supreme-collector.798911CF"));
+            Assert.IsTrue(source.Contains("capture.20260722-152454.gnarl.79891585"));
             Assert.IsTrue(source.Contains("capture.20260722-152454.waste.798913CD"));
             Assert.IsTrue(source.Contains("capture.20260722-152454.docker.798914DC"));
             Assert.IsTrue(source.Contains("RegisterObservedAretePartTwoTable("));
@@ -651,6 +750,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             LootGenerationResult result = GenerateCredits(mode, min, max);
             Assert.AreEqual(expected, result.Credits);
             Assert.AreEqual(unresolved, result.CreditsUnresolved);
+        }
+
+        private static string SourceSlice(string source, string startMarker, string endMarker)
+        {
+            int start = source.IndexOf(startMarker, StringComparison.Ordinal);
+            Assert.IsTrue(start >= 0, "Missing source marker: " + startMarker);
+            int end = source.IndexOf(endMarker, start + startMarker.Length, StringComparison.Ordinal);
+            Assert.IsTrue(end > start, "Missing source marker: " + endMarker);
+            return source.Substring(start, end - start).Replace("\r\n", "\n");
+        }
+
+        private static int CountOccurrences(string source, string value)
+        {
+            int count = 0;
+            int offset = 0;
+            while ((offset = source.IndexOf(value, offset, StringComparison.Ordinal)) >= 0)
+            {
+                count++;
+                offset += value.Length;
+            }
+            return count;
         }
 
         private static string FindRepositoryRoot()

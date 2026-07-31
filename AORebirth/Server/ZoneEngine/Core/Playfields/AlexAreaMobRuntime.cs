@@ -100,7 +100,10 @@ namespace ZoneEngine.Core.Playfields
 
         private const int MissingVisualId = 1234567890;
 
-        private const double RespawnSeconds = 30.0;
+        private const double DefaultRespawnSeconds = 30.0;
+
+        // Captures 20260722-104809/152454: Docker respawns cluster at 40 seconds.
+        private const double CapturedDockerRespawnSeconds = 40.0;
 
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
 
@@ -417,7 +420,8 @@ namespace ZoneEngine.Core.Playfields
                 }
                 else if (timers[i] == DateTime.MaxValue)
                 {
-                    timers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(RespawnSeconds);
+                    timers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(
+                        ResolveRespawnSeconds(Slots[i]));
                 }
                 else if (!(timers[i] > DateTime.UtcNow)
                          && SpawnSlot(playfield, playfieldIdentity, activateNpc, i) != null)
@@ -425,6 +429,15 @@ namespace ZoneEngine.Core.Playfields
                     timers[i] = DateTime.MaxValue;
                 }
             }
+        }
+
+        private static double ResolveRespawnSeconds(MobSlot slot)
+        {
+            return slot != null
+                   && slot.Kind == MobKind.Docker
+                   && string.Equals(slot.Name, "32-V Docker", StringComparison.Ordinal)
+                       ? CapturedDockerRespawnSeconds
+                       : DefaultRespawnSeconds;
         }
 
         private static Character SpawnSlot(
