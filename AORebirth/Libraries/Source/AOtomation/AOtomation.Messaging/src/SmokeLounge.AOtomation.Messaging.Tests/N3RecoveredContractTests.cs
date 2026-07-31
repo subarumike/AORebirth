@@ -128,6 +128,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0, decoded.Unknown4);
             Assert.AreEqual(0, decoded.Unknown5);
             Assert.AreEqual(0, decoded.Unknown6.Length);
+
+            message.Unknown3 = 1;
+            byte[] capturedOpenBody = HexToBytes(
+                "4C7D403B0000C748108CB77A000000000200010000000000000003F1");
+            CollectionAssert.AreEqual(capturedOpenBody, Serialize(message));
         }
 
         [TestMethod]

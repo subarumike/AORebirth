@@ -1068,10 +1068,7 @@ namespace AORebirth.Core.Playfields
                 SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
             }
 
-            int doorStatuses = new CapturedPlayfieldDoorStatusRuntimeService().SendInitialStatuses(
-                character,
-                this.Identity.Instance,
-                this.statels);
+            int doorStatuses = this.runtimeSystems.SendInitialDoorStatuses(character, this.statels);
             if (doorStatuses > 0)
             {
                 LogUtil.Debug(
