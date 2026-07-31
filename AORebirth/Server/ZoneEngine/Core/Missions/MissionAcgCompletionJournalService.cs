@@ -115,15 +115,14 @@ namespace ZoneEngine.Core.Missions
             string reason)
         {
             string failure;
-            if (!MissionAcgExpiryRuntime.CanBeginObjectiveAction(
+            MissionAcgBindingRecord claimedBinding;
+            MissionAcgObjectiveRecord claimedObjective;
+            if (!MissionAcgExpiryRuntime.TryClaimObjectiveVerification(
                     bindingRecord,
                     objectiveRecord,
-                    DateTime.UtcNow,
-                    out failure)
-                || !MissionAcgObjectiveContract.TryVerify(
-                objectiveRecord,
-                observation,
-                out failure))
+                    out claimedBinding,
+                    out claimedObjective,
+                    out failure))
             {
                 MissionDiagnostics.Log(
                     "ACG-OBJECTIVE-REJECT char={0} accepted={1}:{2} livePf2={3} reason={4}",
@@ -136,21 +135,41 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionAcgObjectiveRecord verified;
-            if (!MissionAcgObjectiveRuntime.TryReplaceState(
-                objectiveRecord,
-                objectiveRecord.State.Copy(
-                    lifecycle: MissionAcgObjectiveLifecycle.Verified,
-                    phase: MissionAcgCompletionPhase.ObjectiveVerified),
-                out verified,
-                out failure))
+            int acceptedInstance =
+                claimedBinding.Binding.AcceptedQuestIdentity.Instance;
+            try
             {
-                return false;
+                if (!MissionAcgObjectiveContract.TryVerify(
+                        claimedObjective,
+                        observation,
+                        out failure)
+                    || !MissionTokenProgressTracker.SealGeneratedProgress(
+                        claimedBinding,
+                        claimedObjective,
+                        out failure)
+                    || !MissionAcgObjectiveRuntime.TryReplaceState(
+                        claimedObjective,
+                        claimedObjective.State.Copy(
+                            lifecycle:
+                                MissionAcgObjectiveLifecycle.Verified,
+                            phase:
+                                MissionAcgCompletionPhase.ObjectiveVerified),
+                        out verified,
+                        out failure))
+                {
+                    return false;
+                }
+            }
+            finally
+            {
+                MissionAcgExpiryRuntime.ReleaseObjectiveVerificationClaim(
+                    acceptedInstance);
             }
 
             MissionAcceptedStore.AcceptedMission accepted;
             if (!MissionAcceptedStore.TryResolve(
                 character.Identity.Instance,
-                ToIdentity(bindingRecord.Binding.AcceptedQuestIdentity),
+                ToIdentity(claimedBinding.Binding.AcceptedQuestIdentity),
                 out accepted))
             {
                 return false;
@@ -160,7 +179,7 @@ namespace ZoneEngine.Core.Missions
                 client,
                 character,
                 accepted,
-                bindingRecord,
+                claimedBinding,
                 verified,
                 reason);
         }
@@ -260,7 +279,11 @@ namespace ZoneEngine.Core.Missions
                     bool bindingTransitionPersisted =
                         binding.State.LifecycleState
                         == MissionAcgLifecycleState.CompletionStarted;
-                    if ((!bindingTransitionPersisted
+                    if (!MissionTokenProgressTracker.SealGeneratedProgress(
+                            binding,
+                            objective,
+                            out failure)
+                        || (!bindingTransitionPersisted
                          && !MissionAcgBindingRuntime.TryTransition(
                              binding,
                              MissionAcgLifecycleState.CompletionStarted,

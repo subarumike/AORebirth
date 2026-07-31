@@ -257,6 +257,8 @@ client.Controller.Character.Playfield.Identity,
                         client,
                         client.Controller.Character);
                     ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
+                    MissionTokenProgressTracker.TryResumePendingClientUpdates(
+                        client.Controller.Character);
 
                     // Gold 080425: Door/Chest FullUpdates land with SCFU before FullCharacter.
                     // Send here (not post-PAF) so the client accepts door meshes + map icons.

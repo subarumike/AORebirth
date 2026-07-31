@@ -3,6 +3,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
+    using System.Web.Script.Serialization;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,6 +18,38 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [DeploymentItem(@".\XML Data\MissionRewards", @"XML Data\MissionRewards")]
     public class MissionRollSemanticsTests
     {
+        [TestMethod]
+        public void MalisRollableNanosAreDistinctFamiliesAtOneLockedQuality()
+        {
+            string path = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "XML Data",
+                "MissionRewards",
+                "ItemDb_Nanos.json");
+            var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            List<MalisNanoEntry> rows =
+                serializer.Deserialize<List<MalisNanoEntry>>(File.ReadAllText(path));
+            var families = new HashSet<string>(StringComparer.Ordinal);
+
+            Assert.AreEqual(2112, rows.Count);
+            foreach (MalisNanoEntry row in rows)
+            {
+                Assert.IsNotNull(row);
+                Assert.IsNotNull(row.Key);
+                Assert.AreEqual(
+                    row.Key.LowQl,
+                    row.Key.HighQl,
+                    "Nano family "
+                    + row.Key.LowId
+                    + ":"
+                    + row.Key.HighId
+                    + " must have one locked QL.");
+                families.Add(row.Key.LowId + ":" + row.Key.HighId);
+            }
+
+            Assert.AreEqual(2110, families.Count);
+        }
+
         [TestMethod]
         public void OfficialFindAndReturnItemIconsMapToCapturedBehavior()
         {
@@ -605,6 +639,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             catch (ArgumentOutOfRangeException)
             {
             }
+        }
+
+        private sealed class MalisNanoEntry
+        {
+            public MalisNanoKey Key { get; set; }
+        }
+
+        private sealed class MalisNanoKey
+        {
+            public int LowId { get; set; }
+
+            public int HighId { get; set; }
+
+            public int LowQl { get; set; }
+
+            public int HighQl { get; set; }
         }
     }
 }
