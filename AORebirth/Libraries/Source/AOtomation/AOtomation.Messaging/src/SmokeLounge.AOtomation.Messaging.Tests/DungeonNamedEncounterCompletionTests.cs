@@ -428,6 +428,25 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void CapturedNanoLandingResultsMapToExactFinishPacketSemantics()
+        {
+            string nanoRuntime = File.ReadAllText(
+                Path.Combine(
+                    FindRepositoryRoot(),
+                    @"AORebirth\Server\ZoneEngine\Core\NanoEventRuntimeService.cs"));
+            Assert.IsTrue(
+                nanoRuntime.Contains("case NanoLandingResult.NotRequired:")
+                && nanoRuntime.Contains("case NanoLandingResult.Landed:")
+                && nanoRuntime.Contains("parameter = 1;")
+                && nanoRuntime.Contains("case NanoLandingResult.Resisted:")
+                && nanoRuntime.Contains("parameter = 3;")
+                && nanoRuntime.Contains("default:")
+                && nanoRuntime.Contains("parameter = 0;")
+                && nanoRuntime.Contains("return false;"),
+                "Captured finish result 1 must mean landed, 3 resisted, and unresolved must fail closed.");
+        }
+
+        [TestMethod]
         public void CapturedDungeonLootRemainsAtomicWithUnresolvedSelectionProbabilities()
         {
             string root = FindRepositoryRoot();
