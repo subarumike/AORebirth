@@ -924,9 +924,6 @@
     <Content Include="XML Data\MissionRewards\ItemDb_Refined.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="XML Data\MissionRewards\MissionRewardNanoNames.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Rest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
