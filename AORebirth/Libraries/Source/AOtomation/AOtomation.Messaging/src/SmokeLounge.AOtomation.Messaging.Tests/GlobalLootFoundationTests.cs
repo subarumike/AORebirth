@@ -274,7 +274,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.EnsureAreteMalfunctioningRobot();",
                 StringComparison.Ordinal);
             int sharedMonsterDataGate = source.IndexOf(
-                "if (context.MonsterData == AlexWasteMonsterData)",
+                "context.MonsterData == AlexWasteMonsterData",
                 StringComparison.Ordinal);
 
             Assert.IsTrue(cleanmeisterNameGate >= 0 && cleanmeisterNameGate < sharedMonsterDataGate);
@@ -288,6 +288,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(source.Contains("capture.20260722-104809.malfunctioning-robot.7988C9BF"));
             Assert.IsTrue(source.Contains("ObservedCorpseSnapshots = snapshots"));
             Assert.IsTrue(source.Contains("ItemPoolUnresolved = true"));
+            Assert.IsFalse(
+                source.Contains("arete.landing.shiny-sword.independent"),
+                "Arete corpse snapshots must not be contaminated by a playfield-global independent roll.");
         }
 
         [TestMethod]
