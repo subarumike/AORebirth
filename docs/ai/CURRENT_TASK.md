@@ -167,3 +167,12 @@ verify expiry while outside and inside the mission, reconnect cleanup, exact
 Quest Delete, exact key/item removal, and PF2 release. The existing
 capture-backed `21–87` generated-mission corpse-credit repair remains intact;
 ordinary/authored corpses are unchanged.
+
+## Local WIP (not pushed)
+
+### Pet owner dialogue (Mike)
+
+Pet command announces currently use Zone FormatFeedback (brown AOML + leading
+`: `) so lines show without ChatEngine. Live capture `20260731-085057` still
+points at chat type 35 Your Pets for the real Public Groups toggle; that path
+is not required for the visible FormatFeedback fallback.

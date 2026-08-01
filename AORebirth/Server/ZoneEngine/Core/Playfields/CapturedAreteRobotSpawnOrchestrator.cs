@@ -226,13 +226,15 @@ namespace AORebirth.Core.Playfields
 
                 if (now >= state.BurnStartedUtc + TimeSpan.FromSeconds(BurnBeforeExplodeSeconds))
                 {
-                    // Health=0 → ProcessDeadNpcDespawn → BeginNpcDeath → explode Parameter2=503.
+                    // Capture 20260731-172247: CharacterAction Death Parameter2=503 then corpse.
                     candidate.Stats[StatIds.health].Value = 0;
                     this.robotLifeByInstance.Remove(instance);
                     LogUtil.Debug(
                         DebugInfoDetail.Engine,
                         "Captured Arete robot explode identity="
                         + candidate.Identity.ToString(true));
+                    // Force death pipeline now (explode anim) — don't wait for heartbeat race.
+                    playfield.HandleCombatKillingHit(null, candidate);
                     continue;
                 }
 

@@ -25,8 +25,8 @@ namespace ZoneEngine.Core.Arete.Quests
     using Playfield = AORebirth.Core.Playfields.Playfield;
 
     /// <summary>
-    /// Capture 20260725-credit-card: Bank of Rubi-Ka Credit Card pickup + Leonora turn-in.
-    /// Reward: 2507 XP + Vacuum Packed Omni-Med Suit (297054).
+    /// Capture 20260725-credit-card / 20260730-214622: Bank of Rubi-Ka Credit Card floor pickup + Leonora turn-in.
+    /// Reward: 2507 XP + Vacuum Packed Omni-Med Suit (297054). Steal path: 15000 credits.
     /// </summary>
     public static class LeonoraMartyQuestRuntime
     {
@@ -40,7 +40,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public const int CreditCardWorldTemplateId = 297315;
 
-        public const int CreditCardWorldInstance = unchecked((int)0x57A4218D);
+        // Capture 20260730-214622 Terminal:57A9CCBE (live instance rotates; match also by template).
+        public const int CreditCardWorldInstance = unchecked((int)0x57A9CCBE);
 
         public const int SuitRewardItemId = 297054;
 
@@ -183,21 +184,22 @@ namespace ZoneEngine.Core.Arete.Quests
                 return true;
             }
 
-            GenericCmdMessageHandler.Default.Acknowledge(character, message);
-
             if (!TryGrantItem(character, CreditCardItemId))
             {
+                GenericCmdMessageHandler.Default.Acknowledge(character, message);
                 Log("pickup grant failed character=" + character.Identity.ToString(true));
                 return true;
             }
 
+            // Capture 20260730-214622 order: QFU tips → FormatFeedback → TemplateAction/CAI → GenericCmd ack → Despawn.
             // World claim only — player may still steal OR turn in to Leonora once.
             MarkCreditCardWorldClaimed(character);
-            SendPickupFeedback(character);
-            SendOverflowGrantPackets(character, CreditCardItemId);
             EnsureQuestActive(character, StealQuestId);
             EnsureQuestActive(character, DeliverQuestId);
             LeonoraMartyTipSender.TrySendBothTips(character);
+            SendPickupFeedback(character);
+            SendOverflowGrantPackets(character, CreditCardItemId);
+            GenericCmdMessageHandler.Default.Acknowledge(character, message);
             TryDespawnCreditCard(character, target);
             Log("credit-card pickup character=" + character.Identity.ToString(true));
             return true;
@@ -804,7 +806,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return true;
             }
 
-            // Capture 20260726-secon try CC: world prop instance rotates on respawn (e.g. 57A42262).
+            // Capture 20260730-214622 / 20260726-secon try CC: world prop instance rotates on respawn.
             StaticDynel dynel = Pool.Instance.GetObject<StaticDynel>(character.Playfield.Identity, target);
             if (dynel == null)
             {

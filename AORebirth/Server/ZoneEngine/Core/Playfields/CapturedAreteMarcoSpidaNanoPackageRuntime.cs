@@ -68,7 +68,9 @@ namespace ZoneEngine.Core.Playfields
             }
 
             // Capture 20260721-nanoprogramsvendor: Overflow nanos first, then delete crystal.
+            // Tip rewards always attempt after unpack (even if a content grant fails mid-way).
             int granted = 0;
+            bool unpackAborted = false;
             for (int i = 0; i < package.Contents.Length; i++)
             {
                 CapturedAreteMarcoSpidaNanoPackageContentEntry entry = package.Contents[i];
@@ -84,7 +86,8 @@ namespace ZoneEngine.Core.Playfields
                         + entry.ItemId
                         + " reason="
                         + ex.Message);
-                    return false;
+                    unpackAborted = true;
+                    break;
                 }
 
                 QuestRewardInventoryGrantResult grant =
@@ -116,22 +119,27 @@ namespace ZoneEngine.Core.Playfields
                     + grant.Status
                     + " invErr="
                     + grant.InventoryError);
-                return false;
+                unpackAborted = true;
+                break;
             }
 
-            // Capture: TemplateAction crystal Unknown2=3 at Inventory placement, then DeleteItem.
-            TemplateActionMessageHandler.Default.Send(
-                character,
-                item,
-                (int)itemPosition.Type,
-                itemPosition.Instance);
-            character.BaseInventory.RemoveItem((int)itemPosition.Type, itemPosition.Instance);
-            CharacterActionMessageHandler.Default.SendDeleteItem(
-                character,
-                (int)itemPosition.Type,
-                itemPosition.Instance);
+            if (!unpackAborted)
+            {
+                // Capture: TemplateAction crystal Unknown2=3 at Inventory placement, then DeleteItem.
+                TemplateActionMessageHandler.Default.Send(
+                    character,
+                    item,
+                    (int)itemPosition.Type,
+                    itemPosition.Instance);
+                character.BaseInventory.RemoveItem((int)itemPosition.Type, itemPosition.Instance);
+                CharacterActionMessageHandler.Default.SendDeleteItem(
+                    character,
+                    (int)itemPosition.Type,
+                    itemPosition.Instance);
+            }
 
             // Capture order: tip XP/credits + 223373 + Action59/Delete after crystal delete.
+            // Also heal characters whose tip was ForceCompleted without rewards.
             StanGoodmanQuestRuntime.TryCompleteBuyNanoTipOnCrystalUse(character, item);
 
             Log(
@@ -143,11 +151,13 @@ namespace ZoneEngine.Core.Playfields
                 + package.Contents.Length
                 + " granted="
                 + granted
+                + " aborted="
+                + unpackAborted
                 + " character="
                 + character.Identity
                 + " evidence="
                 + package.Evidence);
-            return true;
+            return !unpackAborted;
         }
 
         private static void SendOverflowGrantPackets(ICharacter source, int itemId, int quality)

@@ -1218,9 +1218,20 @@ namespace AORebirth.Core.Playfields
             if (attack.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
                 && attack.AttackInfoWeaponInstance == 0)
             {
-                return this.WeaponDefinition != null
-                       && this.WeaponDefinition.IsValid
-                       && this.WeaponDefinition.InventorySlot == attack.AttackInfoWeaponSlot;
+                if (this.WeaponDefinition != null
+                    && this.WeaponDefinition.IsValid
+                    && this.WeaponDefinition.InventorySlot == attack.AttackInfoWeaponSlot)
+                {
+                    return true;
+                }
+
+                // Mesh-presented right-hand AttackInfo (Marcus Stone flamethrower):
+                // capture has WeaponSlot=6 AmmoCount=0 WeaponInstance=0 with SCFU mesh only —
+                // no WIFU template in items.dat (ACG 0x495A7).
+                return this.AttackModel == CapturedEnemyAttackModel.Specialized
+                       && this.WeaponDefinition == null
+                       && attack.UsesEquippedWeapon
+                       && attack.AttackInfoAmmoCount == 0;
             }
 
             if (attack.AttackInfoWeaponInstance == 0)
@@ -1243,6 +1254,12 @@ namespace AORebirth.Core.Playfields
             {
                 return this.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
                        && this.AttackInfoWeaponInstance == 0;
+            }
+
+            // Specialized mesh-presented slot-6 attacks certify without a physical WIFU item.
+            if (this.WeaponDefinition == null)
+            {
+                return false;
             }
 
             if (this.SpecialAttackSequence != null)
@@ -1311,17 +1328,57 @@ namespace AORebirth.Core.Playfields
             byte attackInfoN3Unknown,
             byte specialAttackWeaponN3Unknown,
             byte attackN3Unknown,
-            byte attackAction)
+            byte attackAction,
+            CapturedEnemySpecialAttackDefinition[] specialAttacks = null,
+            int specialAttackWeaponUnknown1 = 0,
+            int specialAttackWeaponUnknown2 = 0,
+            int specialAttackWeaponUnknown3 = 0,
+            int specialAttackWeaponUnknown4 = 0,
+            int specialAttackWeaponUnknown5 = 0)
         {
+            // Must satisfy IsCombatReady FixedAttackInfo gates or AcquireAggro refuses
+            // (quarantined contract) — root cause of Arete flea / FixedAttackOnSight no-aggro.
+            int evidenceSourceIdentity = Math.Abs((evidence ?? "fixed-aos").GetHashCode());
+            if (evidenceSourceIdentity == 0)
+            {
+                evidenceSourceIdentity = 1;
+            }
+
+            double attackStartDelaySeconds = 0.0d;
+            double firstHitDelaySeconds = 0.25d;
+            double landedIntervalSeconds = rechargeSeconds > 0.0d ? rechargeSeconds : 2.0d;
+            int[] damageObservations = minDamage == maxDamage
+                                           ? new[] { minDamage }
+                                           : new[] { minDamage, maxDamage };
+            // Do NOT invent (0,0,weaponInstance,"fixed-aos") specials — client resolves
+            // template 0 as nanobot/unknown damage feedback. Pass capture-accurate specials
+            // (e.g. Alex flea LEW1/LEW2) or leave empty.
+            CapturedEnemySpecialAttackDefinition[] resolvedSpecials =
+                specialAttacks ?? new CapturedEnemySpecialAttackDefinition[0];
+
             return new CapturedEnemyCombatContract
             {
                 Evidence = evidence,
+                EvidenceSourceIdentity = evidenceSourceIdentity,
                 Retaliates = true,
                 AiProfile = NpcAiProfile.Aggressive,
                 AttackModel = CapturedEnemyAttackModel.FixedAttackInfo,
                 MinDamage = minDamage,
                 MaxDamage = maxDamage,
-                RechargeSeconds = rechargeSeconds,
+                RechargeSeconds = landedIntervalSeconds,
+                AttackStartDelaySeconds = attackStartDelaySeconds,
+                FirstHitDelaySeconds = firstHitDelaySeconds,
+                CapturedDamageObservations = damageObservations,
+                CapturedAttackStartDelayObservationsSeconds = new[] { attackStartDelaySeconds },
+                CapturedFirstHitDelayObservationsSeconds = new[] { firstHitDelaySeconds },
+                CapturedLandedIntervalObservationsSeconds = new[] { landedIntervalSeconds },
+                CapturedDamageBonus = 0,
+                CapturedUsesEquippedWeapon = false,
+                // Unarmed FixedAttackOnSight must expose melee range or GetCombatAttackSource nulls out.
+                CapturedAttackRange = NpcCombatAttackRules.MaxMeleeCombatDistance,
+                SendCapturedAttackInfo = true,
+                HasCapturedFixedAttackBehavior = true,
+                HasCapturedRequiredPacketFields = true,
                 AttackInfoWeaponSlot = weaponSlot,
                 AttackInfoUnknown = attackInfoUnknown,
                 AttackInfoWeaponInstance = weaponInstance,
@@ -1329,12 +1386,17 @@ namespace AORebirth.Core.Playfields
                 AttackInfoHitType = attackInfoHitType,
                 AttackInfoN3Unknown = attackInfoN3Unknown,
                 SpecialAttackWeaponN3Unknown = specialAttackWeaponN3Unknown,
+                SpecialAttackWeaponUnknown1 = specialAttackWeaponUnknown1,
+                SpecialAttackWeaponUnknown2 = specialAttackWeaponUnknown2,
+                SpecialAttackWeaponUnknown3 = specialAttackWeaponUnknown3,
+                SpecialAttackWeaponUnknown4 = specialAttackWeaponUnknown4,
+                SpecialAttackWeaponUnknown5 = specialAttackWeaponUnknown5,
                 AttackN3Unknown = attackN3Unknown,
                 AttackAction = attackAction,
                 HasCapturedAttackStartContext = true,
-                HasEmptySpecialAttackWeaponContext = true,
+                HasEmptySpecialAttackWeaponContext = resolvedSpecials.Length == 0,
                 HasCapturedSpecialAttackWeaponContext = true,
-                CapturedSpecialAttacks = new CapturedEnemySpecialAttackDefinition[0]
+                CapturedSpecialAttacks = resolvedSpecials
             };
         }
 
@@ -1926,20 +1988,27 @@ namespace AORebirth.Core.Playfields
                 {
                     contract = resolved;
                 }
-                else if (!hasDirectCaptureCertification
-                         || string.IsNullOrWhiteSpace(resolutionFailure)
-                         || !resolutionFailure.StartsWith(
-                             "no canonical raw combat profile for ",
-                             StringComparison.Ordinal))
+                else if (!hasDirectCaptureCertification)
                 {
-                    // Keep a complete source-local CapturedFixedPacketSequence (e.g. Nascence
-                    // Barking Chimera from 20260723-225021) when the Subway corpus has no match.
+                    // Keep a complete source-local Specialized/Fixed sequence (e.g. Marcus Stone
+                    // mesh flamethrower from 20260731-174302, Nascence Barking Chimera) when the
+                    // corpus cannot certify a replacement. Do not quarantine already-ready
+                    // contracts just because a same-name catalog row is unsafe/ambiguous.
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="
                         + (string.IsNullOrWhiteSpace(resolutionFailure)
                                ? "selected retaliatory contract was not capture-certified"
                                : resolutionFailure),
                         true);
+                }
+                else if (!string.IsNullOrWhiteSpace(resolutionFailure))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        "CapturedEnemyCombatKeepCertified actor="
+                        + character.Identity
+                        + " corpus="
+                        + resolutionFailure);
                 }
             }
 

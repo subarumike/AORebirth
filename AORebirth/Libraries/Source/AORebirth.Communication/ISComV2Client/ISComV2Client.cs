@@ -35,6 +35,7 @@ namespace AORebirth.Communication.ISComV2Client
 
     using System;
     using System.Net;
+    using System.Net.Sockets;
     using System.Threading;
 
     using AORebirth.Communication.Messages;
@@ -46,80 +47,60 @@ namespace AORebirth.Communication.ISComV2Client
     #endregion
 
     /// <summary>
+    /// Zone→ChatEngine ISCom client. Zone does not dial ChatEngine at startup.
+    /// Link only when ChatEngine is already listening (operator starts it for LFT /
+    /// owner-only pet SystemChat / etc.), then keepalive while linked.
     /// </summary>
     public class ISComV2Client : IDisposable
     {
         #region Fields
 
-        /// <summary>
-        /// </summary>
         private readonly ISComV2ClientBase clientBase = new ISComV2ClientBase();
 
-        /// <summary>
-        /// </summary>
+        private readonly object linkLock = new object();
+
         private bool closing = false;
 
-        /// <summary>
-        /// </summary>
         private Thread connectorThread;
 
-        /// <summary>
-        /// </summary>
         private IPAddress serverAddress;
 
-        /// <summary>
-        /// </summary>
         private int serverPort;
 
         private bool disposed = false;
+
+        private bool everLinked = false;
+
+        private Thread linkWatchThread;
 
         #endregion
 
         #region Constructors and Destructors
 
-        /// <summary>
-        /// </summary>
         public ISComV2Client()
         {
             this.clientBase.ReceivedData += this.ClientBaseReceivedData;
             this.clientBase.Disconnected += this.ClientBaseDisconnected;
-
-            this.connectorThread = new Thread(new ThreadStart(this.Connector));
         }
 
         #endregion
 
         #region Delegates
 
-        /// <summary>
-        /// </summary>
         public delegate void OnConnectHandler(object sender, EventArgs e);
 
-        /// <summary>
-        /// </summary>
-        /// <param name="e">
-        /// </param>
         public delegate void OnReceiveDataHandler(object sender, DynamicMessage e);
 
-        /// <summary>
-        /// Event fired after reconnect tries were unsuccessful
-        /// </summary>
         public delegate void ReallyDisconnectedHandler(object sender, EventArgs e);
 
         #endregion
 
         #region Public Events
 
-        /// <summary>
-        /// </summary>
         public event OnConnectHandler OnConnect;
 
-        /// <summary>
-        /// </summary>
         public event OnReceiveDataHandler OnReceiveData;
 
-        /// <summary>
-        /// </summary>
         public event ReallyDisconnectedHandler ReallyDisconnected;
 
         #endregion
@@ -127,38 +108,100 @@ namespace AORebirth.Communication.ISComV2Client
         #region Public Methods and Operators
 
         /// <summary>
+        /// True only while the TCP socket is actually connected to ChatEngine.
         /// </summary>
-        /// <param name="address">
-        /// </param>
-        /// <param name="port">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public bool Connect(IPAddress address, int port)
+        public bool IsConnected
         {
-            try
+            get
             {
-                this.serverAddress = address;
-                this.serverPort = port;
-                this.connectorThread = new Thread(new ThreadStart(this.Connector));
-                this.connectorThread.Start();
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                LogUtil.Debug(DebugInfoDetail.Engine, "ISCom Connection to ChatEngine failed");
-                LogUtil.ErrorException(e);
-                return false;
+                return this.clientBase != null && this.clientBase.IsConnected;
             }
         }
 
         /// <summary>
+        /// Remember ChatEngine endpoint. Does not dial. Starts a quiet watch so when
+        /// the operator starts ChatEngine (pets / LFT), Zone links without spam.
         /// </summary>
-        /// <param name="dataObject">
-        /// </param>
-        public void Send(DynamicMessage dataObject)
+        public void Configure(IPAddress address, int port)
         {
+            this.serverAddress = address;
+            this.serverPort = port;
+            this.EnsureLinkWatchRunning();
+        }
+
+        /// <summary>
+        /// Legacy entry: configure only. Does not force-dial a closed port.
+        /// </summary>
+        public bool Connect(IPAddress address, int port)
+        {
+            this.Configure(address, port);
+            this.TryLinkIfChatEngineListening();
+            return true;
+        }
+
+        /// <summary>
+        /// Dial only if ChatEngine is already listening. No refuse spam.
+        /// </summary>
+        public bool TryLinkIfChatEngineListening()
+        {
+            if (this.IsConnected)
+            {
+                return true;
+            }
+
+            if (this.serverAddress == null || this.closing)
+            {
+                return false;
+            }
+
+            lock (this.linkLock)
+            {
+                if (this.IsConnected)
+                {
+                    return true;
+                }
+
+                // Do not rate-limit when CE is up — pet SystemChat must link on first command.
+                if (!this.IsChatEngineListening())
+                {
+                    return false;
+                }
+
+                try
+                {
+                    this.clientBase.ResetForReconnect();
+                    this.clientBase.Connect(this.serverAddress, this.serverPort);
+                    if (this.OnConnect != null)
+                    {
+                        this.OnConnect(this, EventArgs.Empty);
+                    }
+
+                    this.everLinked = true;
+                    this.EnsureConnectorRunning();
+                    LogUtil.Debug(DebugInfoDetail.Engine, "ISCom connected to ChatEngine");
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Error,
+                        "ISCom dial failed while ChatEngine listening: " + e.Message);
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Send when ChatEngine is linked. If ChatEngine is listening, link first.
+        /// Returns false when ChatEngine is not running (normal for Zone-only work).
+        /// </summary>
+        public bool TrySend(DynamicMessage dataObject)
+        {
+            if (!this.IsConnected && !this.TryLinkIfChatEngineListening())
+            {
+                return false;
+            }
+
             MessagePackSerializer<object> serializer = MessagePackSerializer.Create<object>();
             byte[] data = serializer.PackSingleObject(dataObject);
             byte[] finalData = new byte[8 + data.Length];
@@ -166,28 +209,56 @@ namespace AORebirth.Communication.ISComV2Client
             BitConverter.GetBytes(data.Length).CopyTo(finalData, 4);
             Array.Copy(data, 0, finalData, 8, data.Length);
             this.clientBase.Send(finalData);
+            return true;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="dataObject">
-        /// </param>
-        public void Send(MessageBase dataObject)
+        public void Send(DynamicMessage dataObject)
+        {
+            if (!this.TrySend(dataObject))
+            {
+                throw new InvalidOperationException(
+                    "ISCom Send while disconnected from ChatEngine (type="
+                    + (dataObject == null ? "null" : dataObject.TypeName)
+                    + ")");
+            }
+        }
+
+        public bool TrySend(MessageBase dataObject)
         {
             var temp = new DynamicMessage();
             temp.DataObject = dataObject;
-            this.Send(temp);
+            return this.TrySend(temp);
         }
 
-        /// <summary>
-        /// </summary>
+        public void Send(MessageBase dataObject)
+        {
+            if (!this.TrySend(dataObject))
+            {
+                throw new InvalidOperationException(
+                    "ISCom Send while disconnected from ChatEngine (type="
+                    + (dataObject == null ? "null" : dataObject.GetType().FullName)
+                    + ")");
+            }
+        }
+
         public void ShutDown()
         {
             LogUtil.Debug(DebugInfoDetail.Engine, "Shutting down ISCom");
             this.closing = true;
-            while (this.connectorThread.IsAlive)
+            try
             {
-                Thread.Sleep(100);
+                this.clientBase.ResetForReconnect();
+            }
+            catch (Exception)
+            {
+            }
+
+            if (this.connectorThread != null)
+            {
+                while (this.connectorThread.IsAlive)
+                {
+                    Thread.Sleep(100);
+                }
             }
         }
 
@@ -195,7 +266,79 @@ namespace AORebirth.Communication.ISComV2Client
 
         #region Methods
 
+        private bool IsChatEngineListening()
+        {
+            try
+            {
+                using (var probe = new TcpClient())
+                {
+                    IAsyncResult ar = probe.BeginConnect(this.serverAddress, this.serverPort, null, null);
+                    // 200ms was too short under load — pet SystemChat then never linked.
+                    if (!ar.AsyncWaitHandle.WaitOne(1500))
+                    {
+                        try
+                        {
+                            probe.Close();
+                        }
+                        catch (Exception)
+                        {
+                        }
+
+                        return false;
+                    }
+
+                    probe.EndConnect(ar);
+                    return probe.Connected;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void EnsureLinkWatchRunning()
+        {
+            if (this.linkWatchThread != null && this.linkWatchThread.IsAlive)
+            {
+                return;
+            }
+
+            this.linkWatchThread = new Thread(this.LinkWatch);
+            this.linkWatchThread.IsBackground = true;
+            this.linkWatchThread.Start();
+        }
+
         /// <summary>
+        /// Quietly link when ChatEngine appears. No logs while CE is down.
+        /// </summary>
+        private void LinkWatch()
+        {
+            while (!this.closing)
+            {
+                if (!this.IsConnected && this.serverAddress != null)
+                {
+                    this.TryLinkIfChatEngineListening();
+                }
+
+                Thread.Sleep(this.IsConnected ? 10000 : 2000);
+            }
+        }
+
+        private void EnsureConnectorRunning()
+        {
+            if (this.connectorThread != null && this.connectorThread.IsAlive)
+            {
+                return;
+            }
+
+            this.connectorThread = new Thread(new ThreadStart(this.Connector));
+            this.connectorThread.IsBackground = true;
+            this.connectorThread.Start();
+        }
+
+        /// <summary>
+        /// Keepalive only after a successful link. Never dials while ChatEngine is down.
         /// </summary>
         private void Connector()
         {
@@ -204,46 +347,67 @@ namespace AORebirth.Communication.ISComV2Client
             {
                 if (this.serverAddress == null)
                 {
+                    Thread.Sleep(1000);
                     continue;
                 }
 
-                if (!this.clientBase.IsConnected)
+                bool linked = this.clientBase.IsConnected;
+                if (!linked)
                 {
-                    LogUtil.Debug(DebugInfoDetail.ISComm, "Trying to connect to ChatEngine...");
-
-                    // this.Connect(serverAddress, serverPort);
-                    try
+                    // Only redial after we had a link before, and only if CE listens.
+                    if (this.everLinked)
                     {
-                        this.clientBase.Connect(this.serverAddress, this.serverPort);
-                        if (this.OnConnect != null)
-                        {
-                            this.OnConnect(this, EventArgs.Empty);
-                        }
-                    }
-                    catch
-                    {
+                        linked = this.TryLinkIfChatEngineListening();
                     }
                 }
+
+                if (!this.closing && linked && this.clientBase.IsConnected)
+                {
+                    try
+                    {
+                        // Direct write — avoid TrySend re-entry into link logic.
+                        MessagePackSerializer<object> serializer = MessagePackSerializer.Create<object>();
+                        var wrap = new DynamicMessage { DataObject = ping };
+                        byte[] data = serializer.PackSingleObject(wrap);
+                        byte[] finalData = new byte[8 + data.Length];
+                        BitConverter.GetBytes(0x00ff55aa).CopyTo(finalData, 0);
+                        BitConverter.GetBytes(data.Length).CopyTo(finalData, 4);
+                        Array.Copy(data, 0, finalData, 8, data.Length);
+                        this.clientBase.Send(finalData);
+                    }
+                    catch (Exception e)
+                    {
+                        linked = false;
+                        try
+                        {
+                            this.clientBase.ResetForReconnect();
+                        }
+                        catch (Exception)
+                        {
+                        }
+
+                        LogUtil.Debug(
+                            DebugInfoDetail.Error,
+                            "ISCom ping failed: " + e.Message);
+                    }
+                }
+
                 if (!this.closing)
                 {
-                    Thread.Sleep(5000);
-                    this.Send(ping);
+                    Thread.Sleep(linked ? 5000 : 10000);
                 }
             }
         }
 
-        /// <summary>
-        /// </summary>
         private void ClientBaseDisconnected(object sender, EventArgs e)
         {
             if (this.serverAddress == null)
             {
-                LogUtil.Debug(DebugInfoDetail.Error, "Could not reconnect to ChatEngine (no server address found)");
                 this.RaiseReallyDisconnected();
                 return;
             }
 
-            LogUtil.Debug(DebugInfoDetail.ISComm, "Trying to reconnect to ChatEngine");
+            // No log spam — operator starts ChatEngine when needed (LFT, pet SystemChat).
         }
 
         private void RaiseReallyDisconnected()
@@ -255,16 +419,11 @@ namespace AORebirth.Communication.ISComV2Client
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="dataBytes">
-        /// </param>
         private void ClientBaseReceivedData(object sender, OnDataReceivedArgs e)
         {
             MessagePackSerializer<DynamicMessage> serializer = MessagePackSerializer.Create<DynamicMessage>();
             DynamicMessage tmp = serializer.UnpackSingleObject(e.dataBytes);
 
-            // Is the handler set?
             if (this.OnReceiveData != null)
             {
                 this.OnReceiveData(this, tmp);
@@ -288,6 +447,7 @@ namespace AORebirth.Communication.ISComV2Client
                     this.clientBase.Dispose();
                 }
             }
+
             this.disposed = true;
         }
     }

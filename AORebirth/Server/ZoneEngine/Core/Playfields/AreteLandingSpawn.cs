@@ -1631,6 +1631,11 @@ namespace AORebirth.Core.Playfields
                 ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.PrepareSpawnedPeacekeeper(mob, npcController);
             }
 
+            if (AreteRexLarssonIdleGestureRuntime.IsRexLarsson(mob))
+            {
+                AreteRexLarssonIdleGestureRuntime.Register(mob);
+            }
+
             ZoneEngine.Core.Playfields.AreteIccPeacekeeperPatrolRuntime.TryApplyPatrol(def.CaptureInstance, npcController);
 
             if (def.CaptureInstance != 0)

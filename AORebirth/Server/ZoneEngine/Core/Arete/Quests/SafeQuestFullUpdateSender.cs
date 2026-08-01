@@ -14,6 +14,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
     using ZoneEngine.Core;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
 
     #endregion
 
@@ -1585,7 +1586,8 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         /// <summary>
-        /// Capture 20260720-074847: Action59+Delete Deliver + QFU Surveillance Uplink.
+        /// Capture 20260731-184635: Action59+Delete Deliver + QFU Surveillance Uplink
+        /// (+ Blank Info Chip / HC-12 granted before tip).
         /// </summary>
         public static RexQuestPreviewEmissionResult TrySendDeliverBioToSurveillanceUplinkHandoff(ICharacter source)
         {
@@ -1614,7 +1616,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 source.Controller.Client.SendCompressed(CreateSurveillanceUplinkPreviewMessage(source.Identity));
                 return RexQuestPreviewEmissionResult.Sent(
                     "Deliver→SurveillanceUplink Action59+Delete + tip. mission=Mission:5514B19D "
-                    + "source=20260720-074847/mission-flow.log");
+                    + "source=20260731-184635/mission-flow.log");
             }
             catch (Exception e)
             {
@@ -1989,6 +1991,19 @@ namespace ZoneEngine.Core.Arete.Quests
             QuestFullUpdateMessage message = CreateBuyNanoProgramsPreviewMessage(source.Identity);
             ApplyLiveTipExpiry(message, source);
             source.Controller.Client.SendCompressed(message);
+        }
+
+        /// <summary>
+        /// Login heal for Active Buy Nano tip — re-send tip only (do not re-run factory handoff).
+        /// </summary>
+        internal static void SendBuyNanoProgramsTipForLogin(ICharacter source)
+        {
+            if (source?.Controller?.Client == null)
+            {
+                return;
+            }
+
+            SendBuyNanoProgramsTip(source);
         }
 
         /// <summary>
@@ -3353,9 +3368,9 @@ namespace ZoneEngine.Core.Arete.Quests
                                    LongInfo = B196LongInfo,
                                    UnknownId1 = marcusIdentity,
                                    Unknown5 = 6,
-                                   Unknown6 = 0,
+                                   Unknown6 = 1080,
                                    Unknown7 = 0,
-                                   Unknown8 = 0,
+                                   Unknown8 = 2076,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData = new MissionItemReward[0],
@@ -3662,7 +3677,7 @@ namespace ZoneEngine.Core.Arete.Quests
                                    Unknown5 = 6,
                                    Unknown6 = 1120,
                                    Unknown7 = 0,
-                                   Unknown8 = 2076,
+                                   Unknown8 = 2229,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData = new MissionItemReward[0],
@@ -4452,7 +4467,8 @@ namespace ZoneEngine.Core.Arete.Quests
 
         internal static QuestFullUpdateMessage CreateBuyNanoProgramsPreviewMessage(Identity characterIdentity)
         {
-            // Capture 20260721-afgter dog lockpick goodman: UnknownId1 = CanbeAffected:78E0FC65 (Stan).
+            // Capture 20260730-212713 QFU Mission:5572F3B7:
+            // Unknown6=1160 credits, Unknown8=2581 XP, MissionItemData=223373 QL25.
             Identity missionIdentity = IdentityFromRaw(MissionIdentityType, BuyNanoProgramsInstance);
             Identity tipNpcIdentity = new Identity
                                        {
@@ -4479,12 +4495,25 @@ namespace ZoneEngine.Core.Arete.Quests
                                    LongInfo = BuyNanoProgramsLongInfo,
                                    UnknownId1 = tipNpcIdentity,
                                    Unknown5 = 6,
-                                   Unknown6 = 0,
+                                   Unknown6 = 1160,
                                    Unknown7 = 0,
-                                   Unknown8 = 0,
+                                   Unknown8 = 2581,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
-                                   MissionItemData = new MissionItemReward[0],
+                                   MissionItemData =
+                                       new[]
+                                       {
+                                           new MissionItemReward
+                                           {
+                                               LowId = CapturedAreteMarcoSpidaVendorContentProvider
+                                                   .BuyNanoTipRewardItemId,
+                                               HighId = CapturedAreteMarcoSpidaVendorContentProvider
+                                                   .BuyNanoTipRewardItemId,
+                                               Ql = CapturedAreteMarcoSpidaVendorContentProvider
+                                                   .BuyNanoTipRewardQuality,
+                                               Unknown = 0
+                                           }
+                                       },
                                    Unknown11 = expiry,
                                    Unknown12 = 0,
                                    Unknown13 = 0,
@@ -4828,9 +4857,9 @@ namespace ZoneEngine.Core.Arete.Quests
                                    LongInfo = B199LongInfo,
                                    UnknownId1 = marcusIdentity,
                                    Unknown5 = 6,
-                                   Unknown6 = 0,
+                                   Unknown6 = 1040,
                                    Unknown7 = 0,
-                                   Unknown8 = 0,
+                                   Unknown8 = 2076,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData = new MissionItemReward[0],
@@ -4924,9 +4953,9 @@ namespace ZoneEngine.Core.Arete.Quests
                                    LongInfo = B19ALongInfo,
                                    UnknownId1 = marcusIdentity,
                                    Unknown5 = 6,
-                                   Unknown6 = 0,
+                                   Unknown6 = 1040,
                                    Unknown7 = 0,
-                                   Unknown8 = 0,
+                                   Unknown8 = 2076,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData = new MissionItemReward[0],

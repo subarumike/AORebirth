@@ -1,8 +1,8 @@
 {
   "Identity": {
     "Id": "arete-marcus-stone-dialogue-20260614-195107",
-    "Version": "captured-marcus-wounded-20260719-224226",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107 + 20260719-Rex-Markus-stone/chat-dialogue.log"
+    "Version": "captured-marcus-once-each-20260731-macrus-stone-dialog-quests",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-macrus-stone-dialog-quests + prior Marcus chain captures"
   },
   "SourceCaptures": [
     "20260614-195107",
@@ -11,7 +11,9 @@
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/chat-dialogue.log",
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log",
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-Rex-Markus-stone/chat-dialogue.log",
-    "20260719-224226"
+    "20260719-224226",
+    "20260730-142434",
+    "20260731-macrus-stone-dialog-quests"
   ],
   "Npcs": [
     {
@@ -229,6 +231,46 @@
           "EnterActions": []
         },
         {
+          "Id": "marcus_post_flint_001",
+          "PromptText": "Was there anything else?",
+          "PromptTextConfidence": "Capture 20260730-142434 reopen after fire return / Flint tip — AnswerList order wounded-first",
+          "Options": [
+            {
+              "Id": "marcus_post_flint_001_option_0",
+              "Index": 0,
+              "Text": "Are those wounded workers your guys?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "marcus_wounded_001",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_post_flint_001_option_1",
+              "Index": 1,
+              "Text": "Who are you?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_post_flint_001_option_2",
+              "Index": 2,
+              "Text": "Where am I?",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_post_flint_001_option_3",
+              "Index": 3,
+              "Text": "Goodbye",
+              "TextEvidence": "KnuBotAnswerList 2026-07-30T12:25:22.7469229Z, 20260730-142434/chat-dialogue.log line 26",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
           "Id": "marcus_wounded_001",
           "PromptText": "They are.. Say, if you are not in a hurry would you mind saving at least one of them? I'll reward you with some equipment to patch yourself up when you get hurt.",
           "PromptTextConfidence": "KnubotAppendText 20260719-224226 #1741",
@@ -358,6 +400,70 @@
               "Index": 0,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:57.6760468Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_busy_extinguish_001",
+          "PromptText": "As you might have noticed, I'm a little busy at the moment.",
+          "PromptTextConfidence": "Reuse captured busy opener while Extinguish (B194) is Active — never re-offer fire.",
+          "Options": [
+            {
+              "Id": "marcus_busy_extinguish_001_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "Idle flavor while fire tip Active; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_busy_extinguish_001_option_1",
+              "Index": 1,
+              "Text": "Where am I?",
+              "TextEvidence": "Idle flavor while fire tip Active; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_busy_extinguish_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "Close while Extinguish Active",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_idle_001",
+          "PromptText": "Was there anything else?",
+          "PromptTextConfidence": "Capture 20260731-macrus-stone-dialog-quests: after heal turn-in, Marcus keeps only Who/Where (no fire, no wounded re-offer).",
+          "Options": [
+            {
+              "Id": "marcus_idle_001_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "User requirement + post-chain reopen; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_idle_001_option_1",
+              "Index": 1,
+              "Text": "Where am I?",
+              "TextEvidence": "User requirement + post-chain reopen; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_idle_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "Standard close; present on every captured Marcus AnswerList",
               "NextNodeId": "marcus_goodbye",
               "Actions": []
             }

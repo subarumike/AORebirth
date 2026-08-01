@@ -419,9 +419,10 @@ client.Controller.Character.Playfield.Identity,
 
             // Do NOT ExchangeOnlinePresence / SCFU-seed remotes here — that spawned
             // visible doubles of the same players in both zones.
-            if (Program.ISComClient != null && client.Controller.Character.Playfield != null)
+            if (Program.ISComClient != null && Program.ISComClient.IsConnected
+                && client.Controller.Character.Playfield != null)
             {
-                Program.ISComClient.Send(
+                Program.ISComClient.TrySend(
                     new AORebirth.Communication.Messages.ChatCommand
                     {
                         CharacterId = client.Controller.Character.Identity.Instance,

@@ -66,10 +66,14 @@ namespace ChatEngine.Packets
         VicinityMessage = 34,
 
         /// <summary>
+        /// AOSharp ChatMessageType.NpcMessage / NpcMessage packet id (35).
+        /// Used for owner-only brown pet announces. Not Vicinity (34).
+        /// Wiki also calls 35 BroadcastMessage (3 strings) — see MsgAnonymousVicinity.
         /// </summary>
         AnonymousMessage = 35,
 
         /// <summary>
+        /// Wiki SimpleSystemMessage (string only). Not used for pet owner announces.
         /// </summary>
         SystemMessage = 36,
 

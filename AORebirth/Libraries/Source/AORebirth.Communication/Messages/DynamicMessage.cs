@@ -125,10 +125,39 @@ namespace AORebirth.Communication.Messages
             byte[] temp;
             unpacker.ReadBinary(out temp);
 
-            // Create a message serializer object
-            IMessagePackSingleObjectSerializer ser = MessagePackSerializer.Create(Type.GetType(this.typeName));
+            // Resolve type from this assembly first (FullName only is not always enough).
+            Type dataType = Type.GetType(this.typeName)
+                            ?? typeof(MessageBase).Assembly.GetType(this.typeName);
+            if (dataType == null && !string.IsNullOrEmpty(this.typeName))
+            {
+                // Fallback: short name match inside Communication (Zone/Chat DLL skew).
+                string shortName = this.typeName;
+                int dot = shortName.LastIndexOf('.');
+                if (dot >= 0 && dot < shortName.Length - 1)
+                {
+                    shortName = shortName.Substring(dot + 1);
+                }
 
-            // Unpack the message's data object
+                foreach (Type candidate in typeof(MessageBase).Assembly.GetTypes())
+                {
+                    if (candidate != null
+                        && typeof(MessageBase).IsAssignableFrom(candidate)
+                        && (string.Equals(candidate.FullName, this.typeName, StringComparison.Ordinal)
+                            || string.Equals(candidate.Name, shortName, StringComparison.Ordinal)))
+                    {
+                        dataType = candidate;
+                        break;
+                    }
+                }
+            }
+
+            if (dataType == null)
+            {
+                throw new InvalidOperationException(
+                    "ISCom DynamicMessage unknown type: " + this.typeName);
+            }
+
+            IMessagePackSingleObjectSerializer ser = MessagePackSerializer.Create(dataType);
             this.dataObject = (MessageBase)ser.UnpackSingleObject(temp);
         }
 

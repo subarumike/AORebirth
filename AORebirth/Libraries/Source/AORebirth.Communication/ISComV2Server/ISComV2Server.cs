@@ -174,12 +174,24 @@ namespace AORebirth.Communication.ISComV2Server
         /// </param>
         private void ISComV2ServerDataReceived(object sender, OnDataReceivedArgs e)
         {
-            if (this.DataReceived != null)
+            if (this.DataReceived == null)
+            {
+                return;
+            }
+
+            try
             {
                 MessagePackSerializer<DynamicMessage> serializer = MessagePackSerializer.Create<DynamicMessage>();
                 DynamicMessage result = serializer.UnpackSingleObject(e.dataBytes);
-
                 this.DataReceived(sender, result);
+            }
+            catch (Exception ex)
+            {
+                // Zone→Chat SystemChatMessage unpack failures were silent → no owner pet lines.
+                Utility.LogUtil.Debug(
+                    Utility.DebugInfoDetail.Error,
+                    "ISComV2Server unpack/dispatch failed: " + ex.Message);
+                Utility.LogUtil.ErrorException(ex);
             }
         }
 
