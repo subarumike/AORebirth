@@ -9,7 +9,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class MissionAcgAcceptanceIdempotencyContractTests
     {
         [TestMethod]
-        public void DurableOwnerOfferClaimPrecedesProcessLocalOfferAndAllocation()
+        public void DurableOwnerOfferClaimPrecedesAllocation()
         {
             string coordinator = ReadMissionSource("MissionAcgAcceptanceCoordinator.cs");
             string accept = ReadMember(coordinator, "internal static bool TryAccept(");
@@ -21,7 +21,110 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "MissionOfferStore.TryClaimForAcceptance(",
                 "TryReserveAcceptedQuestIdentity(",
                 "MissionAcgAcceptedProjectionRuntime.TryCreate(",
+                "MissionOfferStore.TryMarkAccepted(",
                 "TryResumeAcceptance(");
+        }
+
+        [TestMethod]
+        public void DurableOfferAuthorityRestoresBeforeAllocatorAndNewIdentityPublication()
+        {
+            string runtime = ReadMissionSource("MissionAcgBindingRuntime.cs");
+            string initialize = ReadMember(runtime, "internal static void Initialize()");
+
+            AssertOrdered(
+                initialize,
+                "MissionAcgAcceptedProjectionRuntime.Initialize(",
+                "MissionOfferStore.Initialize(missionStateDirectory);",
+                "RestoreGeneratedOfferAuthority(DateTime.UtcNow);",
+                "allocator.TryRestore(",
+                "MissionRollService.SetOfferIdentityCollisionValidator(");
+
+            string restore =
+                ReadMember(runtime, "private static void RestoreGeneratedOfferAuthority(");
+            AssertOrdered(
+                restore,
+                "MissionOfferStore.DiscardPreparedOnRestoration(nowUtc);",
+                "MissionOfferStore.Snapshot();",
+                "MissionAcgAcceptedProjectionRuntime.TryGetByOwnerOffer(",
+                "MissionOfferStore.TryReconcileAccepted(",
+                "MissionOfferStore.TryRestoreUnprojectedClaim(",
+                "MissionOfferStore.ExpirePending(nowUtc);");
+        }
+
+        [TestMethod]
+        public void RollPublishesExactDurableBatchAndDiscardsOnlyThatBatchOnFeeFailure()
+        {
+            string handler =
+                ReadZoneSource("Core/MessageHandlers/QuestAlternativeMessageHandler.cs");
+            string read = ReadMember(handler, "protected override void Read(");
+            string coordinator = ReadMissionSource("MissionAcgAcceptanceCoordinator.cs");
+            string accept = ReadMember(coordinator, "internal static bool TryAccept(");
+
+            AssertOrdered(
+                read,
+                "lock (MissionOfferStore.AuthorityGate)",
+                "out rollSeed",
+                "MissionOfferStore.TryStoreRoll(",
+                "out storedBatch",
+                "MissionOfferStore.TryBeginFeeCharge(",
+                "MissionRollFeeService.TryChargeRollFee(",
+                "MissionOfferStore.TryDiscardBatch(",
+                "storedBatch,",
+                "rollFeeWasCharged = true;",
+                "MissionOfferStore.TryPublishBatch(",
+                "client.SendCompressed(response);");
+            StringAssert.Contains(accept, "lock (MissionOfferStore.AuthorityGate)");
+            Assert.IsFalse(
+                read.IndexOf("MissionOfferStore.DiscardRoll(", StringComparison.Ordinal) >= 0);
+        }
+
+        [TestMethod]
+        public void LoginRecoversTheDurableFeeClaimBeforeMissionWindowResend()
+        {
+            string connected = ReadZoneSource("Core/PacketHandlers/ClientConnected.cs");
+            AssertOrdered(
+                connected,
+                "MissionAcgLifecycleService.TryCleanupPendingForCharacter(",
+                "MissionRollFeeService.TryRecoverAndSendForLogin(",
+                "MissionAcceptService.TryResendForLogin(");
+
+            string feeService = ReadMissionSource("MissionRollFeeService.cs");
+            string recover = ReadMember(
+                feeService,
+                "internal static bool TryRecoverAndSendForLogin(");
+            AssertOrdered(
+                recover,
+                "MissionOfferStore.TryGetFeeChargePending(",
+                "TryChargeRollFee(",
+                "MissionOfferStore.TryPublishBatch(",
+                "MissionOfferStore.TryGetPendingRollForLogin(",
+                "client.SendCompressed(pendingResponse);");
+        }
+
+        [TestMethod]
+        public void RollFeeDebitAndBatchClaimShareOneExistingDatabaseTransaction()
+        {
+            string feeService = ReadMissionSource("MissionRollFeeService.cs");
+            string apply = ReadMember(
+                feeService,
+                "internal static MissionRollFeeApplyResult TryApply(");
+            AssertOrdered(
+                apply,
+                "connection.BeginTransaction()",
+                "ReadCash(",
+                "SELECT RewardType, Status, EffectReference FROM missionrewardledger",
+                "INSERT INTO stats",
+                "INSERT INTO missionrewardledger",
+                "transaction.Commit();");
+            string readCash = ReadMember(
+                feeService,
+                "private static int ReadCash(");
+            StringAssert.Contains(readCash, "SELECT StatValue FROM stats");
+            StringAssert.Contains(readCash, "FOR UPDATE");
+            Assert.IsFalse(
+                apply.IndexOf("INSERT INTO missionstate", StringComparison.OrdinalIgnoreCase) >= 0);
+            Assert.IsFalse(
+                apply.IndexOf("CREATE TABLE", StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         [TestMethod]

@@ -128,6 +128,66 @@ as replay-prevention audit state after transient runtime registrations are
 removed. These mechanisms provide explicit durable idempotency around
 server-controlled phases; they are not a distributed exactly-once transaction.
 
+## Durable generated-offer authority
+
+Pre-acceptance generated offers use a version-1 owner ledger beneath
+`mission-state/generated-offers`. A record retains the complete serialized roll
+payload and the exact owner, terminal, slider, issued/expiry, offer-index,
+offer-identity, deterministic seed, and response-nonce fields needed to audit or
+accept that roll without a process-local template. Serialization is
+deterministic, SHA-256 protected, atomically replaced, version validated, and
+fail closed. Mutable transitions use exact-record compare-and-swap so stale
+callbacks cannot overwrite a newer owner state.
+
+The authoritative states are:
+
+1. `Prepared`
+2. `FeeChargePending`
+3. `Pending`
+4. `AcceptanceClaimed`
+5. `Accepted`
+6. `Expired`
+7. `Replaced`
+8. `Discarded`
+
+`Prepared` is a non-accepting pre-fee state. Before cash can change, the exact
+batch advances durably to the also non-accepting `FeeChargePending` state. A
+dedicated transaction locks the owner's cash stat, applies the unchanged
+capture-backed fee, and inserts a unique applied claim keyed by owner and batch
+in the existing `missionrewardledger`; no schema is added and no completion
+reward record is fabricated. Retry observes that same claim instead of debiting
+again. The committed claim then publishes the exact batch as `Pending` and
+replaces the previous paid batch in the same owner-ledger write. A rejected fee
+discards only the pre-publication batch, leaving previous pending offers intact.
+Startup discards `Prepared` records that never reserved a fee claim; an
+interrupted `FeeChargePending` record is resumed idempotently when its owner logs
+in, followed by the exact stored pending roll payload. A pre-fee crash cannot
+restore an unpaid offer, while a post-debit crash cannot lose the paid roll.
+
+Startup restores and validates the owner ledger before new rolls or acceptance
+claims are published. The durable roll seed and response nonce, together with
+the separate restart-safe offer-identity cursor, prevent a process restart from
+resetting offer-generation ownership. Expiry, replacement, and discard select
+the exact owner and exact persisted roll; they do not broadly clear another
+owner's offers or infer ownership from mission type.
+
+Acceptance first compare-and-swaps the exact owner/original-offer record from
+`Pending` to `AcceptanceClaimed`. It then persists or locates the matching
+accepted projection and reconciles the claim to `Accepted`. A crash between
+these writes may resume only when both records correlate to the same owner,
+original offer, and accepted mission. Missing or conflicting evidence fails
+closed without allocating a replacement identity or silently releasing another
+mission's claim.
+
+The accepted projection remains the authority for full accepted QFU, binding,
+reward, artifact, and lifecycle restoration. It is not, by itself, the durable
+owner of the earlier pre-acceptance claim; that ownership belongs to the
+generated-offer ledger. Restored pending offers remain server-side audit and
+acceptance state. Reconnect reuses only the exact persisted response bytes; it
+does not regenerate or reroll offers. No database schema, reward formula,
+slider, loot, ACG-payload, authored-quest,
+legacy-mission, or procedural-generation behavior changes.
+
 ## Durable accepted-mission projection and idempotent acceptance
 
 The accepted generated mission is now authoritative without retaining a
@@ -164,9 +224,11 @@ zero/no-item outcomes remain explicit and are not replaced by formula fallback.
 ### Acceptance ownership and crash recovery
 
 Acceptance is serialized and keyed by `(owner, original offer identity)`. One
-offer can therefore own only one accepted quest. The selected offer is claimed
-durably before a binding, objective, key, artifact, accepted mission, or client
-QFU is exposed. The recoverable order is:
+offer can therefore own only one accepted quest. The durable generated-offer
+ledger claims the selected owner/offer before a binding, objective, key,
+artifact, accepted mission, or client QFU is exposed; the accepted projection
+then reconciles that claim to the exact accepted result. The recoverable order
+is:
 
 1. persist `OfferClaimed` with the reserved accepted quest, bundle, building,
    live PF2, key, expiry, and frozen accepted projection;

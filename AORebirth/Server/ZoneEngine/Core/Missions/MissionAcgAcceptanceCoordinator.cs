@@ -20,8 +20,6 @@ namespace ZoneEngine.Core.Missions
     {
         private const int RepairArtifactIdentityType = 0x0000C73D;
 
-        private static readonly object AcceptanceSync = new object();
-
         internal static bool TryAccept(
             IZoneClient client,
             ICharacter character,
@@ -40,7 +38,7 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            lock (AcceptanceSync)
+            lock (MissionOfferStore.AuthorityGate)
             {
                 MissionAcgBindingRuntime.Initialize();
 
@@ -52,6 +50,18 @@ namespace ZoneEngine.Core.Missions
                     originalOfferIdentity.Instance,
                     out existingProjection))
                 {
+                    bool offerRecordExists;
+                    if (!MissionOfferStore.TryReconcileAccepted(
+                            character.Identity,
+                            originalOfferIdentity,
+                            existingProjection.Binding.AcceptedQuestIdentity,
+                            DateTime.UtcNow,
+                            out offerRecordExists,
+                            out failure))
+                    {
+                        return false;
+                    }
+
                     return TryResumeAcceptance(
                         client,
                         character,
@@ -75,7 +85,7 @@ namespace ZoneEngine.Core.Missions
 
                 MissionOfferRecord offerRecord;
                 if (!MissionOfferStore.TryClaimForAcceptance(
-                    character.Identity.Instance,
+                    character.Identity,
                     originalOfferIdentity,
                     DateTime.UtcNow,
                     out offerRecord,
@@ -212,9 +222,15 @@ namespace ZoneEngine.Core.Missions
                     }
 
                     durableClaimCreated = true;
-                    MissionOfferStore.MarkDurablyClaimed(
-                        character.Identity.Instance,
-                        originalOfferIdentity);
+                    if (!MissionOfferStore.TryMarkAccepted(
+                            offerRecord,
+                            persistedProjection.Binding.AcceptedQuestIdentity,
+                            DateTime.UtcNow,
+                            out failure))
+                    {
+                        return false;
+                    }
+
                     return TryResumeAcceptance(
                         client,
                         character,
@@ -235,9 +251,11 @@ namespace ZoneEngine.Core.Missions
                             acceptedIdentity,
                             keyIdentity,
                             livePlayfield2);
-                        MissionOfferStore.ReleaseClaim(
-                            character.Identity.Instance,
-                            originalOfferIdentity);
+                        string releaseFailure;
+                        MissionOfferStore.TryReleaseClaim(
+                            offerRecord,
+                            DateTime.UtcNow,
+                            out releaseFailure);
                     }
                 }
             }
@@ -257,7 +275,7 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            lock (AcceptanceSync)
+            lock (MissionOfferStore.AuthorityGate)
             {
                 MissionAcgBindingRuntime.Initialize();
                 IList<MissionAcgAcceptedProjection> projections =

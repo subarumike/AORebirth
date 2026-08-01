@@ -101,6 +101,8 @@ namespace ZoneEngine.Core.Missions
                         missionStateDirectory,
                         catalog,
                         loaded.Records);
+                MissionOfferStore.Initialize(missionStateDirectory);
+                RestoreGeneratedOfferAuthority(DateTime.UtcNow);
                 var allocationRestorationRecords =
                     new List<MissionAcgBindingRecord>(loaded.Records);
                 for (int i = 0; i < pendingAcceptedReservations.Count; i++)
@@ -597,6 +599,70 @@ namespace ZoneEngine.Core.Missions
 
                 return false;
             }
+        }
+
+        private static void RestoreGeneratedOfferAuthority(DateTime nowUtc)
+        {
+            MissionOfferStore.DiscardPreparedOnRestoration(nowUtc);
+            List<MissionOfferRecord> offers = MissionOfferStore.Snapshot();
+            for (int i = 0; i < offers.Count; i++)
+            {
+                MissionOfferRecord offer = offers[i];
+                MissionAcgAcceptedProjection projection;
+                if (MissionAcgAcceptedProjectionRuntime.TryGetByOwnerOffer(
+                        (int)offer.OwnerIdentity.Type,
+                        offer.OwnerIdentity.Instance,
+                        (int)offer.Offer.QuestIdentity.Type,
+                        offer.Offer.QuestIdentity.Instance,
+                        out projection))
+                {
+                    bool offerRecordExists;
+                    string reconcileFailure;
+                    if (!MissionOfferStore.TryReconcileAccepted(
+                            offer.OwnerIdentity,
+                            offer.Offer.QuestIdentity,
+                            projection.Binding.AcceptedQuestIdentity,
+                            nowUtc,
+                            out offerRecordExists,
+                            out reconcileFailure))
+                    {
+                        throw new InvalidOperationException(
+                            "Generated mission offer/projection restoration failed for offer "
+                            + offer.Offer.QuestIdentity.Instance
+                            + ": "
+                            + reconcileFailure);
+                    }
+
+                    continue;
+                }
+
+                if (offer.LifecycleState
+                    == MissionOfferLifecycleState.AcceptanceClaimed)
+                {
+                    string claimFailure;
+                    if (!MissionOfferStore.TryRestoreUnprojectedClaim(
+                            offer,
+                            nowUtc,
+                            out claimFailure))
+                    {
+                        throw new InvalidOperationException(
+                            "Generated mission unprojected offer claim restoration failed for offer "
+                            + offer.Offer.QuestIdentity.Instance
+                            + ": "
+                            + claimFailure);
+                    }
+                }
+                else if (offer.LifecycleState
+                         == MissionOfferLifecycleState.Accepted)
+                {
+                    throw new InvalidOperationException(
+                        "Generated mission accepted offer "
+                        + offer.Offer.QuestIdentity.Instance
+                        + " has no matching durable accepted projection.");
+                }
+            }
+
+            MissionOfferStore.ExpirePending(nowUtc);
         }
 
         private static bool IsGeneratedOfferIdentityInUse(int originalOfferInstance)

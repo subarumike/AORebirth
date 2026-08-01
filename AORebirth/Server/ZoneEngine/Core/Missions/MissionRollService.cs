@@ -73,6 +73,33 @@ namespace ZoneEngine.Core.Missions
             MissionLocationSide characterSide,
             int clientClockNowSeconds)
         {
+            int rollSeed;
+            int responseNonce;
+            return BuildRollResponse(
+                request,
+                character,
+                characterLevel,
+                terminalPlayfieldId,
+                terminalX,
+                terminalZ,
+                characterSide,
+                clientClockNowSeconds,
+                out rollSeed,
+                out responseNonce);
+        }
+
+        internal static QuestAlternativeMessage BuildRollResponse(
+            QuestAlternativeMessage request,
+            Identity character,
+            int characterLevel,
+            int terminalPlayfieldId,
+            float terminalX,
+            float terminalZ,
+            MissionLocationSide characterSide,
+            int clientClockNowSeconds,
+            out int rollSeed,
+            out int responseNonce)
+        {
             EnsureInitialized();
 
             if (request == null)
@@ -92,7 +119,12 @@ namespace ZoneEngine.Core.Missions
                 throw new ArgumentOutOfRangeException("request", sliderError);
             }
 
-            var rng = new Random(unchecked(Environment.TickCount * 397) ^ character.Instance ^ missionQuality);
+            rollSeed =
+                unchecked(Environment.TickCount * 397)
+                ^ character.Instance
+                ^ missionQuality;
+            responseNonce = unchecked((int)(uint)Environment.TickCount);
+            var rng = new Random(rollSeed);
             return BuildRollResponseCore(
                 request,
                 character,
@@ -104,7 +136,7 @@ namespace ZoneEngine.Core.Missions
                 missionQuality,
                 sliders,
                 rng,
-                unchecked((int)(uint)Environment.TickCount),
+                responseNonce,
                 clientClockNowSeconds,
                 NextQuestInstance);
         }
