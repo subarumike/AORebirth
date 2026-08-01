@@ -811,7 +811,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string current = AppDomain.CurrentDomain.BaseDirectory;
             while (!string.IsNullOrEmpty(current))
             {
-                if (Directory.Exists(Path.Combine(current, ".git")))
+                string gitMarker = Path.Combine(current, ".git");
+                if (Directory.Exists(gitMarker) || File.Exists(gitMarker))
                 {
                     return current;
                 }
