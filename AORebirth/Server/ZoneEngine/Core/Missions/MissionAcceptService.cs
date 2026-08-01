@@ -59,6 +59,28 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            MissionAcgBindingRuntime.Initialize();
+            ISet<int> deliveredAcceptedQuestInstances = new HashSet<int>();
+            IZoneClient zoneClient =
+                character.Controller == null
+                    ? null
+                    : character.Controller.Client as IZoneClient;
+            if (zoneClient != null)
+            {
+                string recoveryFailure;
+                if (!MissionAcgAcceptanceCoordinator.TryRecoverOwned(
+                    zoneClient,
+                    character,
+                    out deliveredAcceptedQuestInstances,
+                    out recoveryFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "ACG-ACCEPT-LOGIN-RECOVERY-PENDING owner={0} reason={1}",
+                        character.Identity.Instance,
+                        recoveryFailure);
+                }
+            }
+
             List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(character.Identity.Instance);
             bool hasKey = MissionKeyGrantService.HasMissionKey(character);
             if (all.Count == 0 && !hasKey)
@@ -84,6 +106,13 @@ namespace ZoneEngine.Core.Missions
             foreach (MissionAcceptedStore.AcceptedMission entry in all)
             {
                 if (entry == null)
+                {
+                    continue;
+                }
+
+                if (entry.QuestIdentity != null
+                    && deliveredAcceptedQuestInstances.Contains(
+                        entry.QuestIdentity.Instance))
                 {
                     continue;
                 }

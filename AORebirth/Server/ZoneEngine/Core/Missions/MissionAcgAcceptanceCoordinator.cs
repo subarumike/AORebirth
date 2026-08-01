@@ -335,6 +335,7 @@ namespace ZoneEngine.Core.Missions
                     MissionAcgAcceptedProjection expiredProjection;
                     string expiryPersistenceFailure;
                     if (MissionAcgAcceptedProjectionRuntime.TryReplace(
+                        projection,
                         projection.WithLifecycle(
                             MissionAcgLifecycleState.Cleaned,
                             MissionAcgCleanupState.Completed,
@@ -762,52 +763,19 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
-            Identity acceptedQuest = ToIdentity(
-                bindingRecord.Binding.AcceptedQuestIdentity);
-            int ignoredItem;
-            MissionKeyStore.TryTakeExact(
-                character.Identity.Instance,
-                acceptedQuest,
-                out ignoredItem);
-            MissionKeyGrantService.TryRemoveMissionKey(
-                client,
-                character,
-                bindingRecord.Binding.MissionKeyIdentity.Instance);
-
-            if (bindingRecord.Binding.MissionType == MissionRollType.RepairMachine
-                && projection.MissionArtifactIdentity != null)
-            {
-                MissionKeyStore.TryTakeRepairKit(
-                    character.Identity.Instance,
-                    acceptedQuest,
-                    out ignoredItem);
-                MissionKeyGrantService.TryRemoveRepairItem(
-                    client,
-                    character,
-                    projection.MissionArtifactIdentity.Instance);
-            }
-
             string cleanupFailure;
-            if (!MissionAcgObjectiveRuntime.TryDeleteAfterFailedAcceptance(
-                bindingRecord.Binding.AcceptedQuestIdentity,
-                out cleanupFailure))
-            {
-                MissionDiagnostics.Log(
-                    "ACG-ACCEPT-INVALID-CLEANUP-PENDING accepted={0}:{1} reason={2}",
-                    bindingRecord.Binding.AcceptedQuestIdentity.Type,
-                    bindingRecord.Binding.AcceptedQuestIdentity.Instance,
-                    cleanupFailure);
-                return;
-            }
-
-            MissionAcgBindingRecord cleanupPending;
-            if (!MissionAcgBindingRuntime.TryTransition(
-                bindingRecord,
-                MissionAcgLifecycleState.CleanupPending,
-                MissionAcgCleanupState.InstanceReleasePending,
-                DateTime.UtcNow,
-                out cleanupPending,
-                out cleanupFailure))
+            MissionAcgBindingRecord cleanupPending = bindingRecord;
+            if (bindingRecord.State.LifecycleState
+                    != MissionAcgLifecycleState.CleanupPending
+                && bindingRecord.State.LifecycleState
+                    != MissionAcgLifecycleState.Cleaned
+                && !MissionAcgBindingRuntime.TryTransition(
+                    bindingRecord,
+                    MissionAcgLifecycleState.CleanupPending,
+                    MissionAcgCleanupState.InstanceReleasePending,
+                    DateTime.UtcNow,
+                    out cleanupPending,
+                    out cleanupFailure))
             {
                 MissionDiagnostics.Log(
                     "ACG-ACCEPT-INVALID-CLEANUP-PENDING accepted={0}:{1} reason={2}",
@@ -818,16 +786,12 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionAcgBindingRecord cleaned;
-            if (!MissionAcgBindingRuntime.TryTransition(
-                    cleanupPending,
-                    MissionAcgLifecycleState.Cleaned,
-                    MissionAcgCleanupState.Completed,
-                    DateTime.UtcNow,
-                    out cleaned,
-                    out cleanupFailure)
-                || !MissionAcgBindingRuntime.TryReleaseFailedAcceptanceAfterCleanup(
-                    cleaned,
-                    out cleanupFailure))
+            if (!MissionAcgLifecycleService.TryCleanupOwnedRecord(
+                client,
+                character,
+                cleanupPending,
+                out cleaned,
+                out cleanupFailure))
             {
                 MissionDiagnostics.Log(
                     "ACG-ACCEPT-INVALID-CLEANUP-PENDING accepted={0}:{1} reason={2}",

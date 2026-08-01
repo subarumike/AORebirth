@@ -360,6 +360,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void StalePhaseReplacementCannotOverwriteTerminalLifecycle()
+        {
+            SourceOffer source = FindAllMissionTypes()[MissionRollType.FindItem];
+            MissionAcgAcceptedProjectionStore store = this.CreateStore("stale-replacement");
+            MissionAcgAcceptedProjection original =
+                this.CreateProjection(
+                    source,
+                    125,
+                    8125,
+                    MissionAcgAcceptancePhase.OfferClaimed);
+            PersistOne(store, original);
+
+            MissionAcgAcceptedProjection terminal =
+                original.WithLifecycle(
+                    MissionAcgLifecycleState.Cleaned,
+                    MissionAcgCleanupState.Completed,
+                    original.UpdatedUtc.AddSeconds(1));
+            MissionAcgAcceptedProjection persisted;
+            string failure;
+            Assert.IsTrue(
+                store.TryReplace(original, terminal, out persisted, out failure),
+                failure);
+
+            MissionAcgAcceptedProjection staleAdvance =
+                original.WithPhase(
+                    MissionAcgAcceptancePhase.BindingPersisted,
+                    original.UpdatedUtc.AddSeconds(2));
+            Assert.IsFalse(
+                store.TryReplace(original, staleAdvance, out persisted, out failure));
+            StringAssert.Contains(failure, "changed after the expected record was read");
+
+            MissionAcgAcceptedProjectionLoadResult restarted = store.LoadAll();
+            Assert.IsTrue(restarted.IsValid, string.Join("|", restarted.Diagnostics));
+            Assert.AreEqual(1, restarted.Projections.Count);
+            Assert.AreEqual(
+                MissionAcgAcceptancePhase.OfferClaimed,
+                restarted.Projections[0].AcceptancePhase);
+            Assert.AreEqual(
+                MissionAcgLifecycleState.Cleaned,
+                restarted.Projections[0].LifecycleState);
+            Assert.AreEqual(
+                MissionAcgCleanupState.Completed,
+                restarted.Projections[0].CleanupState);
+        }
+
+        [TestMethod]
         public void ExpiredOfferClaimCleanupPersistsAndReleasesItsAllocatorReservation()
         {
             SourceOffer source = FindAllMissionTypes()[MissionRollType.FindItem];
@@ -394,7 +440,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     MissionAcgCleanupState.Completed,
                     pending.Binding.ExpiryUtc.AddSeconds(1));
             MissionAcgAcceptedProjection persisted;
-            Assert.IsTrue(store.TryReplace(cleaned, out persisted, out failure), failure);
+            Assert.IsTrue(
+                store.TryReplace(pending, cleaned, out persisted, out failure),
+                failure);
             allocator.RollbackUnpersisted(
                 pending.Binding.AcceptedQuestIdentity,
                 pending.Binding.MissionKeyIdentity,

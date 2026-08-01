@@ -327,6 +327,37 @@ namespace ZoneEngine.Core.Missions
             return entry != null;
         }
 
+        internal static bool TryResolveGeneratedProjection(
+            int characterInstance,
+            Identity questIdentity,
+            out AcceptedMission entry)
+        {
+            entry = null;
+            if (questIdentity == null
+                || questIdentity.Instance <= 0
+                || !MissionAcgAcceptedProjectionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            MissionAcgAcceptedProjection projection;
+            if (!MissionAcgAcceptedProjectionRuntime.TryGetByAcceptedQuest(
+                    questIdentity.Instance,
+                    out projection)
+                || projection == null
+                || projection.Binding.OwnerIdentity.Instance != characterInstance
+                || projection.Binding.AcceptedQuestIdentity.Type
+                    != (int)questIdentity.Type
+                || (int)projection.AcceptancePhase
+                    < (int)MissionAcgAcceptancePhase.AcceptanceCommitted)
+            {
+                return false;
+            }
+
+            entry = BuildProjectionEntry(projection);
+            return entry != null;
+        }
+
         /// <summary>
         /// Removes one mission by quest identity (journal delete). Returns true if something was removed.
         /// </summary>

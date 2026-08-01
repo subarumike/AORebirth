@@ -112,6 +112,7 @@ namespace ZoneEngine.Core.Missions
                         MissionAcgAcceptedProjection reconciled;
                         string reconcileFailure;
                         if (!store.TryReplace(
+                            projection,
                             projection.WithLifecycle(
                                 binding.State.LifecycleState,
                                 binding.State.CleanupState,
@@ -165,6 +166,7 @@ namespace ZoneEngine.Core.Missions
         }
 
         internal static bool TryReplace(
+            MissionAcgAcceptedProjection expected,
             MissionAcgAcceptedProjection projection,
             out MissionAcgAcceptedProjection persisted,
             out string failure)
@@ -173,20 +175,28 @@ namespace ZoneEngine.Core.Missions
             {
                 EnsureInitialized_NoLock();
                 MissionAcgAcceptedProjection current;
-                if (!ByAcceptedQuest.TryGetValue(
-                        projection.Binding.AcceptedQuestIdentity.Instance,
+                if (expected == null
+                    || projection == null
+                    || !ByAcceptedQuest.TryGetValue(
+                        expected.Binding.AcceptedQuestIdentity.Instance,
                         out current)
+                    || !object.ReferenceEquals(current, expected)
                     || !string.Equals(
                         OwnerOfferKey(current.Binding),
                         OwnerOfferKey(projection.Binding),
                         StringComparison.Ordinal))
                 {
                     persisted = null;
-                    failure = "Accepted projection is not registered for replacement.";
+                    failure =
+                        "Accepted projection is stale or is not registered for replacement.";
                     return false;
                 }
 
-                if (!store.TryReplace(projection, out persisted, out failure))
+                if (!store.TryReplace(
+                    expected,
+                    projection,
+                    out persisted,
+                    out failure))
                 {
                     return false;
                 }
@@ -207,6 +217,7 @@ namespace ZoneEngine.Core.Missions
             try
             {
                 return TryReplace(
+                    projection,
                     projection.WithPhase(phase, nowUtc),
                     out updated,
                     out failure);
@@ -229,6 +240,7 @@ namespace ZoneEngine.Core.Missions
             try
             {
                 return TryReplace(
+                    projection,
                     projection.WithObjective(objectiveIdentity, nowUtc),
                     out updated,
                     out failure);
@@ -251,6 +263,7 @@ namespace ZoneEngine.Core.Missions
             try
             {
                 return TryReplace(
+                    projection,
                     projection.WithArtifact(artifactIdentity, nowUtc),
                     out updated,
                     out failure);
@@ -294,6 +307,7 @@ namespace ZoneEngine.Core.Missions
                 MissionAcgAcceptedProjection persisted;
                 string failure;
                 if (!store.TryReplace(
+                        projection,
                         projection.WithLifecycle(
                             bindingRecord.State.LifecycleState,
                             bindingRecord.State.CleanupState,
@@ -407,7 +421,11 @@ namespace ZoneEngine.Core.Missions
                 {
                     MissionAcgAcceptedProjection persisted;
                     string failure;
+                    MissionAcgAcceptedProjection expected =
+                        ByAcceptedQuest[
+                            replacements[i].Binding.AcceptedQuestIdentity.Instance];
                     if (!store.TryReplace(
+                        expected,
                         replacements[i],
                         out persisted,
                         out failure))

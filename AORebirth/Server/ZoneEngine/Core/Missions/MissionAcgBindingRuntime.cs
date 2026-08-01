@@ -142,6 +142,7 @@ namespace ZoneEngine.Core.Missions
                     MissionAcgAcceptedProjection cleanedProjection;
                     string cleanupFailure;
                     if (!MissionAcgAcceptedProjectionRuntime.TryReplace(
+                            projection,
                             projection.WithLifecycle(
                                 MissionAcgLifecycleState.Cleaned,
                                 MissionAcgCleanupState.Completed,

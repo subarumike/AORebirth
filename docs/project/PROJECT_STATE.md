@@ -1140,6 +1140,16 @@ instead of being rebuilt from defaults. Authored quests and true legacy mission
 paths remain unchanged. This work adds no database/schema, reward-formula,
 slider, loot, ACG-payload, or procedural-generation changes.
 
+The live reconnect owner resumes incomplete acceptance before projecting the
+mission list and suppresses duplicate QFU delivery for records completed by
+that recovery pass. Accepted-projection updates use exact-record
+compare-and-swap, preventing stale phase checkpoints from overwriting terminal
+lifecycle changes. Failed acceptance first persists `CleanupPending`, then uses
+the existing exact artifact/runtime cleanup pipeline; PF2 release remains gated
+on durable cleanup completion. Completion restart recovery resolves the frozen
+accepted projection directly when `CompletionStarted` is intentionally absent
+from the active mission-list view.
+
 # Generated Terminal Mission Token Progress
 
 Generated-terminal mission token progress has an accepted-quest-scoped
