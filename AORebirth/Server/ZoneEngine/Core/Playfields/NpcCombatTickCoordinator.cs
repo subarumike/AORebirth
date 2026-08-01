@@ -26,6 +26,8 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class NpcCombatTickCoordinator
     {
+        private const int AreteLandingPlayfieldId = 6553;
+
         private const int MissingItemStatValue = 1234567890;
 
         private readonly Dictionary<int, DateTime> nextCombatTicks = new Dictionary<int, DateTime>();
@@ -836,8 +838,9 @@ namespace AORebirth.Core.Playfields
         {
             // Player pets on Arete must land hits once in melee range; strict PF127
             // LOS/nav gates leave them frozen on the target with no AttackInfo.
-            if (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
-                || PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker))
+            if (this.playfield.Identity.Instance == AreteLandingPlayfieldId
+                && (PetCombatRules.IsPlayerOwnedMeleeCombatPet(attacker)
+                    || PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(attacker)))
             {
                 this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);
                 return true;

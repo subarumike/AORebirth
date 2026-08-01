@@ -476,6 +476,12 @@ namespace ZoneEngine.Core.Arete.Quests
 
             try
             {
+                if (!ApplyAlexTurnInXpCredits(source))
+                {
+                    Log("alex-turnin deferred: durable reward was not completed");
+                    return;
+                }
+
                 TryConsumeBioCom(source, stagedContainer);
                 try
                 {
@@ -486,7 +492,6 @@ namespace ZoneEngine.Core.Arete.Quests
                     Log("alex-rejecteditems failed: " + ex.Message);
                 }
 
-                ApplyAlexTurnInXpCredits(source);
                 TrySendTurnInRewardFeedback(source);
                 TryGrantAlexTurnInItems(source);
                 CompleteDeliverAndOfferUplink(source);
@@ -664,11 +669,20 @@ namespace ZoneEngine.Core.Arete.Quests
                 });
         }
 
-        private static void ApplyAlexTurnInXpCredits(ICharacter source)
+        private static bool ApplyAlexTurnInXpCredits(ICharacter source)
         {
+            if (source == null || !MissionRuntime.IsInitialized || MissionRuntime.Rewards == null)
+            {
+                return false;
+            }
+
             MissionRewardDefinition definition = new MissionRewardDefinition
                                                 {
                                                     RewardKey = "captured-alex-bio-com-turnin-xp-credits-20260731-184635",
+                                                    LegacyRewardKeys = new[]
+                                                                       {
+                                                                           "captured-alex-bio-com-turnin-xp-credits"
+                                                                       },
                                                     RewardType = "character-stats",
                                                     IsResolved = true,
                                                     StatMutations =
@@ -717,49 +731,30 @@ namespace ZoneEngine.Core.Arete.Quests
                 "Mission:5514B19C",
                 definition,
                 "capture:20260731-184635:alex-turnin-xp-credits");
-            if (!result.Succeeded || result.StatValues == null)
+            if (result == null || !result.Succeeded)
             {
                 Log(
                     "alex xp/credits reward failed status="
                     + (result == null ? "null" : result.Status.ToString())
                     + " msg="
                     + (result == null ? string.Empty : result.Message));
-                // Capture still shows live Cash/XP even if ledger rejects — apply directly.
-                ApplyDirectXpCreditsFallback(source);
-                return;
+                return false;
             }
 
-            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            if (result.StatValues != null)
             {
-                uint value = statValue.Value <= 0
-                                 ? 0
-                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                source.Stats[(StatIds)statValue.StatId].Set(value);
-            }
+                foreach (MissionCharacterStatValue statValue in result.StatValues)
+                {
+                    uint value = statValue.Value <= 0
+                                     ? 0
+                                     : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                    source.Stats[(StatIds)statValue.StatId].Set(value);
+                }
 
-            StatMessageHandler.Default.SendChanged(source);
-        }
-
-        private static void ApplyDirectXpCreditsFallback(ICharacter source)
-        {
-            if (source == null || source.Stats == null)
-            {
-                return;
-            }
-
-            try
-            {
-                source.Stats[StatIds.cash].Value = source.Stats[StatIds.cash].Value + TurnInCreditReward;
-                source.Stats[StatIds.xp].Value = source.Stats[StatIds.xp].Value + TurnInXpReward;
-                source.Stats[StatIds.unsavedxp].Value = source.Stats[StatIds.unsavedxp].Value + TurnInXpReward;
-                source.Stats[StatIds.lastxp].Value = TurnInXpReward;
                 StatMessageHandler.Default.SendChanged(source);
-                Log("alex xp/credits applied via direct fallback");
             }
-            catch (Exception ex)
-            {
-                Log("alex xp/credits fallback failed: " + ex.Message);
-            }
+
+            return true;
         }
 
         private static void TrySendTurnInRewardFeedback(ICharacter source)
