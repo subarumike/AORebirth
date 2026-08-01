@@ -19,7 +19,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class CapturedEnemyCombatActiveCoverageTests
     {
         private const int ExpectedInitialActorCount = 1583;
-        private const int ExpectedBindingRecordCount = 1565;
+        private const int ExpectedBindingRecordCount = 1566;
         private static readonly Lazy<Dictionary<string, object>> CoverageDocument =
             new Lazy<Dictionary<string, object>>(LoadCoverageDocument);
 
@@ -403,16 +403,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     value => StringArrayMember(value, "contentEvidenceCaptureIds")
                         .Contains("20260726-spawn-mob-tll-alien")));
 
-            Dictionary<string, object> sandstorm = bindings.Single(
-                value => StringMember(value, "surface")
-                    == "arete-sandstorm-marauders");
-            Assert.AreEqual("SANDSTORM Marauder", StringMember(sandstorm, "name"));
-            Assert.AreEqual(265822, IntMember(sandstorm, "monsterData"));
-            Assert.AreEqual(7, Convert.ToInt32(ArrayMember(sandstorm, "levelCandidates").Single()));
-            Assert.AreEqual(5, IntMember(sandstorm, "actorCount"));
-            CollectionAssert.AreEqual(
-                new[] { "20260727-204902" },
-                StringArrayMember(sandstorm, "contentEvidenceCaptureIds"));
+            Dictionary<string, object>[] sandstorm = bindings
+                .Where(
+                    value => StringMember(value, "surface")
+                        == "arete-sandstorm-marauders")
+                .ToArray();
+            Assert.AreEqual(2, sandstorm.Length);
+            Assert.IsTrue(sandstorm.All(value => StringMember(value, "name") == "SANDSTORM Marauder"));
+            CollectionAssert.AreEquivalent(
+                new[] { 265822, 287217 },
+                sandstorm.Select(value => IntMember(value, "monsterData")).ToArray());
+            Assert.IsTrue(
+                sandstorm.All(
+                    value => Convert.ToInt32(ArrayMember(value, "levelCandidates").Single()) == 7));
+            Assert.AreEqual(5, sandstorm.Sum(value => IntMember(value, "actorCount")));
+            Assert.AreEqual(
+                2,
+                IntMember(sandstorm.Single(value => IntMember(value, "monsterData") == 265822), "actorCount"));
+            Assert.AreEqual(
+                3,
+                IntMember(sandstorm.Single(value => IntMember(value, "monsterData") == 287217), "actorCount"));
+            Assert.IsTrue(
+                sandstorm.All(
+                    value => StringArrayMember(value, "contentEvidenceCaptureIds")
+                        .SequenceEqual(new[] { "20260727-204902" })));
         }
 
         [TestMethod]

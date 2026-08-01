@@ -64,6 +64,23 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
+            if (CrashedAlienShipDoorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (LeonoraMartyQuestRuntime.TryHandleCreditCardPickup(client, message, target))
+            {
+                return true;
+            }
+
+            var source = client?.Controller?.Character;
+            if (PatrickSunQuestRuntime.TryHandleInsuranceTerminalUse(source, target))
+            {
+                GenericCmdMessageHandler.Default.Acknowledge(source, message);
+                return true;
+            }
+
             // Insurance Terminal → SaveChar (must run; playfields.dat has no SaveChar OnUse).
             // Surgery clinic Uses are excluded inside InsuranceTerminalInteractionHandler so they
             // fall through to SurgeryClinicInteractionHandler (Arete Terminal:574187D1).
@@ -150,6 +167,21 @@ namespace ZoneEngine.Core.Playfields
             }
 
             if (CapturedAreteLoreleiVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteAntonioStacklundVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteRemiGalloisVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteSarahGreeneVendorInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

@@ -2,14 +2,21 @@
 
 ## Result
 
-The two complete Arete movement captures reconcile deterministically to **24,042** independently classified paths: **20,573 promotable**, **1,853 ambiguous**, and **1,616 rejected**.
+The three complete Arete movement evidence sources reconcile deterministically to **26,654** independently classified paths: **23,185 promotable**, **1,853 ambiguous**, and **1,616 rejected**.
 
-The aggregate runtime dataset contains **20,267** deduplicated patrol, spawn, chase, flee, and leash observations. Scripted runtime rows: **0**.
+The aggregate runtime dataset contains **22,798** deduplicated patrol, spawn, chase, flee, and leash observations. Scripted runtime rows: **0**.
 
 ## Evidence searched
 
 Complete corrected packet projections and their input hashes were read for:
 
+- Capture `20260721-Rox-robots`:
+  - `docs/generated/arete_20260721_rox_robots_movement/source/cleaning_robot_patrol_replay.csv` (`sha256 3f2b549145744da918a34f8f16a35d33039609529e1287513e8d89d3f38f76d7`)
+  - `docs/generated/arete_20260722_104809_movement/patrol.csv` (`sha256 a117d53fa95a43331e500483f8e7ba984ef2dfe330321d0857b8ed044731f10b`)
+  - `docs/generated/arete_20260722_152454_movement/patrol.csv` (`sha256 f6cb5d1121b5764ac7587a562acf2c41af208f87ed4d5e24b868c30fac3e9d0f`)
+  - `docs/generated/arete_20260721_rox_robots_movement/manifest.json`
+  - `docs/generated/arete_20260721_rox_robots_movement/runtime/manifest.json`
+  - six behavior analysis CSVs and five non-scripted runtime CSVs under `docs/generated/arete_20260721_rox_robots_movement`
 - Capture `20260722-104809`:
   - `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/capture_info.json` (`sha256 9fb26887405925fe6fb84ccb28a2d672a5ae39a854ef48ed31bfa6fc535b4596`)
   - `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/movement-summary.json` (`sha256 d53120d8e0f26514d626e299d1c34cd4baaa4cbf87e7fde9a846a935282b5b40`)
@@ -41,12 +48,13 @@ The corrected audit resolves identity metadata from the complete capture, includ
 
 | Capture | Reconciled | Promotable | Ambiguous | Rejected | Runtime rows | Route groups |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `20260721-Rox-robots` | 2,612 | 2,612 | 0 | 0 | 2,531 | 158 |
 | `20260722-104809` | 14,516 | 12,344 | 909 | 1,263 | 12,146 | 2,884 |
 | `20260722-152454` | 9,526 | 8,229 | 944 | 353 | 8,121 | 2,754 |
 
 | Behavior | Observations | Promotable | Ambiguous | Rejected | Aggregate runtime rows |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| patrol | 19,874 | 18,693 | 0 | 1,181 | 18,402 |
+| patrol | 22,486 | 21,305 | 0 | 1,181 | 20,933 |
 | spawn | 1,411 | 1,399 | 0 | 12 | 1,384 |
 | chase | 1,053 | 164 | 496 | 393 | 164 |
 | flee | 76 | 54 | 0 | 22 | 54 |
@@ -62,7 +70,7 @@ Every promotable observation retains its captured family, template, level, captu
 
 Per-capture exact equivalents remain collapsed by the corrected audit. Distinct observations from different captures are retained because capture provenance, timestamps, identities, or ordering make them separate evidence; the aggregator does not invent or splice routes.
 
-- patrol: **18,402** rows in `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/patrol.csv`
+- patrol: **20,933** rows in `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/patrol.csv`
 - spawn: **1,384** rows in `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/spawn.csv`
 - chase: **164** rows in `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/chase.csv`
 - flee: **54** rows in `AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/flee.csv`

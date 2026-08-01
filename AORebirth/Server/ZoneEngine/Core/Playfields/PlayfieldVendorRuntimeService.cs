@@ -30,6 +30,15 @@ namespace ZoneEngine.Core.Playfields
         private readonly CapturedAreteLoreleiVendorRuntimeService capturedAreteLorelei =
             new CapturedAreteLoreleiVendorRuntimeService();
 
+        private readonly CapturedAreteAntonioStacklundVendorRuntimeService capturedAreteAntonio =
+            new CapturedAreteAntonioStacklundVendorRuntimeService();
+
+        private readonly CapturedAreteRemiGalloisVendorRuntimeService capturedAreteRemi =
+            new CapturedAreteRemiGalloisVendorRuntimeService();
+
+        private readonly CapturedAreteSarahGreeneVendorRuntimeService capturedAreteSarah =
+            new CapturedAreteSarahGreeneVendorRuntimeService();
+
         internal void SpawnVendors(Playfield playfield, StatelData[] vendorStatels)
         {
             VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);
@@ -89,6 +98,9 @@ namespace ZoneEngine.Core.Playfields
             this.capturedAreteAlexArea.Spawn(playfield, playfieldIdentity, dynelRegistry);
             this.AttachCapturedAreteMarcoSpidaVendor(playfield, playfieldIdentity, dynelRegistry);
             this.AttachCapturedAreteLoreleiVendor(playfield, playfieldIdentity, dynelRegistry);
+            this.capturedAreteAntonio.Attach(playfield, playfieldIdentity, dynelRegistry);
+            this.capturedAreteRemi.Attach(playfield, playfieldIdentity, dynelRegistry);
+            this.capturedAreteSarah.Attach(playfield, playfieldIdentity, dynelRegistry);
         }
 
         internal void AttachCapturedAreteMarcoSpidaVendor(
@@ -111,6 +123,9 @@ namespace ZoneEngine.Core.Playfields
             Identity playfieldIdentity,
             PlayfieldDynelRegistry dynelRegistry)
         {
+            this.capturedAreteSarah.Clear(playfieldIdentity, dynelRegistry);
+            this.capturedAreteRemi.Clear(playfieldIdentity, dynelRegistry);
+            this.capturedAreteAntonio.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteLorelei.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteMarcoSpida.Clear(playfieldIdentity, dynelRegistry);
             this.capturedAreteAlexArea.Clear(playfieldIdentity, dynelRegistry);

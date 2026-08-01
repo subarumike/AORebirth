@@ -180,14 +180,17 @@ namespace ZoneEngine.Core.PacketHandlers
                 bool masonAssemble =
                     ZoneEngine.Core.Arete.Quests.DoctorMasonCombineRules
                         .IsAssembleResult(newItem.LowID, newItem.HighID);
+                bool antonioCombine =
+                    ZoneEngine.Core.Arete.Quests.AntonioStacklundCombineRules
+                        .IsCombineResult(newItem.LowID, newItem.HighID);
 
                 // Capture: Overflow grants do not need a free inventory slot first, but our
                 // server TryAdd does. Consume inputs before add when both are deleted (Mason)
                 // or when Vernon consumes the library.
-                if (vernonLibraryHack || masonAssemble)
+                if (vernonLibraryHack || masonAssemble || antonioCombine)
                 {
-                    // Capture Mason results are always QL1 Overflow (even with QL5 clusters).
-                    if (masonAssemble && newItem.Quality != 1)
+                    // Captured Mason and Antonio results are always QL1 Overflow.
+                    if ((masonAssemble || antonioCombine) && newItem.Quality != 1)
                     {
                         try
                         {
@@ -235,6 +238,15 @@ namespace ZoneEngine.Core.PacketHandlers
                             targetItem,
                             newItem);
                 }
+                else if (antonioCombine)
+                {
+                    ZoneEngine.Core.Arete.Quests.AntonioStacklundQuestRuntime
+                        .SendCombineResultClientPackets(
+                            client.Controller.Character,
+                            sourceItem,
+                            targetItem,
+                            newItem);
+                }
                 else
                 {
                     AddTemplateMessageHandler.Default.Send(client.Controller.Character, newItem);
@@ -261,6 +273,10 @@ namespace ZoneEngine.Core.PacketHandlers
                     newItem.LowID,
                     newItem.HighID);
                 ZoneEngine.Core.Arete.Quests.LoreleiQuestRuntime.OnCombineSucceeded(
+                    client.Controller.Character,
+                    newItem.LowID,
+                    newItem.HighID);
+                ZoneEngine.Core.Arete.Quests.AntonioStacklundQuestRuntime.OnCombineSucceeded(
                     client.Controller.Character,
                     newItem.LowID,
                     newItem.HighID);

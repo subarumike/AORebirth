@@ -89,12 +89,7 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             ICharacter npc = Pool.Instance.GetObject<ICharacter>(source.Playfield.Identity, npcIdentity);
-            if (npc == null || string.IsNullOrEmpty(npc.Name))
-            {
-                return false;
-            }
-
-            return npc.Name.IndexOf("Greedy Desert Reet", StringComparison.OrdinalIgnoreCase) >= 0;
+            return LoreleiOasisMobRuntime.IsRegisteredGreedyDesertReet(npc);
         }
 
         /// <summary>

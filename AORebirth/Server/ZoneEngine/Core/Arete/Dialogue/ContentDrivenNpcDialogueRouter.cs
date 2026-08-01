@@ -62,6 +62,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const int ShippingManifestTerminalInstance = unchecked((int)0x78E0FC6A);
         private const int MarcoSpidaInstance = unchecked((int)0x78E0FC81);
         private const int VaughnHammondInstance = unchecked((int)0x78E0FC73);
+        private const int AntonioStacklundInstance = unchecked((int)0x78E0FC7C);
+        private const int KarliCappelleriInstance = unchecked((int)0x799AD394);
+        private const int LeonoraMartyInstance = unchecked((int)0x78E0FC74);
+        private const int PatrickSunInstance = unchecked((int)0x78E0FC7B);
+        private const int RemiGalloisInstance = unchecked((int)0x78E0FC75);
+        private const int GreedyDesertReetInstance = unchecked((int)0x79978BB8);
 
         private const string RexLarssonNpcIdentity = "SimpleChar:782DE568";
 
@@ -86,6 +92,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
         private const string ShippingManifestTerminalNpcIdentity = "SimpleChar:78E0FC6A";
         private const string MarcoSpidaNpcIdentity = "SimpleChar:78E0FC81";
         private const string VaughnHammondNpcIdentity = "SimpleChar:78E0FC73";
+        private const string AntonioStacklundNpcIdentity = "SimpleChar:78E0FC7C";
+        private const string KarliCappelleriNpcIdentity = "SimpleChar:799AD394";
+        private const string LeonoraMartyNpcIdentity = "SimpleChar:78E0FC74";
+        private const string PatrickSunNpcIdentity = "SimpleChar:78E0FC7B";
+        private const string RemiGalloisNpcIdentity = "SimpleChar:78E0FC75";
+        private const string GreedyDesertReetNpcIdentity = "SimpleChar:79978BB8";
 
         private const string RexB18EReturnNodeId = "rex_194454_006";
 
@@ -380,6 +392,54 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 LogPrefix = "ARETE_VAUGHN_DIALOGUE"
             };
 
+        private static readonly ContentDrivenNpcDialogueRegistration AntonioStacklundRegistration =
+            CreateAreteRegistration(
+                "Antonio Stacklund",
+                AntonioStacklundInstance,
+                AntonioStacklundNpcIdentity,
+                AreteLandingPlayfieldId,
+                "ARETE_ANTONIO_DIALOGUE");
+
+        private static readonly ContentDrivenNpcDialogueRegistration KarliCappelleriRegistration =
+            CreateAreteRegistration(
+                "Karli Cappelleri",
+                KarliCappelleriInstance,
+                KarliCappelleriNpcIdentity,
+                8009,
+                "ARETE_KARLI_DIALOGUE");
+
+        private static readonly ContentDrivenNpcDialogueRegistration LeonoraMartyRegistration =
+            CreateAreteRegistration(
+                "Leonora Marty",
+                LeonoraMartyInstance,
+                LeonoraMartyNpcIdentity,
+                AreteLandingPlayfieldId,
+                "ARETE_LEONORA_DIALOGUE");
+
+        private static readonly ContentDrivenNpcDialogueRegistration PatrickSunRegistration =
+            CreateAreteRegistration(
+                "Patrick Sun",
+                PatrickSunInstance,
+                PatrickSunNpcIdentity,
+                AreteLandingPlayfieldId,
+                "ARETE_PATRICK_DIALOGUE");
+
+        private static readonly ContentDrivenNpcDialogueRegistration RemiGalloisRegistration =
+            CreateAreteRegistration(
+                "Remi Gallois",
+                RemiGalloisInstance,
+                RemiGalloisNpcIdentity,
+                AreteLandingPlayfieldId,
+                "ARETE_REMI_DIALOGUE");
+
+        private static readonly ContentDrivenNpcDialogueRegistration GreedyDesertReetRegistration =
+            CreateAreteRegistration(
+                "Greedy Desert Reet",
+                GreedyDesertReetInstance,
+                GreedyDesertReetNpcIdentity,
+                AreteLandingPlayfieldId,
+                "ARETE_GREEDY_REET_DIALOGUE");
+
         private static readonly ContentDrivenNpcDialogueRegistration WindcallerKarrecRegistration =
             CreateWindcallerRegistration(WindcallerKarrecNpcContent.Karrec);
 
@@ -587,6 +647,12 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ShippingManifestTerminalRegistration,
             MarcoSpidaRegistration,
             VaughnHammondRegistration,
+            AntonioStacklundRegistration,
+            KarliCappelleriRegistration,
+            LeonoraMartyRegistration,
+            PatrickSunRegistration,
+            RemiGalloisRegistration,
+            GreedyDesertReetRegistration,
             WindcallerKarrecRegistration,
             AnnoyingDudeRegistration,
             MaddyCardileRegistration,
@@ -632,6 +698,29 @@ namespace ZoneEngine.Core.Arete.Dialogue
                        PlayfieldId = definition.PlayfieldId,
                        GateEnvironmentVariableName = null,
                        LogPrefix = "SUBWAY_KARREC_DIALOGUE"
+                   };
+        }
+
+        private static ContentDrivenNpcDialogueRegistration CreateAreteRegistration(
+            string displayName,
+            int sourceNpcInstance,
+            string npcIdentityText,
+            int playfieldId,
+            string logPrefix)
+        {
+            return new ContentDrivenNpcDialogueRegistration
+                   {
+                       Name = displayName,
+                       ExpectedNpcName = displayName,
+                       NpcIdentity = new Identity
+                                     {
+                                         Type = IdentityType.CanbeAffected,
+                                         Instance = sourceNpcInstance
+                                     },
+                       NpcIdentityText = npcIdentityText,
+                       PlayfieldId = playfieldId,
+                       GateEnvironmentVariableName = RexLarssonGateEnvironmentVariableName,
+                       LogPrefix = logPrefix
                    };
         }
 
@@ -918,6 +1007,21 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
+            if (IsRegistration(registration, KarliCappelleriRegistration))
+            {
+                DialogueSessionResult branchOverride =
+                    KarliCappelleriQuestRuntime.ApplyDoingBranchOverride(
+                        service,
+                        result,
+                        previousNodeId,
+                        answerIndex,
+                        source);
+                if (branchOverride != null)
+                {
+                    result = branchOverride;
+                }
+            }
+
             LogRecordedActions(source, result, registration);
             TryHandleTailorMeasurementGrant(
                 source,
@@ -1000,6 +1104,18 @@ namespace ZoneEngine.Core.Arete.Dialogue
                            previousNodeId,
                            answerIndex,
                            targetIdentity)
+                       || TryHandleLeonoraTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
+                       || TryHandleShinySwordTradeHoldSideEffect(
+                           source,
+                           registration,
+                           previousNodeId,
+                           answerIndex,
+                           targetIdentity)
                        || TryHandleShippingManifestTradeHoldSideEffect(
                            source,
                            registration,
@@ -1010,6 +1126,13 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             if (result.Session == null || !result.Session.IsActive)
             {
+                DispatchCapturedQuestAnswerSideEffects(
+                    source,
+                    registration,
+                    previousNodeId,
+                    answerIndex,
+                    targetIdentity,
+                    false);
                 LogDialogue(
                     registration,
                     "answer closed session character=" + source.Identity.ToString(true)
@@ -1262,7 +1385,45 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return true;
             }
 
+            if (IsLeonoraTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleLeonoraTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
+            }
+
+            if (IsShinySwordTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                SendDialoguePromptOnly(source, result, registration);
+                PaceKnuBotPackets();
+                if (TryHandleShinySwordTradeHoldSideEffect(
+                        source,
+                        registration,
+                        previousNodeId,
+                        answerIndex,
+                        targetIdentity))
+                {
+                    return true;
+                }
+            }
+
             SendDialogueNode(source, result, registration, suppressOptionsForTradeHold);
+
+            DispatchCapturedQuestAnswerSideEffects(
+                source,
+                registration,
+                previousNodeId,
+                answerIndex,
+                targetIdentity,
+                true);
 
             if (IsRegistration(registration, RexLarssonRegistration))
             {
@@ -1337,6 +1498,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             if (hadSession)
             {
+                ResumeCapturedDialoguePatrol(source, registration, targetIdentity);
                 LogDialogue(registration, "session closed by client character=" + source.Identity.ToString(true));
                 return true;
             }
@@ -1349,6 +1511,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ICharacter npc,
             ContentDrivenNpcDialogueRegistration registration)
         {
+            if (IsRegistration(registration, RemiGalloisRegistration)
+                && RemiGalloisQuestRuntime.IsCompleted(source))
+            {
+                // No post-completion interaction was captured. Fail closed rather than
+                // promoting the inferred remi_done vendor branch from the draft pack.
+                return CloseRegisteredDialogueSafely(source, npc, registration);
+            }
+
             if (IsRegistration(registration, WindcallerKarrecRegistration))
             {
                 WindcallerKarrecTradeAdapter.TryResumeDurableCompletion(source, registration.NpcIdentity);
@@ -1423,6 +1593,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 SessionsByCharacter[CreateSessionKey(source.Identity, registration)] =
                     new DialogueSessionRecord { Registration = registration, Session = result.Session };
             }
+
+            PauseCapturedDialoguePatrol(npc, registration);
 
             FaceNpcTowardSource(npc, source);
             SendOpenChatWindow(source, registration);
@@ -1860,6 +2032,172 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return VaughnHammondQuestRuntime.TryBeginVaughnTrade(source, tradeTarget);
         }
 
+        private static bool IsLeonoraTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsRegistration(registration, LeonoraMartyRegistration)
+                   && answerIndex == 0
+                   && string.Equals(
+                       previousNodeId,
+                       LeonoraMartyQuestRuntime.WithCardStartNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool TryHandleLeonoraTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveLeonoraIdentity)
+        {
+            if (!IsLeonoraTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                return false;
+            }
+
+            return LeonoraMartyQuestRuntime.TryBeginLeonoraTrade(
+                source,
+                ResolveLiveNpcIdentity(liveLeonoraIdentity, registration));
+        }
+
+        private static bool IsShinySwordTradeHoldAnswer(
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex)
+        {
+            return IsRegistration(registration, GreedyDesertReetRegistration)
+                   && answerIndex == 1
+                   && string.Equals(
+                       previousNodeId,
+                       ShinySwordQuestRuntime.DemandNodeId,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool TryHandleShinySwordTradeHoldSideEffect(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveReetIdentity)
+        {
+            if (!IsShinySwordTradeHoldAnswer(registration, previousNodeId, answerIndex))
+            {
+                return false;
+            }
+
+            return ShinySwordQuestRuntime.TryBeginSwordTrade(
+                source,
+                ResolveLiveNpcIdentity(liveReetIdentity, registration));
+        }
+
+        private static void DispatchCapturedQuestAnswerSideEffects(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            string previousNodeId,
+            int answerIndex,
+            Identity liveNpcIdentity,
+            bool responseNodeSent)
+        {
+            if (IsRegistration(registration, AntonioStacklundRegistration))
+            {
+                if (responseNodeSent)
+                {
+                    AntonioStacklundQuestRuntime.TryHandleDialogueAnswer(
+                        source,
+                        previousNodeId,
+                        answerIndex);
+                    if (string.Equals(
+                            previousNodeId,
+                            "antonio_001",
+                            StringComparison.OrdinalIgnoreCase)
+                        && answerIndex == 1)
+                    {
+                        CapturedAreteAntonioStacklundVendorInteractionHandler.Default.TryOpenShop(
+                            source,
+                            ResolveLiveNpcIdentity(liveNpcIdentity, registration));
+                    }
+                }
+
+                return;
+            }
+
+            if (IsRegistration(registration, KarliCappelleriRegistration))
+            {
+                if (responseNodeSent)
+                {
+                    KarliCappelleriQuestRuntime.TryHandleDialogueAnswer(
+                        source,
+                        previousNodeId,
+                        answerIndex);
+                }
+
+                return;
+            }
+
+            if (IsRegistration(registration, PatrickSunRegistration))
+            {
+                if (responseNodeSent)
+                {
+                    PatrickSunQuestRuntime.TryHandleDialogueAnswer(
+                        source,
+                        previousNodeId,
+                        answerIndex);
+                }
+
+                return;
+            }
+
+            if (!IsRegistration(registration, RemiGalloisRegistration))
+            {
+                return;
+            }
+
+            bool capturedSellOption =
+                (string.Equals(previousNodeId, RemiGalloisQuestRuntime.RootNodeId, StringComparison.OrdinalIgnoreCase)
+                 || string.Equals(previousNodeId, RemiGalloisQuestRuntime.DoingNodeId, StringComparison.OrdinalIgnoreCase)
+                 || string.Equals(previousNodeId, RemiGalloisQuestRuntime.ReturnNodeId, StringComparison.OrdinalIgnoreCase))
+                && answerIndex == 1;
+            if (capturedSellOption)
+            {
+                CapturedAreteRemiGalloisVendorInteractionHandler.Default.TryOpenShop(
+                    source,
+                    ResolveLiveNpcIdentity(liveNpcIdentity, registration));
+            }
+
+            if (responseNodeSent
+                || string.Equals(
+                    previousNodeId,
+                    RemiGalloisQuestRuntime.AcceptNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                RemiGalloisQuestRuntime.TryHandleDialogueAnswer(
+                    source,
+                    previousNodeId,
+                    answerIndex);
+            }
+
+            if (responseNodeSent
+                && answerIndex == 0
+                && string.Equals(
+                    previousNodeId,
+                    RemiGalloisQuestRuntime.OfferNodeId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                RemiGalloisQuestRuntime.EmitAcceptTipAndHellfyre(source);
+            }
+        }
+
+        private static Identity ResolveLiveNpcIdentity(
+            Identity candidate,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            return candidate.Type == IdentityType.CanbeAffected && candidate.Instance != 0
+                       ? candidate
+                       : registration.NpcIdentity;
+        }
+
         private static bool TryHandleLoreleiVendorSideEffect(
             ICharacter source,
             ContentDrivenNpcDialogueRegistration registration,
@@ -2197,6 +2535,21 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 return LoreleiQuestRuntime.ResolveLollyStartNodeId(source);
             }
 
+            if (IsRegistration(registration, LeonoraMartyRegistration))
+            {
+                return LeonoraMartyQuestRuntime.ResolveLeonoraStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, PatrickSunRegistration))
+            {
+                return PatrickSunQuestRuntime.ResolvePatrickStartNodeId(source);
+            }
+
+            if (IsRegistration(registration, RemiGalloisRegistration))
+            {
+                return RemiGalloisQuestRuntime.ResolveRemiStartNodeId(source);
+            }
+
             if (IsRegistration(registration, ProphetYuttRegistration))
             {
                 // Capture: Ancient Device first until inspect. Then Insignia Active → mark speech.
@@ -2507,12 +2860,54 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 SessionsByCharacter.Remove(sessionKey);
             }
 
+            ResumeCapturedDialoguePatrol(source, registration, registration.NpcIdentity);
+
             if (sendClose)
             {
                 KnuBotCloseChatWindowMessageHandler.Default.Send(source, registration.NpcIdentity);
             }
 
             LogDialogue(registration, "session ended character=" + source.Identity.ToString(true));
+        }
+
+        private static void PauseCapturedDialoguePatrol(
+            ICharacter npc,
+            ContentDrivenNpcDialogueRegistration registration)
+        {
+            if (IsRegistration(registration, KarliCappelleriRegistration))
+            {
+                KarliCappelleriQuestRuntime.PausePatrolForDialogue(npc);
+            }
+            else if (IsRegistration(registration, LeonoraMartyRegistration))
+            {
+                LeonoraMartyQuestRuntime.PausePatrolForDialogue(npc);
+            }
+        }
+
+        private static void ResumeCapturedDialoguePatrol(
+            ICharacter source,
+            ContentDrivenNpcDialogueRegistration registration,
+            Identity npcIdentity)
+        {
+            if (source?.Playfield == null
+                || (!IsRegistration(registration, KarliCappelleriRegistration)
+                    && !IsRegistration(registration, LeonoraMartyRegistration)))
+            {
+                return;
+            }
+
+            Identity resolvedIdentity = ResolveLiveNpcIdentity(npcIdentity, registration);
+            ICharacter npc = Pool.Instance.GetObject<ICharacter>(
+                source.Playfield.Identity,
+                resolvedIdentity);
+            if (IsRegistration(registration, KarliCappelleriRegistration))
+            {
+                KarliCappelleriQuestRuntime.ResumePatrolAfterDialogue(npc);
+            }
+            else
+            {
+                LeonoraMartyQuestRuntime.ResumePatrolAfterDialogue(npc);
+            }
         }
 
         private static void LogRecordedActions(
@@ -2667,7 +3062,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
             ContentDrivenNpcDialogueRegistration runtimeRegistration =
                 FindCapturedSubwayVendorRuntimeRegistration(npc)
-                ?? FindWindcallerRuntimeRegistration(npc);
+                ?? FindWindcallerRuntimeRegistration(npc)
+                ?? FindGreedyDesertReetRuntimeRegistration(npc);
             if (runtimeRegistration != null)
             {
                 return runtimeRegistration;
@@ -2778,6 +3174,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return registration == null ? null : BindRegistration(registration, runtime.NpcIdentity);
         }
 
+        private static ContentDrivenNpcDialogueRegistration FindGreedyDesertReetRuntimeRegistration(
+            ICharacter npc)
+        {
+            return npc != null && ShinySwordQuestRuntime.IsGreedyDesertReet(npc, npc.Identity)
+                       ? BindRegistration(GreedyDesertReetRegistration, npc.Identity)
+                       : null;
+        }
+
         private static ContentDrivenNpcDialogueRegistration BindRegistration(
             ContentDrivenNpcDialogueRegistration registration,
             Identity npcIdentity)
@@ -2806,7 +3210,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
             ContentDrivenNpcDialogueRegistration registration)
         {
             return IsWindcallerQuestRegistration(registration)
-                   || IsRegistration(registration, SubwayTailorRegistration);
+                   || IsRegistration(registration, SubwayTailorRegistration)
+                   || IsRegistration(registration, GreedyDesertReetRegistration);
         }
 
         private static bool IsRegistration(

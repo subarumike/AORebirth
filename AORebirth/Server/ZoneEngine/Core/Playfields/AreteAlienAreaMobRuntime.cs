@@ -109,21 +109,15 @@ namespace ZoneEngine.Core.Playfields
 
         private const int MissingVisualId = 1234567890;
 
-        // Alien-family timings remain unresolved and retain the prior 60-second soft timer.
-        private const double DefaultRespawnSeconds = 60.0;
-
         // Captures 20260722-104809/152454: ordinary Rollerrats and Angry
-        // Minibulls respawn at approximately 40 seconds. Harvey and alien
-        // families retain the prior default because their timing is unresolved.
+        // Minibulls respawn at approximately 40 seconds. Every other family
+        // remains fail-closed because its respawn timing is unresolved.
         private const double CapturedWildlifeRespawnSeconds = 40.0;
 
-        // Minibull / Saltworm / Harvey / Rollerrat AOS at 5m.
-        // Capture 20260726-230559: Spider / Scout / Specialist are passive until player attacks.
-        private const float WildlifeAggroRadiusMeters = 5.0f;
-
-        // Capture 20260726-124832: Rollerrat AOS ~13.07m.
-        private const float RollerratAggroRadiusMeters =
-            NpcCombatAttackRules.CapturedAreteRollerratAggroRadiusMeters;
+        // Do not infer one shared radius for this population. Automatic aggro
+        // is owned by CapturedAreteAggroCatalog, which applies only the exact
+        // identity/family/template/level constraints proven by the corpus.
+        private const float WildlifeAggroRadiusMeters = 0.0f;
 
         // Capture CharacterFlags for Angry Minibull / Saltworm / Spider (includes alien AXP bit 0x4000).
         private const int WildlifeCharacterFlags = 268980737;
@@ -438,16 +432,19 @@ namespace ZoneEngine.Core.Playfields
                 if (TryFindLivingMobNear(playfield, Slots[i], out living))
                 {
                     timers[i] = DateTime.MaxValue;
-                    // Re-bind AOS if spawn registration was lost after a Clear race.
-                    if (Slots[i].AggroRadiusMeters > 0f && living != null)
-                    {
-                        RegisterAggro(living.Identity.Instance, Slots[i].AggroRadiusMeters);
-                    }
+                    continue;
                 }
-                else if (timers[i] == DateTime.MaxValue)
+
+                double respawnSeconds;
+                if (!TryResolveRespawnSeconds(Slots[i], out respawnSeconds))
                 {
-                    timers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(
-                        ResolveRespawnSeconds(Slots[i]));
+                    timers[i] = DateTime.MinValue;
+                    continue;
+                }
+
+                if (timers[i] == DateTime.MaxValue)
+                {
+                    timers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(respawnSeconds);
                 }
                 else if (!(timers[i] > DateTime.UtcNow)
                          && SpawnSlot(playfield, playfieldIdentity, activateNpc, i) != null)
@@ -457,21 +454,20 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
-        private static double ResolveRespawnSeconds(MobSlot slot)
+        private static bool TryResolveRespawnSeconds(MobSlot slot, out double seconds)
         {
-            if (slot == null)
-            {
-                return DefaultRespawnSeconds;
-            }
-
-            if (slot.Kind == MobKind.Rollerrat
+            bool captured = slot != null
+                && (slot.Kind == MobKind.Rollerrat
                 || (slot.Kind == MobKind.Minibull
-                    && string.Equals(slot.Name, "Angry Minibull", StringComparison.Ordinal)))
+                    && string.Equals(slot.Name, "Angry Minibull", StringComparison.Ordinal)));
+            if (captured)
             {
-                return CapturedWildlifeRespawnSeconds;
+                seconds = CapturedWildlifeRespawnSeconds;
+                return true;
             }
 
-            return DefaultRespawnSeconds;
+            seconds = 0.0;
+            return false;
         }
 
         private static Character SpawnSlot(
@@ -481,7 +477,8 @@ namespace ZoneEngine.Core.Playfields
             int slotIndex)
         {
             MobSlot slot = Slots[slotIndex];
-            // Rollerrat AOS when AggroRadius > 0; other alien-area mobs are Passive retaliators.
+            // AOS is selected later by CapturedAreteAggroCatalog. This owner
+            // supplies only exact captured population and visual/stat data.
             NpcAiProfile aiProfile = slot.AggroRadiusMeters > 0f
                                          ? NpcAiProfile.Aggressive
                                          : slot.AiProfile;
@@ -506,85 +503,16 @@ namespace ZoneEngine.Core.Playfields
             ApplyCaptureStats(mob, slot);
             controller.AiProfile = aiProfile;
 
-            int minDamage;
-            int maxDamage;
-            ResolveCaptureDamage(slot, out minDamage, out maxDamage);
-            CapturedEnemyCombatContract contract;
-            if (slot.Kind == MobKind.Rollerrat)
-            {
-                // Capture 20260726-124832: dual LEW1/LEW2 fight anim + ~3s cadence.
-                contract = CapturedEnemyCombatContract.AreteRollerratAttackOnSight(
-                    "arete-alien-rollerrat-20260726-124832",
-                    mob.Identity.Instance,
-                    minDamage,
-                    maxDamage);
-            }
-            else if (slot.Kind == MobKind.Minibull)
-            {
-                // Capture 20260726-220219 / 20260726-230559: dual LEW1/LEW2 SAW.
-                contract = CapturedEnemyCombatContract.AreteAngryMinibullAttackOnSight(
-                    "arete-angry-minibull-20260726-220219",
-                    mob.Identity.Instance,
-                    minDamage,
-                    maxDamage);
-            }
-            else if (slot.Kind == MobKind.Saltworm)
-            {
-                // Capture 20260727-054719: dual LEW1/LEW2 SAW Unknown=109, Amount 13..21.
-                contract = CapturedEnemyCombatContract.AreteSaltwormAttackOnSight(
-                    "arete-saltworm-20260727-054719",
-                    mob.Identity.Instance,
-                    minDamage,
-                    maxDamage);
-            }
-            else if (slot.Kind == MobKind.Spider)
-            {
-                // Capture 20260726-230559: dual VZCX/CKHC SAW + AttackInfo.
-                contract = CapturedEnemyCombatContract.AreteAlienSpiderAttackOnSight(
-                    "arete-alien-spider-zix-20260726-230559",
-                    mob.Identity.Instance,
-                    minDamage,
-                    maxDamage);
-            }
-            else if (slot.Kind == MobKind.Scout)
-            {
-                // Capture 20260726-230559: DXZJ/HFRS/UGPQ SAW + cycling AttackInfo.
-                contract = CapturedEnemyCombatContract.AreteScoutJaaxSinuhAttackOnSight(
-                    "arete-scout-jaaxsinuh-20260726-230559",
-                    mob.Identity.Instance,
-                    minDamage,
-                    maxDamage);
-            }
-            else if (slot.Kind == MobKind.Specialist)
-            {
-                // Capture 20260726-230559: five-special SAW + cycling AttackInfo.
-                contract = CapturedEnemyCombatContract.AreteSpecialistChaHeruAttackOnSight(
-                    "arete-specialist-chaheru-20260726-230559",
-                    mob.Identity.Instance,
-                    minDamage,
-                    maxDamage);
-            }
-            else
-            {
-                contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                    "arete-alien-area-20260726-spawn-mob-tll-alien",
-                    minDamage,
-                    maxDamage,
-                    2.0,
-                    0,
-                    0,
-                    1279612721,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0);
-            }
+            // The generated capture catalog owns exact attack packets, cadence,
+            // damage, and retaliation eligibility for this population. Starting
+            // unresolved makes missing family/template/level evidence passive
+            // instead of falling back to guessed source-local combat values.
+            CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.Unresolved(
+                "arete-alien-area-complete-corpus-catalog",
+                true);
 
             string unused;
             CapturedEnemyCombatRuntime.Prepare(mob, controller, contract, out unused);
-            controller.AiProfile = aiProfile;
             mob.Coordinates(new Coordinate { x = slot.X, y = slot.Y, z = slot.Z });
             mob.DoNotDoTimers = false;
             // Register AOS before Activate so the first NPC tick can aggro.
@@ -642,74 +570,6 @@ namespace ZoneEngine.Core.Playfields
             }
         }
 
-        private static void ResolveCaptureDamage(MobSlot slot, out int minDamage, out int maxDamage)
-        {
-            // Capture AttackInfo Amounts vs local player.
-            switch (slot.Kind)
-            {
-                case MobKind.Saltworm:
-                    // Capture 20260727-054719 AttackInfo Amounts: 13 normal, 21 critical.
-                    minDamage = 13;
-                    maxDamage = 21;
-                    return;
-                case MobKind.Minibull:
-                    // Capture 20260726-220219 / 20260726-230559 AttackInfo Amounts: 5..20.
-                    minDamage = 5;
-                    maxDamage = 20;
-                    return;
-                case MobKind.Rollerrat:
-                    // Capture 20260726-124832 AttackInfo Amounts: 5..11.
-                    minDamage = 5;
-                    maxDamage = 11;
-                    return;
-                case MobKind.Specialist:
-                    // Capture 20260726-230559 AttackInfo Amounts: 16..52.
-                    minDamage = 16;
-                    maxDamage = 52;
-                    return;
-                case MobKind.Scout:
-                    // Capture 20260726-230559 AttackInfo Amounts: 20..23.
-                    minDamage = 20;
-                    maxDamage = 23;
-                    return;
-                case MobKind.Spider:
-                    // Capture 20260726-230559 AttackInfo Amount=11 (one landed hit).
-                    minDamage = 9;
-                    maxDamage = 14;
-                    return;
-                default:
-                    minDamage = 6;
-                    maxDamage = 10;
-                    return;
-            }
-        }
-
-        private static int ResolveCaptureXp(MobSlot slot)
-        {
-            // Capture Stat XP deltas after kills (side-bonus tips excluded).
-            // Scout/Specialist: no kill XP observed yet — provisional spider-tier.
-            if (string.Equals(slot.Name, "Harvey the Bully", StringComparison.OrdinalIgnoreCase))
-            {
-                return 890;
-            }
-
-            switch (slot.Kind)
-            {
-                case MobKind.Saltworm:
-                    return 830;
-                case MobKind.Minibull:
-                    return slot.Level >= 10 ? 890 : 830;
-                case MobKind.Rollerrat:
-                    return 1;
-                case MobKind.Specialist:
-                    return slot.Level >= 12 ? 600 : 450;
-                case MobKind.Scout:
-                case MobKind.Spider:
-                default:
-                    return 400;
-            }
-        }
-
         private static void ApplyCaptureStats(Character mob, MobSlot slot)
         {
             SetStat(mob, StatIds.monsterdata, slot.MonsterData);
@@ -735,12 +595,12 @@ namespace ZoneEngine.Core.Playfields
             SetStat(mob, StatIds.sex, 1);
             SetStat(mob, StatIds.race, 1);
             SetStat(mob, StatIds.fatness, 1);
-            SetStat(mob, StatIds.xp, ResolveCaptureXp(slot));
-            int minDamage;
-            int maxDamage;
-            ResolveCaptureDamage(slot, out minDamage, out maxDamage);
-            SetStat(mob, StatIds.mindamage, minDamage);
-            SetStat(mob, StatIds.maxdamage, maxDamage);
+            // Regular XP and fallback damage stats are not promoted for this
+            // population. Exact combat amounts come from the generated combat
+            // profile; exact Alien Spider AIXP is owned by AlienXpRuntimeService.
+            SetStat(mob, StatIds.xp, 0);
+            SetStat(mob, StatIds.mindamage, 0);
+            SetStat(mob, StatIds.maxdamage, 0);
             SetStat(mob, StatIds.damagetype, 1);
             SetStat(mob, StatIds.defaultattacktype, 1);
             if (slot.Kind == MobKind.Spider)

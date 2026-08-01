@@ -264,6 +264,9 @@
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
     <Compile Include="CapturedAreteExactInteractionTests.cs" />
+    <Compile Include="AreteAcceptanceMatrixTests.cs" />
+    <Compile Include="AreteCapturedVendorOwnershipTests.cs" />
+    <Compile Include="AreteCapturedQuestOwnershipTests.cs" />
     <Compile Include="WindcallerKarrecNpcContentTests.cs" />
     <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
     <Compile Include="DailyMissionRewardRulesTests.cs" />
@@ -497,10 +500,6 @@
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json">
       <Link>Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
-      <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\aggro.csv">

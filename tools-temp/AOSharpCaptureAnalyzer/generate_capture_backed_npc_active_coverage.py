@@ -1262,22 +1262,33 @@ def parse_arete_sandstorm(repo_root: Path) -> List[ActorDefinition]:
     path = "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
     text = read_source(repo_root, path)
     constants = extract_constants(text)
-    body = extract_array_initializer(text, "float[][] SpawnSlots")
-    slot_count = len(re.findall(r"\bnew\s*\[\]\s*\{", body))
-    if slot_count != 5:
-        raise CoverageError(f"Arete SANDSTORM parser found {slot_count} slots")
-    actor = make_actor(
-        "arete-sandstorm-marauders",
-        6553,
-        parse_csharp_string("MarauderName", constants),
-        parse_csharp_int("MarauderMonsterData", constants),
-        parse_csharp_int("MarauderLevel", constants),
-        path,
-        runtime_profile_selector="arete-sandstorm-captured-contract",
-        evidence_capture_ids=("20260727-204902",),
-    )
-    actor.actor_count = slot_count
-    return [actor]
+    body = extract_array_initializer(text, "MarauderSlot[] SpawnSlots")
+    calls = extract_calls(body, "MarauderSlot", True)
+    if len(calls) != 5:
+        raise CoverageError(f"Arete SANDSTORM parser found {len(calls)} initial slots")
+
+    counts_by_monster_data: Dict[int, int] = {}
+    for call in calls:
+        args = split_top_level(call)
+        monster_data = parse_csharp_int(args[0], constants)
+        counts_by_monster_data[monster_data] = counts_by_monster_data.get(monster_data, 0) + 1
+
+    actors: List[ActorDefinition] = []
+    for monster_data, actor_count in sorted(counts_by_monster_data.items()):
+        actor = make_actor(
+            "arete-sandstorm-marauders",
+            6553,
+            parse_csharp_string("MarauderName", constants),
+            monster_data,
+            parse_csharp_int("MarauderLevel", constants),
+            path,
+            runtime_profile_selector="arete-sandstorm-captured-contract",
+            evidence_capture_ids=("20260727-204902",),
+            notes=("initial slot MonsterData is preserved per captured actor",),
+        )
+        actor.actor_count = actor_count
+        actors.append(actor)
+    return actors
 
 
 def parse_subway_merchants(repo_root: Path) -> List[ActorDefinition]:

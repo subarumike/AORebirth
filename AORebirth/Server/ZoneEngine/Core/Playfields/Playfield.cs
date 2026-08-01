@@ -543,6 +543,16 @@ namespace AORebirth.Core.Playfields
             this.runtimeSystems.ActivateNpc(character);
         }
 
+        public void SuspendCapturedAretePatrol(ICharacter character)
+        {
+            this.runtimeSystems.SuspendCapturedAretePatrol(character);
+        }
+
+        public void ResumeCapturedAretePatrol(ICharacter character)
+        {
+            this.runtimeSystems.ResumeCapturedAretePatrol(character);
+        }
+
         public void RegisterDynel(IEntity entity)
         {
             this.runtimeSystems.RegisterDynel(entity);

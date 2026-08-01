@@ -2,6 +2,8 @@
 
 Generated: 2026-06-17
 
+> Historical phase result. Superseded by the full-corpus Arete implementation in commit `a83d689a` and the authoritative acceptance matrix in `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`. The limitations below describe this 2026-06-17 slice only.
+
 ## Summary
 
 Added a minimum evidence-backed SQL/data patch for five `Malfunctioning Cleaning Robot` mobspawns in playfield `6553` Arete Landing so the next Rex B18C smoke test can use runtime NPC deaths.
@@ -209,8 +211,8 @@ COMMIT;
 
 Then restart ZoneEngine so the playfield reloads without the rows.
 
-## Remaining Blockers
+## Superseded phase limitations
 
-- The next prompt still needs the gated live smoke test against these runtime spawn rows.
-- The robots are stationary because no evidence-backed waypoint/pathing rows were added.
-- Quest completion, rewards, progress refresh packets, `Quest Delete`, action `59`, B18D, B18E, and Cargo Box behavior remain intentionally out of scope.
+- The five-row SQL smoke-test slice was replaced by production-owned captured spawning and full-corpus schema-4 movement.
+- The statement that robots are stationary is obsolete; captured patrol evidence is promoted by the canonical Arete movement runtime.
+- Quest, interaction, reward, and packet coverage is tracked only by the authoritative Arete acceptance matrix; this historical slice is not a current blocker list.

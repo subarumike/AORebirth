@@ -295,6 +295,25 @@ namespace ZoneEngine.Core.Playfields
             return allies.ToArray();
         }
 
+        internal static bool IsRegisteredGreedyDesertReet(ICharacter npc)
+        {
+            if (npc == null
+                || npc.Playfield == null
+                || npc.Playfield.Identity.Instance != AreteLandingPlayfieldId
+                || !string.Equals(npc.Name, "Greedy Desert Reet", StringComparison.OrdinalIgnoreCase)
+                || npc.Stats[StatIds.level].Value != 7
+                || npc.Stats[StatIds.monsterdata].Value != CombatTestMobArchetype.IslandReet.MonsterData
+                || npc.Stats[StatIds.npcfamily].Value != CombatTestMobArchetype.IslandReet.NpcFamily)
+            {
+                return false;
+            }
+
+            lock (OasisGate)
+            {
+                return OasisReetInstances.Contains(npc.Identity.Instance);
+            }
+        }
+
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
         {
             if (string.Equals(name, "Lolly the Reet", StringComparison.OrdinalIgnoreCase)
@@ -711,38 +730,6 @@ namespace ZoneEngine.Core.Playfields
                 isLolly: true);
             controller.AiProfile = NpcAiProfile.Passive;
 
-            controller.SetCapturedPatrolReplaySegments(
-                new[]
-                {
-                    new NpcPatrolReplaySegment(
-                        0.0,
-                        LollySpawnX,
-                        LollySpawnY,
-                        LollySpawnZ,
-                        3359.94f,
-                        3.57f,
-                        620.67f),
-                    new NpcPatrolReplaySegment(
-                        2.0,
-                        3359.94f,
-                        3.57f,
-                        620.67f,
-                        3358.18f,
-                        3.61f,
-                        640.52f),
-                    new NpcPatrolReplaySegment(
-                        0.0,
-                        3358.18f,
-                        3.61f,
-                        640.52f,
-                        LollySpawnX,
-                        LollySpawnY,
-                        LollySpawnZ),
-                },
-                false,
-                true,
-                true);
-            controller.State = CharacterState.Patrolling;
             mob.Coordinates(new Coordinate { x = LollySpawnX, y = LollySpawnY, z = LollySpawnZ });
             mob.DoNotDoTimers = false;
             activateNpc(mob);

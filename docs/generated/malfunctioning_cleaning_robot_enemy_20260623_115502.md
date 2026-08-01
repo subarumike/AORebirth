@@ -4,6 +4,8 @@ Capture folder:
 
 `tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260623-115502`
 
+> Historical single-capture implementation note. Superseded by commit `a83d689a` and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; statements below about missing runtime ownership describe only this original slice.
+
 Implemented enemy:
 
 - Name: `Malfunctioning Cleaning Robot`
@@ -31,5 +33,5 @@ Implementation notes:
 
 - The robot is registered as a focused combat-test archetype using the captured static values.
 - Existing combat handling supplies attack, damage, NPC follow, health updates, stop-fight, death action, and delayed despawn.
-- The captured corpse/loot replacement body is not implemented here; the robot uses the captured missing/placeholder visual id only as the static catmesh/displaycatmesh value and is excluded from known corpse visual mapping.
-- No broad AI, reward, loot, or multi-enemy system was added.
+- This original slice did not own corpse/loot replacement; current death, corpse, loot, reward, and movement ownership is recorded in the authoritative Arete acceptance matrix.
+- No behavior absent from this single capture was inferred by the original slice.

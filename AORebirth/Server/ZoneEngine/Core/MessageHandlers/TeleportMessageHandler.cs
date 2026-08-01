@@ -75,6 +75,9 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedPrivateCityTeleportPlayfield2Instance = unchecked((int)0xC000177A);
 
+        // Captures 20260727-055715 / 20260727-Alien- quest-ncu.
+        private const int CapturedCrashedAlienShipSecondaryPlayfieldInstance = 0x00031999;
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -111,6 +114,54 @@ namespace ZoneEngine.Core.MessageHandlers
                     heading,
                     destinationPlayfieldId),
                 false);
+        }
+
+        internal void SendCapturedCrashedAlienShipDoorExit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendCapturedCrashedAlienShipDoorTransfer(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId);
+        }
+
+        internal void SendCapturedCrashedAlienShipDoorEntry(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendCapturedCrashedAlienShipDoorTransfer(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId);
+        }
+
+        private void SendCapturedCrashedAlienShipDoorTransfer(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                (IdentityType)51102,
+                1,
+                0,
+                new Identity
+                {
+                    Type = IdentityType.Playfield3,
+                    Instance = CapturedCrashedAlienShipSecondaryPlayfieldInstance
+                },
+                new byte[0]);
         }
 
         internal void SendOfficialDungeonProxyTransfer(

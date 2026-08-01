@@ -267,7 +267,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(alien.Contains("CapturedWildlifeRespawnSeconds = 40.0"));
             Assert.IsTrue(alien.Contains("slot.Kind == MobKind.Rollerrat"));
             Assert.IsTrue(alien.Contains("string.Equals(slot.Name, \"Angry Minibull\", StringComparison.Ordinal)"));
-            Assert.IsTrue(alien.Contains("DefaultRespawnSeconds = 60.0"));
+            Assert.IsTrue(alien.Contains("TryResolveRespawnSeconds"));
+            Assert.IsFalse(alien.Contains("DefaultRespawnSeconds"));
         }
 
         [TestMethod]

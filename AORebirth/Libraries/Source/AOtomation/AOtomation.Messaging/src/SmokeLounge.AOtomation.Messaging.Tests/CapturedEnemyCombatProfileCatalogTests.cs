@@ -107,6 +107,303 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AreteAlienAreaCompleteMultiStreamProfilesResolveFromUnresolvedWithoutGuessedBaseline()
+        {
+            CapturedEnemyCombatContract rollerrat;
+            string failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Rollerrat",
+                    17687,
+                    5,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "Arete alien-area catalog-only baseline",
+                        true),
+                    out rollerrat,
+                    out failure),
+                failure);
+            Assert.IsTrue(rollerrat.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Specialized, rollerrat.AttackModel);
+            Assert.IsNotNull(rollerrat.ParallelAttackSequence);
+            Assert.AreEqual(2, rollerrat.ParallelAttackSequence.Streams.Length);
+            Assert.IsTrue(rollerrat.UsesCaptureProvenArchetype);
+            StringAssert.Contains(
+                rollerrat.CaptureProvenArchetypeId,
+                "captured-parallel-streams=2");
+
+            CapturedEnemyParallelAttackStreamDefinition rollerratLew1 =
+                rollerrat.ParallelAttackSequence.Streams.Single(
+                    value => value.Attack.AttackInfoWeaponSlot == 0);
+            Assert.AreEqual(5, rollerratLew1.Attack.MinDamage);
+            Assert.AreEqual(8, rollerratLew1.Attack.MaxDamage);
+            Assert.AreEqual(1279612721, rollerratLew1.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(5.092768d, rollerratLew1.InitialDelaySeconds, 0.000001d);
+            Assert.AreEqual(7.20138d, rollerratLew1.Attack.RechargeSeconds, 0.000001d);
+            CollectionAssert.AreEqual(
+                new[] { 7, 8, 5, 8, 5, 5 },
+                rollerratLew1.Attack.CapturedDamageObservations);
+
+            CapturedEnemyParallelAttackStreamDefinition rollerratLew2 =
+                rollerrat.ParallelAttackSequence.Streams.Single(
+                    value => value.Attack.AttackInfoWeaponSlot == 1);
+            Assert.AreEqual(5, rollerratLew2.Attack.MinDamage);
+            Assert.AreEqual(8, rollerratLew2.Attack.MaxDamage);
+            Assert.AreEqual(1279612722, rollerratLew2.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(0.240753d, rollerratLew2.InitialDelaySeconds, 0.000001d);
+            Assert.AreEqual(6.550794d, rollerratLew2.Attack.RechargeSeconds, 0.000001d);
+            CollectionAssert.AreEqual(
+                new[] { 8, 5, 8, 5, 5 },
+                rollerratLew2.Attack.CapturedDamageObservations);
+
+            CapturedEnemyCombatContract minibull;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Angry Minibull",
+                    30360,
+                    13,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved(
+                        "Arete alien-area catalog-only baseline",
+                        true),
+                    out minibull,
+                    out failure),
+                failure);
+            Assert.IsTrue(minibull.IsCombatReady);
+            Assert.AreEqual(CapturedEnemyAttackModel.Specialized, minibull.AttackModel);
+            Assert.IsNotNull(minibull.ParallelAttackSequence);
+            Assert.AreEqual(2, minibull.ParallelAttackSequence.Streams.Length);
+            Assert.IsTrue(minibull.UsesCaptureProvenArchetype);
+            StringAssert.Contains(
+                minibull.CaptureProvenArchetypeId,
+                "captured-parallel-streams=2");
+
+            CapturedEnemyParallelAttackStreamDefinition minibullLew1 =
+                minibull.ParallelAttackSequence.Streams.Single(
+                    value => value.Attack.AttackInfoWeaponSlot == 0);
+            Assert.AreEqual(19, minibullLew1.Attack.MinDamage);
+            Assert.AreEqual(22, minibullLew1.Attack.MaxDamage);
+            Assert.AreEqual(1279612721, minibullLew1.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(3.500739d, minibullLew1.InitialDelaySeconds, 0.000001d);
+            Assert.AreEqual(6.01237d, minibullLew1.Attack.RechargeSeconds, 0.000001d);
+            CollectionAssert.AreEqual(
+                new[] { 19, 22 },
+                minibullLew1.Attack.CapturedDamageObservations);
+
+            CapturedEnemyParallelAttackStreamDefinition minibullLew2 =
+                minibull.ParallelAttackSequence.Streams.Single(
+                    value => value.Attack.AttackInfoWeaponSlot == 1);
+            Assert.AreEqual(8, minibullLew2.Attack.MinDamage);
+            Assert.AreEqual(18, minibullLew2.Attack.MaxDamage);
+            Assert.AreEqual(1279612722, minibullLew2.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(2.380962d, minibullLew2.InitialDelaySeconds, 0.000001d);
+            Assert.AreEqual(4.831813d, minibullLew2.Attack.RechargeSeconds, 0.000001d);
+            CollectionAssert.AreEqual(
+                new[] { 18, 8 },
+                minibullLew2.Attack.CapturedDamageObservations);
+        }
+
+        [TestMethod]
+        public void AreteAlienAreaPartialProfilesReplayExactOneShotStreamsWithoutSchedulingRepetition()
+        {
+            var cases = new[]
+            {
+                new { Name = "Rollerrat", MonsterData = 17687, Level = 6, StreamCount = 2, OneShotCount = 1 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 8, StreamCount = 1, OneShotCount = 1 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 9, StreamCount = 2, OneShotCount = 2 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 11, StreamCount = 2, OneShotCount = 2 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 12, StreamCount = 2, OneShotCount = 1 }
+            };
+
+            DateTime now = new DateTime(2026, 7, 31, 12, 0, 0, DateTimeKind.Utc);
+            foreach (var item in cases)
+            {
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsTrue(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        6553,
+                        item.Name,
+                        item.MonsterData,
+                        item.Level,
+                        0,
+                        CapturedEnemyCombatContract.Unresolved(
+                            "Arete alien-area partial-evidence baseline",
+                            true),
+                        out resolved,
+                        out failure),
+                    item.Name + " L" + item.Level + ": " + failure);
+                Assert.IsTrue(resolved.IsCombatReady, item.Name + " L" + item.Level);
+                Assert.AreEqual(CapturedEnemyAttackModel.Specialized, resolved.AttackModel);
+                Assert.IsNotNull(resolved.ParallelAttackSequence);
+                Assert.AreEqual(
+                    item.StreamCount,
+                    resolved.ParallelAttackSequence.Streams.Length,
+                    item.Name + " L" + item.Level);
+                Assert.AreEqual(
+                    item.OneShotCount,
+                    resolved.ParallelAttackSequence.Streams.Count(value => !value.Repeats),
+                    item.Name + " L" + item.Level);
+
+                foreach (CapturedEnemyParallelAttackStreamDefinition stream in
+                    resolved.ParallelAttackSequence.Streams)
+                {
+                    Assert.IsTrue(stream.IsValid);
+                    Assert.IsTrue(stream.Attack.CapturedDamageObservations.Length > 0);
+                    if (stream.Repeats)
+                    {
+                        Assert.IsTrue(stream.Attack.RechargeSeconds > 0.0d);
+                        Assert.AreEqual(
+                            now + TimeSpan.FromSeconds(stream.Attack.RechargeSeconds),
+                            stream.ResolveNextTickAfterHit(now));
+                    }
+                    else
+                    {
+                        Assert.AreEqual(0.0d, stream.Attack.RechargeSeconds);
+                        Assert.AreEqual(DateTime.MaxValue, stream.ResolveNextTickAfterHit(now));
+                    }
+                }
+            }
+
+            CapturedEnemyCombatContract minibullLevel8;
+            string minibullLevel8Failure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Angry Minibull",
+                    30360,
+                    8,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved("exact partial check", true),
+                    out minibullLevel8,
+                    out minibullLevel8Failure),
+                minibullLevel8Failure);
+            Assert.AreEqual(
+                0.001d,
+                minibullLevel8.ParallelAttackSequence.AttackStartDelaySeconds,
+                0.000001d);
+
+            CapturedEnemyCombatContract rollerratLevel6;
+            string rollerratFailure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Rollerrat",
+                    17687,
+                    6,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved("exact partial check", true),
+                    out rollerratLevel6,
+                    out rollerratFailure),
+                rollerratFailure);
+            CapturedEnemyParallelAttackStreamDefinition rollerratOneShot =
+                rollerratLevel6.ParallelAttackSequence.Streams.Single(value => !value.Repeats);
+            Assert.AreEqual(0, rollerratOneShot.Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1279612721, rollerratOneShot.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(0.486999d, rollerratOneShot.InitialDelaySeconds, 0.000001d);
+            CollectionAssert.AreEqual(
+                new[] { 5, 8, 5, 5 },
+                rollerratOneShot.Attack.CapturedDamageObservations);
+            CapturedEnemyParallelAttackStreamDefinition rollerratRepeating =
+                rollerratLevel6.ParallelAttackSequence.Streams.Single(value => value.Repeats);
+            Assert.AreEqual(1, rollerratRepeating.Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1279612722, rollerratRepeating.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(6.317314d, rollerratRepeating.Attack.RechargeSeconds, 0.000001d);
+
+            CapturedEnemyCombatContract minibullLevel12;
+            string minibullFailure;
+            Assert.IsTrue(
+                CapturedEnemyCombatProfileCatalog.TryResolve(
+                    6553,
+                    "Angry Minibull",
+                    30360,
+                    12,
+                    0,
+                    CapturedEnemyCombatContract.Unresolved("exact partial check", true),
+                    out minibullLevel12,
+                    out minibullFailure),
+                minibullFailure);
+            CapturedEnemyParallelAttackStreamDefinition minibullRepeating =
+                minibullLevel12.ParallelAttackSequence.Streams.Single(value => value.Repeats);
+            Assert.AreEqual(0, minibullRepeating.Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1279612721, minibullRepeating.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(7.910029d, minibullRepeating.Attack.RechargeSeconds, 0.000001d);
+            CapturedEnemyParallelAttackStreamDefinition minibullOneShot =
+                minibullLevel12.ParallelAttackSequence.Streams.Single(value => !value.Repeats);
+            Assert.AreEqual(1, minibullOneShot.Attack.AttackInfoWeaponSlot);
+            Assert.AreEqual(1279612722, minibullOneShot.Attack.AttackInfoWeaponInstance);
+            Assert.AreEqual(1.249285d, minibullOneShot.InitialDelaySeconds, 0.000001d);
+            CollectionAssert.AreEqual(
+                new[] { 8, 13, 10 },
+                minibullOneShot.Attack.CapturedDamageObservations);
+
+            string coordinator = File.ReadAllText(
+                Path.Combine(
+                    FindRepositoryRoot(),
+                    "AORebirth",
+                    "Server",
+                    "ZoneEngine",
+                    "Core",
+                    "Playfields",
+                    "NpcCombatTickCoordinator.cs"));
+            StringAssert.Contains(
+                coordinator,
+                "streams[dueIndex].ResolveNextTickAfterHit(now)");
+            StringAssert.Contains(
+                coordinator,
+                "parallelAttackSequence.AttackStartDelaySeconds");
+            StringAssert.Contains(
+                coordinator,
+                "this.StartCapturedParallelAttackClocks(");
+            Assert.IsFalse(
+                coordinator.Contains(
+                    "nextTicks[dueIndex] = now + TimeSpan.FromSeconds(attack.RechargeSeconds);"));
+            StringAssert.Contains(
+                coordinator,
+                "this.nextCapturedParallelAttackTicks.Remove(identity.Instance);");
+            StringAssert.Contains(
+                coordinator,
+                "this.startedCapturedParallelAttackClocks.Remove(identity.Instance);");
+        }
+
+        [TestMethod]
+        public void AreteAlienAreaIncompleteOrAbsentMultiStreamProfilesRemainQuarantined()
+        {
+            var unsupported = new[]
+            {
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 10 },
+                new { Name = "Harvey the Bully", MonsterData = 30360, Level = 10 },
+                new { Name = "Saltworm", MonsterData = 17712, Level = 13 },
+                new { Name = "Alien Spider - Zix", MonsterData = 247728, Level = 7 },
+                new { Name = "Scout - Jaax'Sinuh", MonsterData = 251782, Level = 11 },
+                new { Name = "Specialist - Cha'Heru", MonsterData = 251772, Level = 10 }
+            };
+
+            foreach (var item in unsupported)
+            {
+                CapturedEnemyCombatContract resolved;
+                string failure;
+                Assert.IsFalse(
+                    CapturedEnemyCombatProfileCatalog.TryResolve(
+                        6553,
+                        item.Name,
+                        item.MonsterData,
+                        item.Level,
+                        0,
+                        CapturedEnemyCombatContract.Unresolved(
+                            "Arete alien-area catalog-only baseline",
+                            true),
+                        out resolved,
+                        out failure),
+                    item.Name + " L" + item.Level + " unexpectedly resolved.");
+                Assert.IsFalse(resolved.IsCombatReady, item.Name + " L" + item.Level);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
+            }
+        }
+
+        [TestMethod]
         public void AreteNaturalAttackSelectionFailsClosedWithoutAnExactSafeStream()
         {
             CapturedEnemyCombatContract baseline =
@@ -1477,7 +1774,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void GeneratedRuntimeUnsafeProfilesAreNeverSelected()
+        public void GeneratedRuntimeUnsafeProfilesRequireExplicitCaptureBoundResolution()
         {
             CapturedEnemyCombatProfileDefinition[] allProfiles =
                 CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
@@ -1501,6 +1798,31 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     out failure);
                 if (success)
                 {
+                    bool explicitAreteParallelResolution =
+                        resolved.UsesCaptureProvenArchetype
+                        && resolved.CaptureProvenArchetypeId.IndexOf(
+                            "|captured-parallel-streams=",
+                            StringComparison.Ordinal) >= 0;
+                    if (explicitAreteParallelResolution)
+                    {
+                        CapturedEnemyCombatProfileDefinition selectedAreteProfile =
+                            allProfiles.Single(
+                                value => value.MatchesKey(
+                                             profile.ResourceId,
+                                             profile.Name,
+                                             profile.MonsterData,
+                                             profile.Level)
+                                         && value.CaptureEvidenceSafe
+                                         && value.Evidence == resolved.Evidence
+                                         && value.ContainsSource(
+                                             resolved.EvidenceSourceIdentity));
+                        Assert.AreEqual(6553, selectedAreteProfile.ResourceId);
+                        Assert.AreEqual(profile.ProfileId, selectedAreteProfile.ProfileId);
+                        Assert.IsFalse(selectedAreteProfile.CaptureRuntimeEvidenceSafe);
+                        Assert.IsTrue(resolved.IsCombatReady);
+                        continue;
+                    }
+
                     CapturedEnemyCombatProfileDefinition selected = allProfiles.Single(
                         value => value.MatchesKey(
                                      profile.ResourceId,
@@ -1573,17 +1895,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 coordinator,
                 "internal void ProcessCombatTick",
                 "private bool TryApplyCapturedWeaponAmmo");
-            int fixedRelease = process.IndexOf(
-                "fixedAttackStartReleased = true;",
+            int capturedRelease = process.IndexOf(
+                "capturedAttackStartReleased = true;",
                 StringComparison.Ordinal);
             int pendingRemoval = process.IndexOf(
                 "pendingCapturedAttackStarts.Remove",
                 StringComparison.Ordinal);
             int conditionalReturn = process.IndexOf(
-                "if (!fixedAttackStartReleased)",
+                "if (!capturedAttackStartReleased)",
                 StringComparison.Ordinal);
-            Assert.IsTrue(fixedRelease >= 0);
-            Assert.IsTrue(pendingRemoval > fixedRelease);
+            Assert.IsTrue(capturedRelease >= 0);
+            Assert.IsTrue(pendingRemoval > capturedRelease);
             Assert.IsTrue(conditionalReturn > pendingRemoval);
         }
 

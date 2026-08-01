@@ -2,6 +2,8 @@
 
 Generated: 2026-07-01 local
 
+> Historical replay-path report. Superseded by the schema-4 full-corpus movement runtime and the deterministic `20260721-Rox-robots` normalization in `docs/generated/arete_20260721_rox_robots_movement_promotion_audit.md`. The looping runtime path documented below was removed; its source rows remain preserved as generated provenance.
+
 ## Scope
 
 This report documents the promotion of captured `Malfunctioning Cleaning Robot` idle patrol replay data out of local `tools-temp` capture output and into committed runtime/evidence data.
@@ -16,8 +18,9 @@ No movement algorithm, replay cadence, combat behavior, corpse/despawn behavior,
 
 ## Runtime Data
 
-- Committed runtime/evidence CSV: `AORebirth/Server/ZoneEngine/Content/Captured/Arete/cleaning_robot_patrol_replay.csv`
-- Runtime provider: `CapturedAreteRobotContentProvider`
+- Historical runtime/evidence CSV: `AORebirth/Server/ZoneEngine/Content/Captured/Arete/cleaning_robot_patrol_replay.csv` (removed after consolidation)
+- Current provenance CSV: `docs/generated/arete_20260721_rox_robots_movement/source/cleaning_robot_patrol_replay.csv`
+- Current runtime owner: `CapturedAreteMovementRuntimeService` through `movement-full` schema 4
 - Runtime coordinator: `NpcPatrolReplayCoordinator`
 - Runtime executor: `NPCController`
 

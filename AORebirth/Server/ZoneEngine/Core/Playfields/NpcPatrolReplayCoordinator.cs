@@ -4,48 +4,11 @@ namespace ZoneEngine.Core.Playfields
     {
         public delegate void AssignPatrolReplaySegments(NpcPatrolReplaySegment[] segments);
 
-        private readonly CapturedAreteRobotContentProvider capturedRobotContentProvider;
-
         private readonly CapturedSubwayContentProvider capturedSubwayContentProvider;
 
-        public NpcPatrolReplayCoordinator(CapturedAreteRobotContentProvider capturedRobotContentProvider)
-            : this(capturedRobotContentProvider, null)
+        internal NpcPatrolReplayCoordinator(CapturedSubwayContentProvider capturedSubwayContentProvider)
         {
-        }
-
-        internal NpcPatrolReplayCoordinator(
-            CapturedAreteRobotContentProvider capturedRobotContentProvider,
-            CapturedSubwayContentProvider capturedSubwayContentProvider)
-        {
-            this.capturedRobotContentProvider = capturedRobotContentProvider;
             this.capturedSubwayContentProvider = capturedSubwayContentProvider;
-        }
-
-        public NpcPatrolReplaySegment[] BuildCapturedAreteRobotSegments(int sourceInstance)
-        {
-            CapturedAreteRobotPatrolReplaySegment[] segments =
-                this.capturedRobotContentProvider.GetPatrolReplaySegments(sourceInstance);
-            var result = new NpcPatrolReplaySegment[segments.Length];
-            for (int i = 0; i < segments.Length; i++)
-            {
-                result[i] = new NpcPatrolReplaySegment(
-                    segments[i].DelayAfterSeconds,
-                    segments[i].StartX,
-                    segments[i].StartY,
-                    segments[i].StartZ,
-                    segments[i].EndX,
-                    segments[i].EndY,
-                    segments[i].EndZ);
-            }
-
-            return result;
-        }
-
-        public void AssignCapturedAreteRobotReplay(
-            int sourceInstance,
-            AssignPatrolReplaySegments assignSegments)
-        {
-            assignSegments(this.BuildCapturedAreteRobotSegments(sourceInstance));
         }
 
         internal NpcPatrolReplaySegment[] BuildCapturedSubwaySegments(int sourceInstance)
