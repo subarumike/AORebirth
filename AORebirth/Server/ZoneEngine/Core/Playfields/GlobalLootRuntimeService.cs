@@ -332,13 +332,6 @@ namespace AORebirth.Core.Playfields
                     return;
                 }
 
-                // Arete Landing: Shiny Sword 297289 QL1 @ 6.2% on all PF 6553 kills
-                // (Independent Global; stacks with name/MonsterData corpse tables).
-                if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId)
-                {
-                    this.EnsureAreteShinySwordIndependent();
-                }
-
                 // Arete Landing part 1/2: exact-name observed corpse snapshots (items + credits).
                 if (context.PlayfieldId == CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId)
                 {
@@ -1041,84 +1034,6 @@ namespace AORebirth.Core.Playfields
                         ObservedCorpseSnapshotEntry(e, tenth, 248322, 248322, 1, 1)),
                     ObservedCorpseSnapshot(e, eleventh, 5)
                 };
-        }
-
-        private void EnsureAreteShinySwordIndependent()
-        {
-            const string tableKey = "arete.landing.shiny-sword.independent";
-            if (this.registry.ContainsTable(tableKey))
-            {
-                return;
-            }
-
-            // Mike loot table / capture-backed rate: Shiny Sword 297289 QL1 @ 6.2% (620 bp).
-            const string evidence =
-                "Mike Arete loot table; Shiny Sword 297289 QL1 6.2%; also observed Waste Collector corpse in arete-part-1";
-            this.registry.RegisterTable(
-                new LootTableDefinition
-                {
-                    LootTableKey = tableKey,
-                    DisplayName = "Arete Landing Shiny Sword independent",
-                    TableType = LootTableType.GlobalDefault,
-                    RollGroups =
-                        new[]
-                        {
-                            new LootGroupDefinition
-                            {
-                                LootGroupKey = "shiny-sword",
-                                RollMode = LootRollMode.Independent,
-                                RollCount = 1,
-                                EmptyWeight = 0,
-                                DropChanceBasisPoints = 10000,
-                                Entries =
-                                    new[]
-                                    {
-                                        new LootEntryDefinition
-                                        {
-                                            SelectionKey = "shiny-sword-297289",
-                                            ItemTemplateId = 297289,
-                                            HighItemTemplateId = 297289,
-                                            FixedQuality = 1,
-                                            MinimumQuality = 1,
-                                            MaximumQuality = 1,
-                                            MinimumQuantity = 1,
-                                            MaximumQuantity = 1,
-                                            Weight = 1,
-                                            DropChanceBasisPoints = 620,
-                                            Semantics = LootSemantics.WeightedDocumented,
-                                            Evidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                                            EvidenceReference = evidence
-                                        }
-                                    },
-                                Conditions = new string[0]
-                            }
-                        },
-                    ObservedCorpseSnapshots = new ObservedCorpseSnapshotDefinition[0],
-                    CreditsPolicy = new CreditsPolicyDefinition
-                    {
-                        Mode = CreditsPolicyMode.None,
-                        Evidence = LootEvidenceConfidence.ProvenCapture
-                    },
-                    QualityPolicy = "fixed-ql1",
-                    Evidence = evidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    ItemPoolUnresolved = false,
-                    Enabled = true
-                });
-            this.registry.RegisterAssignment(
-                new LootAssignmentDefinition
-                {
-                    AssignmentKey = tableKey,
-                    TargetType = LootAssignmentTargetType.Global,
-                    TargetKey = null,
-                    LootTableKey = tableKey,
-                    PlayfieldId = CapturedAreteLandingLootDefinitions.AreteLandingPlayfieldId,
-                    Priority = 0,
-                    Conditions = new string[0],
-                    Evidence = evidence,
-                    Confidence = LootEvidenceConfidence.ObservedAvailableLoot,
-                    Enabled = true
-                });
         }
 
         private void EnsureAlexGarbageFlea()

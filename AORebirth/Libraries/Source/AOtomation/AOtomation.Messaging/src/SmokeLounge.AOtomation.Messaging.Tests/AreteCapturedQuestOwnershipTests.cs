@@ -233,6 +233,54 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(router, "IsRegistration(registration, GreedyDesertReetRegistration)");
         }
 
+        [TestMethod]
+        public void AreteRewardDeltasAndRetryMarkersPreserveCapturedDurableSemantics()
+        {
+            string rex = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\RexB18ECompletionHandler.cs");
+            AssertContains(rex, "private const int XpReward = 290;");
+            AssertContains(rex, "Received reward: 1281 XP, 1040 credits.");
+            AssertContains(rex, "displayXp=1281 actualXpDelta=290");
+            AssertContains(rex, "rex-b18e-return-290xp");
+            Assert.IsFalse(rex.Contains("private const int XpReward = 1281;"));
+
+            string stan = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\StanGoodmanQuestRuntime.cs");
+            AssertContains(stan, "buy-nano-tip-rewards-granted");
+            AssertContains(stan, "buy-nano-tip-rewards-v2-granted");
+            AssertContains(
+                stan,
+                "private static MissionRewardExecutionResult ApplyBuyNanoTipXpCredits");
+            AssertContains(stan, "MissionRuntime.Rewards.ExecuteAtomicCharacterStats(");
+            AssertInOrder(
+                stan,
+                "if (HasLegacyBuyNanoTipRewardsGranted(character))",
+                "legacy marker migrated without replaying unjournaled stats",
+                "MissionRewardExecutionResult statsResult = ApplyBuyNanoTipXpCredits(character);");
+            AssertInOrder(
+                stan,
+                "MissionRewardExecutionResult statsResult = ApplyBuyNanoTipXpCredits(character);",
+                "TrySendBuyNanoTipRewardFeedback(character);",
+                "if (!TryGrantBuyNanoTipReward(character))",
+                "MissionOperationResult completionMarker = MarkBuyNanoTipRewardsGranted(character);",
+                "ForceCompleteHandoffTip(");
+            Assert.IsFalse(stan.Contains("buy-nano-tip-2581xp"));
+        }
+
+        [TestMethod]
+        public void CaptureReadyCombatStillFailsClosedForUnsafeCatalogResolution()
+        {
+            string combat = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs");
+            AssertContains(combat, "else if (!hasDirectCaptureCertification");
+            AssertContains(combat, "string.IsNullOrWhiteSpace(resolutionFailure)");
+            AssertContains(combat, "!resolutionFailure.StartsWith(");
+            AssertContains(combat, "no canonical raw combat profile for ");
+            Assert.IsFalse(
+                combat.Contains("CapturedEnemyCombatKeepCertified"),
+                "Ambiguous or mismatched catalog resolution must quarantine even a direct-ready contract.");
+        }
+
         private static void AssertRegistration(
             string router,
             string name,

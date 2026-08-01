@@ -28,7 +28,9 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int RexLarssonInstance = unchecked((int)0x782DE568);
 
-        private const int XpReward = 1281;
+        // Capture 20260618-083035: the character XP stat increased by 290.
+        // QuestFullUpdate and reward feedback display 1281, but that value is metadata only.
+        private const int XpReward = 290;
 
         private const int CreditReward = 1040;
 
@@ -41,6 +43,8 @@ namespace ZoneEngine.Core.Arete.Quests
         // Quest description / QuestFullUpdate Unknown6=1040 Unknown8=1281 (SafeQuestFullUpdateSender B18E).
         private const string CreditRewardKey = "captured-rex-b18e-credits-1040";
 
+        // Preserve the legacy durable key so characters rewarded by the regressed build
+        // are not awarded a second XP delta after this correction.
         private const string XpAwardedFlag = "rex-b18e-xp-1281-awarded";
 
         public static bool IsCompletionEnabled
@@ -296,7 +300,7 @@ namespace ZoneEngine.Core.Arete.Quests
             bool xpApplied = MissionRuntime.Service.GetFlag(characterId, MissionId, XpAwardedFlag) != null;
             if (!xpApplied)
             {
-                if (CombatXpRuntimeService.AwardDirectXp(source, XpReward, "rex-b18e-return-1281xp"))
+                if (CombatXpRuntimeService.AwardDirectXp(source, XpReward, "rex-b18e-return-290xp"))
                 {
                     MissionRuntime.Service.SetFlag(characterId, MissionId, XpAwardedFlag, "true");
                     xpApplied = true;
@@ -350,8 +354,8 @@ namespace ZoneEngine.Core.Arete.Quests
                 + source.Identity.ToString(true)
                 + " message=\""
                 + RewardFeedbackText
-                + "\" xpReward=1281 creditReward=1040 "
-                + "source=quest-description/B18E-QuestFullUpdate "
+                + "\" displayXp=1281 actualXpDelta=290 creditReward=1040 "
+                + "source=20260618-083035/events.log:1076,system-messages.log:281 "
                 + "safeFormatFeedback=true noAction59=true noItems=true noInventory=true");
 
             return new RewardFeedbackResult

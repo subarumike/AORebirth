@@ -1988,27 +1988,22 @@ namespace AORebirth.Core.Playfields
                 {
                     contract = resolved;
                 }
-                else if (!hasDirectCaptureCertification)
+                else if (!hasDirectCaptureCertification
+                         || string.IsNullOrWhiteSpace(resolutionFailure)
+                         || (!resolutionFailure.StartsWith(
+                                 "no canonical raw combat profile for ",
+                                 StringComparison.Ordinal)
+                             && !IsProductionOwnedTempleContract(character)))
                 {
-                    // Keep a complete source-local Specialized/Fixed sequence (e.g. Marcus Stone
-                    // mesh flamethrower from 20260731-174302, Nascence Barking Chimera) when the
-                    // corpus cannot certify a replacement. Do not quarantine already-ready
-                    // contracts just because a same-name catalog row is unsafe/ambiguous.
+                    // A complete source-local contract may stand when the corpus has no canonical
+                    // profile. Ambiguous, mismatched, or otherwise unsafe catalog resolutions must
+                    // still fail closed even when the source-local contract is independently ready.
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="
                         + (string.IsNullOrWhiteSpace(resolutionFailure)
                                ? "selected retaliatory contract was not capture-certified"
                                : resolutionFailure),
                         true);
-                }
-                else if (!string.IsNullOrWhiteSpace(resolutionFailure))
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        "CapturedEnemyCombatKeepCertified actor="
-                        + character.Identity
-                        + " corpus="
-                        + resolutionFailure);
                 }
             }
 
@@ -2110,6 +2105,16 @@ namespace AORebirth.Core.Playfields
             }
 
             return true;
+        }
+
+        private static bool IsProductionOwnedTempleContract(Character character)
+        {
+            // PF1931 named/ordinary contracts are owned directly by the checked-in Temple
+            // providers and guarded exhaustively by the PF1931 acceptance suite. They do not
+            // depend on a best-effort corpus replacement to remain certified.
+            return character != null
+                   && character.Playfield != null
+                   && character.Playfield.Identity.Instance == 1931;
         }
 
         private static bool TryEquipCapturedWeapon(
