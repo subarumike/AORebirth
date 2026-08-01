@@ -416,6 +416,11 @@ namespace ZoneEngine.Core.Missions
                 return 0;
             }
 
+            if (entry.HasFrozenAcceptedRewards)
+            {
+                return entry.CashReward;
+            }
+
             int ql = entry.Quality > 0 ? entry.Quality : 1;
             // Hard ceiling: capture-shell leftovers were ~106k on QL18; never pay that again.
             const int AbsoluteMaxCash = 150000;
@@ -453,6 +458,11 @@ namespace ZoneEngine.Core.Missions
             if (entry == null)
             {
                 return 0;
+            }
+
+            if (entry.HasFrozenAcceptedRewards)
+            {
+                return entry.ExperienceReward;
             }
 
             int ql = entry.Quality > 0 ? entry.Quality : 1;
@@ -514,20 +524,55 @@ namespace ZoneEngine.Core.Missions
             out int grantedItemInstance)
         {
             grantedItemInstance = 0;
-            if (entry == null || entry.Offer == null || entry.Offer.ItemRewards == null
-                || entry.Offer.ItemRewards.Length == 0)
+            if (entry == null)
             {
                 return false;
             }
 
-            QuestItemShort reward = entry.Offer.ItemRewards[0];
-            if (reward == null || reward.LowId <= 0)
+            int lowId;
+            int highId;
+            int ql;
+            if (entry.HasFrozenAcceptedRewards)
+            {
+                if (entry.FrozenItemRewardCount == 0)
+                {
+                    return false;
+                }
+
+                lowId = entry.FrozenItemRewardLowId;
+                highId = entry.FrozenItemRewardHighId > 0
+                             ? entry.FrozenItemRewardHighId
+                             : lowId;
+                ql = entry.FrozenItemRewardQuality > 0
+                         ? entry.FrozenItemRewardQuality
+                         : (entry.Quality > 0 ? entry.Quality : 1);
+            }
+            else
+            {
+                if (entry.Offer == null
+                    || entry.Offer.ItemRewards == null
+                    || entry.Offer.ItemRewards.Length == 0)
+                {
+                    return false;
+                }
+
+                QuestItemShort reward = entry.Offer.ItemRewards[0];
+                if (reward == null)
+                {
+                    return false;
+                }
+
+                lowId = reward.LowId;
+                highId = reward.HighId > 0 ? reward.HighId : reward.LowId;
+                ql = reward.Quality > 0
+                         ? reward.Quality
+                         : (entry.Quality > 0 ? entry.Quality : 1);
+            }
+
+            if (lowId <= 0)
             {
                 return false;
             }
-
-            int highId = reward.HighId > 0 ? reward.HighId : reward.LowId;
-            int ql = reward.Quality > 0 ? reward.Quality : (entry.Quality > 0 ? entry.Quality : 1);
             string name = "Mission Reward";
             int itemInstance;
             InventoryError error;
@@ -536,7 +581,7 @@ namespace ZoneEngine.Core.Missions
                     ? MissionKeyGrantService.TryGrantNamedItem(
                         client,
                         character,
-                        reward.LowId,
+                        lowId,
                         highId,
                         ql,
                         name,
@@ -545,7 +590,7 @@ namespace ZoneEngine.Core.Missions
                     : MissionKeyGrantService.TryGrantReservedNamedItem(
                         client,
                         character,
-                        reward.LowId,
+                        lowId,
                         highId,
                         ql,
                         name,
@@ -556,7 +601,7 @@ namespace ZoneEngine.Core.Missions
                 "COMPLETE-ITEM char={0} ok={1} low={2} high={3} ql={4} err={5}",
                 character.Identity.Instance,
                 ok,
-                reward.LowId,
+                lowId,
                 highId,
                 ql,
                 error);

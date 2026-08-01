@@ -5,7 +5,6 @@ namespace ZoneEngine.Core.Missions
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Threading;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -49,8 +48,11 @@ namespace ZoneEngine.Core.Missions
 
         private static CapturedOfferReference[] capturedOfferReferences;
 
-        private static int questInstanceSeed =
-            Math.Max(0x55569000, unchecked((int)(DateTime.UtcNow.Ticks & 0x3fffffff)));
+        private static readonly object OfferIdentityLock = new object();
+
+        private static MissionOfferIdentityStore offerIdentityStore;
+
+        private static Func<int, bool> offerIdentityCollisionValidator;
 
         /// <summary>
         /// Builds a fresh 5-offer roll for the requesting player/terminal.
@@ -438,7 +440,7 @@ namespace ZoneEngine.Core.Missions
 
         internal static QuestAlternativeMessage DecodeCapturedRoll(int index)
         {
-            return DecodeRollBody(CapturedRollBody(index));
+            return DeserializeBody(CapturedRollBody(index));
         }
 
         private static QuestInfo PickCompatibleCapturedOffer(
@@ -464,7 +466,7 @@ namespace ZoneEngine.Core.Missions
                 CapturedOfferReference selected = candidates[selectedIndex];
                 candidates.RemoveAt(selectedIndex);
 
-                QuestAlternativeMessage roll = DecodeRollBody(libraryBodies[selected.BodyIndex]);
+                QuestAlternativeMessage roll = DeserializeBody(libraryBodies[selected.BodyIndex]);
                 if (roll.QuestInfos == null
                     || selected.OfferIndex < 0
                     || selected.OfferIndex >= roll.QuestInfos.Length)
@@ -493,9 +495,14 @@ namespace ZoneEngine.Core.Missions
             return null;
         }
 
-        private static QuestAlternativeMessage DecodeRollBody(byte[] body)
+        internal static QuestAlternativeMessage DeserializeBody(byte[] body)
         {
             EnsureInitialized();
+            if (body == null || body.Length == 0)
+            {
+                throw new ArgumentException("Serialized mission roll body is required.", "body");
+            }
+
             var message = (QuestAlternativeMessage)Deserialize(body);
             RestoreStringTerminators(message);
             return message;
@@ -837,8 +844,41 @@ namespace ZoneEngine.Core.Missions
 
         private static int NextQuestInstance()
         {
-            int instance = Interlocked.Increment(ref questInstanceSeed) & 0x7fffffff;
-            return instance == 0 ? NextQuestInstance() : instance;
+            lock (OfferIdentityLock)
+            {
+                if (offerIdentityStore == null)
+                {
+                    string missionStateDirectory =
+                        Path.Combine(
+                            AppDomain.CurrentDomain.BaseDirectory ?? ".",
+                            "mission-state");
+                    offerIdentityStore =
+                        new MissionOfferIdentityStore(missionStateDirectory);
+                }
+
+                MissionOfferIdentityAllocationResult result =
+                    offerIdentityStore.TryAllocate(IsOfferIdentityInUse);
+                if (!result.Succeeded)
+                {
+                    throw new InvalidOperationException(
+                        "Mission offer identity allocation failed closed: "
+                        + result.Diagnostic);
+                }
+
+                return result.OfferId;
+            }
+        }
+
+        private static bool IsOfferIdentityInUse(int offerInstance)
+        {
+            Func<int, bool> validator = offerIdentityCollisionValidator;
+            return validator != null && validator(offerInstance);
+        }
+
+        internal static void SetOfferIdentityCollisionValidator(
+            Func<int, bool> validator)
+        {
+            offerIdentityCollisionValidator = validator;
         }
 
         internal static int ResolveClientClockNowSeconds(
