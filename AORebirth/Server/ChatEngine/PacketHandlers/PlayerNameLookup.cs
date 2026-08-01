@@ -65,7 +65,9 @@ namespace ChatEngine.PacketHandlers
             reader.ReadUInt16(); // data length
             uint playerId = uint.MaxValue;
             string playerName = reader.ReadString();
-            if (playerName == string.Empty)
+            if (string.IsNullOrEmpty(playerName)
+                || playerName == ":"
+                || playerName == "::")
             {
                 return;
             }
@@ -85,12 +87,29 @@ namespace ChatEngine.PacketHandlers
 
             byte[] namelookup = NameLookupResult.Create(playerId, playerName);
             client.Send(namelookup);
+
+            int online = 0;
+            if (playerId != uint.MaxValue)
+            {
+                try
+                {
+                    online = CharacterDao.Instance.IsOnline((int)playerId);
+                }
+                catch
+                {
+                    online = 0;
+                }
+            }
+
             client.Send(
                 BuddyOnlineStatus.Create(
                     playerId,
-                    (uint)CharacterDao.Instance.IsOnline((int)playerId),
+                    (uint)online,
                     new byte[] { 0x00, 0x01, 0x00 }));
-            client.KnownClients.Add(playerId);
+            if (playerId != uint.MaxValue && !client.KnownClients.Contains(playerId))
+            {
+                client.KnownClients.Add(playerId);
+            }
         }
 
         #endregion

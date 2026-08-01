@@ -42,8 +42,16 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public const string MarcusPostCompleteNodeId = "marcus_return_003";
 
-        // Capture 20260730-142434 reopen after Flint handoff: wounded-workers option first.
+        // Capture 20260730-142434 / 20260731-macrus-stone-dialog-quests:
+        // After fire return + Flint tip: wounded-workers option once.
         public const string MarcusPostFlintNodeId = "marcus_post_flint_001";
+
+        // Capture 20260731-macrus-stone-dialog-quests: after heal turn-in finished,
+        // Marcus idle is only Who are you / Where am I / Goodbye — never re-offer fire or heal.
+        public const string MarcusIdleNodeId = "marcus_idle_001";
+
+        // Mid Extinguish (B194): do not fall through to fire-offer root.
+        public const string MarcusBusyExtinguishNodeId = "marcus_busy_extinguish_001";
 
         public const string MarcusHealReturnNodeId = MarcusWoundedWorkersQuestRuntime.HealReturnNodeId;
 
@@ -417,25 +425,28 @@ namespace ZoneEngine.Core.Arete.Quests
                 case RexMarcusChainPhase.ReturnMarcus:
                     return MarcusReturnNodeId;
                 case RexMarcusChainPhase.TalkMarcus:
+                    // Fire quest offer once (Rex → Marcus). Never reuse after B194/B196/Flint.
                     return MarcusFireRootNodeId;
                 case RexMarcusChainPhase.ReturnMarcusStim:
                     return MarcusHealReturnNodeId;
                 case RexMarcusChainPhase.HealWorkers:
+                    // Stim already handed out — do not re-offer "wounded workers".
+                    return MarcusIdleNodeId;
                 case RexMarcusChainPhase.Flint:
                 case RexMarcusChainPhase.Done:
-                    // Capture 20260730-142434: after fire return / Flint tip, offer heal side-quest
-                    // once. After stim return finish, never re-offer wounded-workers.
+                    // Capture 20260731-macrus-stone-dialog-quests:
+                    // After main fire→Flint: offer heal once. After heal done: idle only.
                     if (MarcusWoundedWorkersQuestRuntime.HasCompletedStimReturn(source))
                     {
-                        return null;
+                        return MarcusIdleNodeId;
                     }
 
                     return MarcusPostFlintNodeId;
                 case RexMarcusChainPhase.Extinguish:
-                    // After suppressant: idle root — post-complete looked like "quest over".
-                    return null;
+                    // Suppressant in progress — never fall back to fire-offer root.
+                    return MarcusBusyExtinguishNodeId;
                 default:
-                    return null;
+                    return MarcusIdleNodeId;
             }
         }
 

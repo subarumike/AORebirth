@@ -1199,9 +1199,20 @@ namespace AORebirth.Core.Playfields
             if (attack.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
                 && attack.AttackInfoWeaponInstance == 0)
             {
-                return this.WeaponDefinition != null
-                       && this.WeaponDefinition.IsValid
-                       && this.WeaponDefinition.InventorySlot == attack.AttackInfoWeaponSlot;
+                if (this.WeaponDefinition != null
+                    && this.WeaponDefinition.IsValid
+                    && this.WeaponDefinition.InventorySlot == attack.AttackInfoWeaponSlot)
+                {
+                    return true;
+                }
+
+                // Mesh-presented right-hand AttackInfo (Marcus Stone flamethrower):
+                // capture has WeaponSlot=6 AmmoCount=0 WeaponInstance=0 with SCFU mesh only —
+                // no WIFU template in items.dat (ACG 0x495A7).
+                return this.AttackModel == CapturedEnemyAttackModel.Specialized
+                       && this.WeaponDefinition == null
+                       && attack.UsesEquippedWeapon
+                       && attack.AttackInfoAmmoCount == 0;
             }
 
             if (attack.AttackInfoWeaponInstance == 0)
@@ -1224,6 +1235,12 @@ namespace AORebirth.Core.Playfields
             {
                 return this.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
                        && this.AttackInfoWeaponInstance == 0;
+            }
+
+            // Specialized mesh-presented slot-6 attacks certify without a physical WIFU item.
+            if (this.WeaponDefinition == null)
+            {
+                return false;
             }
 
             if (this.SpecialAttackSequence != null)
@@ -1952,20 +1969,27 @@ namespace AORebirth.Core.Playfields
                 {
                     contract = resolved;
                 }
-                else if (!hasDirectCaptureCertification
-                         || string.IsNullOrWhiteSpace(resolutionFailure)
-                         || !resolutionFailure.StartsWith(
-                             "no canonical raw combat profile for ",
-                             StringComparison.Ordinal))
+                else if (!hasDirectCaptureCertification)
                 {
-                    // Keep a complete source-local CapturedFixedPacketSequence (e.g. Nascence
-                    // Barking Chimera from 20260723-225021) when the Subway corpus has no match.
+                    // Keep a complete source-local Specialized/Fixed sequence (e.g. Marcus Stone
+                    // mesh flamethrower from 20260731-174302, Nascence Barking Chimera) when the
+                    // corpus cannot certify a replacement. Do not quarantine already-ready
+                    // contracts just because a same-name catalog row is unsafe/ambiguous.
                     contract = CapturedEnemyCombatContract.Unresolved(
                         contract.Evidence + "; corpus resolution="
                         + (string.IsNullOrWhiteSpace(resolutionFailure)
                                ? "selected retaliatory contract was not capture-certified"
                                : resolutionFailure),
                         true);
+                }
+                else if (!string.IsNullOrWhiteSpace(resolutionFailure))
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        "CapturedEnemyCombatKeepCertified actor="
+                        + character.Identity
+                        + " corpus="
+                        + resolutionFailure);
                 }
             }
 

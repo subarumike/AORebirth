@@ -366,24 +366,34 @@ namespace ChatEngine.CoreServer
                 return;
             }
 
-            // Type 35 NpcMessage (AOSharp SystemMessage). Live capture Unk1=0 Unk2=1.
-            // Type 36 SimpleSystemMessage was wrong — client showed it under Vicinity.
-            byte[] packet = MsgSystem.Create(
-                systemChatMessage.Text,
-                systemChatMessage.Unk1,
-                systemChatMessage.Unk2 == 0 ? 1 : systemChatMessage.Unk2);
+            // Your Pets (ctch_mypet): live Unk1=0 + Text + Unk2=1 (capture 20260731-085057).
+            // Client Subscribe Channels → Public Groups → Your Pets gates display.
+            string source = systemChatMessage.Source ?? string.Empty;
+            string body = systemChatMessage.Text ?? string.Empty;
+            if (!string.IsNullOrEmpty(source) && !string.IsNullOrEmpty(body))
+            {
+                body = source + ": " + body;
+            }
+            else if (string.IsNullOrEmpty(body))
+            {
+                body = source;
+            }
+
+            int unk1 = systemChatMessage.Unk1;
+            int unk2 = systemChatMessage.Unk2 != 0 ? systemChatMessage.Unk2 : 1;
+            byte[] packet = MsgSystem.Create(body, unk1, unk2);
             if (packet == null || packet.Length < 2 || packet[0] != 0x00 || packet[1] != 0x23)
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
-                    "DistributeSystemChat refused non-type-35 packet (need 0023 NpcMessage, not Vicinity 0022 / SimpleSystem 0024)");
+                    "DistributeSystemChat refused non-YourPets packet (need type 35 / 0023)");
                 return;
             }
 
             string hexPrefix = "????";
             if (packet.Length > 0)
             {
-                int take = Math.Min(16, packet.Length);
+                int take = Math.Min(32, packet.Length);
                 var sb = new System.Text.StringBuilder(take * 2);
                 for (int i = 0; i < take; i++)
                 {

@@ -65,9 +65,7 @@ namespace ZoneEngine.Core
 
         public const int CommandReport = 14;
 
-        // Capture 20260731-054922 / 20260731-pet-chat: owner-only brown chat type 35
-        // (AOSharp NpcMessage). Not Vicinity (34). Not Zone ChatText.
-        // Per-pet lines: PetSystemChatLines (Carlo / CEO from 20260731-072612).
+        // Pet dialogue: Zone FormatFeedback only (working look before Your Pets attempts).
 
         // Capture 20260731-054922: PetCommand Attack with invalid/wrong target.
         private const string ChatAfraidCantDoThat = "I'm afraid I can't do that.";
@@ -590,10 +588,8 @@ namespace ZoneEngine.Core
         }
 
         /// <summary>
-        /// Capture 20260731-054922 / 20260731-pet-chat: owner-only brown pet announce.
-        /// Chat type 35 AOSharp NpcMessage (Unk1=0, Text, Unk2=1) — NOT Vicinity 34, NOT type 36.
-        /// Path: Zone ISCom SystemChatMessage → ChatEngine MsgSystem → owner chat client only.
-        /// Requires ChatEngine running (start it when testing pets).
+        /// Owner-only pet dialogue via Zone FormatFeedback (works without ChatEngine).
+        /// Brown text with leading ": " to match live Your Pets look.
         /// </summary>
         private static void AnnouncePetSystemChat(ICharacter owner, ICharacter pet, string line)
         {
@@ -602,60 +598,32 @@ namespace ZoneEngine.Core
                 return;
             }
 
-            string ownerName = string.IsNullOrEmpty(owner.Name) ? "Your" : owner.Name;
-            string petName = string.IsNullOrEmpty(pet.Name) ? "pet" : pet.Name;
-            string text = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}'s pet, {1}: {2}",
-                ownerName,
-                petName,
-                line);
-
-            try
+            if (owner.Controller == null || owner.Controller.Client == null)
             {
-                if (Program.ISComClient == null)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        "PetSystemChat: ISComClient null — start ChatEngine for brown owner SystemMessage; text="
-                        + text);
-                    return;
-                }
-
-                if (!Program.ISComClient.TrySend(
-                    new SystemChatMessage
-                    {
-                        CharacterId = owner.Identity.Instance,
-                        CharacterName = ownerName,
-                        Text = text,
-                        Unk1 = 0,
-                        Unk2 = 1
-                    }))
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        "PetSystemChat: ChatEngine not linked — start ChatEngine for brown owner SystemMessage; text="
-                        + text);
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                LogUtil.ErrorException(e);
-                LogUtil.Debug(
-                    DebugInfoDetail.Error,
-                    "PetSystemChat ISCom failed: " + e.Message + " text=" + text);
                 return;
             }
 
-            LogUtil.Debug(
-                DebugInfoDetail.Engine,
-                "PetSystemChat sent ownerId="
-                + owner.Identity.Instance
-                + " name="
-                + ownerName
-                + " text="
-                + text);
+            string ownerName = string.IsNullOrEmpty(owner.Name) ? "Your" : owner.Name;
+            string petName = string.IsNullOrEmpty(pet.Name) ? "pet" : pet.Name;
+            // Live chat UI shows ": {owner}'s pet, {pet}: {line}" in brown.
+            string text = string.Format(
+                CultureInfo.InvariantCulture,
+                ": {0}'s pet, {1}: {2}",
+                ownerName,
+                petName,
+                line);
+            string brownText = "<font color=#C08040>" + text + "</font>";
+
+            owner.Controller.Client.SendCompressed(
+                new FormatFeedbackMessage
+                {
+                    Identity = owner.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(brownText),
+                    Unknown2 = 0
+                },
+                owner.Identity.Instance);
         }
 
         /// <summary>

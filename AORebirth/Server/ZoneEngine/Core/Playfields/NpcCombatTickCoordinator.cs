@@ -169,7 +169,11 @@ namespace AORebirth.Core.Playfields
                                                this.nextCapturedFirstHitDelayObservationIndexes,
                                                attacker.Identity.Instance,
                                                capturedContract.CapturedFirstHitDelayObservationsSeconds)
-                                           : capturedContract.FirstHitDelaySeconds;
+                                           : capturedContract.FirstHitDelaySeconds > 0
+                                                 ? capturedContract.FirstHitDelaySeconds
+                                                 : specialAttackSequence != null
+                                                       ? specialAttackSequence.InitialAttackDelaySeconds
+                                                       : 0.0d;
                 bool usesSplitFixedAttackStartPackets = capturedContract.AttackModel
                                                         == CapturedEnemyAttackModel.FixedAttackInfo;
                 DateTime attackSequenceStartedAt = now;

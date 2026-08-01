@@ -62,12 +62,13 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string AlexTurnInRewardsFlag = "alex-turnin-rewards";
 
-        private const int TurnInXpReward = 2076;
+        // Capture 20260731-184635 FormatFeedback: "Received reward: 2229 XP, 1120 credits."
+        private const int TurnInXpReward = 2229;
 
         private const int TurnInCreditReward = 1120;
 
-        // Capture 20260720-074847 FormatFeedback wire.
-        private const string TurnInRewardFeedback = "~&!!!\":$'O\"ui!!!9Ei!!!.0~";
+        // Capture 20260731-184635 FormatFeedback wire.
+        private const string TurnInRewardFeedback = "~&!!!\":$'O\"ui!!!;4i!!!.0~";
 
         private const int AreteLandingPlayfieldId = 6553;
 
@@ -572,7 +573,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            // Capture 20260720-flint @20:49:09: Blank Info Chip 296570 + Rebuilt HC-12 295800.
+            // Capture 20260731-184635 @16:47:00: Blank Info Chip 296570 + Rebuilt HC-12 295800.
             if (!hasChip)
             {
                 GrantSingleRewardItem(source, BlankInfoChipItemId);
@@ -667,7 +668,7 @@ namespace ZoneEngine.Core.Arete.Quests
         {
             MissionRewardDefinition definition = new MissionRewardDefinition
                                                 {
-                                                    RewardKey = "captured-alex-bio-com-turnin-xp-credits",
+                                                    RewardKey = "captured-alex-bio-com-turnin-xp-credits-20260731-184635",
                                                     RewardType = "character-stats",
                                                     IsResolved = true,
                                                     StatMutations =
@@ -715,9 +716,16 @@ namespace ZoneEngine.Core.Arete.Quests
                 source.Identity.Instance,
                 "Mission:5514B19C",
                 definition,
-                "capture:20260720-074847:alex-turnin-xp-credits");
+                "capture:20260731-184635:alex-turnin-xp-credits");
             if (!result.Succeeded || result.StatValues == null)
             {
+                Log(
+                    "alex xp/credits reward failed status="
+                    + (result == null ? "null" : result.Status.ToString())
+                    + " msg="
+                    + (result == null ? string.Empty : result.Message));
+                // Capture still shows live Cash/XP even if ledger rejects — apply directly.
+                ApplyDirectXpCreditsFallback(source);
                 return;
             }
 
@@ -730,6 +738,28 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             StatMessageHandler.Default.SendChanged(source);
+        }
+
+        private static void ApplyDirectXpCreditsFallback(ICharacter source)
+        {
+            if (source == null || source.Stats == null)
+            {
+                return;
+            }
+
+            try
+            {
+                source.Stats[StatIds.cash].Value = source.Stats[StatIds.cash].Value + TurnInCreditReward;
+                source.Stats[StatIds.xp].Value = source.Stats[StatIds.xp].Value + TurnInXpReward;
+                source.Stats[StatIds.unsavedxp].Value = source.Stats[StatIds.unsavedxp].Value + TurnInXpReward;
+                source.Stats[StatIds.lastxp].Value = TurnInXpReward;
+                StatMessageHandler.Default.SendChanged(source);
+                Log("alex xp/credits applied via direct fallback");
+            }
+            catch (Exception ex)
+            {
+                Log("alex xp/credits fallback failed: " + ex.Message);
+            }
         }
 
         private static void TrySendTurnInRewardFeedback(ICharacter source)
@@ -941,6 +971,11 @@ namespace ZoneEngine.Core.Arete.Quests
             }
         }
 
+        public static bool IsDeliverBioDialogueActive(ICharacter source)
+        {
+            return IsDeliverTipActive(source);
+        }
+
         private static bool IsDeliverTipActive(ICharacter source)
         {
             if (source == null || !MissionRuntime.IsInitialized)
@@ -948,9 +983,28 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            ZoneEngine.Core.Missions.MissionStateRecord mission =
+            ZoneEngine.Core.Missions.MissionStateRecord deliver =
                 MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19C");
-            return IsActiveOrOffered(mission);
+            if (IsActiveOrOffered(deliver))
+            {
+                return true;
+            }
+
+            // Tip-only / ledger desync: Bio Com in bag after Find complete, Deliver not finished.
+            if (!HasBioCom(source))
+            {
+                return false;
+            }
+
+            ZoneEngine.Core.Missions.MissionStateRecord find =
+                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19B");
+            ZoneEngine.Core.Missions.MissionStateRecord uplink =
+                MissionRuntime.Service.GetMission(source.Identity.Instance, "Mission:5514B19D");
+            bool findDone = find != null && find.State == MissionLifecycleState.Completed;
+            bool uplinkStarted = IsActiveOrOffered(uplink)
+                                 || (uplink != null && uplink.State == MissionLifecycleState.Completed);
+            bool deliverDone = deliver != null && deliver.State == MissionLifecycleState.Completed;
+            return findDone && !deliverDone && !uplinkStarted;
         }
 
         private static bool IsAlexGibbsNpc(ICharacter source, Identity target)

@@ -224,10 +224,12 @@ namespace AORebirth.Core.Playfields
             this.npcHomeStates.Clear();
             this.corpseDespawnTicks.Clear();
             AndromedaIccHqIdleGestureRuntime.Clear();
+            AreteRexLarssonIdleGestureRuntime.Clear();
             AndromedaIccHqSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteLandingSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteIccPeacekeeperPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             MarcusPadAmbientCombat.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteGasFireRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             this.capturedAreteRobotSpawns.ClearPlayfield(this.playfield.Identity.Instance);
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
@@ -330,7 +332,7 @@ namespace AORebirth.Core.Playfields
 
             try
             {
-                // Capture 20260720-212302: Arete Cleaning Robot population (mesh/attack/loot).
+                // Capture 20260731-180854: Flint/Alex Cleaning Robot population (no stacked extras).
                 JunkyardCleaningRobotRuntime.StartForPlayfield(
                     this.playfield,
                     playfieldIdentity,
@@ -518,6 +520,7 @@ namespace AORebirth.Core.Playfields
                 playfieldIdentity,
                 this.ActivateNpc);
             AndromedaIccHqIdleGestureRuntime.ProcessDue(utcNow);
+            AreteRexLarssonIdleGestureRuntime.ProcessDue(utcNow);
             this.capturedTempleEncounters.ProcessDue(utcNow, this.AcquireAggro);
         }
 
@@ -670,6 +673,12 @@ namespace AORebirth.Core.Playfields
 
             if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker)
                 || this.capturedTempleEncounters.IsCapturedNanoCastInProgress(attacker))
+            {
+                return;
+            }
+
+            // Marcus pad: standing flamethrower — never chase into melee range.
+            if (MarcusPadAmbientCombat.IsStandingPadAmbientCombatant(attacker))
             {
                 return;
             }
@@ -931,19 +940,19 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
-            if (this.playfield != null
-                && this.playfield.Identity.Instance == 6553
-                && string.Equals(character.Name, "Marcus Stone", StringComparison.OrdinalIgnoreCase))
+            if (this.playfield != null && this.playfield.Identity.Instance == 6553)
             {
+                // Drive Marcus pad fight every Arete heartbeat (not only when Marcus is the dynel).
                 MarcusPadAmbientCombat.TickRespawn(
                     this.playfield,
                     this.playfield.Identity,
                     this.ActivateNpc);
-                MarcusWoundedWorkersQuestRuntime.TickHealRecoveries(this.playfield);
-            }
+                if (string.Equals(character.Name, "Marcus Stone", StringComparison.OrdinalIgnoreCase))
+                {
+                    MarcusWoundedWorkersQuestRuntime.TickHealRecoveries(this.playfield);
+                    AreteGasFireRuntime.TickRespawn(this.playfield);
+                }
 
-            if (this.playfield != null && this.playfield.Identity.Instance == 6553)
-            {
                 SurveillanceDroidRuntime.TickEnsurePresent(
                     this.playfield,
                     this.playfield.Identity,
@@ -1023,6 +1032,20 @@ namespace AORebirth.Core.Playfields
 
             if (character.FightingTarget.Instance != 0)
             {
+                // Marcus Stone / Burning Cleaning Robot: stay put and shoot (no DoFollow chase).
+                if (MarcusPadAmbientCombat.IsStandingPadAmbientCombatant(character))
+                {
+                    NPCController padController = character.Controller as NPCController;
+                    if (padController != null)
+                    {
+                        padController.StopFollow();
+                        padController.SnapshotCurrentMotionPosition();
+                        padController.State = CharacterState.Fighting;
+                    }
+
+                    return;
+                }
+
                 ICharacter capturedMovementTarget =
                     this.dynelRegistry.FindByIdentity<ICharacter>(character.FightingTarget);
                 if (!missionStationary
