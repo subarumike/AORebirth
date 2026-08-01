@@ -1,5 +1,7 @@
 # Temple of Three Winds: The Curator and Nematet
 
+> **PF1931 status authority (2026-08-01):** Historical evidence/provenance only. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
+
 ## Scope
 
 This record promotes the next PF1931 named-encounter slice from finalized

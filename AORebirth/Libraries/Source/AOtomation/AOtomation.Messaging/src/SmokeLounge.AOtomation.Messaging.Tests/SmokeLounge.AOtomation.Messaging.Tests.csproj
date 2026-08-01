@@ -279,6 +279,7 @@
     <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
     <Compile Include="TempleDoorStatusRuntimeTests.cs" />
     <Compile Include="StatelDataTestStub.cs" />
+    <Compile Include="TempleAcceptanceMatrixTests.cs" />
     <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
     <Compile Include="DungeonNamedLifecycleCompletionTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />

@@ -1,5 +1,7 @@
 # Temple ordinary-combat completion — 2026-07-28
 
+> **PF1931 status authority (2026-08-01):** Historical evidence/provenance only. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
+
 > Final cross-dungeon update: L18 Eternal Sentinel sources `0x7983FA22` and
 > `0x7983FBC2` are certified through the exact active WIFU loadouts, bounded
 > L18..L20 setup formula, and compatible L19/L20 normal-result domain. PF1931

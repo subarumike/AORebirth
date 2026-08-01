@@ -1,5 +1,7 @@
 # PF127/PF1931 Dungeon Gameplay Completion
 
+> **PF1931 status authority (2026-08-01):** Historical PF1931 evidence/provenance only. Later nano, geometry, door, zoning, and lifecycle passes superseded its PF1931 status claims. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md).
+
 Date: 2026-07-28
 
 ## Scope and baseline
