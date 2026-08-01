@@ -14,7 +14,9 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core.Functions.GameFunctions;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
 
     using Coordinate = AORebirth.Core.Vector.Coordinate;
     using Identity = SmokeLounge.AOtomation.Messaging.GameData.Identity;
@@ -243,7 +245,10 @@ namespace AORebirth.Core.Playfields
 
             foreach (StatelData sd in collisionStatels)
             {
-                if (!IsInStatelCollisionRange(sd, dynel))
+                bool inRange = TempleWorldInteractionRules.IsBoundaryLinkStatel(sd)
+                    ? TempleWorldInteractionRules.IsInBoundaryTriggerRange(sd, dynel)
+                    : IsInStatelCollisionRange(sd, dynel);
+                if (!inRange)
                 {
                     continue;
                 }
@@ -354,7 +359,9 @@ namespace AORebirth.Core.Playfields
             foreach (StatelData sd in collisionStatels)
             {
                 string statelKey = BuildStatelContactKey(sd);
-                bool inRange = IsInStatelCollisionRange(sd, dynel);
+                bool inRange = TempleWorldInteractionRules.IsBoundaryLinkStatel(sd)
+                    ? TempleWorldInteractionRules.IsInBoundaryTriggerRange(sd, dynel)
+                    : IsInStatelCollisionRange(sd, dynel);
                 bool wasInRange = activeEnterContacts.Contains(statelKey);
 
                 if (!inRange)
@@ -365,6 +372,30 @@ namespace AORebirth.Core.Playfields
                     }
 
                     continue;
+                }
+
+                if (TempleWorldInteractionRules.IsExteriorLinkStatel(
+                    playfieldIdentity.Instance,
+                    sd))
+                {
+                    // The official EntryHall exterior link has no statel Event. Prime the
+                    // arrival contact, re-arm only after leaving it, and reuse the shared
+                    // ExitProxyPlayfield owner when the character returns to the edge.
+                    if (!initialized)
+                    {
+                        activeEnterContacts.Add(statelKey);
+                        continue;
+                    }
+
+                    if (wasInRange)
+                    {
+                        continue;
+                    }
+
+                    activeEnterContacts.Add(statelKey);
+                    stopMovement(dynel);
+                    exitproxyplayfield.TryExecute(dynel, sd);
+                    return;
                 }
 
                 foreach (StatelEvent ev in
