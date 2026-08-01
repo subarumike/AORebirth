@@ -256,6 +256,9 @@ client.Controller.Character.Playfield.Identity,
                     MissionAcgLifecycleService.TryCleanupPendingForCharacter(
                         client,
                         client.Controller.Character);
+                    MissionRollFeeService.TryRecoverAndSendForLogin(
+                        client,
+                        client.Controller.Character);
                     ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
                     MissionTokenProgressTracker.TryResumePendingClientUpdates(
                         client.Controller.Character);

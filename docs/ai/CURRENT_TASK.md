@@ -2,6 +2,47 @@
 
 ## Active
 
+TASK ID: GENERATED-MISSION-OFFER-AUTHORITY-001
+
+Generated-terminal offers now have durable owner-scoped authority before
+acceptance. Version 1 is stored under `mission-state/generated-offers` with the
+complete serialized roll payload and exact owner, terminal, slider, timing,
+offer-index, seed, response-nonce, and offer-identity fields. Records use
+deterministic serialization, SHA-256 integrity, atomic replacement,
+fail-closed loading, and exact-record compare-and-swap.
+
+The durable lifecycle is `Prepared`, `FeeChargePending`, `Pending`,
+`AcceptanceClaimed`, `Accepted`, `Expired`, `Replaced`, or `Discarded`. A new
+roll is first persisted as non-accepting `Prepared`, then durably reserves its
+exact roll-fee claim as `FeeChargePending`. The cash debit and batch-keyed claim
+commit together through the existing `stats` and `missionrewardledger` tables;
+no schema was added. Only that committed claim atomically publishes the batch as
+`Pending` and replaces the prior pending batch. Fee rejection discards only the
+prepared claim and leaves the prior paid roll intact. Startup discards
+interrupted pre-claim preparations, while reconnect idempotently resumes an
+in-flight fee claim and re-sends the exact stored pending roll before restoring
+acceptance authority. Startup then restores and audits
+the ledger before new
+roll or acceptance ownership is published. The ledger owns deterministic roll
+seed/nonce continuity together with the restart-safe offer-identity cursor;
+expiry, a replacement roll, and explicit discard transition only the exact
+owner's records.
+
+Acceptance first claims the exact owner/original-offer record by durable CAS,
+then creates or reconciles the accepted projection. A crash between those
+boundaries resumes only when the ledger and projection prove the same owner,
+offer, and accepted mission; divergence fails closed. The accepted projection
+remains the complete accepted-mission authority, but it is no longer described
+as the sole durable proof of the pre-acceptance claim. Restored pending offers
+are server audit/acceptance authority only: this stage does not claim an
+different or regenerated offer after reconnect.
+
+No database schema, reward formula, mission slider, loot, ACG payload,
+authored-quest, legacy-mission, or procedural-generation behavior changes in
+this stage.
+
+## Previous completed status
+
 TASK ID: GENERATED-MISSION-COMPLETION-RECOVERY-001
 
 Generated-terminal mission completion now resumes from durable, exact mission
@@ -68,9 +109,11 @@ accepted quest ID, owner, binding, rewards, QFU contract, artifacts, expiry,
 and lifecycle fields; malformed, partial, unknown-version, duplicate, or
 conflicting records fail closed.
 
-Acceptance is idempotent by owner plus original offer identity. The offer is
-durably claimed before the binding, objective, key, mission artifact, accepted
-state, or QFU is exposed. Persisted acceptance phases make each later boundary
+Acceptance is idempotent by owner plus original offer identity. The durable
+generated-offer ledger claims that exact owner/offer before the binding,
+objective, key, mission artifact, accepted state, or QFU is exposed; the
+accepted projection then preserves and reconciles the accepted result.
+Persisted acceptance phases make each later boundary
 recoverable: binding and objective persistence; key and exact Repair/Return
 Item artifact grants; accepted-state commit; and pending/sent QFU delivery.
 Retries and reconnects resume the same accepted quest, bundle, building, PF2,

@@ -1103,6 +1103,46 @@ Final runtime third-party attribution is documented in the root `NOTICE`: CellAO
 - `600 Varmint Woods` static vendor coverage was expanded with 1 approved mapping. Commit `e197b9f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, query-back confirmed `39321612 | 600 | 93063 | AdvOA`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`. Total uncovered statel vendors dropped from `571` to `570`, and `600 Varmint Woods` dropped from `3` to `2`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`. Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered until matching `vendortemplate.ItemTemplate` evidence is found. No runtime vendor behavior changed.
 - Surgery clinic and implant flows have documented repaired behavior.
 
+# Durable Generated-Mission Offer Authority
+
+Generated terminal rolls have a version-1 owner ledger under
+`mission-state/generated-offers`. Each record preserves the complete serialized
+roll payload plus exact owner, issuing terminal, sliders, issued/expiry times,
+offer indices and identities, deterministic roll seed, and response nonce.
+Canonical serialization, SHA-256 integrity, atomic replacement, strict version
+and field validation, duplicate detection, and exact-record compare-and-swap
+make malformed, partial, stale, or conflicting ownership fail closed.
+
+The persisted offer lifecycle is `Prepared`, `FeeChargePending`, `Pending`,
+`AcceptanceClaimed`, `Accepted`, `Expired`, `Replaced`, or `Discarded`.
+`Prepared` and `FeeChargePending` are durable but cannot be accepted. The latter
+keys one idempotent cash-debit claim to the exact owner and batch; its stat update
+and unique applied claim commit in one transaction using the existing `stats`
+and `missionrewardledger` tables. The committed claim publishes the batch as
+`Pending` and only then replaces the prior paid roll. Fee rejection discards the
+pre-publication batch without invalidating that prior roll. Startup durably
+discards interrupted pre-claim preparations; login resumes an in-flight applied
+or unapplied fee claim exactly once and re-sends the exact stored pending roll.
+It then restores and audits the full owner ledger against the
+offer-identity cursor and accepted projections before publishing new offer or
+acceptance authority. Deterministic seed/nonce
+continuity and cursor allocation are durable owners rather than process-start
+state. Expiry, replacement rolls, and discard affect only the exact owner's
+matching records and cannot consume another player's offer.
+
+Acceptance durably compare-and-swaps the exact owner/original-offer record to
+`AcceptanceClaimed` before allocating or exposing accepted artifacts. Crash
+recovery reconciles that claim with the exact accepted projection and advances
+it to `Accepted` only for the same owner and offer; missing, duplicate, or
+conflicting state fails closed. The accepted projection remains authoritative
+for the accepted mission, while the generated-offer ledger is the durable
+pre-acceptance claim owner. Restored offers are retained for audit and exact
+acceptance; reconnect uses only the persisted exact response payload and does
+not regenerate an offer.
+
+This authority layer changes no database/schema, reward formula, slider, loot,
+ACG payload, authored quest, legacy mission, or procedural-generation behavior.
+
 # Durable Accepted Generated-Mission Projection
 
 Generated terminal missions persist a complete version-1 accepted projection
@@ -1126,8 +1166,10 @@ accepted source after restart; completion consumes its frozen rewards instead
 of mutable roll templates or recalculation fallbacks.
 
 Acceptance is serialized and idempotent by owner plus original offer identity.
-The selected offer is claimed durably before artifacts or client-visible
-accepted state. Persisted phases cover the offer claim, binding, objective,
+The generated-offer ledger durably claims the selected owner/offer before
+artifacts or client-visible accepted state, and the accepted projection
+reconciles the resulting accepted identity. Persisted phases cover the offer
+claim, binding, objective,
 pending/granted key, pending/granted exact artifact, objective exposure,
 accepted commit, and pending/sent QFU delivery. A retry or restart resumes the
 same reservation and exact inventory identities; it cannot allocate another

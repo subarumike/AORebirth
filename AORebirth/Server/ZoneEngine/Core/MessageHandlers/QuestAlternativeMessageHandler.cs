@@ -54,8 +54,11 @@ namespace ZoneEngine.Core.MessageHandlers
                 message.MoneyExperienceSlider,
                 message.QuestInfos == null ? 0 : message.QuestInfos.Length);
 
+            bool rollFeeWasCharged = false;
             try
             {
+                lock (MissionOfferStore.AuthorityGate)
+                {
                 int characterLevel = character.Stats[StatIds.level].Value;
                 int terminalPlayfieldId = character.Playfield != null
                                              ? character.Playfield.Identity.Instance
@@ -154,6 +157,8 @@ namespace ZoneEngine.Core.MessageHandlers
                 {
                 }
 
+                int rollSeed;
+                int responseNonce;
                 QuestAlternativeMessage response = MissionRollService.BuildRollResponse(
                     message,
                     character.Identity,
@@ -164,7 +169,9 @@ namespace ZoneEngine.Core.MessageHandlers
                     characterSide,
                     MissionRollService.ResolveClientClockNowSeconds(
                         zoneClient.LastGameTimeSyncUtc,
-                        DateTime.UtcNow));
+                        DateTime.UtcNow),
+                    out rollSeed,
+                    out responseNonce);
 
                 if (response == null
                     || response.QuestInfos == null
@@ -186,18 +193,23 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 byte[] serializedRollPayload =
                     MissionRollService.SerializeBody(response);
+                DateTime issuedUtc = DateTime.UtcNow;
+                MissionOfferBatchHandle storedBatch;
                 string offerStoreFailure;
                 if (!MissionOfferStore.TryStoreRoll(
-                    character.Identity.Instance,
+                    character.Identity,
                     response,
                     message,
-                    DateTime.UtcNow,
+                    issuedUtc,
+                    rollSeed,
+                    responseNonce,
                     serializedRollPayload,
+                    out storedBatch,
                     out offerStoreFailure))
                 {
                     client.Server.Info(
                         client,
-                        "QuestAlternative roll blocked - accepted projection unavailable: {0}",
+                        "QuestAlternative roll blocked - durable offer authority unavailable: {0}",
                         offerStoreFailure);
                     character.Send(
                         new FormatFeedbackMessage
@@ -214,14 +226,106 @@ namespace ZoneEngine.Core.MessageHandlers
 
                 // Capture order: fee deduct feedback, then the 5-offer QuestAlternative.
                 // Never charge unless we have a non-empty roll ready to send.
-                int fee;
-                if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
+                int fee = MissionRollFeeRules.FeeForLevel(characterLevel);
+                string feeClaimFailure;
+                if (!MissionOfferStore.TryBeginFeeCharge(
+                        storedBatch,
+                        fee,
+                        DateTime.UtcNow,
+                        out feeClaimFailure))
                 {
-                    MissionOfferStore.DiscardRoll(character.Identity.Instance);
                     client.Server.Info(
                         client,
-                        "QuestAlternative roll blocked — need {0} credits",
-                        fee);
+                        "QuestAlternative roll-fee claim could not be durably reserved: {0}",
+                        feeClaimFailure);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                "The mission terminal could not preserve the roll fee. No credits were deducted.")
+                        });
+                    return;
+                }
+
+                int appliedFee;
+                int cashBefore;
+                int cashAfter;
+                bool insufficientCredits;
+                if (!MissionRollFeeService.TryChargeRollFee(
+                        character,
+                        storedBatch.BatchIdentity,
+                        fee,
+                        out appliedFee,
+                        out cashBefore,
+                        out cashAfter,
+                        out insufficientCredits,
+                        out feeClaimFailure))
+                {
+                    string discardFailure;
+                    bool batchDiscarded = MissionOfferStore.TryDiscardBatch(
+                            storedBatch,
+                            DateTime.UtcNow,
+                            "RollFeeRejected",
+                            out discardFailure);
+                    if (!batchDiscarded)
+                    {
+                        client.Server.Info(
+                            client,
+                            "QuestAlternative rejected batch could not be durably discarded: {0}",
+                            discardFailure);
+                        return;
+                    }
+
+                    if (batchDiscarded && insufficientCredits)
+                    {
+                        MissionRollFeeService.NotifyRollFeeRejected(
+                            character,
+                            appliedFee,
+                            cashBefore);
+                    }
+
+                    client.Server.Info(
+                        client,
+                        string.IsNullOrEmpty(feeClaimFailure)
+                            ? "QuestAlternative roll blocked — need {0} credits"
+                            : "QuestAlternative durable roll-fee claim failed: {0}",
+                        string.IsNullOrEmpty(feeClaimFailure)
+                            ? (object)fee
+                            : feeClaimFailure);
+                    return;
+                }
+
+                rollFeeWasCharged = true;
+                MissionRollFeeService.NotifyRollFeeApplied(
+                    character,
+                    appliedFee,
+                    cashBefore,
+                    cashAfter);
+
+                string publicationFailure;
+                if (!MissionOfferStore.TryPublishBatch(
+                        storedBatch,
+                        DateTime.UtcNow,
+                        out publicationFailure))
+                {
+                    client.Server.Info(
+                        client,
+                        "QuestAlternative paid batch could not be durably published: {0}",
+                        publicationFailure);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                "The mission roll could not be preserved after the fee was deducted.")
+                        });
                     return;
                 }
 
@@ -236,6 +340,7 @@ namespace ZoneEngine.Core.MessageHandlers
                     missionQuality,
                     fee,
                     response.MissionTerminalIdentity);
+                }
             }
             catch (Exception ex)
             {
@@ -249,7 +354,9 @@ namespace ZoneEngine.Core.MessageHandlers
                         Unknown1 = 0,
                         Unknown2 = 0,
                         FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
-                            "The mission terminal failed to prepare missions. No credits were deducted.")
+                            rollFeeWasCharged
+                                ? "The mission roll could not be delivered after the fee was deducted."
+                                : "The mission terminal failed to prepare missions. No credits were deducted.")
                     });
             }
         }
