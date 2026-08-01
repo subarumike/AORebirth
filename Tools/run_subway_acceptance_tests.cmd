@@ -75,7 +75,25 @@ if errorlevel 1 exit /b %errorlevel%
 call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~QuestRuntimePersistenceTests.Karrec"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests"
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.RegistryRejectsDuplicateMissingInvalidAndEvidenceUnsafeDefinitions"
+if errorlevel 1 exit /b %errorlevel%
+
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.VergilObservedCorpseSnapshotsGenerateOnlyExactLinkedBundles"
+if errorlevel 1 exit /b %errorlevel%
+
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.StrikeForemanObservedSnapshotsUseEnemyLevelWithinItemQlBounds"
+if errorlevel 1 exit /b %errorlevel%
+
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ObservedCorpseSnapshotsRejectIndependentProbabilityDefinitions"
+if errorlevel 1 exit /b %errorlevel%
+
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.NoAssignmentUnresolvedAndOwnedSummonPathsFailClosed"
+if errorlevel 1 exit /b %errorlevel%
+
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ObservedCreditSetsRemainUniqueWhileObservedSamplesPreserveMultiplicity"
+if errorlevel 1 exit /b %errorlevel%
+
+call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ArchitectureGuardrailsKeepLootOwnershipOutOfPlayfieldAndEnemyBranches"
 if errorlevel 1 exit /b %errorlevel%
 
 exit /b 0

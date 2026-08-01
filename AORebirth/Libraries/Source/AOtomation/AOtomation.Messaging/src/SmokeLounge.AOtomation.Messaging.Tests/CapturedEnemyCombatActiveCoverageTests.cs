@@ -18,7 +18,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1583;
+        private const int ExpectedInitialActorCount = 1590;
         private const int ExpectedBindingRecordCount = 1566;
         private const string Pf127OrdinaryProfileResolutionMode =
             "production-owned-exact-pf127-ordinary-profile-resolver";
@@ -42,7 +42,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1585, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1592, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -575,10 +575,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1, recordsByFamily["scripted-hostiles"].Length);
             Assert.AreEqual(171, records.Length);
             Assert.AreEqual(
-                27,
+                34,
                 recordsByFamily["cleaning-robots"].Sum(
                     value => IntMember(value, "fixedDenominatorActorCount")),
-                "Cleaning-robot supplemental rows must reconcile to their 27 fixed Arete actors.");
+                "Cleaning-robot supplemental rows must reconcile to their 34 fixed Arete actors.");
 
             var auditKeys = new HashSet<string>(StringComparer.Ordinal);
             foreach (Dictionary<string, object> record in recordsByFamily.Values.SelectMany(value => value))
@@ -780,6 +780,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 sandstorm.All(
                     value => StringArrayMember(value, "contentEvidenceCaptureIds")
                         .SequenceEqual(new[] { "20260727-204902" })));
+
+            Dictionary<string, object> cleaningRobots = bindings.Single(
+                value => StringMember(value, "name") == "Cleaning Robot"
+                         && StringArrayMember(value, "contentSources").Single()
+                            == "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs");
+            Assert.AreEqual(21, IntMember(cleaningRobots, "actorCount"));
+            CollectionAssert.AreEqual(
+                new[] { "20260731-180854" },
+                StringArrayMember(cleaningRobots, "contentEvidenceCaptureIds"));
         }
 
         [TestMethod]
@@ -826,8 +835,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
             Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
             Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(22, discovered.Count);
-            Assert.AreEqual(24, discovered.Values.Sum());
+            Assert.AreEqual(21, discovered.Count);
+            Assert.AreEqual(22, discovered.Values.Sum());
             foreach (KeyValuePair<string, int> entryPoint in discovered)
             {
                 Dictionary<string, object> record = recorded[entryPoint.Key];
@@ -1120,7 +1129,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 { "temple-reanimated-corpse-adds", 2 },
                 { "nascence-core-hecklers", 40 },
                 { "nascence-life", 837 },
-                { "arete-family", 96 },
+                { "arete-family", 103 },
                 { "arete-additional-captured-actors", 14 },
                 { "arete-alien-area", 64 },
                 { "arete-sandstorm-marauders", 5 },

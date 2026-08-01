@@ -1,6 +1,6 @@
 {
   "bindingTotals": {
-    "actorCount": 1583,
+    "actorCount": 1590,
     "bindingRecordCount": 1566
   },
   "bindings": [
@@ -33896,6 +33896,30 @@
     },
     {
       "actorCount": 1,
+      "bindingKey": "21d07d8d08ddcdfc1410",
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260720-204431"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
+      ],
+      "coverageKey": "a42378ba0942077878bf",
+      "level": 5,
+      "levelCandidates": [
+        5
+      ],
+      "monsterData": 17657,
+      "name": "Garbage Flea",
+      "runtimeContractReady": false,
+      "runtimePlayfieldOrResource": 6553,
+      "runtimeProfileSelector": null,
+      "runtimeSourceIdentityHint": null,
+      "surface": "arete-family"
+    },
+    {
+      "actorCount": 1,
       "bindingKey": "d34133b6e05ba41cd076",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -33944,7 +33968,7 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "21d07d8d08ddcdfc1410",
+      "bindingKey": "2d5929b72618f8c630c8",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
@@ -34016,30 +34040,6 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "2d5929b72618f8c630c8",
-      "classification": "unresolved",
-      "configuredSourceIdentity": null,
-      "contentEvidenceCaptureIds": [
-        "20260720-204431"
-      ],
-      "contentSources": [
-        "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs"
-      ],
-      "coverageKey": "a42378ba0942077878bf",
-      "level": 5,
-      "levelCandidates": [
-        5
-      ],
-      "monsterData": 17657,
-      "name": "Garbage Flea",
-      "runtimeContractReady": false,
-      "runtimePlayfieldOrResource": 6553,
-      "runtimeProfileSelector": null,
-      "runtimeSourceIdentityHint": null,
-      "surface": "arete-family"
-    },
-    {
-      "actorCount": 1,
       "bindingKey": "db3be170de825289f414",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -34087,12 +34087,12 @@
       "surface": "arete-family"
     },
     {
-      "actorCount": 14,
-      "bindingKey": "af27bd8e2954fa804356",
+      "actorCount": 21,
+      "bindingKey": "229244a687f46a09ffc2",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
-        "20260720-212302"
+        "20260731-180854"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs"
@@ -37883,7 +37883,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-      "sha256": "4409d974141d35be4644b276658f3aa487ecf8f671fd0c31cc26550bef717e6b"
+      "sha256": "e8916713492676bfb021ba7bce959f1c3e4e9eb4a4436eb6560002eb2e3b288f"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteAlienAreaMobRuntime.cs",
@@ -37899,7 +37899,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
-      "sha256": "5291e2c9b8a0bca74252e1a527d8a480315fd0171ba70d8300dec25bdcab429c"
+      "sha256": "08e20edaaec9dfbe9175b5146513743f39231a46636d7623cea0f28b5e548047"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs",
@@ -37915,11 +37915,11 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
-      "sha256": "1bed52ed54b2bc2872bab7968b21599c6409e3ed11f048e61a3fe28cadea9bd3"
+      "sha256": "73fab15a358e1030c66a16ba670744f70878b810bd88160c9aea5eb7e9aa520a"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-      "sha256": "6b4b467a4a4424537d867b4cf090d122e990c22df194bd678f21112a7ce427b7"
+      "sha256": "ba5ea95d5bc015a8292fd9bd2656956d38283699b5142cda8232ad353b165dfb"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
@@ -37967,7 +37967,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
-      "sha256": "699937ae71fc589ceaecfaeb7604c86da1d5501242302b85a54891be2bfa0035"
+      "sha256": "275b97a3605a82893458da1405c7719a92e368e32507c2a3a6c6f619c7d0e53d"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
@@ -37975,7 +37975,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-      "sha256": "9e9ce82eaaf90e4795d4faab74b3b381ac25c10d230fe852e36ded71978feb47"
+      "sha256": "1e4feb223a7aa1eb16a0b94630b5a050676aa822803fb520869a54b827116d9f"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceShapeCatalog.cs",
@@ -38422,7 +38422,7 @@
     "captureCertifiedVariantCountWithMutableWeaponState": 4,
     "exactRawWireObservationCount": 2462,
     "finalCaptureCertifiedActorCount": 478,
-    "finalQuarantinedActorCount": 1105,
+    "finalQuarantinedActorCount": 1112,
     "fixedCertifiedProfileRowCount": 478,
     "fixedProfileRowCount": 788,
     "fixedUnresolvedProfileRowCount": 310,
@@ -52488,7 +52488,7 @@
           }
         ],
         "evidencePacketIds": [],
-        "fixedDenominatorActorCount": 14,
+        "fixedDenominatorActorCount": 21,
         "fixedDenominatorCoverageKey": "c8e54168cc559ee0e2fd",
         "level": 1,
         "levelCandidates": [
@@ -55018,11 +55018,11 @@
     "surface": "subway-ordinary"
   },
   "populationContract": {
-    "actualInitialActorCount": 1583,
-    "configuredMaximumActorCount": 1585,
+    "actualInitialActorCount": 1590,
+    "configuredMaximumActorCount": 1592,
     "cursedSilvertail": "a dynamic replacement for one of five Dreaming Silvertails and does not increase the Nascence Life count",
     "dynamicMissionMobs": "excluded from the fixed denominator because their count and identity are mission-instance data",
-    "expectedInitialActorCount": 1583,
+    "expectedInitialActorCount": 1590,
     "maximumExplanation": "two Infector slots arm only after Abmouth combat and are not initial actors"
   },
   "profiles": [
@@ -182438,7 +182438,7 @@
       ]
     },
     {
-      "actorCount": 14,
+      "actorCount": 21,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 375,
       "captureSessions": [
@@ -182476,10 +182476,10 @@
       "classification": "unresolved",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [
-        "20260720-212302"
+        "20260731-180854"
       ],
       "contentEvidenceCaptureIdsOutsideCombatInventory": [
-        "20260720-212302"
+        "20260731-180854"
       ],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs"
@@ -183886,7 +183886,7 @@
       "missingEvidence": [
         "AttackInfo correlated after this packet inside the same capture and SCFU generation",
         "capture-backed non-equipped attack range",
-        "content provenance not indexed by the canonical combat inventory: 20260720-212302",
+        "content provenance not indexed by the canonical combat inventory: 20260731-180854",
         "exact specialized runtime sequence for multiple captured AttackInfo streams",
         "runtime-ready capture-proven unique semantic fallback for a source-unbound runtime actor"
       ],
@@ -232305,7 +232305,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          504
+          622
         ]
       },
       {
@@ -232349,7 +232349,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          1694
+          1699
         ]
       },
       {
@@ -232382,7 +232382,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          314
+          316
         ]
       },
       {
@@ -232438,7 +232438,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          216
+          225
         ]
       },
       {
@@ -232451,18 +232451,6 @@
         "prepareCallSourceLines": [
           633,
           689
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-family"
-        ],
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-        "prepareCallCount": 2,
-        "prepareCallSourceLines": [
-          268,
-          278
         ]
       },
       {
@@ -232533,8 +232521,8 @@
         ]
       }
     ],
-    "entryPointCount": 24,
-    "entryPointFileCount": 22,
+    "entryPointCount": 22,
+    "entryPointFileCount": 21,
     "prepareCallPattern": "\\bCapturedEnemyCombatRuntime\\s*\\.\\s*Prepare\\s*\\(",
     "productionRoot": "AORebirth/Server/ZoneEngine/Core"
   },
@@ -232583,10 +232571,10 @@
       "unresolved": 837
     },
     {
-      "actorCount": 96,
+      "actorCount": 103,
       "certified": 0,
       "surface": "arete-family",
-      "unresolved": 96
+      "unresolved": 103
     },
     {
       "actorCount": 14,
@@ -232627,7 +232615,7 @@
   ],
   "totals": {
     "certified": 478,
-    "initialActorCount": 1583,
-    "unresolved": 1105
+    "initialActorCount": 1590,
+    "unresolved": 1112
   }
 }
