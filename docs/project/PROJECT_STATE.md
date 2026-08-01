@@ -59,6 +59,15 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   reducing the accepted captured outcomes. SimpleChar `78E0FC65` retains its
   captured display name `Stanley Goodman`.
 
+- PF1931 Temple of Three Winds is finalized for the existing evidence corpus.
+  The sole current status authority is
+  `docs/evidence/PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md`; earlier Temple
+  reports are evidence/provenance only. All recoverable PF1931 contracts have
+  production owners and regression coverage. Unsupported nano selectors,
+  resistance/action-lock mechanics, loot probabilities/wider pools, and the
+  Murial/Reanimated Corpse loot outcomes remain explicitly fail-closed with
+  exact blockers in the matrix.
+
 - PF127/PF1931 named encounter completion is authoritative across 19 unique
   active combat/profile domains: 14 initial stages, two successors, two
   owned-add domains, and Murial's ordinary-owned named patrol. All active
@@ -82,10 +91,8 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   materialized corpse/loot state. Strike Foreman is active as a PF127 named encounter with exact
   capture-backed `122767/122768` equipped semantics, production-owned L19/QL19
   selection, shared encounter lifecycle, and capture-proven atomic loot
-  memberships. Exact unresolved boundaries are unproven downstream or
-  scheduling behavior for packet-only Temple nanos, unknown loot probabilities
-  and wider pools, and Murial nano `70294` and loot. The Aztur reset delay
-  remains policy-owned, not capture-timed. Evidence:
+  memberships. For PF1931, exact unsupported behavior and project-policy timing
+  boundaries are governed only by the acceptance matrix above. Evidence:
   `docs/evidence/DUNGEON_NAMED_ENCOUNTER_COMPLETION_20260728.md`,
   `docs/evidence/DUNGEON_GAMEPLAY_COMPLETION_20260728.md`, and
   `docs/evidence/DUNGEON_NAMED_LIFECYCLE_COMPLETION_20260729.md`.

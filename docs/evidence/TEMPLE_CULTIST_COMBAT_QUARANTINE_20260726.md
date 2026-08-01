@@ -1,5 +1,7 @@
 # Temple Cultist combat quarantine audit — 2026-07-26
 
+> **PF1931 status authority (2026-08-01):** Historical evidence/provenance only. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
+
 > Superseded on 2026-07-28 by
 > `docs/evidence/TEMPLE_ORDINARY_COMBAT_COMPLETION_20260728.md`. The earlier
 > conclusion below predated the exact active WIFU catalog and bounded

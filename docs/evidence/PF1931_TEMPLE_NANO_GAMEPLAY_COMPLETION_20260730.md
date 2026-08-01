@@ -1,5 +1,7 @@
 # PF1931 Temple Nano Gameplay Completion - 2026-07-30
 
+> **PF1931 status authority (2026-08-01):** Evidence/provenance only. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
+
 ## Scope and repository boundary
 
 - Requested baseline SHA: `c5fcf773bfe64ef8801f2b8db546281aae45bd23`.
