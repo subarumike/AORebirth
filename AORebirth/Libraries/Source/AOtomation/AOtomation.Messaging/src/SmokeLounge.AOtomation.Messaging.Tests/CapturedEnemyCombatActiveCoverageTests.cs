@@ -18,10 +18,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class CapturedEnemyCombatActiveCoverageTests
     {
-        private const int ExpectedInitialActorCount = 1590;
-        private const int ExpectedBindingRecordCount = 1566;
+        private const int ExpectedInitialActorCount = 1607;
+        private const int ExpectedBindingRecordCount = 1583;
         private const string Pf127OrdinaryProfileResolutionMode =
             "production-owned-exact-pf127-ordinary-profile-resolver";
+        private const string Pf1931ProfileResolutionMode =
+            "production-owned-exact-pf1931-capture-contract";
         private static readonly Lazy<Dictionary<string, object>> CoverageDocument =
             new Lazy<Dictionary<string, object>>(LoadCoverageDocument);
 
@@ -42,7 +44,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "expectedInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(population, "actualInitialActorCount"));
             Assert.AreEqual(ExpectedInitialActorCount, IntMember(totals, "initialActorCount"));
-            Assert.AreEqual(1592, IntMember(population, "configuredMaximumActorCount"));
+            Assert.AreEqual(1609, IntMember(population, "configuredMaximumActorCount"));
             Assert.AreEqual(IntMember(corpusSearch, "sessionCount"), searchedSessions.Length);
             Assert.IsTrue(searchedSessions.Length > 0);
             Assert.AreEqual(
@@ -321,6 +323,88 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 322,
                 productionReadyActors,
                 "Every PF127 ordinary actor must resolve to a production-ready combat contract.");
+        }
+
+        [TestMethod]
+        public void Pf1931CoverageIncludesEveryOrdinaryNamedSuccessorAndOwnedAdd()
+        {
+            Dictionary<string, object> document = ReadCoverageDocument();
+            var surfaces = ArrayMember(document, "surfaces")
+                .Select(value => JsonObject(value, "surface coverage"))
+                .ToDictionary(
+                    value => StringMember(value, "surface"),
+                    StringComparer.Ordinal);
+            var expectedSurfaces = new Dictionary<string, int>(StringComparer.Ordinal)
+            {
+                { "temple-ordinary", 167 },
+                { "temple-named-encounters", 12 },
+                { "temple-reanimated-corpse-adds", 2 }
+            };
+            foreach (KeyValuePair<string, int> expected in expectedSurfaces)
+            {
+                Dictionary<string, object> surface = surfaces[expected.Key];
+                Assert.AreEqual(expected.Value, IntMember(surface, "actorCount"), expected.Key);
+                Assert.AreEqual(expected.Value, IntMember(surface, "certified"), expected.Key);
+                Assert.AreEqual(0, IntMember(surface, "unresolved"), expected.Key);
+            }
+
+            Dictionary<string, object> resolverAudit = ObjectMember(
+                document,
+                "pf1931CaptureContractResolverAudit");
+            Assert.AreEqual(
+                Pf1931ProfileResolutionMode,
+                StringMember(resolverAudit, "resolutionMode"));
+            Assert.AreEqual(1931, IntMember(resolverAudit, "runtimePlayfieldOrResource"));
+            Assert.AreEqual(
+                "totw.ordinary.deathless-legionnaire.42981",
+                StringMember(resolverAudit, "ordinaryProfileSelector"));
+            Assert.IsFalse(BoolMember(resolverAudit, "capturedRuntimeIdentityMappingAllowed"));
+            Assert.IsFalse(BoolMember(resolverAudit, "crossPlayfieldFallbackAllowed"));
+            Assert.AreEqual(6, ArrayMember(resolverAudit, "owners").Length);
+
+            var profiles = ArrayMember(document, "profiles")
+                .Select(value => JsonObject(value, "coverage profile"))
+                .ToDictionary(
+                    value => StringMember(value, "coverageKey"),
+                    StringComparer.Ordinal);
+            Dictionary<string, object>[] ownedBindings = ArrayMember(document, "bindings")
+                .Select(value => JsonObject(value, "active hostile binding"))
+                .Where(
+                    value =>
+                        StringMember(value, "surface") == "temple-named-encounters"
+                        || StringMember(value, "surface") == "temple-reanimated-corpse-adds"
+                        || Convert.ToString(
+                               value["runtimeProfileSelector"],
+                               CultureInfo.InvariantCulture)
+                           == "totw.ordinary.deathless-legionnaire.42981")
+                .ToArray();
+
+            Assert.AreEqual(27, ownedBindings.Length);
+            Assert.AreEqual(28, ownedBindings.Sum(value => IntMember(value, "actorCount")));
+            foreach (Dictionary<string, object> binding in ownedBindings)
+            {
+                string bindingKey = StringMember(binding, "bindingKey");
+                Assert.AreEqual("certified", StringMember(binding, "classification"), bindingKey);
+                Assert.IsTrue(BoolMember(binding, "runtimeContractReady"), bindingKey);
+                Dictionary<string, object> profile = profiles[
+                    StringMember(binding, "coverageKey")];
+                foreach (object levelObject in ArrayMember(profile, "levelCoverage"))
+                {
+                    Dictionary<string, object> level = JsonObject(
+                        levelObject,
+                        bindingKey + " PF1931 level coverage");
+                    Assert.AreEqual(
+                        Pf1931ProfileResolutionMode,
+                        StringMember(level, "resolutionMode"),
+                        bindingKey);
+                    Assert.IsTrue(BoolMember(level, "runtimeContractReady"), bindingKey);
+                    Assert.IsFalse(
+                        BoolMember(level, "capturedRuntimeIdentityMappingUsed"),
+                        bindingKey);
+                    Assert.IsTrue(ArrayMember(level, "captureSessions").Length > 0, bindingKey);
+                    Assert.IsTrue(ArrayMember(level, "evidenceFound").Length > 0, bindingKey);
+                }
+            }
         }
 
         [TestMethod]
@@ -1124,8 +1208,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 { "subway-ordinary", 322 },
                 { "subway-initial-encounters", 3 },
-                { "temple-ordinary", 153 },
-                { "temple-named-encounters", 9 },
+                { "temple-ordinary", 167 },
+                { "temple-named-encounters", 12 },
                 { "temple-reanimated-corpse-adds", 2 },
                 { "nascence-core-hecklers", 40 },
                 { "nascence-life", 837 },

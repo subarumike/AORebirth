@@ -1,6 +1,6 @@
 # Temple of Three Winds: Yatila Through Betany
 
-> **PF1931 status authority (2026-08-01):** Historical evidence/provenance only. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
+> **PF1931 status authority (2026-08-01):** Historical evidence/provenance only. Current PF1931 status is the [Temple full-corpus completion matrix](TEMPLE_FULL_CORPUS_COMPLETION_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
 
 Scope: PF1931 capture-backed room slice after Defender of the Three. PF647 is the preceding transfer/gateway. The runtime content in this slice is owned by the Temple module and does not share Subway or ICC encounter definitions.
 
