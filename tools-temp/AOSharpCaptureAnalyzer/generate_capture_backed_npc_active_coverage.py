@@ -10,7 +10,7 @@ two safe lookup modes as the generated runtime catalog:
 * a capture-proven unique semantic fallback for source-unbound actors.
 
 The generator intentionally fails if any content shape is no longer understood
-or if the fixed initial population does not reconcile to 1,496 actors.
+or if the fixed initial population does not reconcile to 1,607 actors.
 """
 
 from __future__ import annotations
@@ -29,13 +29,13 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1590
+EXPECTED_INITIAL_ACTORS = 1607
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
     ("subway-initial-encounters", 3),
-    ("temple-ordinary", 153),
-    ("temple-named-encounters", 9),
+    ("temple-ordinary", 167),
+    ("temple-named-encounters", 12),
     ("temple-reanimated-corpse-adds", 2),
     ("nascence-core-hecklers", 40),
     ("nascence-life", 837),
@@ -90,6 +90,45 @@ PF127_ORDINARY_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
     "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs": (
         "TryResolveProductionOwnedNaturalAttackProfile(",
         "TryResolveCaptureProvenEquippedWeaponArchetype(",
+    ),
+}
+
+PF1931_PROFILE_RESOLUTION_MODE = (
+    "production-owned-exact-pf1931-capture-contract"
+)
+PF1931_DEATHLESS_PROFILE_SELECTOR = (
+    "totw.ordinary.deathless-legionnaire.42981"
+)
+PF1931_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs": (
+        "BuildDeathlessLegionnaireSpawns()",
+        "DeathlessLegionnaireProfileKey",
+        "OrdinaryEnemyDamageSource.WeaponRoll",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs": (
+        "internal static CapturedEnemyCombatContract DefenderOfTheThree()",
+        "internal static CapturedEnemyCombatContract UkleshTheFrozen()",
+        "internal static CapturedEnemyCombatContract AzturTheImmortal()",
+        "internal static CapturedEnemyCombatContract ReanimatedCorpse(int captureSourceIdentity)",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs": (
+        "CapturedTempleOfThreeWindsCombatCatalog.DefenderOfTheThree()",
+        "CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal()",
+        "CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(",
+        "CapturedEnemyCombatRuntime.Prepare(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs": (
+        "TryResolveCaptureProvenEquippedWeaponArchetype(",
+        "TryResolveProductionOwnedNaturalAttackProfile(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs": (
+        "internal static CapturedEnemyCombatContract ForOrdinary(",
+        "ForOrdinarySelectedAtomicGeneration(",
+        "CapturedEnemyCombatProfileCatalog.TryResolve(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs": (
+        "ResolveCombatContractForSpawn(",
+        "CapturedEnemyCombatRuntime.Prepare(",
     ),
 }
 
@@ -259,6 +298,27 @@ def discover_pf127_ordinary_profile_owners(
         if missing:
             raise CoverageError(
                 "PF127 ordinary profile resolver ownership changed in "
+                f"{relative}: missing " + ", ".join(repr(marker) for marker in missing)
+            )
+        owners.append(
+            {
+                "path": relative,
+                "requiredMarkers": list(required_markers),
+            }
+        )
+    return owners
+
+
+def discover_pf1931_profile_owners(
+    repo_root: Path,
+) -> List[Dict[str, Any]]:
+    owners: List[Dict[str, Any]] = []
+    for relative, required_markers in sorted(PF1931_PROFILE_OWNER_MARKERS.items()):
+        source = read_source(repo_root, relative)
+        missing = [marker for marker in required_markers if marker not in source]
+        if missing:
+            raise CoverageError(
+                "PF1931 capture-contract ownership changed in "
                 f"{relative}: missing " + ", ".join(repr(marker) for marker in missing)
             )
         owners.append(
@@ -850,6 +910,40 @@ def parse_temple_ordinary(repo_root: Path) -> List[ActorDefinition]:
             )
         )
 
+    deathless_body = extract_method_body(
+        text,
+        "private static OrdinaryEnemySpawnDefinition[] BuildDeathlessLegionnaireSpawns()",
+    )
+    deathless_calls = extract_calls(
+        deathless_body,
+        "BuildDeathlessLegionnaireSpawn",
+    )
+    if len(deathless_calls) != 14:
+        raise CoverageError(
+            f"Temple Deathless Legionnaire parser found {len(deathless_calls)} spawns"
+        )
+    for call in deathless_calls:
+        args = split_top_level(call)
+        source_identity = parse_csharp_int(args[0])
+        actors.append(
+            make_actor(
+                "temple-ordinary",
+                1931,
+                "Deathless Legionnaire",
+                42981,
+                parse_csharp_int(args[1]),
+                path,
+                configured_source_identity=source_identity,
+                runtime_source_identity_hint=source_identity,
+                runtime_profile_selector=PF1931_DEATHLESS_PROFILE_SELECTOR,
+                evidence_capture_ids=(
+                    "20260722-042930",
+                    "20260722-043108",
+                    "20260722-044315",
+                ),
+            )
+        )
+
     murial_body = extract_method_body(
         text, "private static OrdinaryEnemySpawnDefinition BuildMurialSpawn()"
     )
@@ -872,7 +966,7 @@ def parse_temple_ordinary(repo_root: Path) -> List[ActorDefinition]:
             evidence_capture_ids=("20260721-232051", "20260721-234614"),
         )
     )
-    if len(actors) != 153:
+    if len(actors) != 167:
         raise CoverageError(f"Temple ordinary parser reconciled {len(actors)} actors")
     return actors
 
@@ -892,6 +986,9 @@ def parse_temple_encounters(repo_root: Path) -> List[ActorDefinition]:
         ("internal static CapturedEncounterRuntimeDefinition CreateNematetDefinition()", "CapturedEncounterRuntimeDefinition", True),
         ("internal static CapturedEncounterRuntimeDefinition CreateGuardianDefinition()", "CapturedEncounterRuntimeDefinition", True),
         ("internal static CapturedEncounterRuntimeDefinition CreateGartuaDefinition()", "CapturedEncounterRuntimeDefinition", True),
+        ("internal static CapturedEncounterRuntimeDefinition CreateUkleshDefinition()", "CapturedEncounterRuntimeDefinition", True),
+        ("internal static CapturedEncounterRuntimeDefinition CreateKhalumDefinition()", "CapturedEncounterRuntimeDefinition", True),
+        ("internal static CapturedEncounterRuntimeDefinition CreateAzturDefinition()", "CapturedEncounterRuntimeDefinition", True),
     )
     for method, call_name, require_new in methods:
         body = extract_method_body(text, method)
@@ -1783,6 +1880,141 @@ def classify_pf127_ordinary_profile_level(
     }
 
 
+def classify_pf1931_owned_profile_level(
+    actor: ActorDefinition,
+    level: int,
+    profile: Optional[Mapping[str, Any]],
+    family_profiles: Sequence[Mapping[str, Any]],
+    resolver_owners: Sequence[Mapping[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    is_named_or_add = actor.surface in (
+        "temple-named-encounters",
+        "temple-reanimated-corpse-adds",
+    )
+    is_deathless = (
+        actor.surface == "temple-ordinary"
+        and actor.runtime_profile_selector == PF1931_DEATHLESS_PROFILE_SELECTOR
+    )
+    if not (is_named_or_add or is_deathless):
+        return None
+    if actor.resource != 1931:
+        raise CoverageError(
+            "PF1931 capture-contract resolver escaped PF1931: "
+            f"resource={actor.resource} selector={actor.runtime_profile_selector}"
+        )
+    if not resolver_owners:
+        raise CoverageError("PF1931 capture-contract resolver has no production owner")
+    if profile is None and not family_profiles:
+        return None
+
+    evidence_profiles = (
+        list(family_profiles)
+        if is_deathless or profile is None
+        else [profile]
+    )
+    capture_variants = [
+        variant
+        for evidence_profile in evidence_profiles
+        for variant in evidence_profile.get("variants", [])
+        if variant.get("captureCertified") is True
+        and variant.get("captureEvidenceSafe") is True
+    ]
+    evidence_rows = [
+        row
+        for evidence_profile in evidence_profiles
+        for row in unresolved_evidence_rows(evidence_profile, None)
+    ]
+    if not capture_variants and not evidence_rows:
+        return None
+    if is_deathless and not any(
+        variant.get("runtimeContractReady") is True
+        for variant in capture_variants
+    ):
+        return None
+
+    capture_sessions = sorted_unique(
+        [
+            session
+            for evidence_profile in evidence_profiles
+            for session in evidence_profile.get("captureSessionsSearched", [])
+        ]
+        + [
+            session
+            for variant in capture_variants
+            for session in variant.get("captureSessions", [])
+        ]
+        + [
+            session
+            for row in evidence_rows
+            for session in row.get("captureSessions", [])
+        ]
+    )
+    packet_ids = sorted_unique(
+        [
+            variant.get(field)
+            for variant in capture_variants
+            for field in (
+                "representativeWifuPacketId",
+                "representativeSawPacketId",
+                "representativeAttackPacketId",
+            )
+        ]
+        + [
+            packet_id
+            for variant in capture_variants
+            for stream in variant.get("streams", [])
+            for packet_id in stream.get("attackInfoPacketIds", [])[:1]
+        ]
+        + [
+            packet_id
+            for row in evidence_rows
+            for packet_id in row.get("samplePacketIds", [])
+        ]
+    )
+    owner_paths = sorted_unique(owner.get("path") for owner in resolver_owners)
+    evidence_scope = (
+        "capture-proven equipped-weapon archetype with production item-derived values"
+        if is_deathless
+        else "exact capture-backed encounter contract and packet fixture"
+    )
+    return {
+        "level": level,
+        "combatProfileKey": (
+            profile.get("profileKey")
+            if profile is not None
+            else (
+                f"resource={actor.resource}|md={actor.monster_data}|"
+                f"level={level}|name={actor.name}"
+            )
+        ),
+        "classification": "certified",
+        "resolutionMode": PF1931_PROFILE_RESOLUTION_MODE,
+        "captureSessions": capture_sessions,
+        "evidencePacketIds": packet_ids,
+        "evidenceFound": [
+            {
+                "observationType": "production-owned-exact-pf1931-contract",
+                "runtimeProfileSelector": actor.runtime_profile_selector,
+                "evidenceScope": evidence_scope,
+                "captureCertifiedVariantCount": len(capture_variants),
+                "correlatedPacketObservationCount": len(evidence_rows),
+                "captureSessions": capture_sessions,
+                "representativeEvidencePacketIds": packet_ids,
+            }
+        ],
+        "missingEvidence": [],
+        "runtimeContractReady": True,
+        "runtimeMissingEvidence": [],
+        "disabledGameplayCapability": None,
+        "runtimeProfileSelector": actor.runtime_profile_selector,
+        "runtimeResolverSources": owner_paths,
+        "capturedRuntimeIdentityMappingUsed": False,
+        "crossPlayfieldFallbackAllowed": False,
+        "automaticAggressionPolicyPromoted": False,
+        "automaticCombatActivationPromoted": False,
+    }
+
+
 def classify_level(
     actor: ActorDefinition,
     level: int,
@@ -1792,6 +2024,7 @@ def classify_level(
         Mapping[Tuple[int, int, int, str, Optional[str]], Mapping[str, Any]]
     ] = None,
     pf127_ordinary_profile_owners: Sequence[Mapping[str, Any]] = (),
+    pf1931_profile_owners: Sequence[Mapping[str, Any]] = (),
     profiles_by_archetype: Optional[
         Mapping[Tuple[int, int, str], Sequence[Mapping[str, Any]]]
     ] = None,
@@ -1868,6 +2101,19 @@ def classify_level(
             }
         )
         return result
+    pf1931_owned_profile = classify_pf1931_owned_profile_level(
+        actor,
+        level,
+        profile,
+        (profiles_by_archetype or {}).get(
+            (actor.resource, actor.monster_data, actor.name),
+            (),
+        ),
+        pf1931_profile_owners,
+    )
+    if pf1931_owned_profile is not None:
+        return pf1931_owned_profile
+
     if profile is None:
         metadata = list(metadata_by_identity.get(identity, []))
         result["captureSessions"] = sorted_unique(row.get("capture") for row in metadata)
@@ -2492,6 +2738,7 @@ def build_inventory(
     pf127_ordinary_profile_owners = discover_pf127_ordinary_profile_owners(
         repo_root
     )
+    pf1931_profile_owners = discover_pf1931_profile_owners(repo_root)
     pf127_retaliation_resolver_source = read_source(
         repo_root,
         "AORebirth/Server/ZoneEngine/Core/Playfields/"
@@ -2578,6 +2825,7 @@ def build_inventory(
                 metadata_by_identity,
                 mathematical_bindings,
                 pf127_ordinary_profile_owners,
+                pf1931_profile_owners,
                 profiles_by_archetype,
             )
             for level in actor.levels
@@ -2676,6 +2924,7 @@ def build_inventory(
             "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceSpawn.cs",
         }
         | {row["path"] for row in pf127_ordinary_profile_owners}
+        | {row["path"] for row in pf1931_profile_owners}
         | {row["path"] for row in runtime_prepare_entry_points}
     )
     source_inputs = [
@@ -2940,11 +3189,12 @@ def build_inventory(
             "cursedSilvertail": "a dynamic replacement for one of five Dreaming Silvertails and does not increase the Nascence Life count",
         },
         "classificationRule": {
-            "certified": "every runtime level candidate resolves through an exact runtime source-identity binding, a capture-proven unique semantic fallback, an exact mathematical setup, or the production-owned PF127 ordinary-profile resolver after every concrete exact-source variant passes source-bound retaliation-eligibility resolution and final IsCombatReady validation",
+            "certified": "every runtime level candidate resolves through an exact runtime source-identity binding, a capture-proven unique semantic fallback, an exact mathematical setup, the production-owned PF127 ordinary-profile resolver, or an exact production-owned PF1931 capture contract guarded by packet-path tests",
             "unresolved": "at least one runtime level candidate lacks runtime-ready contract data or either safe resolver mode; absent runtimeContractReady is fail-closed",
             "configuredSourceIdentity": "official capture identity recorded by content, when defined",
             "runtimeSourceIdentityHint": "identity actually supplied to the generated runtime resolver; null means only a semantic fallback can resolve safely",
             "pf127OrdinaryProfile": "limited to subway.ordinary.* profiles plus the exact capture-proven Discarded Pet and Mugger supported selectors in resource 127, always with exact configured/runtime source identity; focused tests reproduce the production source-bound retaliation resolver and final TryResolve chain for every concrete variant",
+            "pf1931CaptureContract": "limited to Deathless Legionnaire, the twelve explicit Temple named stages, and the two Reanimated Corpse slots in resource 1931; production owns the exact contract without captured runtime identity allocation and focused tests guard every packet path",
         },
         "totals": totals,
         "migrationSummary": migration_summary,
@@ -2994,6 +3244,18 @@ def build_inventory(
             "automaticAggressionPolicyPromotionAllowed": False,
             "automaticCombatActivationPromotionAllowed": False,
             "owners": pf127_ordinary_profile_owners,
+        },
+        "pf1931CaptureContractResolverAudit": {
+            "resolutionMode": PF1931_PROFILE_RESOLUTION_MODE,
+            "runtimePlayfieldOrResource": 1931,
+            "ordinaryProfileSelector": PF1931_DEATHLESS_PROFILE_SELECTOR,
+            "namedSurface": "temple-named-encounters",
+            "ownedAddSurface": "temple-reanimated-corpse-adds",
+            "capturedRuntimeIdentityMappingAllowed": False,
+            "crossPlayfieldFallbackAllowed": False,
+            "automaticAggressionPolicyPromotionAllowed": False,
+            "automaticCombatActivationPromotionAllowed": False,
+            "owners": pf1931_profile_owners,
         },
         "fixedDenominatorExclusions": [
             "53 ICC HQ Social actors",

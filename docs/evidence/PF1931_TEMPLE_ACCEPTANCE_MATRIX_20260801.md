@@ -1,5 +1,9 @@
 # PF1931 Temple of Three Winds acceptance matrix - 2026-08-01
 
+> **Superseded status:** The sole current Temple status authority is
+> `TEMPLE_FULL_CORPUS_COMPLETION_20260801.md`. This document remains evidence
+> and provenance only.
+
 ## Authority and closure rule
 
 This is the sole authoritative status document for PF1931 Temple of Three

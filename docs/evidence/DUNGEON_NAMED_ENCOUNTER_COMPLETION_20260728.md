@@ -1,6 +1,6 @@
 # PF127/PF1931 Named Dungeon Encounter Completion
 
-> **PF1931 status authority (2026-08-01):** Evidence/provenance only. Current PF1931 status is the [Temple acceptance matrix](PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
+> **PF1931 status authority (2026-08-01):** Historical evidence/provenance only. Current PF1931 status is the [Temple full-corpus completion matrix](TEMPLE_FULL_CORPUS_COMPLETION_20260801.md); any PF1931 completion, blocker, or test-count statement below is superseded by that matrix.
 
 Date: 2026-07-28
 

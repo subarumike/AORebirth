@@ -13,7 +13,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class TempleAcceptanceMatrixTests
     {
         private const string MatrixPath =
-            @"docs\evidence\PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md";
+            @"docs\evidence\TEMPLE_FULL_CORPUS_COMPLETION_20260801.md";
 
         [TestMethod]
         public void MatrixPreservesAcceptedTotalsAndExactFailClosedBoundaries()
@@ -22,32 +22,55 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             AssertContainsAll(
                 matrix,
-                "PF1931 acceptance totals",
-                "sole authoritative status document",
-                "`167/167` ordinary actor slots; `14/14` named lifecycle/combat domains",
-                "`167/167` PF1931 actors resolve exact active contracts",
-                "`14/14` PF1931 domains",
-                "`3` gameplay contracts; `3` explicit active-domain no-nano classifications",
-                "`20` actor/family contracts",
-                "`21` observed outcome families: `9` ordinary plus `12` named",
-                "`2` domains have no proven outcome",
-                "`30/30` official rooms",
-                "`43/43` internal doors plus exterior EntryHall statel `C024078B`",
-                "PF647 `C0080287` entry and PF1931 `C024078B` exit",
-                "PF1931 Temple of Three Winds is complete for the existing evidence corpus.");
+                "Temple full-corpus acceptance matrix",
+                "current Temple status authority",
+                "Capture sessions discovered | `381`",
+                "Canonical-valid sessions | `365`",
+                "Complete combat chains | `3,269`",
+                "`temple-ordinary` | `167` | `167` | `0`",
+                "`temple-named-encounters` | `12` | `12` | `0`",
+                "`temple-reanimated-corpse-adds` | `2` | `2` | `0`",
+                "**PF1931 total** | **181** | **181** | **0**",
+                "**Accepted - 30/30 rooms**",
+                "**Accepted - 43/43 internal**",
+                "**Accepted absence - no synthetic vendor**",
+                "**Accepted absence - no invented dialogue**",
+                "**Accepted absence - no invented quest/mission**",
+                @"tools\run_temple_acceptance_tests.cmd");
 
             AssertContainsAll(
                 matrix,
-                "PF1931 fail-closed contracts",
-                "Authoritative attack-skill versus Nano Resist resolution",
-                "Hostile AreaCast recipients",
-                "generic stun/action-lock semantics",
-                "Proven landed-hit proc probability",
-                "Categorical missing-buff ally/self selector and safe cadence",
-                "Generation selector and resist resolution for hostile damage",
-                "Reanimated Corpse adds and Murial",
-                "`Weight=0`, `DropChanceBasisPoints=0`, and",
-                "No fail-closed row creates a nano");
+                "Temple fail-closed contracts",
+                "Attack-skill versus Nano Resist selection",
+                "hostile AreaCast recipients",
+                "stun/RestrictAction behavior",
+                "Uklesh proc probability",
+                "Murial ally selector/cadence",
+                "Murial and Reanimated Corpse loot outcomes",
+                "Official loot probabilities and unseen wider pools",
+                "No valid Temple observation was rejected");
+        }
+
+        [TestMethod]
+        public void DeterministicRunnerOwnsEveryTempleAcceptanceSurface()
+        {
+            string runner = Read(@"tools\run_temple_acceptance_tests.cmd");
+
+            AssertContainsAll(
+                runner,
+                "Temple acceptance runner",
+                "TempleAcceptanceMatrixTests",
+                "Pf1931CoverageIncludesEveryOrdinaryNamedSuccessorAndOwnedAdd",
+                "TempleOfThreeWindsOrdinaryContentTests",
+                "DungeonNamedEncounterCompletionTests",
+                "DungeonNamedLifecycleCompletionTests",
+                "TempleDoorStatusRuntimeTests",
+                "PlayfieldCollisionGeometryTests",
+                "NpcChaseNavigationTests",
+                "OfficialDungeonNavigationTests",
+                "N3RecoveredContractTests",
+                "PlayfieldRuntimeOwnershipTests",
+                "GlobalLootFoundationTests");
         }
 
         [TestMethod]
@@ -78,7 +101,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 string report = Read(Path.Combine("docs", "evidence", document));
                 StringAssert.Contains(report, "PF1931 status authority (2026-08-01)", document);
-                StringAssert.Contains(report, "PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md", document);
+                StringAssert.Contains(report, "TEMPLE_FULL_CORPUS_COMPLETION_20260801.md", document);
             }
         }
 

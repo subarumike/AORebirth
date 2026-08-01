@@ -59,14 +59,17 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   reducing the accepted captured outcomes. SimpleChar `78E0FC65` retains its
   captured display name `Stanley Goodman`.
 
-- PF1931 Temple of Three Winds is finalized for the existing evidence corpus.
-  The sole current status authority is
-  `docs/evidence/PF1931_TEMPLE_ACCEPTANCE_MATRIX_20260801.md`; earlier Temple
-  reports are evidence/provenance only. All recoverable PF1931 contracts have
-  production owners and regression coverage. Unsupported nano selectors,
-  resistance/action-lock mechanics, loot probabilities/wider pools, and the
-  Murial/Reanimated Corpse loot outcomes remain explicitly fail-closed with
-  exact blockers in the matrix.
+- PF1931 Temple of Three Winds is finalized to the Arete/Subway full-corpus
+  standard for the existing evidence corpus. The sole current status authority
+  is `docs/evidence/TEMPLE_FULL_CORPUS_COMPLETION_20260801.md`; earlier Temple
+  reports are evidence/provenance only. The canonical active projection now
+  covers all `167` ordinary actors, all `12` named stages, and both owned add
+  slots (`181/181` production-owned contracts), including the previously
+  omitted 14 Deathless Legionnaires and Uklesh/Khalum/Aztur stages. The
+  deterministic gate is `tools/run_temple_acceptance_tests.cmd`. Unsupported
+  nano selectors, resistance/action-lock mechanics, loot probabilities/wider
+  pools, and Murial/Reanimated Corpse loot outcomes remain explicitly
+  fail-closed with exact blockers in the matrix.
 
 - PF127/PF1931 named encounter completion is authoritative across 19 unique
   active combat/profile domains: 14 initial stages, two successors, two
