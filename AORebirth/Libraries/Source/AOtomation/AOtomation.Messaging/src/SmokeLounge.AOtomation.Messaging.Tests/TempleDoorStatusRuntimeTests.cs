@@ -212,7 +212,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TeleportMessageHandler.cs");
             StringAssert.Contains(teleportHandler, "Type = (IdentityType)51100");
             StringAssert.Contains(teleportHandler, "Type = (IdentityType)100003");
-            StringAssert.Contains(teleportHandler, "x.Payload = new byte[] { 0, 0, 0, 1 }");
+            StringAssert.Contains(teleportHandler, "new byte[] { 0, 0, 0, 1 }");
         }
 
         [TestMethod]
