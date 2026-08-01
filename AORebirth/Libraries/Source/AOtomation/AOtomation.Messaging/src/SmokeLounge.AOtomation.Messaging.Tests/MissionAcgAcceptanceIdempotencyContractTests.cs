@@ -64,10 +64,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void ReconnectRecoversPendingAcceptanceBeforeMissionListProjection()
         {
             string service = ReadMissionSource("MissionAcceptService.cs");
-            string refresh = ReadMember(service, "public static void RefreshAllMissionTimers(");
+            string reconnect = ReadMember(service, "public static bool TryResendForLogin(");
 
             AssertOrdered(
-                refresh,
+                reconnect,
                 "MissionAcgBindingRuntime.Initialize();",
                 "MissionAcgAcceptanceCoordinator.TryRecoverOwned(",
                 "MissionAcceptedStore.GetAll(",
@@ -91,12 +91,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "deliveredAcceptedQuestInstances.Add(");
 
             string service = ReadMissionSource("MissionAcceptService.cs");
-            string refresh = ReadMember(
+            string reconnect = ReadMember(
                 service,
-                "public static void RefreshAllMissionTimers(");
+                "public static bool TryResendForLogin(");
             AssertOrdered(
-                refresh,
-                "ISet<int> deliveredAcceptedQuestInstances;",
+                reconnect,
+                "ISet<int> deliveredAcceptedQuestInstances",
                 "MissionAcgAcceptanceCoordinator.TryRecoverOwned(",
                 "deliveredAcceptedQuestInstances.Contains(",
                 "entry.QuestIdentity.Instance",
@@ -114,6 +114,48 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertOrdered(cash, "HasFrozenAcceptedRewards", "BaseCashForMissionQl(");
             AssertOrdered(xp, "HasFrozenAcceptedRewards", "BaseXpForMissionQl(");
             StringAssert.Contains(completion, "FrozenItemRewardCount");
+        }
+
+        [TestMethod]
+        public void CompletionRecoveryResolvesFrozenProjectionOutsideActiveMissionList()
+        {
+            string journal = ReadMissionSource("MissionAcgCompletionJournalService.cs");
+            string resolver = ReadMember(
+                journal,
+                "private static bool TryResolveAcceptedMission(");
+            AssertOrdered(
+                resolver,
+                "MissionAcceptedStore.TryResolve(",
+                "MissionAcceptedStore.TryResolveGeneratedProjection(");
+
+            string acceptedStore = ReadMissionSource("MissionAcceptedStore.cs");
+            string projectionResolver = ReadMember(
+                acceptedStore,
+                "internal static bool TryResolveGeneratedProjection(");
+            AssertOrdered(
+                projectionResolver,
+                "MissionAcgAcceptedProjectionRuntime.TryGetByAcceptedQuest(",
+                "MissionAcgAcceptancePhase.AcceptanceCommitted",
+                "BuildProjectionEntry(projection)");
+        }
+
+        [TestMethod]
+        public void IrrecoverableAcceptanceUsesDurableExactCleanupOwner()
+        {
+            string coordinator = ReadMissionSource("MissionAcgAcceptanceCoordinator.cs");
+            string cleanup = ReadMember(
+                coordinator,
+                "private static void CleanupIrrecoverableAcceptance(");
+            AssertOrdered(
+                cleanup,
+                "MissionAcgLifecycleState.CleanupPending",
+                "MissionAcgLifecycleService.TryCleanupOwnedRecord(");
+            Assert.IsFalse(
+                cleanup.IndexOf("TryRemoveMissionKey(", StringComparison.Ordinal) >= 0);
+            Assert.IsFalse(
+                cleanup.IndexOf(
+                    "TryReleaseFailedAcceptanceAfterCleanup(",
+                    StringComparison.Ordinal) >= 0);
         }
 
         [TestMethod]

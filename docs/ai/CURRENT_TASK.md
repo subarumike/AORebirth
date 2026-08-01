@@ -38,6 +38,16 @@ filled from defaults. Authored quests and true legacy missions keep their
 existing owners. No database schema, reward formula, slider, loot, ACG payload,
 or procedural-generation behavior changes in this stage.
 
+Restart and race recovery now use the same authoritative projection directly.
+The actual login resend path resumes every incomplete acceptance before reading
+the mission list and suppresses a second QFU when recovery already sent it.
+Projection replacement is compare-and-swap against the exact previously read
+record, so expiry, abandonment, or cleanup cannot be overwritten by a stale
+acceptance phase. Irrecoverable acceptance persists `CleanupPending` before
+delegating to the exact restart-resumable artifact/runtime cleanup owner, and
+completion recovery can resolve frozen rewards from the accepted projection
+after the active mission-list view has hidden `CompletionStarted` records.
+
 ## Previous completed status
 
 TASK ID: GENERATED-MISSION-LEGACY-FALLTHROUGH-001

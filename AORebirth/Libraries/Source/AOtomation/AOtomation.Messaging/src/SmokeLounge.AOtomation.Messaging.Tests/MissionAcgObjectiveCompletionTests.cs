@@ -345,7 +345,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgAcceptanceCoordinator.cs");
             StringAssert.Contains(
                 acceptance,
-                "TryReleaseFailedAcceptanceAfterCleanup");
+                "MissionAcgLifecycleState.CleanupPending");
+            StringAssert.Contains(
+                acceptance,
+                "MissionAcgLifecycleService.TryCleanupOwnedRecord");
+            Assert.IsFalse(
+                acceptance.Contains("TryReleaseFailedAcceptanceAfterCleanup"));
             Assert.IsFalse(acceptance.Contains("MissionKeyStore.TryTake("));
         }
 

@@ -52,9 +52,9 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 MissionAcceptedStore.AcceptedMission accepted;
-                MissionAcceptedStore.TryResolve(
-                    character.Identity.Instance,
-                    ToIdentity(objective.Binding.AcceptedQuestIdentity),
+                TryResolveAcceptedMission(
+                    character,
+                    objective.Binding.AcceptedQuestIdentity,
                     out accepted);
                 TryCompleteVerified(
                     client,
@@ -93,9 +93,9 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionAcceptedStore.AcceptedMission accepted;
-            MissionAcceptedStore.TryResolve(
-                character.Identity.Instance,
-                ToIdentity(objective.Binding.AcceptedQuestIdentity),
+            TryResolveAcceptedMission(
+                character,
+                objective.Binding.AcceptedQuestIdentity,
                 out accepted);
             return TryCompleteVerified(
                 client,
@@ -167,9 +167,9 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionAcceptedStore.AcceptedMission accepted;
-            if (!MissionAcceptedStore.TryResolve(
-                character.Identity.Instance,
-                ToIdentity(claimedBinding.Binding.AcceptedQuestIdentity),
+            if (!TryResolveAcceptedMission(
+                character,
+                claimedBinding.Binding.AcceptedQuestIdentity,
                 out accepted))
             {
                 return false;
@@ -746,6 +746,28 @@ namespace ZoneEngine.Core.Missions
                 reward,
                 objective.RecordPath);
             return false;
+        }
+
+        private static bool TryResolveAcceptedMission(
+            ICharacter character,
+            MissionAcgIdentityRecord acceptedQuestIdentity,
+            out MissionAcceptedStore.AcceptedMission accepted)
+        {
+            accepted = null;
+            if (character == null || acceptedQuestIdentity == null)
+            {
+                return false;
+            }
+
+            Identity questIdentity = ToIdentity(acceptedQuestIdentity);
+            return MissionAcceptedStore.TryResolve(
+                       character.Identity.Instance,
+                       questIdentity,
+                       out accepted)
+                   || MissionAcceptedStore.TryResolveGeneratedProjection(
+                       character.Identity.Instance,
+                       questIdentity,
+                       out accepted);
         }
 
         private static void ResolveItemReward(

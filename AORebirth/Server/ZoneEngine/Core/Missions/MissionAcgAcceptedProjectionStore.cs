@@ -157,15 +157,16 @@ namespace ZoneEngine.Core.Missions
         }
 
         internal bool TryReplace(
+            MissionAcgAcceptedProjection expected,
             MissionAcgAcceptedProjection projection,
             out MissionAcgAcceptedProjection persisted,
             out string failure)
         {
             persisted = null;
             failure = string.Empty;
-            if (projection == null)
+            if (expected == null || projection == null)
             {
-                failure = "Accepted projection is required.";
+                failure = "Expected and replacement accepted projections are required.";
                 return false;
             }
 
@@ -173,6 +174,7 @@ namespace ZoneEngine.Core.Missions
             {
                 try
                 {
+                    this.ValidateProjection(expected);
                     this.ValidateProjection(projection);
                     string path = this.PathFor(
                         projection.Binding.AcceptedQuestIdentity);
@@ -185,6 +187,16 @@ namespace ZoneEngine.Core.Missions
                     MissionAcgAcceptedProjection current;
                     if (!this.TryRead(path, out current, out failure))
                     {
+                        return false;
+                    }
+
+                    if (!string.Equals(
+                            Serialize(BuildValues(current)),
+                            Serialize(BuildValues(expected)),
+                            StringComparison.Ordinal))
+                    {
+                        failure =
+                            "Accepted projection changed after the expected record was read.";
                         return false;
                     }
 
