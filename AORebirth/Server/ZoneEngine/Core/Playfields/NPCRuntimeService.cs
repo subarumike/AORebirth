@@ -547,17 +547,21 @@ namespace AORebirth.Core.Playfields
             Identity corpseIdentity = Identity.None;
             bool isOperationalNpc;
             bool operationalDeathAlreadyPersisted;
+            bool persistedDeathWitnessMatchesAttacker;
             bool operationalDeathPersisted =
                 ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TryPrepareNpcDeath(
+                    attacker,
                     target,
+                    diedAtUtc,
                     this.playfield.CanBuildKnownCorpseVisual(target),
                     out corpseIdentity,
                     out isOperationalNpc,
-                    out operationalDeathAlreadyPersisted);
+                    out operationalDeathAlreadyPersisted,
+                    out persistedDeathWitnessMatchesAttacker);
             if (isOperationalNpc && operationalDeathAlreadyPersisted)
             {
                 bool completionResumed =
-                    attacker != null
+                    persistedDeathWitnessMatchesAttacker
                     && ZoneEngine.Core.Missions.MissionAcgObjectiveInteractionService
                         .TryHandleTargetDeath(attacker, target);
                 ZoneEngine.Core.Missions.MissionDiagnostics.Log(
@@ -583,7 +587,39 @@ namespace AORebirth.Core.Playfields
             if (!isOperationalNpc || operationalDeathPersisted)
             {
                 this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);
-                this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);
+                bool runRewardHooks =
+                    !isOperationalNpc
+                    || ZoneEngine.Core.Missions.MissionAcgOperationalRuntime
+                        .TryAdvanceNpcDeathHookCheckpoint(
+                            target,
+                            ZoneEngine.Core.Missions.MissionAcgNpcDeathHookCheckpoint
+                                .RewardHooksStarted);
+                if (runRewardHooks)
+                {
+                    this.rewards.RunNpcDeathRewardHooks(
+                        attacker,
+                        target,
+                        this.playfield.AwardCombatXp);
+                    if (isOperationalNpc
+                        && !ZoneEngine.Core.Missions.MissionAcgOperationalRuntime
+                            .TryAdvanceNpcDeathHookCheckpoint(
+                                target,
+                                ZoneEngine.Core.Missions.MissionAcgNpcDeathHookCheckpoint
+                                    .RewardHooksCompleted))
+                    {
+                        ZoneEngine.Core.Missions.MissionDiagnostics.Log(
+                            "ACG-OPERATIONAL-DEATH-HOOK-CHECKPOINT-FAIL runtime={0} livePf2={1} checkpoint=reward-hooks-completed action=no-hook-replay",
+                            target.Identity.Instance,
+                            this.playfield.Identity.Instance);
+                    }
+                }
+                else
+                {
+                    ZoneEngine.Core.Missions.MissionDiagnostics.Log(
+                        "ACG-OPERATIONAL-DEATH-HOOK-CHECKPOINT-FAIL runtime={0} livePf2={1} checkpoint=reward-hooks-started action=reward-hooks-suppressed",
+                        target.Identity.Instance,
+                        this.playfield.Identity.Instance);
+                }
             }
             else
             {

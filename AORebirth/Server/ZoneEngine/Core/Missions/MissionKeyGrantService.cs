@@ -22,6 +22,13 @@ namespace ZoneEngine.Core.Missions
 
     #endregion
 
+    internal enum MissionReservedItemLookupResult
+    {
+        Missing = 0,
+        Exact = 1,
+        Conflict = 2
+    }
+
     /// <summary>
     /// Grants a mission key item into a character's inventory when a mission is accepted, mirroring the
     /// captured official flow (SimpleItemFullUpdate for the key followed by ContainerAddItem routing it
@@ -31,7 +38,7 @@ namespace ZoneEngine.Core.Missions
     internal static class MissionKeyGrantService
     {
         // Item identity type observed for mission keys on the wire (capture 20260717-pull-mish-doit).
-        private const int MissionKeyIdentityType = 0x0000C76D;
+        internal const int MissionKeyIdentityType = 0x0000C76D;
 
         // Repair kit identity type from capture 20260724-repaair-machine-mish (SimpleItemFullUpdate /
         // FullCharacter inventory row): IdentityType.Terminal = 0xC73D, NOT MissionKey.
@@ -256,6 +263,31 @@ namespace ZoneEngine.Core.Missions
             out int itemInstance,
             out InventoryError inventoryError)
         {
+            return TryGrantReservedNamedItem(
+                client,
+                character,
+                lowId,
+                highId,
+                quality,
+                itemName,
+                reservedItemInstance,
+                1,
+                out itemInstance,
+                out inventoryError);
+        }
+
+        public static bool TryGrantReservedNamedItem(
+            IZoneClient client,
+            ICharacter character,
+            int lowId,
+            int highId,
+            int quality,
+            string itemName,
+            int reservedItemInstance,
+            int multipleCount,
+            out int itemInstance,
+            out InventoryError inventoryError)
+        {
             return TryGrantItem(
                 client,
                 character,
@@ -268,8 +300,78 @@ namespace ZoneEngine.Core.Missions
                 MissionKeyIdentityType,
                 true,
                 reservedItemInstance,
+                multipleCount,
                 out itemInstance,
                 out inventoryError);
+        }
+
+        /// <summary>
+        /// Reconciles one persistently reserved mission reward identity against every inventory page owned by
+        /// the exact character. Inventory persistence does not reliably retain the outbound wire IdentityType,
+        /// so the durable ownership key is owner plus identity instance. Duplicate instances or any mismatch in
+        /// template, QL, or count remain conflicts and never permit creation of another reward item.
+        /// </summary>
+        internal static MissionReservedItemLookupResult InspectReservedNamedItem(
+            ICharacter character,
+            int identityType,
+            int identityInstance,
+            int lowId,
+            int highId,
+            int quality,
+            int multipleCount,
+            out IItem item)
+        {
+            item = null;
+            if (character == null
+                || character.BaseInventory == null
+                || identityType <= 0
+                || identityInstance <= 0
+                || lowId <= 0
+                || highId <= 0
+                || quality <= 0
+                || multipleCount <= 0)
+            {
+                return MissionReservedItemLookupResult.Conflict;
+            }
+
+            IItem exact = null;
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry
+                     in character.BaseInventory.Pages)
+            {
+                IInventoryPage page = pageEntry.Value;
+                if (page == null)
+                {
+                    return MissionReservedItemLookupResult.Conflict;
+                }
+
+                foreach (KeyValuePair<int, IItem> itemEntry in page.List())
+                {
+                    IItem candidate = itemEntry.Value;
+                    if (candidate == null
+                        || candidate.Identity == null
+                        || candidate.Identity.Instance != identityInstance)
+                    {
+                        continue;
+                    }
+
+                    if (exact != null
+                        || candidate.LowID != lowId
+                        || candidate.HighID != highId
+                        || candidate.Quality != quality
+                        || candidate.MultipleCount != multipleCount)
+                    {
+                        item = null;
+                        return MissionReservedItemLookupResult.Conflict;
+                    }
+
+                    exact = candidate;
+                }
+            }
+
+            item = exact;
+            return exact == null
+                       ? MissionReservedItemLookupResult.Missing
+                       : MissionReservedItemLookupResult.Exact;
         }
 
         internal static bool TryGetExactInventoryItem(
@@ -596,11 +698,45 @@ namespace ZoneEngine.Core.Missions
             out int itemInstance,
             out InventoryError inventoryError)
         {
+            return TryGrantItem(
+                client,
+                character,
+                lowId,
+                highId,
+                quality,
+                itemName,
+                overflowSlot,
+                itemFlags,
+                itemIdentityType,
+                finishRewardWire,
+                reservedItemInstance,
+                1,
+                out itemInstance,
+                out inventoryError);
+        }
+
+        private static bool TryGrantItem(
+            IZoneClient client,
+            ICharacter character,
+            int lowId,
+            int highId,
+            int quality,
+            string itemName,
+            byte overflowSlot,
+            uint itemFlags,
+            int itemIdentityType,
+            bool finishRewardWire,
+            int reservedItemInstance,
+            int multipleCount,
+            out int itemInstance,
+            out InventoryError inventoryError)
+        {
             itemInstance = 0;
             inventoryError = InventoryError.Invalid;
 
             if (client == null || character == null || character.BaseInventory == null
-                || character.Playfield == null)
+                || character.Playfield == null
+                || multipleCount <= 0)
             {
                 return false;
             }
@@ -639,7 +775,8 @@ namespace ZoneEngine.Core.Missions
                     quality,
                     itemFlags,
                     itemIdentityType,
-                    reservedItemInstance);
+                    reservedItemInstance,
+                    multipleCount);
             }
             catch (Exception ex)
             {
@@ -675,11 +812,12 @@ namespace ZoneEngine.Core.Missions
             // Capture accept (20260724-134055): CreateItem → ContainerAdd → TemplateActions.
             // Finish gold 20260725-185432: TemplateAction → ContainerAddItem only (no CreateItem).
             MissionDiagnostics.Log(
-                "GRANT-ITEM name={0} low={1} high={2} ql={3} idType=0x{4:X} instance={5} invSlot={6} overflow={7} finishWire={8}",
+                "GRANT-ITEM name={0} low={1} high={2} ql={3} count={4} idType=0x{5:X} instance={6} invSlot={7} overflow={8} finishWire={9}",
                 itemName,
                 lowId,
                 highId,
                 quality,
+                multipleCount,
                 itemIdentityType,
                 itemInstance,
                 inventorySlot,
@@ -698,7 +836,8 @@ namespace ZoneEngine.Core.Missions
                         lowId,
                         highId,
                         quality,
-                        itemFlags));
+                        itemFlags,
+                        multipleCount));
             }
 
             if (finishRewardWire)
@@ -1104,7 +1243,8 @@ namespace ZoneEngine.Core.Missions
             int quality,
             uint itemFlags,
             int itemIdentityType,
-            int reservedItemInstance)
+            int reservedItemInstance,
+            int multipleCount)
         {
             var item = new Item(quality, lowId, highId)
                        {
@@ -1119,12 +1259,13 @@ namespace ZoneEngine.Core.Missions
                            Flags = 1
                        };
 
-            foreach (GameTuple<CharacterStat, uint> stat in CreateItemStats(lowId, highId, quality, itemFlags))
+            foreach (GameTuple<CharacterStat, uint> stat
+                     in CreateItemStats(lowId, highId, quality, itemFlags, multipleCount))
             {
                 item.SetAttribute((int)stat.Value1, unchecked((int)stat.Value2));
             }
 
-            item.MultipleCount = 1;
+            item.MultipleCount = multipleCount;
             return item;
         }
 
@@ -1143,7 +1284,8 @@ namespace ZoneEngine.Core.Missions
             int lowId,
             int highId,
             int quality,
-            uint itemFlags)
+            uint itemFlags,
+            int multipleCount)
         {
             return new SimpleItemFullUpdateMessage
                    {
@@ -1156,7 +1298,7 @@ namespace ZoneEngine.Core.Missions
                        Unknown1 = new Identity { Type = (IdentityType)MissionKeyStateMachineType, Instance = 0 },
                        Unknown2 = unknown2,
                        Unknown3 = unknown3,
-                       Stats = CreateItemStats(lowId, highId, quality, itemFlags),
+                       Stats = CreateItemStats(lowId, highId, quality, itemFlags, multipleCount),
                        Name = TerminatedName(itemName)
                    };
         }
@@ -1181,7 +1323,8 @@ namespace ZoneEngine.Core.Missions
             int lowId,
             int highId,
             int quality,
-            uint itemFlags)
+            uint itemFlags,
+            int multipleCount)
         {
             return new[]
                    {
@@ -1190,7 +1333,7 @@ namespace ZoneEngine.Core.Missions
                        MissionKeyStat(CharacterStat.ACGItemLevel, quality),
                        MissionKeyStat(CharacterStat.ACGItemTemplateID, lowId),
                        MissionKeyStat(CharacterStat.ACGItemTemplateID2, highId),
-                       MissionKeyStat(CharacterStat.MultipleCount, 1)
+                       MissionKeyStat(CharacterStat.MultipleCount, multipleCount)
                    };
         }
 

@@ -41,6 +41,14 @@ namespace ZoneEngine.Core.Missions
         Cleaned = 4
     }
 
+    internal enum MissionAcgNpcDeathHookCheckpoint
+    {
+        None = 0,
+        DeathPersisted = 1,
+        RewardHooksStarted = 2,
+        RewardHooksCompleted = 3
+    }
+
     internal enum MissionAcgLootAuthority
     {
         CaptureProvenFixed = 1,
@@ -83,8 +91,16 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord corpseIdentity,
             MissionAcgCorpseState corpseState,
             int spawnGeneration,
-            bool cleanupCompleted)
+            bool cleanupCompleted,
+            MissionAcgIdentityRecord deathCreditedAttackerIdentity = null,
+            MissionAcgIdentityRecord deathCreditedOwnerIdentity = null,
+            DateTime? diedAtUtc = null,
+            int deathSpawnGeneration = 0,
+            MissionAcgNpcDeathHookCheckpoint deathHookCheckpoint =
+                MissionAcgNpcDeathHookCheckpoint.None)
         {
+            bool hasDeathWitness =
+                deathHookCheckpoint != MissionAcgNpcDeathHookCheckpoint.None;
             if (capturedSlot < 0
                 || capturedIdentity == null
                 || runtimeIdentity == null
@@ -94,12 +110,28 @@ namespace ZoneEngine.Core.Missions
                 || !Enum.IsDefined(typeof(MissionAcgNpcLifeState), lifeState)
                 || !Enum.IsDefined(typeof(MissionAcgNpcCombatState), combatState)
                 || !Enum.IsDefined(typeof(MissionAcgCorpseState), corpseState)
+                || !Enum.IsDefined(
+                    typeof(MissionAcgNpcDeathHookCheckpoint),
+                    deathHookCheckpoint)
                 || level < 0
                 || maximumHealth < 0
                 || currentHealth < 0
                 || currentHealth > maximumHealth
                 || spawnGeneration < 1
-                || ((corpseState == MissionAcgCorpseState.None) != (corpseIdentity == null)))
+                || ((corpseState == MissionAcgCorpseState.None) != (corpseIdentity == null))
+                || (!hasDeathWitness
+                    && (deathCreditedAttackerIdentity != null
+                        || deathCreditedOwnerIdentity != null
+                        || diedAtUtc.HasValue
+                        || deathSpawnGeneration != 0))
+                || (hasDeathWitness
+                    && (deathCreditedOwnerIdentity == null
+                        || !diedAtUtc.HasValue
+                        || diedAtUtc.Value == DateTime.MinValue
+                        || deathSpawnGeneration < 1
+                        || deathSpawnGeneration != spawnGeneration
+                        || (lifeState != MissionAcgNpcLifeState.Dead
+                            && lifeState != MissionAcgNpcLifeState.Cleaned))))
             {
                 throw new ArgumentException("Mission ACG NPC runtime state is invalid.");
             }
@@ -124,6 +156,16 @@ namespace ZoneEngine.Core.Missions
             this.CorpseState = corpseState;
             this.SpawnGeneration = spawnGeneration;
             this.CleanupCompleted = cleanupCompleted;
+            this.DeathCreditedAttackerIdentity = deathCreditedAttackerIdentity;
+            this.DeathCreditedOwnerIdentity = deathCreditedOwnerIdentity;
+            this.DiedAtUtc =
+                diedAtUtc.HasValue
+                    ? (diedAtUtc.Value.Kind == DateTimeKind.Utc
+                        ? diedAtUtc.Value
+                        : diedAtUtc.Value.ToUniversalTime())
+                    : (DateTime?)null;
+            this.DeathSpawnGeneration = deathSpawnGeneration;
+            this.DeathHookCheckpoint = deathHookCheckpoint;
         }
 
         internal int CapturedSlot { get; private set; }
@@ -166,6 +208,16 @@ namespace ZoneEngine.Core.Missions
 
         internal bool CleanupCompleted { get; private set; }
 
+        internal MissionAcgIdentityRecord DeathCreditedAttackerIdentity { get; private set; }
+
+        internal MissionAcgIdentityRecord DeathCreditedOwnerIdentity { get; private set; }
+
+        internal DateTime? DiedAtUtc { get; private set; }
+
+        internal int DeathSpawnGeneration { get; private set; }
+
+        internal MissionAcgNpcDeathHookCheckpoint DeathHookCheckpoint { get; private set; }
+
         internal bool IsMaterializable
         {
             get
@@ -195,7 +247,10 @@ namespace ZoneEngine.Core.Missions
         }
 
         internal MissionAcgNpcRuntimeState WithDeath(
-            MissionAcgIdentityRecord corpseIdentity)
+            MissionAcgIdentityRecord corpseIdentity,
+            MissionAcgIdentityRecord creditedAttackerIdentity,
+            MissionAcgIdentityRecord creditedOwnerIdentity,
+            DateTime diedAtUtc)
         {
             return this.Copy(
                 MissionAcgNpcLifeState.Dead,
@@ -205,7 +260,37 @@ namespace ZoneEngine.Core.Missions
                     ? MissionAcgCorpseState.None
                     : MissionAcgCorpseState.Pending,
                 0,
-                this.CleanupCompleted);
+                this.CleanupCompleted,
+                creditedAttackerIdentity,
+                creditedOwnerIdentity,
+                diedAtUtc,
+                this.SpawnGeneration,
+                MissionAcgNpcDeathHookCheckpoint.DeathPersisted);
+        }
+
+        internal MissionAcgNpcRuntimeState WithDeathHookCheckpoint(
+            MissionAcgNpcDeathHookCheckpoint checkpoint)
+        {
+            if (this.DeathHookCheckpoint == MissionAcgNpcDeathHookCheckpoint.None
+                || checkpoint < this.DeathHookCheckpoint
+                || checkpoint > this.DeathHookCheckpoint + 1)
+            {
+                throw new InvalidOperationException(
+                    "Mission ACG NPC death-hook checkpoint transition is invalid.");
+            }
+
+            return this.Copy(
+                this.LifeState,
+                this.CombatState,
+                this.CorpseIdentity,
+                this.CorpseState,
+                this.CurrentHealth,
+                this.CleanupCompleted,
+                this.DeathCreditedAttackerIdentity,
+                this.DeathCreditedOwnerIdentity,
+                this.DiedAtUtc,
+                this.DeathSpawnGeneration,
+                checkpoint);
         }
 
         internal MissionAcgNpcRuntimeState WithCorpseState(
@@ -239,7 +324,12 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord corpseIdentity,
             MissionAcgCorpseState corpseState,
             int currentHealth,
-            bool cleanupCompleted)
+            bool cleanupCompleted,
+            MissionAcgIdentityRecord deathCreditedAttackerIdentity = null,
+            MissionAcgIdentityRecord deathCreditedOwnerIdentity = null,
+            DateTime? diedAtUtc = null,
+            int deathSpawnGeneration = 0,
+            MissionAcgNpcDeathHookCheckpoint? deathHookCheckpoint = null)
         {
             return new MissionAcgNpcRuntimeState(
                 this.CapturedSlot,
@@ -261,7 +351,18 @@ namespace ZoneEngine.Core.Missions
                 corpseIdentity,
                 corpseState,
                 this.SpawnGeneration,
-                cleanupCompleted);
+                cleanupCompleted,
+                deathHookCheckpoint.HasValue
+                    ? deathCreditedAttackerIdentity
+                    : this.DeathCreditedAttackerIdentity,
+                deathHookCheckpoint.HasValue
+                    ? deathCreditedOwnerIdentity
+                    : this.DeathCreditedOwnerIdentity,
+                deathHookCheckpoint.HasValue ? diedAtUtc : this.DiedAtUtc,
+                deathHookCheckpoint.HasValue
+                    ? deathSpawnGeneration
+                    : this.DeathSpawnGeneration,
+                deathHookCheckpoint ?? this.DeathHookCheckpoint);
         }
     }
 
@@ -350,7 +451,9 @@ namespace ZoneEngine.Core.Missions
     {
         internal const int LegacyCapturedDifficultyFormatVersion = 1;
 
-        internal const int CurrentFormatVersion = 2;
+        internal const int LegacyDeathWitnessFormatVersion = 2;
+
+        internal const int CurrentFormatVersion = 3;
 
         private readonly Dictionary<int, MissionAcgNpcRuntimeState> npcByRuntime;
 
@@ -370,6 +473,7 @@ namespace ZoneEngine.Core.Missions
             DateTime updatedUtc)
         {
             if ((formatVersion != LegacyCapturedDifficultyFormatVersion
+                 && formatVersion != LegacyDeathWitnessFormatVersion
                  && formatVersion != CurrentFormatVersion)
                 || acceptedQuestIdentity == null
                 || ownerIdentity == null
@@ -400,6 +504,16 @@ namespace ZoneEngine.Core.Missions
             var npcList = new List<MissionAcgNpcRuntimeState>();
             foreach (MissionAcgNpcRuntimeState npc in npcs ?? new MissionAcgNpcRuntimeState[0])
             {
+                if ((formatVersion < CurrentFormatVersion
+                     && npc.DeathHookCheckpoint
+                        != MissionAcgNpcDeathHookCheckpoint.None)
+                    || (npc.DeathCreditedOwnerIdentity != null
+                        && !npc.DeathCreditedOwnerIdentity.Equals(ownerIdentity)))
+                {
+                    throw new ArgumentException(
+                        "Mission ACG NPC death witness does not match operational ownership.");
+                }
+
                 if (this.npcByRuntime.ContainsKey(npc.RuntimeIdentity.Instance))
                 {
                     throw new ArgumentException("Duplicate mission ACG NPC runtime identity.");
@@ -706,6 +820,112 @@ namespace ZoneEngine.Core.Missions
                     || !SameChestImmutable(restoredChest, currentChest))
                 {
                     failure = "Operational chest migration identity changed.";
+                    return false;
+                }
+
+                migratedChests.Add(restoredChest);
+            }
+
+            upgraded =
+                new MissionAcgOperationalState(
+                    MissionAcgOperationalState.CurrentFormatVersion,
+                    currentExpected.AcceptedQuestIdentity,
+                    currentExpected.OwnerIdentity,
+                    currentExpected.AllocatedLivePlayfield2,
+                    currentExpected.BundleId,
+                    currentExpected.BundlePayloadSha256,
+                    currentExpected.BuildingIdentity,
+                    migratedNpcs,
+                    migratedChests,
+                    restored.CleanupState,
+                    updatedUtc);
+            if (!ValidateImmutable(upgraded, currentExpected, out failure))
+            {
+                upgraded = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static bool TryUpgradeLegacyDeathWitness(
+            MissionAcgOperationalState restored,
+            MissionAcgOperationalState currentExpected,
+            DateTime updatedUtc,
+            out MissionAcgOperationalState upgraded,
+            out string failure)
+        {
+            upgraded = null;
+            failure = string.Empty;
+            if (restored == null
+                || currentExpected == null
+                || restored.FormatVersion
+                   != MissionAcgOperationalState.LegacyDeathWitnessFormatVersion
+                || currentExpected.FormatVersion
+                   != MissionAcgOperationalState.CurrentFormatVersion
+                || !SameStateIdentity(restored, currentExpected)
+                || restored.Npcs.Count != currentExpected.Npcs.Count
+                || restored.Chests.Count != currentExpected.Chests.Count)
+            {
+                failure = "Operational state does not have a supported death-witness migration shape.";
+                return false;
+            }
+
+            var migratedNpcs =
+                new List<MissionAcgNpcRuntimeState>(currentExpected.Npcs.Count);
+            for (int i = 0; i < currentExpected.Npcs.Count; i++)
+            {
+                MissionAcgNpcRuntimeState expectedNpc = currentExpected.Npcs[i];
+                MissionAcgNpcRuntimeState restoredNpc;
+                if (!restored.TryGetNpc(
+                        expectedNpc.RuntimeIdentity.Instance,
+                        out restoredNpc)
+                    || !SameNpcImmutable(restoredNpc, expectedNpc, true))
+                {
+                    failure = "Operational NPC death-witness migration identity changed.";
+                    return false;
+                }
+
+                // Version 2 did not durably correlate the credited attacker, death
+                // generation, or reward-hook boundary. Preserve mutable death/corpse
+                // state, but deliberately leave the witness absent so an unverified
+                // legacy death can never synthesize completion after restart.
+                migratedNpcs.Add(
+                    new MissionAcgNpcRuntimeState(
+                        expectedNpc.CapturedSlot,
+                        expectedNpc.CapturedIdentity,
+                        expectedNpc.RuntimeIdentity,
+                        expectedNpc.Position,
+                        expectedNpc.Heading,
+                        expectedNpc.TemplateId,
+                        expectedNpc.MonsterData,
+                        expectedNpc.Level,
+                        expectedNpc.MaximumHealth,
+                        restoredNpc.CurrentHealth,
+                        expectedNpc.MonsterScale,
+                        expectedNpc.HeadMesh,
+                        expectedNpc.Name,
+                        expectedNpc.Role,
+                        restoredNpc.LifeState,
+                        restoredNpc.CombatState,
+                        restoredNpc.CorpseIdentity,
+                        restoredNpc.CorpseState,
+                        restoredNpc.SpawnGeneration,
+                        restoredNpc.CleanupCompleted));
+            }
+
+            var migratedChests =
+                new List<MissionAcgChestRuntimeState>(currentExpected.Chests.Count);
+            for (int i = 0; i < currentExpected.Chests.Count; i++)
+            {
+                MissionAcgChestRuntimeState expectedChest = currentExpected.Chests[i];
+                MissionAcgChestRuntimeState restoredChest;
+                if (!restored.TryGetChest(
+                        expectedChest.RuntimeIdentity.Instance,
+                        out restoredChest)
+                    || !SameChestImmutable(restoredChest, expectedChest))
+                {
+                    failure = "Operational chest death-witness migration identity changed.";
                     return false;
                 }
 

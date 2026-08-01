@@ -184,6 +184,93 @@ namespace ZoneEngine.Core.Missions
                    && !exactTarget.CleanupCompleted;
         }
 
+        internal static bool IsPersistedKillDeathWitnessEligible(
+            MissionAcgBindingRecord binding,
+            MissionAcgOperationalState operational,
+            MissionAcgObjectiveRecord objective,
+            MissionAcgNpcRuntimeState exactTarget)
+        {
+            if (binding == null
+                || binding.Binding == null
+                || binding.State == null
+                || operational == null
+                || objective == null
+                || exactTarget == null
+                || binding.Binding.MissionType != MissionRollType.KillPerson
+                || objective.Binding.MissionType != MissionRollType.KillPerson
+                || objective.Binding.RequiredInteraction
+                   != MissionAcgObjectiveInteraction.TargetDeath
+                || objective.State.Lifecycle != MissionAcgObjectiveLifecycle.Exposed
+                || objective.State.Phase >= MissionAcgCompletionPhase.ObjectiveVerified
+                || binding.Binding.TeamIdentity != null
+                || !binding.Binding.ExplicitNoTeam
+                || objective.Binding.TeamIdentity != null
+                || !objective.Binding.ExplicitNoTeam
+                || binding.State.LifecycleState == MissionAcgLifecycleState.Abandoned
+                || binding.State.LifecycleState == MissionAcgLifecycleState.Expired
+                || binding.State.LifecycleState == MissionAcgLifecycleState.CleanupPending
+                || binding.State.LifecycleState == MissionAcgLifecycleState.Cleaned
+                || binding.State.LifecycleState == MissionAcgLifecycleState.Invalid
+                || binding.State.CleanupState != MissionAcgCleanupState.None
+                || operational.CleanupState != MissionAcgOperationalCleanupState.Active)
+            {
+                return false;
+            }
+
+            MissionAcgInstanceBinding instance = binding.Binding;
+            MissionAcgObjectiveBinding objectiveBinding = objective.Binding;
+            return operational.AcceptedQuestIdentity.Equals(
+                       instance.AcceptedQuestIdentity)
+                   && operational.OwnerIdentity.Equals(instance.OwnerIdentity)
+                   && operational.AllocatedLivePlayfield2
+                      == instance.AllocatedLivePlayfield2
+                   && string.Equals(
+                       operational.BundleId,
+                       instance.SelectedBundleId,
+                       StringComparison.Ordinal)
+                   && string.Equals(
+                       operational.BundlePayloadSha256,
+                       instance.SelectedBundlePayloadSha256,
+                       StringComparison.OrdinalIgnoreCase)
+                   && operational.BuildingIdentity.Equals(instance.AcgBuildingIdentity)
+                   && objectiveBinding.AcceptedQuestIdentity.Equals(
+                       instance.AcceptedQuestIdentity)
+                   && objectiveBinding.OwnerIdentity.Equals(instance.OwnerIdentity)
+                   && objectiveBinding.AllocatedLivePlayfield2
+                      == instance.AllocatedLivePlayfield2
+                   && string.Equals(
+                       objectiveBinding.BundleId,
+                       instance.SelectedBundleId,
+                       StringComparison.Ordinal)
+                   && string.Equals(
+                       objectiveBinding.BundlePayloadSha256,
+                       instance.SelectedBundlePayloadSha256,
+                       StringComparison.OrdinalIgnoreCase)
+                   && objectiveBinding.BuildingIdentity.Equals(instance.AcgBuildingIdentity)
+                   && exactTarget.CapturedSlot == objectiveBinding.CapturedObjectiveSlot
+                   && exactTarget.CapturedIdentity.Equals(
+                       objectiveBinding.CapturedObjectiveIdentity)
+                   && exactTarget.RuntimeIdentity.Equals(
+                       objectiveBinding.RuntimeObjectiveIdentity)
+                   && exactTarget.TemplateId == objectiveBinding.ObjectiveTemplateId
+                   && string.Equals(
+                       exactTarget.Name,
+                       objectiveBinding.ObjectiveName,
+                       StringComparison.Ordinal)
+                   && exactTarget.Role == MissionAcgNpcRole.KillTarget
+                   && exactTarget.LifeState == MissionAcgNpcLifeState.Dead
+                   && exactTarget.CurrentHealth == 0
+                   && !exactTarget.CleanupCompleted
+                   && exactTarget.DeathHookCheckpoint
+                      >= MissionAcgNpcDeathHookCheckpoint.DeathPersisted
+                   && exactTarget.DiedAtUtc.HasValue
+                   && exactTarget.DeathSpawnGeneration == exactTarget.SpawnGeneration
+                   && exactTarget.DeathCreditedAttackerIdentity != null
+                   && exactTarget.DeathCreditedOwnerIdentity != null
+                   && exactTarget.DeathCreditedOwnerIdentity.Equals(instance.OwnerIdentity)
+                   && exactTarget.DeathCreditedAttackerIdentity.Equals(instance.OwnerIdentity);
+        }
+
         internal static bool ShouldDeferKillCompletionCleanup(
             MissionAcgOperationalState state,
             MissionAcgObjectiveRecord objective,

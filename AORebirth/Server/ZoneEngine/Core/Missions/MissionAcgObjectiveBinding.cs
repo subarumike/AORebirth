@@ -50,6 +50,149 @@ namespace ZoneEngine.Core.Missions
         ExplicitNone = 3
     }
 
+    internal enum MissionAcgDurableClaimPhase
+    {
+        Uninitialized = 0,
+        NotEligible = 1,
+        EligibleFrozen = 2,
+        ClaimReserved = 3,
+        ApplicationPending = 4,
+        DurablyApplied = 5,
+        ClientNotificationPending = 6,
+        ClientNotificationSent = 7,
+        TerminalFailure = 8
+    }
+
+    internal enum MissionAcgDeliveryPhase
+    {
+        NotStarted = 0,
+        Pending = 1,
+        Sent = 2,
+        TerminalFailure = 3
+    }
+
+    internal sealed class MissionAcgDurableRewardClaim
+    {
+        internal MissionAcgDurableRewardClaim(
+            MissionAcgDurableClaimPhase phase,
+            string claimId,
+            long amount,
+            int itemLowId,
+            int itemHighId,
+            int itemQuality,
+            int itemCount,
+            MissionAcgIdentityRecord reservedItemIdentity,
+            MissionAcgIdentityRecord targetContainerIdentity,
+            long preApplyValue,
+            long expectedPostValue,
+            string preApplyFingerprint,
+            string failure)
+        {
+            if (!Enum.IsDefined(typeof(MissionAcgDurableClaimPhase), phase)
+                || amount < 0
+                || itemCount < 0)
+            {
+                throw new ArgumentException("Durable reward claim is invalid.");
+            }
+
+            this.Phase = phase;
+            this.ClaimId = claimId ?? string.Empty;
+            this.Amount = amount;
+            this.ItemLowId = itemLowId;
+            this.ItemHighId = itemHighId;
+            this.ItemQuality = itemQuality;
+            this.ItemCount = itemCount;
+            this.ReservedItemIdentity = reservedItemIdentity;
+            this.TargetContainerIdentity = targetContainerIdentity;
+            this.PreApplyValue = preApplyValue;
+            this.ExpectedPostValue = expectedPostValue;
+            this.PreApplyFingerprint = preApplyFingerprint ?? string.Empty;
+            this.Failure = failure ?? string.Empty;
+        }
+
+        internal MissionAcgDurableClaimPhase Phase { get; private set; }
+
+        internal string ClaimId { get; private set; }
+
+        internal long Amount { get; private set; }
+
+        internal int ItemLowId { get; private set; }
+
+        internal int ItemHighId { get; private set; }
+
+        internal int ItemQuality { get; private set; }
+
+        internal int ItemCount { get; private set; }
+
+        internal MissionAcgIdentityRecord ReservedItemIdentity { get; private set; }
+
+        internal MissionAcgIdentityRecord TargetContainerIdentity { get; private set; }
+
+        internal long PreApplyValue { get; private set; }
+
+        internal long ExpectedPostValue { get; private set; }
+
+        internal string PreApplyFingerprint { get; private set; }
+
+        internal string Failure { get; private set; }
+
+        internal MissionAcgDurableRewardClaim Copy(
+            MissionAcgDurableClaimPhase? phase = null,
+            string claimId = null,
+            long? amount = null,
+            int? itemLowId = null,
+            int? itemHighId = null,
+            int? itemQuality = null,
+            int? itemCount = null,
+            MissionAcgIdentityRecord reservedItemIdentity = null,
+            bool preserveReservedItemWhenNull = true,
+            MissionAcgIdentityRecord targetContainerIdentity = null,
+            bool preserveTargetContainerWhenNull = true,
+            long? preApplyValue = null,
+            long? expectedPostValue = null,
+            string preApplyFingerprint = null,
+            string failure = null)
+        {
+            return new MissionAcgDurableRewardClaim(
+                phase ?? this.Phase,
+                claimId ?? this.ClaimId,
+                amount ?? this.Amount,
+                itemLowId ?? this.ItemLowId,
+                itemHighId ?? this.ItemHighId,
+                itemQuality ?? this.ItemQuality,
+                itemCount ?? this.ItemCount,
+                reservedItemIdentity != null || !preserveReservedItemWhenNull
+                    ? reservedItemIdentity
+                    : this.ReservedItemIdentity,
+                targetContainerIdentity != null || !preserveTargetContainerWhenNull
+                    ? targetContainerIdentity
+                    : this.TargetContainerIdentity,
+                preApplyValue ?? this.PreApplyValue,
+                expectedPostValue ?? this.ExpectedPostValue,
+                preApplyFingerprint ?? this.PreApplyFingerprint,
+                failure ?? this.Failure);
+        }
+
+        internal static MissionAcgDurableRewardClaim Empty(
+            MissionAcgDurableClaimPhase phase)
+        {
+            return new MissionAcgDurableRewardClaim(
+                phase,
+                string.Empty,
+                0,
+                0,
+                0,
+                0,
+                0,
+                null,
+                null,
+                0,
+                0,
+                string.Empty,
+                string.Empty);
+        }
+    }
+
     /// <summary>
     /// Immutable identity relationship between one accepted generated mission and one captured
     /// objective slot. Mutable progress and reward delivery are held by
@@ -57,7 +200,9 @@ namespace ZoneEngine.Core.Missions
     /// </summary>
     internal sealed class MissionAcgObjectiveBinding
     {
-        internal const int CurrentFormatVersion = 1;
+        internal const int CurrentFormatVersion = 2;
+
+        internal const int LegacyFormatVersion = 1;
 
         internal MissionAcgObjectiveBinding(
             int formatVersion,
@@ -80,7 +225,8 @@ namespace ZoneEngine.Core.Missions
             int requiredMissionItemTemplateId,
             int requiredMachineTemplateId)
         {
-            if (formatVersion != CurrentFormatVersion
+            if ((formatVersion != CurrentFormatVersion
+                 && formatVersion != LegacyFormatVersion)
                 || acceptedQuestIdentity == null
                 || ownerIdentity == null
                 || buildingIdentity == null
@@ -156,6 +302,30 @@ namespace ZoneEngine.Core.Missions
         internal int RequiredMissionItemTemplateId { get; private set; }
 
         internal int RequiredMachineTemplateId { get; private set; }
+
+        internal MissionAcgObjectiveBinding WithFormatVersion(int formatVersion)
+        {
+            return new MissionAcgObjectiveBinding(
+                formatVersion,
+                this.AcceptedQuestIdentity,
+                this.OwnerIdentity,
+                this.TeamIdentity,
+                this.ExplicitNoTeam,
+                this.MissionType,
+                this.AllocatedLivePlayfield2,
+                this.BundleId,
+                this.BundlePayloadSha256,
+                this.BuildingIdentity,
+                this.CapturedObjectiveSlot,
+                this.CapturedObjectiveIdentity,
+                this.RuntimeObjectiveIdentity,
+                this.ObjectiveTemplateId,
+                this.ObjectiveName,
+                this.RequiredInteraction,
+                this.IssuingTerminalIdentity,
+                this.RequiredMissionItemTemplateId,
+                this.RequiredMachineTemplateId);
+        }
     }
 
     internal sealed class MissionAcgObjectiveState
@@ -222,6 +392,144 @@ namespace ZoneEngine.Core.Missions
                 updatedUtc.Kind == DateTimeKind.Utc
                     ? updatedUtc
                     : updatedUtc.ToUniversalTime();
+            this.CreditsClaim = FromLegacyGrant(
+                creditsState,
+                this.CreditsClaimId,
+                frozenCredits,
+                0,
+                0,
+                0,
+                0,
+                grantedRewardItemInstance,
+                "credits");
+            this.XpClaim = FromLegacyGrant(
+                xpState,
+                this.XpClaimId,
+                frozenXp,
+                0,
+                0,
+                0,
+                0,
+                0,
+                "xp");
+            this.ItemClaim = FromLegacyGrant(
+                itemState,
+                this.ItemClaimId,
+                0,
+                frozenItemLowId,
+                frozenItemHighId,
+                frozenItemQuality,
+                frozenItemCount,
+                grantedRewardItemInstance,
+                "item");
+            this.TokenClaim = MissionAcgDurableRewardClaim.Empty(
+                MissionAcgDurableClaimPhase.Uninitialized);
+            this.RewardFeedbackDelivery = MissionAcgDeliveryPhase.NotStarted;
+            this.MissionAccomplishedDelivery = MissionAcgDeliveryPhase.NotStarted;
+            this.Action59Delivery =
+                action59Sent
+                    ? MissionAcgDeliveryPhase.Sent
+                    : MissionAcgDeliveryPhase.NotStarted;
+            this.QuestDeleteDelivery =
+                questDeleteSent
+                    ? MissionAcgDeliveryPhase.Sent
+                    : MissionAcgDeliveryPhase.NotStarted;
+            this.MissionListRemovalDelivery = MissionAcgDeliveryPhase.NotStarted;
+            this.CleanupHandoffDelivery =
+                missionCleanupCompleted
+                    ? MissionAcgDeliveryPhase.Sent
+                    : MissionAcgDeliveryPhase.NotStarted;
+            if (phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved)
+            {
+                this.CreditsClaim = LegacyNotificationSent(this.CreditsClaim);
+                this.XpClaim = LegacyNotificationSent(this.XpClaim);
+                this.ItemClaim = LegacyNotificationSent(this.ItemClaim);
+                this.RewardFeedbackDelivery = MissionAcgDeliveryPhase.Sent;
+                this.MissionAccomplishedDelivery = MissionAcgDeliveryPhase.Sent;
+            }
+        }
+
+        internal MissionAcgObjectiveState(
+            MissionAcgObjectiveLifecycle lifecycle,
+            MissionAcgCompletionPhase phase,
+            MissionAcgIdentityRecord missionItemIdentity,
+            int frozenCredits,
+            int frozenXp,
+            int frozenItemLowId,
+            int frozenItemHighId,
+            int frozenItemQuality,
+            int frozenItemCount,
+            MissionAcgGrantState creditsState,
+            MissionAcgGrantState xpState,
+            MissionAcgGrantState itemState,
+            string creditsClaimId,
+            string xpClaimId,
+            string itemClaimId,
+            int grantedRewardItemInstance,
+            bool artifactsRemoved,
+            bool action59Sent,
+            bool questDeleteSent,
+            bool objectiveCleanupCompleted,
+            bool missionCleanupCompleted,
+            DateTime updatedUtc,
+            MissionAcgDurableRewardClaim creditsClaim,
+            MissionAcgDurableRewardClaim xpClaim,
+            MissionAcgDurableRewardClaim itemClaim,
+            MissionAcgDurableRewardClaim tokenClaim,
+            MissionAcgDeliveryPhase rewardFeedbackDelivery,
+            MissionAcgDeliveryPhase missionAccomplishedDelivery,
+            MissionAcgDeliveryPhase action59Delivery,
+            MissionAcgDeliveryPhase questDeleteDelivery,
+            MissionAcgDeliveryPhase missionListRemovalDelivery,
+            MissionAcgDeliveryPhase cleanupHandoffDelivery)
+            : this(
+                lifecycle,
+                phase,
+                missionItemIdentity,
+                frozenCredits,
+                frozenXp,
+                frozenItemLowId,
+                frozenItemHighId,
+                frozenItemQuality,
+                frozenItemCount,
+                creditsState,
+                xpState,
+                itemState,
+                creditsClaimId,
+                xpClaimId,
+                itemClaimId,
+                grantedRewardItemInstance,
+                artifactsRemoved,
+                action59Sent,
+                questDeleteSent,
+                objectiveCleanupCompleted,
+                missionCleanupCompleted,
+                updatedUtc)
+        {
+            if (creditsClaim == null
+                || xpClaim == null
+                || itemClaim == null
+                || tokenClaim == null
+                || !Enum.IsDefined(typeof(MissionAcgDeliveryPhase), rewardFeedbackDelivery)
+                || !Enum.IsDefined(typeof(MissionAcgDeliveryPhase), missionAccomplishedDelivery)
+                || !Enum.IsDefined(typeof(MissionAcgDeliveryPhase), action59Delivery)
+                || !Enum.IsDefined(typeof(MissionAcgDeliveryPhase), questDeleteDelivery)
+                || !Enum.IsDefined(typeof(MissionAcgDeliveryPhase), missionListRemovalDelivery)
+                || !Enum.IsDefined(typeof(MissionAcgDeliveryPhase), cleanupHandoffDelivery))
+            {
+                throw new ArgumentException("Durable completion recovery state is invalid.");
+            }
+
+            this.CreditsClaim = creditsClaim;
+            this.XpClaim = xpClaim;
+            this.ItemClaim = itemClaim;
+            this.TokenClaim = tokenClaim;
+            this.RewardFeedbackDelivery = rewardFeedbackDelivery;
+            this.MissionAccomplishedDelivery = missionAccomplishedDelivery;
+            this.Action59Delivery = action59Delivery;
+            this.QuestDeleteDelivery = questDeleteDelivery;
+            this.MissionListRemovalDelivery = missionListRemovalDelivery;
+            this.CleanupHandoffDelivery = cleanupHandoffDelivery;
         }
 
         internal MissionAcgObjectiveLifecycle Lifecycle { get; private set; }
@@ -268,6 +576,26 @@ namespace ZoneEngine.Core.Missions
 
         internal DateTime UpdatedUtc { get; private set; }
 
+        internal MissionAcgDurableRewardClaim CreditsClaim { get; private set; }
+
+        internal MissionAcgDurableRewardClaim XpClaim { get; private set; }
+
+        internal MissionAcgDurableRewardClaim ItemClaim { get; private set; }
+
+        internal MissionAcgDurableRewardClaim TokenClaim { get; private set; }
+
+        internal MissionAcgDeliveryPhase RewardFeedbackDelivery { get; private set; }
+
+        internal MissionAcgDeliveryPhase MissionAccomplishedDelivery { get; private set; }
+
+        internal MissionAcgDeliveryPhase Action59Delivery { get; private set; }
+
+        internal MissionAcgDeliveryPhase QuestDeleteDelivery { get; private set; }
+
+        internal MissionAcgDeliveryPhase MissionListRemovalDelivery { get; private set; }
+
+        internal MissionAcgDeliveryPhase CleanupHandoffDelivery { get; private set; }
+
         internal MissionAcgObjectiveState Copy(
             MissionAcgObjectiveLifecycle? lifecycle = null,
             MissionAcgCompletionPhase? phase = null,
@@ -291,6 +619,16 @@ namespace ZoneEngine.Core.Missions
             bool? questDeleteSent = null,
             bool? objectiveCleanupCompleted = null,
             bool? missionCleanupCompleted = null,
+            MissionAcgDurableRewardClaim creditsClaim = null,
+            MissionAcgDurableRewardClaim xpClaim = null,
+            MissionAcgDurableRewardClaim itemClaim = null,
+            MissionAcgDurableRewardClaim tokenClaim = null,
+            MissionAcgDeliveryPhase? rewardFeedbackDelivery = null,
+            MissionAcgDeliveryPhase? missionAccomplishedDelivery = null,
+            MissionAcgDeliveryPhase? action59Delivery = null,
+            MissionAcgDeliveryPhase? questDeleteDelivery = null,
+            MissionAcgDeliveryPhase? missionListRemovalDelivery = null,
+            MissionAcgDeliveryPhase? cleanupHandoffDelivery = null,
             DateTime? updatedUtc = null)
         {
             return new MissionAcgObjectiveState(
@@ -317,7 +655,78 @@ namespace ZoneEngine.Core.Missions
                 questDeleteSent ?? this.QuestDeleteSent,
                 objectiveCleanupCompleted ?? this.ObjectiveCleanupCompleted,
                 missionCleanupCompleted ?? this.MissionCleanupCompleted,
-                updatedUtc ?? DateTime.UtcNow);
+                updatedUtc ?? DateTime.UtcNow,
+                creditsClaim ?? this.CreditsClaim,
+                xpClaim ?? this.XpClaim,
+                itemClaim ?? this.ItemClaim,
+                tokenClaim ?? this.TokenClaim,
+                rewardFeedbackDelivery ?? this.RewardFeedbackDelivery,
+                missionAccomplishedDelivery ?? this.MissionAccomplishedDelivery,
+                action59Delivery ?? this.Action59Delivery,
+                questDeleteDelivery ?? this.QuestDeleteDelivery,
+                missionListRemovalDelivery ?? this.MissionListRemovalDelivery,
+                cleanupHandoffDelivery ?? this.CleanupHandoffDelivery);
+        }
+
+        private static MissionAcgDurableRewardClaim FromLegacyGrant(
+            MissionAcgGrantState state,
+            string claimId,
+            long amount,
+            int itemLowId,
+            int itemHighId,
+            int itemQuality,
+            int itemCount,
+            int grantedItemInstance,
+            string component)
+        {
+            MissionAcgDurableClaimPhase phase;
+            string failure = string.Empty;
+            switch (state)
+            {
+                case MissionAcgGrantState.ExplicitNone:
+                    phase = MissionAcgDurableClaimPhase.NotEligible;
+                    break;
+                case MissionAcgGrantState.NotStarted:
+                    phase = string.IsNullOrEmpty(claimId)
+                                ? MissionAcgDurableClaimPhase.Uninitialized
+                                : MissionAcgDurableClaimPhase.EligibleFrozen;
+                    break;
+                case MissionAcgGrantState.Granted:
+                    phase = MissionAcgDurableClaimPhase.DurablyApplied;
+                    break;
+                default:
+                    phase = MissionAcgDurableClaimPhase.TerminalFailure;
+                    failure =
+                        "Legacy " + component
+                        + " application was pending and cannot be replayed safely.";
+                    break;
+            }
+
+            return new MissionAcgDurableRewardClaim(
+                phase,
+                claimId,
+                amount,
+                itemLowId,
+                itemHighId,
+                itemQuality,
+                itemCount,
+                grantedItemInstance == 0
+                    ? null
+                    : new MissionAcgIdentityRecord(0x0000C76D, grantedItemInstance),
+                null,
+                0,
+                0,
+                string.Empty,
+                failure);
+        }
+
+        private static MissionAcgDurableRewardClaim LegacyNotificationSent(
+            MissionAcgDurableRewardClaim claim)
+        {
+            return claim.Phase == MissionAcgDurableClaimPhase.DurablyApplied
+                       ? claim.Copy(
+                           phase: MissionAcgDurableClaimPhase.ClientNotificationSent)
+                       : claim;
         }
     }
 

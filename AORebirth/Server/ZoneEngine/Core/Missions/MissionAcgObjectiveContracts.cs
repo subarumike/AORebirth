@@ -228,6 +228,36 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            if (!DurableClaimCanAdvance(current.CreditsClaim, next.CreditsClaim)
+                || !DurableClaimCanAdvance(current.XpClaim, next.XpClaim)
+                || !DurableClaimCanAdvance(current.ItemClaim, next.ItemClaim)
+                || !DurableClaimCanAdvance(current.TokenClaim, next.TokenClaim))
+            {
+                failure = "Durable reward claim cannot regress or change frozen ownership.";
+                return false;
+            }
+
+            if (!DeliveryCanAdvance(
+                    current.RewardFeedbackDelivery,
+                    next.RewardFeedbackDelivery)
+                || !DeliveryCanAdvance(
+                    current.MissionAccomplishedDelivery,
+                    next.MissionAccomplishedDelivery)
+                || !DeliveryCanAdvance(current.Action59Delivery, next.Action59Delivery)
+                || !DeliveryCanAdvance(
+                    current.QuestDeleteDelivery,
+                    next.QuestDeleteDelivery)
+                || !DeliveryCanAdvance(
+                    current.MissionListRemovalDelivery,
+                    next.MissionListRemovalDelivery)
+                || !DeliveryCanAdvance(
+                    current.CleanupHandoffDelivery,
+                    next.CleanupHandoffDelivery))
+            {
+                failure = "Durable completion delivery state cannot regress.";
+                return false;
+            }
+
             if (current.MissionItemIdentity != null
                 && (next.MissionItemIdentity == null
                     || !current.MissionItemIdentity.Equals(next.MissionItemIdentity)))
@@ -313,6 +343,15 @@ namespace ZoneEngine.Core.Missions
             if (state == null)
             {
                 failure = "Completion state is required.";
+                return false;
+            }
+
+            if (!ClaimIsConsistent(state.CreditsClaim)
+                || !ClaimIsConsistent(state.XpClaim)
+                || !ClaimIsConsistent(state.ItemClaim)
+                || !ClaimIsConsistent(state.TokenClaim))
+            {
+                failure = "Durable reward claim is structurally incomplete.";
                 return false;
             }
 
@@ -407,6 +446,22 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+
+            if (!abandonmentCleanup
+                && state.Phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved
+                && (!ClaimReadyForCleanup(state.CreditsClaim)
+                    || !ClaimReadyForCleanup(state.XpClaim)
+                    || !ClaimReadyForCleanup(state.ItemClaim)
+                    || !ClaimReadyForCleanup(state.TokenClaim)
+                    || state.RewardFeedbackDelivery != MissionAcgDeliveryPhase.Sent
+                    || state.MissionAccomplishedDelivery
+                       != MissionAcgDeliveryPhase.Sent))
+            {
+                failure =
+                    "Completion cleanup cannot start before durable claims and send attempts finish.";
+                return false;
+            }
+
             return true;
         }
 
@@ -439,6 +494,180 @@ namespace ZoneEngine.Core.Missions
 
             return current == MissionAcgGrantState.Pending
                    && next == MissionAcgGrantState.Granted;
+        }
+
+        private static bool DurableClaimCanAdvance(
+            MissionAcgDurableRewardClaim current,
+            MissionAcgDurableRewardClaim next)
+        {
+            if (current == null || next == null)
+            {
+                return false;
+            }
+
+            if (next.Phase < current.Phase)
+            {
+                return false;
+            }
+
+            if (current.Phase == MissionAcgDurableClaimPhase.TerminalFailure)
+            {
+                return next.Phase == current.Phase
+                       && SameClaim(current, next);
+            }
+
+            if (current.Phase == MissionAcgDurableClaimPhase.NotEligible)
+            {
+                return next.Phase == current.Phase && SameClaim(current, next);
+            }
+
+            if (next.Phase == current.Phase)
+            {
+                return SameClaim(current, next);
+            }
+
+            if (current.Phase == MissionAcgDurableClaimPhase.Uninitialized)
+            {
+                return next.Phase == MissionAcgDurableClaimPhase.NotEligible
+                       || next.Phase
+                          == MissionAcgDurableClaimPhase.EligibleFrozen;
+            }
+
+            if (current.Phase == MissionAcgDurableClaimPhase.EligibleFrozen)
+            {
+                if (next.Phase == MissionAcgDurableClaimPhase.ClaimReserved)
+                {
+                    return SameRewardDefinition(current, next);
+                }
+
+                return next.Phase == MissionAcgDurableClaimPhase.TerminalFailure
+                       && SameFrozenClaim(current, next);
+            }
+
+            if (!SameFrozenClaim(current, next))
+            {
+                return false;
+            }
+
+            if (next.Phase == MissionAcgDurableClaimPhase.TerminalFailure)
+            {
+                return true;
+            }
+
+            MissionAcgDurableClaimPhase expected;
+            switch (current.Phase)
+            {
+                case MissionAcgDurableClaimPhase.ClaimReserved:
+                    expected = MissionAcgDurableClaimPhase.ApplicationPending;
+                    break;
+                case MissionAcgDurableClaimPhase.ApplicationPending:
+                    expected = MissionAcgDurableClaimPhase.DurablyApplied;
+                    break;
+                case MissionAcgDurableClaimPhase.DurablyApplied:
+                    expected = MissionAcgDurableClaimPhase.ClientNotificationPending;
+                    break;
+                case MissionAcgDurableClaimPhase.ClientNotificationPending:
+                    expected = MissionAcgDurableClaimPhase.ClientNotificationSent;
+                    break;
+                case MissionAcgDurableClaimPhase.ClientNotificationSent:
+                    return next.Phase == current.Phase && SameClaim(current, next);
+                default:
+                    return false;
+            }
+
+            return next.Phase == expected;
+        }
+
+        private static bool SameFrozenClaim(
+            MissionAcgDurableRewardClaim left,
+            MissionAcgDurableRewardClaim right)
+        {
+            return string.Equals(left.ClaimId, right.ClaimId, StringComparison.Ordinal)
+                   && left.Amount == right.Amount
+                   && left.ItemLowId == right.ItemLowId
+                   && left.ItemHighId == right.ItemHighId
+                   && left.ItemQuality == right.ItemQuality
+                   && left.ItemCount == right.ItemCount
+                   && SameIdentity(left.ReservedItemIdentity, right.ReservedItemIdentity)
+                   && SameIdentity(left.TargetContainerIdentity, right.TargetContainerIdentity)
+                   && left.PreApplyValue == right.PreApplyValue
+                   && left.ExpectedPostValue == right.ExpectedPostValue
+                   && string.Equals(
+                       left.PreApplyFingerprint,
+                       right.PreApplyFingerprint,
+                       StringComparison.Ordinal);
+        }
+
+        private static bool SameRewardDefinition(
+            MissionAcgDurableRewardClaim left,
+            MissionAcgDurableRewardClaim right)
+        {
+            return string.Equals(left.ClaimId, right.ClaimId, StringComparison.Ordinal)
+                   && left.Amount == right.Amount
+                   && left.ItemLowId == right.ItemLowId
+                   && left.ItemHighId == right.ItemHighId
+                   && left.ItemQuality == right.ItemQuality
+                   && left.ItemCount == right.ItemCount;
+        }
+
+        private static bool SameClaim(
+            MissionAcgDurableRewardClaim left,
+            MissionAcgDurableRewardClaim right)
+        {
+            return SameFrozenClaim(left, right)
+                   && string.Equals(left.Failure, right.Failure, StringComparison.Ordinal);
+        }
+
+        private static bool SameIdentity(
+            MissionAcgIdentityRecord left,
+            MissionAcgIdentityRecord right)
+        {
+            return left == null
+                       ? right == null
+                       : right != null && left.Equals(right);
+        }
+
+        private static bool ClaimIsConsistent(MissionAcgDurableRewardClaim claim)
+        {
+            if (claim == null)
+            {
+                return false;
+            }
+
+            if (claim.Phase >= MissionAcgDurableClaimPhase.EligibleFrozen
+                && string.IsNullOrEmpty(claim.ClaimId))
+            {
+                return false;
+            }
+
+            if (claim.ItemCount > 0
+                && claim.Phase >= MissionAcgDurableClaimPhase.ClaimReserved
+                && (claim.ItemLowId <= 0
+                    || claim.ItemHighId <= 0
+                    || claim.ItemQuality <= 0))
+            {
+                return false;
+            }
+
+            return claim.Phase != MissionAcgDurableClaimPhase.TerminalFailure
+                   || !string.IsNullOrEmpty(claim.Failure);
+        }
+
+        private static bool DeliveryCanAdvance(
+            MissionAcgDeliveryPhase current,
+            MissionAcgDeliveryPhase next)
+        {
+            return next >= current
+                   && (current != MissionAcgDeliveryPhase.TerminalFailure
+                       || next == current);
+        }
+
+        private static bool ClaimReadyForCleanup(
+            MissionAcgDurableRewardClaim claim)
+        {
+            return claim.Phase == MissionAcgDurableClaimPhase.NotEligible
+                   || claim.Phase
+                      == MissionAcgDurableClaimPhase.ClientNotificationSent;
         }
     }
 }

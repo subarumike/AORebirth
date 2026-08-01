@@ -6,6 +6,7 @@ namespace ZoneEngine.Core.Missions
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Items;
     using AORebirth.Core.Network;
     using AORebirth.Enums;
 
@@ -26,6 +27,9 @@ namespace ZoneEngine.Core.Missions
         private static readonly object Gate = new object();
 
         private static readonly HashSet<int> InFlight = new HashSet<int>();
+
+        private static readonly Dictionary<int, object> OwnerCompletionGates =
+            new Dictionary<int, object>();
 
         internal static void ResumeForCharacter(
             IZoneClient client,
@@ -117,9 +121,10 @@ namespace ZoneEngine.Core.Missions
             string failure;
             MissionAcgBindingRecord claimedBinding;
             MissionAcgObjectiveRecord claimedObjective;
-            if (!MissionAcgExpiryRuntime.TryClaimObjectiveVerification(
+            if (!TryPersistObjectiveVerification(
                     bindingRecord,
                     objectiveRecord,
+                    observation,
                     out claimedBinding,
                     out claimedObjective,
                     out failure))
@@ -132,38 +137,6 @@ namespace ZoneEngine.Core.Missions
                     objectiveRecord == null ? 0 : objectiveRecord.Binding.AllocatedLivePlayfield2,
                     failure);
                 return false;
-            }
-
-            MissionAcgObjectiveRecord verified;
-            int acceptedInstance =
-                claimedBinding.Binding.AcceptedQuestIdentity.Instance;
-            try
-            {
-                if (!MissionAcgObjectiveContract.TryVerify(
-                        claimedObjective,
-                        observation,
-                        out failure)
-                    || !MissionTokenProgressTracker.SealGeneratedProgress(
-                        claimedBinding,
-                        claimedObjective,
-                        out failure)
-                    || !MissionAcgObjectiveRuntime.TryReplaceState(
-                        claimedObjective,
-                        claimedObjective.State.Copy(
-                            lifecycle:
-                                MissionAcgObjectiveLifecycle.Verified,
-                            phase:
-                                MissionAcgCompletionPhase.ObjectiveVerified),
-                        out verified,
-                        out failure))
-                {
-                    return false;
-                }
-            }
-            finally
-            {
-                MissionAcgExpiryRuntime.ReleaseObjectiveVerificationClaim(
-                    acceptedInstance);
             }
 
             MissionAcceptedStore.AcceptedMission accepted;
@@ -180,8 +153,57 @@ namespace ZoneEngine.Core.Missions
                 character,
                 accepted,
                 claimedBinding,
-                verified,
+                claimedObjective,
                 reason);
+        }
+
+        internal static bool TryPersistObjectiveVerification(
+            MissionAcgBindingRecord bindingRecord,
+            MissionAcgObjectiveRecord objectiveRecord,
+            MissionAcgObjectiveEvent observation,
+            out MissionAcgBindingRecord claimedBinding,
+            out MissionAcgObjectiveRecord verified,
+            out string failure)
+        {
+            claimedBinding = null;
+            verified = null;
+            failure = string.Empty;
+            MissionAcgObjectiveRecord claimedObjective;
+            if (!MissionAcgExpiryRuntime.TryClaimObjectiveVerification(
+                    bindingRecord,
+                    objectiveRecord,
+                    out claimedBinding,
+                    out claimedObjective,
+                    out failure))
+            {
+                return false;
+            }
+
+            int acceptedInstance =
+                claimedBinding.Binding.AcceptedQuestIdentity.Instance;
+            try
+            {
+                return MissionAcgObjectiveContract.TryVerify(
+                           claimedObjective,
+                           observation,
+                           out failure)
+                       && MissionTokenProgressTracker.SealGeneratedProgress(
+                           claimedBinding,
+                           claimedObjective,
+                           out failure)
+                       && MissionAcgObjectiveRuntime.TryReplaceState(
+                           claimedObjective,
+                           claimedObjective.State.Copy(
+                               lifecycle: MissionAcgObjectiveLifecycle.Verified,
+                               phase: MissionAcgCompletionPhase.ObjectiveVerified),
+                           out verified,
+                           out failure);
+            }
+            finally
+            {
+                MissionAcgExpiryRuntime.ReleaseObjectiveVerificationClaim(
+                    acceptedInstance);
+            }
         }
 
         internal static bool TryCompleteVerified(
@@ -224,13 +246,30 @@ namespace ZoneEngine.Core.Missions
 
             try
             {
-                return Continue(
-                    client,
-                    character,
-                    accepted,
-                    bindingRecord,
-                    objectiveRecord,
-                    reason);
+                object ownerGate;
+                lock (Gate)
+                {
+                    if (!OwnerCompletionGates.TryGetValue(
+                        character.Identity.Instance,
+                        out ownerGate))
+                    {
+                        ownerGate = new object();
+                        OwnerCompletionGates.Add(
+                            character.Identity.Instance,
+                            ownerGate);
+                    }
+                }
+
+                lock (ownerGate)
+                {
+                    return Continue(
+                        client,
+                        character,
+                        accepted,
+                        bindingRecord,
+                        objectiveRecord,
+                        reason);
+                }
             }
             finally
             {
@@ -322,49 +361,23 @@ namespace ZoneEngine.Core.Missions
                     return false;
                 }
 
-                if (accepted == null)
+                MissionAcgObjectiveState frozen;
+                if (!TryFreezeAcceptedRewards(
+                    character,
+                    accepted,
+                    binding,
+                    objective,
+                    out frozen,
+                    out failure))
                 {
+                    MissionDiagnostics.Log(
+                        "ACG-COMPLETE-FROZEN-REJECT accepted={0}:{1} reason={2}",
+                        binding.Binding.AcceptedQuestIdentity.Type,
+                        binding.Binding.AcceptedQuestIdentity.Instance,
+                        failure);
                     return false;
                 }
 
-                int itemLow;
-                int itemHigh;
-                int itemQuality;
-                int itemCount;
-                ResolveItemReward(
-                    accepted,
-                    out itemLow,
-                    out itemHigh,
-                    out itemQuality,
-                    out itemCount);
-                string claimBase =
-                    binding.Binding.AcceptedQuestIdentity.Type
-                    + "-"
-                    + binding.Binding.AcceptedQuestIdentity.Instance;
-                MissionAcgObjectiveState frozen =
-                    objective.State.Copy(
-                        phase: MissionAcgCompletionPhase.RewardCalculationFrozen,
-                        frozenCredits: MissionCompleteService.ResolveCashReward(accepted),
-                        frozenXp: MissionCompleteService.ResolveXpReward(accepted),
-                        frozenItemLowId: itemLow,
-                        frozenItemHighId: itemHigh,
-                        frozenItemQuality: itemQuality,
-                        frozenItemCount: itemCount,
-                        creditsState:
-                            MissionCompleteService.ResolveCashReward(accepted) > 0
-                                ? MissionAcgGrantState.NotStarted
-                                : MissionAcgGrantState.ExplicitNone,
-                        xpState:
-                            MissionCompleteService.ResolveXpReward(accepted) > 0
-                                ? MissionAcgGrantState.NotStarted
-                                : MissionAcgGrantState.ExplicitNone,
-                        itemState:
-                            itemCount > 0
-                                ? MissionAcgGrantState.NotStarted
-                                : MissionAcgGrantState.ExplicitNone,
-                        creditsClaimId: claimBase + "-credits",
-                        xpClaimId: claimBase + "-xp",
-                        itemClaimId: claimBase + "-item");
                 if (!Replace(objective, frozen, out objective, out failure))
                 {
                     return false;
@@ -399,152 +412,70 @@ namespace ZoneEngine.Core.Missions
                     acceptedInstance);
             }
 
-            if (objective.State.CreditsState == MissionAcgGrantState.NotStarted)
-            {
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(creditsState: MissionAcgGrantState.Pending),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-
-                MissionCompleteService.GrantCredits(
-                    character,
-                    objective.State.FrozenCredits);
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(
-                        creditsState: MissionAcgGrantState.Granted,
-                        phase: MissionAcgCompletionPhase.CreditsGranted),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-            }
-            else if (objective.State.CreditsState == MissionAcgGrantState.Pending)
-            {
-                return PendingGrant("credits", objective);
-            }
-            else if (objective.State.Phase < MissionAcgCompletionPhase.CreditsGranted)
-            {
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(
-                        phase: MissionAcgCompletionPhase.CreditsGranted),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-            }
-
-            if (objective.State.XpState == MissionAcgGrantState.NotStarted)
-            {
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(xpState: MissionAcgGrantState.Pending),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-
-                if (!CombatXpRuntimeService.AwardDirectXp(
-                    character,
-                    objective.State.FrozenXp,
-                    "mission-claim-" + objective.State.XpClaimId))
-                {
-                    return false;
-                }
-
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(
-                        xpState: MissionAcgGrantState.Granted,
-                        phase: MissionAcgCompletionPhase.XpGranted),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-            }
-            else if (objective.State.XpState == MissionAcgGrantState.Pending)
-            {
-                return PendingGrant("xp", objective);
-            }
-            else if (objective.State.Phase < MissionAcgCompletionPhase.XpGranted)
-            {
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(phase: MissionAcgCompletionPhase.XpGranted),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-            }
-
-            if (objective.State.ItemState == MissionAcgGrantState.NotStarted)
-            {
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(itemState: MissionAcgGrantState.Pending),
-                    out objective,
-                    out failure))
-                {
-                    return false;
-                }
-
-                int reservedItemInstance = RewardItemInstance(binding.Binding);
-                int grantedItemInstance;
-                if (!MissionCompleteService.TryGrantOfferItemReward(
+            if (!ProcessCredits(character, objective, out objective, out failure)
+                || !ProcessXp(character, objective, out objective, out failure)
+                || !ProcessInventoryClaim(
                     client,
                     character,
-                    accepted,
-                    reservedItemInstance,
-                    out grantedItemInstance))
-                {
-                    return false;
-                }
+                    binding.Binding,
+                    objective,
+                    false,
+                    out objective,
+                    out failure)
+                || !ProcessInventoryClaim(
+                    client,
+                    character,
+                    binding.Binding,
+                    objective,
+                    true,
+                    out objective,
+                    out failure)
+                || !DeliverRewardNotifications(
+                    character,
+                    objective,
+                    out objective,
+                    out failure)
+                || !DeliverMissionNotifications(
+                    character,
+                    binding.Binding,
+                    objective,
+                    out objective,
+                    out failure))
+            {
+                return false;
+            }
 
+            if (objective.State.MissionListRemovalDelivery
+                == MissionAcgDeliveryPhase.NotStarted)
+            {
                 if (!Replace(
                     objective,
                     objective.State.Copy(
-                        itemState: MissionAcgGrantState.Granted,
-                        phase: MissionAcgCompletionPhase.ItemRewardGrantedOrNone,
-                        grantedRewardItemInstance: grantedItemInstance),
+                        missionListRemovalDelivery: MissionAcgDeliveryPhase.Pending),
                     out objective,
                     out failure))
                 {
                     return false;
                 }
             }
-            else if (objective.State.ItemState == MissionAcgGrantState.Pending)
+
+            if (objective.State.MissionListRemovalDelivery
+                == MissionAcgDeliveryPhase.Pending)
             {
-                return PendingGrant("item", objective);
-            }
-            else if (objective.State.Phase
-                     < MissionAcgCompletionPhase.ItemRewardGrantedOrNone)
-            {
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(
-                        phase: MissionAcgCompletionPhase.ItemRewardGrantedOrNone),
-                    out objective,
-                    out failure))
+                if (!MissionAcceptedStore.TryRemoveExactPersisted(
+                    character.Identity.Instance,
+                    ToIdentity(binding.Binding.AcceptedQuestIdentity),
+                    out failure)
+                    || !Replace(
+                        objective,
+                        objective.State.Copy(
+                            missionListRemovalDelivery: MissionAcgDeliveryPhase.Sent),
+                        out objective,
+                        out failure))
                 {
                     return false;
                 }
             }
-
-            MissionCompleteService.SendRewardFeedback(
-                character,
-                objective.State.FrozenXp,
-                objective.State.FrozenCredits);
-            MissionCompleteService.SendMissionAccomplishedFeedback(character);
 
             if (!objective.State.ArtifactsRemoved)
             {
@@ -553,58 +484,37 @@ namespace ZoneEngine.Core.Missions
                     character,
                     binding.Binding,
                     objective,
-                    out failure))
-                {
-                    return false;
-                }
-
-                MissionAcceptedStore.Remove(
-                    character.Identity.Instance,
-                    ToIdentity(binding.Binding.AcceptedQuestIdentity));
-                if (!Replace(
-                    objective,
-                    objective.State.Copy(
-                        artifactsRemoved: true,
-                        phase: MissionAcgCompletionPhase.MissionArtifactsRemoved),
-                    out objective,
-                    out failure))
+                    out failure)
+                    || !Replace(
+                        objective,
+                        objective.State.Copy(
+                            artifactsRemoved: true,
+                            phase: MissionAcgCompletionPhase.MissionArtifactsRemoved),
+                        out objective,
+                        out failure))
                 {
                     return false;
                 }
             }
 
-            if (!objective.State.Action59Sent)
-            {
-                MissionCompleteService.SendMissionCompleteAction(
-                    character,
-                    ToIdentity(binding.Binding.AcceptedQuestIdentity));
-                if (!Replace(
+            if (objective.State.Phase < MissionAcgCompletionPhase.Action59Sent
+                && !Replace(
                     objective,
-                    objective.State.Copy(
-                        action59Sent: true,
-                        phase: MissionAcgCompletionPhase.Action59Sent),
+                    objective.State.Copy(phase: MissionAcgCompletionPhase.Action59Sent),
                     out objective,
                     out failure))
-                {
-                    return false;
-                }
+            {
+                return false;
             }
 
-            if (!objective.State.QuestDeleteSent)
-            {
-                MissionCompleteService.SendQuestDelete(
-                    character,
-                    ToIdentity(binding.Binding.AcceptedQuestIdentity));
-                if (!Replace(
+            if (objective.State.Phase < MissionAcgCompletionPhase.QuestDeleteSent
+                && !Replace(
                     objective,
-                    objective.State.Copy(
-                        questDeleteSent: true,
-                        phase: MissionAcgCompletionPhase.QuestDeleteSent),
+                    objective.State.Copy(phase: MissionAcgCompletionPhase.QuestDeleteSent),
                     out objective,
                     out failure))
-                {
-                    return false;
-                }
+            {
+                return false;
             }
 
             if (!objective.State.ObjectiveCleanupCompleted
@@ -624,12 +534,27 @@ namespace ZoneEngine.Core.Missions
 
             if (!objective.State.ObjectiveCleanupCompleted)
             {
+                if (objective.State.CleanupHandoffDelivery
+                    == MissionAcgDeliveryPhase.NotStarted)
+                {
+                    if (!Replace(
+                        objective,
+                        objective.State.Copy(
+                            cleanupHandoffDelivery: MissionAcgDeliveryPhase.Pending),
+                        out objective,
+                        out failure))
+                    {
+                        return false;
+                    }
+                }
+
                 if (!MissionAcgRuntimeManager.Cleanup(binding, out failure)
                     || !Replace(
                         objective,
                         objective.State.Copy(
                             objectiveCleanupCompleted: true,
-                            phase: MissionAcgCompletionPhase.ObjectiveCleanupCompleted),
+                            phase: MissionAcgCompletionPhase.ObjectiveCleanupCompleted,
+                            cleanupHandoffDelivery: MissionAcgDeliveryPhase.Sent),
                         out objective,
                         out failure))
                 {
@@ -735,17 +660,965 @@ namespace ZoneEngine.Core.Missions
                 out failure);
         }
 
-        private static bool PendingGrant(
-            string reward,
-            MissionAcgObjectiveRecord objective)
+        private static bool TryFreezeAcceptedRewards(
+            ICharacter character,
+            MissionAcceptedStore.AcceptedMission accepted,
+            MissionAcgBindingRecord binding,
+            MissionAcgObjectiveRecord objective,
+            out MissionAcgObjectiveState frozen,
+            out string failure)
         {
-            MissionDiagnostics.Log(
-                "ACG-COMPLETE-RECONCILE accepted={0}:{1} reward={2} state=pending path={3}",
-                objective.Binding.AcceptedQuestIdentity.Type,
-                objective.Binding.AcceptedQuestIdentity.Instance,
-                reward,
-                objective.RecordPath);
+            frozen = null;
+            failure = string.Empty;
+            if (character == null
+                || accepted == null
+                || !accepted.HasFrozenAcceptedRewards
+                || accepted.Projection == null
+                || accepted.QuestIdentity == null
+                || accepted.QuestIdentity.Instance
+                   != binding.Binding.AcceptedQuestIdentity.Instance
+                || accepted.Projection.Binding == null
+                || !accepted.Projection.Binding.AcceptedQuestIdentity.Equals(
+                    binding.Binding.AcceptedQuestIdentity)
+                || !accepted.Projection.Binding.OwnerIdentity.Equals(
+                    binding.Binding.OwnerIdentity)
+                || accepted.Projection.Binding.AllocatedLivePlayfield2
+                   != binding.Binding.AllocatedLivePlayfield2
+                || accepted.CashReward < 0
+                || accepted.ExperienceReward < 0
+                || accepted.FrozenItemRewardCount < 0
+                || (accepted.FrozenItemRewardCount > 0
+                    && (accepted.FrozenItemRewardLowId <= 0
+                        || accepted.FrozenItemRewardHighId <= 0
+                        || accepted.FrozenItemRewardQuality <= 0)))
+            {
+                failure =
+                    "Complete exact frozen accepted projection is required before any reward claim.";
+                return false;
+            }
+
+            string claimBase =
+                binding.Binding.AcceptedQuestIdentity.Type
+                + "-"
+                + binding.Binding.AcceptedQuestIdentity.Instance;
+            MissionAcgDurableRewardClaim credits =
+                FrozenScalarClaim(
+                    claimBase + "-credits",
+                    accepted.CashReward);
+            MissionAcgDurableRewardClaim xp =
+                FrozenScalarClaim(
+                    claimBase + "-xp",
+                    accepted.ExperienceReward);
+            MissionAcgDurableRewardClaim item =
+                accepted.FrozenItemRewardCount > 0
+                    ? new MissionAcgDurableRewardClaim(
+                        MissionAcgDurableClaimPhase.EligibleFrozen,
+                        claimBase + "-item",
+                        0,
+                        accepted.FrozenItemRewardLowId,
+                        accepted.FrozenItemRewardHighId,
+                        accepted.FrozenItemRewardQuality,
+                        accepted.FrozenItemRewardCount,
+                        null,
+                        null,
+                        0,
+                        0,
+                        string.Empty,
+                        string.Empty)
+                    : MissionAcgDurableRewardClaim.Empty(
+                        MissionAcgDurableClaimPhase.NotEligible);
+
+            MissionAcgTokenProgressState progress;
+            MissionAcgTokenClaimResolution tokenResolution;
+            if (!MissionAcgTokenProgressRuntime.TryGetSealedProgress(
+                    binding,
+                    objective,
+                    out progress,
+                    out failure)
+                || !MissionAcgTokenClaimPolicy.TryResolve(
+                    progress,
+                    (int)character.Stats[StatIds.level].Value,
+                    (Side)character.Stats[StatIds.side].Value,
+                    out tokenResolution,
+                    out failure))
+            {
+                return false;
+            }
+
+            MissionAcgDurableRewardClaim token;
+            if (tokenResolution.IsEligible)
+            {
+                token = new MissionAcgDurableRewardClaim(
+                    MissionAcgDurableClaimPhase.EligibleFrozen,
+                    claimBase + "-token",
+                    tokenResolution.TokenCount,
+                    tokenResolution.TokenLowId,
+                    tokenResolution.TokenHighId,
+                    tokenResolution.TokenQuality,
+                    tokenResolution.TokenCount,
+                    null,
+                    null,
+                    (int)character.Stats[StatIds.level].Value,
+                    tokenResolution.Percent,
+                    "token-progress-percent=" + tokenResolution.Percent,
+                    string.Empty);
+            }
+            else
+            {
+                token = new MissionAcgDurableRewardClaim(
+                    MissionAcgDurableClaimPhase.NotEligible,
+                    claimBase + "-token",
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    null,
+                    null,
+                    (int)character.Stats[StatIds.level].Value,
+                    tokenResolution.Percent,
+                    "token-progress-percent=" + tokenResolution.Percent,
+                    tokenResolution.IsExplicitNone
+                        ? string.Empty
+                        : "Official probability below exact 100 percent is unresolved; no claim was created.");
+            }
+
+            frozen = objective.State.Copy(
+                phase: MissionAcgCompletionPhase.RewardCalculationFrozen,
+                frozenCredits: accepted.CashReward,
+                frozenXp: accepted.ExperienceReward,
+                frozenItemLowId: accepted.FrozenItemRewardLowId,
+                frozenItemHighId: accepted.FrozenItemRewardHighId,
+                frozenItemQuality: accepted.FrozenItemRewardQuality,
+                frozenItemCount: accepted.FrozenItemRewardCount,
+                creditsState:
+                    accepted.CashReward > 0
+                        ? MissionAcgGrantState.NotStarted
+                        : MissionAcgGrantState.ExplicitNone,
+                xpState:
+                    accepted.ExperienceReward > 0
+                        ? MissionAcgGrantState.NotStarted
+                        : MissionAcgGrantState.ExplicitNone,
+                itemState:
+                    accepted.FrozenItemRewardCount > 0
+                        ? MissionAcgGrantState.NotStarted
+                        : MissionAcgGrantState.ExplicitNone,
+                creditsClaimId: claimBase + "-credits",
+                xpClaimId: claimBase + "-xp",
+                itemClaimId: claimBase + "-item",
+                creditsClaim: credits,
+                xpClaim: xp,
+                itemClaim: item,
+                tokenClaim: token);
+            return true;
+        }
+
+        private static MissionAcgDurableRewardClaim FrozenScalarClaim(
+            string claimId,
+            int amount)
+        {
+            return amount > 0
+                       ? new MissionAcgDurableRewardClaim(
+                           MissionAcgDurableClaimPhase.EligibleFrozen,
+                           claimId,
+                           amount,
+                           0,
+                           0,
+                           0,
+                           0,
+                           null,
+                           null,
+                           0,
+                           0,
+                           string.Empty,
+                           string.Empty)
+                       : MissionAcgDurableRewardClaim.Empty(
+                           MissionAcgDurableClaimPhase.NotEligible);
+        }
+
+        private static bool ProcessCredits(
+            ICharacter character,
+            MissionAcgObjectiveRecord source,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            MissionAcgDurableRewardClaim claim = updated.State.CreditsClaim;
+            bool applicationWasAlreadyPending =
+                claim.Phase == MissionAcgDurableClaimPhase.ApplicationPending;
+            if (claim.Phase == MissionAcgDurableClaimPhase.NotEligible)
+            {
+                return AdvanceRewardPhase(
+                    updated,
+                    MissionAcgCompletionPhase.CreditsGranted,
+                    out updated,
+                    out failure);
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.EligibleFrozen)
+            {
+                long before = MissionCompleteService.GetCashBalance(character);
+                if (before < 0 || claim.Amount > int.MaxValue - before)
+                {
+                    return FailClaim(
+                        updated,
+                        false,
+                        false,
+                        false,
+                        "Frozen credit reward cannot be applied in full without exceeding the production balance bound.",
+                        out updated,
+                        out failure);
+                }
+
+                long after = before + claim.Amount;
+                if (!Replace(
+                        updated,
+                        updated.State.Copy(
+                            creditsClaim: claim.Copy(
+                                phase: MissionAcgDurableClaimPhase.ClaimReserved,
+                                preApplyValue: before,
+                                expectedPostValue: after)),
+                        out updated,
+                        out failure))
+                {
+                    return false;
+                }
+
+                claim = updated.State.CreditsClaim;
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.ClaimReserved)
+            {
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        creditsState: MissionAcgGrantState.Pending,
+                        creditsClaim: claim.Copy(
+                            phase: MissionAcgDurableClaimPhase.ApplicationPending)),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+
+                claim = updated.State.CreditsClaim;
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.ApplicationPending)
+            {
+                long current = MissionCompleteService.GetCashBalance(character);
+                if (current == claim.PreApplyValue)
+                {
+                    if (!MissionCompleteService.TryPersistFrozenCashTarget(
+                        character,
+                        claim.PreApplyValue,
+                        claim.ExpectedPostValue,
+                        out failure))
+                    {
+                        return FailClaim(
+                            updated,
+                            false,
+                            false,
+                            false,
+                            failure,
+                            out updated,
+                            out failure);
+                    }
+                }
+                else if (current == claim.ExpectedPostValue
+                         && applicationWasAlreadyPending)
+                {
+                    return FailClaim(
+                        updated,
+                        false,
+                        false,
+                        false,
+                        "Credit application is ambiguous after restart because the production cash owner has no durable claim identity.",
+                        out updated,
+                        out failure);
+                }
+                else
+                {
+                    return FailClaim(
+                        updated,
+                        false,
+                        false,
+                        false,
+                        "Credit application is ambiguous because the balance matches neither reserved boundary.",
+                        out updated,
+                        out failure);
+                }
+
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        creditsState: MissionAcgGrantState.Granted,
+                        creditsClaim: claim.Copy(
+                            phase: MissionAcgDurableClaimPhase.DurablyApplied),
+                        phase: MissionAcgCompletionPhase.CreditsGranted),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+
+                claim = updated.State.CreditsClaim;
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.TerminalFailure)
+            {
+                failure = claim.Failure;
+                return false;
+            }
+
+            return AdvanceRewardPhase(
+                updated,
+                MissionAcgCompletionPhase.CreditsGranted,
+                out updated,
+                out failure);
+        }
+
+        private static bool ProcessXp(
+            ICharacter character,
+            MissionAcgObjectiveRecord source,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            MissionAcgDurableRewardClaim claim = updated.State.XpClaim;
+            if (claim.Phase == MissionAcgDurableClaimPhase.NotEligible)
+            {
+                return AdvanceRewardPhase(
+                    updated,
+                    MissionAcgCompletionPhase.XpGranted,
+                    out updated,
+                    out failure);
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.EligibleFrozen)
+            {
+                string fingerprint =
+                    CombatXpRuntimeService.GetDirectXpClaimFingerprint(character);
+                if (string.IsNullOrEmpty(fingerprint)
+                    || !Replace(
+                        updated,
+                        updated.State.Copy(
+                            xpClaim: claim.Copy(
+                                phase: MissionAcgDurableClaimPhase.ClaimReserved,
+                                preApplyFingerprint: fingerprint)),
+                        out updated,
+                        out failure))
+                {
+                    return false;
+                }
+
+                claim = updated.State.XpClaim;
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.ClaimReserved)
+            {
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        xpState: MissionAcgGrantState.Pending,
+                        xpClaim: claim.Copy(
+                            phase: MissionAcgDurableClaimPhase.ApplicationPending)),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+
+                claim = updated.State.XpClaim;
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.ApplicationPending)
+            {
+                string current =
+                    CombatXpRuntimeService.GetDirectXpClaimFingerprint(character);
+                if (!string.Equals(
+                    current,
+                    claim.PreApplyFingerprint,
+                    StringComparison.Ordinal))
+                {
+                    return FailClaim(
+                        updated,
+                        true,
+                        false,
+                        false,
+                        "XP application is ambiguous because the reserved pre-apply fingerprint changed.",
+                        out updated,
+                        out failure);
+                }
+
+                if (!CombatXpRuntimeService.AwardDirectXp(
+                    character,
+                    (int)claim.Amount,
+                    "mission-claim-" + claim.ClaimId))
+                {
+                    string afterFailure =
+                        CombatXpRuntimeService.GetDirectXpClaimFingerprint(character);
+                    if (!string.Equals(
+                        afterFailure,
+                        claim.PreApplyFingerprint,
+                        StringComparison.Ordinal))
+                    {
+                        return FailClaim(
+                            updated,
+                            true,
+                            false,
+                            false,
+                            "XP owner returned failure after changing the reserved fingerprint.",
+                            out updated,
+                            out failure);
+                    }
+
+                    failure = "XP owner did not apply the frozen claim; retry remains safe.";
+                    return false;
+                }
+
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        xpState: MissionAcgGrantState.Granted,
+                        xpClaim: claim.Copy(
+                            phase: MissionAcgDurableClaimPhase.DurablyApplied),
+                        phase: MissionAcgCompletionPhase.XpGranted),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+
+                claim = updated.State.XpClaim;
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.TerminalFailure)
+            {
+                failure = claim.Failure;
+                return false;
+            }
+
+            return AdvanceRewardPhase(
+                updated,
+                MissionAcgCompletionPhase.XpGranted,
+                out updated,
+                out failure);
+        }
+
+        private static bool ProcessInventoryClaim(
+            IZoneClient client,
+            ICharacter character,
+            MissionAcgInstanceBinding binding,
+            MissionAcgObjectiveRecord source,
+            bool token,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            MissionAcgDurableRewardClaim claim =
+                token ? updated.State.TokenClaim : updated.State.ItemClaim;
+            if (claim.Phase == MissionAcgDurableClaimPhase.NotEligible)
+            {
+                return token
+                           ? true
+                           : AdvanceRewardPhase(
+                               updated,
+                               MissionAcgCompletionPhase.ItemRewardGrantedOrNone,
+                               out updated,
+                               out failure);
+            }
+
+            if (claim.Phase == MissionAcgDurableClaimPhase.EligibleFrozen)
+            {
+                if (character.BaseInventory == null)
+                {
+                    failure = "Owner inventory is unavailable for exact reward reservation.";
+                    return false;
+                }
+
+                var reserved = new MissionAcgIdentityRecord(
+                    MissionKeyGrantService.MissionKeyIdentityType,
+                    token ? TokenItemInstance(binding) : RewardItemInstance(binding));
+                var container = new MissionAcgIdentityRecord(
+                    character.BaseInventory.StandardPage,
+                    character.Identity.Instance);
+                claim = claim.Copy(
+                    phase: MissionAcgDurableClaimPhase.ClaimReserved,
+                    reservedItemIdentity: reserved,
+                    targetContainerIdentity: container);
+                if (!Replace(
+                    updated,
+                    CopyInventoryClaim(updated.State, token, claim),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            claim = token ? updated.State.TokenClaim : updated.State.ItemClaim;
+            if (claim.Phase == MissionAcgDurableClaimPhase.ClaimReserved)
+            {
+                claim = claim.Copy(
+                    phase: MissionAcgDurableClaimPhase.ApplicationPending);
+                MissionAcgObjectiveState pending =
+                    CopyInventoryClaim(updated.State, token, claim);
+                if (!token)
+                {
+                    pending = pending.Copy(itemState: MissionAcgGrantState.Pending);
+                }
+
+                if (!Replace(updated, pending, out updated, out failure))
+                {
+                    return false;
+                }
+            }
+
+            claim = token ? updated.State.TokenClaim : updated.State.ItemClaim;
+            if (claim.Phase == MissionAcgDurableClaimPhase.ApplicationPending)
+            {
+                IItem existing;
+                MissionReservedItemLookupResult lookup =
+                    MissionKeyGrantService.InspectReservedNamedItem(
+                        character,
+                        claim.ReservedItemIdentity.Type,
+                        claim.ReservedItemIdentity.Instance,
+                        claim.ItemLowId,
+                        claim.ItemHighId,
+                        claim.ItemQuality,
+                        claim.ItemCount,
+                        out existing);
+                if (lookup == MissionReservedItemLookupResult.Conflict)
+                {
+                    return FailClaim(
+                        updated,
+                        false,
+                        !token,
+                        token,
+                        "Reserved reward item identity conflicts with existing inventory data.",
+                        out updated,
+                        out failure);
+                }
+
+                if (lookup == MissionReservedItemLookupResult.Missing)
+                {
+                    int granted;
+                    InventoryError inventoryError;
+                    if (!MissionKeyGrantService.TryGrantReservedNamedItem(
+                        client,
+                        character,
+                        claim.ItemLowId,
+                        claim.ItemHighId,
+                        claim.ItemQuality,
+                        token ? TokenName(claim.ItemLowId) : "Mission Reward",
+                        claim.ReservedItemIdentity.Instance,
+                        claim.ItemCount,
+                        out granted,
+                        out inventoryError))
+                    {
+                        if (inventoryError == InventoryError.InventoryIsFull)
+                        {
+                            failure =
+                                "Inventory is full; exact reserved reward claim remains pending.";
+                            return false;
+                        }
+
+                        return FailClaim(
+                            updated,
+                            false,
+                            !token,
+                            token,
+                            "Exact reserved reward item grant failed: " + inventoryError,
+                            out updated,
+                            out failure);
+                    }
+
+                    lookup = MissionKeyGrantService.InspectReservedNamedItem(
+                        character,
+                        claim.ReservedItemIdentity.Type,
+                        claim.ReservedItemIdentity.Instance,
+                        claim.ItemLowId,
+                        claim.ItemHighId,
+                        claim.ItemQuality,
+                        claim.ItemCount,
+                        out existing);
+                    if (lookup != MissionReservedItemLookupResult.Exact)
+                    {
+                        return FailClaim(
+                            updated,
+                            false,
+                            !token,
+                            token,
+                            "Granted reward item could not be reconciled by exact identity.",
+                            out updated,
+                            out failure);
+                    }
+                }
+
+                claim = claim.Copy(
+                    phase: MissionAcgDurableClaimPhase.DurablyApplied);
+                MissionAcgObjectiveState applied =
+                    CopyInventoryClaim(updated.State, token, claim);
+                if (!token)
+                {
+                    applied = applied.Copy(
+                        itemState: MissionAcgGrantState.Granted,
+                        phase: MissionAcgCompletionPhase.ItemRewardGrantedOrNone,
+                        grantedRewardItemInstance:
+                            claim.ReservedItemIdentity.Instance);
+                }
+
+                if (!Replace(updated, applied, out updated, out failure))
+                {
+                    return false;
+                }
+            }
+
+            claim = token ? updated.State.TokenClaim : updated.State.ItemClaim;
+            if (claim.Phase == MissionAcgDurableClaimPhase.TerminalFailure)
+            {
+                failure = claim.Failure;
+                return false;
+            }
+
+            return token
+                       ? true
+                       : AdvanceRewardPhase(
+                           updated,
+                           MissionAcgCompletionPhase.ItemRewardGrantedOrNone,
+                           out updated,
+                           out failure);
+        }
+
+        private static bool DeliverRewardNotifications(
+            ICharacter character,
+            MissionAcgObjectiveRecord source,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            if (updated.State.RewardFeedbackDelivery
+                == MissionAcgDeliveryPhase.NotStarted)
+            {
+                MissionAcgObjectiveState pending = updated.State.Copy(
+                    rewardFeedbackDelivery: MissionAcgDeliveryPhase.Pending,
+                    creditsClaim: NotificationPending(updated.State.CreditsClaim),
+                    xpClaim: NotificationPending(updated.State.XpClaim));
+                if (!Replace(updated, pending, out updated, out failure))
+                {
+                    return false;
+                }
+            }
+
+            if (updated.State.RewardFeedbackDelivery
+                == MissionAcgDeliveryPhase.Pending)
+            {
+                if (updated.State.CreditsClaim.Phase
+                        == MissionAcgDurableClaimPhase.ClientNotificationPending
+                    && updated.State.CreditsClaim.ExpectedPostValue > 0)
+                {
+                    MissionCompleteService.SendFrozenCashNotification(
+                        character,
+                        MissionCompleteService.GetCashBalance(character));
+                }
+                MissionCompleteService.SendRewardFeedback(
+                    character,
+                    updated.State.FrozenXp,
+                    updated.State.FrozenCredits);
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        rewardFeedbackDelivery: MissionAcgDeliveryPhase.Sent,
+                        creditsClaim: NotificationSent(updated.State.CreditsClaim),
+                        xpClaim: NotificationSent(updated.State.XpClaim)),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            if (!DeliverInventoryNotification(
+                character,
+                updated,
+                false,
+                out updated,
+                out failure)
+                || !DeliverInventoryNotification(
+                    character,
+                    updated,
+                    true,
+                    out updated,
+                    out failure))
+            {
+                return false;
+            }
+
+            if (updated.State.MissionAccomplishedDelivery
+                == MissionAcgDeliveryPhase.NotStarted)
+            {
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        missionAccomplishedDelivery: MissionAcgDeliveryPhase.Pending),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            if (updated.State.MissionAccomplishedDelivery
+                == MissionAcgDeliveryPhase.Pending)
+            {
+                MissionCompleteService.SendMissionAccomplishedFeedback(character);
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        missionAccomplishedDelivery: MissionAcgDeliveryPhase.Sent),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool DeliverInventoryNotification(
+            ICharacter character,
+            MissionAcgObjectiveRecord source,
+            bool token,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            MissionAcgDurableRewardClaim claim =
+                token ? source.State.TokenClaim : source.State.ItemClaim;
+            if (claim.Phase == MissionAcgDurableClaimPhase.DurablyApplied)
+            {
+                claim = claim.Copy(
+                    phase: MissionAcgDurableClaimPhase.ClientNotificationPending);
+                if (!Replace(
+                    updated,
+                    CopyInventoryClaim(updated.State, token, claim),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            claim = token ? updated.State.TokenClaim : updated.State.ItemClaim;
+            if (claim.Phase
+                == MissionAcgDurableClaimPhase.ClientNotificationPending)
+            {
+                if (token)
+                {
+                    MissionCompleteService.SendTokenAwardedFeedback(character);
+                }
+                else
+                {
+                    MissionCompleteService.SendYellowFeedback(
+                        character,
+                        "You've received an item as mission reward!");
+                }
+
+                claim = claim.Copy(
+                    phase: MissionAcgDurableClaimPhase.ClientNotificationSent);
+                if (!Replace(
+                    updated,
+                    CopyInventoryClaim(updated.State, token, claim),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool DeliverMissionNotifications(
+            ICharacter character,
+            MissionAcgInstanceBinding binding,
+            MissionAcgObjectiveRecord source,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            if (updated.State.Action59Delivery == MissionAcgDeliveryPhase.NotStarted)
+            {
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(action59Delivery: MissionAcgDeliveryPhase.Pending),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            if (updated.State.Action59Delivery == MissionAcgDeliveryPhase.Pending)
+            {
+                MissionCompleteService.SendMissionCompleteAction(
+                    character,
+                    ToIdentity(binding.AcceptedQuestIdentity));
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        action59Sent: true,
+                        action59Delivery: MissionAcgDeliveryPhase.Sent),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            if (updated.State.QuestDeleteDelivery == MissionAcgDeliveryPhase.NotStarted)
+            {
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(questDeleteDelivery: MissionAcgDeliveryPhase.Pending),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            if (updated.State.QuestDeleteDelivery == MissionAcgDeliveryPhase.Pending)
+            {
+                MissionCompleteService.SendQuestDelete(
+                    character,
+                    ToIdentity(binding.AcceptedQuestIdentity));
+                if (!Replace(
+                    updated,
+                    updated.State.Copy(
+                        questDeleteSent: true,
+                        questDeleteDelivery: MissionAcgDeliveryPhase.Sent),
+                    out updated,
+                    out failure))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static MissionAcgObjectiveState CopyInventoryClaim(
+            MissionAcgObjectiveState state,
+            bool token,
+            MissionAcgDurableRewardClaim claim)
+        {
+            return token
+                       ? state.Copy(tokenClaim: claim)
+                       : state.Copy(itemClaim: claim);
+        }
+
+        private static MissionAcgDurableRewardClaim NotificationPending(
+            MissionAcgDurableRewardClaim claim)
+        {
+            return claim.Phase == MissionAcgDurableClaimPhase.DurablyApplied
+                       ? claim.Copy(
+                           phase: MissionAcgDurableClaimPhase.ClientNotificationPending)
+                       : claim;
+        }
+
+        private static MissionAcgDurableRewardClaim NotificationSent(
+            MissionAcgDurableRewardClaim claim)
+        {
+            return claim.Phase
+                   == MissionAcgDurableClaimPhase.ClientNotificationPending
+                       ? claim.Copy(
+                           phase: MissionAcgDurableClaimPhase.ClientNotificationSent)
+                       : claim;
+        }
+
+        private static bool AdvanceRewardPhase(
+            MissionAcgObjectiveRecord source,
+            MissionAcgCompletionPhase phase,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            updated = source;
+            failure = string.Empty;
+            if (source.State.Phase >= phase)
+            {
+                return true;
+            }
+
+            return Replace(
+                source,
+                source.State.Copy(phase: phase),
+                out updated,
+                out failure);
+        }
+
+        private static bool FailClaim(
+            MissionAcgObjectiveRecord source,
+            bool xp,
+            bool item,
+            bool token,
+            string diagnostic,
+            out MissionAcgObjectiveRecord updated,
+            out string failure)
+        {
+            MissionAcgDurableRewardClaim claim =
+                token
+                    ? source.State.TokenClaim
+                    : xp
+                          ? source.State.XpClaim
+                          : item
+                                ? source.State.ItemClaim
+                                : source.State.CreditsClaim;
+            claim = claim.Copy(
+                phase: MissionAcgDurableClaimPhase.TerminalFailure,
+                failure: string.IsNullOrWhiteSpace(diagnostic)
+                    ? "Reward application failed closed."
+                    : diagnostic);
+            MissionAcgObjectiveState state =
+                token
+                    ? source.State.Copy(tokenClaim: claim)
+                    : xp
+                          ? source.State.Copy(xpClaim: claim)
+                          : item
+                                ? source.State.Copy(itemClaim: claim)
+                                : source.State.Copy(creditsClaim: claim);
+
+            if (!Replace(source, state, out updated, out failure))
+            {
+                return false;
+            }
+
+            failure = claim.Failure;
             return false;
+        }
+
+        private static int TokenItemInstance(MissionAcgInstanceBinding binding)
+        {
+            unchecked
+            {
+                return 0x66000000
+                       | (binding.AcceptedQuestIdentity.Instance & 0x00FFFFFF);
+            }
+        }
+
+        private static string TokenName(int lowId)
+        {
+            return lowId == MissionAcgTokenClaimPolicy.ClanTokenLowId
+                       ? "Clan Token"
+                       : "Omni Token";
         }
 
         private static bool TryResolveAcceptedMission(
@@ -768,46 +1641,6 @@ namespace ZoneEngine.Core.Missions
                        character.Identity.Instance,
                        questIdentity,
                        out accepted);
-        }
-
-        private static void ResolveItemReward(
-            MissionAcceptedStore.AcceptedMission accepted,
-            out int low,
-            out int high,
-            out int quality,
-            out int count)
-        {
-            low = 0;
-            high = 0;
-            quality = 0;
-            count = 0;
-            if (accepted != null && accepted.HasFrozenAcceptedRewards)
-            {
-                low = accepted.FrozenItemRewardLowId;
-                high = accepted.FrozenItemRewardHighId;
-                quality = accepted.FrozenItemRewardQuality;
-                count = accepted.FrozenItemRewardCount;
-                return;
-            }
-
-            if (accepted == null
-                || accepted.Offer == null
-                || accepted.Offer.ItemRewards == null
-                || accepted.Offer.ItemRewards.Length == 0
-                || accepted.Offer.ItemRewards[0] == null
-                || accepted.Offer.ItemRewards[0].LowId <= 0)
-            {
-                return;
-            }
-
-            QuestItemShort item = accepted.Offer.ItemRewards[0];
-            low = item.LowId;
-            high = item.HighId > 0 ? item.HighId : item.LowId;
-            quality =
-                item.Quality > 0
-                    ? item.Quality
-                    : accepted.Quality > 0 ? accepted.Quality : 1;
-            count = 1;
         }
 
         internal static bool RemoveExactArtifacts(

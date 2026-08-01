@@ -254,7 +254,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 1,
                 MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion);
-            Assert.AreEqual(2, MissionAcgOperationalState.CurrentFormatVersion);
+            Assert.AreEqual(3, MissionAcgOperationalState.CurrentFormatVersion);
             Assert.AreEqual(1, MissionAcgRuntimeState.CurrentFormatVersion);
             Assert.AreEqual(2, MissionAcgInstanceBinding.CurrentFormatVersion);
         }

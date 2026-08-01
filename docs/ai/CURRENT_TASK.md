@@ -2,6 +2,60 @@
 
 ## Active
 
+TASK ID: GENERATED-MISSION-COMPLETION-RECOVERY-001
+
+Generated-terminal mission completion now resumes from durable, exact mission
+ownership instead of treating an in-process callback as the only proof that an
+objective completed. The version-2 objective/completion sidecar under
+`mission-state/acg-objectives` keeps deterministic fields, SHA-256 integrity,
+atomic replacement, and exact-record compare-and-swap. Each cash, XP, item, and
+eligible token component has its own stable claim identity and phase:
+`Uninitialized`, `NotEligible`, `EligibleFrozen`, `ClaimReserved`,
+`ApplicationPending`, `DurablyApplied`, `ClientNotificationPending`,
+`ClientNotificationSent`, or `TerminalFailure`. Legacy version-1 records are
+migrated only when their prior grant state has one safe meaning; an ambiguous
+pending grant becomes a durable fail-closed terminal record instead of being
+replayed.
+
+Kill death recovery is grounded in version-3 operational state. The persisted
+death witness correlates the accepted quest, solo owner, allocated PF2, exact
+runtime target and captured slot, spawn generation, dead state, and corpse
+state. Startup or re-entry may use that witness to advance objective
+verification, but it never synthesizes another death, corpse, combat-XP event,
+token event, or corpse-credit event.
+
+The accepted projection is the sole authority for generated-mission cash, XP,
+and item rewards. Credit claims freeze pre/post balances. An exact pre-balance
+may be applied, and the claim advances only when that same invocation confirms
+the production persistence call. A previously persisted `ApplicationPending`
+claim observed at its post-balance is ambiguous because the economy owner has no
+durable claim token, so it becomes `TerminalFailure` instead of being inferred
+as applied. XP claims freeze a pre-application stat fingerprint; any changed
+fingerprint across the unresolved crash boundary likewise fails closed. Item
+and token claims reserve distinct exact inventory instances before application.
+Recovery uses the persistence-owned owner/instance/template/QL/count tuple and
+tolerates documented wire-identity-type drift after inventory reload;
+same-template items and conflicting or duplicate instances are not accepted as
+proof.
+
+The generated mission token component is eligible only when the durable token
+progress record is exactly `100` percent. Clan and Omni templates and the
+official level-graph count remain the existing repository owners; Neutral and
+below-100-percent outcomes are explicit no-claim states. The official
+probability below 100 percent is not established by the preserved finalized
+capture corpus and is not guessed.
+
+Reward feedback, mission-accomplished feedback, action 59, Quest Delete, and
+mission-list removal have independently durable pending/sent checkpoints.
+`Sent` records a server send attempt, not client acknowledgement. Exact accepted
+state removal, runtime cleanup, and PF2 release remain ordered and
+restart-resumable, while the objective/completion audit sidecar is retained to
+prevent later replay. This is durable server-controlled idempotency, not a
+claim of a distributed exactly-once transaction or fully proven research-XP
+behavior.
+
+## Previous completed status
+
 TASK ID: GENERATED-MISSION-ACCEPTED-PROJECTION-001
 
 Generated-terminal mission acceptance now freezes one complete accepted
@@ -48,7 +102,7 @@ delegating to the exact restart-resumable artifact/runtime cleanup owner, and
 completion recovery can resolve frozen rewards from the accepted projection
 after the active mission-list view has hidden `CompletionStarted` records.
 
-## Previous completed status
+## Earlier completed status
 
 TASK ID: GENERATED-MISSION-LEGACY-FALLTHROUGH-001
 

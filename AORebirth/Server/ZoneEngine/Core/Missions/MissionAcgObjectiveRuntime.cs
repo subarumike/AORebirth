@@ -78,11 +78,59 @@ namespace ZoneEngine.Core.Missions
                             bindingRecord,
                             record.State.Lifecycle,
                             record.State.Phase);
-                    if (restoredLifecycle != record.State.Lifecycle)
+                    if (record.Binding.FormatVersion
+                        == MissionAcgObjectiveBinding.LegacyFormatVersion)
+                    {
+                        MissionAcgObjectiveRecord migrated;
+                        string migrateFailure;
+                        MissionAcgObjectiveState migratedState =
+                            record.State.Copy(lifecycle: restoredLifecycle);
+                        if (migratedState.ItemClaim.ItemCount > 0
+                            && migratedState.ItemClaim.Phase
+                               >= MissionAcgDurableClaimPhase.ClaimReserved)
+                        {
+                            MissionAcgIdentityRecord reserved =
+                                migratedState.ItemClaim.ReservedItemIdentity
+                                ?? new MissionAcgIdentityRecord(
+                                    MissionKeyGrantService.MissionKeyIdentityType,
+                                    LegacyRewardItemInstance(record.Binding));
+                            MissionAcgIdentityRecord target =
+                                migratedState.ItemClaim.TargetContainerIdentity
+                                ?? new MissionAcgIdentityRecord(
+                                    0,
+                                    record.Binding.OwnerIdentity.Instance);
+                            migratedState = migratedState.Copy(
+                                itemClaim: migratedState.ItemClaim.Copy(
+                                    reservedItemIdentity: reserved,
+                                    targetContainerIdentity: target));
+                        }
+
+                        var replacement = new MissionAcgObjectiveRecord(
+                            record.Binding.WithFormatVersion(
+                                MissionAcgObjectiveBinding.CurrentFormatVersion),
+                            migratedState,
+                            record.RecordPath);
+                        if (!store.TryReplace(
+                            record,
+                            replacement,
+                            out migrated,
+                            out migrateFailure))
+                        {
+                            throw new InvalidOperationException(
+                                "Mission objective v1-to-v2 migration failed at "
+                                + record.RecordPath
+                                + ": "
+                                + migrateFailure);
+                        }
+
+                        record = migrated;
+                    }
+                    else if (restoredLifecycle != record.State.Lifecycle)
                     {
                         MissionAcgObjectiveRecord reconciled;
                         string reconcileFailure;
                         if (!store.TryReplace(
+                            record,
                             record.WithState(
                                 record.State.Copy(lifecycle: restoredLifecycle)),
                             out reconciled,
@@ -127,6 +175,16 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 initialized = true;
+            }
+        }
+
+        private static int LegacyRewardItemInstance(
+            MissionAcgObjectiveBinding binding)
+        {
+            unchecked
+            {
+                return 0x65000000
+                       | (binding.AcceptedQuestIdentity.Instance & 0x0FFFFFFF);
             }
         }
 
@@ -319,7 +377,8 @@ namespace ZoneEngine.Core.Missions
                     || !string.Equals(
                         current.RecordPath,
                         record.RecordPath,
-                        StringComparison.OrdinalIgnoreCase))
+                        StringComparison.OrdinalIgnoreCase)
+                    || !object.ReferenceEquals(current, record))
                 {
                     failure = "Objective record is not active.";
                     return false;
@@ -334,6 +393,7 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 if (!store.TryReplace(
+                    current,
                     current.WithState(state),
                     out updated,
                     out failure))

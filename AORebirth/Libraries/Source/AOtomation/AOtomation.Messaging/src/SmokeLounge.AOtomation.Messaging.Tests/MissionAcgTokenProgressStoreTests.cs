@@ -9,6 +9,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.Core.Missions;
 
     [TestClass]
@@ -553,6 +555,172 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     this.CreateObjective(wrong, 14),
                     out failure));
             StringAssert.Contains(failure, "mission binding");
+        }
+
+        [TestMethod]
+        public void GeneratedClaimPolicyUsesExactSealedProgressAndOfficialTable()
+        {
+            MissionAcgInstanceBinding binding =
+                this.CreateBinding(16, 700016);
+            MissionAcgTokenProgressState sealedProgress =
+                MissionAcgTokenProgressState.Create(
+                    binding,
+                    this.CreateObjective(binding, 16),
+                    0,
+                    MissionAcgLifecycleState.Active,
+                    this.Utc(1))
+                    .WithLifecycle(
+                        MissionAcgLifecycleState.CompletionStarted,
+                        this.Utc(2),
+                        string.Empty);
+
+            MissionAcgTokenClaimResolution clan;
+            string failure;
+            Assert.IsTrue(
+                MissionAcgTokenClaimPolicy.TryResolve(
+                    sealedProgress,
+                    60,
+                    Side.Clan,
+                    out clan,
+                    out failure),
+                failure);
+            Assert.IsTrue(clan.IsEligible);
+            Assert.AreEqual(
+                binding.AcceptedQuestIdentity,
+                clan.AcceptedQuestIdentity);
+            Assert.AreEqual(binding.OwnerIdentity, clan.OwnerIdentity);
+            Assert.AreEqual(
+                binding.AllocatedLivePlayfield2,
+                clan.AllocatedLivePlayfield2);
+            Assert.AreEqual(100, clan.Percent);
+            Assert.AreEqual(103910, clan.TokenLowId);
+            Assert.AreEqual(103911, clan.TokenHighId);
+            Assert.AreEqual(1, clan.TokenQuality);
+            Assert.AreEqual(3, clan.TokenCount);
+            Assert.AreEqual("Clan Token", clan.TokenName);
+
+            MissionAcgTokenClaimResolution omni;
+            Assert.IsTrue(
+                MissionAcgTokenClaimPolicy.TryResolve(
+                    sealedProgress,
+                    60,
+                    Side.Omni,
+                    out omni,
+                    out failure),
+                failure);
+            Assert.IsTrue(omni.IsEligible);
+            Assert.AreEqual(103908, omni.TokenLowId);
+            Assert.AreEqual(103909, omni.TokenHighId);
+            Assert.AreEqual(clan.TokenCount, omni.TokenCount);
+        }
+
+        [TestMethod]
+        public void GeneratedClaimPolicyDoesNotPromoteLegacyPercentThreshold()
+        {
+            MissionAcgInstanceBinding binding =
+                this.CreateBinding(17, 700017);
+            MissionAcgTokenProgressState state =
+                MissionAcgTokenProgressState.Create(
+                    binding,
+                    this.CreateObjective(binding, 17),
+                    2,
+                    MissionAcgLifecycleState.Active,
+                    this.Utc(1));
+            MissionAcgTokenProgressState validated =
+                state.AddValidatedDeath(
+                    new MissionAcgIdentityRecord(50000, 910017),
+                    binding.OwnerIdentity,
+                    17,
+                    1,
+                    this.Utc(2));
+            MissionAcgTokenProgressState sealedProgress =
+                validated.AdvanceDeath(
+                    validated.DeathEvents[0].EventId,
+                    MissionAcgTokenProgressEventPhase.DurablyApplied,
+                    this.Utc(3),
+                    string.Empty)
+                    .WithLifecycle(
+                        MissionAcgLifecycleState.CompletionStarted,
+                        this.Utc(4),
+                        string.Empty);
+
+            MissionAcgTokenClaimResolution resolution;
+            string failure;
+            Assert.IsTrue(
+                MissionAcgTokenClaimPolicy.TryResolve(
+                    sealedProgress,
+                    60,
+                    Side.Clan,
+                    out resolution,
+                    out failure),
+                failure);
+            Assert.AreEqual(50, resolution.Percent);
+            Assert.AreEqual(
+                MissionAcgTokenClaimDisposition
+                    .UnresolvedBelowFullProgress,
+                resolution.Disposition);
+            Assert.IsFalse(resolution.IsEligible);
+            Assert.IsFalse(resolution.IsExplicitNone);
+            Assert.AreEqual(0, resolution.TokenCount);
+        }
+
+        [TestMethod]
+        public void GeneratedClaimPolicyMakesOnlyNeutralExplicitNone()
+        {
+            MissionAcgInstanceBinding binding =
+                this.CreateBinding(18, 700018);
+            MissionAcgTokenProgressState sealedProgress =
+                MissionAcgTokenProgressState.Create(
+                    binding,
+                    this.CreateObjective(binding, 18),
+                    0,
+                    MissionAcgLifecycleState.Active,
+                    this.Utc(1))
+                    .WithLifecycle(
+                        MissionAcgLifecycleState.CompletionStarted,
+                        this.Utc(2),
+                        string.Empty);
+
+            MissionAcgTokenClaimResolution neutral;
+            string failure;
+            Assert.IsTrue(
+                MissionAcgTokenClaimPolicy.TryResolve(
+                    sealedProgress,
+                    60,
+                    Side.Neutral,
+                    out neutral,
+                    out failure),
+                failure);
+            Assert.IsTrue(neutral.IsExplicitNone);
+            Assert.IsFalse(neutral.IsEligible);
+
+            MissionAcgTokenClaimResolution unsupported;
+            Assert.IsFalse(
+                MissionAcgTokenClaimPolicy.TryResolve(
+                    sealedProgress,
+                    60,
+                    Side.Monster,
+                    out unsupported,
+                    out failure));
+            StringAssert.Contains(failure, "supported player faction");
+
+            MissionAcgInstanceBinding activeBinding =
+                this.CreateBinding(19, 700019);
+            MissionAcgTokenProgressState active =
+                MissionAcgTokenProgressState.Create(
+                    activeBinding,
+                    this.CreateObjective(activeBinding, 19),
+                    0,
+                    MissionAcgLifecycleState.Active,
+                    this.Utc(1));
+            Assert.IsFalse(
+                MissionAcgTokenClaimPolicy.TryResolve(
+                    active,
+                    60,
+                    Side.Clan,
+                    out unsupported,
+                    out failure));
+            StringAssert.Contains(failure, "sealed");
         }
 
         private MissionAcgTokenProgressState AppliedPendingState(

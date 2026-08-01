@@ -209,6 +209,34 @@ namespace ZoneEngine.Core.Missions
                 {
                     expiryRestorationComplete = true;
                 }
+
+                for (int i = 0; i < restoredForExpiry.Count; i++)
+                {
+                    MissionAcgBindingRecord restored = restoredForExpiry[i];
+                    bool verified;
+                    string recoveryFailure;
+                    if (!MissionAcgObjectiveInteractionService
+                            .TryReconcileRestoredPersistedTargetDeath(
+                                restored,
+                                out verified,
+                                out recoveryFailure))
+                    {
+                        MissionDiagnostics.Log(
+                            "ACG-KILL-RESTORE-BLOCK accepted={0}:{1} livePf2={2} reason={3}",
+                            restored.Binding.AcceptedQuestIdentity.Type,
+                            restored.Binding.AcceptedQuestIdentity.Instance,
+                            restored.Binding.AllocatedLivePlayfield2,
+                            recoveryFailure);
+                    }
+                    else if (verified)
+                    {
+                        MissionDiagnostics.Log(
+                            "ACG-KILL-RESTORE-VERIFIED accepted={0}:{1} livePf2={2}",
+                            restored.Binding.AcceptedQuestIdentity.Type,
+                            restored.Binding.AcceptedQuestIdentity.Instance,
+                            restored.Binding.AllocatedLivePlayfield2);
+                    }
+                }
             }
         }
 

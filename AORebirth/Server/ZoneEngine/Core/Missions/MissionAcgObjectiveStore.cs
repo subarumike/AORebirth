@@ -44,7 +44,11 @@ namespace ZoneEngine.Core.Missions
 
         private const string Header = "AORebirth-MissionAcgObjective";
 
-        private const int ExpectedFieldCount = 49;
+        private const int LegacyExpectedFieldCount = 49;
+
+        private const int ExpectedFieldCount = 115;
+
+        private readonly object sync = new object();
 
         private readonly string directoryPath;
 
@@ -151,37 +155,57 @@ namespace ZoneEngine.Core.Missions
         }
 
         internal bool TryReplace(
+            MissionAcgObjectiveRecord expected,
             MissionAcgObjectiveRecord record,
             out MissionAcgObjectiveRecord persisted,
             out string failure)
         {
             persisted = null;
             failure = string.Empty;
-            if (record == null)
+            if (expected == null || record == null)
             {
-                failure = "Objective record is required.";
+                failure = "Expected and replacement objective records are required.";
                 return false;
             }
 
-            string path =
-                string.IsNullOrWhiteSpace(record.RecordPath)
-                    ? this.PathFor(record.Binding.AcceptedQuestIdentity)
-                    : record.RecordPath;
-            if (!File.Exists(path))
+            lock (this.sync)
             {
-                failure = "Objective record does not exist.";
-                return false;
-            }
+                string path =
+                    string.IsNullOrWhiteSpace(record.RecordPath)
+                        ? this.PathFor(record.Binding.AcceptedQuestIdentity)
+                        : record.RecordPath;
+                if (!File.Exists(path))
+                {
+                    failure = "Objective record does not exist.";
+                    return false;
+                }
 
-            var withPath =
-                new MissionAcgObjectiveRecord(record.Binding, record.State, path);
-            if (!this.TryWriteAtomic(withPath, true, out failure))
-            {
-                return false;
-            }
+                MissionAcgObjectiveRecord current;
+                if (!this.TryRead(path, out current, out failure))
+                {
+                    return false;
+                }
 
-            persisted = withPath;
-            return true;
+                if (!string.Equals(
+                        Serialize(BuildValues(current)),
+                        Serialize(BuildValues(expected)),
+                        StringComparison.Ordinal))
+                {
+                    failure =
+                        "Objective record changed after the expected record was read.";
+                    return false;
+                }
+
+                var withPath =
+                    new MissionAcgObjectiveRecord(record.Binding, record.State, path);
+                if (!this.TryWriteAtomic(withPath, true, out failure))
+                {
+                    return false;
+                }
+
+                persisted = withPath;
+                return true;
+            }
         }
 
         internal bool TryDelete(
@@ -319,12 +343,6 @@ namespace ZoneEngine.Core.Missions
 
                 string suppliedHash = Require(values, "RecordSha256");
                 values.Remove("RecordSha256");
-                if (values.Count != ExpectedFieldCount)
-                {
-                    failure = "Objective field set is incomplete or contains unknown fields.";
-                    return false;
-                }
-
                 string canonical = Serialize(values);
                 if (!string.Equals(suppliedHash, Hash(canonical), StringComparison.OrdinalIgnoreCase))
                 {
@@ -333,9 +351,25 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 int version = Int(values, "FormatVersion");
-                if (version != MissionAcgObjectiveBinding.CurrentFormatVersion)
+                int expectedFieldCount =
+                    version == MissionAcgObjectiveBinding.LegacyFormatVersion
+                        ? LegacyExpectedFieldCount
+                        : ExpectedFieldCount;
+                if (version != MissionAcgObjectiveBinding.CurrentFormatVersion
+                    && version != MissionAcgObjectiveBinding.LegacyFormatVersion)
                 {
                     failure = "Unknown objective format version " + version + ".";
+                    return false;
+                }
+
+                if (values.Count != expectedFieldCount)
+                {
+                    failure =
+                        "Objective field set is incomplete or contains unknown fields (actual="
+                        + values.Count
+                        + ", expected="
+                        + expectedFieldCount
+                        + ").";
                     return false;
                 }
 
@@ -373,7 +407,7 @@ namespace ZoneEngine.Core.Missions
                         IdentityAllowZeroOrNull(values, "IssuingTerminal"),
                         Int(values, "RequiredMissionItemTemplateId"),
                         Int(values, "RequiredMachineTemplateId"));
-                var state =
+                MissionAcgObjectiveState state =
                     new MissionAcgObjectiveState(
                         (MissionAcgObjectiveLifecycle)Int(values, "Lifecycle"),
                         (MissionAcgCompletionPhase)Int(values, "CompletionPhase"),
@@ -397,6 +431,42 @@ namespace ZoneEngine.Core.Missions
                         Bool(values, "ObjectiveCleanupCompleted"),
                         Bool(values, "MissionCleanupCompleted"),
                         Utc(values, "UpdatedUtc"));
+                if (version == MissionAcgObjectiveBinding.CurrentFormatVersion)
+                {
+                    state = new MissionAcgObjectiveState(
+                        state.Lifecycle,
+                        state.Phase,
+                        state.MissionItemIdentity,
+                        state.FrozenCredits,
+                        state.FrozenXp,
+                        state.FrozenItemLowId,
+                        state.FrozenItemHighId,
+                        state.FrozenItemQuality,
+                        state.FrozenItemCount,
+                        state.CreditsState,
+                        state.XpState,
+                        state.ItemState,
+                        state.CreditsClaimId,
+                        state.XpClaimId,
+                        state.ItemClaimId,
+                        state.GrantedRewardItemInstance,
+                        state.ArtifactsRemoved,
+                        state.Action59Sent,
+                        state.QuestDeleteSent,
+                        state.ObjectiveCleanupCompleted,
+                        state.MissionCleanupCompleted,
+                        state.UpdatedUtc,
+                        ReadClaim(values, "Credits"),
+                        ReadClaim(values, "Xp"),
+                        ReadClaim(values, "Item"),
+                        ReadClaim(values, "Token"),
+                        (MissionAcgDeliveryPhase)Int(values, "RewardFeedbackDelivery"),
+                        (MissionAcgDeliveryPhase)Int(values, "MissionAccomplishedDelivery"),
+                        (MissionAcgDeliveryPhase)Int(values, "Action59Delivery"),
+                        (MissionAcgDeliveryPhase)Int(values, "QuestDeleteDelivery"),
+                        (MissionAcgDeliveryPhase)Int(values, "MissionListRemovalDelivery"),
+                        (MissionAcgDeliveryPhase)Int(values, "CleanupHandoffDelivery"));
+                }
                 record = new MissionAcgObjectiveRecord(binding, state, path);
                 this.Validate(record);
                 return true;
@@ -417,6 +487,15 @@ namespace ZoneEngine.Core.Missions
                 out stateFailure))
             {
                 throw new InvalidOperationException(stateFailure);
+            }
+
+            if (binding.FormatVersion
+                    == MissionAcgObjectiveBinding.CurrentFormatVersion
+                && (!DurableInventoryClaimIsComplete(record.State.ItemClaim)
+                    || !DurableInventoryClaimIsComplete(record.State.TokenClaim)))
+            {
+                throw new InvalidOperationException(
+                    "Reserved item claims require exact item and target-container identities.");
             }
 
             MissionAcgLayoutBundle bundle = this.catalog.FindByLayoutId(binding.BundleId);
@@ -454,6 +533,16 @@ namespace ZoneEngine.Core.Missions
                 throw new InvalidOperationException(
                     "Runtime objective identity does not belong to allocated PF2.");
             }
+        }
+
+        private static bool DurableInventoryClaimIsComplete(
+            MissionAcgDurableRewardClaim claim)
+        {
+            return claim == null
+                   || claim.ItemCount <= 0
+                   || claim.Phase < MissionAcgDurableClaimPhase.ClaimReserved
+                   || (claim.ReservedItemIdentity != null
+                       && claim.TargetContainerIdentity != null);
         }
 
         private static SortedDictionary<string, string> BuildValues(
@@ -513,7 +602,85 @@ namespace ZoneEngine.Core.Missions
                 { "XpClaimId", Encode(state.XpClaimId) },
                 { "XpState", F((int)state.XpState) }
             };
+            if (binding.FormatVersion
+                == MissionAcgObjectiveBinding.CurrentFormatVersion)
+            {
+                AddClaim(values, "Credits", state.CreditsClaim);
+                AddClaim(values, "Xp", state.XpClaim);
+                AddClaim(values, "Item", state.ItemClaim);
+                AddClaim(values, "Token", state.TokenClaim);
+                values.Add(
+                    "RewardFeedbackDelivery",
+                    F((int)state.RewardFeedbackDelivery));
+                values.Add(
+                    "MissionAccomplishedDelivery",
+                    F((int)state.MissionAccomplishedDelivery));
+                values.Add("Action59Delivery", F((int)state.Action59Delivery));
+                values.Add("QuestDeleteDelivery", F((int)state.QuestDeleteDelivery));
+                values.Add(
+                    "MissionListRemovalDelivery",
+                    F((int)state.MissionListRemovalDelivery));
+                values.Add(
+                    "CleanupHandoffDelivery",
+                    F((int)state.CleanupHandoffDelivery));
+            }
             return values;
+        }
+
+        private static void AddClaim(
+            IDictionary<string, string> values,
+            string prefix,
+            MissionAcgDurableRewardClaim claim)
+        {
+            values.Add(prefix + "ClaimPhase", F((int)claim.Phase));
+            values.Add(prefix + "ClaimIdentity", Encode(claim.ClaimId));
+            values.Add(prefix + "ClaimAmount", claim.Amount.ToString(CultureInfo.InvariantCulture));
+            values.Add(prefix + "ClaimItemLowId", F(claim.ItemLowId));
+            values.Add(prefix + "ClaimItemHighId", F(claim.ItemHighId));
+            values.Add(prefix + "ClaimItemQuality", F(claim.ItemQuality));
+            values.Add(prefix + "ClaimItemCount", F(claim.ItemCount));
+            values.Add(
+                prefix + "ClaimReservedItemType",
+                F(claim.ReservedItemIdentity == null ? 0 : claim.ReservedItemIdentity.Type));
+            values.Add(
+                prefix + "ClaimReservedItemInstance",
+                F(claim.ReservedItemIdentity == null ? 0 : claim.ReservedItemIdentity.Instance));
+            values.Add(
+                prefix + "ClaimTargetContainerType",
+                F(claim.TargetContainerIdentity == null ? 0 : claim.TargetContainerIdentity.Type));
+            values.Add(
+                prefix + "ClaimTargetContainerInstance",
+                F(claim.TargetContainerIdentity == null ? 0 : claim.TargetContainerIdentity.Instance));
+            values.Add(
+                prefix + "ClaimPreApplyValue",
+                claim.PreApplyValue.ToString(CultureInfo.InvariantCulture));
+            values.Add(
+                prefix + "ClaimExpectedPostValue",
+                claim.ExpectedPostValue.ToString(CultureInfo.InvariantCulture));
+            values.Add(
+                prefix + "ClaimPreApplyFingerprint",
+                Encode(claim.PreApplyFingerprint));
+            values.Add(prefix + "ClaimFailure", Encode(claim.Failure));
+        }
+
+        private static MissionAcgDurableRewardClaim ReadClaim(
+            IDictionary<string, string> values,
+            string prefix)
+        {
+            return new MissionAcgDurableRewardClaim(
+                (MissionAcgDurableClaimPhase)Int(values, prefix + "ClaimPhase"),
+                Decode(Require(values, prefix + "ClaimIdentity")),
+                Long(values, prefix + "ClaimAmount"),
+                Int(values, prefix + "ClaimItemLowId"),
+                Int(values, prefix + "ClaimItemHighId"),
+                Int(values, prefix + "ClaimItemQuality"),
+                Int(values, prefix + "ClaimItemCount"),
+                IdentityAllowZeroOrNull(values, prefix + "ClaimReservedItem"),
+                IdentityAllowZeroOrNull(values, prefix + "ClaimTargetContainer"),
+                Long(values, prefix + "ClaimPreApplyValue"),
+                Long(values, prefix + "ClaimExpectedPostValue"),
+                Decode(Require(values, prefix + "ClaimPreApplyFingerprint")),
+                Decode(Require(values, prefix + "ClaimFailure")));
         }
 
         private string PathFor(MissionAcgIdentityRecord accepted)
@@ -572,6 +739,21 @@ namespace ZoneEngine.Core.Missions
                 out value))
             {
                 throw new FormatException("Invalid integer objective field " + field + ".");
+            }
+
+            return value;
+        }
+
+        private static long Long(IDictionary<string, string> values, string field)
+        {
+            long value;
+            if (!long.TryParse(
+                Require(values, field),
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out value))
+            {
+                throw new FormatException("Invalid Int64 objective field " + field + ".");
             }
 
             return value;

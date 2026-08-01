@@ -1153,6 +1153,62 @@ on durable cleanup completion. Completion restart recovery resolves the frozen
 accepted projection directly when `CompletionStarted` is intentionally absent
 from the active mission-list view.
 
+# Durable Generated-Mission Completion Recovery
+
+Generated-terminal completion uses the version-2 objective sidecar under
+`mission-state/acg-objectives`. Its canonical, deterministic record is protected
+by SHA-256, published by atomic replacement, and updated with an exact-record
+compare-and-swap so a stale completion worker cannot overwrite a competing
+expiry, abandonment, or cleanup transition. Cash, XP, item, and mission-token
+components each persist a stable claim identity, frozen inputs, reconciliation
+evidence, failure detail, and one of `Uninitialized`, `NotEligible`,
+`EligibleFrozen`, `ClaimReserved`, `ApplicationPending`, `DurablyApplied`,
+`ClientNotificationPending`, `ClientNotificationSent`, or `TerminalFailure`.
+Version-1 sidecars migrate only where the old state is unambiguous. A legacy
+pending grant cannot prove whether its external mutation occurred and is
+therefore retained as a terminal fail-closed claim rather than retried.
+
+Kill recovery is backed by version-3 generated-mission operational state. A
+durable death witness binds the accepted quest, solo owner, allocated live PF2,
+runtime NPC identity, captured objective slot, spawn generation, dead state,
+and corpse state. The startup/re-entry reconciler can advance the exact Kill
+objective from that witness when completion had not yet persisted verification.
+It does not replay NPC death, corpse creation, ordinary combat XP, mission-token
+progress, or corpse credits.
+
+The immutable accepted projection is the only reward authority. Generated
+completion does not recalculate cash or XP and does not fall back to a mutable
+offer for an item. A credit claim freezes its pre/post balance. An exact
+pre-balance may be applied and advances only after that invocation confirms the
+production persistence call. A previously persisted `ApplicationPending` claim
+at its post-balance, or any third balance, is ambiguous and fails closed because
+the economy owner has no durable claim token. XP reuses the production
+award/persistence owner and freezes a pre-application fingerprint. That owner
+also has no transactional claim token, so a changed fingerprint at the
+write-before-checkpoint crash boundary is an explicit terminal failure, not
+permission to repeat the award. This is the strongest recoverable server-side
+idempotency available here, not distributed exactly-once or proof of all
+XP-to-research routing semantics.
+
+Item and eligible token components reserve separate deterministic inventory
+instances before mutation. Recovery verifies the persistence-owned exact owner,
+instance, template pair, QL, and count while tolerating documented wire
+`IdentityType` drift after inventory reload. Duplicate instances, conflicting
+payloads, and unrelated same-template inventory items cannot satisfy the claim.
+Generated token eligibility is conservative: only durable progress of exactly
+`100` percent can freeze a claim. Existing Clan/Omni token templates and
+official level-graph counts remain authoritative. Neutral and below-100-percent
+outcomes are recorded as no claim because the official below-100 probability is
+not proven by the preserved finalized captures.
+
+Reward feedback, mission-accomplished feedback, action 59, Quest Delete, and
+accepted mission-list removal each have durable delivery/removal state. A sent
+packet means the server attempted delivery; no client acknowledgement is
+claimed. Cleanup removes only the exact accepted mission's artifacts and
+runtime registrations, then releases only its PF2 after the existing lifecycle
+gates succeed. The completion audit sidecar remains after runtime cleanup so a
+late or duplicate callback cannot replay rewards.
+
 # Generated Terminal Mission Token Progress
 
 Generated-terminal mission token progress has an accepted-quest-scoped
