@@ -284,7 +284,8 @@ namespace ZoneEngine.Core.Playfields
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3554.468f, 8.074f, 919.910f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 2, 24, 25, 125, 8, NpcAiProfile.Aggressive, 2.0f, 3562.391f, 5.110f, 864.537f),
                 new MobSlot("Garbage Flea", MobKind.GarbageFlea, 17657, 1, 12, 25, 125, 5, NpcAiProfile.Aggressive, 2.0f, 3565.514f, 8.356f, 913.615f),
-                new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 100, 13, NpcAiProfile.Passive, 0.0f, 3549.280f, 5.110f, 864.321f),
+                // Capture 20260731-180854 Cleanmeister: scale=600 at (3549.86, 5.11, 864.18).
+                new MobSlot("Cleanmeister Intelligence Robot", MobKind.CleaningRobot, 297023, 2, 180, 1019, 600, 13, NpcAiProfile.Passive, 0.0f, 3549.860f, 5.110f, 864.180f),
                 new MobSlot("IIV-X Advanced Docker", MobKind.Docker, 17649, 4, 323, 1019, 110, 15, NpcAiProfile.Passive, 0.0f, 3515.109f, 5.305f, 904.289f),
                 new MobSlot("Supreme Collector of Waste", MobKind.WasteCollector, 17714, 4, 370, 1019, 75, 12, NpcAiProfile.Passive, 0.0f, 3506.573f, 11.074f, 943.099f),
                 // Capture 20260730-220951 oasis CHAR-SEEN + dock Y=9.115 (was under floor at Y=0.01).

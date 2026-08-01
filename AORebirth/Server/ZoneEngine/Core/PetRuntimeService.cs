@@ -428,7 +428,7 @@ namespace ZoneEngine.Core
                     resolvedPetTypeId,
                     spawnLevel));
 
-            // Capture 20260730-164552: brown SystemMessage on successful summon.
+            // Live: Your Pets (type 35) after summon — "{owner}'s pet, {name}: Hello master…"
             PetCommandService.AnnouncePetSpawnChat(owner, petCharacter);
 
             return true;

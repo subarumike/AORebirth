@@ -24,8 +24,8 @@ namespace ZoneEngine.Core.Playfields
     #endregion
 
     /// <summary>
-    /// Capture 20260720-212302 Cleaning Robots near Alex pad (mesh / attack / loot).
-    /// Slots kept to the pad cluster so spawn stays reliable.
+    /// Capture 20260731-180854 Cleaning Robots around Flint Novak / Alex pad.
+    /// Unique living positions only — removes prior stacked extras at Flint.
     /// </summary>
     internal static class JunkyardCleaningRobotRuntime
     {
@@ -55,23 +55,32 @@ namespace ZoneEngine.Core.Playfields
 
         private static readonly Dictionary<int, DateTime[]> NextRespawnUtcBySlot = new Dictionary<int, DateTime[]>();
 
-        // Alex-pad Cleaning Robot cluster from capture 20260720-212302 (y≈5).
+        // Capture 20260731-180854: unique living Cleaning Robot positions (5m cluster).
         private static readonly float[][] SpawnSlots =
             {
-                new[] { 3589.222f, 5.1100006f, 864.95667f },
-                new[] { 3583.181f, 5.1100006f, 870.7136f },
-                new[] { 3587.6567f, 5.1100006f, 881.64233f },
-                new[] { 3580.9883f, 5.1100006f, 866.9392f },
-                new[] { 3582.4028f, 5.1100006f, 884.2308f },
-                new[] { 3585.8594f, 5.1100006f, 869.0397f },
-                new[] { 3578.9949f, 5.1100006f, 871.8415f },
-                new[] { 3578.7f, 5.1100006f, 863.3f },
-                new[] { 3586.5f, 5.1100006f, 862.3f },
-                new[] { 3586.1200f, 5.110001f, 861.9959f },
-                new[] { 3575.9670f, 5.110001f, 873.3813f },
-                new[] { 3555.2160f, 5.110001f, 862.7046f },
-                new[] { 3561.2063f, 5.110001f, 871.3840f },
-                new[] { 3549.5845f, 5.110001f, 855.8112f }
+                // Flint Novak ground cluster (y≈5) — two near Flint, not a dense pile.
+                new[] { 3587.3360f, 5.110001f, 862.4274f },
+                new[] { 3578.4930f, 5.110001f, 862.4495f },
+                new[] { 3575.4875f, 5.110001f, 873.9719f },
+                new[] { 3575.0576f, 5.110001f, 886.1254f },
+                new[] { 3589.1553f, 5.110001f, 884.7966f },
+                new[] { 3560.9440f, 5.110001f, 871.1031f },
+                new[] { 3554.4130f, 5.177658f, 877.9979f },
+                new[] { 3550.2827f, 5.110001f, 855.3019f },
+                new[] { 3538.1343f, 5.340942f, 878.4525f },
+                // Elevated / alley Cleaning Robots from same capture.
+                new[] { 3558.6274f, 8.110001f, 908.8449f },
+                new[] { 3551.0073f, 9.057640f, 929.5439f },
+                new[] { 3562.2760f, 8.710001f, 890.5980f },
+                new[] { 3603.3179f, 9.460402f, 895.8156f },
+                new[] { 3577.5325f, 10.597379f, 909.5761f },
+                new[] { 3599.0752f, 14.925001f, 914.4692f },
+                new[] { 3604.7920f, 26.513996f, 878.2173f },
+                new[] { 3610.5615f, 28.619068f, 877.5854f },
+                new[] { 3621.8042f, 35.376926f, 863.7999f },
+                new[] { 3622.1458f, 37.565000f, 847.7902f },
+                new[] { 3630.9453f, 40.984997f, 855.5093f },
+                new[] { 3638.7380f, 40.984997f, 823.8665f }
             };
 
         public static void StartForPlayfield(Playfield playfield, Identity playfieldIdentity, Action<ICharacter> activateNpc)
@@ -114,7 +123,7 @@ namespace ZoneEngine.Core.Playfields
                 + SpawnSlots.Length
                 + " pf="
                 + playfieldIdentity.Instance
-                + " source=20260720-212302");
+                + " source=20260731-180854");
             if (spawned == 0)
             {
                 LinkedPlayfields.Remove(playfieldIdentity.Instance);
@@ -199,7 +208,7 @@ namespace ZoneEngine.Core.Playfields
             robot.Name = RobotName;
             ApplyCaptureStats(robot);
             CapturedEnemyCombatContract contract = CapturedEnemyCombatContract.FixedAttackOnSight(
-                "cleaning-robot-20260720-212302",
+                "cleaning-robot-20260731-180854",
                 4,
                 6,
                 2.0,

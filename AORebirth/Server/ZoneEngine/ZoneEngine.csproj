@@ -168,8 +168,6 @@
     <Compile Include="Core\Arete\Quests\AntonioStacklundCombineRules.cs" />
     <Compile Include="Core\Arete\Quests\KarliCappelleriQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\KarliCappelleriTipSender.cs" />
-    <Compile Include="Core\Arete\Quests\LeonoraMartyQuestRuntime.cs" />
-    <Compile Include="Core\Arete\Quests\LeonoraMartyTipSender.cs" />
     <Compile Include="Core\Arete\Quests\PatrickSunQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\PatrickSunTipSender.cs" />
     <Compile Include="Core\Arete\Quests\RemiGalloisQuestRuntime.cs" />
@@ -567,6 +565,7 @@
     <Compile Include="Core\Playfields\RomeBlueCitySpawn.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqSpawn.cs" />
     <Compile Include="Core\Playfields\AndromedaIccHqIdleGestureRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteRexLarssonIdleGestureRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingSpawn.cs" />
     <Compile Include="Core\Playfields\AreteRoboticGuardDogRuntime.cs" />
     <Compile Include="Core\Playfields\AreteIccPeacekeeperPatrolRuntime.cs" />
@@ -580,9 +579,8 @@
     <Compile Include="Core\Playfields\AreteFinishCaptureMobRuntime.cs" />
     <Compile Include="Core\Playfields\LoreleiOasisMobRuntime.cs" />
     <Compile Include="Core\Playfields\SurveillanceDroidRuntime.cs" />
-    <Compile Include="Core\Playfields\AreteMobDiagnosticSwitches.cs" />
-    <Compile Include="Core\Playfields\AreteLeonoraMartyPatrolRuntime.cs" />
     <Compile Include="Core\Playfields\AreteLandingQuestPropDefinitions.cs" />
+    <Compile Include="Core\Playfields\AreteGasFireRuntime.cs" />
     <Compile Include="Core\Playfields\HoloDeckSpawn.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs" />

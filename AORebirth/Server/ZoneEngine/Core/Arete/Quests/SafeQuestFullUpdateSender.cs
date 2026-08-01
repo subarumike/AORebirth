@@ -1586,7 +1586,8 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         /// <summary>
-        /// Capture 20260720-074847: Action59+Delete Deliver + QFU Surveillance Uplink.
+        /// Capture 20260731-184635: Action59+Delete Deliver + QFU Surveillance Uplink
+        /// (+ Blank Info Chip / HC-12 granted before tip).
         /// </summary>
         public static RexQuestPreviewEmissionResult TrySendDeliverBioToSurveillanceUplinkHandoff(ICharacter source)
         {
@@ -1615,7 +1616,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 source.Controller.Client.SendCompressed(CreateSurveillanceUplinkPreviewMessage(source.Identity));
                 return RexQuestPreviewEmissionResult.Sent(
                     "Deliver→SurveillanceUplink Action59+Delete + tip. mission=Mission:5514B19D "
-                    + "source=20260720-074847/mission-flow.log");
+                    + "source=20260731-184635/mission-flow.log");
             }
             catch (Exception e)
             {
@@ -3676,7 +3677,7 @@ namespace ZoneEngine.Core.Arete.Quests
                                    Unknown5 = 6,
                                    Unknown6 = 1120,
                                    Unknown7 = 0,
-                                   Unknown8 = 2076,
+                                   Unknown8 = 2229,
                                    Unknown9 = 1009,
                                    Unknown10 = 1009,
                                    MissionItemData = new MissionItemReward[0],

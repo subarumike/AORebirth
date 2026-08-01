@@ -1,8 +1,8 @@
 {
   "Identity": {
     "Id": "arete-marcus-stone-dialogue-20260614-195107",
-    "Version": "captured-marcus-post-flint-20260730-142434",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107 + 20260719-Rex-Markus-stone + 20260730-142434/chat-dialogue.log"
+    "Version": "captured-marcus-once-each-20260731-macrus-stone-dialog-quests",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-macrus-stone-dialog-quests + prior Marcus chain captures"
   },
   "SourceCaptures": [
     "20260614-195107",
@@ -12,7 +12,8 @@
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-195107/packets.hex.log",
     "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-Rex-Markus-stone/chat-dialogue.log",
     "20260719-224226",
-    "20260730-142434"
+    "20260730-142434",
+    "20260731-macrus-stone-dialog-quests"
   ],
   "Npcs": [
     {
@@ -399,6 +400,70 @@
               "Index": 0,
               "Text": "Goodbye",
               "TextEvidence": "KnuBotAnswerList 2026-07-19T20:43:57.6760468Z, 20260719-224226/chat-dialogue.log",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_busy_extinguish_001",
+          "PromptText": "As you might have noticed, I'm a little busy at the moment.",
+          "PromptTextConfidence": "Reuse captured busy opener while Extinguish (B194) is Active — never re-offer fire.",
+          "Options": [
+            {
+              "Id": "marcus_busy_extinguish_001_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "Idle flavor while fire tip Active; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_busy_extinguish_001_option_1",
+              "Index": 1,
+              "Text": "Where am I?",
+              "TextEvidence": "Idle flavor while fire tip Active; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_busy_extinguish_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "Close while Extinguish Active",
+              "NextNodeId": "marcus_goodbye",
+              "Actions": []
+            }
+          ],
+          "EnterActions": []
+        },
+        {
+          "Id": "marcus_idle_001",
+          "PromptText": "Was there anything else?",
+          "PromptTextConfidence": "Capture 20260731-macrus-stone-dialog-quests: after heal turn-in, Marcus keeps only Who/Where (no fire, no wounded re-offer).",
+          "Options": [
+            {
+              "Id": "marcus_idle_001_option_0",
+              "Index": 0,
+              "Text": "Who are you?",
+              "TextEvidence": "User requirement + post-chain reopen; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_idle_001_option_1",
+              "Index": 1,
+              "Text": "Where am I?",
+              "TextEvidence": "User requirement + post-chain reopen; 20260731-macrus-stone-dialog-quests",
+              "NextNodeId": "self",
+              "Actions": []
+            },
+            {
+              "Id": "marcus_idle_001_option_2",
+              "Index": 2,
+              "Text": "Goodbye",
+              "TextEvidence": "Standard close; present on every captured Marcus AnswerList",
               "NextNodeId": "marcus_goodbye",
               "Actions": []
             }

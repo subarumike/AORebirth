@@ -1,63 +1,38 @@
 #region License
 
-
-
 // Copyright (c) 2005-2014, CellAO Team
-
 //
-
 // All rights reserved.
-
-
 
 #endregion
 
-
-
 namespace AORebirth.Communication.Messages
-
 {
-
     /// <summary>
-
-    /// Zone → ChatEngine: owner-only brown pet announce.
-
-    /// Capture 20260731-054922: AOSharp NpcMessage PacketType=NpcMessage (=35)
-
-    /// Unk1=0 Text="Owner's pet, Name: …" Unk2=1.
-
-    /// Delivered only to the owner's chat client. Never Vicinity (34).
-
+    /// Zone → ChatEngine: owner-only Your Pets announce (chat type 35).
+    /// Live 20260731-085057: empty source + Text=
+    ///   "{owner}'s pet, {pet}: {line}"
+    /// Client shows brown ": {Text}" and gates on Public Groups → Your Pets.
     /// </summary>
-
     public class SystemChatMessage : MessageBase
-
     {
-
         public int CharacterId { get; set; }
 
-
-
         /// <summary>Fallback when CharacterId lookup misses on ChatEngine.</summary>
-
         public string CharacterName { get; set; }
 
+        /// <summary>
+        /// Unused on live wire (Unk1=0 / empty). Kept for join fallback if set.
+        /// </summary>
+        public string Source { get; set; }
 
-
+        /// <summary>
+        /// Full live line, e.g. "Catcraty's pet, Bureaucrat Worker: Charge!".
+        /// </summary>
         public string Text { get; set; }
-
-
-
-        /// <summary>AOSharp NpcMessage.Unk1 — capture always 0.</summary>
 
         public int Unk1 { get; set; }
 
-
-
-        /// <summary>AOSharp NpcMessage.Unk2 — capture always 1.</summary>
-
         public int Unk2 { get; set; }
-
     }
-
 }

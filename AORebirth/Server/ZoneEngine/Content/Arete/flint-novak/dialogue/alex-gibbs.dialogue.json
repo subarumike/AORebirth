@@ -1,10 +1,11 @@
 {
   "Identity": {
-    "Id": "arete-alex-gibbs-dialogue-20260722-Alex-dialog",
-    "Version": "captured-alex-full-dialog-20260722-Alex-dialog",
-    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-Alex-dialog"
+    "Id": "arete-alex-gibbs-dialogue-20260731-184635",
+    "Version": "captured-alex-deliver-bio-20260731-184635",
+    "Source": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-184635"
   },
   "SourceCaptures": [
+    "20260731-184635",
     "20260722-Alex-dialog",
     "20260720-074847",
     "20260720-171317",
@@ -23,13 +24,13 @@
         {
           "Id": "alex_074847_001",
           "PromptText": "Hello there, what do you want?",
-          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #29",
+          "PromptTextConfidence": "KnubotAppendText 20260731-184635 seq=481",
           "Options": [
             {
               "Id": "alex_074847_001_option_0",
               "Index": 0,
               "Text": "I was told to bring you this device so you could help me get an ID.",
-              "TextEvidence": "KnuBotAnswerList 2026-07-22T13:07:04.9926785Z; StartTrade follows Answer=0 after AppendText #45",
+                  "TextEvidence": "KnuBotAnswerList 20260731-184635; StartTrade follows Answer=0 after AppendText",
               "NextNodeId": "alex_074847_trade",
               "Actions": []
             },
@@ -47,7 +48,7 @@
         {
           "Id": "alex_074847_trade",
           "PromptText": "Wait.. You came onto Rubi-Ka without sufficient identification? What? I don't even... I need a moment to think... I am only experienced with providing identification to newly created automations. While the process is similar in nature, I can only provide you with the most basic identification board.\\n\\nTo imprint that with an actual identification that would be recognized by ICC, you would need to go elsewhere. I can help you with part of the process though... if you're willing to potentially give me a hand.. \\n\\nLet me see what you have for me...",
-          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #45 then KnubotStartTrade #46",
+          "PromptTextConfidence": "KnubotAppendText 20260731-184635 seq=511 then KnubotStartTrade",
           "Options": [
             {
               "Id": "alex_074847_trade_option_0",
@@ -63,7 +64,7 @@
         {
           "Id": "alex_074847_002",
           "PromptText": "It's only part of a broken robot and I already have this one.. Ah well, you have to do me a favour if I'm going to help you further with your ID problem. Have you heard of Desmond Calitri? He is the administrator who operates and oversees all the operations around this industrial area of Arete Landing and has been starting to cut budgets for my engineering work. I want you to find out why, simply remotely hack into one of his patrolling security droids, and then plant an audio recording device in his office.\\n\\nOnce you're done, talk to old Bill. He's the closest contact I have with the ICC officials. He is usually down at the Bronto Dog Kiosk this time of the day.",
-          "PromptTextConfidence": "KnubotAppendText 20260722-Alex-dialog packets.hex.log #112",
+          "PromptTextConfidence": "KnubotAppendText 20260731-184635 seq=569",
           "Options": [
             {
               "Id": "alex_074847_002_option_0",
