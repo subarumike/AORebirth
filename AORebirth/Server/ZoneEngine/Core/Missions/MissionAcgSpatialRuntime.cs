@@ -166,7 +166,7 @@ namespace ZoneEngine.Core.Missions
             failure = string.Empty;
             if (character == null
                 || character.Playfield == null
-                || !MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                || !MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                     character.Playfield.Identity.Instance))
             {
                 return true;
@@ -454,9 +454,11 @@ namespace ZoneEngine.Core.Missions
             int firstPf = ResolvePlayfield(first);
             int secondPf = ResolvePlayfield(second);
             bool firstManaged =
-                MissionAcgAllocationService.IsAllocatableRange(firstPf);
+                firstPf > 0
+                && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(firstPf);
             bool secondManaged =
-                MissionAcgAllocationService.IsAllocatableRange(secondPf);
+                secondPf > 0
+                && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(secondPf);
             if (!firstManaged && !secondManaged)
             {
                 return true;

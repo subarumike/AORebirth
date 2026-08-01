@@ -44,12 +44,14 @@ namespace ZoneEngine.Core.MessageHandlers
             // clients target Building/Statel instead of Door when mesh replay is partial.
             if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
             {
-                // Bound ACG exits are handled earlier by exact owner + PF2 + runtime identity.
-                // Never let the legacy near-door fallback exit a persisted instance.
-                if (MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                // Generated ACG exits are handled earlier by exact owner + PF2 + runtime
+                // identity. Missing runtime state is a rejection, never permission to invoke
+                // the legacy near-door fallback.
+                if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                     character.Playfield.Identity.Instance))
                 {
-                    return false;
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                    return true;
                 }
 
                 bool doorTarget = MissionInstanceService.IsMissionExitDoorTarget(target);
@@ -68,8 +70,29 @@ namespace ZoneEngine.Core.MessageHandlers
                 return true;
             }
 
+            bool generatedExteriorClaim =
+                MissionAcgBindingRuntime.HasOwnedExteriorMarker(
+                    character.Identity.Instance,
+                    character.Playfield.Identity.Instance,
+                    character.RawCoordinates.X,
+                    character.RawCoordinates.Y,
+                    character.RawCoordinates.Z,
+                    10.0,
+                    14.0)
+                || MissionInstanceService.HasGeneratedAcceptedExteriorClaim(
+                    character,
+                    target,
+                    10.0,
+                    14.0);
+
             if (!MissionInstanceService.IsAcceptedMissionEntranceUse(character, target))
             {
+                if (generatedExteriorClaim)
+                {
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                    return true;
+                }
+
                 return false;
             }
 
@@ -79,16 +102,34 @@ namespace ZoneEngine.Core.MessageHandlers
                 && target.Type != IdentityType.MissionEntrance
                 && !MissionInstanceService.IsNearAcceptedMarker(character, 10.0, 14.0))
             {
+                if (generatedExteriorClaim)
+                {
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                    return true;
+                }
+
                 return false;
             }
 
             if (!MissionKeyGrantService.HasMissionKey(character))
             {
+                if (generatedExteriorClaim)
+                {
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                    return true;
+                }
+
                 return false;
             }
 
-            if (!MissionInstanceService.TryEnterMissionInstance(client))
+            if (!MissionInstanceService.TryEnterMissionInstance(client, target))
             {
+                if (generatedExteriorClaim)
+                {
+                    GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
+                    return true;
+                }
+
                 return false;
             }
 

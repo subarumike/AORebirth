@@ -26,6 +26,12 @@ namespace AORebirth.Core.Playfields
 
     internal sealed class NPCRuntimeService
     {
+        // NPC-first attack starts prove automatic aggression even when the
+        // player coordinate needed for an exact trigger distance is absent.
+        // Use a contact-only floor for that proven eligibility; measured
+        // radii continue to take precedence and the exact radius stays unresolved.
+        private const double CapturedEligibilityOnlyAggroRadiusMeters = 1.0d;
+
         private readonly Playfield playfield;
 
         private readonly PlayfieldDynelRegistry dynelRegistry;
@@ -49,6 +55,8 @@ namespace AORebirth.Core.Playfields
         private readonly NpcPatrolReplayCoordinator patrolReplay;
 
         private readonly CapturedAreteMovementRuntimeService capturedAreteMovement;
+
+        private readonly CapturedAreteAggroCatalog capturedAreteAggro;
 
         private readonly CapturedAreteRobotSpawnOrchestrator capturedAreteRobotSpawns;
 
@@ -79,7 +87,7 @@ namespace AORebirth.Core.Playfields
                                    ?? throw new ArgumentNullException("chaseNavigation");
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
-            this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
+            this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider();
             this.capturedSubwayContent = new CapturedSubwayContentProvider();
             this.capturedSubwayOrdinaryContent = new CapturedSubwayOrdinaryContentProvider();
             this.ordinaryEnemyCatalog =
@@ -87,8 +95,7 @@ namespace AORebirth.Core.Playfields
                     this.capturedSubwayContent,
                     this.capturedSubwayOrdinaryContent,
                     new CapturedTempleOfThreeWindsContentProvider());
-            this.patrolReplay =
-                new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
+            this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedSubwayContent);
             this.capturedAreteMovement = new CapturedAreteMovementRuntimeService();
             if (!this.capturedAreteMovement.IsAvailable)
             {
@@ -96,10 +103,16 @@ namespace AORebirth.Core.Playfields
                     DebugInfoDetail.Error,
                     "Captured Arete movement disabled reason=" + this.capturedAreteMovement.FailureReason);
             }
+            this.capturedAreteAggro = CapturedAreteAggroCatalog.LoadDefault();
+            if (!this.capturedAreteAggro.IsValid)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Captured Arete aggro disabled reason=" + this.capturedAreteAggro.FailureReason);
+            }
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
                     this.capturedAreteRobotContent,
-                    this.patrolReplay,
                     this.ActivateNpc);
             this.ordinaryEnemies =
                 new OrdinaryEnemyRuntimeService(
@@ -126,9 +139,43 @@ namespace AORebirth.Core.Playfields
 
         internal void ActivateNpc(ICharacter character)
         {
+            if (character != null
+                && this.playfield.Identity.Instance
+                == Pf1931OfficialDungeonGeometryLoader.TemplePlayfieldResource)
+            {
+                var coordinate = character.Coordinates().coordinate;
+                var reference = new ChaseNavigationPoint(
+                    coordinate.x,
+                    coordinate.y,
+                    coordinate.z);
+                ChaseNavigationPoint grounded;
+                if (!this.chaseNavigation.TryProjectToSurface(reference, out grounded))
+                {
+                    throw new InvalidOperationException(
+                        "PF1931 NPC spawn is outside official dungeon geometry: "
+                        + character.Identity.ToString(true));
+                }
+
+                character.Coordinates(
+                    new Coordinate(
+                        (float)grounded.X,
+                        (float)grounded.Y + 0.01f,
+                        (float)grounded.Z));
+            }
+
             this.dynelRegistry.Register(character);
             this.RegisterNpcHome(character);
             this.capturedAreteMovement.Activate(character);
+        }
+
+        internal void SuspendCapturedAretePatrol(ICharacter character)
+        {
+            this.capturedAreteMovement.SuspendPatrol(character);
+        }
+
+        internal void ResumeCapturedAretePatrol(ICharacter character)
+        {
+            this.capturedAreteMovement.ResumePatrol(character);
         }
 
         internal void EnsureAreteCapturePopulation()
@@ -138,6 +185,14 @@ namespace AORebirth.Core.Playfields
                 this.playfield.Identity,
                 this.ActivateNpc);
             this.capturedAreteRobotSpawns.TickRespawn(this.playfield, this.playfield.Identity);
+            AreteAlienAreaMobRuntime.TickRespawn(
+                this.playfield,
+                this.playfield.Identity,
+                this.ActivateNpc);
+            AreteSandstormMarauderRuntime.TickRespawn(
+                this.playfield,
+                this.playfield.Identity,
+                this.ActivateNpc);
         }
 
         internal void ClearRuntimeState()
@@ -177,6 +232,9 @@ namespace AORebirth.Core.Playfields
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             LoreleiOasisMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteAlienAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteSandstormMarauderRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteKarliCappelleriPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             NascenceLifeSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteFinishCaptureMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             SurveillanceDroidRuntime.ClearPlayfield(this.playfield.Identity.Instance);
@@ -311,6 +369,51 @@ namespace AORebirth.Core.Playfields
 
             try
             {
+                AreteAlienAreaMobRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteAlienAreaMobRuntime start failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                AreteSandstormMarauderRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteSandstormMarauderRuntime start failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                AreteKarliCappelleriPatrolRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteKarliCappelleriPatrolRuntime start failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
                 // Capture 20260721-finish: Engineer Automaton I near Vernon (A004 monster body).
                 AreteFinishCaptureMobRuntime.StartForPlayfield(
                     this.playfield,
@@ -344,7 +447,9 @@ namespace AORebirth.Core.Playfields
                 if (!ZoneEngine.Core.Missions.MissionAcgOperationalRuntime.TrySpawnForPlayfield(
                     this.playfield,
                     playfieldIdentity,
-                    this.ActivateNpc))
+                    this.ActivateNpc)
+                    && !ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                        playfieldIdentity.Instance))
                 {
                     MissionInstanceSpawn.SpawnForPlayfield(
                         this.playfield,
@@ -357,19 +462,23 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "Mission ACG/instance spawn failed: " + ex.GetType().Name + ": " + ex.Message);
-                try
+                if (!ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    playfieldIdentity.Instance))
                 {
-                    MissionInstanceSpawn.SpawnForPlayfield(
-                        this.playfield,
-                        playfieldIdentity,
-                        this.ActivateNpc);
-                }
-                catch (Exception fallbackEx)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Error,
-                        "MissionInstanceSpawn fallback failed: "
-                        + fallbackEx.GetType().Name + ": " + fallbackEx.Message);
+                    try
+                    {
+                        MissionInstanceSpawn.SpawnForPlayfield(
+                            this.playfield,
+                            playfieldIdentity,
+                            this.ActivateNpc);
+                    }
+                    catch (Exception fallbackEx)
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Error,
+                            "MissionInstanceSpawn fallback failed: "
+                            + fallbackEx.GetType().Name + ": " + fallbackEx.Message);
+                    }
                 }
             }
             this.worldPopulation.ActivatePlayfield(playfieldIdentity);
@@ -898,7 +1007,8 @@ namespace AORebirth.Core.Playfields
                 this.AcquireAggro(defenseHostile, character, false);
             }
 
-            ICharacter automaticTarget = this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
+            ICharacter automaticTarget = this.FindCapturedAreteAggroTarget(character)
+                                         ?? this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.capturedTempleEncounters.FindAutomaticAggroTarget(character)
                                          ?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)
                                          ?? AlexAreaMobRuntime.FindAutomaticAggroTarget(character)
@@ -969,6 +1079,57 @@ namespace AORebirth.Core.Playfields
             {
                 character.Controller.StartPatrolling();
             }
+        }
+
+        private ICharacter FindCapturedAreteAggroTarget(ICharacter npc)
+        {
+            if (npc == null
+                || npc.Playfield == null
+                || npc.Playfield.Identity.Instance != 6553
+                || npc.FightingTarget.Instance != 0
+                || npc.Stats[StatIds.health].Value <= 0)
+            {
+                return null;
+            }
+
+            var evidence = new CapturedAreteMovementActorEvidence
+                           {
+                               RuntimeIdentity = npc.Identity.Instance,
+                               SpawnGeneration = 1,
+                               NpcFamily = npc.Stats[StatIds.npcfamily].Value,
+                               MonsterData = npc.Stats[StatIds.monsterdata].Value,
+                               Level = npc.Stats[StatIds.level].Value,
+                               PlayfieldId = npc.Playfield.Identity.Instance,
+                               Name = npc.Name,
+                               Position = new CapturedAreteMovementPoint(0.0d, 0.0d, 0.0d)
+                           };
+            double radius;
+            if (!this.capturedAreteAggro.TryGetRadius(evidence, out radius))
+            {
+                int npcFirstAttackStarts;
+                if (!this.capturedAreteAggro.TryGetEligibility(
+                        evidence,
+                        out npcFirstAttackStarts))
+                {
+                    return null;
+                }
+
+                radius = CapturedEligibilityOnlyAggroRadiusMeters;
+            }
+
+            return this.dynelRegistry
+                .FindCharactersInRange(npc, (float)radius)
+                .Where(
+                    candidate => candidate != null
+                                 && candidate.Identity != npc.Identity
+                                 && candidate.Controller is PlayerController
+                                 && candidate.Stats[StatIds.health].Value > 0)
+                .OrderBy(
+                    candidate =>
+                        candidate.Coordinates().coordinate.Distance2D(
+                            npc.Coordinates().coordinate))
+                .ThenBy(candidate => candidate.Identity.Instance)
+                .FirstOrDefault();
         }
 
         internal void ClearCombatTracking(Identity identity)
@@ -1056,7 +1217,8 @@ namespace AORebirth.Core.Playfields
                     ToNavigationPoint(home.Coordinates.coordinate),
                     ToNavigationPoint(npc.Coordinates().coordinate),
                     ToNavigationPoint(target.Coordinates().coordinate),
-                    home.MaximumNpcDistanceFromHome))
+                    home.MaximumNpcDistanceFromHome,
+                    this.capturedAreteMovement.HasLeashEvidence(npc)))
             {
                 return false;
             }
@@ -1218,11 +1380,6 @@ namespace AORebirth.Core.Playfields
         private void ScheduleDeadNpcDespawn(ICharacter target)
         {
             this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
-        }
-
-        private static void LogCapturedAreteRobotContent(bool isError, string message)
-        {
-            LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);
         }
 
         private class NpcHomeState

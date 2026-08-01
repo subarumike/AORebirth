@@ -8,12 +8,22 @@ namespace ZoneEngine.Core.Navigation
     {
         internal static IPlayfieldChaseNavigationProvider Create(int playfieldResource)
         {
-            return playfieldResource == Pf127CollisionGeometryLoader.SubwayPlayfieldResource
-                       ? new Pf127ChaseNavigationProvider(
-                           playfieldResource,
-                           Pf127CollisionGeometryLoader.Current)
-                       : (IPlayfieldChaseNavigationProvider)
-                         new UnsupportedPlayfieldChaseNavigationProvider(playfieldResource);
+            if (playfieldResource == Pf127CollisionGeometryLoader.SubwayPlayfieldResource)
+            {
+                return new Pf127ChaseNavigationProvider(
+                    playfieldResource,
+                    Pf127CollisionGeometryLoader.Current);
+            }
+
+            if (playfieldResource
+                == Pf1931OfficialDungeonGeometryLoader.TemplePlayfieldResource)
+            {
+                return new OfficialDungeonChaseNavigationProvider(
+                    playfieldResource,
+                    Pf1931OfficialDungeonGeometryLoader.Current);
+            }
+
+            return new UnsupportedPlayfieldChaseNavigationProvider(playfieldResource);
         }
     }
 

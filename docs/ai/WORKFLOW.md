@@ -146,6 +146,24 @@ cmd /d /c restart-engines.cmd
 
 `restart-engines.cmd` is the repo-owned Codex restart entrypoint. It calls the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers and does not add extra polling, diagnostics, or manual lifecycle commands.
 
+### Official Mission-Level Graph
+
+Regenerate the compiled graph from the canonical checked-in CSV with:
+
+```cmd
+cmd /d /c tools\generate_mission_level_graph.cmd
+```
+
+Verify byte-for-byte reproducibility without writing with:
+
+```cmd
+cmd /d /c tools\generate_mission_level_graph.cmd --check
+```
+
+The upstream ODS is provenance only because its mission cells after level 133
+were precision-coerced. Do not generate the complete graph from that ODS and do
+not make production depend on either spreadsheet file.
+
 ## AOtomation Messaging Tests
 
 Build and run the legacy MSTest assembly through the repo-owned wrapper:

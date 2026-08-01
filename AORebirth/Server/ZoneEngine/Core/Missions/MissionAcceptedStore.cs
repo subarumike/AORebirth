@@ -52,6 +52,18 @@ namespace ZoneEngine.Core.Missions
 
             public QuestInfo Offer;
 
+            public MissionAcgAcceptedProjection Projection;
+
+            public bool HasFrozenAcceptedRewards;
+
+            public int FrozenItemRewardLowId;
+
+            public int FrozenItemRewardHighId;
+
+            public int FrozenItemRewardQuality;
+
+            public int FrozenItemRewardCount;
+
             /// <summary>Outdoor map marker from the rolled offer (not the Rome capture shell).</summary>
             public int MarkerPlayfield;
 
@@ -192,6 +204,58 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool TryRegisterGeneratedProjection(
+            MissionAcgAcceptedProjection projection,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (projection == null)
+            {
+                failure = "Accepted generated-mission projection is required.";
+                return false;
+            }
+
+            AcceptedMission entry;
+            try
+            {
+                entry = BuildProjectionEntry(projection);
+            }
+            catch (Exception ex)
+            {
+                failure = "Accepted projection could not reconstruct its exact QFU: " + ex.Message;
+                return false;
+            }
+
+            int characterInstance = projection.Binding.OwnerIdentity.Instance;
+            lock (Sync)
+            {
+                List<AcceptedMission> list = GetOrCreateList_NoLock(characterInstance);
+                int existing = FindIndex_NoLock(list, entry.QuestIdentity);
+                if (existing >= 0)
+                {
+                    AcceptedMission current = list[existing];
+                    if (current.Projection == null
+                        || current.OriginalOfferIdentity == null
+                        || current.OriginalOfferIdentity.Instance
+                            != projection.Binding.OriginalOfferIdentity.Instance)
+                    {
+                        failure = "Accepted quest identity is already owned by another mission.";
+                        return false;
+                    }
+
+                    list[existing] = entry;
+                }
+                else
+                {
+                    list.Add(entry);
+                }
+
+                PruneExpired_NoLock(list);
+                TryWriteSidecar(characterInstance, list);
+                return true;
+            }
+        }
+
         /// <summary>
         /// Returns a snapshot of all non-expired accepted missions for the character.
         /// </summary>
@@ -210,11 +274,13 @@ namespace ZoneEngine.Core.Missions
                     }
                     else
                     {
-                        return new List<AcceptedMission>();
+                        list = new List<AcceptedMission>();
+                        ByCharacter[characterInstance] = list;
                     }
                 }
 
                 PruneExpired_NoLock(list);
+                MergeGeneratedProjections_NoLock(characterInstance, list);
                 if (list.Count == 0)
                 {
                     ByCharacter.Remove(characterInstance);
@@ -497,7 +563,12 @@ namespace ZoneEngine.Core.Missions
                 var sb = new StringBuilder();
                 foreach (AcceptedMission entry in list)
                 {
-                    if (entry == null)
+                    if (entry == null
+                        || entry.Projection != null
+                        || (entry.QuestIdentity != null
+                            && MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                                (int)entry.QuestIdentity.Type,
+                                entry.QuestIdentity.Instance)))
                     {
                         continue;
                     }
@@ -529,6 +600,16 @@ namespace ZoneEngine.Core.Missions
                 var sb = new StringBuilder();
                 foreach (AcceptedMission entry in list)
                 {
+                    if (entry == null
+                        || entry.Projection != null
+                        || (entry.QuestIdentity != null
+                            && MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                                (int)entry.QuestIdentity.Type,
+                                entry.QuestIdentity.Instance)))
+                    {
+                        continue;
+                    }
+
                     if (entry != null)
                     {
                         AppendSidecarEntry(sb, characterInstance, entry);
@@ -640,6 +721,89 @@ namespace ZoneEngine.Core.Missions
                        MarkerY = markerY,
                        MarkerZ = markerZ
                    };
+        }
+
+        private static AcceptedMission BuildProjectionEntry(
+            MissionAcgAcceptedProjection projection)
+        {
+            QuestInfo offer = projection.ReconstructOffer();
+            MissionAcgInstanceBinding binding = projection.Binding;
+            var acceptedIdentity = new Identity
+                                   {
+                                       Type = (IdentityType)binding.AcceptedQuestIdentity.Type,
+                                       Instance = binding.AcceptedQuestIdentity.Instance
+                                   };
+            var originalOfferIdentity = new Identity
+                                        {
+                                            Type = (IdentityType)binding.OriginalOfferIdentity.Type,
+                                            Instance = binding.OriginalOfferIdentity.Instance
+                                        };
+            AcceptedMission entry = BuildEntry(
+                acceptedIdentity,
+                originalOfferIdentity,
+                offer,
+                binding.ExpiryUtc,
+                string.Empty,
+                0,
+                binding.ExteriorEntranceIdentity.Instance,
+                binding.ExteriorEntranceLow,
+                binding.ExteriorEntranceHigh,
+                binding.ExteriorX,
+                binding.ExteriorY,
+                binding.ExteriorZ);
+            entry.Projection = projection;
+            entry.HasFrozenAcceptedRewards = true;
+            entry.CashReward = projection.FrozenCashReward;
+            entry.ExperienceReward = projection.FrozenExperienceReward;
+            entry.FrozenItemRewardLowId = projection.FrozenItemLowId;
+            entry.FrozenItemRewardHighId = projection.FrozenItemHighId;
+            entry.FrozenItemRewardQuality = projection.FrozenItemQuality;
+            entry.FrozenItemRewardCount = projection.FrozenItemCount;
+            return entry;
+        }
+
+        private static void MergeGeneratedProjections_NoLock(
+            int characterInstance,
+            List<AcceptedMission> list)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                AcceptedMission entry = list[i];
+                if (entry != null
+                    && entry.QuestIdentity != null
+                    && MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                        (int)entry.QuestIdentity.Type,
+                        entry.QuestIdentity.Instance))
+                {
+                    list.RemoveAt(i);
+                }
+            }
+
+            if (!MissionAcgAcceptedProjectionRuntime.IsInitialized)
+            {
+                return;
+            }
+
+            IList<MissionAcgAcceptedProjection> projections =
+                MissionAcgAcceptedProjectionRuntime.GetOwned(characterInstance);
+            DateTime now = DateTime.UtcNow;
+            for (int i = 0; i < projections.Count; i++)
+            {
+                MissionAcgAcceptedProjection projection = projections[i];
+                bool activeLifecycle =
+                    projection.LifecycleState == MissionAcgLifecycleState.Accepted
+                    || projection.LifecycleState == MissionAcgLifecycleState.Active;
+                if ((int)projection.AcceptancePhase
+                        < (int)MissionAcgAcceptancePhase.AcceptanceCommitted
+                    || !activeLifecycle
+                    || projection.CleanupState != MissionAcgCleanupState.None
+                    || projection.Binding.ExpiryUtc <= now)
+                {
+                    continue;
+                }
+
+                list.Add(BuildProjectionEntry(projection));
+            }
         }
 
         private static bool TryReadSidecarForExactRemoval(
@@ -910,6 +1074,18 @@ namespace ZoneEngine.Core.Missions
                         || !int.TryParse(parts[4], NumberStyles.Integer, CultureInfo.InvariantCulture, out quality)
                         || !long.TryParse(parts[5], NumberStyles.Integer, CultureInfo.InvariantCulture, out ticks))
                     {
+                        continue;
+                    }
+
+                    if (MissionAcgAllocationService.IsGeneratedAcceptedQuestIdentity(
+                        type,
+                        instance))
+                    {
+                        MissionDiagnostics.Log(
+                            "ACG-ACCEPTED-LEGACY-REJECT owner={0} accepted={1}:{2} reason=incomplete-unversioned-projection",
+                            characterInstance,
+                            type,
+                            instance);
                         continue;
                     }
 

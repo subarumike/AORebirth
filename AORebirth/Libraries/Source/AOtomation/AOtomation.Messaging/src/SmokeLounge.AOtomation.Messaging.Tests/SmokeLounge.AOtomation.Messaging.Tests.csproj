@@ -84,6 +84,10 @@
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="MissionAcgLayoutCatalogTests.cs" />
     <Compile Include="MissionAcgBindingPersistenceTests.cs" />
+    <Compile Include="MissionAcgAcceptedProjectionTests.cs" />
+    <Compile Include="MissionAcgAcceptanceIdempotencyContractTests.cs" />
+    <Compile Include="MissionOfferIdentityStoreTests.cs" />
+    <Compile Include="MissionOfferStoreTests.cs" />
     <Compile Include="MissionAcgRuntimeMaterializationTests.cs" />
     <Compile Include="MissionAcgObjectiveCompletionTests.cs" />
     <Compile Include="MissionAcgOperationalRuntimeTests.cs" />
@@ -92,7 +96,9 @@
     <Compile Include="MissionAcgExpiryRuntimeContractTests.cs" />
     <Compile Include="MissionAcgTokenProgressStoreTests.cs" />
     <Compile Include="MissionAcgTokenProgressRuntimeContractTests.cs" />
+    <Compile Include="MissionAcgLegacyFallthroughContractTests.cs" />
     <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
+    <Compile Include="MissionLevelGraphTests.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutRecords.cs">
@@ -118,6 +124,18 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingStore.cs">
       <Link>MissionAcgBindingStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAcceptedProjection.cs">
+      <Link>MissionAcgAcceptedProjection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAcceptedProjectionStore.cs">
+      <Link>MissionAcgAcceptedProjectionStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferIdentityStore.cs">
+      <Link>MissionOfferIdentityStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferStore.cs">
+      <Link>MissionOfferStore.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgExpiryState.cs">
       <Link>MissionAcgExpiryState.cs</Link>
@@ -221,6 +239,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelTable.cs">
       <Link>MissionLevelTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelGraph.cs">
+      <Link>MissionLevelGraph.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelGraphData.g.cs">
+      <Link>MissionLevelGraphData.g.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLocationPool.cs">
       <Link>MissionLocationPool.cs</Link>
     </Compile>
@@ -234,6 +258,7 @@
       <Link>MissionRareLootCatalog.cs</Link>
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
+    <Compile Include="OfficialDungeonNavigationTests.cs" />
     <Compile Include="CapturedAreteMovementRuntimeTests.cs" />
     <Compile Include="OrdinaryEnemyCombatSetupGeneratorTests.cs" />
     <Compile Include="PlayfieldCharacterHeartbeatHealthRulesTests.cs" />
@@ -248,11 +273,16 @@
     <Compile Include="GlobalLootFoundationTests.cs" />
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
+    <Compile Include="TempleDoorStatusRuntimeTests.cs" />
     <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
     <Compile Include="DungeonNamedLifecycleCompletionTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />
     <Compile Include="QuestRuntimePersistenceTests.cs" />
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
+    <Compile Include="CapturedAreteExactInteractionTests.cs" />
+    <Compile Include="AreteAcceptanceMatrixTests.cs" />
+    <Compile Include="AreteCapturedVendorOwnershipTests.cs" />
+    <Compile Include="AreteCapturedQuestOwnershipTests.cs" />
     <Compile Include="WindcallerKarrecNpcContentTests.cs" />
     <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
     <Compile Include="DailyMissionRewardRulesTests.cs" />
@@ -396,6 +426,7 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentPackValidator.cs"><Link>DialogueContentPackValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueModels.cs"><Link>DialogueModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\CapturedAreteExactInteractionCatalog.cs"><Link>CapturedAreteExactInteractionCatalog.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>
@@ -430,6 +461,12 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseRouteState.cs">
       <Link>NpcChaseRouteState.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\OfficialDungeonChaseNavigationProvider.cs">
+      <Link>OfficialDungeonChaseNavigationProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\OfficialDungeonGeometry.cs">
+      <Link>OfficialDungeonGeometry.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\Pf127ChaseNavigationProvider.cs">
       <Link>Pf127ChaseNavigationProvider.cs</Link>
     </Compile>
@@ -444,6 +481,9 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\TempleDoorProximityRuntime.cs">
+      <Link>TempleDoorProximityRuntime.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
       <Link>PlayfieldCollisionGeometry.cs</Link>
@@ -470,20 +510,24 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json">
+      <Link>Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json">
       <Link>Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
-      <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\aggro.csv">
+      <Link>Content\Captured\Arete\aggro.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement\*.csv">
-      <Link>Content\Captured\Arete\movement\%(Filename)%(Extension)</Link>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement-full\*.csv">
+      <Link>Content\Captured\Arete\movement-full\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement\manifest.json">
-      <Link>Content\Captured\Arete\movement\manifest.json</Link>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\movement-full\manifest.json">
+      <Link>Content\Captured\Arete\movement-full\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json">
@@ -504,6 +548,10 @@
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
       <Link>Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\flint-novak\dialogue\captured-june-interactions.dialogue.json">
+      <Link>Content\Arete\flint-novak\dialogue\captured-june-interactions.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\manifest.json">

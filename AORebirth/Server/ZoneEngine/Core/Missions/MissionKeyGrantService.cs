@@ -180,6 +180,40 @@ namespace ZoneEngine.Core.Missions
                 out inventoryError);
         }
 
+        internal static bool TryGrantReservedRepairItem(
+            IZoneClient client,
+            ICharacter character,
+            int reservedItemInstance,
+            int lowId,
+            int highId,
+            out InventoryError inventoryError)
+        {
+            if (reservedItemInstance <= 0
+                || lowId <= 0
+                || highId <= 0)
+            {
+                inventoryError = InventoryError.Invalid;
+                return false;
+            }
+
+            int actualInstance;
+            bool granted = TryGrantItem(
+                client,
+                character,
+                lowId,
+                highId,
+                RepairItemQuality,
+                RepairItemDisplayName,
+                MissionKeyOverflowSlot,
+                RepairItemFlags,
+                RepairKitIdentityType,
+                false,
+                reservedItemInstance,
+                out actualInstance,
+                out inventoryError);
+            return granted && actualInstance == reservedItemInstance;
+        }
+
         /// <summary>
         /// Grants an arbitrary named item (FindItem cube pickup / finish reward) into inventory.
         /// Finish reward uses gold 20260725-185432 wire: TemplateAction → ContainerAddItem,
@@ -261,6 +295,51 @@ namespace ZoneEngine.Core.Missions
 
             item = page?[source.Instance];
             return item != null;
+        }
+
+        internal static bool TryFindReservedMissionArtifact(
+            ICharacter character,
+            int itemIdentityInstance,
+            bool requireRepairTool,
+            out IItem item)
+        {
+            item = null;
+            if (character == null
+                || character.BaseInventory == null
+                || itemIdentityInstance <= 0)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry
+                     in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List())
+                {
+                    IItem candidate = itemEntry.Value;
+                    if (candidate == null
+                        || candidate.Identity == null
+                        || candidate.Identity.Instance != itemIdentityInstance)
+                    {
+                        continue;
+                    }
+
+                    bool exactArtifact =
+                        requireRepairTool
+                            ? IsRepairTool(candidate)
+                            : candidate.LowID == MissionKeyTemplateId
+                              && candidate.HighID == MissionKeyTemplateId;
+                    if (!exactArtifact)
+                    {
+                        return false;
+                    }
+
+                    item = candidate;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static bool TryRemoveExactMissionArtifact(
@@ -424,7 +503,7 @@ namespace ZoneEngine.Core.Missions
             return false;
         }
 
-        private static bool TryResolveRepairTemplateIds(out int lowId, out int highId)
+        internal static bool TryResolveRepairTemplateIds(out int lowId, out int highId)
         {
             // Prefer a random capture kit AOID present in items.dat (official varies per accept).
             var available = new List<int>();
@@ -718,6 +797,33 @@ namespace ZoneEngine.Core.Missions
             return false;
         }
 
+        public static bool HasNonGeneratedMissionKey(ICharacter character)
+        {
+            if (character == null || character.BaseInventory == null)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<int, IInventoryPage> pageEntry in character.BaseInventory.Pages)
+            {
+                foreach (KeyValuePair<int, IItem> itemEntry in pageEntry.Value.List().ToList())
+                {
+                    IItem item = itemEntry.Value;
+                    if (item != null
+                        && item.LowID == MissionKeyTemplateId
+                        && item.HighID == MissionKeyTemplateId
+                        && (item.Identity == null
+                            || !MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance(
+                                item.Identity.Instance)))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public static bool HasMissionKeyInstance(ICharacter character, int keyInstance)
         {
             if (character == null || character.BaseInventory == null || keyInstance == 0)
@@ -880,7 +986,9 @@ namespace ZoneEngine.Core.Missions
                 {
                     IItem item = itemEntry.Value;
                     if (item == null || item.Identity == null || item.LowID != MissionKeyTemplateId
-                        || item.HighID != MissionKeyTemplateId)
+                        || item.HighID != MissionKeyTemplateId
+                        || MissionAcgBindingRuntime.IsGeneratedMissionKeyInstance(
+                            item.Identity.Instance))
                     {
                         continue;
                     }

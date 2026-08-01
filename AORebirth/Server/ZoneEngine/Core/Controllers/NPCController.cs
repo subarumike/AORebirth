@@ -93,6 +93,10 @@ namespace ZoneEngine.Core.Controllers
 
         private bool capturedPatrolReplayUsesRuntimeStartOnce;
 
+        private bool capturedPatrolReplayLoops = true;
+
+        private bool capturedPatrolReplayComplete;
+
         private DateTime nextCapturedPatrolReplayUtc = DateTime.MinValue;
 
         private bool hasMotionPacket;
@@ -307,12 +311,47 @@ namespace ZoneEngine.Core.Controllers
             bool batchZeroDelaySegments,
             bool useRuntimeStartOnce)
         {
+            this.SetCapturedPatrolReplaySegments(
+                segments,
+                useRuntimeStart,
+                batchZeroDelaySegments,
+                useRuntimeStartOnce,
+                true,
+                0.0);
+        }
+
+        public void SetCapturedPatrolReplaySegments(
+            NpcPatrolReplaySegment[] segments,
+            bool useRuntimeStart,
+            bool batchZeroDelaySegments,
+            bool useRuntimeStartOnce,
+            bool loop,
+            double initialDelaySeconds)
+        {
             this.capturedPatrolReplaySegments = segments ?? new NpcPatrolReplaySegment[0];
             this.capturedPatrolReplayIndex = 0;
             this.capturedPatrolReplayUsesRuntimeStart = useRuntimeStart;
             this.capturedPatrolReplayBatchesZeroDelaySegments = batchZeroDelaySegments;
             this.capturedPatrolReplayUsesRuntimeStartOnce = useRuntimeStartOnce;
+            this.capturedPatrolReplayLoops = loop;
+            this.capturedPatrolReplayComplete = false;
+            this.nextCapturedPatrolReplayUtc = initialDelaySeconds > 0.0
+                                                   ? DateTime.UtcNow
+                                                     + TimeSpan.FromSeconds(initialDelaySeconds)
+                                                   : DateTime.MinValue;
+        }
+
+        public void ResumeCapturedPatrolReplay()
+        {
+            if (!this.HasCapturedPatrolReplay() || this.capturedPatrolReplayComplete)
+            {
+                return;
+            }
+
+            this.capturedPatrolReplayUsesRuntimeStartOnce = true;
             this.nextCapturedPatrolReplayUtc = DateTime.MinValue;
+            this.State = CharacterState.Patrolling;
+            this.StartPatrolling();
         }
 
         public void SendCapturedAreteMovementSegment(
@@ -380,6 +419,12 @@ namespace ZoneEngine.Core.Controllers
             {
                 if (this.capturedPatrolReplayIndex >= this.capturedPatrolReplaySegments.Length)
                 {
+                    if (!this.capturedPatrolReplayLoops)
+                    {
+                        this.capturedPatrolReplayComplete = true;
+                        return true;
+                    }
+
                     this.capturedPatrolReplayIndex = 0;
                 }
 
@@ -412,8 +457,7 @@ namespace ZoneEngine.Core.Controllers
                 this.hasMotionPacket = true;
                 this.capturedPatrolReplayUsesRuntimeStartOnce = false;
 
-                this.capturedPatrolReplayIndex =
-                    (this.capturedPatrolReplayIndex + 1) % this.capturedPatrolReplaySegments.Length;
+                this.capturedPatrolReplayIndex++;
                 sentSegments++;
 
                 if (!this.capturedPatrolReplayBatchesZeroDelaySegments
@@ -675,6 +719,11 @@ namespace ZoneEngine.Core.Controllers
 
         public bool Trade(Identity target)
         {
+            if (CapturedAreteExactInteractionRuntime.TryHandleTrade(this.Character, target))
+            {
+                return true;
+            }
+
             if (ContentDrivenNpcDialogueRouter.TryStartDialogue(this.Character, target))
             {
                 return true;

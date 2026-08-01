@@ -117,7 +117,7 @@ namespace ZoneEngine.Core.Arete.Quests
             {
                 // Capture 20260725-patric:
                 // Answer Cell Scanner → AppendText "Excellent..." → Talk tip delete + Yell QFU
-                // → AnswerList Goodbye → HealthDamage/Death (~1s later, before player clicks Goodbye).
+                // → AnswerList Goodbye → HealthDamage/Death (2954 ms later, before player clicks Goodbye).
                 EnsureQuestActive(source, YellQuestId);
                 CompleteAndActivate(source, TalkQuestId, YellQuestId, "mission_5565C963_talk_patrick");
                 EnsureQuestActive(source, YellQuestId);
@@ -143,6 +143,7 @@ namespace ZoneEngine.Core.Arete.Quests
             if (source == null
                 || target == null
                 || target.Type != IdentityType.Terminal
+                || target.Instance != unchecked((int)0x574187D0)
                 || !IsInAreteLanding(source)
                 || !IsMissionActive(source, InsuranceQuestId)
                 || IsMissionCompleted(source, InsuranceQuestId))
@@ -150,8 +151,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return false;
             }
 
-            // Capture used Terminal:574187D0; also accept any Arete SaveChar insurance Use
-            // while the Patrick insurance tip is active.
+            // Capture 20260727-193403 proves only Terminal:574187D0 for this transition.
             CompleteAndActivate(source, InsuranceQuestId, TalkQuestId, "mission_5565C962_use_scanner");
             PatrickSunTipSender.TrySendInsuranceToTalkHandoff(source);
             Log(
@@ -176,9 +176,9 @@ namespace ZoneEngine.Core.Arete.Quests
             Log("insurance tip started character=" + source.Identity.ToString(true));
         }
 
-        // Capture gap: Excellent @19:34:57.630 → HealthDamage @19:35:00.584 (~3s).
+        // Capture: Excellent @19:34:57.630 → HealthDamage @19:35:00.584 (2954 ms).
         // Tip/Yell lands first; death follows while Goodbye options are on screen.
-        private const int PatrickKillDelayMilliseconds = 1200;
+        private const int PatrickKillDelayMilliseconds = 2954;
 
         private static void SchedulePatrickKill(ICharacter source)
         {

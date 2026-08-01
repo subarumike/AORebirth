@@ -21,6 +21,87 @@ regenerating or substituting layout evidence.
 
 No database schema or destructive database operation is part of this stage.
 
+## Durable accepted-mission projection and idempotent acceptance
+
+The accepted generated mission is now authoritative without retaining a
+process-local rolled `QuestInfo`. Version 1 is persisted beneath
+`mission-state/acg-accepted-projections`. Its canonical body contains exactly
+65 deterministically ordered `key=value` fields. The complete serialized
+`QuestAlternative` roll-response body is stored as Base64, preserving all
+offer text, arrays, action fields, reward descriptors, and item identities;
+the selected offer index is stored separately and validated against that body.
+Each file ends in a SHA-256 integrity value and is published by atomic
+temp-file replacement. Unknown versions, truncation, missing or extra fields,
+invalid Base64, hash mismatch, duplicate accepted quest IDs, duplicate
+owner/original-offer claims, and binding or QFU mismatches fail closed.
+
+The immutable accepted projection freezes and cross-correlates:
+
+- original offer ID and distinct accepted quest ID;
+- owner and explicit team state, mission type/icon, QL, and sliders;
+- complete title, description, action fields, and frozen cash/XP/item reward;
+- issuing terminal, exterior entrance, exact mission key, and exact Repair or
+  Return Item artifact identity where applicable, including the frozen Repair
+  component low/high template pair;
+- type-specific structured QFU data for Kill, Find Person, Find Item, Return
+  Item, and Repair; and
+- selected bundle, building identity, allocated live PF2, expiry, and lifecycle
+  state.
+
+Restart restoration decodes the captured roll body and verifies those semantic
+fields before rebuilding any accepted QFU. It does not reconstruct from a
+mutable roll template, partial defaults, a mission type, or the newest mission.
+Completion likewise freezes and consumes the accepted projection's rewards;
+zero/no-item outcomes remain explicit and are not replaced by formula fallback.
+
+### Acceptance ownership and crash recovery
+
+Acceptance is serialized and keyed by `(owner, original offer identity)`. One
+offer can therefore own only one accepted quest. The selected offer is claimed
+durably before a binding, objective, key, artifact, accepted mission, or client
+QFU is exposed. The recoverable order is:
+
+1. persist `OfferClaimed` with the reserved accepted quest, bundle, building,
+   live PF2, key, expiry, and frozen accepted projection;
+2. persist the exact mission binding;
+3. persist the exact objective binding and structured QFU contract;
+4. persist key-grant pending, grant or reconcile the exact key identity, then
+   persist key granted;
+5. persist artifact-grant pending, grant or reconcile the exact Repair/Return
+   Item identity where required, then persist artifacts granted;
+6. expose the exact objective and persist its state;
+7. commit the accepted binding/projection and persist QFU pending;
+8. send the structured accepted QFU, then persist QFU sent.
+
+A process stop at any durable boundary resumes the same projection. Expired
+`OfferClaimed` reservations are marked cleaned and released during startup even
+when their owner never reconnects. Operations after a pending phase first
+reconcile the exact binding or inventory identity,
+so retries cannot reserve another PF2, create another quest/key, or duplicate an
+artifact. A send failure retains `QfuPending`; reconnect resends the same QFU
+without recreating or repaying the mission. Timer refresh suppresses the same
+QFU when recovery already sent it in that reconnect pass. The sent marker
+records a server send, not a client acknowledgement.
+
+### Offer identity and migration boundary
+
+Rolled-offer identity allocation uses a separate version-1 cursor at
+`mission-state/offer-identities/generated-offer-id.cursor`. The cursor is
+SHA-256 protected, atomically replaced, restart-restored, bounded, and checked
+against current process offers plus all persisted accepted projections and
+bindings before an ID is published. Stale, expired, or already claimed offers
+are rejected before acceptance artifacts or accepted state are exposed.
+Offer expiry is not reused as mission expiry: a valid acceptance starts the
+existing independent 48-hour accepted-mission duration.
+
+The former generated `MissionAcceptedStore` sidecar omits full roll/QFU/action,
+reward-item, artifact, and binding data. Such rows cannot be promoted safely to
+version 1 and are rejected as ambiguous rather than repaired with mutable
+templates or defaults. Authored quests and genuine legacy missions remain on
+their existing persistence and runtime paths. This change introduces no
+database schema, reward formula, slider, loot, ACG-payload, or procedural
+generation work.
+
 ## Durable generated-mission token progress
 
 The earlier `MissionTokenProgressTracker` kept generated-mission progress in
@@ -1087,6 +1168,27 @@ owner/quest/PF2/NPC/corpse matching, lifecycle rejection, restart identity,
 cleanup wiring, and ordinary-path preservation. The private-client smoke test
 (kill trash, open corpse, transfer credits once, and complete the mission)
 remains deferred; no additional official capture is required.
+
+## Generated-runtime legacy fallthrough boundary
+
+Generated runtime ownership is now an outer dispatch boundary rather than an
+ordinary boolean handler result. Exact ownership may be established by the
+persisted accepted binding, a restored PF2 reservation, a reversibly encoded
+runtime identity whose PF2 is claimed, an exact mission-owned inventory
+identity, or an exact exterior marker for that owner. Once claimed, a failed
+runtime lookup or lifecycle check is an explicit rejection and cannot continue
+into replay-era spawn, global target tables, newest/type/template objective
+selection, shared mission payloads, or legacy completion and cleanup.
+
+The numeric allocator range alone is intentionally not an ownership signal:
+legacy mission instances also allocate PF2 values inside that range. This keeps
+non-generated missions and authored quests on their existing handlers while
+preventing a missing generated binding/runtime record from silently changing
+systems. Generated completion remains owned only by the Stage 4 exact objective
+and completion journal; legacy callbacks cannot bridge into it.
+
+No capture-derived bundle, payload byte, building identity, reward, slider,
+loot, token, expiry, or objective contract changes in this boundary repair.
 
 ## Deferred Stage 7 behavior
 

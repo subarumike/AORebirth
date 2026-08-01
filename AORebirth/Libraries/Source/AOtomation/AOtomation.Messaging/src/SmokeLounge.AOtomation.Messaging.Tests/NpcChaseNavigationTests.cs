@@ -398,6 +398,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AreteLeashRequiresExactCapturedActorEvidence()
+        {
+            ChaseNavigationPoint home = Point(0, 0);
+            ChaseNavigationPoint farAway = Point(101.0, 0);
+
+            Assert.IsFalse(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    6553,
+                    false,
+                    home,
+                    farAway,
+                    farAway,
+                    100.0,
+                    false));
+            Assert.IsTrue(
+                NpcCombatLeashPolicy.ShouldResetCombat(
+                    6553,
+                    false,
+                    home,
+                    farAway,
+                    farAway,
+                    100.0,
+                    true));
+        }
+
+        [TestMethod]
         public void CustomShortLeashEnforcesOnNonSubwayPlayfields()
         {
             ChaseNavigationPoint home = Point(0, 0);

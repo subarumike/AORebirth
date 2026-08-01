@@ -359,7 +359,7 @@ namespace AORebirth.Core.Playfields
                 }
 
                 CapturedEnemyCombatContract pendingContract;
-                bool fixedAttackStartReleased = false;
+                bool capturedAttackStartReleased = false;
                 if (CapturedEnemyCombatRuntimeRegistry.TryGet(
                         attacker.Identity.Instance,
                         out pendingContract)
@@ -384,7 +384,18 @@ namespace AORebirth.Core.Playfields
                         this.AnnounceCapturedEnemyAttackPacket(attacker, pendingContract);
                         this.nextCombatTicks[attacker.Identity.Instance] =
                             DateTime.UtcNow + capturedAttackToFirstHit;
-                        fixedAttackStartReleased = true;
+                        capturedAttackStartReleased = true;
+                    }
+                    else if (pendingContract.ParallelAttackSequence != null)
+                    {
+                        this.AnnounceCapturedParallelAttackPacket(
+                            attacker,
+                            pendingContract.ParallelAttackSequence);
+                        this.StartCapturedParallelAttackClocks(
+                            attacker.Identity.Instance,
+                            pendingContract.ParallelAttackSequence,
+                            DateTime.UtcNow);
+                        capturedAttackStartReleased = true;
                     }
                     else
                     {
@@ -393,7 +404,7 @@ namespace AORebirth.Core.Playfields
                 }
 
                 this.pendingCapturedAttackStarts.Remove(attacker.Identity.Instance);
-                if (!fixedAttackStartReleased)
+                if (!capturedAttackStartReleased)
                 {
                     return;
                 }
@@ -1190,11 +1201,47 @@ namespace AORebirth.Core.Playfields
                 CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
                     attacker.Identity,
                     parallelAttackSequence));
+            DateTime attackSequenceStartedAt = DateTime.UtcNow;
+            if (parallelAttackSequence.AttackStartDelaySeconds > 0.0d)
+            {
+                this.pendingCapturedAttackStarts[attacker.Identity.Instance] =
+                    attackSequenceStartedAt + TimeSpan.FromSeconds(
+                        parallelAttackSequence.AttackStartDelaySeconds);
+                return;
+            }
+
+            this.AnnounceCapturedParallelAttackPacket(attacker, parallelAttackSequence);
+            this.StartCapturedParallelAttackClocks(
+                attacker.Identity.Instance,
+                parallelAttackSequence,
+                DateTime.UtcNow);
+        }
+
+        private void AnnounceCapturedParallelAttackPacket(
+            ICharacter attacker,
+            CapturedEnemyParallelAttackSequenceDefinition parallelAttackSequence)
+        {
             this.playfield.Announce(
                 CapturedEnemyCombatPacketFactory.CreateAttack(
                     attacker.Identity,
                     attacker.FightingTarget,
                     parallelAttackSequence));
+        }
+
+        private void StartCapturedParallelAttackClocks(
+            int attackerInstance,
+            CapturedEnemyParallelAttackSequenceDefinition sequence,
+            DateTime attackStartedAt)
+        {
+            if (this.startedCapturedParallelAttackClocks.Contains(attackerInstance))
+            {
+                return;
+            }
+
+            this.nextCapturedParallelAttackTicks[attackerInstance] = sequence.Streams
+                .Select(value => attackStartedAt + TimeSpan.FromSeconds(value.InitialDelaySeconds))
+                .ToArray();
+            this.startedCapturedParallelAttackClocks.Add(attackerInstance);
         }
 
         private void ProcessCapturedParallelAttackTicks(
@@ -1311,7 +1358,7 @@ namespace AORebirth.Core.Playfields
             target.Stats[StatIds.health].Value = newHealth;
             target.SendChangedStats();
             this.playfield.NotifyNpcCombatDamage(target);
-            nextTicks[dueIndex] = now + TimeSpan.FromSeconds(attack.RechargeSeconds);
+            nextTicks[dueIndex] = streams[dueIndex].ResolveNextTickAfterHit(now);
 
             LogUtil.Debug(
                 DebugInfoDetail.Network,

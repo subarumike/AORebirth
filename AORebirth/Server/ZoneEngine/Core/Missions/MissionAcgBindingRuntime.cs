@@ -96,13 +96,70 @@ namespace ZoneEngine.Core.Missions
                         + string.Join(" | ", loaded.Diagnostics));
                 }
 
+                IList<MissionAcgBindingRecord> pendingAcceptedReservations =
+                    MissionAcgAcceptedProjectionRuntime.Initialize(
+                        missionStateDirectory,
+                        catalog,
+                        loaded.Records);
+                var allocationRestorationRecords =
+                    new List<MissionAcgBindingRecord>(loaded.Records);
+                for (int i = 0; i < pendingAcceptedReservations.Count; i++)
+                {
+                    allocationRestorationRecords.Add(pendingAcceptedReservations[i]);
+                }
+
                 allocator = new MissionAcgAllocationService(catalog);
                 string allocationFailure;
-                if (!allocator.TryRestore(loaded.Records, out allocationFailure))
+                if (!allocator.TryRestore(
+                        allocationRestorationRecords,
+                        out allocationFailure))
                 {
                     throw new InvalidOperationException(
                         "Mission ACG allocation restoration failed closed: "
                         + allocationFailure);
+                }
+
+                DateTime restorationUtc = DateTime.UtcNow;
+                for (int i = 0; i < pendingAcceptedReservations.Count; i++)
+                {
+                    MissionAcgBindingRecord pending = pendingAcceptedReservations[i];
+                    if (pending.Binding.ExpiryUtc > restorationUtc)
+                    {
+                        continue;
+                    }
+
+                    MissionAcgAcceptedProjection projection;
+                    if (!MissionAcgAcceptedProjectionRuntime.TryGetByAcceptedQuest(
+                            pending.Binding.AcceptedQuestIdentity.Instance,
+                            out projection))
+                    {
+                        throw new InvalidOperationException(
+                            "Expired provisional acceptance projection is missing for quest "
+                            + pending.Binding.AcceptedQuestIdentity.Instance
+                            + ".");
+                    }
+
+                    MissionAcgAcceptedProjection cleanedProjection;
+                    string cleanupFailure;
+                    if (!MissionAcgAcceptedProjectionRuntime.TryReplace(
+                            projection.WithLifecycle(
+                                MissionAcgLifecycleState.Cleaned,
+                                MissionAcgCleanupState.Completed,
+                                restorationUtc),
+                            out cleanedProjection,
+                            out cleanupFailure))
+                    {
+                        throw new InvalidOperationException(
+                            "Expired provisional acceptance cleanup failed closed for quest "
+                            + pending.Binding.AcceptedQuestIdentity.Instance
+                            + ": "
+                            + cleanupFailure);
+                    }
+
+                    allocator.RollbackUnpersisted(
+                        pending.Binding.AcceptedQuestIdentity,
+                        pending.Binding.MissionKeyIdentity,
+                        pending.Binding.AllocatedLivePlayfield2);
                 }
 
                 for (int i = 0; i < loaded.Records.Count; i++)
@@ -121,6 +178,7 @@ namespace ZoneEngine.Core.Missions
                     restored,
                     catalog,
                     missionStateDirectory);
+                MissionAcgAcceptedProjectionRuntime.ReconcileObjectiveArtifacts();
                 MissionAcgOperationalRuntime.Initialize(
                     restored,
                     catalog,
@@ -133,6 +191,8 @@ namespace ZoneEngine.Core.Missions
                     restored,
                     missionStateDirectory);
                 initialized = true;
+                MissionRollService.SetOfferIdentityCollisionValidator(
+                    IsGeneratedOfferIdentityInUse);
                 restoredForExpiry =
                     new List<MissionAcgBindingRecord>(
                         ByAcceptedInstance.Values).AsReadOnly();
@@ -263,6 +323,7 @@ namespace ZoneEngine.Core.Missions
                 ReplaceIndexes(updated);
             }
 
+            MissionAcgAcceptedProjectionRuntime.OnBindingStateChanged(updated);
             MissionAcgSpatialRuntime.OnBindingStateChanged(updated);
             MissionAcgOperationalRuntime.OnBindingStateChanged(updated);
             MissionAcgRuntimeManager.OnBindingStateChanged(updated);
@@ -462,6 +523,61 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static bool TryGetByOwnerOffer(
+            int ownerType,
+            int ownerInstance,
+            int originalOfferType,
+            int originalOfferInstance,
+            out MissionAcgBindingRecord record)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgBindingRecord candidate in ByAcceptedInstance.Values)
+                {
+                    if (candidate.Binding.OwnerIdentity.Type == ownerType
+                        && candidate.Binding.OwnerIdentity.Instance == ownerInstance
+                        && candidate.Binding.OriginalOfferIdentity.Type
+                            == originalOfferType
+                        && candidate.Binding.OriginalOfferIdentity.Instance
+                            == originalOfferInstance)
+                    {
+                        record = candidate;
+                        return true;
+                    }
+                }
+
+                record = null;
+                return false;
+            }
+        }
+
+        internal static bool HasOriginalOfferIdentity(int originalOfferInstance)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgBindingRecord candidate in ByAcceptedInstance.Values)
+                {
+                    if (candidate.Binding.OriginalOfferIdentity.Instance
+                        == originalOfferInstance)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private static bool IsGeneratedOfferIdentityInUse(int originalOfferInstance)
+        {
+            return MissionOfferStore.IsIdentityInUse(originalOfferInstance)
+                   || MissionAcgAcceptedProjectionRuntime.IsOriginalOfferIdentityInUse(
+                       originalOfferInstance)
+                   || HasOriginalOfferIdentity(originalOfferInstance);
+        }
+
         internal static bool TryResolveByAcceptedQuest(
             int ownerInstance,
             int acceptedQuestInstance,
@@ -588,6 +704,40 @@ namespace ZoneEngine.Core.Missions
             return TryResolveByLivePlayfield(livePlayfield2, out ignored);
         }
 
+        internal static bool ClaimsGeneratedLivePlayfield(int livePlayfield2)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return ByLivePlayfield.ContainsKey(livePlayfield2)
+                       || allocator.IsReserved(livePlayfield2);
+            }
+        }
+
+        internal static bool HasOwnedExteriorMarker(
+            int ownerInstance,
+            int exteriorPlayfieldInstance,
+            double x,
+            double y,
+            double z,
+            double horizontalRadius,
+            double verticalRadius)
+        {
+            EnsureInitialized();
+            lock (Sync)
+            {
+                return MissionAcgBindingResolver.HasOwnedExteriorMarker(
+                    ByAcceptedInstance.Values,
+                    ownerInstance,
+                    exteriorPlayfieldInstance,
+                    x,
+                    y,
+                    z,
+                    horizontalRadius,
+                    verticalRadius);
+            }
+        }
+
         internal static bool HasAnyBindingForOwner(int ownerInstance)
         {
             EnsureInitialized();
@@ -597,6 +747,69 @@ namespace ZoneEngine.Core.Missions
                 {
                     if (record.Binding.OwnerIdentity.Instance == ownerInstance
                         && record.State.ReservesPlayfield)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        internal static bool IsOwnedMissionKey(
+            int ownerInstance,
+            MissionAcgIdentityRecord itemIdentity)
+        {
+            if (itemIdentity == null)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgBindingRecord record
+                    in ByAcceptedInstance.Values)
+                {
+                    if (record != null
+                        && record.Binding != null
+                        && record.Binding.OwnerIdentity != null
+                        && record.Binding.MissionKeyIdentity != null
+                        && record.Binding.OwnerIdentity.Instance == ownerInstance
+                        && record.Binding.MissionKeyIdentity.Equals(itemIdentity))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        internal static bool IsGeneratedMissionKey(
+            MissionAcgIdentityRecord itemIdentity)
+        {
+            return itemIdentity != null
+                   && IsGeneratedMissionKeyInstance(itemIdentity.Instance);
+        }
+
+        internal static bool IsGeneratedMissionKeyInstance(int itemInstance)
+        {
+            if (itemInstance == 0)
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                foreach (MissionAcgBindingRecord record
+                    in ByAcceptedInstance.Values)
+                {
+                    if (record != null
+                        && record.Binding != null
+                        && record.Binding.MissionKeyIdentity != null
+                        && record.Binding.MissionKeyIdentity.Instance == itemInstance)
                     {
                         return true;
                     }

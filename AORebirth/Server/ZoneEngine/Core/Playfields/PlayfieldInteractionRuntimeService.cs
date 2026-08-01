@@ -19,6 +19,14 @@ namespace ZoneEngine.Core.Playfields
     {
         internal bool TryHandleGenericCmdUse(IZoneClient client, GenericCmdMessage message, Identity target)
         {
+            bool generatedPlayfield =
+                MissionAcgRuntimeInteractionService.ClaimsCurrentGeneratedPlayfield(client);
+            if (generatedPlayfield
+                && CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
             // Persisted ACG missions route every interaction by owner + allocated PF2 + runtime
             // identity before any legacy global tracker can claim the target.
             if (MissionAcgRuntimeInteractionService.TryHandleUse(client, message, target))
@@ -53,6 +61,23 @@ namespace ZoneEngine.Core.Playfields
             // Must run before Insurance — template 297303 must not be stolen as SaveChar.
             if (VaughnHammondQuestRuntime.TryHandleExitAreteLandingUse(client, message, target))
             {
+                return true;
+            }
+
+            if (CrashedAlienShipDoorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (LeonoraMartyQuestRuntime.TryHandleCreditCardPickup(client, message, target))
+            {
+                return true;
+            }
+
+            var source = client?.Controller?.Character;
+            if (PatrickSunQuestRuntime.TryHandleInsuranceTerminalUse(source, target))
+            {
+                GenericCmdMessageHandler.Default.Acknowledge(source, message);
                 return true;
             }
 
@@ -152,7 +177,23 @@ namespace ZoneEngine.Core.Playfields
                 return true;
             }
 
-            if (CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
+            if (CapturedAreteAntonioStacklundVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteRemiGalloisVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (CapturedAreteSarahGreeneVendorInteractionHandler.Default.TryHandleUse(client, message, target))
+            {
+                return true;
+            }
+
+            if (!generatedPlayfield
+                && CorpseInteractionHandler.Default.TryHandleUse(client, message, target))
             {
                 return true;
             }

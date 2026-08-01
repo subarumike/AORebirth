@@ -388,6 +388,18 @@ namespace ZoneEngine.Core.MessageHandlers
                         break;
                     }
 
+                    if (AORebirth.Core.Playfields.Playfield.ClaimsGeneratedMissionCorpseContainer(
+                            client.Controller.Character.Playfield,
+                            message.Target,
+                            message.Parameter1,
+                            message.Parameter2)
+                        || (message.Target.Type == IdentityType.Corpse
+                            && ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                                client.Controller.Character.Playfield.Identity.Instance)))
+                    {
+                        break;
+                    }
+
                     if (!InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(
                             client.Controller.Character,
                             message))

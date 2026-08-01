@@ -2524,6 +2524,11 @@ namespace ZoneEngine.Core.Arete.Quests
             source.Controller.Client.SendCompressed(message);
         }
 
+        internal static void ReanchorGameTimeForWireTip(ICharacter source)
+        {
+            ReanchorGameTimeForTipJournal(source);
+        }
+
         private static void ReanchorGameTimeForTipJournal(ICharacter source)
         {
             ZoneClient client = source?.Controller?.Client as ZoneClient;

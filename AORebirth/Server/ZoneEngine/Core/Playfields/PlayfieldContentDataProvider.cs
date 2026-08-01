@@ -16,12 +16,14 @@ namespace ZoneEngine.Core.Playfields
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
+    using AORebirth.Interfaces;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
 
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Navigation;
 
     using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
 
@@ -107,7 +109,11 @@ namespace ZoneEngine.Core.Playfields
                 return new StatelData[0];
             }
 
-            return statels.Where(HandlesCollisionEvent).ToArray();
+            return statels
+                .Where(
+                    statel => HandlesCollisionEvent(statel)
+                              || TempleWorldInteractionRules.IsExteriorLinkStatel(statel))
+                .ToArray();
         }
 
         internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)
@@ -219,5 +225,160 @@ namespace ZoneEngine.Core.Playfields
         internal Coordinate Coordinate { get; private set; }
 
         internal Quaternion Heading { get; private set; }
+    }
+    internal static class TempleWorldInteractionRules
+    {
+        internal const int TemplePlayfieldId = 1931;
+
+        internal const int TempleGatewayPlayfieldId = 647;
+
+        internal const int TempleGatewayDoorInstance = unchecked((int)0xC0080287);
+
+        internal const int TempleExteriorDoorInstance = unchecked((int)0xC024078B);
+
+        internal const int TempleExteriorGeometryDoorIndex = 4468;
+
+        internal const float CapturedEntryX = 172.989990234375f;
+
+        internal const float CapturedEntryY = 24.011247634887695f;
+
+        internal const float CapturedEntryZ = 7.81494140625f;
+
+        internal const float CapturedExitX = 1813.9990234375f;
+
+        internal const float CapturedExitY = 26.806131362915039f;
+
+        internal const float CapturedExitZ = 2715.84521484375f;
+
+        internal static bool IsExteriorLinkStatel(StatelData statel)
+        {
+            return statel != null
+                   && statel.PlayfieldId == TemplePlayfieldId
+                   && statel.Identity.Type == IdentityType.Door
+                   && statel.Identity.Instance == TempleExteriorDoorInstance;
+        }
+
+        internal static bool IsExteriorLinkStatel(int playfieldId, StatelData statel)
+        {
+            return playfieldId == TemplePlayfieldId
+                   && IsExteriorLinkStatel(statel);
+        }
+
+        internal static bool IsGatewayEntryStatel(StatelData statel)
+        {
+            return statel != null
+                   && statel.PlayfieldId == TempleGatewayPlayfieldId
+                   && statel.Identity.Type == IdentityType.Door
+                   && statel.Identity.Instance == TempleGatewayDoorInstance;
+        }
+
+        internal static bool IsBoundaryLinkStatel(StatelData statel)
+        {
+            return IsExteriorLinkStatel(statel) || IsGatewayEntryStatel(statel);
+        }
+
+        internal static bool TryResolveProxyEntry(
+            int sourcePlayfieldId,
+            Identity sourceStatel,
+            int destinationIdentityType,
+            int destinationPlayfieldId,
+            int destinationDoorIndex,
+            int sourceDoorArgument,
+            out Coordinate destination)
+        {
+            destination = null;
+            if (sourcePlayfieldId != TempleGatewayPlayfieldId
+                || sourceStatel.Type != IdentityType.Door
+                || sourceStatel.Instance != TempleGatewayDoorInstance
+                || destinationIdentityType != 51102
+                || destinationPlayfieldId != TemplePlayfieldId
+                || destinationDoorIndex != 0
+                || sourceDoorArgument != TempleGatewayDoorInstance
+                || !HasExactOfficialInventory())
+            {
+                return false;
+            }
+
+            destination = new Coordinate(CapturedEntryX, CapturedEntryY, CapturedEntryZ);
+            return true;
+        }
+
+        internal static bool IsTempleProxyArrival(ICharacter character)
+        {
+            return character != null
+                   && character.Playfield != null
+                   && character.Playfield.Identity.Instance == TemplePlayfieldId
+                   && character.Stats[StatIds.externalplayfieldinstance].Value
+                       == TempleGatewayPlayfieldId
+                   && unchecked((int)character.Stats[StatIds.externaldoorinstance].BaseValue)
+                       == TempleGatewayDoorInstance;
+        }
+
+        internal static bool IsInBoundaryTriggerRange(StatelData statel, ICharacter character)
+        {
+            if (!IsBoundaryLinkStatel(statel) || character == null)
+            {
+                return false;
+            }
+
+            float dx = statel.X - character.RawCoordinates.X;
+            float dz = statel.Z - character.RawCoordinates.Z;
+            float horizontalDistance = (float)Math.Sqrt((dx * dx) + (dz * dz));
+            float verticalDistance = Math.Abs(statel.Y - character.RawCoordinates.Y);
+            return horizontalDistance <= TempleDoorProximityRuntime.TriggerRadius
+                   && verticalDistance <= 6.0f;
+        }
+
+        internal static bool TryResolveProxyExit(
+            int sourcePlayfieldId,
+            int externalPlayfieldId,
+            uint externalDoorInstance,
+            out Coordinate destination)
+        {
+            destination = null;
+            if (sourcePlayfieldId != TemplePlayfieldId
+                || externalPlayfieldId != TempleGatewayPlayfieldId
+                || unchecked((int)externalDoorInstance) != TempleGatewayDoorInstance
+                || !HasExactOfficialInventory())
+            {
+                return false;
+            }
+
+            destination = new Coordinate(CapturedExitX, CapturedExitY, CapturedExitZ);
+            return true;
+        }
+
+        internal static bool HasExactOfficialInventory()
+        {
+            PlayfieldData temple;
+            PlayfieldData gateway;
+            if (!PlayfieldLoader.PFData.TryGetValue(TemplePlayfieldId, out temple)
+                || !PlayfieldLoader.PFData.TryGetValue(TempleGatewayPlayfieldId, out gateway))
+            {
+                return false;
+            }
+
+            StatelData[] templeDoors = temple.Statels
+                .Where(statel => statel.Identity.Type == IdentityType.Door)
+                .GroupBy(statel => statel.Identity)
+                .Select(group => group.First())
+                .ToArray();
+            bool exactGateway = gateway.Statels.Any(
+                statel => statel.Identity.Type == IdentityType.Door
+                          && statel.Identity.Instance == TempleGatewayDoorInstance);
+            bool exactExterior = templeDoors.Count(
+                statel => statel.Identity.Instance == TempleExteriorDoorInstance) == 1;
+            OfficialDungeonGeometryLoadResult geometry =
+                Pf1931OfficialDungeonGeometryLoader.Current;
+            return templeDoors.Length == 44
+                   && exactExterior
+                   && exactGateway
+                   && temple.Destinations.Count == 1
+                   && geometry.IsLoaded
+                   && geometry.Geometry.ExteriorDoorConnectionCount == 1
+                   && geometry.Geometry.HasExteriorDoorConnection(
+                       "EntryHall",
+                       TempleExteriorGeometryDoorIndex);
+        }
     }
 }

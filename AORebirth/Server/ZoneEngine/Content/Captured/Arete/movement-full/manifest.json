@@ -1,0 +1,284 @@
+{
+  "behaviors": {
+    "chase": {
+      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/chase.csv",
+      "runtimeRows": 164,
+      "sourceObservations": 164
+    },
+    "flee": {
+      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/flee.csv",
+      "runtimeRows": 54,
+      "sourceObservations": 54
+    },
+    "leash": {
+      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/leash.csv",
+      "runtimeRows": 263,
+      "sourceObservations": 263
+    },
+    "patrol": {
+      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/patrol.csv",
+      "runtimeRows": 20933,
+      "sourceObservations": 21305
+    },
+    "spawn": {
+      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement-full/spawn.csv",
+      "runtimeRows": 1384,
+      "sourceObservations": 1399
+    }
+  },
+  "captureIds": [
+    "20260721-Rox-robots",
+    "20260722-104809",
+    "20260722-152454"
+  ],
+  "capturedPlayfieldId": 1044525,
+  "datasetKind": "arete-movement-runtime-aggregate",
+  "deduplicatedRuntimeRows": 22798,
+  "identityScope": [
+    "CaptureId",
+    "SourceIdentity",
+    "SourceGeneration"
+  ],
+  "inputs": [
+    {
+      "bytes": 302,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/chase.csv",
+      "sha256": "02d8fb300a6b68e1d97eb857bb4a23ddca87e892aceeaaadb073cff67cfdd365"
+    },
+    {
+      "bytes": 302,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/flee.csv",
+      "sha256": "02d8fb300a6b68e1d97eb857bb4a23ddca87e892aceeaaadb073cff67cfdd365"
+    },
+    {
+      "bytes": 302,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/leash.csv",
+      "sha256": "02d8fb300a6b68e1d97eb857bb4a23ddca87e892aceeaaadb073cff67cfdd365"
+    },
+    {
+      "bytes": 2031,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/manifest.json",
+      "sha256": "9566d2f6a7df309e5282e6d5863c1038a4e670cd36aa4dcdbd2226bc881fdf35"
+    },
+    {
+      "bytes": 904540,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/patrol.csv",
+      "sha256": "087394ced9ddc46c5279e6ebde5dbf5510536597dbb75fae4d07b4a272902766"
+    },
+    {
+      "bytes": 254,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/runtime/chase.csv",
+      "sha256": "10b33740ce871f6e46b349c5eb87af3b64d68bc4685a0a889ba1a2f5b1f2fa13"
+    },
+    {
+      "bytes": 254,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/runtime/flee.csv",
+      "sha256": "10b33740ce871f6e46b349c5eb87af3b64d68bc4685a0a889ba1a2f5b1f2fa13"
+    },
+    {
+      "bytes": 254,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/runtime/leash.csv",
+      "sha256": "10b33740ce871f6e46b349c5eb87af3b64d68bc4685a0a889ba1a2f5b1f2fa13"
+    },
+    {
+      "bytes": 1062,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/runtime/manifest.json",
+      "sha256": "5e021d72ab2a9ee8a661919239b25ccf57cd179cbe6850e4632a0fd13ba79aa9"
+    },
+    {
+      "bytes": 558019,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/runtime/patrol.csv",
+      "sha256": "de1eea536e42290a6f3b6325cee1d4f978dc0fd45575838decdee85ede3146d1"
+    },
+    {
+      "bytes": 254,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/runtime/spawn.csv",
+      "sha256": "10b33740ce871f6e46b349c5eb87af3b64d68bc4685a0a889ba1a2f5b1f2fa13"
+    },
+    {
+      "bytes": 302,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/scripted.csv",
+      "sha256": "02d8fb300a6b68e1d97eb857bb4a23ddca87e892aceeaaadb073cff67cfdd365"
+    },
+    {
+      "bytes": 302,
+      "path": "docs/generated/arete_20260721_rox_robots_movement/spawn.csv",
+      "sha256": "02d8fb300a6b68e1d97eb857bb4a23ddca87e892aceeaaadb073cff67cfdd365"
+    },
+    {
+      "bytes": 114349,
+      "path": "docs/generated/arete_20260722_104809_movement/chase.csv",
+      "sha256": "6ac1aab15e5c8c4e93c45d30d82b3ac099383c85deb72254634b42af8c278206"
+    },
+    {
+      "bytes": 15238,
+      "path": "docs/generated/arete_20260722_104809_movement/flee.csv",
+      "sha256": "d48822d4eea96eb12c15f50f335627e829c49a8855a6831645920a230868b03b"
+    },
+    {
+      "bytes": 24758,
+      "path": "docs/generated/arete_20260722_104809_movement/leash.csv",
+      "sha256": "7604ce6816fea20041976321c963a7dc2c722495b3173ecdbb651f2f3172f6a1"
+    },
+    {
+      "bytes": 3189,
+      "path": "docs/generated/arete_20260722_104809_movement/manifest.json",
+      "sha256": "68068255b0dc3e6a8d4623dc683e83bff19920831d2d86ee08056715d59923b1"
+    },
+    {
+      "bytes": 3926279,
+      "path": "docs/generated/arete_20260722_104809_movement/patrol.csv",
+      "sha256": "a117d53fa95a43331e500483f8e7ba984ef2dfe330321d0857b8ed044731f10b"
+    },
+    {
+      "bytes": 13418,
+      "path": "docs/generated/arete_20260722_104809_movement/runtime/chase.csv",
+      "sha256": "1aaa89b8ef2816624a866e630d98d79638032f43b6d68d7eecd26e9eef4988d3"
+    },
+    {
+      "bytes": 6405,
+      "path": "docs/generated/arete_20260722_104809_movement/runtime/flee.csv",
+      "sha256": "e0a47a6389adb19079ce780da7e6d28cf37fa2ea83b0f0a26f83398c4c721da1"
+    },
+    {
+      "bytes": 13772,
+      "path": "docs/generated/arete_20260722_104809_movement/runtime/leash.csv",
+      "sha256": "343f34eebfd5c98cd20568f1b40e08d56ecdd683302b7afc06726ab626c83560"
+    },
+    {
+      "bytes": 1052,
+      "path": "docs/generated/arete_20260722_104809_movement/runtime/manifest.json",
+      "sha256": "35f08e57a388add3a970b7624b473645adb30a4a4d59c4a0c2aed81df3111f19"
+    },
+    {
+      "bytes": 2348409,
+      "path": "docs/generated/arete_20260722_104809_movement/runtime/patrol.csv",
+      "sha256": "0bfc8376082e4adff3224de965754643e2570058d44bb9df7e9b427ecaace161"
+    },
+    {
+      "bytes": 158508,
+      "path": "docs/generated/arete_20260722_104809_movement/runtime/spawn.csv",
+      "sha256": "a609180693b3d23bb5fc50f766b07723ef11805de2300e431c165f89caa30e02"
+    },
+    {
+      "bytes": 196553,
+      "path": "docs/generated/arete_20260722_104809_movement/scripted.csv",
+      "sha256": "a23865bb0cd7aaf8ea533fba3e9b06a9d330aa03dfd86371d083e9db27791bf9"
+    },
+    {
+      "bytes": 252008,
+      "path": "docs/generated/arete_20260722_104809_movement/spawn.csv",
+      "sha256": "7694c75aef7c60b985f3fe626e2547c4bf6d525b3aafddc74d4b413e974fe21d"
+    },
+    {
+      "bytes": 195515,
+      "path": "docs/generated/arete_20260722_152454_movement/chase.csv",
+      "sha256": "beafbfc13d1df9e9d687de4a79b11e060f4864a559ff0c590f306705e8b0c070"
+    },
+    {
+      "bytes": 11706,
+      "path": "docs/generated/arete_20260722_152454_movement/flee.csv",
+      "sha256": "8c10d3bad6608a74806fe15a8ce7e4ebc0d1c8f6c40c70ca3880fd6c4cb07336"
+    },
+    {
+      "bytes": 72037,
+      "path": "docs/generated/arete_20260722_152454_movement/leash.csv",
+      "sha256": "69c58848a71f3f67ded98fb04784a9268f6be7e279378933a238d5b654fd0326"
+    },
+    {
+      "bytes": 3183,
+      "path": "docs/generated/arete_20260722_152454_movement/manifest.json",
+      "sha256": "4d722acfd729883b95578f30af9d5537b7d189004aaa357a671430271a953d9f"
+    },
+    {
+      "bytes": 2382454,
+      "path": "docs/generated/arete_20260722_152454_movement/patrol.csv",
+      "sha256": "f6cb5d1121b5764ac7587a562acf2c41af208f87ed4d5e24b868c30fac3e9d0f"
+    },
+    {
+      "bytes": 19453,
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/chase.csv",
+      "sha256": "d06be74f7ce42d3067bb0b9ee2d3d3c6eefe3d713902a0d4b723fdda351d633b"
+    },
+    {
+      "bytes": 4549,
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/flee.csv",
+      "sha256": "2055e46d66499a2441ed6ef80ae03dd9582b827cd9195fd37dfe6f98f0c4fa23"
+    },
+    {
+      "bytes": 39275,
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/leash.csv",
+      "sha256": "3f95de257a867ae68dacf51ec48c17ad6d65c45262d72ffd0162ccd928fb34e4"
+    },
+    {
+      "bytes": 1050,
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/manifest.json",
+      "sha256": "e4d9caccc2bd8a06bc6d565341bcfd82027829971cf507054484d1a3fa27b129"
+    },
+    {
+      "bytes": 1521707,
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/patrol.csv",
+      "sha256": "5ad51bde1210a146b85da336fe198dd62c9e50bffc7137c43fda5ce343d59d79"
+    },
+    {
+      "bytes": 121760,
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/spawn.csv",
+      "sha256": "1acbf0c5d7f5206b139d0ea5be7ca18679f4c65e9250b14be161d6f5b978e303"
+    },
+    {
+      "bytes": 161800,
+      "path": "docs/generated/arete_20260722_152454_movement/scripted.csv",
+      "sha256": "0fa52a1cc0c351c1939e6733da7d8d7013e9cde00829fade36e5a64f4b6a7c98"
+    },
+    {
+      "bytes": 194205,
+      "path": "docs/generated/arete_20260722_152454_movement/spawn.csv",
+      "sha256": "30d14872b878f5797df5a958e6fe0d19510d1ad4597a09e697289da59a36fa4d"
+    }
+  ],
+  "observationIdFormat": "{CaptureId}:{SourceObservationId}",
+  "ordering": [
+    "CaptureId",
+    "SourceIdentity",
+    "SourceGeneration",
+    "CapturedUtc",
+    "Sequence",
+    "ObservationId"
+  ],
+  "runtimePlayfieldId": 6553,
+  "schemaVersion": 4,
+  "scriptedRuntimeRows": 0,
+  "sourcePromotableObservations": 23185,
+  "sources": [
+    {
+      "ambiguousObservations": 0,
+      "analysisManifest": "docs/generated/arete_20260721_rox_robots_movement/manifest.json",
+      "captureId": "20260721-Rox-robots",
+      "deduplicatedRuntimeRows": 2531,
+      "reconciledObservations": 2612,
+      "rejectedObservations": 0,
+      "runtimeManifest": "docs/generated/arete_20260721_rox_robots_movement/runtime/manifest.json",
+      "sourcePromotableObservations": 2612
+    },
+    {
+      "ambiguousObservations": 909,
+      "analysisManifest": "docs/generated/arete_20260722_104809_movement/manifest.json",
+      "captureId": "20260722-104809",
+      "deduplicatedRuntimeRows": 12146,
+      "reconciledObservations": 14516,
+      "rejectedObservations": 1263,
+      "runtimeManifest": "docs/generated/arete_20260722_104809_movement/runtime/manifest.json",
+      "sourcePromotableObservations": 12344
+    },
+    {
+      "ambiguousObservations": 944,
+      "analysisManifest": "docs/generated/arete_20260722_152454_movement/manifest.json",
+      "captureId": "20260722-152454",
+      "deduplicatedRuntimeRows": 8121,
+      "reconciledObservations": 9526,
+      "rejectedObservations": 353,
+      "runtimeManifest": "docs/generated/arete_20260722_152454_movement/runtime/manifest.json",
+      "sourcePromotableObservations": 8229
+    }
+  ]
+}

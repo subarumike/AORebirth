@@ -82,6 +82,8 @@ namespace ZoneEngine.Core.Playfields
 
         private readonly PlayfieldStatelTransitionRuntimeService statelTransitions;
 
+        private readonly CapturedPlayfieldDoorStatusRuntimeService doorStatuses;
+
         private readonly PlayfieldStatUpdateRuntimeService statUpdates;
 
         private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime;
@@ -122,6 +124,7 @@ namespace ZoneEngine.Core.Playfields
             this.announcements = new PlayfieldAnnouncementRuntimeService();
             this.content = new PlayfieldContentCoordinator(
                 new AreteContentModule(),
+                new CrashedAlienShipContentModule(),
                 new MontroyalContentModule(),
                 new SubwayContentModule(),
                 new TempleOfThreeWindsContentModule(),
@@ -163,6 +166,7 @@ namespace ZoneEngine.Core.Playfields
             this.interaction = new PlayfieldInteractionRuntimeService();
             this.playerCombat = new PlayerCombatRuntimeService();
             this.statelTransitions = new PlayfieldStatelTransitionRuntimeService();
+            this.doorStatuses = new CapturedPlayfieldDoorStatusRuntimeService();
             this.statUpdates = new PlayfieldStatUpdateRuntimeService();
             this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();
             this.timedLifecycle = new PlayfieldTimedLifecycleRuntimeService();
@@ -256,6 +260,7 @@ namespace ZoneEngine.Core.Playfields
             this.vendors.ClearCapturedSubwayVendors(this.playfield.Identity, this.dynelRegistry);
             this.npcRuntime.ClearRuntimeState();
             this.npcChaseNavigation.Dispose();
+            this.doorStatuses.Clear();
             this.visibilityInterest.Clear();
             this.dynelRegistry.Clear();
         }
@@ -387,6 +392,16 @@ namespace ZoneEngine.Core.Playfields
             this.visibilityInterest.Register(character);
         }
 
+        internal void SuspendCapturedAretePatrol(ICharacter character)
+        {
+            this.npcRuntime.SuspendCapturedAretePatrol(character);
+        }
+
+        internal void ResumeCapturedAretePatrol(ICharacter character)
+        {
+            this.npcRuntime.ResumeCapturedAretePatrol(character);
+        }
+
         private void DeactivateNpc(Identity identity)
         {
             this.npcRuntime.RemoveNpcHome(identity);
@@ -409,6 +424,15 @@ namespace ZoneEngine.Core.Playfields
         internal void RegisterStatels(IEnumerable<StatelData> statels)
         {
             this.dynelRegistry.RegisterStatels(statels);
+            this.doorStatuses.Configure(this.playfield.Identity.Instance, statels);
+        }
+
+        internal int SendInitialDoorStatuses(ICharacter character, IEnumerable<StatelData> statels)
+        {
+            return this.doorStatuses.SendInitialStatuses(
+                character,
+                this.playfield.Identity.Instance,
+                statels);
         }
 
         internal IInstancedEntity FindByIdentity(Identity identity)
@@ -819,6 +843,7 @@ namespace ZoneEngine.Core.Playfields
                 this.ProcessNpcPatrolTick,
                 processFollow,
                 processPlayerCollision);
+            this.doorStatuses.ProcessCharacters(this.Characters(), DateTime.UtcNow);
         }
 
         internal void ProcessCharacterRegeneration(ICharacter dynel, Action<ICharacter> sendChangedStats)

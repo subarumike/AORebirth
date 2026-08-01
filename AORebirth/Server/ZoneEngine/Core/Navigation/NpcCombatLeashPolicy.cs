@@ -45,6 +45,25 @@ namespace ZoneEngine.Core.Navigation
             ChaseNavigationPoint target,
             double maximumNpcDistanceFromHome)
         {
+            return ShouldResetCombat(
+                playfieldResource,
+                isPlayerOwnedPet,
+                home,
+                npc,
+                target,
+                maximumNpcDistanceFromHome,
+                false);
+        }
+
+        internal static bool ShouldResetCombat(
+            int playfieldResource,
+            bool isPlayerOwnedPet,
+            ChaseNavigationPoint home,
+            ChaseNavigationPoint npc,
+            ChaseNavigationPoint target,
+            double maximumNpcDistanceFromHome,
+            bool hasCapturedAreteLeashEvidence)
+        {
             if (isPlayerOwnedPet)
             {
                 return false;
@@ -53,13 +72,15 @@ namespace ZoneEngine.Core.Navigation
             // PF127 always leashes. Explicit short custom leashes (e.g. Arete
             // Robotic Guard Dog) also enforce on any playfield.
             bool subwayApplies = playfieldResource == SubwayPlayfieldResource;
+            bool capturedAreteApplies = playfieldResource == 6553
+                                        && hasCapturedAreteLeashEvidence;
             bool customShortLeash =
                 maximumNpcDistanceFromHome > 0.0
                 && maximumNpcDistanceFromHome
                    < SubwayDefaultMaximumNpcDistanceFromHome
                 && !double.IsNaN(maximumNpcDistanceFromHome)
                 && !double.IsInfinity(maximumNpcDistanceFromHome);
-            if (!subwayApplies && !customShortLeash)
+            if (!subwayApplies && !capturedAreteApplies && !customShortLeash)
             {
                 return false;
             }
@@ -74,11 +95,13 @@ namespace ZoneEngine.Core.Navigation
                 return true;
             }
 
-            // Subway keeps the separate 100m target boundary (captured short
-            // NPC travel limits still use that target safety).
+            // Subway and exact captured Arete leash actors keep the existing
+            // 100m safety boundary; the capture proves return behavior but not
+            // an exact trigger threshold. Captured short NPC travel limits
+            // still use that target safety.
             // Short custom leashes use the same home radius for target so a
             // fleeing player cannot keep a guard dog in combat across the zone.
-            double maximumTargetDistanceFromHome = subwayApplies
+            double maximumTargetDistanceFromHome = subwayApplies || capturedAreteApplies
                                                        ? SubwayMaximumTargetDistanceFromHome
                                                        : maximumNpcDistanceFromHome;
 

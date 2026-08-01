@@ -40,27 +40,31 @@ namespace ZoneEngine.Core.Playfields
 
         private const string TemplateHash = "BART";
 
-        // Matches NPCController.WalkFollowSpeedPerSecond.
-        private const double WalkSpeedPerSecond = 1.5;
-
-        private const double EarlyTurnFactor = 0.85;
+        // SCFU -> first NpcPath delay in capture 20260727-055715.
+        private const double InitialPatrolDelaySeconds = 2.4464911;
 
         private static readonly HashSet<int> SpawnedPlayfields = new HashSet<int>();
 
-        // Capture FollowTarget NpcPath destinations (y=0.435 throughout).
-        private static readonly float[][] PatrolLoopWaypoints =
+        // Exact observed NpcPath ordering and inter-packet timing. The capture
+        // ends after the fourteenth packet, so this sequence deliberately does
+        // not synthesize a loop or restart after its terminal observation.
+        private static readonly NpcPatrolReplaySegment[] PatrolSegments =
             {
-                new[] { 49.341f, 0.435f, 49.576f },
-                new[] { 50.422f, 0.435f, 41.723f },
-                new[] { 50.031f, 0.435f, 32.054f },
-                new[] { 45.423f, 0.435f, 31.171f },
-                new[] { 38.128f, 0.435f, 32.729f },
-                new[] { 31.111f, 0.435f, 41.707f },
-                new[] { 34.599f, 0.435f, 46.464f },
-                new[] { 41.239f, 0.435f, 46.778f },
+                new NpcPatrolReplaySegment(5.7825051, 36.14677f, 0.435f, 45.91928f, 49.341f, 0.435f, 49.576f),
+                new NpcPatrolReplaySegment(4.7290840, 49.341f, 0.435f, 49.576f, 50.422f, 0.435f, 41.723f),
+                new NpcPatrolReplaySegment(6.5569558, 50.422f, 0.435f, 41.723f, 50.031f, 0.435f, 32.054f),
+                new NpcPatrolReplaySegment(2.6983371, 50.031f, 0.435f, 32.054f, 45.423f, 0.435f, 31.171f),
+                new NpcPatrolReplaySegment(4.9789282, 45.423f, 0.435f, 31.171f, 38.128f, 0.435f, 32.729f),
+                new NpcPatrolReplaySegment(7.3864468, 38.128f, 0.435f, 32.729f, 31.111f, 0.435f, 41.707f),
+                new NpcPatrolReplaySegment(4.0485019, 31.111f, 0.435f, 41.707f, 34.599f, 0.435f, 46.464f),
+                new NpcPatrolReplaySegment(4.1124633, 34.599f, 0.435f, 46.464f, 41.239f, 0.435f, 46.778f),
+                new NpcPatrolReplaySegment(5.3347104, 41.239f, 0.435f, 46.778f, 49.341f, 0.435f, 49.576f),
+                new NpcPatrolReplaySegment(4.6848174, 49.341f, 0.435f, 49.576f, 50.422f, 0.435f, 41.723f),
+                new NpcPatrolReplaySegment(6.8447781, 50.422f, 0.435f, 41.723f, 50.031f, 0.435f, 32.054f),
+                new NpcPatrolReplaySegment(2.3515507, 50.031f, 0.435f, 32.054f, 45.423f, 0.435f, 31.171f),
+                new NpcPatrolReplaySegment(4.9829270, 45.423f, 0.435f, 31.171f, 38.128f, 0.435f, 32.729f),
+                new NpcPatrolReplaySegment(0.0, 38.128f, 0.435f, 32.729f, 31.111f, 0.435f, 41.707f),
             };
-
-        private static readonly NpcPatrolReplaySegment[] PatrolSegments = BuildContinuousLoop(PatrolLoopWaypoints);
 
         public static bool IsKarliDefinition(string name, int captureInstance)
         {
@@ -70,8 +74,7 @@ namespace ZoneEngine.Core.Playfields
 
         public static void StartForPlayfield(Playfield playfield, Identity playfieldIdentity, Action<ICharacter> activateNpc)
         {
-            if (!AreteMobDiagnosticSwitches.KarliCappelleri
-                || !SpawnEnabled
+            if (!SpawnEnabled
                 || playfield == null
                 || activateNpc == null
                 || playfieldIdentity.Instance != CrashedAlienShipPlayfieldId
@@ -104,7 +107,7 @@ namespace ZoneEngine.Core.Playfields
 
         public static void PrepareSpawnedKarli(Character mob, NPCController controller)
         {
-            if (!AreteMobDiagnosticSwitches.KarliCappelleri || mob == null || controller == null)
+            if (mob == null || controller == null)
             {
                 return;
             }
@@ -114,8 +117,7 @@ namespace ZoneEngine.Core.Playfields
 
         public static bool TryApplyPatrol(int captureInstance, NPCController controller)
         {
-            if (!AreteMobDiagnosticSwitches.KarliCappelleri
-                || controller == null
+            if (controller == null
                 || captureInstance != KarliCaptureInstance)
             {
                 return false;
@@ -125,7 +127,9 @@ namespace ZoneEngine.Core.Playfields
                 PatrolSegments,
                 true,
                 false,
-                false);
+                false,
+                false,
+                InitialPatrolDelaySeconds);
             controller.State = CharacterState.Patrolling;
             return true;
         }
@@ -151,13 +155,7 @@ namespace ZoneEngine.Core.Playfields
                 return;
             }
 
-            controller.SetCapturedPatrolReplaySegments(
-                PatrolSegments,
-                true,
-                false,
-                false);
-            controller.State = CharacterState.Patrolling;
-            controller.StartPatrolling();
+            controller.ResumeCapturedPatrolReplay();
         }
 
         private static bool IsKarliNpc(ICharacter npc)
@@ -173,7 +171,7 @@ namespace ZoneEngine.Core.Playfields
             Character mob = NonPlayerCharacterHandler.SpawnMobFromTemplate(
                 TemplateHash,
                 playfieldIdentity,
-                new Coordinate { x = 36.147f, y = 0.435f, z = 45.919f },
+                new Coordinate { x = 36.14677f, y = 0.435f, z = 45.91928f },
                 new Quaternion(0.0, 0.6452817, 0.0, 0.7639447),
                 controller,
                 15);
@@ -236,7 +234,7 @@ namespace ZoneEngine.Core.Playfields
 
             PrepareSpawnedKarli(mob, controller);
             TryApplyPatrol(KarliCaptureInstance, controller);
-            mob.Coordinates(new Coordinate { x = 36.147f, y = 0.435f, z = 45.919f });
+            mob.Coordinates(new Coordinate { x = 36.14677f, y = 0.435f, z = 45.91928f });
             mob.DoNotDoTimers = false;
             activateNpc(mob);
             playfield.AnnounceSpawnedCharacterVisibility(mob, Identity.None);
@@ -249,28 +247,5 @@ namespace ZoneEngine.Core.Playfields
             return true;
         }
 
-        private static NpcPatrolReplaySegment[] BuildContinuousLoop(float[][] waypoints)
-        {
-            var segments = new NpcPatrolReplaySegment[waypoints.Length];
-            for (int i = 0; i < waypoints.Length; i++)
-            {
-                float[] start = waypoints[i];
-                float[] end = waypoints[(i + 1) % waypoints.Length];
-                double dx = end[0] - start[0];
-                double dz = end[2] - start[2];
-                double distance = Math.Sqrt((dx * dx) + (dz * dz));
-                double delay = Math.Max(0.25, (distance / WalkSpeedPerSecond) * EarlyTurnFactor);
-                segments[i] = new NpcPatrolReplaySegment(
-                    delay,
-                    start[0],
-                    start[1],
-                    start[2],
-                    end[0],
-                    end[1],
-                    end[2]);
-            }
-
-            return segments;
-        }
     }
 }

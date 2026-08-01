@@ -14,7 +14,9 @@ namespace AORebirth.Core.Playfields
 
     using Utility;
 
+    using ZoneEngine.Core.Functions.GameFunctions;
     using ZoneEngine.Core.Missions;
+    using ZoneEngine.Core.Playfields;
 
     using Coordinate = AORebirth.Core.Vector.Coordinate;
     using Identity = SmokeLounge.AOtomation.Messaging.GameData.Identity;
@@ -243,7 +245,10 @@ namespace AORebirth.Core.Playfields
 
             foreach (StatelData sd in collisionStatels)
             {
-                if (!IsInStatelCollisionRange(sd, dynel))
+                bool inRange = TempleWorldInteractionRules.IsBoundaryLinkStatel(sd)
+                    ? TempleWorldInteractionRules.IsInBoundaryTriggerRange(sd, dynel)
+                    : IsInStatelCollisionRange(sd, dynel);
+                if (!inRange)
                 {
                     continue;
                 }
@@ -284,6 +289,12 @@ namespace AORebirth.Core.Playfields
                 playfieldIdentity,
                 stopMovement,
                 teleportToPlayfield))
+            {
+                return;
+            }
+
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                playfieldIdentity.Instance))
             {
                 return;
             }
@@ -348,7 +359,9 @@ namespace AORebirth.Core.Playfields
             foreach (StatelData sd in collisionStatels)
             {
                 string statelKey = BuildStatelContactKey(sd);
-                bool inRange = IsInStatelCollisionRange(sd, dynel);
+                bool inRange = TempleWorldInteractionRules.IsBoundaryLinkStatel(sd)
+                    ? TempleWorldInteractionRules.IsInBoundaryTriggerRange(sd, dynel)
+                    : IsInStatelCollisionRange(sd, dynel);
                 bool wasInRange = activeEnterContacts.Contains(statelKey);
 
                 if (!inRange)
@@ -359,6 +372,30 @@ namespace AORebirth.Core.Playfields
                     }
 
                     continue;
+                }
+
+                if (TempleWorldInteractionRules.IsExteriorLinkStatel(
+                    playfieldIdentity.Instance,
+                    sd))
+                {
+                    // The official EntryHall exterior link has no statel Event. Prime the
+                    // arrival contact, re-arm only after leaving it, and reuse the shared
+                    // ExitProxyPlayfield owner when the character returns to the edge.
+                    if (!initialized)
+                    {
+                        activeEnterContacts.Add(statelKey);
+                        continue;
+                    }
+
+                    if (wasInRange)
+                    {
+                        continue;
+                    }
+
+                    activeEnterContacts.Add(statelKey);
+                    stopMovement(dynel);
+                    exitproxyplayfield.TryExecute(dynel, sd);
+                    return;
                 }
 
                 foreach (StatelEvent ev in
@@ -501,9 +538,23 @@ namespace AORebirth.Core.Playfields
                 return false;
             }
 
+            bool generatedExteriorClaim =
+                MissionAcgBindingRuntime.HasOwnedExteriorMarker(
+                    character.Identity.Instance,
+                    playfieldIdentity.Instance,
+                    character.RawCoordinates.X,
+                    character.RawCoordinates.Y,
+                    character.RawCoordinates.Z,
+                    8.0,
+                    12.0)
+                || MissionInstanceService.HasGeneratedAcceptedExteriorClaim(
+                    character,
+                    Identity.None,
+                    8.0,
+                    12.0);
             if (!MissionKeyGrantService.HasMissionKey(character))
             {
-                return false;
+                return generatedExteriorClaim;
             }
 
             float sourceX = character.RawCoordinates.X;
@@ -601,7 +652,7 @@ namespace AORebirth.Core.Playfields
             stopMovement(character);
             if (!MissionInstanceService.TryEnterMissionInstance(character.Controller.Client))
             {
-                return false;
+                return generatedExteriorClaim;
             }
 
             LogUtil.Debug(
@@ -648,11 +699,14 @@ namespace AORebirth.Core.Playfields
             float doorX;
             float doorY;
             float doorZ;
-            MissionInstanceService.ResolveInteriorExitDoor(
-                playfieldIdentity.Instance,
-                out doorX,
-                out doorY,
-                out doorZ);
+            if (!MissionInstanceService.ResolveInteriorExitDoor(
+                    playfieldIdentity.Instance,
+                    out doorX,
+                    out doorY,
+                    out doorZ))
+            {
+                return false;
+            }
 
             float sourceX = character.RawCoordinates.X;
             float sourceY = character.RawCoordinates.Y;

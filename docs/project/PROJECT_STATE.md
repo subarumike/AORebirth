@@ -4,31 +4,34 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Focus
 
-- Arete Landing capture `20260722-152454` has been imported from the public
-  handoff and fully recovered offline: `2,407/2,407` SCFUs and `213/213`
-  corpse full updates decode without errors, all `56` corpse-loot rows are
-  identity-linked, and lifecycle processing is allowed. Production now
-  preserves `50` additional exact atomic corpse snapshots (`59` item rows,
-  including `19` empty snapshots) for Arete Rollerrat, Desert Reet, Angry
-  Minibull, Gnarl the Roller, Kneebreaker Alfonzo Rizzolo, 32-V Docker, Waste
-  Collector, Cleanmeister Intelligence Robot, and Supreme Collector of Waste.
-  Ordinary wildlife is playfield/name/MonsterData scoped and named variants
-  remain name scoped. The capture also contains `9,526` usable FollowTarget
-  paths, but raw ambient/chase branches and respawn-generation identities are
-  not promoted as interchangeable patrol routes; the existing captured robot
-  replay already covers the two highest-volume stable robot identities.
-  Snapshot probabilities, wider loot pools, and two corpse snapshots lacking
-  captured enemy name/level context remain unresolved.
+- **Arete is complete for the behavior supported by the complete existing
+  repository and capture corpus.** The authoritative acceptance source is
+  `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; older generated
+  plans, phase notes, TODOs, blocker statements, and short live-verification
+  notes are historical wherever they contradict that matrix or commit
+  `a83d689a`. Every accepted NPC, movement, aggro, combat, death, respawn, loot,
+  vendor, interaction, dialogue, quest, mission, and playfield boundary has a
+  production owner and focused acceptance coverage. Remaining unknown values
+  are explicit non-blocking evidence gaps, not unfinished Arete implementation.
 
-- Arete Landing capture `20260722-104809` has been recovered from the public
-  handoff and offline-decoded with all `2,581` SCFUs and `275` corpse full
-  updates recovered without errors. Exact identity-linked loot now separates
-  Cleanmeister Intelligence Robot (`17` credits, two atomic snapshots),
-  Supreme Collector of Waste (`35` credits, two atomic snapshots), and
-  Malfunctioning Cleaning Robot (`5` credits, two empty snapshots) from the
-  previous shared MonsterData-only Cleaning Robot/Waste Collector fallbacks.
-  Snapshot probability and wider pools remain unresolved. SimpleChar
-  `78E0FC65` now uses its captured display name `Stanley Goodman`.
+- The canonical Arete movement corpus contains `26,654` independently
+  classified observations: `23,185` promotable, `1,853` ambiguous, `1,616`
+  rejected, and `22,798` deduplicated runtime rows (`20,933` patrol, `1,384`
+  spawn, `164` chase, `54` flee, and `263` leash). Scripted rows stay out of
+  runtime because their trigger contract is absent. The only production data
+  source is `Content/Captured/Arete/movement-full`; the old split movement
+  directory and standalone cleaning-robot replay are obsolete duplicate paths.
+  The full acceptance release gate is `tools\run_arete_acceptance_tests.cmd`,
+  followed by the approved debug build and engine restart wrappers.
+
+- Captures `20260722-104809` and `20260722-152454` remain authoritative for
+  exact identity-linked lifecycle and loot. All `2,581`/`275` and
+  `2,407`/`213` SCFU/corpse-full projections respectively decode without
+  errors. Production preserves every complete first-open atomic snapshot,
+  including empty outcomes and resolved blank-name owners, while loot
+  probability and any unseen wider pool remain explicitly unresolved without
+  reducing the accepted captured outcomes. SimpleChar `78E0FC65` retains its
+  captured display name `Stanley Goodman`.
 
 - PF127/PF1931 named encounter completion is authoritative across 19 unique
   active combat/profile domains: 14 initial stages, two successors, two
@@ -193,6 +196,37 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   regressions pass. Active version-1 captured-difficulty state is validated and
   atomically migrated without losing proportional health or mutable lifecycle
   state; the post-repair live destination/NPC recheck remains pending.
+
+- The generated-terminal mission-level graph is now a compiled, deterministic
+  artifact generated from the canonical exact
+  `AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv`. The graph requires
+  every level `1..220` and all eleven `Q0..Q10` positions, validates strict
+  numeric syntax, exact header/row/column shape, uniqueness, QL/token bounds,
+  monotonic rows and columns, and `Q5 == level`, and verifies canonical
+  SHA-256
+  `295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f`
+  before atomically publishing one immutable snapshot. Production no longer
+  searches runtime paths for a CSV or ODS, silently skips bad rows, publishes
+  default cells, or falls back after an invalid graph. Mission rolling reports
+  the graph failure and charges no fee. The upstream ODS hash is
+  `5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`;
+  it matches levels `1..133`, while `134..220` are lossy scientific-notation
+  cells and remain provenance only. Mission locations, sliders, rewards, token
+  progress, ACG, and authored quests are unchanged.
+
+- Generated-terminal runtime ownership is fail-closed across spawn, entry,
+  interaction, combat, completion, payload, exit, corpse, and cleanup routing.
+  Exact accepted bindings, allocator reservations, reversible runtime
+  identities, mission-owned inventory identities, and exterior markers claim
+  generated traffic before any legacy handler can run. A claimed PF2 with a
+  missing binding or runtime record is rejected; it cannot receive legacy NPC
+  or database population, captured-default payload/building substitution,
+  newest/type/template objective selection, global target completion, or legacy
+  artifact cleanup. The fence does not classify by numeric PF2 range alone
+  because legacy mission instances share that allocation namespace. True
+  legacy missions and authored quests retain their existing paths. ACG
+  payloads, rewards, sliders, loot, token progress, expiry, schema, and
+  procedural-generation behavior are unchanged.
 
 - Generated-ACG mission corpses now use the later-analyzed
   `20260725-185432` mission-trash credit evidence as an inclusive `21-87`
@@ -784,30 +818,39 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Explicit truthy values enable: `1`, `true`, `yes`, `on`.
 - Other non-empty values remain disabled.
 - Current Rex gates using this model: `AO_REBIRTH_ENABLE_ARETE_REX_DIALOGUE_ROUTING`, `AO_REBIRTH_ENABLE_ARETE_REX_QUEST_PREVIEW`, `AO_REBIRTH_ENABLE_ARETE_REX_B18C_PROGRESS`, `AO_REBIRTH_ENABLE_ARETE_REX_B18D_PREVIEW`, and `AO_REBIRTH_ENABLE_ARETE_REX_B18E_COMPLETION`.
+- These are compatibility/configuration controls for already accepted behavior;
+  they are not Arete completion blockers and do not narrow the authoritative
+  evidence matrix.
 
 ## Current AO Arete / Rex State
 
-- `6553 Arete Landing` is enabled and is the active Rex test playfield.
-- Rex Larsson identity is `SimpleChar:782DE568`.
-- Rex checked-in content lives under `AORebirth/Server/ZoneEngine/Content/Arete/rex-larsson`.
-- Rex works through B18F on the current baseline.
-- B18C, B18D, B18E, and B18F handoff paths are implemented through safe DTO/body packet construction.
-- B18C: Rex dialogue can offer `Mission:5514B18C`; B18C counts five `Malfunctioning Cleaning Robot` kills; captured per-kill feedback is emitted; final handoff sends captured mission-window sequence to B18D.
-- B18C runtime targets are five evidence-backed `Malfunctioning Cleaning Robot` rows in playfield `6553`; the local spawn repair uses heartbeat-safe actor-baseline stats and preserves captured HP/level/monster data.
-- B18D: exact Cargo Box use target is `Terminal:56D9B4AF`; use records B18D progress, cleans up B18D with DTO-built `QuestMessage Action=Delete`, and emits B18E `QuestFullUpdate`.
-- B18E: returning to Rex from B18E state starts the captured return branch, deletes B18E with DTO-built `QuestMessage Action=Delete`, grants actual `+290 XP`, grants `+1040` credits, sends reward feedback, and emits B18F `QuestFullUpdate`.
-- B18F: handoff is implemented as `Mission:5514B18F` / `Talk to Marcus Stone`. Marcus Stone identity evidence is `SimpleChar:782DE567`.
-- Reward feedback text is `Received reward: 1281 XP, 1040 credits.` The `1281 XP` value is display metadata only and must not be applied as actual XP.
-- Marcus Stone static B18F dialogue visibility is implemented for `SimpleChar:782DE567` in playfield `6553`, using captured `20260614-195107` B18F prompt/options.
-- Marcus B18F -> B194 transition is implemented only for node `marcus_195107_b18f_002`, answer index `0`, option text `So, let me guess... You need some help with the fire?`. It requires Rex chain state `B18FPreviewed` or later, uses a process-local duplicate guard, sends DTO-built B18F `QuestMessage Action=Delete`, and sends DTO-built B194 `QuestFullUpdate`.
-- Uncommitted Phase 4B item `296780` handout work exists inside the Marcus B18F -> B194 transition. It grants item `296780/296780` at QL `1` through `BaseInventory`, persists inventory immediately, sends safe DTO-built `TemplateAction`/`ContainerAddItem` notifications, and blocks the mission transition if template lookup, inventory add, or inventory persistence fails. It has focused build/search validation but has not had live smoke and is not committed. No raw replay, DB mission persistence, full Marcus quest chain, gas-fire use, trade, rewards, or follow-up mission is implemented.
-- Historical stale Marcus runtime hook cleanup remains preserved: `ZoneEngine.csproj` no longer includes missing `MarcusStoneQuestChainHandler.cs`, and runtime router code no longer references `MarcusStoneQuestChainHandler`. Current Marcus static dialogue is registered through content-driven dialogue and loads the checked-in `Content/Arete/marcus-stone/manifest.json`; Marcus quest chain remains future work, gate behavior is unchanged, focused ZoneEngine build passed, and `git diff --check` passed for the cleanup.
+- `6553 Arete Landing` and captured namespace `1044525`, plus Crashed Alien
+  Ship PF `8009`, are covered by the authoritative Arete acceptance matrix.
+- Rex Larsson is `SimpleChar:782DE568`; Marcus Stone is
+  `SimpleChar:782DE567`. Their checked-in content and capture-backed mission
+  handoffs are production-owned and included in focused Arete acceptance.
+- B18C counts the five exact Malfunctioning Cleaning Robot kills and emits the
+  captured feedback/handoff. B18D uses exact Cargo Box
+  `Terminal:56D9B4AF`. B18E owns its captured deletion, actual `+290 XP`,
+  `+1040` credits, reward feedback, and B18F handoff. The displayed `1281 XP`
+  remains wire text and is not applied as actual XP.
+- B18F and the exact captured Marcus transition to B194 retain their checked-in
+  dialogue/mission identity, answer index, option text, item handoff, packet
+  ordering, and duplicate suppression. This is accepted production behavior;
+  no phase TODO remains for the supported transition.
+- Five terminal-only mission observations and other exact unsupported facts are
+  evidence-only boundaries in the acceptance matrix. They are not Arete TODOs
+  and do not block the supported Rex, Marcus, or other Arete flows.
 
 ## Current Arete / Rex Source Documents
 
-- Current Rex content pack: `AORebirth/Server/ZoneEngine/Content/Arete/rex-larsson/manifest.json`.
-- Key Rex/Arete result history: `docs/generated/rex_b18c_robot_progress_smoke_result.md`, `docs/generated/rex_b18d_to_b18e_safe_handoff_result.md`, `docs/generated/rex_mission_window_cleanup_return_state_result.md`, `docs/generated/rex_b18e_completion_b18f_handoff_result.md`, `docs/generated/rex_b18e_credit_reward_message_result.md`, and `docs/generated/arete_malfunctioning_cleaning_robot_spawn_result.md`.
-- Older generated reports may describe earlier disabled-by-default gates, missing B18D cleanup, missing B18E completion, missing credits, or missing B18F handoff. Treat those as historical phase notes superseded by this top section unless a newer file says otherwise.
+- Authoritative acceptance matrix:
+  `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`.
+- Current Rex content pack:
+  `AORebirth/Server/ZoneEngine/Content/Arete/rex-larsson/manifest.json`.
+- Generated Rex/Arete results remain historical evidence. They do not override
+  the acceptance matrix, revive removed TODOs, or turn an explicit evidence gap
+  into an implementation blocker.
 
 ## Current Working Systems Summary
 
@@ -1002,6 +1045,50 @@ Final runtime third-party attribution is documented in the root `NOTICE`: CellAO
 - `2070 neut_advanced_weapons_shop` static vendor coverage was expanded with 1 approved mapping. Commit `9c41ed9` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 571`. Total uncovered statel vendors dropped from `572` to `571`, and `2070 neut_advanced_weapons_shop` dropped from `5` to `4`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_2070_neut_advanced_weapons_shop_20260610_040826.sql`. Rejected candidates `135659521`/`297466`, `135659522`/`297470`, `135659523`/`99572`, and `135659524`/`99573` remain uncovered until matching `vendortemplate` evidence is found. No runtime vendor behavior changed.
 - `600 Varmint Woods` static vendor coverage was expanded with 1 approved mapping. Commit `e197b9f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, query-back confirmed `39321612 | 600 | 93063 | AdvOA`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`. Total uncovered statel vendors dropped from `571` to `570`, and `600 Varmint Woods` dropped from `3` to `2`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`. Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered until matching `vendortemplate.ItemTemplate` evidence is found. No runtime vendor behavior changed.
 - Surgery clinic and implant flows have documented repaired behavior.
+
+# Durable Accepted Generated-Mission Projection
+
+Generated terminal missions persist a complete version-1 accepted projection
+under `mission-state/acg-accepted-projections`. Each sidecar contains 65
+deterministically ordered `key=value` fields, a Base64 encoding of the complete
+serialized roll-response body, a SHA-256 integrity value, and atomic temp-file
+replacement. Loading rejects unknown versions, malformed or partial fields,
+hash mismatches, invalid selected-offer indices, duplicate accepted quest IDs,
+duplicate owner/original-offer ownership, and any mismatch with the persisted
+bundle, building, live PF2, key, objective, reward, artifact, expiry, or
+lifecycle identities.
+
+The projection freezes the original offer and distinct accepted quest IDs,
+owner/explicit team state, mission type and icon, QL and all sliders, complete
+title and description, action fields, cash/XP/item rewards, issuing terminal,
+exterior entrance, key, exact Repair or Return Item artifact, the frozen Repair
+component low/high template pair, all structured
+type-specific QFU data, binding, expiry, and lifecycle state. Kill, Find Person,
+Find Item, Return Item, and Repair QFUs are reconstructed from this immutable
+accepted source after restart; completion consumes its frozen rewards instead
+of mutable roll templates or recalculation fallbacks.
+
+Acceptance is serialized and idempotent by owner plus original offer identity.
+The selected offer is claimed durably before artifacts or client-visible
+accepted state. Persisted phases cover the offer claim, binding, objective,
+pending/granted key, pending/granted exact artifact, objective exposure,
+accepted commit, and pending/sent QFU delivery. A retry or restart resumes the
+same reservation and exact inventory identities; it cannot allocate another
+accepted quest, PF2, bundle, key, or artifact. Expired pre-binding reservations
+are cleaned autonomously during startup. Reconnect re-registers exact artifacts
+and resends the accepted QFU from the stored projection without rerolling
+rewards or action data, while suppressing a duplicate timer-refresh QFU when
+recovery already delivered it. Offer expiry gates acceptance; a successful
+acceptance starts the existing independent 48-hour mission duration.
+
+Offer identity allocation has its own version-1 atomic SHA-256 cursor at
+`mission-state/offer-identities/generated-offer-id.cursor`. It is restored
+before allocation and collision-checked against current offers, accepted
+projections, and mission bindings. Old generated `MissionAcceptedStore` rows do
+not contain enough information for safe migration; ambiguous rows fail closed
+instead of being rebuilt from defaults. Authored quests and true legacy mission
+paths remain unchanged. This work adds no database/schema, reward-formula,
+slider, loot, ACG-payload, or procedural-generation changes.
 
 # Generated Terminal Mission Token Progress
 

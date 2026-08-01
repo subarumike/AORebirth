@@ -121,6 +121,16 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (LeonoraMartyQuestRuntime.TryFinishLeonoraTrade(
+                    messageWrapper.Client.Controller.Character,
+                    messageWrapper.MessageBody)
+                || ShinySwordQuestRuntime.TryFinishSwordTrade(
+                    messageWrapper.Client.Controller.Character,
+                    messageWrapper.MessageBody))
+            {
+                return;
+            }
+
             if (ShippingManifestTerminalQuestRuntime.TryFinishTerminalTrade(
                 messageWrapper.Client.Controller.Character,
                 messageWrapper.MessageBody))

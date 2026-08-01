@@ -30,6 +30,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly HashSet<int> completedSpawnMovement = new HashSet<int>();
 
+        private readonly HashSet<int> suspendedPatrols = new HashSet<int>();
+
         internal CapturedAreteMovementRuntimeService()
             : this(CapturedAreteMovementCatalog.LoadDefault())
         {
@@ -98,10 +100,15 @@ namespace AORebirth.Core.Playfields
 
         internal bool TryProcessPatrol(ICharacter character, DateTime utcNow)
         {
+            if (character == null || this.suspendedPatrols.Contains(character.Identity.Instance))
+            {
+                return false;
+            }
+
             NPCController controller = character == null ? null : character.Controller as NPCController;
-            if (controller == null
-                || controller.State != CharacterState.Patrolling
-                || character.FightingTarget.Instance != 0)
+            if (!CapturedAreteMovementRuntimeCoordinator.PatrolConditionMatches(
+                    controller != null,
+                    character != null && character.FightingTarget.Instance != 0))
             {
                 return false;
             }
@@ -130,6 +137,9 @@ namespace AORebirth.Core.Playfields
 
             CapturedAreteMovementPoint targetPosition =
                 ToPoint(target.Coordinates().coordinate);
+            bool continuingCapturedChase = this.coordinator.HasActiveSequence(
+                character.Identity.Instance,
+                CapturedAreteMovementBehavior.Chase);
             CapturedAreteMovementDecisionKind chase = this.Process(
                 character,
                 CapturedAreteMovementBehavior.Chase,
@@ -140,6 +150,11 @@ namespace AORebirth.Core.Playfields
             if (chase != CapturedAreteMovementDecisionKind.Fallback)
             {
                 return true;
+            }
+
+            if (continuingCapturedChase)
+            {
+                return false;
             }
 
             return this.Process(
@@ -167,11 +182,50 @@ namespace AORebirth.Core.Playfields
                    != CapturedAreteMovementDecisionKind.Fallback;
         }
 
+        internal bool HasLeashEvidence(ICharacter character)
+        {
+            int generation;
+            return character != null
+                   && this.IsAvailable
+                   && this.runtimeSpawnGenerations.TryGetValue(
+                       character.Identity.Instance,
+                       out generation)
+                   && this.catalog.Matching(
+                       this.BuildEvidence(character, generation, false, null, null),
+                       CapturedAreteMovementBehavior.Leash).Length != 0;
+        }
+
         internal void Interrupt(ICharacter character)
         {
             if (character != null)
             {
+                if (this.coordinator.HasActiveSequence(
+                        character.Identity.Instance,
+                        CapturedAreteMovementBehavior.Spawn))
+                {
+                    this.completedSpawnMovement.Add(character.Identity.Instance);
+                }
+
                 this.coordinator.Interrupt(character.Identity.Instance);
+            }
+        }
+
+        internal void SuspendPatrol(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.suspendedPatrols.Add(character.Identity.Instance);
+            this.Interrupt(character);
+        }
+
+        internal void ResumePatrol(ICharacter character)
+        {
+            if (character != null)
+            {
+                this.suspendedPatrols.Remove(character.Identity.Instance);
             }
         }
 
@@ -186,6 +240,7 @@ namespace AORebirth.Core.Playfields
             this.coordinator.Remove(runtimeIdentity);
             this.runtimeSpawnGenerations.Remove(runtimeIdentity);
             this.completedSpawnMovement.Remove(runtimeIdentity);
+            this.suspendedPatrols.Remove(runtimeIdentity);
         }
 
         internal void Clear()
@@ -193,6 +248,7 @@ namespace AORebirth.Core.Playfields
             this.coordinator.Clear();
             this.runtimeSpawnGenerations.Clear();
             this.completedSpawnMovement.Clear();
+            this.suspendedPatrols.Clear();
         }
 
         private CapturedAreteMovementDecisionKind Process(

@@ -94,7 +94,7 @@ namespace ZoneEngine.Core.Missions
         {
             if (character != null
                 && character.Playfield != null
-                && MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                     character.Playfield.Identity.Instance))
             {
                 return;
@@ -121,7 +121,7 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
-            if (MissionAcgBindingRuntime.IsBoundLivePlayfield(
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                 character.Playfield.Identity.Instance))
             {
                 return;
