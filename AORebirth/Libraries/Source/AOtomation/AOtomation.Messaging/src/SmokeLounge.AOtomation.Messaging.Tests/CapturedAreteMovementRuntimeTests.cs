@@ -34,9 +34,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedAreteMovementCatalog catalog = CapturedAreteMovementCatalog.LoadDefault();
 
             Assert.IsTrue(catalog.IsValid, catalog.FailureReason);
-            Assert.AreEqual(20573, catalog.SourceObservationCount);
-            Assert.AreEqual(20267, catalog.RuntimeObservationCount);
-            Assert.AreEqual(18402, catalog.Count(CapturedAreteMovementBehavior.Patrol));
+            Assert.AreEqual(23185, catalog.SourceObservationCount);
+            Assert.AreEqual(22798, catalog.RuntimeObservationCount);
+            Assert.AreEqual(20933, catalog.Count(CapturedAreteMovementBehavior.Patrol));
             Assert.AreEqual(1384, catalog.Count(CapturedAreteMovementBehavior.Spawn));
             Assert.AreEqual(164, catalog.Count(CapturedAreteMovementBehavior.Chase));
             Assert.AreEqual(54, catalog.Count(CapturedAreteMovementBehavior.Flee));
@@ -525,7 +525,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void TimingUsesAbsoluteScheduleWithoutCrossPacketTeleportOrLooping()
+        public void TerminalSchema4PatrolFallsBackWithoutEnteringLegacyReplayWrap()
         {
             string directory = CreateDataset(
                 new[]

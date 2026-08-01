@@ -1,7 +1,7 @@
 {
   "bindingTotals": {
     "actorCount": 1583,
-    "bindingRecordCount": 1565
+    "bindingRecordCount": 1566
   },
   "bindings": [
     {
@@ -36904,7 +36904,7 @@
       "surface": "arete-alien-area"
     },
     {
-      "actorCount": 5,
+      "actorCount": 2,
       "bindingKey": "7aa0128054600baeddb1",
       "classification": "unresolved",
       "configuredSourceIdentity": null,
@@ -36920,6 +36920,30 @@
         7
       ],
       "monsterData": 265822,
+      "name": "SANDSTORM Marauder",
+      "runtimeContractReady": false,
+      "runtimePlayfieldOrResource": 6553,
+      "runtimeProfileSelector": "arete-sandstorm-captured-contract",
+      "runtimeSourceIdentityHint": null,
+      "surface": "arete-sandstorm-marauders"
+    },
+    {
+      "actorCount": 3,
+      "bindingKey": "de4fcb088774f406e44f",
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260727-204902"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
+      ],
+      "coverageKey": "71fe2138049411d599ae",
+      "level": 7,
+      "levelCandidates": [
+        7
+      ],
+      "monsterData": 287217,
       "name": "SANDSTORM Marauder",
       "runtimeContractReady": false,
       "runtimePlayfieldOrResource": 6553,
@@ -37862,7 +37886,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteAlienAreaMobRuntime.cs",
-      "sha256": "37e9885f9c7d64d9c7c9c5b7d3723797e09f34059aabe3646d4847852e0c3be5"
+      "sha256": "d4b1483cd9378c3972a1a8c3aaaa48f42a8136b41c291f01703cd58a476e8548"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs",
@@ -37882,15 +37906,15 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs",
-      "sha256": "5d50d1d1a314748ae49727ecc1228a20f43ce2efb9b43a2ffa68539743f8a8e0"
+      "sha256": "b32df2de36b3f76a98f0488bb59294301cf71f839b0d57527cadfa3176bc3b51"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotContentProvider.cs",
-      "sha256": "57bc27ed2ab7260741169a73ec64e129872abe6b88aecea80787747565fd5fbd"
+      "sha256": "b25c6b49473db6b832559dc147ba15f5991d8ab435d0af839b30d495352b3eb9"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
-      "sha256": "e5f5c2f59d1c43a2cb390feea186fda78f8b853a74e0d164004df03175ea18df"
+      "sha256": "1bed52ed54b2bc2872bab7968b21599c6409e3ed11f048e61a3fe28cadea9bd3"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs",
@@ -37934,7 +37958,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-      "sha256": "dd825eb785de9b34af232a3115f8e99b92f61a2b29653d4c78bc49131dc52f1d"
+      "sha256": "37fa06a6b70cb677f32b5da4c39f409e5ac165b69884f9ac6c6ca48b8c5528ca"
     },
     {
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
@@ -38383,8 +38407,8 @@
     "finalCaptureCertifiedActorCount": 313,
     "finalQuarantinedActorCount": 1270,
     "fixedCertifiedProfileRowCount": 313,
-    "fixedProfileRowCount": 787,
-    "fixedUnresolvedProfileRowCount": 474,
+    "fixedProfileRowCount": 788,
+    "fixedUnresolvedProfileRowCount": 475,
     "newlyCaptureCertifiedActorCount": 298,
     "priorCaptureCertifiedActorCount": 15,
     "remainingConflictedSourceIdentityCount": 2,
@@ -246956,7 +246980,7 @@
       ]
     },
     {
-      "actorCount": 5,
+      "actorCount": 2,
       "captureSearchScope": "corpusSearch.sessionsSearched",
       "captureSessionCountSearched": 375,
       "captureSessions": [
@@ -247013,7 +247037,9 @@
       "monsterData": 265822,
       "name": "SANDSTORM Marauder",
       "noMatchingEvidenceAfterExhaustiveSearch": false,
-      "notes": [],
+      "notes": [
+        "initial slot MonsterData is preserved per captured actor"
+      ],
       "runtimeContractReady": false,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 6553,
@@ -247023,6 +247049,749 @@
       "unresolvedReasons": [
         "the canonical combat inventory does not independently index every cited content capture",
         "unresolved-incomplete-sequence: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+      ]
+    },
+    {
+      "actorCount": 3,
+      "captureSearchScope": "corpusSearch.sessionsSearched",
+      "captureSessionCountSearched": 375,
+      "captureSessions": [
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+      ],
+      "classification": "unresolved",
+      "configuredSourceIdentity": null,
+      "contentEvidenceCaptureIds": [
+        "20260727-204902"
+      ],
+      "contentEvidenceCaptureIdsOutsideCombatInventory": [
+        "20260727-204902"
+      ],
+      "contentSources": [
+        "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs"
+      ],
+      "coverageKey": "71fe2138049411d599ae",
+      "disabledGameplayCapabilities": [
+        "NPC auto-attack emission and damage application"
+      ],
+      "evidenceFound": [
+        {
+          "level": 7,
+          "observations": [
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11368|9e7230de80d4",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11896|24831654fe4a",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11897|24831654fe4a",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 13,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11358|9db9bb023b39",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 1,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11366|ae62d86db4d3",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11894|dca858ff7033",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11895|dca858ff7033",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 13,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11356|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 1,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "non-normal-landed",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": true,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11369|9e7230de80d4",
+                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11588|fc4a2e4a012b",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11367|ae62d86db4d3",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 1,
+              "observationType": "non-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "non-normal-landed",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": true,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11422|e2deb82506ee",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11464|1de3151ed830",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 2,
+              "observationType": "non-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "miss",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": true,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "MissedAttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11400|dfbc8149877d",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "MissedAttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11401|dfbc8149877d",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "normal landed or critical AttackInfo semantics",
+                "owner-linked WIFU or independently proven natural attack mode"
+              ],
+              "observationCount": 2,
+              "observationType": "unsupported-sequence",
+              "runtimeSupport": "evidence-only miss; the packet contains no landed, critical, terminal, damage-type, hit-type, weapon-slot, or weapon-instance result semantics",
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "unsupported-message",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {},
+                  {}
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 2,
+              "observationType": "unsupported-sequence",
+              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "unsupported-message",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {},
+                  {}
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 2,
+              "observationType": "unsupported-sequence",
+              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            }
+          ]
+        }
+      ],
+      "evidencePacketIds": [],
+      "level": 7,
+      "levelCandidates": [
+        7
+      ],
+      "levelCoverage": [
+        {
+          "captureSessions": [
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+          ],
+          "classification": "unresolved",
+          "combatInventoryStatus": "capture-certified",
+          "combatProfileKey": "resource=6553|md=287217|level=7|name=SANDSTORM Marauder",
+          "disabledGameplayCapability": "NPC auto-attack emission and damage application",
+          "evidenceFound": [
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11368|9e7230de80d4",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11896|24831654fe4a",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11897|24831654fe4a",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 13,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11358|9db9bb023b39",
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": null,
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 1,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11366|ae62d86db4d3",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11894|dca858ff7033",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11895|dca858ff7033",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 13,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "orphan-combat-prefix",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": null,
+                    "AttackInfo": null,
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11356|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "AttackInfo correlated after this packet inside the same capture and SCFU generation"
+              ],
+              "observationCount": 1,
+              "observationType": "incomplete-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "non-normal-landed",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": true,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11369|9e7230de80d4",
+                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11588|fc4a2e4a012b",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11367|ae62d86db4d3",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 1,
+              "observationType": "non-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "non-normal-landed",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": true,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11422|e2deb82506ee",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "AttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11464|1de3151ed830",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null,
+                    "WeaponItemFullUpdateDefinitionComplete": null,
+                    "WeaponItemFullUpdateProblems": [],
+                    "WeaponItemFullUpdateResolution": "missing"
+                  }
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 2,
+              "observationType": "non-normal-attack",
+              "runtimeSupport": null,
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "miss",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": true,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "MissedAttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11400|dfbc8149877d",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null
+                  },
+                  {
+                    "Attack": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11359|9db9bb023b39",
+                    "MissedAttackInfo": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11401|dfbc8149877d",
+                    "SpecialAttackWeapon": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831|IN|11357|9bcfe771b16b",
+                    "WeaponItemFullUpdate": null
+                  }
+                ]
+              },
+              "missingEvidence": [
+                "normal landed or critical AttackInfo semantics",
+                "owner-linked WIFU or independently proven natural attack mode"
+              ],
+              "observationCount": 2,
+              "observationType": "unsupported-sequence",
+              "runtimeSupport": "evidence-only miss; the packet contains no landed, critical, terminal, damage-type, hit-type, weapon-slot, or weapon-instance result semantics",
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "unsupported-message",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {},
+                  {}
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 2,
+              "observationType": "unsupported-sequence",
+              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0B"
+            },
+            {
+              "captureSessions": [
+                "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-215831"
+              ],
+              "classification": "unsupported-message",
+              "conflicts": [],
+              "evidenceFound": {
+                "AttackInfo": false,
+                "MissedAttackInfo": false,
+                "metadataResolution": [
+                  "capture-local-generation"
+                ],
+                "samples": [
+                  {},
+                  {}
+                ]
+              },
+              "missingEvidence": [],
+              "observationCount": 2,
+              "observationType": "unsupported-sequence",
+              "runtimeSupport": "inventory-only; current shared NPC auto-attack runtime does not emit this sequence",
+              "samplePacketIds": [],
+              "sourceIdentity": "0x78D30B0D"
+            }
+          ],
+          "evidencePacketIds": [],
+          "level": 7,
+          "missingEvidence": [
+            "AttackInfo correlated after this packet inside the same capture and SCFU generation",
+            "capture-backed non-equipped attack range",
+            "captured same-fight landed AttackInfo interval",
+            "exact specialized runtime sequence for multiple captured AttackInfo streams",
+            "runtime-ready capture-proven unique semantic fallback for a source-unbound runtime actor"
+          ],
+          "resolutionMode": "none",
+          "runtimeContractReady": false,
+          "runtimeMissingEvidence": [
+            "capture-backed non-equipped attack range",
+            "captured same-fight landed AttackInfo interval",
+            "exact specialized runtime sequence for multiple captured AttackInfo streams"
+          ],
+          "semanticFallbackCaptureProven": true,
+          "unresolvedReason": "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution"
+        }
+      ],
+      "matchingEvidenceSessionCount": 1,
+      "missingEvidence": [
+        "AttackInfo correlated after this packet inside the same capture and SCFU generation",
+        "capture-backed non-equipped attack range",
+        "captured same-fight landed AttackInfo interval",
+        "content provenance not indexed by the canonical combat inventory: 20260727-204902",
+        "exact specialized runtime sequence for multiple captured AttackInfo streams",
+        "runtime-ready capture-proven unique semantic fallback for a source-unbound runtime actor"
+      ],
+      "monsterData": 287217,
+      "name": "SANDSTORM Marauder",
+      "noMatchingEvidenceAfterExhaustiveSearch": false,
+      "notes": [
+        "initial slot MonsterData is preserved per captured actor"
+      ],
+      "runtimeContractReady": false,
+      "runtimeMissingEvidence": [
+        "capture-backed non-equipped attack range",
+        "captured same-fight landed AttackInfo interval",
+        "exact specialized runtime sequence for multiple captured AttackInfo streams"
+      ],
+      "runtimePlayfieldOrResource": 6553,
+      "runtimeProfileSelector": "arete-sandstorm-captured-contract",
+      "runtimeSourceIdentityHint": null,
+      "surface": "arete-sandstorm-marauders",
+      "unresolvedReasons": [
+        "capture-certified: no runtime-ready capture-certified binding satisfies the runtime selector without substitution",
+        "the canonical combat inventory does not independently index every cited content capture"
       ]
     },
     {
@@ -250420,7 +251189,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteAlienAreaMobRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          586
+          515
         ]
       },
       {
@@ -250475,7 +251244,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          208
+          354
         ]
       },
       {
@@ -250486,7 +251255,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          319
+          314
         ]
       },
       {
@@ -250553,8 +251322,8 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
         "prepareCallCount": 2,
         "prepareCallSourceLines": [
-          614,
-          670
+          633,
+          689
         ]
       },
       {

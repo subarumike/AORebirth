@@ -1,6 +1,6 @@
 # Arete Movement Live Verification — 20260731-030702
 
-> Historical classifier notice: the 6 m activation and 2.5 m continuation rules below were false runtime assumptions. Exact packet/manual observations remain evidence; distance-gated eligibility and rejection conclusions are superseded by the corrected verifier and full-corpus completion report.
+> Historical classifier notice: the 6 m activation and 2.5 m continuation rules below were false runtime assumptions. Exact packet/manual observations remain evidence; distance-gated eligibility and rejection conclusions are superseded by the corrected verifier and full-corpus completion report. Rows labeled `exact_legacy_robot_route` below were subsequently normalized into schema-4 `movement-full` and are no longer a separate runtime path.
 
 This report reconciles the complete live observation capture against every behavior-specific promoted runtime row. Regenerated live identities are evidence labels only and are not used as promotion keys.
 

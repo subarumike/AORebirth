@@ -124,6 +124,7 @@ namespace ZoneEngine.Core.Playfields
             this.announcements = new PlayfieldAnnouncementRuntimeService();
             this.content = new PlayfieldContentCoordinator(
                 new AreteContentModule(),
+                new CrashedAlienShipContentModule(),
                 new MontroyalContentModule(),
                 new SubwayContentModule(),
                 new TempleOfThreeWindsContentModule(),
@@ -389,6 +390,16 @@ namespace ZoneEngine.Core.Playfields
         {
             this.npcRuntime.ActivateNpc(character);
             this.visibilityInterest.Register(character);
+        }
+
+        internal void SuspendCapturedAretePatrol(ICharacter character)
+        {
+            this.npcRuntime.SuspendCapturedAretePatrol(character);
+        }
+
+        internal void ResumeCapturedAretePatrol(ICharacter character)
+        {
+            this.npcRuntime.ResumeCapturedAretePatrol(character);
         }
 
         private void DeactivateNpc(Identity identity)

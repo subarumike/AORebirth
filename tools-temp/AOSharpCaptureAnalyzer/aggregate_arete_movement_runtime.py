@@ -30,6 +30,11 @@ DEFAULT_SOURCE_RUNTIME_DIRS = (
     REPOSITORY_ROOT
     / "docs"
     / "generated"
+    / "arete_20260721_rox_robots_movement"
+    / "runtime",
+    REPOSITORY_ROOT
+    / "docs"
+    / "generated"
     / "arete_20260722_104809_movement"
     / "runtime",
     REPOSITORY_ROOT
@@ -55,10 +60,10 @@ DEFAULT_REPORT = (
     / "arete_full_corpus_movement_promotion_audit.md"
 )
 
-EXPECTED_SOURCE_PROMOTABLE = 20573
-EXPECTED_RUNTIME_ROWS = 20267
+EXPECTED_SOURCE_PROMOTABLE = 23185
+EXPECTED_RUNTIME_ROWS = 22798
 EXPECTED_RUNTIME_BEHAVIORS = {
-    "patrol": 18402,
+    "patrol": 20933,
     "spawn": 1384,
     "chase": 164,
     "flee": 54,
@@ -426,7 +431,7 @@ def render_report(
         "## Result",
         "",
         (
-            f"The two complete Arete movement captures reconcile deterministically to "
+            f"The three complete Arete movement evidence sources reconcile deterministically to "
             f"**{sum(integer(source.analysis_manifest['reconciledObservations'], 'reconciledObservations') for source in sources):,}** "
             f"independently classified paths: **{totals['promotable']:,} promotable**, "
             f"**{totals['ambiguous']:,} ambiguous**, and **{totals['rejected']:,} rejected**."

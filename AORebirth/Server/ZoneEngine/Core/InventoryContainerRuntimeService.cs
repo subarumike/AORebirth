@@ -980,6 +980,20 @@ namespace ZoneEngine.Core
                 return true;
             }
 
+            if (ShinySwordQuestRuntime.TryHandleShinySwordUse(character, itemPosition, item)
+                || LeonoraMartyQuestRuntime.TryHandleCreditCardStealUse(character, itemPosition, item)
+                || LeonoraMartyQuestRuntime.TryHandleVacuumPackedOmniMedSuitUse(
+                    character,
+                    itemPosition,
+                    item)
+                || KarliCappelleriQuestRuntime.TryHandleFriendlyBuffUse(
+                    character,
+                    itemPosition,
+                    item))
+            {
+                return true;
+            }
+
             TemplateActionMessageHandler.Default.Send(
                 character,
                 item,

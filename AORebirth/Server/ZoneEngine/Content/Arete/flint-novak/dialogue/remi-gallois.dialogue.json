@@ -158,32 +158,17 @@
         {
           "Id": "remi_done",
           "PromptText": "Flashing a killer smile as you approach the young man before you spreads his arms at his side, directing attention to his wares.\n\nThis is a dangerous world, friend - I'd hope you're prepared. That Omni-Tek... yokel over there believes that you can hide from your troubles behind some shiny plasteel. Personally, I prescribe to the idea that the best offense? Is a damn good offense.",
-          "PromptTextConfidence": "KnubotAppendText greeting reuse after rewards granted",
+          "PromptTextConfidence": "Not promoted: post-completion interaction is absent from the corpus",
           "Options": [
             {
               "Id": "remi_done_option_0",
               "Index": 0,
-              "Text": "Do you sell any weapons?",
-              "TextEvidence": "inferred post-complete; sell option from mid/finish lists",
+              "Text": "Goodbye",
+              "TextEvidence": "Safe fail-closed option; post-completion interaction not captured",
               "NextNodeId": "remi_goodbye",
               "Actions": [
                 {
                   "Id": "remi_done_option_0_end",
-                  "Type": "EndDialogue",
-                  "QuestId": null,
-                  "Text": "Shop opens via Remi vendor side-effect / GenericCmd Use"
-                }
-              ]
-            },
-            {
-              "Id": "remi_done_option_1",
-              "Index": 1,
-              "Text": "Goodbye",
-              "TextEvidence": "KnuBotAnswerList Goodbye",
-              "NextNodeId": "remi_goodbye",
-              "Actions": [
-                {
-                  "Id": "remi_done_option_1_end",
                   "Type": "EndDialogue",
                   "QuestId": null,
                   "Text": "Safe close"

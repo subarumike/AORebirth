@@ -30,6 +30,8 @@ namespace AORebirth.Core.Playfields
 
         private readonly HashSet<int> completedSpawnMovement = new HashSet<int>();
 
+        private readonly HashSet<int> suspendedPatrols = new HashSet<int>();
+
         internal CapturedAreteMovementRuntimeService()
             : this(CapturedAreteMovementCatalog.LoadDefault())
         {
@@ -98,6 +100,11 @@ namespace AORebirth.Core.Playfields
 
         internal bool TryProcessPatrol(ICharacter character, DateTime utcNow)
         {
+            if (character == null || this.suspendedPatrols.Contains(character.Identity.Instance))
+            {
+                return false;
+            }
+
             NPCController controller = character == null ? null : character.Controller as NPCController;
             if (!CapturedAreteMovementRuntimeCoordinator.PatrolConditionMatches(
                     controller != null,
@@ -203,6 +210,25 @@ namespace AORebirth.Core.Playfields
             }
         }
 
+        internal void SuspendPatrol(ICharacter character)
+        {
+            if (character == null)
+            {
+                return;
+            }
+
+            this.suspendedPatrols.Add(character.Identity.Instance);
+            this.Interrupt(character);
+        }
+
+        internal void ResumePatrol(ICharacter character)
+        {
+            if (character != null)
+            {
+                this.suspendedPatrols.Remove(character.Identity.Instance);
+            }
+        }
+
         internal void Remove(ICharacter character)
         {
             if (character == null)
@@ -214,6 +240,7 @@ namespace AORebirth.Core.Playfields
             this.coordinator.Remove(runtimeIdentity);
             this.runtimeSpawnGenerations.Remove(runtimeIdentity);
             this.completedSpawnMovement.Remove(runtimeIdentity);
+            this.suspendedPatrols.Remove(runtimeIdentity);
         }
 
         internal void Clear()
@@ -221,6 +248,7 @@ namespace AORebirth.Core.Playfields
             this.coordinator.Clear();
             this.runtimeSpawnGenerations.Clear();
             this.completedSpawnMovement.Clear();
+            this.suspendedPatrols.Clear();
         }
 
         private CapturedAreteMovementDecisionKind Process(

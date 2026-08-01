@@ -87,7 +87,7 @@ namespace AORebirth.Core.Playfields
                                    ?? throw new ArgumentNullException("chaseNavigation");
             this.corpseLifecycle = new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome);
             this.combatTick = new NpcCombatTickCoordinator(playfield);
-            this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent);
+            this.capturedAreteRobotContent = new CapturedAreteRobotContentProvider();
             this.capturedSubwayContent = new CapturedSubwayContentProvider();
             this.capturedSubwayOrdinaryContent = new CapturedSubwayOrdinaryContentProvider();
             this.ordinaryEnemyCatalog =
@@ -95,8 +95,7 @@ namespace AORebirth.Core.Playfields
                     this.capturedSubwayContent,
                     this.capturedSubwayOrdinaryContent,
                     new CapturedTempleOfThreeWindsContentProvider());
-            this.patrolReplay =
-                new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent);
+            this.patrolReplay = new NpcPatrolReplayCoordinator(this.capturedSubwayContent);
             this.capturedAreteMovement = new CapturedAreteMovementRuntimeService();
             if (!this.capturedAreteMovement.IsAvailable)
             {
@@ -114,7 +113,6 @@ namespace AORebirth.Core.Playfields
             this.capturedAreteRobotSpawns =
                 new CapturedAreteRobotSpawnOrchestrator(
                     this.capturedAreteRobotContent,
-                    this.patrolReplay,
                     this.ActivateNpc);
             this.ordinaryEnemies =
                 new OrdinaryEnemyRuntimeService(
@@ -170,6 +168,16 @@ namespace AORebirth.Core.Playfields
             this.capturedAreteMovement.Activate(character);
         }
 
+        internal void SuspendCapturedAretePatrol(ICharacter character)
+        {
+            this.capturedAreteMovement.SuspendPatrol(character);
+        }
+
+        internal void ResumeCapturedAretePatrol(ICharacter character)
+        {
+            this.capturedAreteMovement.ResumePatrol(character);
+        }
+
         internal void EnsureAreteCapturePopulation()
         {
             AreteLandingPopulationEnsure.Tick(
@@ -177,6 +185,14 @@ namespace AORebirth.Core.Playfields
                 this.playfield.Identity,
                 this.ActivateNpc);
             this.capturedAreteRobotSpawns.TickRespawn(this.playfield, this.playfield.Identity);
+            AreteAlienAreaMobRuntime.TickRespawn(
+                this.playfield,
+                this.playfield.Identity,
+                this.ActivateNpc);
+            AreteSandstormMarauderRuntime.TickRespawn(
+                this.playfield,
+                this.playfield.Identity,
+                this.ActivateNpc);
         }
 
         internal void ClearRuntimeState()
@@ -216,6 +232,9 @@ namespace AORebirth.Core.Playfields
             JunkyardCleaningRobotRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             AlexAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             LoreleiOasisMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteAlienAreaMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteSandstormMarauderRuntime.ClearPlayfield(this.playfield.Identity.Instance);
+            AreteKarliCappelleriPatrolRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             NascenceLifeSpawn.ClearPlayfield(this.playfield.Identity.Instance);
             AreteFinishCaptureMobRuntime.ClearPlayfield(this.playfield.Identity.Instance);
             SurveillanceDroidRuntime.ClearPlayfield(this.playfield.Identity.Instance);
@@ -346,6 +365,51 @@ namespace AORebirth.Core.Playfields
                 LogUtil.Debug(
                     DebugInfoDetail.Error,
                     "LoreleiOasisMobRuntime start failed: " + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                AreteAlienAreaMobRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteAlienAreaMobRuntime start failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                AreteSandstormMarauderRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteSandstormMarauderRuntime start failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
+            }
+
+            try
+            {
+                AreteKarliCappelleriPatrolRuntime.StartForPlayfield(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.ActivateNpc);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "AreteKarliCappelleriPatrolRuntime start failed: "
+                    + ex.GetType().Name + ": " + ex.Message);
             }
 
             try
@@ -1303,11 +1367,6 @@ namespace AORebirth.Core.Playfields
         private void ScheduleDeadNpcDespawn(ICharacter target)
         {
             this.corpseLifecycle.ScheduleDeadNpcDespawn(target);
-        }
-
-        private static void LogCapturedAreteRobotContent(bool isError, string message)
-        {
-            LogUtil.Debug(isError ? DebugInfoDetail.Error : DebugInfoDetail.Engine, message);
         }
 
         private class NpcHomeState

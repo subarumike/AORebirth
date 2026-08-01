@@ -4,6 +4,8 @@ Generated: 2026-06-15
 
 Scope: code scaffolding only. No Arete content pack, Rex Larsson implementation, SQL, database schema change, mission reward, packet emission, live dialogue behavior, or KnuBot behavior change was added.
 
+> Historical scaffolding-phase result. Superseded by commit `a83d689a` and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; this document is not a current implementation or blocker inventory.
+
 ## Inputs Reviewed
 
 - `docs/generated/arete_existing_system_audit.md`

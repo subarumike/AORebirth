@@ -4,6 +4,8 @@ Generated: 2026-06-15
 
 Scope: implementation plan only. This document does not implement Rex Larsson, create missions, generate SQL, create NPC spawns, or change runtime behavior.
 
+> Historical planning document. Superseded by commit `a83d689a` and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; it is retained for provenance and is not a current Arete blocker list.
+
 ## Target
 
 - NPC: Rex Larsson

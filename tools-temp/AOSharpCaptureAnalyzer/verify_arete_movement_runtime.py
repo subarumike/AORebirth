@@ -28,9 +28,6 @@ DEFAULT_RUNTIME_DATASET_DIR = (
     / "Arete"
     / "movement-full"
 )
-DEFAULT_LEGACY_ROBOT_DATASET = (
-    DEFAULT_RUNTIME_DATASET_DIR.parent / "cleaning_robot_patrol_replay.csv"
-)
 BEHAVIORS = ("patrol", "spawn", "chase", "flee", "leash")
 COORDINATE_TOLERANCE = 0.001
 TIMING_TOLERANCE_SECONDS = 0.250
@@ -84,12 +81,6 @@ class LivePath:
     end: Point
 
 
-@dataclass(frozen=True)
-class LegacyPath:
-    start: Point
-    end: Point
-
-
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -101,11 +92,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--runtime-dataset-dir",
         type=Path,
         default=DEFAULT_RUNTIME_DATASET_DIR,
-    )
-    parser.add_argument(
-        "--legacy-robot-dataset",
-        type=Path,
-        default=DEFAULT_LEGACY_ROBOT_DATASET,
     )
     parser.add_argument("--report", type=Path)
     parser.add_argument("--identity-report", type=Path)
@@ -312,21 +298,6 @@ def load_live_paths(capture: Path) -> list[LivePath]:
     return result
 
 
-def load_legacy_paths(path: Path) -> list[LegacyPath]:
-    result: list[LegacyPath] = []
-    for row in read_csv(path):
-        if (
-            (row.get("MessageType") or "").strip() != "FollowTarget"
-            or (row.get("FollowKind") or "").strip() != "NpcPath"
-        ):
-            continue
-        start = point_from(row, "Current")
-        end = point_from(row, "Destination")
-        if start is not None and end is not None:
-            result.append(LegacyPath(start, end))
-    return result
-
-
 def exact_constraint_rows(
     npc: LiveNpc, runtime_rows: list[RuntimeRow]
 ) -> list[RuntimeRow]:
@@ -377,16 +348,6 @@ def matching_paths(
     ]
 
 
-def matching_legacy_paths(
-    path: LivePath, candidates: Iterable[LegacyPath]
-) -> list[LegacyPath]:
-    return [
-        row
-        for row in candidates
-        if points_equal(path.start, row.start) and points_equal(path.end, row.end)
-    ]
-
-
 def family_label(constraint: Constraint) -> str:
     return (
         f"{constraint.name} "
@@ -398,7 +359,6 @@ def family_label(constraint: Constraint) -> str:
 def build_results(
     capture: Path,
     runtime_rows: list[RuntimeRow],
-    legacy_paths: list[LegacyPath],
     visual_no_displacement: bool,
     visual_movement_confirmed: bool,
     visual_no_attacks: bool,
@@ -537,11 +497,8 @@ def build_results(
         npc = npc_by_identity.get(path.identity)
         candidates = [] if npc is None else constraint_rows.get(npc.constraint, [])
         promoted_matches = matching_paths(path, candidates)
-        legacy_matches = matching_legacy_paths(path, legacy_paths)
         if promoted_matches:
             route_result = "exact_promoted_route"
-        elif legacy_matches:
-            route_result = "exact_legacy_robot_route"
         elif npc is None:
             route_result = "live_identity_metadata_unresolved"
         elif not candidates:
@@ -877,11 +834,9 @@ def main(argv: list[str]) -> int:
             "arete-movement-live-paths.csv"
         )
         runtime_rows = load_runtime_rows(args.runtime_dataset_dir.resolve())
-        legacy_paths = load_legacy_paths(args.legacy_robot_dataset.resolve())
         report, identities, paths, summary = build_results(
             args.capture_folder.resolve(),
             runtime_rows,
-            legacy_paths,
             args.visual_no_displacement,
             args.visual_movement_confirmed,
             args.visual_no_attacks,
