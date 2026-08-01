@@ -1138,6 +1138,25 @@ namespace AORebirth.Core.Playfields
             return clone;
         }
 
+        internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility(
+            string eligibilityEvidence)
+        {
+            var clone = (CapturedEnemyCombatContract)this.MemberwiseClone();
+            clone.Retaliates = true;
+            clone.AiProfile = ZoneEngine.Core.NpcAiProfile.Passive;
+            if (!string.IsNullOrWhiteSpace(eligibilityEvidence)
+                && (string.IsNullOrWhiteSpace(clone.Evidence)
+                    || clone.Evidence.IndexOf(
+                        eligibilityEvidence,
+                        StringComparison.Ordinal) < 0))
+            {
+                clone.Evidence = string.IsNullOrWhiteSpace(clone.Evidence)
+                                     ? eligibilityEvidence
+                                     : clone.Evidence + "; " + eligibilityEvidence;
+            }
+            return clone;
+        }
+
         internal CapturedEnemyCombatContract WithCaptureProvenArchetype(
             string archetypeId)
         {

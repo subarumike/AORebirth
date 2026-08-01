@@ -58,6 +58,41 @@ SCRIPTED_HOSTILE_SOURCE = (
 )
 SCRIPTED_HOSTILE_CAPTURE_ID = "20260718-185306"
 
+PF127_ORDINARY_PROFILE_RESOLUTION_MODE = (
+    "production-owned-exact-pf127-ordinary-profile-resolver"
+)
+PF127_ORDINARY_PROFILE_SELECTOR_PREFIX = "subway.ordinary."
+PF127_EXACT_SUPPORTED_PROFILE_SELECTORS = (
+    "subway.supported.17720",
+    "subway.supported.203734",
+)
+PF127_ORDINARY_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
+    "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs": (
+        "CapturedEnemyCombatContract combatContract = ResolveCombatContractForSpawn(",
+        "CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(",
+        "CapturedEnemyCombatRuntime.Prepare(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs": (
+        "private static void BuildCapturedOrdinaryRows(",
+        "CapturedSubwayCombatCatalog.ForOrdinary(",
+        "sourceVariantContractResolver",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs": (
+        "internal static CapturedEnemyCombatContract ForOrdinary(",
+        "ForOrdinarySelectedAtomicGeneration(",
+        "internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs": (
+        "internal static class CapturedSubwayRetaliationEligibilityResolver",
+        "private static readonly Dictionary<int, CapturedSubwayRetaliationBinding> Bindings",
+        "CapturedEnemyCombatProfileCatalog.TryResolve(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs": (
+        "TryResolveProductionOwnedNaturalAttackProfile(",
+        "TryResolveCaptureProvenEquippedWeaponArchetype(",
+    ),
+}
+
 # Every production call site must be assigned to either the fixed-denominator
 # coverage or an explicit non-denominator audit family.  The expected call
 # count makes a second call in an already-covered file fail closed too.
@@ -215,6 +250,29 @@ def repo_path(repo_root: Path, relative: str) -> Path:
 
 def read_source(repo_root: Path, relative: str) -> str:
     return repo_path(repo_root, relative).read_text(encoding="utf-8-sig")
+
+
+def discover_pf127_ordinary_profile_owners(
+    repo_root: Path,
+) -> List[Dict[str, Any]]:
+    owners: List[Dict[str, Any]] = []
+    for relative, required_markers in sorted(
+        PF127_ORDINARY_PROFILE_OWNER_MARKERS.items()
+    ):
+        source = read_source(repo_root, relative)
+        missing = [marker for marker in required_markers if marker not in source]
+        if missing:
+            raise CoverageError(
+                "PF127 ordinary profile resolver ownership changed in "
+                f"{relative}: missing " + ", ".join(repr(marker) for marker in missing)
+            )
+        owners.append(
+            {
+                "path": relative,
+                "requiredMarkers": list(required_markers),
+            }
+        )
+    return owners
 
 
 def sha256_file(path: Path) -> str:
@@ -1604,6 +1662,132 @@ def unresolved_evidence_rows(
     return result
 
 
+def classify_pf127_ordinary_profile_level(
+    actor: ActorDefinition,
+    level: int,
+    profile: Optional[Mapping[str, Any]],
+    family_profiles: Sequence[Mapping[str, Any]],
+    resolver_owners: Sequence[Mapping[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    if actor.surface != "subway-ordinary":
+        return None
+    if actor.resource != 127:
+        raise CoverageError(
+            "Subway ordinary profile resolver escaped PF127: "
+            f"resource={actor.resource} selector={actor.runtime_profile_selector}"
+        )
+    if (
+        not actor.runtime_profile_selector.startswith(
+            PF127_ORDINARY_PROFILE_SELECTOR_PREFIX
+        )
+        and actor.runtime_profile_selector
+        not in PF127_EXACT_SUPPORTED_PROFILE_SELECTORS
+    ):
+        return None
+    if (
+        actor.configured_source_identity is None
+        or actor.runtime_source_identity_hint is None
+        or actor.configured_source_identity != actor.runtime_source_identity_hint
+    ):
+        raise CoverageError(
+            "PF127 ordinary profile resolver requires one exact configured/runtime "
+            f"source identity: selector={actor.runtime_profile_selector}"
+        )
+    if not resolver_owners:
+        raise CoverageError("PF127 ordinary profile resolver has no production owner")
+    if profile is None:
+        return None
+
+    exact_level_variants = [
+        variant
+        for variant in profile.get("variants", [])
+        if variant.get("captureCertified") is True
+        and variant.get("captureEvidenceSafe") is True
+    ]
+    family_variants = [
+        (family_profile, variant)
+        for family_profile in family_profiles
+        for variant in family_profile.get("variants", [])
+        if variant.get("captureCertified") is True
+        and variant.get("captureEvidenceSafe") is True
+    ]
+    evidence_scope = "exact-level-profile"
+    if exact_level_variants:
+        evidence_profile = profile
+        evidence_variants = exact_level_variants
+    elif family_variants:
+        evidence_scope = "same-archetype-profile"
+        evidence_profile, representative = family_variants[0]
+        evidence_variants = [variant for _, variant in family_variants]
+    else:
+        return None
+
+    representative = evidence_variants[0]
+    packet_ids = [
+        representative.get("representativeWifuPacketId"),
+        representative.get("representativeSawPacketId"),
+        representative.get("representativeAttackPacketId"),
+    ]
+    for stream in representative.get("streams", []):
+        packet_ids.extend(stream.get("attackInfoPacketIds", [])[:1])
+
+    source_identity = format_identity(actor.runtime_source_identity_hint)
+    owner_paths = sorted_unique(owner.get("path") for owner in resolver_owners)
+    capture_sessions = sorted_unique(
+        session
+        for variant in evidence_variants
+        for session in variant.get("captureSessions", [])
+    )
+    retaliation_eligibility_promoted = (
+        actor.runtime_profile_selector in PF127_EXACT_SUPPORTED_PROFILE_SELECTORS
+    )
+    return {
+        "level": level,
+        "combatProfileKey": profile.get("profileKey"),
+        "classification": "certified",
+        "resolutionMode": PF127_ORDINARY_PROFILE_RESOLUTION_MODE,
+        "captureSessions": capture_sessions,
+        "evidencePacketIds": sorted_unique(packet_ids),
+        "evidenceFound": [
+            {
+                "observationType": (
+                    "exact-level-profile-consumed-by-production-owned-pf127-"
+                    "ordinary-resolver"
+                ),
+                "runtimeProfileSelector": actor.runtime_profile_selector,
+                "runtimeSourceIdentity": source_identity,
+                "exactCombatProfileKey": profile.get("profileKey"),
+                "evidenceScope": evidence_scope,
+                "evidenceCombatProfileKey": evidence_profile.get("profileKey"),
+                "evidenceLevel": (evidence_profile.get("metadata") or {}).get(
+                    "level"
+                ),
+                "captureCertifiedVariantCount": len(evidence_variants),
+                "captureSessions": capture_sessions,
+                "representativeEvidencePacketIds": sorted_unique(packet_ids),
+            }
+        ],
+        "missingEvidence": [],
+        "runtimeContractReady": True,
+        "runtimeMissingEvidence": [],
+        "disabledGameplayCapability": None,
+        "runtimeProfileSelector": actor.runtime_profile_selector,
+        "runtimeResolverSources": owner_paths,
+        "exactRuntimeSourceIdentityRequired": True,
+        "allConcreteRuntimeVariantsMustResolveRetaliationEligible": True,
+        "allConcreteRuntimeVariantsMustResolveFinalCombatReady": True,
+        "crossPlayfieldFallbackAllowed": False,
+        "promotedCapability": (
+            "source-bound combat-contract ownership and exact retaliation eligibility"
+            if retaliation_eligibility_promoted
+            else "combat-contract ownership only"
+        ),
+        "retaliationEligibilityPromoted": retaliation_eligibility_promoted,
+        "automaticAggressionPolicyPromoted": False,
+        "automaticCombatActivationPromoted": False,
+    }
+
+
 def classify_level(
     actor: ActorDefinition,
     level: int,
@@ -1611,6 +1795,10 @@ def classify_level(
     metadata_by_identity: Mapping[Tuple[int, int, int, str], Sequence[Mapping[str, Any]]],
     mathematical_bindings: Optional[
         Mapping[Tuple[int, int, int, str, Optional[str]], Mapping[str, Any]]
+    ] = None,
+    pf127_ordinary_profile_owners: Sequence[Mapping[str, Any]] = (),
+    profiles_by_archetype: Optional[
+        Mapping[Tuple[int, int, str], Sequence[Mapping[str, Any]]]
     ] = None,
 ) -> Dict[str, Any]:
     identity = (actor.resource, actor.monster_data, level, actor.name)
@@ -1799,6 +1987,19 @@ def classify_level(
             for variant in selected
         ]
         return result
+
+    pf127_ordinary_profile = classify_pf127_ordinary_profile_level(
+        actor,
+        level,
+        profile,
+        (profiles_by_archetype or {}).get(
+            (actor.resource, actor.monster_data, actor.name),
+            (),
+        ),
+        pf127_ordinary_profile_owners,
+    )
+    if pf127_ordinary_profile is not None:
+        return pf127_ordinary_profile
 
     result["captureSessions"] = sorted_unique(profile.get("captureSessionsSearched", []))
     result["evidenceFound"] = unresolved_evidence_rows(
@@ -2293,7 +2494,29 @@ def build_inventory(
         Path(session.replace("\\", "/")).name for session in searched_sessions
     }
     runtime_prepare_entry_points = discover_runtime_prepare_entry_points(repo_root)
+    pf127_ordinary_profile_owners = discover_pf127_ordinary_profile_owners(
+        repo_root
+    )
+    pf127_retaliation_resolver_source = read_source(
+        repo_root,
+        "AORebirth/Server/ZoneEngine/Core/Playfields/"
+        "CapturedSubwayRetaliationEligibilityResolver.cs",
+    )
+    pf127_retaliation_source_binding_count = len(
+        re.findall(
+            r"\{\s*0x[0-9A-Fa-f]{8},\s*new\s+CapturedSubwayRetaliationBinding\(",
+            pf127_retaliation_resolver_source,
+        )
+    )
+    if pf127_retaliation_source_binding_count != 34:
+        raise CoverageError(
+            "PF127 exact retaliation resolver must contain 34 capture-backed "
+            f"source bindings; found {pf127_retaliation_source_binding_count}"
+        )
     profiles_by_identity: Dict[Tuple[int, int, int, str], Mapping[str, Any]] = {}
+    profiles_by_archetype: Dict[
+        Tuple[int, int, str], List[Mapping[str, Any]]
+    ] = defaultdict(list)
     unmapped_profiles: Dict[Tuple[int, int, str], Mapping[str, Any]] = {}
     for profile in combat_inventory.get("profiles", []):
         unmapped_identity = parse_unmapped_combat_profile_key(profile["profileKey"])
@@ -2310,6 +2533,9 @@ def build_inventory(
         if identity in profiles_by_identity:
             raise CoverageError(f"duplicate combat profile identity: {profile['profileKey']}")
         profiles_by_identity[identity] = profile
+        profiles_by_archetype[(identity[0], identity[1], identity[3])].append(
+            profile
+        )
 
     realm_map = {
         int(key): int(value)
@@ -2356,6 +2582,8 @@ def build_inventory(
                 profiles_by_identity,
                 metadata_by_identity,
                 mathematical_bindings,
+                pf127_ordinary_profile_owners,
+                profiles_by_archetype,
             )
             for level in actor.levels
         ]
@@ -2452,6 +2680,7 @@ def build_inventory(
             "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceShapeCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceSpawn.cs",
         }
+        | {row["path"] for row in pf127_ordinary_profile_owners}
         | {row["path"] for row in runtime_prepare_entry_points}
     )
     source_inputs = [
@@ -2716,10 +2945,11 @@ def build_inventory(
             "cursedSilvertail": "a dynamic replacement for one of five Dreaming Silvertails and does not increase the Nascence Life count",
         },
         "classificationRule": {
-            "certified": "every runtime level candidate resolves a variant with runtimeContractReady=true through either an exact runtime source-identity binding or a capture-proven unique semantic fallback",
+            "certified": "every runtime level candidate resolves through an exact runtime source-identity binding, a capture-proven unique semantic fallback, an exact mathematical setup, or the production-owned PF127 ordinary-profile resolver after every concrete exact-source variant passes source-bound retaliation-eligibility resolution and final IsCombatReady validation",
             "unresolved": "at least one runtime level candidate lacks runtime-ready contract data or either safe resolver mode; absent runtimeContractReady is fail-closed",
             "configuredSourceIdentity": "official capture identity recorded by content, when defined",
             "runtimeSourceIdentityHint": "identity actually supplied to the generated runtime resolver; null means only a semantic fallback can resolve safely",
+            "pf127OrdinaryProfile": "limited to subway.ordinary.* profiles plus the exact capture-proven Discarded Pet and Mugger supported selectors in resource 127, always with exact configured/runtime source identity; focused tests reproduce the production source-bound retaliation resolver and final TryResolve chain for every concrete variant",
         },
         "totals": totals,
         "migrationSummary": migration_summary,
@@ -2748,6 +2978,27 @@ def build_inventory(
                 row["prepareCallCount"] for row in runtime_prepare_entry_points
             ),
             "entries": runtime_prepare_entry_points,
+        },
+        "pf127OrdinaryProfileResolverAudit": {
+            "resolutionMode": PF127_ORDINARY_PROFILE_RESOLUTION_MODE,
+            "surface": "subway-ordinary",
+            "runtimePlayfieldOrResource": 127,
+            "profileSelectorPrefix": PF127_ORDINARY_PROFILE_SELECTOR_PREFIX,
+            "exactSupportedProfileSelectors": list(
+                PF127_EXACT_SUPPORTED_PROFILE_SELECTORS
+            ),
+            "requiresExactConfiguredRuntimeSourceIdentity": True,
+            "requiresEveryConcreteRuntimeVariantToResolveRetaliationEligible": True,
+            "requiresEveryConcreteRuntimeVariantToResolveFinalCombatReady": True,
+            "crossPlayfieldFallbackAllowed": False,
+            "promotedCapability": "combat-contract ownership plus exact source-bound retaliation eligibility for supported selectors",
+            "retaliationEligibilityPromotionAllowed": True,
+            "exactRetaliationEligibilitySourceBindingCount": (
+                pf127_retaliation_source_binding_count
+            ),
+            "automaticAggressionPolicyPromotionAllowed": False,
+            "automaticCombatActivationPromotionAllowed": False,
+            "owners": pf127_ordinary_profile_owners,
         },
         "fixedDenominatorExclusions": [
             "53 ICC HQ Social actors",

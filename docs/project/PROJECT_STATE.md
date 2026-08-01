@@ -14,6 +14,32 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   production owner and focused acceptance coverage. Remaining unknown values
   are explicit non-blocking evidence gaps, not unfinished Arete implementation.
 
+- **PF127 Subway is the selected post-Arete playfield and is complete for the
+  behavior supported by the complete existing repository and capture corpus.**
+  The authoritative acceptance source is
+  `docs/evidence/SUBWAY_FULL_CORPUS_COMPLETION_20260731.md`. All `322` ordinary
+  actors are active with zero quarantine; captured ordinary and named movement,
+  aggro, combat, death, corpse, respawn, loot, the canonical vendor stock,
+  Tailor, the linked PF655 Karrec/gateway flow, PF127 geometry/navigation,
+  zoning, teardown, and the exact six closed statuses proven on external PF127
+  arrival have production owners and focused coverage. The six statuses are not
+  replayed for same-playfield death, and no PF1931 proximity rule is imported.
+  The canonical 202-row vendor snapshot remains the only runtime stock; the
+  exact alternate 203-row observation is evidence-only because no selector is
+  proven; its regenerated capture-session identities remain provenance and are
+  not runtime selectors. The separate 18-identity door-state projection is also evidence-only
+  because its transition triggers are absent. The active-coverage projection
+  now recognizes the production-owned exact source-bound PF127 profile resolver
+  instead of applying the circular direct-runtime-binding gate. Its exact
+  165-row scope is 29 `subway.supported.17720` Discarded Pets, five
+  `subway.supported.203734` Muggers, and 131 `subway.ordinary.*` actors. It
+  requires exact configured/runtime source identity and final readiness for
+  every concrete source/level/generation variant. The helper promotes only the
+  retaliation eligibility needed for combat-contract resolution; automatic
+  aggro radii and attack-on-sight activation policy remain separately owned.
+  Unknown probabilities, unseen branches, dynamic trigger semantics, and
+  unmeasured values are explicit non-blocking evidence gaps.
+
 - The canonical Arete movement corpus contains `26,654` independently
   classified observations: `23,185` promotable, `1,853` ambiguous, `1,616`
   rejected, and `22,798` deduplicated runtime rows (`20,933` patrol, `1,384`
@@ -87,8 +113,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   (`290/32` and `165/2`). Evidence:
   `docs/evidence/TEMPLE_ORDINARY_COMBAT_COMPLETION_20260728.md`.
 
-- The fixed 53-actor Subway combat checkpoint is now `52` certified and `1`
-  quarantined. This completion pass restores all six Incomplete Rebuild, all
+- Historical fixed-scope checkpoint, superseded by the authoritative `322/0`
+  PF127 completion above: the 53-actor Subway subset was `52` certified and `1`
+  quarantined at this stage. This pass restored all six Incomplete Rebuild, all
   three Workman Strikers, all three Molested Molecules, Bloodcreeper, and
   Redundant Scan: `14` actors total. Incomplete Rebuild uses
   `base=6*actorLevel+1` with SAW
@@ -97,11 +124,11 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   Both retain exact QL-selected captured weapon families. Workman and Redundant
   use exact active atomic-generation selectors; Bloodcreeper retains two
   genuine captured Bite/Spit streams. PF127/PF1931 are now `377/112` of `489`
-  (`290/32` and unchanged `87/80`). Stim Fiend `0x7957E415`, MD `203739`, L9
-  is the only remaining fixed-scope actor: capture `20260710-202132` has SCFU
-  and movement/despawn but no WIFU, SAW, Attack, AttackInfo, or
-  MissedAttackInfo, so the L10..L17 Stim formula cannot be extended
-  categorically. Evidence:
+  (`290/32` and unchanged `87/80`). At that checkpoint Stim Fiend
+  `0x7957E415`, MD `203739`, L9 lacked a local categorical chain; the later
+  full-corpus formula and exact packet-owner reconciliation in
+  `FINAL_ORDINARY_DUNGEON_COMBAT_COMPLETION_20260728.md` supersedes that
+  quarantine. Evidence for the historical checkpoint:
   `docs/evidence/SUBWAY_FIXED_SCOPE_COMBAT_COMPLETION_20260728.md`.
 
 - Fragmented Soul MonsterData `203729` now uses the bounded mathematical
@@ -565,10 +592,11 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   strict loot `6/1 empty`; Uncontrollable Anger has four normal `9..18`
   outcomes and strict loot `3/0 empty`. Infected Attendant gains one exact idle
   patrol; later capture `20260720-051714` supplies its second local hit and
-  expands strict loot to `6/1 empty`. Strike Foreman's two new fights and loot
-  snapshots are retained as named, report-only evidence; unresolved weapon
-  selection, respawn, leash/reset, aggro threshold, and corpse lifetime keep
-  that encounter dormant.
+  expands strict loot to `6/1 empty`. Historical note: this pass retained Strike
+  Foreman's two fights and loot snapshots as report-only evidence. Later
+  capture-backed named completion now owns Strike Foreman's exact L19/QL19
+  selection, combat, lifecycle, corpse, credits, and atomic loot; it is active,
+  as recorded in `DUNGEON_GAMEPLAY_COMPLETION_20260728.md`.
 - Quest-system status as of `2026-07-21` supersedes the older process-local Rex
   and generic-scaffolding notes retained below for history. ZoneEngine now has a
   MySQL-backed character-scoped mission lifecycle, deduplicated objective
@@ -654,12 +682,12 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   `20260708-004038` now recovers 329 SCFUs, 15 corpse rows, and 9 respawn rows
   with zero decode errors while explicitly excluding 13,247 trailing rows, so
   no repeat gameplay capture is needed.
-- Active development priority: make the Subway dungeon, resource/playfield `127`, fully playable using capture-backed implementation.
-- Current implementation roadmap:
-  1. Complete NPC population, appearances, patrol paths, and combat validation.
-  2. Complete static world objects, doors, containers, interactive objects, and environmental details.
-  3. Implement room-by-room parity, named NPCs, scripted events, boss encounters, and dungeon progression.
-  4. Add vendors, quest interactions, remaining polish, and capture parity validation.
+- Completed capture-backed priority: Subway resource/playfield `127` is complete
+  for every behavior supported by the existing corpus. Its authoritative matrix
+  is `docs/evidence/SUBWAY_FULL_CORPUS_COMPLETION_20260731.md`. General static
+  dynels, dynamic door triggers, unseen loot/vendor selection rules, unsupported
+  nano semantics, and unseen Karrec branches remain evidence gaps rather than an
+  open implementation roadmap.
 - Subway content binding uses resource/playfield `127`; live runtime instance ids such as `R=1187842` and capture/runtime output such as `Playfield2:122002` must not be used as the server content binding key.
 - Subway content work should use completed AOSharpLiveCapture folders supplied by Mike. Codex does not launch the AO client or capture tooling unless Mike explicitly instructs it in the current task.
 - Prefer visible Subway gameplay improvements over architectural refactoring, implement incrementally within playfield `127`, and do not resume Playfield decomposition unless Mike explicitly requests it.
@@ -778,11 +806,24 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 - Previous capture-backed enemy, movement, combat, zoning, and appearance milestones remain completed project history.
 - Filth Flea appearance has been corrected from capture-backed Subway SCFU texture evidence.
 - The hallway Filth Flea is accepted as of `2026-07-12`: Mike live-validated its combat path, corpse loot, credits, corpse cleanup, and repeat respawn behavior. The expanded official-live corpus now proves 18 complete corpse outcomes across `20260708-004038`, `20260709-210452`, `20260709-220439`, `20260712-155528`, and `20260712-161506`: 15 item memberships and five empty inventories. Exact death-linked credits are L4=`23` and L5=`29`; other captured spawn levels retain the private `23..79` fallback policy. Normal player-facing attack streams roll melee slot 0=`3..10` and poison slot 1=`14..24`; reviewed source `79531748` from `20260709-205921` adds one normal `15` and one critical `7`, while critical `7`, `13`, and `47` observations remain separate from runtime normal rolls. Capture `20260712-161506` correlates killed `(SimpleChar:795F924E)` to same-archetype same-position replacement `(SimpleChar:795F9294)` and records the corpse-disappearance boundary. Mike's repeated live observation establishes the four-minute post-despawn schedule, enforced by `AcceptedSubwayEnemyGateRequiresWholeEnemyCoverage` together with spawn, movement/chase, combat, appearance, corpse visual, loot, and credits.
-- Subway PF127 retains a 124-row supported-family evidence set plus 197 ordinary runtime rows. The active runtime contains 113 supported-family and all 197 ordinary rows; only 11 Violent Vagabond supported rows remain quarantined. The earlier `ALL_38` test showed the selector was loaded but not applied by the consolidated population owner; that diagnostic integration is corrected, while normal runtime remains `NONE`. Selected diagnostic rows write a bounded `population-activation-ledger.csv` with `ELIGIBLE`, `MATERIALIZED`, or `FAILED` phases, separating selector admission from runtime creation without changing eligibility. The 16 accepted rows promoted in this slice still require bounded private validation. This server-side PF127 disposition is unchanged by the separate official live-client regression described below.
+- Historical population checkpoint, superseded by the authoritative `322/0`
+  completion above: PF127 previously retained a 124-row supported-family set
+  plus 197 ordinary rows, with 11 Violent Vagabonds still quarantined at that
+  stage. The `ALL_38` diagnostic exposed and corrected selector integration;
+  its activation-ledger behavior remains historical diagnostic provenance, not
+  the current production disposition.
 - Premature Pattern source `79545356` now preserves the two exact same-source generations joined from captures `20260709-225408` and `20260712-232848`: L17/368 HP/scale 98/RunSpeed 65 and L18/394 HP/scale 98/RunSpeed 68. It also follows the complete reviewed out-and-back patrol. The variants intentionally have no weapon because neither capture contains a complete weapon update; uniform selection is private policy, no extra population row was added, and PF127 now remains 322 total/322 active/zero quarantined after the later Workman addition.
 - Global dynamic-character visibility now uses a playfield-owned bounded X/Z uniform index plus per-client bidirectional interest state. Defaults are 80-unit entry, 100-unit leave, and 32-unit cells with validated finite bounds. Initial snapshots, ordinary/captured/pet spawns, player/NPC movement, known-character messages, death/corpse visibility, despawn, respawn, zoning, disconnect, and playfield reset use the shared interest lifecycle; static dynel and vendor delivery remain unchanged. Entry packet order remains SCFU -> weapon definitions -> CharInPlay, and leave uses the proven `DespawnMessage` with `Unknown=1`. There is no pacing, batching, throttling, or pagination. ZoneEngine/AORebirth Debug build passes; focused policy/index/catalog/performance 12/12, executable state 8/8, lifecycle integration 9/9, spatial metrics/JSON 4/4, Python diagnostics 9/9, and exact packet measurement 4/4 pass. The aggregate wrapper completed at 203 total, 194 passed, and the same nine established baseline failures; every visibility-task test passed. No live client success is claimed. See `docs/project/VISIBILITY_INTEREST.md`.
-- The PF127 diagnostic manifest retains its historical selector names `NONE`, `ALL_38`, `SUPPORTED_29`, `ORDINARY_9`, ordinal, identity, and family slices, but selectors control spawn eligibility only and cannot bypass spatial selection. The configured production disposition is now 322 active rows with zero quarantine. The 22 Violent Vagabond rows use the explicit playability damage policy while exact landed-damage parity remains unavailable. The corpus audit also establishes that Bitaxel is a player (`PlayerInfo`, lifecycle `player=True`) rather than a missing enemy. Capture-local SCFU owner identities now preclassify player-owned pets before weaker enemy-role projections. Strike Foreman remains the genuine uncovered named enemy: appearance, QL19 weapon, raw special/attack initiation, chase start, corpse visual, and credits are exact. Raw capture `20260709-222339` also proves two normal `18` hits and one `40` critical against the non-local player Wardog at approximately five-second intervals; Wardog's SCFUs are `PlayerInfo`, `player=True`, and MonsterData `0`, so those post-mitigation other-player outcomes are neither local-player nor pet evidence. Killed source `7954512E` is bound to exact QL19 WeaponInstance `25713A73` and corpse `00F6E017`, while captured positions prove a `20.250672`-unit proactive-acquisition lower bound. Captures `20260720-032106` and `20260720-033513` add six local normal `13` hits, two misses, two `154/154/154/117/0` attack-context rows, two L19/CATMesh `17870`/`176`-credit corpses, and two positive atomic loot outcomes. Respawn, leash/reset, exact acquisition threshold/upper bound, loot-bearing lifetime, and QL17/QL19 weapon selection remain unresolved, so the encounter stays inactive. Container Supplier stock is resolved by exact template-`99634` evidence; dialogue remains unresolved.
-- Subway content work is the primary development track.
+- The PF127 diagnostic manifest retains its historical selector names `NONE`,
+  `ALL_38`, `SUPPORTED_29`, `ORDINARY_9`, ordinal, identity, and family slices,
+  but selectors control diagnostic spawn eligibility only and cannot bypass
+  spatial selection. Production is `322/0`. Bitaxel remains correctly
+  classified as a player. The earlier Strike Foreman gap analysis is
+  superseded: later capture-backed completion owns the exact L19/QL19 encounter,
+  combat, lifecycle, corpse, credits, and atomic loot. Only unmeasured threshold,
+  wider-pool, and probability facts remain non-blocking gaps.
+- Subway's capture-supported surface is complete; its acceptance matrix is the
+  current PF127 authority.
 - AO client Subway room-space mitigation retains its earlier A/B validation for the four original callsites. Two matching official-live dumps on `2026-07-14` expose a fifth path: `n3RoomSurface_t::VetoPosition` calls `n3Playfield_t::PosToRoom` with cached room `-1`, and MSVCR100 throws `std::bad_cast` with `Bad dynamic_cast!` while converting `Space_i` to `n3RoomSpace_t&`. Both captured objects are non-null and present as `n3RoomSpace_t`; the dumps do not preserve why the CRT rejected the transient cast. This remains a client-side room-resolution defect and does not change AORebirth server content.
 - The RoomSpace normal-shortcut repair at `Tools/AOClientRoomSpaceGuard/ProxyDll` now routes five audited `PosToRoom` callers through the existing non-throwing wrapper. The new `VetoPosition` callsites are old-client RVA `0x1570A` and new-client RVA `0x16F98`; both callers already handle a null room result. Proxy package build, wrapper self-test, deployment-helper tests, both profile inspections, and idempotent install verification pass. The rebuilt package is installed in `C:\Funcom\Anarchy Online` and `D:\Funcom\Anarchy Online`; in-game regression validation of the fifth callsite remains pending.
 - Official old-client dump analysis on `2026-07-14`/`2026-07-15` identified four additional exact renderer/GUI failures: `randy31 +0x6C476` dereferences low indirect color pointer `0x100`; NVIDIA 591.86 faults at RVAs `0x172776C` and `0x173A009` during `randy31 +0x219B4` `DrawIndexedPrimitiveVB`; NVIDIA RVA `0x170C490` faults while `IDirect3DVertexBuffer7::Lock` flushes a queued GUI batch; and GUI image RVA `0x4ED00` (crash-report logical `+0x4DD00`) dereferences an impossible tree-search key `0x8`. The proxy uses byte-verified, fail-closed guards at the existing missing-color branch, the indexed-draw call boundary, the complete void GUI-batch boundary, and GUI tree-find entry RVA `0x4F2EF`. Only low invalid tree keys are converted to the original tree's native sentinel not-found result; normal keys fast-path directly to the original function without a memory query. The earlier forced T&L-HAL-to-plain-HAL selector rewrite caused an unacceptable renderer downgrade and has been removed; AO's launcher selection is now preserved. Build/package/self-tests, engine restart, both client installations, package verification, and installed hash `6DD800A587900F4C9D41759A719E3D97AD1B7727BD43702D7C1DC84E61310FE8` pass. Mike confirmed that selector-preserved build restored the expected 100 FPS.
@@ -790,7 +831,9 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
 
 ## Current Baseline
 
-- Current active handoff: `docs/ai/CURRENT_TASK.md` tracks Subway playability work.
+- Current active handoff: `docs/ai/CURRENT_TASK.md` tracks the concurrent
+  generated-mission work. PF127 Subway's stable capture-supported acceptance
+  state is owned by `docs/evidence/SUBWAY_FULL_CORPUS_COMPLETION_20260731.md`.
 - Repository purpose: local C#/.NET Framework-era Anarchy Online server workspace for Mike's current AO client and local `cellao_codex_clean` MySQL database; this is a legacy database name retained for local compatibility.
 - Current stable approach: evidence-backed packet/gameplay/data repair, current-client parity over legacy assumptions, and identity-first capture-derived reconstruction.
 - Documentation split: `docs/ai/CURRENT_TASK.md` remains the active task handoff; this file is the stable project memory; `docs/generated/` contains historical result reports only.
@@ -1818,4 +1861,9 @@ Final state:
 
 # Next Milestone
 
-Move to the next AO Rebirth system. Do not continue vendor capture/import work unless Mike intentionally reopens the deferred access backlog with the required character, profession, side, or special-location setup. Keep NPC movement out of scope unless explicitly selected later.
+After the active generated-mission handoff, PF1931 Temple of Three Winds is the
+next ranked playfield candidate. Do not expand its unsupported nano, proc,
+resist, stun, area-cast, loot-probability, or trigger semantics without evidence.
+Do not continue vendor capture/import work unless Mike intentionally reopens the
+deferred access backlog with the required character, profession, side, or
+special-location setup.

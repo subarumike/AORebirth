@@ -13,6 +13,7 @@ namespace ZoneEngine.Core.Playfields
 
     internal sealed class CapturedPlayfieldDoorStatusRuntimeService
     {
+        private const int SubwayPlayfieldId = CapturedSubwayArrivalDoorEvidenceSet.PlayfieldId;
         private const int TempleOfThreeWindsPlayfieldId = 1931;
         private const int TempleExteriorEntryDoorInstance = unchecked((int)0xC024078B);
         private const int ExpectedTempleInternalDoorCount = 43;
@@ -29,28 +30,34 @@ namespace ZoneEngine.Core.Playfields
 
         internal void Configure(int playfieldId, IEnumerable<StatelData> statels)
         {
-            this.doors = this.ResolveDoorStatels(playfieldId, statels)
-                .Select(
-                    statel => new TempleDoorDefinition(
-                        statel.Identity.Instance,
-                        statel.X,
-                        statel.Y,
-                        statel.Z))
-                .ToArray();
+            this.doors = playfieldId == TempleOfThreeWindsPlayfieldId
+                ? ResolveTempleDoorStatels(statels)
+                    .Select(
+                        statel => new TempleDoorDefinition(
+                            statel.Identity.Instance,
+                            statel.X,
+                            statel.Y,
+                            statel.Z))
+                    .ToArray()
+                : new TempleDoorDefinition[0];
             this.proximityRuntime.ResetAll();
         }
 
         internal int SendInitialStatuses(
             ICharacter character,
             int playfieldId,
-            IEnumerable<StatelData> statels)
+            IEnumerable<StatelData> statels,
+            bool isExternalPlayfieldArrival)
         {
             if (character == null)
             {
                 return 0;
             }
 
-            StatelData[] resolvedDoors = this.ResolveDoorStatels(playfieldId, statels);
+            StatelData[] resolvedDoors = ResolveInitialStatusStatels(
+                playfieldId,
+                statels,
+                isExternalPlayfieldArrival);
             this.proximityRuntime.ResetRecipient(character.Identity.Instance);
             int sent = 0;
             foreach (StatelData door in resolvedDoors)
@@ -64,14 +71,13 @@ namespace ZoneEngine.Core.Playfields
 
         internal Identity[] ResolveInitialStatusDoors(
             int playfieldId,
-            IEnumerable<StatelData> statels)
+            IEnumerable<StatelData> statels,
+            bool isExternalPlayfieldArrival)
         {
-            if (playfieldId != TempleOfThreeWindsPlayfieldId || statels == null)
-            {
-                return new Identity[0];
-            }
-
-            return this.ResolveDoorStatels(playfieldId, statels)
+            return ResolveInitialStatusStatels(
+                    playfieldId,
+                    statels,
+                    isExternalPlayfieldArrival)
                 .Select(statel => statel.Identity)
                 .ToArray();
         }
@@ -124,11 +130,36 @@ namespace ZoneEngine.Core.Playfields
             this.proximityRuntime.ResetAll();
         }
 
-        private StatelData[] ResolveDoorStatels(
+        private static StatelData[] ResolveInitialStatusStatels(
             int playfieldId,
+            IEnumerable<StatelData> statels,
+            bool isExternalPlayfieldArrival)
+        {
+            if (statels == null)
+            {
+                return new StatelData[0];
+            }
+
+            if (playfieldId == TempleOfThreeWindsPlayfieldId)
+            {
+                return ResolveTempleDoorStatels(statels);
+            }
+
+            if (playfieldId == SubwayPlayfieldId && isExternalPlayfieldArrival)
+            {
+                return CapturedSubwayArrivalDoorEvidenceSet.ResolveInitialStatusStatels(
+                    playfieldId,
+                    statels,
+                    true);
+            }
+
+            return new StatelData[0];
+        }
+
+        private static StatelData[] ResolveTempleDoorStatels(
             IEnumerable<StatelData> statels)
         {
-            if (playfieldId != TempleOfThreeWindsPlayfieldId || statels == null)
+            if (statels == null)
             {
                 return new StatelData[0];
             }

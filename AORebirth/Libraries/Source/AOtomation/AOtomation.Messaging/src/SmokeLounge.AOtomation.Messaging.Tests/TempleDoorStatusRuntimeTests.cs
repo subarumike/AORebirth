@@ -3,8 +3,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+
+    using AORebirth.Core.Statels;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Core.Playfields;
 
@@ -29,6 +34,217 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "DoorStatusUpdateMessageHandler.Default.SendStatus(character, door.Identity, false)");
             StringAssert.Contains(playfield, "this.statels");
             StringAssert.Contains(playfield, "SendInitialDoorStatuses(");
+            StringAssert.Contains(playfield, "this.SendStaticDynelsToClient(character);");
+        }
+
+        [TestMethod]
+        public void SubwayDoorEvidencePreservesExactCapturedIdentityAndStateCoverage()
+        {
+            CapturedDoorSnapshotEvidence[] evidence = CapturedSubwayDoorSnapshotEvidence.GetAll();
+
+            Assert.AreEqual(127, CapturedSubwayDoorSnapshotEvidence.PlayfieldId);
+            Assert.AreEqual(18, CapturedSubwayDoorSnapshotEvidence.ExpectedDoorCount);
+            Assert.AreEqual(10, CapturedSubwayDoorSnapshotEvidence.ExpectedCollectorActivationBatchCount);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    unchecked((int)0xC02D007F),
+                    unchecked((int)0xC02E007F),
+                    unchecked((int)0xC02F007F),
+                    unchecked((int)0xC030007F),
+                    unchecked((int)0xC031007F),
+                    unchecked((int)0xC032007F),
+                    unchecked((int)0xC033007F),
+                    unchecked((int)0xC034007F),
+                    unchecked((int)0xC035007F),
+                    unchecked((int)0xC036007F),
+                    unchecked((int)0xC037007F),
+                    unchecked((int)0xC038007F),
+                    unchecked((int)0xC03A007F),
+                    unchecked((int)0xC03B007F),
+                    unchecked((int)0xC03C007F),
+                    unchecked((int)0xC03D007F),
+                    unchecked((int)0xC03F007F),
+                    unchecked((int)0xC040007F)
+                },
+                evidence.Select(door => door.Instance).ToArray());
+            Assert.IsTrue(evidence.All(door => door.ObservedClosed));
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    unchecked((int)0xC02F007F),
+                    unchecked((int)0xC030007F),
+                    unchecked((int)0xC035007F),
+                    unchecked((int)0xC03C007F),
+                    unchecked((int)0xC040007F)
+                },
+                evidence.Where(door => door.ObservedOpen)
+                    .Select(door => door.Instance)
+                    .ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    unchecked((int)0xC031007F),
+                    unchecked((int)0xC032007F),
+                    unchecked((int)0xC033007F),
+                    unchecked((int)0xC034007F),
+                    unchecked((int)0xC035007F),
+                    unchecked((int)0xC036007F),
+                    unchecked((int)0xC037007F),
+                    unchecked((int)0xC038007F),
+                    unchecked((int)0xC03C007F),
+                    unchecked((int)0xC03D007F)
+                },
+                evidence.Where(door => door.ObservedInCollectorActivationBatch)
+                    .Select(door => door.Instance)
+                    .ToArray());
+        }
+
+        [TestMethod]
+        public void SubwayExternalArrivalEvidenceMapsExactlySixOfficialStatels()
+        {
+            CapturedSubwayArrivalDoorEvidence[] evidence =
+                CapturedSubwayArrivalDoorEvidenceSet.GetAll();
+
+            Assert.AreEqual(127, CapturedSubwayArrivalDoorEvidenceSet.PlayfieldId);
+            Assert.AreEqual(6, CapturedSubwayArrivalDoorEvidenceSet.ExpectedDoorCount);
+            Assert.AreEqual(0.001f, CapturedSubwayArrivalDoorEvidenceSet.CoordinateTolerance);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    unchecked((int)0xC006007F),
+                    unchecked((int)0xC007007F),
+                    unchecked((int)0xC00A007F),
+                    unchecked((int)0xC00B007F),
+                    unchecked((int)0xC00C007F),
+                    unchecked((int)0xC00D007F)
+                },
+                evidence.Select(door => door.Instance).ToArray());
+            CollectionAssert.AreEqual(
+                new[] { 164818, 164818, 164818, 164818, 164818, 164815 },
+                evidence.Select(door => door.TemplateId).ToArray());
+            Assert.IsTrue(
+                CapturedSubwayArrivalDoorEvidenceSet.MatchesOfficialStatel(
+                    unchecked((int)0xC006007F),
+                    164818,
+                    64.008300781f,
+                    115.693832397f,
+                    318.987945557f));
+            Assert.IsFalse(
+                CapturedSubwayArrivalDoorEvidenceSet.MatchesOfficialStatel(
+                    unchecked((int)0xC006007F),
+                    164815,
+                    64.008300781f,
+                    115.693832397f,
+                    318.987945557f));
+            Assert.IsFalse(
+                CapturedSubwayArrivalDoorEvidenceSet.MatchesOfficialStatel(
+                    unchecked((int)0xC006007F),
+                    164818,
+                    64.010300781f,
+                    115.693832397f,
+                    318.987945557f));
+        }
+
+        [TestMethod]
+        public void SubwayExternalArrivalSendsOnlySixCapturedClosedStatuses()
+        {
+            string service = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs");
+            string clientConnected = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
+
+            StringAssert.Contains(service, "CapturedSubwayArrivalDoorEvidenceSet.ResolveInitialStatusStatels(");
+            StringAssert.Contains(service, "playfieldId == SubwayPlayfieldId && isExternalPlayfieldArrival");
+            StringAssert.Contains(
+                service,
+                "DoorStatusUpdateMessageHandler.Default.SendStatus(character, door.Identity, false)");
+            StringAssert.Contains(
+                clientConnected,
+                "currentPlayfield.SendStaticDynelsToClientAfterExternalPlayfieldArrival(");
+            StringAssert.Contains(clientConnected, "client.Controller.Character);");
+        }
+
+        [TestMethod]
+        public void SubwayInitialStatusResolverReturnsExactlySixOnlyForExternalPf127Arrival()
+        {
+            StatelData[] officialStatels = CapturedSubwayArrivalDoorEvidenceSet.GetAll()
+                .Select(
+                    door => new StatelData
+                    {
+                        Identity = new Identity
+                        {
+                            Type = IdentityType.Door,
+                            Instance = door.Instance
+                        },
+                        TemplateId = door.TemplateId,
+                        X = door.CapturedX,
+                        Y = door.CapturedY,
+                        Z = door.CapturedZ
+                    })
+                .Concat(
+                    new[]
+                    {
+                        new StatelData
+                        {
+                            Identity = new Identity
+                            {
+                                Type = IdentityType.Door,
+                                Instance = unchecked((int)0xC02D007F)
+                            },
+                            TemplateId = 164818,
+                            X = 1.0f,
+                            Y = 2.0f,
+                            Z = 3.0f
+                        }
+                    })
+                .ToArray();
+
+            CollectionAssert.AreEqual(
+                CapturedSubwayArrivalDoorEvidenceSet.GetAll()
+                    .Select(door => door.Instance)
+                    .ToArray(),
+                CapturedSubwayArrivalDoorEvidenceSet.ResolveInitialStatusStatels(
+                        127,
+                        officialStatels,
+                        true)
+                    .Select(statel => statel.Identity.Instance)
+                    .ToArray());
+            Assert.AreEqual(
+                0,
+                CapturedSubwayArrivalDoorEvidenceSet.ResolveInitialStatusStatels(
+                    127,
+                    officialStatels,
+                    false).Length);
+            Assert.AreEqual(
+                0,
+                CapturedSubwayArrivalDoorEvidenceSet.ResolveInitialStatusStatels(
+                    1931,
+                    officialStatels,
+                    true).Length);
+        }
+
+        [TestMethod]
+        public void SubwayDoorRuntimeDoesNotReplayOnDeathOrInventProximity()
+        {
+            string service = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs");
+            string playfield = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
+
+            StringAssert.Contains(
+                service,
+                "this.doors = playfieldId == TempleOfThreeWindsPlayfieldId");
+            StringAssert.Contains(service, ": new TempleDoorDefinition[0]");
+            StringAssert.Contains(
+                playfield,
+                "public void SendStaticDynelsToClient(ICharacter character)");
+            StringAssert.Contains(
+                playfield,
+                "this.SendStaticDynelsToClient(character, false);");
+            StringAssert.Contains(
+                playfield,
+                "this.SendStaticDynelsToClient(character, true);");
             StringAssert.Contains(playfield, "this.SendStaticDynelsToClient(character);");
         }
 

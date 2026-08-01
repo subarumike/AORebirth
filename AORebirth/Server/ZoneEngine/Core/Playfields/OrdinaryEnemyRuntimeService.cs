@@ -475,8 +475,12 @@ namespace AORebirth.Core.Playfields
             this.ApplyMovement(character, controller, spawn);
 
             string combatFailure;
-            CapturedEnemyCombatContract combatContract =
-                profile.Combat.ResolveContract(spawn.SourceIdentity, variant);
+            bool retaliationEligibilityPromoted;
+            CapturedEnemyCombatContract combatContract = ResolveCombatContractForSpawn(
+                spawn,
+                profile,
+                variant,
+                out retaliationEligibilityPromoted);
             bool combatReady = CapturedEnemyCombatRuntime.Prepare(
                 character,
                 controller,
@@ -524,7 +528,7 @@ namespace AORebirth.Core.Playfields
                 DebugInfoDetail.Engine,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Ordinary enemy spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} name={3} monsterData={4} level={5} position=({6},{7},{8}) combatModel={9} combatReady={10}",
+                        "Ordinary enemy spawned sourceIdentity=SimpleChar:{0:X8} serverIdentity={1} profile={2} name={3} monsterData={4} level={5} position=({6},{7},{8}) combatModel={9} combatReady={10} retaliationEligibilityPromoted={11}",
                     spawn.SourceIdentity,
                     character.Identity,
                     profile.ProfileKey,
@@ -535,8 +539,43 @@ namespace AORebirth.Core.Playfields
                     spawn.Y,
                     spawn.Z,
                     combatContract.AttackModel,
-                    combatReady));
+                    combatReady,
+                    retaliationEligibilityPromoted));
             return true;
+        }
+
+        internal static CapturedEnemyCombatContract ResolveCombatContractForSpawn(
+            OrdinaryEnemySpawnDefinition spawn,
+            OrdinaryEnemyProfile profile,
+            OrdinaryEnemySpawnVariant variant,
+            out bool retaliationEligibilityPromoted)
+        {
+            retaliationEligibilityPromoted = false;
+            if (spawn == null || profile == null || variant == null || profile.Combat == null)
+            {
+                return null;
+            }
+
+            CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(
+                spawn.SourceIdentity,
+                variant);
+            CapturedEnemyCombatContract resolved;
+            string failure;
+            if (!CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(
+                    spawn.PlayfieldInstance,
+                    profile.DisplayName,
+                    profile.MonsterData,
+                    variant.Level,
+                    spawn.SourceIdentity,
+                    baseline,
+                    out resolved,
+                    out failure))
+            {
+                return baseline;
+            }
+
+            retaliationEligibilityPromoted = true;
+            return resolved;
         }
 
         private ICharacter FindSupportNanoTarget(

@@ -20,6 +20,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     {
         private const int ExpectedInitialActorCount = 1583;
         private const int ExpectedBindingRecordCount = 1566;
+        private const string Pf127OrdinaryProfileResolutionMode =
+            "production-owned-exact-pf127-ordinary-profile-resolver";
         private static readonly Lazy<Dictionary<string, object>> CoverageDocument =
             new Lazy<Dictionary<string, object>>(LoadCoverageDocument);
 
@@ -190,6 +192,357 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Every fixed coverage profile must be backed by at least one exact content binding.");
 
             AssertExactSurfacePopulation(document, certifiedActors, unresolvedActors);
+        }
+
+        [TestMethod]
+        public void Pf127OrdinaryCoverageIsCompleteThroughExactProductionOwnedProfileResolution()
+        {
+            Dictionary<string, object> document = ReadCoverageDocument();
+            Dictionary<string, object> subwayOrdinary = ArrayMember(document, "surfaces")
+                .Select(value => JsonObject(value, "surface coverage"))
+                .Single(value => StringMember(value, "surface") == "subway-ordinary");
+            Assert.AreEqual(322, IntMember(subwayOrdinary, "actorCount"));
+            Assert.AreEqual(322, IntMember(subwayOrdinary, "certified"));
+            Assert.AreEqual(0, IntMember(subwayOrdinary, "unresolved"));
+
+            Dictionary<string, object> resolverAudit = ObjectMember(
+                document,
+                "pf127OrdinaryProfileResolverAudit");
+            Assert.AreEqual(
+                Pf127OrdinaryProfileResolutionMode,
+                StringMember(resolverAudit, "resolutionMode"));
+            Assert.AreEqual("subway-ordinary", StringMember(resolverAudit, "surface"));
+            Assert.AreEqual(127, IntMember(resolverAudit, "runtimePlayfieldOrResource"));
+            Assert.IsTrue(BoolMember(
+                resolverAudit,
+                "requiresExactConfiguredRuntimeSourceIdentity"));
+            Assert.IsTrue(BoolMember(
+                resolverAudit,
+                "requiresEveryConcreteRuntimeVariantToResolveRetaliationEligible"));
+            Assert.IsTrue(BoolMember(
+                resolverAudit,
+                "requiresEveryConcreteRuntimeVariantToResolveFinalCombatReady"));
+            Assert.IsFalse(BoolMember(resolverAudit, "crossPlayfieldFallbackAllowed"));
+            CollectionAssert.AreEquivalent(
+                new[] { "subway.supported.17720", "subway.supported.203734" },
+                StringArrayMember(resolverAudit, "exactSupportedProfileSelectors"));
+            Assert.AreEqual(5, ArrayMember(resolverAudit, "owners").Length);
+
+            var profiles = ArrayMember(document, "profiles")
+                .Select(value => JsonObject(value, "coverage profile"))
+                .ToDictionary(
+                    value => StringMember(value, "coverageKey"),
+                    StringComparer.Ordinal);
+            Dictionary<string, object>[] bindings = ArrayMember(document, "bindings")
+                .Select(value => JsonObject(value, "active hostile binding"))
+                .Where(value => StringMember(value, "surface") == "subway-ordinary")
+                .ToArray();
+            Assert.AreEqual(322, bindings.Sum(value => IntMember(value, "actorCount")));
+
+            int reusableResolverActors = 0;
+            int productionReadyActors = 0;
+            foreach (Dictionary<string, object> binding in bindings)
+            {
+                string bindingKey = StringMember(binding, "bindingKey");
+                Assert.AreEqual(127, IntMember(binding, "runtimePlayfieldOrResource"), bindingKey);
+                Assert.AreEqual("certified", StringMember(binding, "classification"), bindingKey);
+                Assert.IsTrue(BoolMember(binding, "runtimeContractReady"), bindingKey);
+                Assert.AreEqual(
+                    StringMember(binding, "configuredSourceIdentity"),
+                    StringMember(binding, "runtimeSourceIdentityHint"),
+                    bindingKey);
+                string runtimeProfileSelector = StringMember(
+                    binding,
+                    "runtimeProfileSelector");
+                StringAssert.StartsWith(
+                    runtimeProfileSelector,
+                    "subway.",
+                    bindingKey);
+                bool expectedRetaliationEligibilityPromotion =
+                    runtimeProfileSelector == "subway.supported.17720"
+                    || runtimeProfileSelector == "subway.supported.203734";
+
+                Dictionary<string, object> profile = profiles[
+                    StringMember(binding, "coverageKey")];
+                AssertCertifiedBindingResolves(binding, profile, bindingKey);
+                productionReadyActors += IntMember(binding, "actorCount");
+                Dictionary<string, object>[] reusableLevels = ArrayMember(
+                        profile,
+                        "levelCoverage")
+                    .Select(value => JsonObject(value, bindingKey + " level coverage"))
+                    .Where(
+                        value => StringMember(value, "resolutionMode")
+                                 == Pf127OrdinaryProfileResolutionMode)
+                    .ToArray();
+                if (reusableLevels.Length == 0)
+                {
+                    continue;
+                }
+
+                reusableResolverActors += IntMember(binding, "actorCount");
+                foreach (Dictionary<string, object> level in reusableLevels)
+                {
+                    Assert.IsTrue(
+                        BoolMember(level, "exactRuntimeSourceIdentityRequired"),
+                        bindingKey);
+                    Assert.IsFalse(
+                        BoolMember(level, "crossPlayfieldFallbackAllowed"),
+                        bindingKey);
+                    Assert.IsTrue(
+                        BoolMember(level, "allConcreteRuntimeVariantsMustResolveRetaliationEligible"),
+                        bindingKey);
+                    Assert.IsTrue(
+                        BoolMember(
+                            level,
+                            "allConcreteRuntimeVariantsMustResolveFinalCombatReady"),
+                        bindingKey);
+                    Assert.AreEqual(
+                        5,
+                        ArrayMember(level, "runtimeResolverSources").Length,
+                        bindingKey);
+                    Assert.AreEqual(
+                        expectedRetaliationEligibilityPromotion,
+                        BoolMember(level, "retaliationEligibilityPromoted"),
+                        bindingKey);
+                    Assert.IsFalse(
+                        BoolMember(level, "automaticAggressionPolicyPromoted"),
+                        bindingKey);
+                    Assert.IsFalse(
+                        BoolMember(level, "automaticCombatActivationPromoted"),
+                        bindingKey);
+                }
+            }
+
+            Assert.AreEqual(
+                165,
+                reusableResolverActors,
+                "Every formerly quarantined PF127 ordinary actor must be covered by the checked production resolver chain.");
+            Assert.AreEqual(
+                322,
+                productionReadyActors,
+                "Every PF127 ordinary actor must resolve to a production-ready combat contract.");
+        }
+
+        [TestMethod]
+        public void Pf127InitialEncountersAndMerchantsAreOutsideTheOrdinaryArchetypeResolver()
+        {
+            Dictionary<string, object> document = ReadCoverageDocument();
+            var excludedSurfaces = new Dictionary<string, int>(StringComparer.Ordinal)
+            {
+                { "subway-initial-encounters", 3 },
+                { "subway-merchants", 6 }
+            };
+
+            foreach (KeyValuePair<string, int> expected in excludedSurfaces)
+            {
+                Dictionary<string, object> surface = ArrayMember(document, "surfaces")
+                    .Select(value => JsonObject(value, "surface coverage"))
+                    .Single(value => StringMember(value, "surface") == expected.Key);
+                Assert.AreEqual(expected.Value, IntMember(surface, "actorCount"), expected.Key);
+            }
+
+            var profiles = ArrayMember(document, "profiles")
+                .Select(value => JsonObject(value, "coverage profile"))
+                .ToDictionary(
+                    value => StringMember(value, "coverageKey"),
+                    StringComparer.Ordinal);
+            Dictionary<string, object>[] excludedBindings = ArrayMember(document, "bindings")
+                .Select(value => JsonObject(value, "active hostile binding"))
+                .Where(value => excludedSurfaces.ContainsKey(StringMember(value, "surface")))
+                .ToArray();
+            Assert.AreEqual(9, excludedBindings.Sum(value => IntMember(value, "actorCount")));
+            foreach (Dictionary<string, object> binding in excludedBindings)
+            {
+                string bindingKey = StringMember(binding, "bindingKey");
+                Dictionary<string, object> profile = profiles[
+                    StringMember(binding, "coverageKey")];
+                Assert.IsFalse(
+                    ArrayMember(profile, "levelCoverage")
+                        .Select(value => JsonObject(value, bindingKey + " level coverage"))
+                        .Any(
+                            value => StringMember(value, "resolutionMode")
+                                     == Pf127OrdinaryProfileResolutionMode),
+                    bindingKey + " was incorrectly promoted through the ordinary resolver.");
+            }
+        }
+
+        [TestMethod]
+        public void Pf127ProfileResolutionReproducesTheExactProductionContractPath()
+        {
+            Dictionary<string, object> document = ReadCoverageDocument();
+            Dictionary<string, object> resolverAudit = ObjectMember(
+                document,
+                "pf127OrdinaryProfileResolverAudit");
+            Assert.AreEqual(
+                "combat-contract ownership plus exact source-bound retaliation eligibility for supported selectors",
+                StringMember(resolverAudit, "promotedCapability"));
+            Assert.IsTrue(BoolMember(
+                resolverAudit,
+                "retaliationEligibilityPromotionAllowed"));
+            Assert.AreEqual(
+                34,
+                IntMember(
+                    resolverAudit,
+                    "exactRetaliationEligibilitySourceBindingCount"));
+            Assert.IsFalse(BoolMember(
+                resolverAudit,
+                "automaticAggressionPolicyPromotionAllowed"));
+            Assert.IsFalse(BoolMember(
+                resolverAudit,
+                "automaticCombatActivationPromotionAllowed"));
+
+            var profiles = ArrayMember(document, "profiles")
+                .Select(value => JsonObject(value, "coverage profile"))
+                .ToDictionary(
+                    value => StringMember(value, "coverageKey"),
+                    StringComparer.Ordinal);
+            var runtimeCatalog = new OrdinaryEnemyCatalog(
+                new CapturedSubwayContentProvider(),
+                new CapturedSubwayOrdinaryContentProvider(),
+                new CapturedTempleOfThreeWindsContentProvider());
+            int resolvedActors = 0;
+            int resolvedRuntimeVariants = 0;
+            int exactRetaliationEligibilityVariantPromotions = 0;
+            var exactRetaliationEligibilitySources = new HashSet<int>();
+            foreach (Dictionary<string, object> binding in ArrayMember(document, "bindings")
+                .Select(value => JsonObject(value, "active hostile binding"))
+                .Where(value => StringMember(value, "surface") == "subway-ordinary"))
+            {
+                string bindingKey = StringMember(binding, "bindingKey");
+                Dictionary<string, object> profile = profiles[
+                    StringMember(binding, "coverageKey")];
+                Dictionary<string, object>[] reusableLevels = ArrayMember(
+                        profile,
+                        "levelCoverage")
+                    .Select(value => JsonObject(value, bindingKey + " level coverage"))
+                    .Where(
+                        value => StringMember(value, "resolutionMode")
+                                 == Pf127OrdinaryProfileResolutionMode)
+                    .ToArray();
+                if (reusableLevels.Length == 0)
+                {
+                    continue;
+                }
+
+                resolvedActors += IntMember(binding, "actorCount");
+                foreach (Dictionary<string, object> level in reusableLevels)
+                {
+                    bool expectedRetaliationEligibilityPromotion =
+                        StringMember(binding, "runtimeProfileSelector")
+                            == "subway.supported.17720"
+                        || StringMember(binding, "runtimeProfileSelector")
+                            == "subway.supported.203734";
+                    Assert.AreEqual(
+                        expectedRetaliationEligibilityPromotion
+                            ? "source-bound combat-contract ownership and exact retaliation eligibility"
+                            : "combat-contract ownership only",
+                        StringMember(level, "promotedCapability"),
+                        bindingKey);
+                    Assert.AreEqual(
+                        expectedRetaliationEligibilityPromotion,
+                        BoolMember(level, "retaliationEligibilityPromoted"),
+                        bindingKey);
+                    Assert.IsFalse(
+                        BoolMember(level, "automaticAggressionPolicyPromoted"),
+                        bindingKey);
+                    Assert.IsFalse(
+                        BoolMember(level, "automaticCombatActivationPromoted"),
+                        bindingKey);
+                }
+
+                int sourceIdentity = ParseOptionalIdentity(
+                    binding,
+                    "runtimeSourceIdentityHint");
+                string profileSelector = StringMember(binding, "runtimeProfileSelector");
+                string name = StringMember(binding, "name");
+                int monsterData = IntMember(binding, "monsterData");
+                OrdinaryEnemyProfile runtimeProfile = runtimeCatalog.GetProfiles().Single(
+                    value => value.ProfileKey == profileSelector);
+                OrdinaryEnemySpawnDefinition runtimeSpawn = runtimeCatalog.GetSpawns().Single(
+                    value => value.PlayfieldInstance == 127
+                             && value.SourceIdentity == sourceIdentity);
+                foreach (Dictionary<string, object> level in reusableLevels)
+                {
+                    int runtimeLevel = IntMember(level, "level");
+                    OrdinaryEnemySpawnVariant[] runtimeVariants = runtimeSpawn.LevelDefinition
+                        .GetExplicitVariants()
+                        .Where(value => value.Level == runtimeLevel)
+                        .ToArray();
+                    if (runtimeVariants.Length == 0)
+                    {
+                        runtimeVariants = new[]
+                        {
+                            runtimeSpawn.LevelDefinition.Resolve(runtimeLevel)
+                        };
+                    }
+                    foreach (OrdinaryEnemySpawnVariant runtimeVariant in runtimeVariants)
+                    {
+                        CapturedEnemyCombatContract baseline =
+                            runtimeProfile.Combat.ResolveContract(
+                                runtimeSpawn.SourceIdentity,
+                                runtimeVariant);
+                        CapturedEnemyCombatContract exactResolved;
+                        string exactFailure;
+                        bool retaliationEligibilityPromoted =
+                            CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(
+                                runtimeSpawn.PlayfieldInstance,
+                                runtimeProfile.DisplayName,
+                                runtimeProfile.MonsterData,
+                                runtimeVariant.Level,
+                                runtimeSpawn.SourceIdentity,
+                                baseline,
+                                out exactResolved,
+                                out exactFailure);
+                        CapturedEnemyCombatContract productionContract =
+                            retaliationEligibilityPromoted ? exactResolved : baseline;
+                        Assert.IsNotNull(productionContract, bindingKey);
+                        bool expectedEligibilityPromotion =
+                            profileSelector == "subway.supported.17720"
+                            || profileSelector == "subway.supported.203734";
+                        Assert.AreEqual(
+                            expectedEligibilityPromotion,
+                            retaliationEligibilityPromoted,
+                            bindingKey + ": " + exactFailure);
+                        Assert.AreEqual(
+                            expectedEligibilityPromotion,
+                            BoolMember(level, "retaliationEligibilityPromoted"),
+                            bindingKey);
+
+                        CapturedEnemyCombatContract finalContract = productionContract;
+                        if (!finalContract.IsCombatReady)
+                        {
+                            CapturedEnemyCombatContract resolved;
+                            string failure;
+                            Assert.IsTrue(
+                                CapturedEnemyCombatProfileCatalog.TryResolve(
+                                    127,
+                                    name,
+                                    monsterData,
+                                    runtimeVariant.Level,
+                                    sourceIdentity,
+                                    finalContract,
+                                    out resolved,
+                                    out failure),
+                                bindingKey + ": " + failure);
+                            finalContract = resolved;
+                        }
+
+                        Assert.IsTrue(finalContract.IsCombatReady, bindingKey);
+                        resolvedRuntimeVariants++;
+                        if (retaliationEligibilityPromoted)
+                        {
+                            exactRetaliationEligibilityVariantPromotions++;
+                            exactRetaliationEligibilitySources.Add(
+                                runtimeSpawn.SourceIdentity);
+                        }
+                    }
+                }
+            }
+
+            Assert.AreEqual(165, resolvedActors);
+            Assert.AreEqual(166, resolvedRuntimeVariants);
+            Assert.AreEqual(34, exactRetaliationEligibilityVariantPromotions);
+            Assert.AreEqual(34, exactRetaliationEligibilitySources.Count);
         }
 
         [TestMethod]
@@ -543,7 +896,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Dictionary<string, object> levelRow = matchingLevelRows[0];
                 string resolutionMode = StringMember(levelRow, "resolutionMode");
                 var runtimeBaselines = new List<CapturedEnemyCombatContract>();
-                if (resolutionMode == "exact-mathematical-combat-setup")
+                if (resolutionMode == "exact-mathematical-combat-setup"
+                    || resolutionMode == Pf127OrdinaryProfileResolutionMode)
                 {
                     var runtimeCatalog = new OrdinaryEnemyCatalog(
                         new CapturedSubwayContentProvider(),
@@ -551,7 +905,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         new CapturedTempleOfThreeWindsContentProvider());
                     OrdinaryEnemyProfile runtimeProfile =
                         runtimeCatalog.GetProfiles().Single(
-                            value => value.DisplayName == name
+                            value => value.ProfileKey == runtimeProfileSelector
+                                     && value.DisplayName == name
                                      && value.MonsterData == monsterData);
                     OrdinaryEnemySpawnDefinition runtimeSpawn =
                         runtimeCatalog.GetSpawns().Single(
@@ -577,10 +932,53 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                             runtimeProfile.Combat.ResolveContract(
                                 sourceIdentity,
                                 runtimeVariant);
-                        if (name == "Melded Patterns"
+                        if (resolutionMode == Pf127OrdinaryProfileResolutionMode)
+                        {
+                            bool expectedEligibilityPromotion =
+                                runtimeProfileSelector == "subway.supported.17720"
+                                || runtimeProfileSelector == "subway.supported.203734";
+                            Assert.AreEqual(
+                                expectedEligibilityPromotion,
+                                BoolMember(
+                                    levelRow,
+                                    "retaliationEligibilityPromoted"),
+                                bindingKey);
+                            Assert.IsFalse(
+                                BoolMember(
+                                    levelRow,
+                                    "automaticAggressionPolicyPromoted"),
+                                bindingKey);
+                            Assert.IsFalse(
+                                BoolMember(
+                                    levelRow,
+                                    "automaticCombatActivationPromoted"),
+                                bindingKey);
+                            CapturedEnemyCombatContract exactResolved;
+                            string exactFailure;
+                            bool eligibilityPromoted =
+                                CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(
+                                    runtimeSpawn.PlayfieldInstance,
+                                    runtimeProfile.DisplayName,
+                                    runtimeProfile.MonsterData,
+                                    runtimeVariant.Level,
+                                    runtimeSpawn.SourceIdentity,
+                                    runtimeBaseline,
+                                    out exactResolved,
+                                    out exactFailure);
+                            Assert.AreEqual(
+                                expectedEligibilityPromotion,
+                                eligibilityPromoted,
+                                bindingKey + ": " + exactFailure);
+                            if (eligibilityPromoted)
+                            {
+                                runtimeBaseline = exactResolved;
+                            }
+                        }
+                        if (resolutionMode == "exact-mathematical-combat-setup"
+                            && (name == "Melded Patterns"
                             || name == "Fragmented Soul"
                             || name == "Workman Striker"
-                            || name == "Redundant Scan")
+                            || name == "Redundant Scan"))
                         {
                             runtimeBaseline.Retaliates = true;
                             runtimeBaseline.AiProfile =

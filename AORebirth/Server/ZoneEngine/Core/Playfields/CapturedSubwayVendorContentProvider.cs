@@ -15,6 +15,10 @@ namespace ZoneEngine.Core.Playfields
     {
         internal const int SubwayPlayfieldResource = 127;
 
+        internal const string BaselineStockSnapshotId = "captured-canonical-202-row";
+
+        internal const string AlternateStockSnapshotId = "AOSharpLiveCapture/20260719-021611";
+
         private const string Evidence = "AOSharpLiveCapture/20260709-212115";
 
         private const string ContainerStockEvidence =
@@ -155,9 +159,80 @@ namespace ZoneEngine.Core.Playfields
                         ContainerStockEvidence)
                 });
 
+        private static readonly ReadOnlyCollection<CapturedSubwayVendorStockDefinition> AlternateTailorStock =
+            Array.AsReadOnly(TailorStock20260719());
+
+        private static readonly ReadOnlyCollection<CapturedSubwayVendorStockDefinition> AlternateWeaponsdealerStock =
+            Array.AsReadOnly(WeaponsdealerStock20260719());
+
+        private static readonly ReadOnlyCollection<CapturedSubwayVendorStockDefinition> AlternateArmorerStock =
+            Array.AsReadOnly(ArmorerStock20260719());
+
+        private static readonly ReadOnlyCollection<CapturedSubwayVendorStockDefinition> AlternateToolsStock =
+            Array.AsReadOnly(ToolsStock20260719());
+
+        private static readonly ReadOnlyCollection<CapturedSubwayVendorStockSnapshot> CapturedStockSnapshots =
+            Array.AsReadOnly(
+                new[]
+                {
+                    CreateBaselineStockSnapshot(),
+                    CreateAlternateStockSnapshot()
+                });
+
         internal static ReadOnlyCollection<CapturedSubwayVendorDefinition> Definitions
         {
             get { return CapturedDefinitions; }
+        }
+
+        // This is an evidence archive, not a runtime selector. Production continues to
+        // use each definition's canonical captured stock until a selector is proven.
+        internal static ReadOnlyCollection<CapturedSubwayVendorStockSnapshot> EvidenceStockSnapshots
+        {
+            get { return CapturedStockSnapshots; }
+        }
+
+        private static CapturedSubwayVendorStockSnapshot CreateBaselineStockSnapshot()
+        {
+            var entries = new CapturedSubwayVendorStockSnapshotEntry[CapturedDefinitions.Count];
+            for (int index = 0; index < CapturedDefinitions.Count; index++)
+            {
+                CapturedSubwayVendorDefinition definition = CapturedDefinitions[index];
+                entries[index] = CreateStockSnapshotEntry(definition, definition.Stock);
+            }
+
+            return new CapturedSubwayVendorStockSnapshot(
+                SubwayPlayfieldResource,
+                BaselineStockSnapshotId,
+                entries);
+        }
+
+        private static CapturedSubwayVendorStockSnapshot CreateAlternateStockSnapshot()
+        {
+            return new CapturedSubwayVendorStockSnapshot(
+                SubwayPlayfieldResource,
+                AlternateStockSnapshotId,
+                new[]
+                {
+                    CreateStockSnapshotEntry(CapturedDefinitions[0], AlternateTailorStock),
+                    CreateStockSnapshotEntry(CapturedDefinitions[1], AlternateWeaponsdealerStock),
+                    CreateStockSnapshotEntry(CapturedDefinitions[2], AlternateArmorerStock),
+                    // These two observations are byte-for-byte duplicates of the canonical
+                    // capture and deliberately share the canonical immutable stock objects.
+                    CreateStockSnapshotEntry(CapturedDefinitions[3], CapturedDefinitions[3].Stock),
+                    CreateStockSnapshotEntry(CapturedDefinitions[4], AlternateToolsStock),
+                    CreateStockSnapshotEntry(CapturedDefinitions[5], CapturedDefinitions[5].Stock)
+                });
+        }
+
+        private static CapturedSubwayVendorStockSnapshotEntry CreateStockSnapshotEntry(
+            CapturedSubwayVendorDefinition definition,
+            ReadOnlyCollection<CapturedSubwayVendorStockDefinition> stock)
+        {
+            return new CapturedSubwayVendorStockSnapshotEntry(
+                definition.SourceNpcInstance,
+                definition.SourceVendorInstance,
+                definition.VendorTemplateId,
+                stock);
         }
 
         private static CapturedSubwayVendorDefinition Create(
@@ -443,6 +518,135 @@ namespace ZoneEngine.Core.Playfields
             };
         }
 
+        private static CapturedSubwayVendorStockDefinition[] TailorStock20260719()
+        {
+            return new[]
+            {
+                new CapturedSubwayVendorStockDefinition(0, 41071, 41071, 1),
+                new CapturedSubwayVendorStockDefinition(1, 31246, 31246, 1),
+                new CapturedSubwayVendorStockDefinition(2, 296342, 296342, 1),
+                new CapturedSubwayVendorStockDefinition(3, 41031, 41031, 1),
+                new CapturedSubwayVendorStockDefinition(4, 31531, 31531, 1),
+                new CapturedSubwayVendorStockDefinition(5, 31110, 31110, 1),
+                new CapturedSubwayVendorStockDefinition(6, 41076, 41076, 1),
+                new CapturedSubwayVendorStockDefinition(7, 42347, 42347, 1),
+                new CapturedSubwayVendorStockDefinition(8, 31495, 31495, 1),
+                new CapturedSubwayVendorStockDefinition(9, 42314, 42314, 1),
+                new CapturedSubwayVendorStockDefinition(10, 41008, 41008, 1),
+                new CapturedSubwayVendorStockDefinition(11, 31248, 31248, 1),
+                new CapturedSubwayVendorStockDefinition(12, 42358, 42358, 1),
+                new CapturedSubwayVendorStockDefinition(13, 42356, 42356, 1),
+                new CapturedSubwayVendorStockDefinition(14, 41230, 41230, 1),
+                new CapturedSubwayVendorStockDefinition(15, 41061, 41061, 1),
+                new CapturedSubwayVendorStockDefinition(16, 41063, 41063, 1),
+                new CapturedSubwayVendorStockDefinition(17, 41068, 41068, 1),
+                new CapturedSubwayVendorStockDefinition(18, 41069, 41069, 1),
+                new CapturedSubwayVendorStockDefinition(19, 31516, 31516, 1),
+                new CapturedSubwayVendorStockDefinition(20, 41039, 41039, 1),
+                new CapturedSubwayVendorStockDefinition(21, 41014, 41014, 1)
+            };
+        }
+
+        private static CapturedSubwayVendorStockDefinition[] WeaponsdealerStock20260719()
+        {
+            return new[]
+            {
+                new CapturedSubwayVendorStockDefinition(0, 129001, 129002, 71),
+                new CapturedSubwayVendorStockDefinition(1, 122693, 122694, 25),
+                new CapturedSubwayVendorStockDefinition(2, 128676, 128677, 27),
+                new CapturedSubwayVendorStockDefinition(3, 201257, 201258, 61),
+                new CapturedSubwayVendorStockDefinition(4, 128946, 128947, 96),
+                new CapturedSubwayVendorStockDefinition(5, 124785, 124786, 69),
+                new CapturedSubwayVendorStockDefinition(6, 121939, 121940, 85),
+                new CapturedSubwayVendorStockDefinition(7, 123976, 123977, 42),
+                new CapturedSubwayVendorStockDefinition(8, 124136, 124137, 2),
+                new CapturedSubwayVendorStockDefinition(9, 124129, 124130, 94),
+                new CapturedSubwayVendorStockDefinition(10, 206289, 206290, 36),
+                new CapturedSubwayVendorStockDefinition(11, 123666, 123666, 1),
+                new CapturedSubwayVendorStockDefinition(12, 125300, 125301, 59),
+                new CapturedSubwayVendorStockDefinition(13, 124200, 124201, 34),
+                new CapturedSubwayVendorStockDefinition(14, 129014, 129015, 35),
+                new CapturedSubwayVendorStockDefinition(15, 129014, 129015, 97),
+                new CapturedSubwayVendorStockDefinition(16, 123099, 123100, 44),
+                new CapturedSubwayVendorStockDefinition(17, 123175, 123176, 59),
+                new CapturedSubwayVendorStockDefinition(18, 123137, 123138, 65),
+                new CapturedSubwayVendorStockDefinition(19, 121610, 121610, 1),
+                new CapturedSubwayVendorStockDefinition(20, 130165, 130166, 53),
+                new CapturedSubwayVendorStockDefinition(21, 160236, 160237, 79),
+                new CapturedSubwayVendorStockDefinition(22, 123311, 123312, 72),
+                new CapturedSubwayVendorStockDefinition(23, 128663, 128664, 95),
+                new CapturedSubwayVendorStockDefinition(24, 128898, 128899, 93),
+                new CapturedSubwayVendorStockDefinition(25, 121593, 121594, 33),
+                new CapturedSubwayVendorStockDefinition(26, 160489, 160490, 61),
+                new CapturedSubwayVendorStockDefinition(27, 150254, 150255, 13),
+                new CapturedSubwayVendorStockDefinition(28, 124404, 124405, 83),
+                new CapturedSubwayVendorStockDefinition(29, 129644, 129645, 72),
+                new CapturedSubwayVendorStockDefinition(30, 123879, 123880, 35)
+            };
+        }
+
+        private static CapturedSubwayVendorStockDefinition[] ArmorerStock20260719()
+        {
+            return new[]
+            {
+                new CapturedSubwayVendorStockDefinition(0, 85513, 22313, 24),
+                new CapturedSubwayVendorStockDefinition(1, 85693, 27389, 36),
+                new CapturedSubwayVendorStockDefinition(2, 85602, 85601, 46),
+                new CapturedSubwayVendorStockDefinition(3, 85481, 85690, 23),
+                new CapturedSubwayVendorStockDefinition(4, 85533, 85532, 27),
+                new CapturedSubwayVendorStockDefinition(5, 85714, 85713, 10),
+                new CapturedSubwayVendorStockDefinition(6, 70563, 85558, 9),
+                new CapturedSubwayVendorStockDefinition(7, 85633, 85632, 22),
+                new CapturedSubwayVendorStockDefinition(8, 85737, 85736, 19),
+                new CapturedSubwayVendorStockDefinition(9, 162435, 162436, 39),
+                new CapturedSubwayVendorStockDefinition(10, 162427, 162428, 4),
+                new CapturedSubwayVendorStockDefinition(11, 162427, 162428, 34),
+                new CapturedSubwayVendorStockDefinition(12, 162426, 162437, 6),
+                new CapturedSubwayVendorStockDefinition(13, 85500, 85499, 47),
+                new CapturedSubwayVendorStockDefinition(14, 85607, 22170, 33),
+                new CapturedSubwayVendorStockDefinition(15, 85526, 22293, 12),
+                new CapturedSubwayVendorStockDefinition(16, 85526, 22293, 37),
+                new CapturedSubwayVendorStockDefinition(17, 85755, 21921, 37),
+                new CapturedSubwayVendorStockDefinition(18, 85548, 22258, 12),
+                new CapturedSubwayVendorStockDefinition(19, 85731, 21967, 16),
+                new CapturedSubwayVendorStockDefinition(20, 85516, 22301, 43),
+                new CapturedSubwayVendorStockDefinition(21, 85655, 22104, 10),
+                new CapturedSubwayVendorStockDefinition(22, 85655, 22104, 43),
+                new CapturedSubwayVendorStockDefinition(23, 85612, 22166, 10),
+                new CapturedSubwayVendorStockDefinition(24, 85612, 22166, 15),
+                new CapturedSubwayVendorStockDefinition(25, 85712, 22010, 2),
+                new CapturedSubwayVendorStockDefinition(26, 85638, 85637, 28),
+                new CapturedSubwayVendorStockDefinition(27, 85557, 85556, 41),
+                new CapturedSubwayVendorStockDefinition(28, 85512, 85511, 32)
+            };
+        }
+
+        private static CapturedSubwayVendorStockDefinition[] ToolsStock20260719()
+        {
+            return new[]
+            {
+                new CapturedSubwayVendorStockDefinition(0, 36786, 36780, 49),
+                new CapturedSubwayVendorStockDefinition(1, 300751, 300751, 1),
+                new CapturedSubwayVendorStockDefinition(2, 206904, 206904, 1),
+                new CapturedSubwayVendorStockDefinition(3, 36783, 36782, 18),
+                new CapturedSubwayVendorStockDefinition(4, 95576, 95576, 1),
+                new CapturedSubwayVendorStockDefinition(5, 158038, 158039, 13),
+                new CapturedSubwayVendorStockDefinition(6, 31837, 31837, 1),
+                new CapturedSubwayVendorStockDefinition(7, 87810, 87814, 39),
+                new CapturedSubwayVendorStockDefinition(8, 121305, 121304, 40),
+                new CapturedSubwayVendorStockDefinition(9, 121306, 121307, 32),
+                new CapturedSubwayVendorStockDefinition(10, 121309, 121308, 6),
+                new CapturedSubwayVendorStockDefinition(11, 95577, 95577, 1),
+                new CapturedSubwayVendorStockDefinition(12, 81757, 81756, 38),
+                new CapturedSubwayVendorStockDefinition(13, 81753, 99727, 24),
+                new CapturedSubwayVendorStockDefinition(14, 28564, 28564, 1),
+                new CapturedSubwayVendorStockDefinition(15, 95514, 95515, 44),
+                new CapturedSubwayVendorStockDefinition(16, 161699, 161699, 1),
+                new CapturedSubwayVendorStockDefinition(17, 29738, 29738, 1),
+                new CapturedSubwayVendorStockDefinition(18, 88373, 88374, 39)
+            };
+        }
+
         private static CapturedSubwayVendorStockDefinition[] ContainerStock()
         {
             return new[]
@@ -511,6 +715,91 @@ namespace ZoneEngine.Core.Playfields
                 new CapturedSubwayVendorStockDefinition(61, 287448, 287448, 1)
             };
         }
+    }
+
+    internal sealed class CapturedSubwayVendorStockSnapshot
+    {
+        private readonly ReadOnlyCollection<CapturedSubwayVendorStockSnapshotEntry> entries;
+
+        internal CapturedSubwayVendorStockSnapshot(
+            int playfieldResource,
+            string snapshotId,
+            CapturedSubwayVendorStockSnapshotEntry[] entries)
+        {
+            this.PlayfieldResource = playfieldResource;
+            this.SnapshotId = snapshotId;
+            this.entries = Array.AsReadOnly((CapturedSubwayVendorStockSnapshotEntry[])entries.Clone());
+
+            int totalRows = 0;
+            foreach (CapturedSubwayVendorStockSnapshotEntry entry in this.entries)
+            {
+                totalRows += entry.Stock.Count;
+            }
+
+            this.TotalRows = totalRows;
+        }
+
+        internal int PlayfieldResource { get; private set; }
+        internal string SnapshotId { get; private set; }
+        internal int TotalRows { get; private set; }
+
+        internal ReadOnlyCollection<CapturedSubwayVendorStockSnapshotEntry> Entries
+        {
+            get { return this.entries; }
+        }
+
+        internal bool TryGetStock(
+            int playfieldResource,
+            int sourceNpcInstance,
+            int sourceVendorInstance,
+            int vendorTemplateId,
+            out ReadOnlyCollection<CapturedSubwayVendorStockDefinition> stock)
+        {
+            stock = null;
+            if (playfieldResource != this.PlayfieldResource)
+            {
+                return false;
+            }
+
+            foreach (CapturedSubwayVendorStockSnapshotEntry entry in this.entries)
+            {
+                if (entry.SourceVendorInstance != sourceVendorInstance)
+                {
+                    continue;
+                }
+
+                if (entry.SourceNpcInstance != sourceNpcInstance
+                    || entry.VendorTemplateId != vendorTemplateId)
+                {
+                    return false;
+                }
+
+                stock = entry.Stock;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    internal sealed class CapturedSubwayVendorStockSnapshotEntry
+    {
+        internal CapturedSubwayVendorStockSnapshotEntry(
+            int sourceNpcInstance,
+            int sourceVendorInstance,
+            int vendorTemplateId,
+            ReadOnlyCollection<CapturedSubwayVendorStockDefinition> stock)
+        {
+            this.SourceNpcInstance = sourceNpcInstance;
+            this.SourceVendorInstance = sourceVendorInstance;
+            this.VendorTemplateId = vendorTemplateId;
+            this.Stock = stock;
+        }
+
+        internal int SourceNpcInstance { get; private set; }
+        internal int SourceVendorInstance { get; private set; }
+        internal int VendorTemplateId { get; private set; }
+        internal ReadOnlyCollection<CapturedSubwayVendorStockDefinition> Stock { get; private set; }
     }
 
     internal sealed class CapturedSubwayVendorDefinition
