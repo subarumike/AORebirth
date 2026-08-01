@@ -50,6 +50,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using ZoneEngine.Core.Playfields;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
+    using ServerPlayfield = AORebirth.Core.Playfields.Playfield;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     #endregion
@@ -83,6 +84,51 @@ namespace ZoneEngine.Core.Functions.GameFunctions
 
             if (arguments[1].AsInt32() > 0)
             {
+                Coordinate officialDungeonDestination;
+                if (TempleWorldInteractionRules.TryResolveProxyEntry(
+                    character.Playfield.Identity.Instance,
+                    caller.Identity,
+                    arguments[0].AsInt32(),
+                    arguments[1].AsInt32(),
+                    arguments[2].AsInt32(),
+                    arguments[3].AsInt32(),
+                    out officialDungeonDestination))
+                {
+                    ServerPlayfield sourcePlayfield = character.Playfield as ServerPlayfield;
+                    if (sourcePlayfield == null)
+                    {
+                        return false;
+                    }
+
+                    var preservedHeading = new Quaternion(
+                        character.RawHeading.xf,
+                        character.RawHeading.yf,
+                        character.RawHeading.zf,
+                        character.RawHeading.wf);
+                    var envelopeDestination = new Vector3(
+                        character.RawCoordinates.X,
+                        character.RawCoordinates.Y,
+                        character.RawCoordinates.Z);
+                    sourcePlayfield.Teleport(
+                        (Dynel)character,
+                        officialDungeonDestination,
+                        preservedHeading,
+                        new Identity
+                        {
+                            Type = IdentityType.Playfield,
+                            Instance = arguments[1].AsInt32()
+                        },
+                        transferCharacter =>
+                            ZoneEngine.Core.MessageHandlers.TeleportMessageHandler.Default
+                                .SendOfficialDungeonProxyTransfer(
+                                    transferCharacter,
+                                    envelopeDestination,
+                                    preservedHeading,
+                                    arguments[1].AsInt32(),
+                                    caller.Identity));
+                    return true;
+                }
+
                 Coordinate overrideDestination;
                 Quaternion overrideHeading;
                 if (SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride(

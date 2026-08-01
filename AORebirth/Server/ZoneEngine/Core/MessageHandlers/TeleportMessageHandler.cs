@@ -113,6 +113,95 @@ namespace ZoneEngine.Core.MessageHandlers
                 false);
         }
 
+        internal void SendOfficialDungeonProxyTransfer(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            Identity sourceDoor)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                (IdentityType)51102,
+                1,
+                sourceDoor.Instance,
+                new Identity { Type = (IdentityType)100002, Instance = 1 },
+                new byte[0]);
+        }
+
+        internal void SendOfficialDungeonProxyExit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            Identity sourceDoor)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                (IdentityType)51100,
+                0,
+                0,
+                new Identity { Type = (IdentityType)100003, Instance = sourceDoor.Instance },
+                new byte[] { 0, 0, 0, 1 });
+        }
+
+        private void SendOfficialDungeonProxyTransition(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            IdentityType categoricalPlayfieldType,
+            int gameServerId,
+            int sgId,
+            Identity secondaryPlayfield,
+            byte[] payload)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = categoricalPlayfieldType,
+                                      Instance = destinationPlayfieldId
+                                  };
+                    x.GameServerId = gameServerId;
+                    x.SgId = sgId;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = secondaryPlayfield;
+                    x.Payload = payload;
+                },
+                false);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="character">

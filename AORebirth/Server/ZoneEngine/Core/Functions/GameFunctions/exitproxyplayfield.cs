@@ -51,6 +51,7 @@ namespace ZoneEngine.Core.Functions.GameFunctions
     using ZoneEngine.Core.Playfields;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
+    using ServerPlayfield = AORebirth.Core.Playfields.Playfield;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     #endregion
@@ -73,8 +74,61 @@ namespace ZoneEngine.Core.Functions.GameFunctions
             IInstancedEntity target,
             MessagePackObject[] arguments)
         {
+            return TryExecute((ICharacter)self, caller);
+        }
+
+        internal static bool TryExecute(ICharacter self, IEntity caller)
+        {
             uint externalDoorInstance = self.Stats[StatIds.externaldoorinstance].BaseValue;
             int externalPlayfieldId = self.Stats[StatIds.externalplayfieldinstance].Value;
+
+            if (!PlayfieldLoader.PFData.ContainsKey(externalPlayfieldId))
+            {
+                return false;
+            }
+
+            Coordinate officialDungeonDestination;
+            if (TempleWorldInteractionRules.TryResolveProxyExit(
+                self.Playfield.Identity.Instance,
+                externalPlayfieldId,
+                externalDoorInstance,
+                out officialDungeonDestination))
+            {
+                ServerPlayfield sourcePlayfield = self.Playfield as ServerPlayfield;
+                if (sourcePlayfield == null)
+                {
+                    return false;
+                }
+
+                Dynel dynel = (Dynel)self;
+                var preservedHeading = new Quaternion(
+                    self.RawHeading.xf,
+                    self.RawHeading.yf,
+                    self.RawHeading.zf,
+                    self.RawHeading.wf);
+                var envelopeDestination = new Vector3(
+                    self.RawCoordinates.X,
+                    self.RawCoordinates.Y,
+                    self.RawCoordinates.Z);
+                sourcePlayfield.Teleport(
+                    dynel,
+                    officialDungeonDestination,
+                    preservedHeading,
+                    new Identity { Type = IdentityType.Playfield, Instance = externalPlayfieldId },
+                    transferCharacter =>
+                        ZoneEngine.Core.MessageHandlers.TeleportMessageHandler.Default
+                            .SendOfficialDungeonProxyExit(
+                                transferCharacter,
+                                envelopeDestination,
+                                preservedHeading,
+                                externalPlayfieldId,
+                                new Identity
+                                {
+                                    Type = IdentityType.Door,
+                                    Instance = unchecked((int)externalDoorInstance)
+                                }));
+                return true;
+            }
 
             StatelData door =
                 PlayfieldLoader.PFData[externalPlayfieldId].Statels.FirstOrDefault(

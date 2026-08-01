@@ -444,6 +444,24 @@ namespace ZoneEngine.Core.Navigation
             }
         }
 
+        internal int ExteriorDoorConnectionCount
+        {
+            get
+            {
+                return this.rooms.Sum(
+                    room => room.Doors.Count(door => door.RoomIndex == -1));
+            }
+        }
+
+        internal bool HasExteriorDoorConnection(string roomName, int doorIndex)
+        {
+            return this.rooms.Any(
+                room => string.Equals(room.Name, roomName, StringComparison.Ordinal)
+                        && room.Doors.Any(
+                            door => door.RoomIndex == -1
+                                    && door.DoorIndex == doorIndex));
+        }
+
         internal IEnumerable<string> RoomNames
         {
             get { return this.rooms.Select(room => room.Name); }
