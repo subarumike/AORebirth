@@ -29,7 +29,7 @@ if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
 
 
-EXPECTED_INITIAL_ACTORS = 1583
+EXPECTED_INITIAL_ACTORS = 1590
 
 SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("subway-ordinary", 322),
@@ -39,7 +39,7 @@ SURFACE_EXPECTATIONS: Sequence[Tuple[str, int]] = (
     ("temple-reanimated-corpse-adds", 2),
     ("nascence-core-hecklers", 40),
     ("nascence-life", 837),
-    ("arete-family", 96),
+    ("arete-family", 103),
     ("arete-additional-captured-actors", 14),
     ("arete-alien-area", 64),
     ("arete-sandstorm-marauders", 5),
@@ -171,11 +171,6 @@ RUNTIME_PREPARE_AUDIT_REFERENCES: Mapping[
         ("cleaning-robots",),
     ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs": (
-        2,
-        "fixed-denominator-surfaces",
-        ("arete-family",),
-    ),
-    "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs": (
         2,
         "fixed-denominator-surfaces",
         ("arete-family",),
@@ -1084,7 +1079,7 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
     # three-float rows after validating the whole initializer shape.
     if junkyard_slots == 0:
         junkyard_slots = len(re.findall(r"\bnew\s*\[\]\s*\{", junkyard_body))
-    if junkyard_slots != 14:
+    if junkyard_slots != 21:
         raise CoverageError(f"Junkyard Cleaning Robot parser found {junkyard_slots} slots")
     robot = make_actor(
         "arete-family",
@@ -1093,7 +1088,7 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
         parse_csharp_int("RobotMonsterData", junkyard_constants),
         parse_csharp_int("RobotLevel", junkyard_constants),
         junkyard_path,
-        evidence_capture_ids=("20260720-212302",),
+        evidence_capture_ids=("20260731-180854",),
     )
     robot.actor_count = junkyard_slots
     actors.append(robot)
@@ -1172,10 +1167,10 @@ def parse_arete_family(repo_root: Path) -> List[ActorDefinition]:
             evidence_capture_ids=("20260720-064523",),
         )
     )
-    if sum(actor.actor_count for actor in actors) != 96:
+    if sum(actor.actor_count for actor in actors) != 103:
         raise CoverageError(
             "Arete family parser reconciled "
-            f"{sum(actor.actor_count for actor in actors)} actors instead of 96"
+            f"{sum(actor.actor_count for actor in actors)} actors instead of 103"
         )
     return actors
 
