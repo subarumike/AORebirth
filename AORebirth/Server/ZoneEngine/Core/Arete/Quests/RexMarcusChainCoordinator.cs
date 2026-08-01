@@ -83,9 +83,11 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string MarcusReturnXpCreditsFlag = "marcus-return-xp-credits-2076-1080";
 
-        private const string MarcusReturnCreditRewardKey = "captured-marcus-return-credits-1080";
+        private const string LegacyMarcusReturnXpCreditsFlag = "marcus-return-xp-credits-1281-1080";
 
-        private const string MarcusReturnXpAwardedFlag = "marcus-return-xp-2076-awarded";
+        private const string MergedMarcusReturnCreditRewardKey = "captured-marcus-return-credits-1080";
+
+        private const string MergedMarcusReturnXpAwardedFlag = "marcus-return-xp-2076-awarded";
 
         private static readonly Dictionary<int, MarcusTradeSession> TradeSessionsByCharacter =
             new Dictionary<int, MarcusTradeSession>();
@@ -1197,6 +1199,12 @@ namespace ZoneEngine.Core.Arete.Quests
                     + " target="
                     + marcusTarget.ToString(true));
 
+                if (!ApplyMarcusReturnRewards(source))
+                {
+                    Log("marcus-trade-turnin deferred: durable reward was not completed");
+                    return;
+                }
+
                 TryConsumeSuppressant(source, stagedContainer);
 
                 try
@@ -1212,6 +1220,7 @@ namespace ZoneEngine.Core.Arete.Quests
                     Log("marcus-trade-rejecteditems failed: " + e.Message);
                 }
 
+                SendMarcusReturnRewardFeedback(source);
                 CompleteMarcusReturnAndHandoffFlint(source);
                 ForgetTradeSession(source);
 
@@ -1310,20 +1319,6 @@ namespace ZoneEngine.Core.Arete.Quests
                     ForceCompleteIfNeeded(characterId, MissionRuntime.RexB18FQuestId);
                     ForceCompleteIfNeeded(characterId, MissionRuntime.RexB194QuestId);
                     ForceCompleteIfNeeded(characterId, MissionRuntime.RexB18EQuestId);
-
-                    if (MissionRuntime.Service.GetFlag(
-                            characterId,
-                            MissionRuntime.RexB196QuestId,
-                            MarcusReturnXpCreditsFlag) == null)
-                    {
-                        ApplyMarcusReturnRewards(source);
-                        SendMarcusReturnRewardFeedback(source);
-                        MissionRuntime.Service.SetFlag(
-                            characterId,
-                            MissionRuntime.RexB196QuestId,
-                            MarcusReturnXpCreditsFlag,
-                            "xp:" + MarcusReturnXpReward + "+credits:" + MarcusReturnCreditReward);
-                    }
 
                     MissionRuntime.Service.OfferMission(characterId, MissionRuntime.RexFlintQuestId);
                     MissionRuntime.Service.AcceptMission(characterId, MissionRuntime.RexFlintQuestId);
@@ -1477,104 +1472,171 @@ namespace ZoneEngine.Core.Arete.Quests
             FeedbackMessageHandler.Default.Send(source, 110, 108871108);
         }
 
-        private static void ApplyMarcusReturnRewards(ICharacter source)
+        private static bool ApplyMarcusReturnRewards(ICharacter source)
         {
-            if (source == null)
+            if (source == null || !MissionRuntime.IsInitialized || MissionRuntime.Rewards == null)
             {
-                return;
+                return false;
             }
 
             int characterId = source.Identity.Instance;
-            bool cashApplied = false;
-            if (MissionRuntime.IsInitialized && MissionRuntime.Rewards != null)
-            {
-                try
-                {
-                    var cashDefinition = new MissionRewardDefinition
-                                         {
-                                             RewardKey = MarcusReturnCreditRewardKey,
-                                             RewardType = "character-stats",
-                                             IsResolved = true,
-                                             StatMutations = new[]
-                                                             {
-                                                                 new MissionCharacterStatMutation
-                                                                 {
-                                                                     StatIdentityType =
-                                                                         (int)IdentityType.CanbeAffected,
-                                                                     StatId = (int)StatIds.cash,
-                                                                     Kind = MissionStatMutationKind.AddClamped,
-                                                                     Value = MarcusReturnCreditReward,
-                                                                     MinimumValue = 0,
-                                                                     MaximumValue = uint.MaxValue
-                                                                 }
-                                                             }
-                                         };
-                    MissionRewardExecutionResult cashResult =
-                        MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                            characterId,
-                            MissionRuntime.RexB196QuestId,
-                            cashDefinition,
-                            "capture:20260730-142434:marcus-b196-1080-credits");
-                    if (cashResult.Succeeded && cashResult.StatValues != null)
-                    {
-                        foreach (MissionCharacterStatValue statValue in cashResult.StatValues)
-                        {
-                            if (statValue.StatId != (int)StatIds.cash)
-                            {
-                                continue;
-                            }
-
-                            uint value = statValue.Value <= 0
-                                             ? 0
-                                             : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                            source.Stats[StatIds.cash].Set(value);
-                            cashApplied = true;
-                        }
-
-                        if (cashApplied)
-                        {
-                            StatMessageHandler.Default.SendChanged(source);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log("marcus-return credits ledger failed: " + e.Message);
-                }
-            }
-
-            if (!cashApplied)
-            {
-                long cashAfter = (long)source.Stats[StatIds.cash].Value + MarcusReturnCreditReward;
-                if (cashAfter > uint.MaxValue)
-                {
-                    cashAfter = uint.MaxValue;
-                }
-
-                source.Stats[StatIds.cash].Set((uint)cashAfter);
-                StatMessageHandler.Default.SendChanged(source);
-            }
-
-            if (MissionRuntime.IsInitialized
-                && MissionRuntime.Service.GetFlag(
+            if (MissionRuntime.Service.GetFlag(
+                    characterId,
+                    MissionRuntime.RexB196QuestId,
+                    MarcusReturnXpCreditsFlag) != null
+                || MissionRuntime.Service.GetFlag(
                        characterId,
                        MissionRuntime.RexB196QuestId,
-                       MarcusReturnXpAwardedFlag) != null)
+                       LegacyMarcusReturnXpCreditsFlag) != null)
             {
-                return;
+                return true;
             }
 
-            if (CombatXpRuntimeService.AwardDirectXp(
-                    source,
-                    MarcusReturnXpReward,
-                    "marcus-b196-return-2076xp")
-                && MissionRuntime.IsInitialized)
+            if (MissionRuntime.Service.GetFlag(
+                    characterId,
+                    MissionRuntime.RexB196QuestId,
+                    MergedMarcusReturnXpAwardedFlag) != null)
             {
                 MissionRuntime.Service.SetFlag(
                     characterId,
                     MissionRuntime.RexB196QuestId,
-                    MarcusReturnXpAwardedFlag,
-                    "true");
+                    MarcusReturnXpCreditsFlag,
+                    "migrated:merged-split-reward");
+                return true;
+            }
+
+            try
+            {
+                bool recoverMergedXpOnly = MissionRuntime.Rewards.IsRewardApplied(
+                    characterId,
+                    MissionRuntime.RexB196QuestId,
+                    MergedMarcusReturnCreditRewardKey);
+                var definition = new MissionRewardDefinition
+                                 {
+                                     RewardKey = recoverMergedXpOnly
+                                                     ? "captured-marcus-return-xp-2076-recovery"
+                                                     : "captured-marcus-return-xp-credits",
+                                     RewardType = "character-stats",
+                                     IsResolved = true,
+                                     StatMutations = recoverMergedXpOnly
+                                                         ? new[]
+                                                           {
+                                                               new MissionCharacterStatMutation
+                                                               {
+                                                                   StatIdentityType =
+                                                                       (int)IdentityType.CanbeAffected,
+                                                                   StatId = (int)StatIds.xp,
+                                                                   Kind = MissionStatMutationKind.AddClamped,
+                                                                   Value = MarcusReturnXpReward,
+                                                                   MinimumValue = 0,
+                                                                   MaximumValue = uint.MaxValue
+                                                               },
+                                                               new MissionCharacterStatMutation
+                                                               {
+                                                                   StatIdentityType =
+                                                                       (int)IdentityType.CanbeAffected,
+                                                                   StatId = (int)StatIds.unsavedxp,
+                                                                   Kind = MissionStatMutationKind.AddClamped,
+                                                                   Value = MarcusReturnXpReward,
+                                                                   MinimumValue = 0,
+                                                                   MaximumValue = uint.MaxValue
+                                                               },
+                                                               new MissionCharacterStatMutation
+                                                               {
+                                                                   StatIdentityType =
+                                                                       (int)IdentityType.CanbeAffected,
+                                                                   StatId = (int)StatIds.lastxp,
+                                                                   Kind = MissionStatMutationKind.Set,
+                                                                   Value = MarcusReturnXpReward,
+                                                                   MinimumValue = 0,
+                                                                   MaximumValue = uint.MaxValue
+                                                               }
+                                                           }
+                                                         : new[]
+                                                     {
+                                                         new MissionCharacterStatMutation
+                                                         {
+                                                             StatIdentityType =
+                                                                 (int)IdentityType.CanbeAffected,
+                                                             StatId = (int)StatIds.cash,
+                                                             Kind = MissionStatMutationKind.AddClamped,
+                                                             Value = MarcusReturnCreditReward,
+                                                             MinimumValue = 0,
+                                                             MaximumValue = uint.MaxValue
+                                                         },
+                                                         new MissionCharacterStatMutation
+                                                         {
+                                                             StatIdentityType =
+                                                                 (int)IdentityType.CanbeAffected,
+                                                             StatId = (int)StatIds.xp,
+                                                             Kind = MissionStatMutationKind.AddClamped,
+                                                             Value = MarcusReturnXpReward,
+                                                             MinimumValue = 0,
+                                                             MaximumValue = uint.MaxValue
+                                                         },
+                                                         new MissionCharacterStatMutation
+                                                         {
+                                                             StatIdentityType =
+                                                                 (int)IdentityType.CanbeAffected,
+                                                             StatId = (int)StatIds.unsavedxp,
+                                                             Kind = MissionStatMutationKind.AddClamped,
+                                                             Value = MarcusReturnXpReward,
+                                                             MinimumValue = 0,
+                                                             MaximumValue = uint.MaxValue
+                                                         },
+                                                         new MissionCharacterStatMutation
+                                                         {
+                                                             StatIdentityType =
+                                                                 (int)IdentityType.CanbeAffected,
+                                                             StatId = (int)StatIds.lastxp,
+                                                             Kind = MissionStatMutationKind.Set,
+                                                             Value = MarcusReturnXpReward,
+                                                             MinimumValue = 0,
+                                                             MaximumValue = uint.MaxValue
+                                                         }
+                                                     }
+                                 };
+                MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
+                    characterId,
+                    MissionRuntime.RexB196QuestId,
+                    definition,
+                    recoverMergedXpOnly
+                        ? "repair:merged-marcus-b196-xp-only"
+                        : "capture:20260730-142434:marcus-b196-xp-credits");
+                if (result == null || !result.Succeeded)
+                {
+                    Log(
+                        "marcus-return reward deferred status="
+                        + (result == null ? "null" : result.Status.ToString())
+                        + " msg="
+                        + (result == null ? string.Empty : result.Message));
+                    return false;
+                }
+
+                if (result.StatValues != null)
+                {
+                    foreach (MissionCharacterStatValue statValue in result.StatValues)
+                    {
+                        uint value = statValue.Value <= 0
+                                         ? 0
+                                         : (uint)Math.Min(statValue.Value, uint.MaxValue);
+                        source.Stats[(StatIds)statValue.StatId].Set(value);
+                    }
+
+                    StatMessageHandler.Default.SendChanged(source);
+                }
+
+                MissionRuntime.Service.SetFlag(
+                    characterId,
+                    MissionRuntime.RexB196QuestId,
+                    MarcusReturnXpCreditsFlag,
+                    "xp:" + MarcusReturnXpReward + "+credits:" + MarcusReturnCreditReward);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log("marcus-return reward deferred: " + e.Message);
+                return false;
             }
         }
 

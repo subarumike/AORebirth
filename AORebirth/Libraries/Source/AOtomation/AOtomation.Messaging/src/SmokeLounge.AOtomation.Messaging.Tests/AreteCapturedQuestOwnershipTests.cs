@@ -268,6 +268,76 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void MergedAreteTurnInsUseAtomicLegacyAwareRewardsBeforeConsumingItems()
+        {
+            string wounded = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\MarcusWoundedWorkersQuestRuntime.cs");
+            AssertContains(wounded, "private const int StimReturnXpReward = 1281;");
+            AssertContains(wounded, "marcus-wounded-xp-credits-1281-1040");
+            AssertContains(wounded, "captured-marcus-stim-return-xp-credits-2076-1040");
+            AssertContains(wounded, "LegacyRewardKeys = new[]");
+            AssertInOrder(
+                wounded,
+                "if (!ApplyStimReturnRewards(source))",
+                "TryConsumeStim(source, stagedContainer);");
+            Assert.IsFalse(wounded.Contains("stim-return rewards live-fallback"));
+
+            string flint = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\FlintBioComQuestRuntime.cs");
+            AssertContains(flint, "LegacyRewardKeys = new[]");
+            AssertContains(flint, "captured-alex-bio-com-turnin-xp-credits");
+            AssertInOrder(
+                flint,
+                "if (!ApplyAlexTurnInXpCredits(source))",
+                "TryConsumeBioCom(source, stagedContainer);");
+            Assert.IsFalse(flint.Contains("ApplyDirectXpCreditsFallback"));
+
+            string marcus = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Arete\Quests\RexMarcusChainCoordinator.cs");
+            AssertContains(marcus, "captured-marcus-return-xp-credits");
+            AssertContains(marcus, "LegacyMarcusReturnXpCreditsFlag");
+            AssertInOrder(
+                marcus,
+                "if (!ApplyMarcusReturnRewards(source))",
+                "TryConsumeSuppressant(source, stagedContainer);");
+            AssertContains(marcus, "MergedMarcusReturnCreditRewardKey");
+            AssertContains(marcus, "captured-marcus-return-xp-2076-recovery");
+            AssertContains(marcus, "MissionRuntime.Rewards.IsRewardApplied(");
+            Assert.IsFalse(marcus.Contains("CombatXpRuntimeService.AwardDirectXp("));
+        }
+
+        [TestMethod]
+        public void AretePetLosAndPetChatRepairsRemainNarrowlyScoped()
+        {
+            string combat = ReadRepositoryFile(
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs");
+            AssertContains(combat, "private const int AreteLandingPlayfieldId = 6553;");
+            AssertContains(combat, "this.playfield.Identity.Instance == AreteLandingPlayfieldId");
+            AssertInOrder(
+                combat,
+                "private bool CanApplyNpcDamage(",
+                "this.playfield.Identity.Instance == AreteLandingPlayfieldId",
+                "this.nextLineOfSightRetryTicks.Remove(attacker.Identity.Instance);");
+
+            string packets = ReadRepositoryFile(@"AORebirth\Server\ChatEngine\Packets\MsgSystem.cs");
+            AssertInOrder(
+                packets,
+                "public static byte[] Create(string message)",
+                "MessageType.SystemMessage",
+                "public static byte[] CreatePet(string message, int unk1, int unk2)",
+                "MessageType.AnonymousMessage");
+
+            string chatServer = ReadRepositoryFile(@"AORebirth\Server\ChatEngine\CoreServer\ChatServer.cs");
+            AssertContains(chatServer, "MsgSystem.CreatePet(body, unk1, unk2)");
+            AssertContains(chatServer, "LogUtil.Debug(DebugInfoDetail.Network, ok);");
+            Assert.IsFalse(chatServer.Contains("Console.WriteLine(ok)"));
+            Assert.IsFalse(chatServer.Contains("Console.WriteLine(miss)"));
+
+            string tell = ReadRepositoryFile(@"AORebirth\Server\ChatEngine\PacketHandlers\Tell.cs");
+            AssertContains(tell, "MsgSystem.Create(\"Player not online.\")");
+        }
+
+        [TestMethod]
         public void CaptureReadyCombatStillFailsClosedForUnsafeCatalogResolution()
         {
             string combat = ReadRepositoryFile(

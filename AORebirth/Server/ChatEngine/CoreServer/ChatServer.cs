@@ -381,7 +381,7 @@ namespace ChatEngine.CoreServer
 
             int unk1 = systemChatMessage.Unk1;
             int unk2 = systemChatMessage.Unk2 != 0 ? systemChatMessage.Unk2 : 1;
-            byte[] packet = MsgSystem.Create(body, unk1, unk2);
+            byte[] packet = MsgSystem.CreatePet(body, unk1, unk2);
             if (packet == null || packet.Length < 2 || packet[0] != 0x00 || packet[1] != 0x23)
             {
                 LogUtil.Debug(
@@ -421,8 +421,7 @@ namespace ChatEngine.CoreServer
                             + (packet == null ? 0 : packet.Length)
                             + " text="
                             + systemChatMessage.Text;
-                LogUtil.Debug(DebugInfoDetail.Error, ok);
-                Console.WriteLine(ok);
+                LogUtil.Debug(DebugInfoDetail.Network, ok);
                 return;
             }
 
@@ -445,8 +444,7 @@ namespace ChatEngine.CoreServer
                                 + (packet == null ? 0 : packet.Length)
                                 + " text="
                                 + systemChatMessage.Text;
-                    LogUtil.Debug(DebugInfoDetail.Error, ok);
-                    Console.WriteLine(ok);
+                    LogUtil.Debug(DebugInfoDetail.Network, ok);
                     return;
                 }
 
@@ -465,8 +463,7 @@ namespace ChatEngine.CoreServer
                                 + (packet == null ? 0 : packet.Length)
                                 + " text="
                                 + systemChatMessage.Text;
-                    LogUtil.Debug(DebugInfoDetail.Error, ok);
-                    Console.WriteLine(ok);
+                    LogUtil.Debug(DebugInfoDetail.Network, ok);
                     return;
                 }
             }
@@ -478,7 +475,6 @@ namespace ChatEngine.CoreServer
                           + " clients="
                           + this.ConnectedClients.Count;
             LogUtil.Debug(DebugInfoDetail.Error, miss);
-            Console.WriteLine(miss);
         }
 
         private void DistributeVicinityChat(VicinityChatMessage vicinityChatMessage)
