@@ -288,9 +288,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(source.Contains("capture.20260722-104809.malfunctioning-robot.7988C9BF"));
             Assert.IsTrue(source.Contains("ObservedCorpseSnapshots = snapshots"));
             Assert.IsTrue(source.Contains("ItemPoolUnresolved = true"));
-            Assert.IsFalse(
-                source.Contains("arete.landing.shiny-sword.independent"),
-                "Arete corpse snapshots must not be contaminated by a playfield-global independent roll.");
+            Assert.IsTrue(source.Contains("arete.landing.shiny-sword.independent"));
+            Assert.IsTrue(source.Contains("this.EnsureAreteShinySwordIndependent();"));
+            Assert.IsTrue(source.Contains("TargetType = LootAssignmentTargetType.Global"));
+            Assert.IsTrue(source.Contains("DropChanceBasisPoints = 620"));
+            Assert.IsTrue(source.Contains("ItemTemplateId = 297289"));
         }
 
         [TestMethod]
