@@ -2,7 +2,10 @@
 
 namespace SmokeLounge.AOtomation.Messaging.Tests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
@@ -117,6 +120,161 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
+        public void AlternateCapturedShopSnapshotIsAtomicAndMatchesAuthoritativeCsv()
+        {
+            CapturedSubwayVendorStockSnapshot snapshot =
+                CapturedSubwayVendorContentProvider.EvidenceStockSnapshots.Single(
+                    candidate => candidate.SnapshotId
+                        == CapturedSubwayVendorContentProvider.AlternateStockSnapshotId);
+
+            Assert.AreEqual(CapturedSubwayVendorContentProvider.SubwayPlayfieldResource, snapshot.PlayfieldResource);
+            Assert.AreEqual(6, snapshot.Entries.Count);
+            Assert.AreEqual(203, snapshot.TotalRows);
+            CollectionAssert.AreEqual(
+                new[] { 22, 31, 29, 40, 19, 62 },
+                snapshot.Entries.Select(entry => entry.Stock.Count).ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    0x12ECC394,
+                    0x12ECC395,
+                    0x12ECC396,
+                    0x12ECC397,
+                    0x12ECC398,
+                    0x12ECC399
+                },
+                snapshot.Entries.Select(entry => entry.SourceVendorInstance).ToArray());
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    0x79135F51,
+                    0x79135F52,
+                    0x79135F53,
+                    0x79135F54,
+                    0x79135F55,
+                    0x79135F56
+                },
+                snapshot.Entries.Select(entry => entry.SourceNpcInstance).ToArray());
+
+            foreach (CapturedSubwayVendorStockSnapshotEntry entry in snapshot.Entries)
+            {
+                CollectionAssert.AreEqual(
+                    Enumerable.Range(0, entry.Stock.Count).ToArray(),
+                    entry.Stock.Select(stock => stock.Slot).ToArray(),
+                    entry.SourceVendorInstance.ToString("X8") + " must retain one complete captured ordering.");
+            }
+
+            CollectionAssert.AreEqual(
+                ReadAuthoritativeAlternateStockRows(),
+                SnapshotRows(snapshot));
+        }
+
+        [TestMethod]
+        public void AlternateCapturedSnapshotDoesNotReplaceCanonicalRuntimeStock()
+        {
+            CapturedSubwayVendorStockSnapshot baseline =
+                CapturedSubwayVendorContentProvider.EvidenceStockSnapshots.Single(
+                    candidate => candidate.SnapshotId
+                        == CapturedSubwayVendorContentProvider.BaselineStockSnapshotId);
+            foreach (CapturedSubwayVendorDefinition definition
+                in CapturedSubwayVendorContentProvider.Definitions)
+            {
+                CapturedSubwayVendorStockSnapshotEntry entry = baseline.Entries.Single(
+                    candidate => candidate.SourceVendorInstance
+                        == definition.SourceVendorInstance);
+                Assert.AreSame(definition.Stock, entry.Stock);
+            }
+        }
+
+        [TestMethod]
+        public void IdenticalPharmacistAndContainerObservationsReuseCanonicalStocks()
+        {
+            CapturedSubwayVendorStockSnapshot baseline = CapturedSubwayVendorContentProvider.EvidenceStockSnapshots[0];
+            CapturedSubwayVendorStockSnapshot alternate = CapturedSubwayVendorContentProvider.EvidenceStockSnapshots[1];
+
+            int[] duplicateDefinitionIndexes = { 3, 5 };
+            foreach (int definitionIndex in duplicateDefinitionIndexes)
+            {
+                CapturedSubwayVendorStockSnapshotEntry baselineEntry =
+                    baseline.Entries[definitionIndex];
+                CapturedSubwayVendorStockSnapshotEntry alternateEntry =
+                    alternate.Entries[definitionIndex];
+                Assert.AreSame(baselineEntry.Stock, alternateEntry.Stock);
+            }
+
+            int[] changedDefinitionIndexes = { 0, 1, 2, 4 };
+            foreach (int definitionIndex in changedDefinitionIndexes)
+            {
+                CapturedSubwayVendorStockSnapshotEntry baselineEntry =
+                    baseline.Entries[definitionIndex];
+                CapturedSubwayVendorStockSnapshotEntry alternateEntry =
+                    alternate.Entries[definitionIndex];
+                Assert.AreNotSame(baselineEntry.Stock, alternateEntry.Stock);
+            }
+        }
+
+        [TestMethod]
+        public void CapturedSnapshotResolutionFailsClosedOutsideExactEvidence()
+        {
+            CapturedSubwayVendorStockSnapshot snapshot =
+                CapturedSubwayVendorContentProvider.EvidenceStockSnapshots.Single(
+                    candidate => candidate.SnapshotId
+                        == CapturedSubwayVendorContentProvider.AlternateStockSnapshotId);
+
+            CapturedSubwayVendorStockSnapshotEntry entry = snapshot.Entries[0];
+            ReadOnlyCollection<CapturedSubwayVendorStockDefinition> stock;
+            Assert.IsFalse(
+                snapshot.TryGetStock(
+                    128,
+                    entry.SourceNpcInstance,
+                    entry.SourceVendorInstance,
+                    entry.VendorTemplateId,
+                    out stock));
+            Assert.IsNull(stock);
+            Assert.IsFalse(
+                snapshot.TryGetStock(
+                    127,
+                    entry.SourceNpcInstance + 1,
+                    entry.SourceVendorInstance,
+                    entry.VendorTemplateId,
+                    out stock));
+            Assert.IsNull(stock);
+            Assert.IsFalse(
+                snapshot.TryGetStock(
+                    127,
+                    0x79775804,
+                    0x12F6284F,
+                    entry.VendorTemplateId,
+                    out stock),
+                "Capture-session identities must not become canonical runtime selectors.");
+            Assert.IsNull(stock);
+            Assert.IsFalse(
+                snapshot.TryGetStock(
+                    127,
+                    entry.SourceNpcInstance,
+                    int.MaxValue,
+                    entry.VendorTemplateId,
+                    out stock));
+            Assert.IsNull(stock);
+            Assert.IsFalse(
+                snapshot.TryGetStock(
+                    127,
+                    entry.SourceNpcInstance,
+                    entry.SourceVendorInstance,
+                    entry.VendorTemplateId + 1,
+                    out stock));
+            Assert.IsNull(stock);
+            Assert.IsTrue(
+                snapshot.TryGetStock(
+                    127,
+                    entry.SourceNpcInstance,
+                    entry.SourceVendorInstance,
+                    entry.VendorTemplateId,
+                    out stock));
+            Assert.AreSame(entry.Stock, stock);
+        }
+
+        [TestMethod]
         public void MerchantAppearanceMetadataRemainsCaptureExact()
         {
             CapturedSubwayVendorDefinition tailor = CapturedSubwayVendorContentProvider.Definitions[0];
@@ -170,6 +328,114 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 "tailor_root_reopen",
                 CapturedSubwayTailorDialogueContent.ResolveRootNodeId(true));
+        }
+
+        private static string Fingerprint(CapturedSubwayVendorStockSnapshot snapshot)
+        {
+            string canonical = string.Concat(
+                snapshot.Entries
+                    .OrderBy(entry => entry.SourceVendorInstance)
+                    .SelectMany(
+                        entry => entry.Stock
+                            .OrderBy(stock => stock.Slot)
+                            .Select(
+                                stock => string.Format(
+                                    "{0:X8}:{1}:{2}:{3}:{4};",
+                                    entry.SourceVendorInstance,
+                                    stock.Slot,
+                                    stock.LowId,
+                                    stock.HighId,
+                                    stock.Quality))));
+
+            byte[] digest;
+            using (SHA256 sha = SHA256.Create())
+            {
+                digest = sha.ComputeHash(Encoding.UTF8.GetBytes(canonical));
+            }
+
+            return string.Concat(digest.Select(value => value.ToString("x2")));
+        }
+
+        private static string[] SnapshotRows(
+            CapturedSubwayVendorStockSnapshot snapshot)
+        {
+            return snapshot.Entries
+                .SelectMany(
+                    entry => entry.Stock.Select(
+                        stock => string.Format(
+                            "{0:X8}:{1}:{2}:{3}:{4}",
+                            entry.SourceVendorInstance,
+                            stock.Slot,
+                            stock.LowId,
+                            stock.HighId,
+                            stock.Quality)))
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+        }
+
+        private static string[] ReadAuthoritativeAlternateStockRows()
+        {
+            var canonicalTerminalByCapturedTerminal =
+                new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    { "12F6284F", "12ECC394" },
+                    { "12F62850", "12ECC395" },
+                    { "12F62851", "12ECC396" },
+                    { "12F62852", "12ECC397" },
+                    { "12F62853", "12ECC398" },
+                    { "12F62854", "12ECC399" }
+                };
+            return File.ReadAllLines(
+                    RepositoryPath(
+                        @"docs\evidence\data\subway-vendors-20260719-021611.csv"))
+                .Skip(1)
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(
+                    value =>
+                    {
+                        string[] fields = value.Split(',');
+                        Assert.AreEqual(8, fields.Length, value);
+                        string identity = fields[3].Trim('"');
+                        int separator = identity.IndexOf(':');
+                        Assert.IsTrue(separator > 0, identity);
+                        string terminal = identity
+                            .Substring(separator + 1)
+                            .TrimEnd(')')
+                            .ToUpperInvariant();
+                        string canonicalTerminal;
+                        Assert.IsTrue(
+                            canonicalTerminalByCapturedTerminal.TryGetValue(
+                                terminal,
+                                out canonicalTerminal),
+                            terminal);
+                        return string.Format(
+                            "{0}:{1}:{2}:{3}:{4}",
+                            canonicalTerminal,
+                            fields[4],
+                            fields[5],
+                            fields[6],
+                            fields[7]);
+                    })
+                .OrderBy(value => value, StringComparer.Ordinal)
+                .ToArray();
+        }
+
+        private static string RepositoryPath(string relativePath)
+        {
+            DirectoryInfo cursor = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (cursor != null)
+            {
+                string candidate = Path.Combine(cursor.FullName, relativePath);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                cursor = cursor.Parent;
+            }
+
+            Assert.Fail("Repository file was not found: " + relativePath);
+            return string.Empty;
         }
     }
 }

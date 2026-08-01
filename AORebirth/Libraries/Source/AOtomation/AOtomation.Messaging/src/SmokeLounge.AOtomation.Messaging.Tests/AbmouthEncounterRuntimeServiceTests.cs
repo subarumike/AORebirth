@@ -179,7 +179,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 coordinator.Contains("nextCapturedParallelAttackTicks")
                 && coordinator.Contains("nextTicks[index] <= now && nextTicks[index] < dueAt")
-                && coordinator.Contains("nextTicks[dueIndex] = now + TimeSpan.FromSeconds(attack.RechargeSeconds);"),
+                && coordinator.Contains(
+                    "nextTicks[dueIndex] = streams[dueIndex].ResolveNextTickAfterHit(now);"),
                 "Parallel captured streams must schedule and recharge independently.");
             Assert.IsTrue(
                 rules.Contains("CapturedSubwayAbmouthInfectorMinimumDamage = 21")

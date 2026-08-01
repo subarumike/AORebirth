@@ -1064,6 +1064,18 @@ namespace AORebirth.Core.Playfields
         /// </summary>
         public void SendStaticDynelsToClient(ICharacter character)
         {
+            this.SendStaticDynelsToClient(character, false);
+        }
+
+        internal void SendStaticDynelsToClientAfterExternalPlayfieldArrival(ICharacter character)
+        {
+            this.SendStaticDynelsToClient(character, true);
+        }
+
+        private void SendStaticDynelsToClient(
+            ICharacter character,
+            bool isExternalPlayfieldArrival)
+        {
             if (character == null)
             {
                 return;
@@ -1078,7 +1090,10 @@ namespace AORebirth.Core.Playfields
                 SimpleItemFullUpdateMessageHandler.Default.Send(character, staticDynel);
             }
 
-            int doorStatuses = this.runtimeSystems.SendInitialDoorStatuses(character, this.statels);
+            int doorStatuses = this.runtimeSystems.SendInitialDoorStatuses(
+                character,
+                this.statels,
+                isExternalPlayfieldArrival);
             if (doorStatuses > 0)
             {
                 LogUtil.Debug(

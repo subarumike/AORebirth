@@ -427,12 +427,16 @@ namespace ZoneEngine.Core.Playfields
             this.doorStatuses.Configure(this.playfield.Identity.Instance, statels);
         }
 
-        internal int SendInitialDoorStatuses(ICharacter character, IEnumerable<StatelData> statels)
+        internal int SendInitialDoorStatuses(
+            ICharacter character,
+            IEnumerable<StatelData> statels,
+            bool isExternalPlayfieldArrival)
         {
             return this.doorStatuses.SendInitialStatuses(
                 character,
                 this.playfield.Identity.Instance,
-                statels);
+                statels,
+                isExternalPlayfieldArrival);
         }
 
         internal IInstancedEntity FindByIdentity(Identity identity)

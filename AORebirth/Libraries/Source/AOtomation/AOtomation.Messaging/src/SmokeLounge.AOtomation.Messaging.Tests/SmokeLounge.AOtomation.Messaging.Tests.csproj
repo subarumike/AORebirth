@@ -69,11 +69,15 @@
     <Compile Include="DamageCalculationTests.cs" />
     <Compile Include="CapturedEnemyCombatActiveCoverageTests.cs" />
     <Compile Include="CapturedEnemyCombatContractTestStub.cs" />
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs">
+      <Link>CapturedSubwayRetaliationEligibilityResolver.cs</Link>
+    </Compile>
     <Compile Include="CapturedEnemyCombatPacketFactoryTests.cs" />
     <Compile Include="CapturedEnemyCombatGeneratedPacketFixtureTests.cs" />
     <Compile Include="CapturedEnemyCombatProfileCatalogFixtures.g.cs" />
     <Compile Include="CapturedEnemyCombatProfileCatalogTestStubs.cs" />
     <Compile Include="CapturedEnemyCombatProfileCatalogTests.cs" />
+    <Compile Include="CapturedSubwayRetaliationEligibilityResolverTests.cs" />
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedIntObservationCursor.cs">
       <Link>CapturedIntObservationCursor.cs</Link>
     </Compile>
@@ -274,6 +278,7 @@
     <Compile Include="WorldPopulationFoundationTests.cs" />
     <Compile Include="TempleOfThreeWindsOrdinaryContentTests.cs" />
     <Compile Include="TempleDoorStatusRuntimeTests.cs" />
+    <Compile Include="StatelDataTestStub.cs" />
     <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
     <Compile Include="DungeonNamedLifecycleCompletionTests.cs" />
     <Compile Include="PersistentMissionFoundationTests.cs" />
@@ -281,6 +286,7 @@
     <Compile Include="AreteFrameworkBootstrapTests.cs" />
     <Compile Include="CapturedAreteExactInteractionTests.cs" />
     <Compile Include="AreteAcceptanceMatrixTests.cs" />
+    <Compile Include="SubwayAcceptanceMatrixTests.cs" />
     <Compile Include="AreteCapturedVendorOwnershipTests.cs" />
     <Compile Include="AreteCapturedQuestOwnershipTests.cs" />
     <Compile Include="WindcallerKarrecNpcContentTests.cs" />

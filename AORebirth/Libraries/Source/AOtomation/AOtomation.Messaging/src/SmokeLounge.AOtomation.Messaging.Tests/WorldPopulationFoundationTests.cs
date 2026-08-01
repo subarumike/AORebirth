@@ -890,10 +890,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new CapturedEnemyCombatContract { Evidence = "base" },
                 OrdinaryEnemyEvidenceState.Unresolved,
                 contractResolver: level => levelResolved);
-            Assert.AreSame(
+            CapturedEnemyCombatContract resolved = levelAware.ResolveContract(0x7953FFFF, 10);
+            Assert.AreNotSame(
                 levelResolved,
-                levelAware.ResolveContract(0x7953FFFF, 10),
-                "The source-aware overload must retain the existing level resolver fallback.");
+                resolved,
+                "The source-aware overload must preserve the fallback without mutating its shared contract.");
+            Assert.AreEqual("level", resolved.Evidence);
+            Assert.AreEqual(0x7953FFFF, resolved.EvidenceSourceIdentityHint);
         }
 
         [TestMethod]
@@ -1311,9 +1314,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(17534, mugger.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, mugger.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, mugger.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, mugger.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, mugger.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, mugger.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, mugger.Corpse.LootedCleanupSeconds);
         }
 
         [TestMethod]
@@ -1460,9 +1463,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     value => value.RespawnPolicy.Mode
                              == WorldRespawnPolicyAssignmentMode.Inherit
                              && value.RespawnDelaySeconds == 240.0));
-            Assert.AreEqual(30.0, profile.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, profile.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, profile.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, profile.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, profile.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, profile.Corpse.LootedCleanupSeconds);
 
             CollectionAssert.AreEqual(
                 new[]
@@ -1554,7 +1557,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     Assert.IsFalse(contract.IsCombatReady);
                     Assert.IsTrue(contract.IsQuarantined);
                     Assert.IsFalse(string.IsNullOrWhiteSpace(contract.QuarantineReason));
-                    Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, contract.AttackModel);
+                    Assert.AreEqual(CapturedEnemyAttackModel.EquippedWeapon, contract.AttackModel);
                 }
 
                 var selection = new OrdinaryEnemyLevelSelectionState();
@@ -2122,9 +2125,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     .Select(value => string.Format("{0}:{1}:{2}:{3}", value.EnemyLevel, value.MinimumCredits, value.MaximumCredits, value.ObservedCorpses))
                     .ToArray());
             Assert.AreEqual(5927, shopper.Corpse.CapturedCatMesh);
-            Assert.AreEqual(30.0, shopper.Corpse.EmptyLifetimeSeconds);
-            Assert.AreEqual(120.0, shopper.Corpse.UnlootedLifetimeSeconds);
-            Assert.AreEqual(30.0, shopper.Corpse.LootedCleanupSeconds);
+            Assert.AreEqual(0.0, shopper.Corpse.EmptyLifetimeSeconds);
+            Assert.AreEqual(60.0, shopper.Corpse.UnlootedLifetimeSeconds);
+            Assert.AreEqual(0.0, shopper.Corpse.LootedCleanupSeconds);
         }
 
         [TestMethod]

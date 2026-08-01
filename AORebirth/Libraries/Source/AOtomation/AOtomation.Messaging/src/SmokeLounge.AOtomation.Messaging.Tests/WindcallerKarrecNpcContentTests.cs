@@ -3,6 +3,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     #region Usings ...
 
     using System;
+    using System.IO;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -270,8 +271,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void EverySpawnDefinitionResolvesToCheckedInDialogueContent()
         {
+            string manifestPath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Content",
+                "Subway",
+                "windcaller-karrec",
+                "manifest.json");
             AreteFrameworkRegistries registries =
-                AreteFrameworkBootstrap.InitializeCheckedInContent(AppDomain.CurrentDomain.BaseDirectory);
+                AreteFrameworkBootstrap.LoadManifestSet(new[] { manifestPath });
 
             Assert.IsTrue(registries.IsValid);
             foreach (WindcallerKarrecNpcDefinition definition in WindcallerKarrecNpcContent.Definitions)

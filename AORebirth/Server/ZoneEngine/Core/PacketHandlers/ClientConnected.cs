@@ -399,7 +399,8 @@ client.Controller.Character.Playfield.Identity,
                     {
                         currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });
                         // CellAO sends statues on CharInPlay; this client often never sends CharInPlay.
-                        currentPlayfield.SendStaticDynelsToClient(client.Controller.Character);
+                        currentPlayfield.SendStaticDynelsToClientAfterExternalPlayfieldArrival(
+                            client.Controller.Character);
                     });
             }
 
