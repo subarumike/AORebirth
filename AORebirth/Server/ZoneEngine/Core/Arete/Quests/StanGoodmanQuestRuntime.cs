@@ -76,10 +76,15 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int StanTurnInCreditReward = 1240;
 
-        // Capture 20260721-nanoprogramsvendor: Use Doctor crystal → "Received reward: 2569 XP, 1240 credits."
-        private const int BuyNanoTipXpReward = 2569;
+        // Capture 20260730-212921: Use Doctor/Bureaucrat crystal →
+        // "Received reward: 2581 XP, 1160 credits." + Overflow 223373 QL25.
+        private const int BuyNanoTipXpReward = 2581;
 
-        private const int BuyNanoTipCreditReward = 1240;
+        private const int BuyNanoTipCreditReward = 1160;
+
+        private const int BuyNanoProgramsTipInstance = unchecked((int)0x555BE9F4);
+
+        private const string BuyNanoTipRewardsGrantedFlag = "buy-nano-tip-rewards-granted";
 
         private const int CapturedTemplateActionUnknown1 = 1;
 
@@ -96,8 +101,8 @@ namespace ZoneEngine.Core.Arete.Quests
         // Capture wire FormattedMessage for XP/credits after factory turn-in.
         private const string StanTurnInRewardFeedback = "~&!!!\":$'O\"ui!!!?Oi!!!/S~";
 
-        // Capture 20260721-nanoprogramsvendor FormatFeedback after Doctor pack open.
-        private const string BuyNanoTipRewardFeedback = "~&!!!\":$'O\"ui!!!?4i!!!/S~";
+        // Capture 20260730-212921 FormatFeedback wire (decodes to Received reward: 2581 XP, 1160 credits.).
+        private const string BuyNanoTipRewardFeedback = "~&!!!\":$'O\"ui!!!?@i!!!.X~";
 
         private const string StanTradePrompt =
             "Drag and drop the item(s) you want to give to Stanley Goodman into one of the slots available and press \"accept\"";
@@ -270,8 +275,9 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         /// <summary>
-        /// Capture 20260721-nanoprogramsvendor: buy any Marco nano package →
-        /// Overflow reward 223373 + Action59/Delete Mission:555BE9F4.
+        /// Capture 20260730-212921: buy OR open Marco Nanoprogram Container →
+        /// Overflow 223373 QL25 + XP/credits + Action59/Delete Buy some Nano tip.
+        /// Rewards once; tip deleted so the quest cannot repeat.
         /// </summary>
         public static bool TryCompleteBuyNanoTipOnVendorPurchase(ICharacter character, IItem[] boughtItems)
         {
@@ -306,8 +312,8 @@ namespace ZoneEngine.Core.Arete.Quests
         }
 
         /// <summary>
-        /// Fallback: Use purchased Marco nano crystal completes tip if buy path missed it.
-        /// Side-effect only; returns false so normal crystal Use continues.
+        /// Capture 20260730-212921: Use purchased Nanoprogram Container → tip rewards + Delete.
+        /// Side-effect only; returns false so normal crystal Use continues after package unpack.
         /// </summary>
         public static bool TryCompleteBuyNanoTipOnCrystalUse(ICharacter character, Item item)
         {
@@ -328,37 +334,131 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static bool TryCompleteBuyNanoTip(ICharacter character, string reason)
         {
-            if (character == null
-                || !MissionRuntime.IsInitialized
-                || !IsMissionLifecycle(character, BuyNanoProgramsQuestId, true, false))
+            if (character == null || !MissionRuntime.IsInitialized)
             {
                 return false;
             }
 
             int characterId = character.Identity.Instance;
-            ForceCompleteHandoffTip(
-                characterId,
-                BuyNanoProgramsQuestId,
-                "mission_555BE9F4_buy_nano");
+
+            // Fully rewarded already — tip delete only (no repeat).
+            if (HasBuyNanoTipRewardsGranted(character))
+            {
+                SafeQuestFullUpdateSender.SendTipAction59AndDelete(character, BuyNanoProgramsTipInstance);
+                ForceCompleteHandoffTip(
+                    characterId,
+                    BuyNanoProgramsQuestId,
+                    "buy_nano_programs");
+                Log(
+                    "buy-nano tip already rewarded — tip delete only ("
+                    + reason
+                    + ") character="
+                    + character.Identity.ToString(true));
+                return false;
+            }
+
+            // Heal path: earlier builds could ForceComplete/Delete the tip without granting
+            // XP/credits/223373. Mission may be Completed while rewards flag is missing.
+            bool missionActive = IsMissionLifecycle(character, BuyNanoProgramsQuestId, true, false);
+            bool missionCompleted = IsMissionLifecycle(character, BuyNanoProgramsQuestId, false, true);
+            if (!missionActive && !missionCompleted)
+            {
+                if (!TryEnsureBuyNanoMissionActive(character))
+                {
+                    Log(
+                        "buy-nano tip complete skipped (mission not active) ("
+                        + reason
+                        + ") character="
+                        + character.Identity.ToString(true));
+                    return false;
+                }
+            }
+
+            if (missionCompleted)
+            {
+                Log(
+                    "buy-nano tip heal — mission was completed without rewards ("
+                    + reason
+                    + ") character="
+                    + character.Identity.ToString(true));
+            }
+
+            MarkBuyNanoTipRewardsGranted(character);
+
+            // Capture 20260730-212921 order after package unpack:
+            // FormatFeedback XP/credits → Overflow 223373 → Quest Delete.
             ApplyBuyNanoTipXpCredits(character);
             TrySendBuyNanoTipRewardFeedback(character);
             TryGrantBuyNanoTipReward(character);
-            try
-            {
-                FeedbackMessageHandler.Default.Send(character, 110, 108871108);
-            }
-            catch (Exception ex)
-            {
-                Log("buy-nano tip item-feedback failed: " + ex.Message);
-            }
 
-            FlintKneecappingTipWire.TryDeleteTip(character, unchecked((int)0x555BE9F4));
+            ForceCompleteHandoffTip(
+                characterId,
+                BuyNanoProgramsQuestId,
+                "buy_nano_programs");
+            SafeQuestFullUpdateSender.SendTipAction59AndDelete(character, BuyNanoProgramsTipInstance);
+
             Log(
                 "buy-nano tip complete ("
                 + reason
                 + ") character="
-                + character.Identity.ToString(true));
+                + character.Identity.ToString(true)
+                + " reward=223373 ql25 xp="
+                + BuyNanoTipXpReward
+                + " credits="
+                + BuyNanoTipCreditReward);
             return true;
+        }
+
+        private static bool TryEnsureBuyNanoMissionActive(ICharacter character)
+        {
+            if (character == null || !MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            // Tip may be visible from QFU while MissionRuntime missed Accept (login edge).
+            // Auto-accept when Stan factory tip is past Offer, or Buy Nano already Offered.
+            if (!IsMissionActiveOrCompleted(character, DeliverAntonioFactoryQuestId)
+                && !IsMissionActiveOrCompleted(character, TalkToSarahGreeneQuestId)
+                && !IsMissionActiveOrCompleted(character, BuyNanoProgramsQuestId)
+                && !IsMissionActiveOrCompleted(character, StrongboxQuestId)
+                && !IsMissionActiveOrCompleted(character, BuyLockpickQuestId))
+            {
+                return false;
+            }
+
+            int characterId = character.Identity.Instance;
+            MissionRuntime.Service.OfferMission(characterId, BuyNanoProgramsQuestId);
+            MissionRuntime.Service.AcceptMission(characterId, BuyNanoProgramsQuestId);
+            return IsMissionLifecycle(character, BuyNanoProgramsQuestId, true, false)
+                   || IsMissionLifecycle(character, BuyNanoProgramsQuestId, false, true);
+        }
+
+        private static bool HasBuyNanoTipRewardsGranted(ICharacter source)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return false;
+            }
+
+            return MissionRuntime.Service.GetFlag(
+                       source.Identity.Instance,
+                       BuyNanoProgramsQuestId,
+                       BuyNanoTipRewardsGrantedFlag) != null;
+        }
+
+        private static void MarkBuyNanoTipRewardsGranted(ICharacter source)
+        {
+            if (source == null || !MissionRuntime.IsInitialized)
+            {
+                return;
+            }
+
+            MissionRuntime.Service.SetFlag(
+                source.Identity.Instance,
+                BuyNanoProgramsQuestId,
+                BuyNanoTipRewardsGrantedFlag,
+                "1");
         }
 
         /// <summary>
@@ -395,9 +495,25 @@ namespace ZoneEngine.Core.Arete.Quests
                 }
             }
 
-            if (IsMissionLifecycle(source, BuyNanoProgramsQuestId, true, false))
+            // Completed Buy Nano with rewards granted — tip must stay deleted (no repeat).
+            // Do NOT ForceComplete-only when rewards flag is missing: that locked characters
+            // out of XP/credits/223373. Missing rewards are healed on next buy/open.
+            if (HasBuyNanoTipRewardsGranted(source))
             {
-                SafeQuestFullUpdateSender.TrySendDeliverFactoryToSarahAndNanoTipsHandoff(source);
+                SafeQuestFullUpdateSender.SendTipAction59AndDelete(source, BuyNanoProgramsTipInstance);
+                ForceCompleteHandoffTip(characterId, BuyNanoProgramsQuestId, "buy_nano_programs");
+            }
+            else if (IsMissionLifecycle(source, BuyNanoProgramsQuestId, false, true))
+            {
+                // Tip deleted/completed without rewards — keep tip deleted in journal UI but
+                // leave heal for next Marco buy/open (do not re-offer tip).
+                SafeQuestFullUpdateSender.SendTipAction59AndDelete(source, BuyNanoProgramsTipInstance);
+            }
+
+            if (IsMissionLifecycle(source, BuyNanoProgramsQuestId, true, false)
+                && !HasBuyNanoTipRewardsGranted(source))
+            {
+                SafeQuestFullUpdateSender.SendBuyNanoProgramsTipForLogin(source);
                 return true;
             }
 
@@ -885,33 +1001,44 @@ namespace ZoneEngine.Core.Arete.Quests
             MissionRuntime.Service.CompleteMission(characterId, questId);
         }
 
+        /// <summary>
+        /// Capture 20260730-212921: Overflow TemplateAction 223373 QL25
+        /// (Nano Crystal Composite Attribute Boost) after XP/credits feedback.
+        /// </summary>
         private static void TryGrantBuyNanoTipReward(ICharacter character)
         {
-            if (character == null
-                || !ItemLoader.ItemList.ContainsKey(
-                        CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId))
+            if (character == null)
             {
+                return;
+            }
+
+            int rewardId = CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId;
+            int rewardQl = CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality;
+
+            if (!ItemLoader.ItemList.ContainsKey(rewardId))
+            {
+                Log(
+                    "buy-nano tip reward ItemLoader missing id="
+                    + rewardId
+                    + " (Composite Attribute Boost)");
+                // Still push Overflow so client can show the quest reward item id.
+                SendOverflowGrantPackets(character, rewardId, rewardQl);
                 return;
             }
 
             if (InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(
                     character,
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId))
+                    rewardId))
             {
-                SendOverflowGrantPackets(
-                    character,
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality);
+                SendOverflowGrantPackets(character, rewardId, rewardQl);
+                Log("buy-nano tip reward already carried id=" + rewardId);
                 return;
             }
 
             Item reward;
             try
             {
-                reward = new Item(
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality,
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId);
+                reward = new Item(rewardQl, rewardId, rewardId);
             }
             catch (Exception ex)
             {
@@ -923,82 +1050,48 @@ namespace ZoneEngine.Core.Arete.Quests
                 InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(character, reward);
             if (grant.Status != QuestRewardInventoryGrantStatus.Success)
             {
-                Log("buy-nano tip reward grant failed status=" + grant.Status);
+                // Capture still shows Overflow even when inventory cannot take the item.
+                SendOverflowGrantPackets(character, rewardId, rewardQl);
+                Log(
+                    "buy-nano tip reward inventory grant status="
+                    + grant.Status
+                    + " invErr="
+                    + grant.InventoryError
+                    + " id="
+                    + rewardId
+                    + " (overflow sent)");
                 return;
             }
 
-            SendOverflowGrantPackets(
-                character,
-                CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
-                CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality);
+            // Capture order: Overflow TemplateAction + ContainerAddItem for 223373 QL25.
+            SendOverflowGrantPackets(character, rewardId, rewardQl);
+            try
+            {
+                AddTemplateMessageHandler.Default.Send(character, reward);
+            }
+            catch (Exception ex)
+            {
+                Log("buy-nano tip reward AddTemplate failed: " + ex.Message);
+            }
+
+            Log("buy-nano tip reward granted id=" + rewardId + " ql=" + rewardQl);
         }
 
         private static void ApplyBuyNanoTipXpCredits(ICharacter source)
         {
-            MissionRewardDefinition definition = new MissionRewardDefinition
-                                                {
-                                                    RewardKey = "captured-buy-nano-tip-xp-credits",
-                                                    RewardType = "character-stats",
-                                                    IsResolved = true,
-                                                    StatMutations =
-                                                        new[]
-                                                        {
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.cash,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = BuyNanoTipCreditReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.xp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = BuyNanoTipXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.unsavedxp,
-                                                                Kind = MissionStatMutationKind.AddClamped,
-                                                                Value = BuyNanoTipXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            },
-                                                            new MissionCharacterStatMutation
-                                                            {
-                                                                StatIdentityType = (int)IdentityType.CanbeAffected,
-                                                                StatId = (int)StatIds.lastxp,
-                                                                Kind = MissionStatMutationKind.Set,
-                                                                Value = BuyNanoTipXpReward,
-                                                                MinimumValue = 0,
-                                                                MaximumValue = uint.MaxValue
-                                                            }
-                                                        }
-                                                };
-            MissionRewardExecutionResult result = MissionRuntime.Rewards.ExecuteAtomicCharacterStats(
-                source.Identity.Instance,
-                BuyNanoProgramsQuestId,
-                definition,
-                "capture:20260721-nanoprogramsvendor:buy-nano-tip-xp-credits");
-            if (!result.Succeeded || result.StatValues == null)
+            if (source?.Stats == null)
             {
                 return;
             }
 
-            foreach (MissionCharacterStatValue statValue in result.StatValues)
+            long cashAfter = (long)source.Stats[StatIds.cash].Value + BuyNanoTipCreditReward;
+            if (cashAfter > uint.MaxValue)
             {
-                uint value = statValue.Value <= 0
-                                 ? 0
-                                 : (uint)Math.Min(statValue.Value, uint.MaxValue);
-                source.Stats[(StatIds)statValue.StatId].Set(value);
+                cashAfter = uint.MaxValue;
             }
 
+            source.Stats[StatIds.cash].Set((uint)cashAfter);
+            CombatXpRuntimeService.AwardDirectXp(source, BuyNanoTipXpReward, "buy-nano-tip-2581xp");
             StatMessageHandler.Default.SendChanged(source);
         }
 

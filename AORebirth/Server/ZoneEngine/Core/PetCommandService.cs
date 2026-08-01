@@ -12,11 +12,14 @@ namespace ZoneEngine.Core
 
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
+    using AORebirth.Communication.Messages;
     using AORebirth.Core.Entities;
     using AORebirth.Core.Network;
     using AORebirth.Core.Nanos;
     using AORebirth.Core.Playfields;
+    using AORebirth.Core.Vector;
     using AORebirth.Enums;
     using AORebirth.ObjectManager;
 
@@ -25,6 +28,7 @@ namespace ZoneEngine.Core
 
     using ZoneEngine.Core.Controllers;
     using ZoneEngine.Core.MessageHandlers;
+    using ZoneEngine.Core.Playfields;
 
     using Utility;
 
@@ -42,6 +46,9 @@ namespace ZoneEngine.Core
         private static readonly Dictionary<int, Identity> OwnerHealFocusSelection =
             new Dictionary<int, Identity>();
 
+        // Capture/live: Wait holds pet; Follow/Guard/Behind/Attack allow owner-assist.
+        private static readonly HashSet<int> PetsHoldingWaitStance = new HashSet<int>();
+
         public const int CommandFollow = 1;
 
         public const int CommandBehind = 2;
@@ -57,6 +64,15 @@ namespace ZoneEngine.Core
         public const int CommandHeal = 12;
 
         public const int CommandReport = 14;
+
+        // Pet dialogue: Zone FormatFeedback only (working look before Your Pets attempts).
+
+        // Capture 20260731-054922: PetCommand Attack with invalid/wrong target.
+        private const string ChatAfraidCantDoThat = "I'm afraid I can't do that.";
+
+        // Capture 20260730-234537: Heal on attack pet (Worker).
+        private const string ChatManyTasksUnsupported =
+            "Many tasks I am able to undertake, this is not one of them...";
 
         public static void HandleChatPetCommand(IZoneClient client, string[] cmdArgs)
         {
@@ -128,6 +144,39 @@ namespace ZoneEngine.Core
             int commandId,
             Identity commandTarget)
         {
+            // Capture 20260731-072612: all-pets terminate announces farewell for each pet,
+            // then deactivation for each (CEO wish/Ciao before Deactivating/appointment).
+            if (commandId == CommandTerminate)
+            {
+                var pets = new List<ICharacter>();
+                foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
+                {
+                    ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
+                    if (pet != null)
+                    {
+                        pets.Add(pet);
+                    }
+                }
+
+                foreach (ICharacter pet in pets)
+                {
+                    string farewell;
+                    string deactivation;
+                    PetSystemChatLines.GetTerminateLines(pet, out farewell, out deactivation);
+                    if (!string.IsNullOrEmpty(farewell))
+                    {
+                        AnnouncePetSystemChat(owner, pet, farewell);
+                    }
+                }
+
+                foreach (ICharacter pet in pets)
+                {
+                    ExecuteTerminatePet(owner, pet, announceFarewell: false);
+                }
+
+                return;
+            }
+
             foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
             {
                 ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
@@ -179,14 +228,30 @@ namespace ZoneEngine.Core
             switch (commandId)
             {
                 case CommandFollow:
+                    ActiveHealCommands.Remove(pet.Identity.Instance);
+                    PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+                    ClearPetCombatState(pet, petController, playfield);
+                    ApplyPetFollowDesiredDistance(pet, 0);
+                    petController.Follow(owner.Identity, 2.0);
+                    AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Follow(pet));
+                    return;
+
                 case CommandGuard:
                     ActiveHealCommands.Remove(pet.Identity.Instance);
+                    PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+                    ClearPetCombatState(pet, petController, playfield);
+                    ApplyPetFollowDesiredDistance(pet, 0);
                     petController.Follow(owner.Identity, 2.0);
+                    AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Guard(pet));
                     return;
 
                 case CommandBehind:
                     ActiveHealCommands.Remove(pet.Identity.Instance);
+                    PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+                    ClearPetCombatState(pet, petController, playfield);
+                    ApplyPetFollowDesiredDistance(pet, 0);
                     petController.Follow(owner.Identity, 4.0);
+                    AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Behind(pet));
                     return;
 
                 case CommandWait:
@@ -195,32 +260,132 @@ namespace ZoneEngine.Core
 
                 case CommandAttack:
                     ActiveHealCommands.Remove(pet.Identity.Instance);
-                    if (!PetCombatRules.IsPlayerOwnedMeleeCombatPet(pet))
+                    PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+                    if (!PetCombatRules.IsPlayerOwnedMeleeCombatPet(pet)
+                        && !PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(pet))
                     {
                         return;
                     }
 
-                    ExecuteAttack(owner, pet, petController, playfield, commandTarget);
+                    ExecuteAttack(owner, pet, petController, playfield, commandTarget, true);
                     return;
 
                 case CommandHeal:
+                    if (!PetCombatRules.IsPlayerOwnedHealingPet(pet))
+                    {
+                        // Capture 20260730-234537: Heal on Bureaucrat Worker → Many tasks…
+                        AnnouncePetSystemChat(owner, pet, ChatManyTasksUnsupported);
+                        return;
+                    }
+
                     ExecuteHeal(owner, pet, petController, playfield, commandTarget);
                     return;
 
                 case CommandReport:
-                    ChatTextMessageHandler.Default.Send(
-                        owner,
-                        string.Format(
-                            "{0}: HP {1}/{2}",
-                            pet.Name,
-                            pet.Stats[StatIds.health].Value,
-                            pet.Stats[StatIds.life].Value));
+                    AnnouncePetReportFeedback(owner, pet);
                     return;
 
                 case CommandTerminate:
-                    ActiveHealCommands.Remove(pet.Identity.Instance);
-                    PetRuntimeService.Default.TerminatePetByIdentity(owner, pet.Identity);
+                    ExecuteTerminatePet(owner, pet, announceFarewell: true);
                     return;
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260731-072612: Carlo/CEO send farewell then deactivation;
+        /// Worker sends only Deactivating.
+        /// </summary>
+        private static void ExecuteTerminatePet(ICharacter owner, ICharacter pet, bool announceFarewell)
+        {
+            ActiveHealCommands.Remove(pet.Identity.Instance);
+            PetsHoldingWaitStance.Remove(pet.Identity.Instance);
+
+            string farewell;
+            string deactivation;
+            PetSystemChatLines.GetTerminateLines(pet, out farewell, out deactivation);
+
+            if (announceFarewell && !string.IsNullOrEmpty(farewell))
+            {
+                AnnouncePetSystemChat(owner, pet, farewell);
+            }
+
+            if (!string.IsNullOrEmpty(deactivation))
+            {
+                AnnouncePetSystemChat(owner, pet, deactivation);
+            }
+
+            PetRuntimeService.Default.TerminatePetByIdentity(owner, pet.Identity);
+        }
+
+        /// <summary>
+        /// Capture 20260730-164552: spawn SystemMessage after pet appears.
+        /// </summary>
+        internal static void AnnouncePetSpawnChat(ICharacter owner, ICharacter pet)
+        {
+            AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Spawn(pet));
+        }
+
+        /// <summary>
+        /// When the owner starts fighting a target, combat pets assist without PetCommand Attack.
+        /// Wait stance holds; already-engaged same target is left alone (no Charge! spam).
+        /// </summary>
+        internal static void OnOwnerEngagedCombat(ICharacter owner, Identity target)
+        {
+            if (owner == null || target.Instance == 0 || owner.Playfield == null)
+            {
+                return;
+            }
+
+            Playfield playfield = owner.Playfield as Playfield;
+            if (playfield == null)
+            {
+                return;
+            }
+
+            ICharacter targetCharacter = owner.Playfield.FindByIdentity<ICharacter>(target);
+            if (targetCharacter == null
+                || targetCharacter.Stats[StatIds.health].Value <= 0
+                || target.Instance == owner.Identity.Instance)
+            {
+                return;
+            }
+
+            foreach (int strain in PetRuntimeService.Default.GetActivePetStrains(owner))
+            {
+                ICharacter pet = PetRuntimeService.Default.GetActivePetInStrain(owner, strain);
+                if (pet == null)
+                {
+                    continue;
+                }
+
+                if (PetsHoldingWaitStance.Contains(pet.Identity.Instance))
+                {
+                    continue;
+                }
+
+                if (!PetCombatRules.IsPlayerOwnedMeleeCombatPet(pet)
+                    && !PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(pet))
+                {
+                    continue;
+                }
+
+                if (pet.Identity.Instance == target.Instance)
+                {
+                    continue;
+                }
+
+                if (pet.FightingTarget.Instance == target.Instance)
+                {
+                    continue;
+                }
+
+                var petController = pet.Controller as NPCController;
+                if (petController == null)
+                {
+                    continue;
+                }
+
+                ExecuteAttack(owner, pet, petController, playfield, target, false);
             }
         }
 
@@ -229,7 +394,8 @@ namespace ZoneEngine.Core
             ICharacter pet,
             NPCController petController,
             Playfield playfield,
-            Identity commandTarget)
+            Identity commandTarget,
+            bool announceCharge)
         {
             Identity attackTarget = commandTarget;
             if (attackTarget.Instance == 0)
@@ -244,26 +410,101 @@ namespace ZoneEngine.Core
 
             if (attackTarget.Instance == 0 || attackTarget.Instance == pet.Identity.Instance)
             {
+                // Capture 20260731-054922: Attack with no/wrong target → afraid SystemMessage.
+                if (announceCharge)
+                {
+                    AnnouncePetSystemChat(owner, pet, ChatAfraidCantDoThat);
+                }
+
                 return;
             }
 
             ICharacter attackTargetCharacter = owner.Playfield.FindByIdentity<ICharacter>(attackTarget);
             if (attackTargetCharacter == null)
             {
+                if (announceCharge)
+                {
+                    AnnouncePetSystemChat(owner, pet, ChatAfraidCantDoThat);
+                }
+
                 return;
             }
 
             if (!PlayerVersusPlayerCombatRules.CanEngagePlayerVersusPlayerCombat(pet, attackTargetCharacter))
             {
+                if (announceCharge)
+                {
+                    AnnouncePetSystemChat(owner, pet, ChatAfraidCantDoThat);
+                }
+
                 return;
             }
 
+            PetsHoldingWaitStance.Remove(pet.Identity.Instance);
             petController.StopFollow();
             pet.SetTarget(attackTarget);
             pet.SetFightingTarget(attackTarget);
             playfield.SuspendNpcRegen(attackTargetCharacter);
             playfield.ResetCombatTick(pet.Identity);
             playfield.AcquireNpcAggro(pet, attackTargetCharacter);
+
+            // Capture 20260730-151431: SpecialAttackWeapon + Attack at engage.
+            // Capture 20260731-005116 #416: FormatFeedback "~&!!!\":$gM*@s…\x1eEnemy~"
+            //   → "Bureaucrat Worker attacked by Malfunctioning Cleaning Robot!"
+            // Charge! only on explicit PetCommand Attack — not on owner-assist.
+            AnnouncePetAttackStartContext(pet, attackTargetCharacter);
+            AnnouncePetAttackedByFeedback(owner, pet, attackTargetCharacter);
+            if (announceCharge)
+            {
+                AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Attack(pet));
+            }
+        }
+
+        /// <summary>
+        /// Capture 20260731-054922 #5045 / 20260731-pet-chat:
+        /// ~&!!!":$gM*@s + (petLen+1) + petName + s + (enemyLen+1) + enemyName + ~
+        /// Wire: Burning → 7317…, Malfunctioning → 731E… (len+1, not a fixed delimiter).
+        /// Displays red: "{pet} attacked by {enemy}!"
+        /// </summary>
+        private static void AnnouncePetAttackedByFeedback(
+            ICharacter owner,
+            ICharacter pet,
+            ICharacter target)
+        {
+            if (owner == null || pet == null || target == null || owner.Playfield == null)
+            {
+                return;
+            }
+
+            string petName = string.IsNullOrEmpty(pet.Name) ? "pet" : pet.Name;
+            string targetName = string.IsNullOrEmpty(target.Name) ? "target" : target.Name;
+            if (petName.Length > 254)
+            {
+                petName = petName.Substring(0, 254);
+            }
+
+            if (targetName.Length > 254)
+            {
+                targetName = targetName.Substring(0, 254);
+            }
+
+            string formatted = string.Format(
+                CultureInfo.InvariantCulture,
+                "~&!!!\":$gM*@s{0}{1}s{2}{3}~",
+                (char)(petName.Length + 1),
+                petName,
+                (char)(targetName.Length + 1),
+                targetName);
+
+            owner.Playfield.Announce(
+                new FormatFeedbackMessage
+                {
+                    Identity = owner.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = formatted,
+                    Unknown2 = 0
+                });
         }
 
         private static void ExecuteWait(
@@ -273,17 +514,10 @@ namespace ZoneEngine.Core
             Playfield playfield)
         {
             ActiveHealCommands.Remove(pet.Identity.Instance);
-            pet.SetFightingTarget(Identity.None);
-            pet.SetTarget(Identity.None);
-            playfield.Announce(
-                new StopFightMessage
-                {
-                    Identity = pet.Identity,
-                    Unknown1 = 1
-                });
-            playfield.ClearCombatTracking(pet.Identity);
-            petController.StopFollow();
+            PetsHoldingWaitStance.Add(pet.Identity.Instance);
+            ClearPetCombatState(pet, petController, playfield);
             FollowTargetMessageHandler.Default.Send(pet, pet.RawCoordinates);
+            AnnouncePetSystemChat(owner, pet, PetSystemChatLines.Wait(pet));
         }
 
         internal static void ReturnPetToOwner(ICharacter pet)
@@ -305,9 +539,307 @@ namespace ZoneEngine.Core
                 return;
             }
 
+            Playfield playfield = pet.Playfield as Playfield;
+            if (playfield != null)
+            {
+                ClearPetCombatState(pet, petController, playfield);
+            }
+            else
+            {
+                pet.SetFightingTarget(Identity.None);
+                pet.SetTarget(Identity.None);
+            }
+
+            ApplyPetFollowDesiredDistance(pet, 0);
+            petController.Follow(owner.Identity, 2.0);
+        }
+
+        /// <summary>
+        /// Capture 20260730-151431 Follow: StopFight + clear targets before owner follow,
+        /// otherwise combat tick pulls the pet back to the old fight target.
+        /// </summary>
+        private static void ClearPetCombatState(
+            ICharacter pet,
+            NPCController petController,
+            Playfield playfield)
+        {
+            if (pet == null)
+            {
+                return;
+            }
+
             pet.SetFightingTarget(Identity.None);
             pet.SetTarget(Identity.None);
-            petController.Follow(owner.Identity, 2.0);
+            if (playfield != null)
+            {
+                playfield.Announce(
+                    new StopFightMessage
+                    {
+                        Identity = pet.Identity,
+                        Unknown1 = 1
+                    });
+                playfield.ClearCombatTracking(pet.Identity);
+            }
+
+            if (petController != null)
+            {
+                petController.StopFollow();
+            }
+        }
+
+        /// <summary>
+        /// Owner-only pet dialogue via Zone FormatFeedback (works without ChatEngine).
+        /// Brown text with leading ": " to match live Your Pets look.
+        /// </summary>
+        private static void AnnouncePetSystemChat(ICharacter owner, ICharacter pet, string line)
+        {
+            if (owner == null || pet == null || string.IsNullOrEmpty(line))
+            {
+                return;
+            }
+
+            if (owner.Controller == null || owner.Controller.Client == null)
+            {
+                return;
+            }
+
+            string ownerName = string.IsNullOrEmpty(owner.Name) ? "Your" : owner.Name;
+            string petName = string.IsNullOrEmpty(pet.Name) ? "pet" : pet.Name;
+            // Live chat UI shows ": {owner}'s pet, {pet}: {line}" in brown.
+            string text = string.Format(
+                CultureInfo.InvariantCulture,
+                ": {0}'s pet, {1}: {2}",
+                ownerName,
+                petName,
+                line);
+            string brownText = "<font color=#C08040>" + text + "</font>";
+
+            owner.Controller.Client.SendCompressed(
+                new FormatFeedbackMessage
+                {
+                    Identity = owner.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(brownText),
+                    Unknown2 = 0
+                },
+                owner.Identity.Instance);
+        }
+
+        /// <summary>
+        /// Capture 20260731-005116 Report → green FormatFeedback (Combat).
+        /// Idle: ~&!!!":$*)e`s + (len+1) + name + i&lt;base85x5&gt; ×6
+        /// Fighting: ~&!!!":"TkDGs + (len+1) + name + i×6 + s + \x1e + enemyName
+        ///   (no trailing ~). Hex: 7e26…22546b44477312…731e4d616c66…
+        /// Length MUST be name.Length+1 (\x12 for "Bureaucrat Worker").
+        /// </summary>
+        private static void AnnouncePetReportFeedback(ICharacter owner, ICharacter pet)
+        {
+            if (owner == null || pet == null || owner.Playfield == null)
+            {
+                return;
+            }
+
+            string petName = string.IsNullOrEmpty(pet.Name) ? "pet" : pet.Name;
+            if (petName.Length > 254)
+            {
+                petName = petName.Substring(0, 254);
+            }
+
+            int life = Math.Max(1, pet.Stats[StatIds.life].Value);
+            int health = Math.Max(0, pet.Stats[StatIds.health].Value);
+            int maxNano = Math.Max(1, pet.Stats[StatIds.maxnanoenergy].Value);
+            int nano = Math.Max(0, pet.Stats[StatIds.currentnano].Value);
+            int healthPct = (int)Math.Round(100.0 * health / life);
+            int nanoPct = (int)Math.Round(100.0 * nano / maxNano);
+            healthPct = Math.Max(0, Math.Min(100, healthPct));
+            nanoPct = Math.Max(0, Math.Min(100, nanoPct));
+
+            int ncuUsed = Math.Max(0, pet.Stats[StatIds.currentncu].Value);
+            int ncuMax = Math.Max(0, pet.Stats[StatIds.maxncu].Value);
+            Coordinate coord = pet.Coordinates();
+            int posX = (int)Math.Round(coord.x);
+            int posZ = (int)Math.Round(coord.z);
+
+            int encodedLength = petName.Length + 1;
+            string statsTail = string.Format(
+                CultureInfo.InvariantCulture,
+                "i{0}i{1}i{2}i{3}i{4}i{5}",
+                EncodeFormatFeedbackInt(healthPct),
+                EncodeFormatFeedbackInt(nanoPct),
+                EncodeFormatFeedbackInt(ncuUsed),
+                EncodeFormatFeedbackInt(ncuMax),
+                EncodeFormatFeedbackInt(posX),
+                EncodeFormatFeedbackInt(posZ));
+
+            string fightingName = null;
+            if (pet.FightingTarget.Instance != 0 && owner.Playfield != null)
+            {
+                ICharacter foe = owner.Playfield.FindByIdentity<ICharacter>(pet.FightingTarget);
+                if (foe != null && !string.IsNullOrEmpty(foe.Name))
+                {
+                    fightingName = foe.Name;
+                }
+            }
+
+            string formatted;
+            if (!string.IsNullOrEmpty(fightingName))
+            {
+                if (fightingName.Length > 254)
+                {
+                    fightingName = fightingName.Substring(0, 254);
+                }
+
+                // Capture 20260731-pet-chat: TkDG … s + (enemyLen+1) + enemy (no trailing ~).
+                formatted = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "~&!!!\":\"TkDGs{0}{1}{2}s{3}{4}",
+                    (char)encodedLength,
+                    petName,
+                    statsTail,
+                    (char)(fightingName.Length + 1),
+                    fightingName);
+            }
+            else
+            {
+                formatted = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "~&!!!\":$*)e`s{0}{1}{2}",
+                    (char)encodedLength,
+                    petName,
+                    statsTail);
+            }
+
+            owner.Playfield.Announce(
+                new FormatFeedbackMessage
+                {
+                    Identity = owner.Identity,
+                    Unknown = 1,
+                    Unknown1 = 0,
+                    FormattedMessage = formatted,
+                    Unknown2 = 0
+                });
+        }
+
+        /// <summary>
+        /// AO FormatFeedback int: fixed-width 5 chars, radix 85, offset 33 ('!').
+        /// Capture: 100→!!!"0, 0→!!!!!, 10→!!!!+, 3617→!!!KP, 787→!!!*7.
+        /// </summary>
+        private static string EncodeFormatFeedbackInt(int value)
+        {
+            uint v = unchecked((uint)value);
+            char[] chars = new char[5];
+            for (int i = 4; i >= 0; i--)
+            {
+                chars[i] = (char)((v % 85) + 33);
+                v /= 85;
+            }
+
+            return new string(chars);
+        }
+
+        private static void AnnouncePetAttackStartContext(ICharacter pet, ICharacter target)
+        {
+            if (pet == null || target == null || pet.Playfield == null)
+            {
+                return;
+            }
+
+            if (PetCombatRules.UsesBureaucratWorkerBuw1CombatPackets(pet))
+            {
+                pet.Playfield.Announce(
+                    CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                        pet.Identity,
+                        new[]
+                        {
+                            new CapturedEnemySpecialAttackDefinition(
+                                PetCombatRules.BureaucratWorkerWeaponLowTemplate,
+                                PetCombatRules.BureaucratWorkerWeaponHighTemplate,
+                                PetCombatRules.BureaucratWorkerWeaponTag,
+                                PetCombatRules.BureaucratWorkerWeaponName)
+                        },
+                        0,
+                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
+                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
+                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
+                        PetCombatRules.BureaucratWorkerSpecialAttackWeaponValue,
+                        0));
+            }
+            else
+            {
+                pet.Playfield.Announce(
+                    new SpecialAttackWeaponMessage
+                    {
+                        Identity = pet.Identity,
+                        Specials = new[]
+                                   {
+                                       new SpecialAttack
+                                       {
+                                           Unknown1 = PetCombatRules.AttackPetLeftWeaponTemplate,
+                                           Unknown2 = PetCombatRules.AttackPetRightWeaponTemplate,
+                                           Unknown3 = PetCombatRules.AttackPetLeftWeaponTag,
+                                           Unknown4 = PetCombatRules.AttackPetLeftWeaponName
+                                       },
+                                       new SpecialAttack
+                                       {
+                                           Unknown1 = PetCombatRules.AttackPetLeftWeaponHighTemplate,
+                                           Unknown2 = PetCombatRules.AttackPetRightWeaponHighTemplate,
+                                           Unknown3 = PetCombatRules.AttackPetRightWeaponTag,
+                                           Unknown4 = PetCombatRules.AttackPetRightWeaponName
+                                       }
+                                   },
+                        Unknown1 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        Unknown2 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        Unknown3 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        Unknown4 = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        Unknown5 = 0
+                    });
+            }
+
+            pet.Playfield.Announce(
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    pet.Identity,
+                    target.Identity,
+                    0,
+                    0));
+        }
+
+        /// <summary>
+        /// Capture 20260730-151431 Follow: Stat DesiredTargetDistance=0 before FollowTarget path.
+        /// </summary>
+        private static void ApplyPetFollowDesiredDistance(ICharacter pet, int distance)
+        {
+            if (pet == null)
+            {
+                return;
+            }
+
+            try
+            {
+                pet.Stats[StatIds.desiredtargetdistance].Value = distance;
+                if (pet.Playfield != null)
+                {
+                    pet.Playfield.Announce(
+                        new StatMessage
+                        {
+                            Identity = pet.Identity,
+                            Stats = new[]
+                                    {
+                                        new GameTuple<CharacterStat, uint>
+                                        {
+                                            Value1 = (CharacterStat)(int)StatIds.desiredtargetdistance,
+                                            Value2 = (uint)Math.Max(0, distance)
+                                        }
+                                    }
+                        });
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "PetDesiredTargetDistance failed: " + e.Message);
+            }
         }
 
         internal static bool OnOwnerLookAtTarget(ICharacter owner, Identity lookTarget)
@@ -898,13 +1430,8 @@ namespace ZoneEngine.Core
 
             if (!healState.AnnouncedStart)
             {
-                string ownerName = owner.Name ?? "Your";
-                ChatTextMessageHandler.Default.Send(
-                    owner,
-                    string.Format(
-                        "{0}'s pet, {1}: Commencing the healing process now, master.",
-                        ownerName,
-                        pet.Name));
+                // Owner-only brown type-35 NpcMessage — not Vicinity.
+                AnnouncePetSystemChat(owner, pet, "Commencing the healing process now, master.");
                 healState.AnnouncedStart = true;
                 ActiveHealCommands[pet.Identity.Instance] = healState;
             }

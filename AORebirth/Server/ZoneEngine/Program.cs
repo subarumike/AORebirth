@@ -331,7 +331,10 @@ namespace ZoneEngine
             try
             {
                 ISComClient.OnReceiveData += ISComClientOnReceiveData;
-                ISComClient.Connect(chatEngineIp, port);
+                // Configure + quiet watch. Dial only when ChatEngine is listening (pets need
+                // type-35 owner NpcMessage via CE — not Vicinity). No refuse spam if CE is down.
+                ISComClient.Configure(chatEngineIp, port);
+                ISComClient.TryLinkIfChatEngineListening();
             }
             catch (Exception e)
             {

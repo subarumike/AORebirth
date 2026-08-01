@@ -93,6 +93,12 @@ namespace ZoneEngine.Core.Arete.Quests
                 return AlexTradeskillOfferNodeId;
             }
 
+            // Capture 20260731-184635: Deliver Bio tip → Hello / bring device / Goodbye.
+            if (FlintBioComQuestRuntime.IsDeliverBioDialogueActive(source))
+            {
+                return FlintBioComQuestRuntime.AlexTradeOfferNodeId;
+            }
+
             // Capture 20260722-Alex-dialog: "How is that...favor..." while Alex favor chain
             // is active (Surveillance Uplink → Plant → Deliver Bill → Kneecapping).
             if (IsMissionActive(source, "Mission:5514B19D")

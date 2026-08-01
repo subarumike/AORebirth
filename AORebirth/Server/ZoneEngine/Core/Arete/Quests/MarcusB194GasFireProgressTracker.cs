@@ -188,13 +188,25 @@ namespace ZoneEngine.Core.Arete.Quests
             {
                 try
                 {
-                    character.Playfield.Despawn(fireIdentity);
+                    AreteGasFireRuntime.TryExtinguish(
+                        character.Playfield as AORebirth.Core.Playfields.Playfield,
+                        fire);
                 }
                 catch (Exception e)
                 {
                     LogUtil.Debug(
                         DebugInfoDetail.Error,
-                        "ARETE_MARCUS_B194 gas fire despawn failed: " + e.Message);
+                        "ARETE_MARCUS_B194 gas fire extinguish/respawn failed: " + e.Message);
+                    try
+                    {
+                        character.Playfield.Despawn(fireIdentity);
+                    }
+                    catch (Exception despawnError)
+                    {
+                        LogUtil.Debug(
+                            DebugInfoDetail.Error,
+                            "ARETE_MARCUS_B194 gas fire despawn failed: " + despawnError.Message);
+                    }
                 }
             }
 

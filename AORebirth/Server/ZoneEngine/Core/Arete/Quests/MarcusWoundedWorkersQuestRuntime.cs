@@ -34,7 +34,7 @@ namespace ZoneEngine.Core.Arete.Quests
     /// Are those wounded workers… → stim 297044 + QFU Use Stim (B199) →
     /// Use stim on Wounded Dockworker → Return to Marcus Stone (B19A) →
     /// FinishTrade Accept only → rechargers 291082x50 + 291043x25
-    /// + capture 20260719-224226 rewards: 1281 XP + 1040 credits.
+    /// + tip reward panel: 1040 credits + (up to) 2076 XP.
     /// </summary>
     public static class MarcusWoundedWorkersQuestRuntime
     {
@@ -60,18 +60,18 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int NanoRechargerQuantity = 25;
 
-        private const int StimReturnXpReward = 1281;
+        private const int StimReturnXpReward = 2076;
 
         private const int StimReturnCreditReward = 1040;
 
-        // Capture 20260719-224226 events.log FormatFeedback wire (1281 XP, 1040 credits).
-        private const string StimReturnRewardFeedback = "~&!!!\":$'O\"ui!!!0'i!!!-5~";
+        // Quest tip Reward panel: Cash 1040 / Experience (Up to) 2076 XP + items.
+        private const string StimReturnRewardFeedback = "Received reward: 2076 XP, 1040 credits.";
 
         private const string StimGrantedFlag = "marcus-wounded-stim-297044";
 
         private const string StimReturnRewardsFlag = "marcus-wounded-rechargers";
 
-        private const string StimReturnXpCreditsFlag = "marcus-wounded-xp-credits-1281-1040";
+        private const string StimReturnXpCreditsFlag = "marcus-wounded-xp-credits-2076-1040";
 
         private const string WoundedDockworkerName = "Wounded Dockworker";
 
@@ -148,7 +148,11 @@ namespace ZoneEngine.Core.Arete.Quests
                    || MissionRuntime.Service.GetFlag(
                           characterId,
                           MissionRuntime.RexB19AQuestId,
-                          StimReturnXpCreditsFlag) != null;
+                          StimReturnXpCreditsFlag) != null
+                   || MissionRuntime.Service.GetFlag(
+                          characterId,
+                          MissionRuntime.RexB19AQuestId,
+                          "marcus-wounded-xp-credits-1281-1040") != null;
         }
 
         public static bool TryHandleDialogueAnswer(
@@ -164,6 +168,11 @@ namespace ZoneEngine.Core.Arete.Quests
             if (string.Equals(previousNodeId, WoundedOfferNodeId, StringComparison.OrdinalIgnoreCase)
                 && answerIndex == 0)
             {
+                if (HasCompletedStimReturn(source))
+                {
+                    return true;
+                }
+
                 AcceptWoundedWorkersBranch(source);
                 return true;
             }
@@ -658,8 +667,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 return;
             }
 
-            // Capture 20260719-224226 stim FinishTrade:
-            // FormatFeedback "Received reward: 1281 XP, 1040 credits."
+            // Stim FinishTrade: items already granted; XP/credits match tip Reward panel.
             bool appliedLive = false;
             if (MissionRuntime.IsInitialized && MissionRuntime.Rewards != null)
             {
@@ -667,7 +675,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 {
                     var definition = new MissionRewardDefinition
                                      {
-                                         RewardKey = "captured-marcus-stim-return-xp-credits",
+                                         RewardKey = "captured-marcus-stim-return-xp-credits-2076-1040",
                                          RewardType = "character-stats",
                                          IsResolved = true,
                                          StatMutations = new[]
@@ -714,7 +722,7 @@ namespace ZoneEngine.Core.Arete.Quests
                         source.Identity.Instance,
                         MissionRuntime.RexB19AQuestId,
                         definition,
-                        "capture:20260719-224226:marcus-b19a-xp-credits");
+                        "marcus-b19a-xp-credits-2076-1040");
                     if (result.Succeeded && result.StatValues != null)
                     {
                         foreach (MissionCharacterStatValue statValue in result.StatValues)
@@ -757,7 +765,7 @@ namespace ZoneEngine.Core.Arete.Quests
                 CombatXpRuntimeService.AwardDirectXp(
                     source,
                     StimReturnXpReward,
-                    "marcus-wounded-stim-return-1281xp");
+                    "marcus-wounded-stim-return-2076xp");
                 StatMessageHandler.Default.SendChanged(source);
                 Log(
                     "stim-return rewards live-fallback xp="

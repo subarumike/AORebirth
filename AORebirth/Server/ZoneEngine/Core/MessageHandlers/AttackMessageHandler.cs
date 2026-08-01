@@ -148,6 +148,7 @@ namespace ZoneEngine.Core.MessageHandlers
             this.EngageNpcTarget(character, target);
             this.SendCombatStartSpecialAttackWeapon(character);
             this.SendAttackState(character, message.Target, message.Action);
+            PetCommandService.OnOwnerEngagedCombat(character, message.Target);
         }
 
         private void StartPlayerAttack(ICharacter character, Identity target)

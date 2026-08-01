@@ -428,6 +428,9 @@ namespace ZoneEngine.Core
                     resolvedPetTypeId,
                     spawnLevel));
 
+            // Live: Your Pets (type 35) after summon — "{owner}'s pet, {name}: Hello master…"
+            PetCommandService.AnnouncePetSpawnChat(owner, petCharacter);
+
             return true;
         }
 
@@ -932,6 +935,17 @@ namespace ZoneEngine.Core
 
             uint maxLife = (uint)petCharacter.Stats[StatIds.life].Value;
             petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.health, maxLife);
+
+            // Capture 20260730-234537 Report: NCU 0/10 on Bureaucrat Worker.
+            if (petCharacter.Stats[StatIds.maxncu].Value <= 0)
+            {
+                petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.maxncu, 10);
+            }
+
+            if (petCharacter.Stats[StatIds.currentncu].Value < 0)
+            {
+                petCharacter.Stats.SetBaseValueWithoutTriggering((int)StatIds.currentncu, 0);
+            }
         }
 
         private Coordinate ResolvePetSpawnCoordinate(ICharacter owner, int petSlotStrain)

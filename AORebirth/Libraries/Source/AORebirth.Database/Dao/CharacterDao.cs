@@ -330,7 +330,13 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public int IsOnline(int id)
         {
-            return this.Get(id).Online;
+            DBCharacter character = this.Get(id);
+            if (character == null)
+            {
+                return 0;
+            }
+
+            return character.Online;
         }
 
         /// <summary>

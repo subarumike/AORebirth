@@ -34,8 +34,15 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
-            // Capture 20260710-220653: Unknown2 is the command id, Unknown1=1 means all pets.
+            // Capture 20260730-234537:
+            // - All-pets (Unknown1=1): command id is Unknown2 (Guard/Behind/Follow/Report/Heal).
+            // - Targeted pet (Unknown1=0): deserializer may leave Unknown2=0 and put id in Unknown3.
             int commandId = message.Unknown2;
+            if (commandId <= 0 && message.Unknown3 > 0)
+            {
+                commandId = message.Unknown3;
+            }
+
             bool applyToAllPets = message.Unknown1 == 1;
             Identity petIdentity = this.ResolvePetIdentity(message);
             Identity rawCommandTarget = this.ResolveCommandTarget(message);

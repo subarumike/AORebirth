@@ -566,7 +566,14 @@ namespace ZoneEngine.Core.Packets
                 if (AlexAreaMobRuntime.TryGetExtendedTextureOverride(charName, out alexExtendedTextures))
                 {
                     // Capture 20260720-204431: Docker / Waste Collector / Garbage Flea HasExtendedTextures.
+                    // Capture 20260730-220951: Mutated ExtTex Material #9 / 275711 + IsPet|UnknownFlag7.
                     scfu.ExtendedTextureOverrideData = alexExtendedTextures;
+                    if (AlexAreaMobRuntime.IsMutatedGarbageFlea(charName))
+                    {
+                        scfu.AdditionalFlags = SimpleCharFullUpdateFlags.IsPet
+                            | SimpleCharFullUpdateFlags.UnknownFlag7;
+                    }
+
                     byte[] alexUnknown1;
                     if (AlexAreaMobRuntime.TryGetCapturedScfuUnknown1(charName, out alexUnknown1))
                     {
