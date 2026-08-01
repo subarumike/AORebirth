@@ -100,6 +100,10 @@ PF1931_DEATHLESS_PROFILE_SELECTOR = (
     "totw.ordinary.deathless-legionnaire.42981"
 )
 PF1931_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs": (
+        "DefenderProfileKey = \"totw.647.boss.defender-of-the-three\"",
+        "AzturProfileKey = \"totw.1931.boss.aztur-the-immortal\"",
+    ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs": (
         "BuildDeathlessLegionnaireSpawns()",
         "DeathlessLegionnaireProfileKey",
@@ -336,6 +340,13 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def sha256_utf8_text_lf(path: Path) -> str:
+    """Hash UTF-8 source text after BOM removal and newline normalization."""
+    source = path.read_text(encoding="utf-8-sig")
+    normalized = source.replace("\r\n", "\n").replace("\r", "\n")
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
 def discover_runtime_prepare_entry_points(repo_root: Path) -> List[Dict[str, Any]]:
@@ -587,6 +598,9 @@ def parse_csharp_string(expression: str, constants: Mapping[str, Any] = {}) -> s
     value = expression.strip()
     if value in constants and isinstance(constants[value], str):
         return str(constants[value])
+    symbol = value.rsplit(".", 1)[-1]
+    if symbol in constants and isinstance(constants[symbol], str):
+        return str(constants[symbol])
     matches = re.findall(r'@?"((?:""|\\.|[^"\\])*)"', value)
     if matches:
         decoded: List[str] = []
@@ -612,8 +626,11 @@ def parse_csharp_int(expression: str, constants: Mapping[str, Any] = {}) -> int:
     raise CoverageError(f"cannot resolve C# integer expression: {expression.strip()}")
 
 
-def extract_constants(text: str) -> Dict[str, Any]:
-    result: Dict[str, Any] = {}
+def extract_constants(
+    text: str,
+    initial: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, Any]:
+    result: Dict[str, Any] = dict(initial or {})
     pattern = re.compile(
         r"\bconst\s+(?:int|string)\s+(\w+)\s*=\s*(.*?);",
         re.DOTALL,
@@ -974,7 +991,13 @@ def parse_temple_ordinary(repo_root: Path) -> List[ActorDefinition]:
 def parse_temple_encounters(repo_root: Path) -> List[ActorDefinition]:
     path = "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
     text = read_source(repo_root, path)
-    constants = extract_constants(text)
+    loot_constants = extract_constants(
+        read_source(
+            repo_root,
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
+        )
+    )
+    constants = extract_constants(text, loot_constants)
     actors: List[ActorDefinition] = []
     methods = (
         ("internal static CapturedEncounterRuntimeDefinition CreateDefenderDefinition()", "CapturedEncounterRuntimeDefinition", True),
@@ -1008,7 +1031,7 @@ def parse_temple_encounters(repo_root: Path) -> List[ActorDefinition]:
                 monster_data,
                 level,
                 path,
-                runtime_profile_selector=args[0].strip(),
+                runtime_profile_selector=parse_csharp_string(args[0], constants),
             )
         )
     reanimated_body = extract_method_body(
@@ -1028,7 +1051,7 @@ def parse_temple_encounters(repo_root: Path) -> List[ActorDefinition]:
         parse_csharp_int(args[4], constants),
         parse_csharp_int(args[7], constants),
         path,
-        runtime_profile_selector=args[0].strip(),
+        runtime_profile_selector=parse_csharp_string(args[0], constants),
         notes=("two fixed Re-Animator encounter slots",),
     )
     reanimated.actor_count = 2
@@ -2930,7 +2953,8 @@ def build_inventory(
     source_inputs = [
         {
             "path": source,
-            "sha256": sha256_file(repo_path(repo_root, source)),
+            "sha256": sha256_utf8_text_lf(repo_path(repo_root, source)),
+            "hashNormalization": "utf8-sig-text-lf",
         }
         for source in source_paths
     ]

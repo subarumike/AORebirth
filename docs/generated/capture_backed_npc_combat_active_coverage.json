@@ -11195,14 +11195,14 @@
     },
     {
       "actorCount": 1,
-      "bindingKey": "abf3fb40c8b401619110",
+      "bindingKey": "ac3b46ca297a846a842a",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "db8e5505c9b3ba910a38",
+      "coverageKey": "437ade32ca98976447c0",
       "level": 42,
       "levelCandidates": [
         42
@@ -11211,20 +11211,20 @@
       "name": "Defender of the Three",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "DefenderProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.defender-of-the-three",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "de19ee6e66d0f93cc1fa",
+      "bindingKey": "1e009ae2552233abfc0f",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "ca30e9f6266e01b1267e",
+      "coverageKey": "45c5fa1631c9a5d4d45a",
       "level": 56,
       "levelCandidates": [
         56
@@ -11233,20 +11233,20 @@
       "name": "Windcaller Yatila",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "YatilaProfileKey",
+      "runtimeProfileSelector": "totw.647.named.windcaller-yatila",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "1fdd8ed7c09de8da6c6a",
+      "bindingKey": "5afc1d924a2518937fa4",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "37955a23393d4f6359d3",
+      "coverageKey": "abff957713fcabd1b319",
       "level": 38,
       "levelCandidates": [
         38
@@ -11255,20 +11255,20 @@
       "name": "Reverend Gulard",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "GulardProfileKey",
+      "runtimeProfileSelector": "totw.647.named.reverend-gulard",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "83abafe190bba98b772c",
+      "bindingKey": "75657efdce2ae1762f67",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "fe7dbca44b069ae460f9",
+      "coverageKey": "d6d3c5821484f4dd009c",
       "level": 60,
       "levelCandidates": [
         60
@@ -11277,20 +11277,20 @@
       "name": "The Re-Animator",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "ReAnimatorProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.the-re-animator",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "dfae6ca867746faaaecc",
+      "bindingKey": "5f8005e57f38f2678e1c",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "87d7f942bb879c662402",
+      "coverageKey": "a11c2750b28dd739ac7b",
       "level": 32,
       "levelCandidates": [
         32
@@ -11299,20 +11299,20 @@
       "name": "Acolyte Betany",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "BetanyProfileKey",
+      "runtimeProfileSelector": "totw.647.named.acolyte-betany",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "5a95bdcb28e29bcda560",
+      "bindingKey": "b1b129b1e10d64a427d3",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "040d7b141db7d7479495",
+      "coverageKey": "3deb78ebd733aed1ef17",
       "level": 52,
       "levelCandidates": [
         52
@@ -11321,20 +11321,20 @@
       "name": "The Curator",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "CuratorProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.the-curator",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "810beee8479b2a01b77f",
+      "bindingKey": "67f6666b1fa3bb93ecb0",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "c24e47dbba2aa10fe87f",
+      "coverageKey": "83b415203af459feb1fb",
       "level": 66,
       "levelCandidates": [
         66
@@ -11343,20 +11343,20 @@
       "name": "Nematet the Custodian of Time",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "NematetProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.nematet-the-custodian-of-time",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "a3721ca2e755fcb6b49f",
+      "bindingKey": "576c999f22319f07f2c4",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "409b894723938cbe7866",
+      "coverageKey": "9c90c3b26217b0471ac6",
       "level": 68,
       "levelCandidates": [
         68
@@ -11365,20 +11365,20 @@
       "name": "Guardian of Tomorrow",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "GuardianProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.guardian-of-tomorrow",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "00fa55ed2fc58f825384",
+      "bindingKey": "d95d277239fd768bbb33",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "2b81254ca404e99e53fb",
+      "coverageKey": "83e06e09a8707509b43b",
       "level": 65,
       "levelCandidates": [
         65
@@ -11387,20 +11387,20 @@
       "name": "Gartua the Doorkeeper",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "GartuaProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.gartua-the-doorkeeper",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "d4a53115052c1fe87fbc",
+      "bindingKey": "d5601ae35ac6bdeff3db",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "565844853cd60e6eb333",
+      "coverageKey": "5813488a15f38b6e2c31",
       "level": 73,
       "levelCandidates": [
         73
@@ -11409,20 +11409,20 @@
       "name": "Uklesh the Frozen",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "UkleshProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.uklesh-the-frozen",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "7ad596d661a9a9a9bb0c",
+      "bindingKey": "0df01c03393fc8be92c9",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "19a1f3b54b4abb6973f5",
+      "coverageKey": "04e3ff168746de17214d",
       "level": 73,
       "levelCandidates": [
         73
@@ -11431,20 +11431,20 @@
       "name": "Khalum",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "KhalumProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.khalum",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 1,
-      "bindingKey": "f23a63450a9b716912b0",
+      "bindingKey": "960d614e5de2beba470b",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "d8a5fbd4ad4e6fc6e625",
+      "coverageKey": "cae36512cf67daf00b02",
       "level": 74,
       "levelCandidates": [
         74
@@ -11453,20 +11453,20 @@
       "name": "Aztur the Immortal",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "AzturProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.aztur-the-immortal",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters"
     },
     {
       "actorCount": 2,
-      "bindingKey": "20f4d00121c142648e6f",
+      "bindingKey": "d5ff817d33e8a66ee48d",
       "classification": "certified",
       "configuredSourceIdentity": null,
       "contentEvidenceCaptureIds": [],
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "f578877364c369ddc435",
+      "coverageKey": "8a03492ad8b48d3be2c4",
       "level": 18,
       "levelCandidates": [
         18
@@ -11475,7 +11475,7 @@
       "name": "Reanimated Corpse",
       "runtimeContractReady": true,
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "ReanimatedProfileKey",
+      "runtimeProfileSelector": "totw.647.encounter.re-animator.reanimated-corpse",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-reanimated-corpse-adds"
     },
@@ -38309,148 +38309,189 @@
   },
   "contentInputs": [
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceMobCombat.cs",
-      "sha256": "88147f4d36e520d6655458ee5fb4461ce47e8cf47c78bc3939c686bb73a01658"
+      "sha256": "1b5ad6eb36c2ae519ba232724d0e216b22e97c8ad6849eea4c5a5610d66725e1"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-      "sha256": "e8916713492676bfb021ba7bce959f1c3e4e9eb4a4436eb6560002eb2e3b288f"
+      "sha256": "282260f946a76323dec8e1c6c8685639e663a922f25f1ae3efc1dcbe2d816630"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteAlienAreaMobRuntime.cs",
-      "sha256": "da3cea1be316030459d13033ade00d2cd502a73e689842d2d91325e2b406cccb"
+      "sha256": "7c96c5253f55667c66b7efd4cd58376a7a1f26a6891054986ecd3e49db6bb597"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs",
-      "sha256": "bc4f17b2751955248d5367cfe62075a927267098c004be8b04a63aad758b11ea"
+      "sha256": "8875efeb0f961db11d74f736f6efd6b555bf0bba29593e02eba784bfde3d9094"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs",
-      "sha256": "45e16a0514f3550cd240aab3b7b31977aa14cfe378bc9d5bbcb83022e2ebd376"
+      "sha256": "d7668db52886aec81b564abfe9478fdd381b982342147fdd925177bf3d5e652f"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
-      "sha256": "08e20edaaec9dfbe9175b5146513743f39231a46636d7623cea0f28b5e548047"
+      "sha256": "0014175bb3607f4d8edd9b540e5ce4baedbca54cd7ef71450c193146de55659c"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs",
-      "sha256": "b95d9f60d11b4b67b932119c9fb0b64ef18718f5ffe90a9a7a98f42fc75397dc"
+      "sha256": "0fc056451f72146944c42cad06ec59da214988844707b25af6e6509558254ed5"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteSandstormMarauderRuntime.cs",
-      "sha256": "62ca5106ed7b7f85b7256a0dbae34a13929d70fe18569c2dca37fcf486e18b9f"
+      "sha256": "442d37daa0d0bfc24111d7fc66768b8a37c9e2d87da3d145dd9dc472d967b8ca"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotContentProvider.cs",
-      "sha256": "494db76b98f4a96990dd46eadbc06067d8b6f260765093ef1661c431ee3cb908"
+      "sha256": "b25c6b49473db6b832559dc147ba15f5991d8ab435d0af839b30d495352b3eb9"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
-      "sha256": "73fab15a358e1030c66a16ba670744f70878b810bd88160c9aea5eb7e9aa520a"
+      "sha256": "da5e526e64bc54a4a45099c1d5ba3ae286b6807bed52445485af31bee280f72d"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-      "sha256": "ba5ea95d5bc015a8292fd9bd2656956d38283699b5142cda8232ad353b165dfb"
+      "sha256": "09ca6e9b815a26efe1403478fd25665fe9f1248728dcb86cd426ae84a9e33cbc"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-      "sha256": "bde2f6d9be95fed9d024976cccfa0587830b6aaec2f2f341e6151f7828302559"
+      "sha256": "01280dbbeceb94464aba428081026002a115f59de9ac1f322940f4b6938840f8"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs",
-      "sha256": "96de3a43a5dadf3d0e748d6bb4084834c78402c23c305e49c03672b628b3ea89"
+      "sha256": "a8d25e19c1663ee154b4a07fd28a45cb29f5009bc27d9ad27cbb37196e478031"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
-      "sha256": "49f3caa2dffdf968db4b65c8cf885530a0deba77f49fcdab7a034fe7b44bb78b"
+      "sha256": "fe61ed164b6310cc2058f06e2ec0d379c1293a3201c3e28e3b6dde6767a5d443"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs",
-      "sha256": "7ca105250b1b50b723bcb45eb432a5b2d140914fdb67cfb1be71f2b903e8e096"
+      "sha256": "5cfa1abec308e1dcbc8643e781015c0a28b730bc735fc9d3be6ab62e49324fe8"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
-      "sha256": "c0246ccbc8f40a9d8699b78e4f4886969031804b0326f7055ba4098bb5488204"
+      "sha256": "e30bab8606c63f64bfac749b8ad3c6360c12e5d0ae6b3f2efb6c554a63b4714c"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs",
-      "sha256": "a347091bd3593dbbc823e72a507122a800d39e567492602dc5318928653269a6"
+      "sha256": "95f97a6e57fc6c45dc084ad7c6d94dc8eacf059c7c08e55af0fb954f59407ff8"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
-      "sha256": "2063a8c2dea49a5162b541dc31b49054b955364f8a4f7e05e7e3b0ef795ed2f4"
+      "sha256": "cf4e3c8a2caaa40a9c501b62d87f93b5a257dd41808b4d6bf5d44a444cb6c674"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
-      "sha256": "9a9a10df81d4be8e1136496a7fd74af8570a6a119b8cc25e6bf7fb881f85c5fb"
+      "sha256": "5b035e7a4bab0170687f7380287c5f0eed6e7ddb77212c63f74992db87a563ae"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
-      "sha256": "9868d306fcca0662b9052dd10b8cb5023b0ac9ba43f3d733f8e26cbbf1078e83"
+      "sha256": "b5fc81c7f51039363e3dd445c765833e1dd4fa03c1474dbd69d0eba42da699e2"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-      "sha256": "82083743fa5f7cbeb5de1085b58f1b8850798b68c56a235045d8603bb58276c0"
+      "sha256": "01ea89c5a28ea47bc59b19128b05df69a73270a4e29fca254374f1463ab04c38"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
+      "sha256": "4b6c444ccc68c17d8e45ca107db34a73c6ced3de8a61fa26409579ebee9976c5"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs",
-      "sha256": "a8f9a42212c2266e86dd2680c11a8471deb86f2c097217e7b3cc72c95570b75a"
+      "sha256": "0c4d4b2e7a96b8f893e52b42c36df10dee1949c524ae5fd5a19a2400b804fe9a"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs",
-      "sha256": "39e349e98598db73196efd32091ec4b2d0eea1573d3f24f5e01f50d46c350cf8"
+      "sha256": "a19f2d8e38c1920fcb59fd2e5175be1f79dbe75af194a581037b980bbd2ed4ca"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
-      "sha256": "275b97a3605a82893458da1405c7719a92e368e32507c2a3a6c6f619c7d0e53d"
+      "sha256": "78b1151664a49974fb58d2c46cca9358267d07c8091c62da60725aa6be6e5929"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-      "sha256": "f87a8fd0e9854c7cf97f2bd9907128e6abef1e8a991cccef1dcd9c5517fead84"
+      "sha256": "a31ea3f29b31e55737fe1f4ecde319013d6ca614cd125f99f6ab08d2daf1f48f"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-      "sha256": "1e4feb223a7aa1eb16a0b94630b5a050676aa822803fb520869a54b827116d9f"
+      "sha256": "bae44121f1793620e8e7d9b8ba4ea4f9154396fcd99f24a02765cceb7793edf4"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceShapeCatalog.cs",
-      "sha256": "b03f0304aac571165f03937bc5b990af9c69ec164f24fe2b99783dc00f0e517f"
+      "sha256": "27c629658013a1f53ec63ce93030d071a4ca51a2fd7871e1044f204bb5ef030c"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceSpawn.cs",
-      "sha256": "e9298cf419fa5f1bae5782a19de1c08e40b807efb982fb6e3ca01d18c95aedb5"
+      "sha256": "1d3c116f41740ffac12a3c5e005910b8b5303a78f41e00c83897f17a97037ec4"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerContentProvider.cs",
-      "sha256": "1312f15fb5506ff6ea333b00757bef5512bd95e47ca028d0a93f3ec9f67b96b6"
+      "sha256": "bb34af96cb4843648a68c45edbca20f0755f6d2f870f09332bd32dacbeac241a"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerSpawnOrchestrator.cs",
-      "sha256": "a3e7a9901b94c33ea78eba9cdcb57517f3844b2ff708873dfa69c608bb9db53b"
+      "sha256": "d43490b7dff338d291e90b39dfb5ff2c8079b6f768e430a151a23f1bc7b02eac"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
-      "sha256": "146ea143fe02b3df6f3fe66dc5e6a6d7136ec8b9b47a06a337a88c74dc085e4f"
+      "sha256": "7502c11ec58b51963259db6435dfc24cfeb478c660176fe8cd9f3f6b5072db6e"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs",
-      "sha256": "e3c563954dd8bb12eff6298f9f59447eb8b4b1eaff5ea20a149c078aedd8b5d9"
+      "sha256": "c6e5a36886c8720d97ab21e3d6390c2fb7370103b90d267fa85b1776e6def226"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-      "sha256": "356a0191a4659de4c2cbe51a51fc9dff7a6c59e57aabc21d2672b382866f4e9f"
+      "sha256": "69bc2860fda2f7c176abe12891f3670f958fbe0827ef187c551d47c20375e9e7"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/RomeBlueCitySpawn.cs",
-      "sha256": "15053b2d612a199882b12a90bba47a961cd985d65519da4084835de514657167"
+      "sha256": "521ca7564a381c7c4f1abc2b78a6e7f66f925b6695cbab07a5bf489cc8249189"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs",
-      "sha256": "8aa0979f7e36560a77d4ff941c52568329da9d4c24e29033ea688f8b3aeb4636"
+      "sha256": "d95c1200af811106a4e864a6bd49a69b1b893bcc6b66ed6fe5eef06b938693b2"
     },
     {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs",
-      "sha256": "14e76a38951f525a5625ad1ef9bb52ea2c10577b67eadc8017e65784ad1026d2"
+      "sha256": "4cfcebb0c1b85121b229f507fe0e2f356699ef2ddc43801fc15fdd4022839bfe"
     }
   ],
   "corpusSearch": {
@@ -55512,6 +55553,13 @@
           "CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal()",
           "CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(",
           "CapturedEnemyCombatRuntime.Prepare("
+        ]
+      },
+      {
+        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
+        "requiredMarkers": [
+          "DefenderProfileKey = \"totw.647.boss.defender-of-the-three\"",
+          "AzturProfileKey = \"totw.1931.boss.aztur-the-immortal\""
         ]
       },
       {
@@ -142888,6 +142936,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143039,6 +143088,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143190,6 +143240,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143341,6 +143392,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143492,6 +143544,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143643,6 +143696,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143794,6 +143848,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -143945,6 +144000,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -144096,6 +144152,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -144247,6 +144304,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -144398,6 +144456,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -144549,6 +144608,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -144700,6 +144760,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -144851,6 +144912,7 @@
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -145676,7 +145738,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "87d7f942bb879c662402",
+      "coverageKey": "a11c2750b28dd739ac7b",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -145694,7 +145756,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "BetanyProfileKey"
+              "runtimeProfileSelector": "totw.647.named.acolyte-betany"
             }
           ]
         }
@@ -145732,7 +145794,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "BetanyProfileKey"
+              "runtimeProfileSelector": "totw.647.named.acolyte-betany"
             }
           ],
           "evidencePacketIds": [],
@@ -145741,13 +145803,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "BetanyProfileKey",
+          "runtimeProfileSelector": "totw.647.named.acolyte-betany",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -145759,7 +145822,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "BetanyProfileKey",
+      "runtimeProfileSelector": "totw.647.named.acolyte-betany",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -145776,7 +145839,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "d8a5fbd4ad4e6fc6e625",
+      "coverageKey": "cae36512cf67daf00b02",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -145799,7 +145862,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|3147|96fe94d7ea0d",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|3183|39982906ff95"
               ],
-              "runtimeProfileSelector": "AzturProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.aztur-the-immortal"
             }
           ]
         }
@@ -145847,7 +145910,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|3147|96fe94d7ea0d",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|3183|39982906ff95"
               ],
-              "runtimeProfileSelector": "AzturProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.aztur-the-immortal"
             }
           ],
           "evidencePacketIds": [
@@ -145864,13 +145927,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "AzturProfileKey",
+          "runtimeProfileSelector": "totw.1931.boss.aztur-the-immortal",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -145882,7 +145946,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "AzturProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.aztur-the-immortal",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -145906,7 +145970,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "db8e5505c9b3ba910a38",
+      "coverageKey": "437ade32ca98976447c0",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -145932,7 +145996,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-035526|IN|8255|107f2cb5c7da",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-035526|IN|8842|d88e47bf93b8"
               ],
-              "runtimeProfileSelector": "DefenderProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.defender-of-the-three"
             }
           ]
         }
@@ -145986,7 +146050,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-035526|IN|8255|107f2cb5c7da",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-035526|IN|8842|d88e47bf93b8"
               ],
-              "runtimeProfileSelector": "DefenderProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.defender-of-the-three"
             }
           ],
           "evidencePacketIds": [
@@ -145999,13 +146063,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "DefenderProfileKey",
+          "runtimeProfileSelector": "totw.647.boss.defender-of-the-three",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146017,7 +146082,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "DefenderProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.defender-of-the-three",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146035,7 +146100,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "2b81254ca404e99e53fb",
+      "coverageKey": "83e06e09a8707509b43b",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146051,7 +146116,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "GartuaProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.gartua-the-doorkeeper"
             }
           ]
         }
@@ -146085,7 +146150,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "GartuaProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.gartua-the-doorkeeper"
             }
           ],
           "evidencePacketIds": [],
@@ -146094,13 +146159,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "GartuaProfileKey",
+          "runtimeProfileSelector": "totw.1931.boss.gartua-the-doorkeeper",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146112,7 +146178,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "GartuaProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.gartua-the-doorkeeper",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146129,7 +146195,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "409b894723938cbe7866",
+      "coverageKey": "9c90c3b26217b0471ac6",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146149,7 +146215,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|2928|c5d873ac7459",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|2950|e5b026de48bd"
               ],
-              "runtimeProfileSelector": "GuardianProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.guardian-of-tomorrow"
             }
           ]
         }
@@ -146191,7 +146257,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|2928|c5d873ac7459",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-230426|IN|2950|e5b026de48bd"
               ],
-              "runtimeProfileSelector": "GuardianProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.guardian-of-tomorrow"
             }
           ],
           "evidencePacketIds": [
@@ -146205,13 +146271,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "GuardianProfileKey",
+          "runtimeProfileSelector": "totw.1931.boss.guardian-of-tomorrow",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146223,7 +146290,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "GuardianProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.guardian-of-tomorrow",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146240,7 +146307,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "19a1f3b54b4abb6973f5",
+      "coverageKey": "04e3ff168746de17214d",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146260,7 +146327,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|2409|0851f9654b82",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|2432|e60d408ae136"
               ],
-              "runtimeProfileSelector": "KhalumProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.khalum"
             }
           ]
         }
@@ -146302,7 +146369,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|2409|0851f9654b82",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-045835|IN|2432|e60d408ae136"
               ],
-              "runtimeProfileSelector": "KhalumProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.khalum"
             }
           ],
           "evidencePacketIds": [
@@ -146316,13 +146383,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "KhalumProfileKey",
+          "runtimeProfileSelector": "totw.1931.boss.khalum",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146334,7 +146402,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "KhalumProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.khalum",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146351,7 +146419,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "c24e47dbba2aa10fe87f",
+      "coverageKey": "83b415203af459feb1fb",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146371,7 +146439,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|10414|cf8338a085cf",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|10466|3c282bcece26"
               ],
-              "runtimeProfileSelector": "NematetProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.nematet-the-custodian-of-time"
             }
           ]
         }
@@ -146413,7 +146481,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|10414|cf8338a085cf",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|10466|3c282bcece26"
               ],
-              "runtimeProfileSelector": "NematetProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.nematet-the-custodian-of-time"
             }
           ],
           "evidencePacketIds": [
@@ -146427,13 +146495,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "NematetProfileKey",
+          "runtimeProfileSelector": "totw.647.boss.nematet-the-custodian-of-time",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146445,7 +146514,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "NematetProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.nematet-the-custodian-of-time",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146464,7 +146533,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "37955a23393d4f6359d3",
+      "coverageKey": "abff957713fcabd1b319",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146486,7 +146555,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3444|cfe54d4daa6b",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3535|aaadd745be1e"
               ],
-              "runtimeProfileSelector": "GulardProfileKey"
+              "runtimeProfileSelector": "totw.647.named.reverend-gulard"
             }
           ]
         }
@@ -146532,7 +146601,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3444|cfe54d4daa6b",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3535|aaadd745be1e"
               ],
-              "runtimeProfileSelector": "GulardProfileKey"
+              "runtimeProfileSelector": "totw.647.named.reverend-gulard"
             }
           ],
           "evidencePacketIds": [
@@ -146546,13 +146615,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "GulardProfileKey",
+          "runtimeProfileSelector": "totw.647.named.reverend-gulard",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146564,7 +146634,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "GulardProfileKey",
+      "runtimeProfileSelector": "totw.647.named.reverend-gulard",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146581,7 +146651,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "040d7b141db7d7479495",
+      "coverageKey": "3deb78ebd733aed1ef17",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146600,7 +146670,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|2246|8407d77cec47",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|2455|d74cb37a04a2"
               ],
-              "runtimeProfileSelector": "CuratorProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.the-curator"
             }
           ]
         }
@@ -146640,7 +146710,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|2246|8407d77cec47",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-052115|IN|2455|d74cb37a04a2"
               ],
-              "runtimeProfileSelector": "CuratorProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.the-curator"
             }
           ],
           "evidencePacketIds": [
@@ -146653,13 +146723,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "CuratorProfileKey",
+          "runtimeProfileSelector": "totw.647.boss.the-curator",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146671,7 +146742,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "CuratorProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.the-curator",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146688,7 +146759,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "fe7dbca44b069ae460f9",
+      "coverageKey": "d6d3c5821484f4dd009c",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146708,7 +146779,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3763|76722f621dc7",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3831|e79ea159eb58"
               ],
-              "runtimeProfileSelector": "ReAnimatorProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.the-re-animator"
             }
           ]
         }
@@ -146750,7 +146821,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3763|76722f621dc7",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3831|e79ea159eb58"
               ],
-              "runtimeProfileSelector": "ReAnimatorProfileKey"
+              "runtimeProfileSelector": "totw.647.boss.the-re-animator"
             }
           ],
           "evidencePacketIds": [
@@ -146764,13 +146835,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "ReAnimatorProfileKey",
+          "runtimeProfileSelector": "totw.647.boss.the-re-animator",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146782,7 +146854,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "ReAnimatorProfileKey",
+      "runtimeProfileSelector": "totw.647.boss.the-re-animator",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146802,7 +146874,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "565844853cd60e6eb333",
+      "coverageKey": "5813488a15f38b6e2c31",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146820,7 +146892,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "UkleshProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.uklesh-the-frozen"
             }
           ]
         }
@@ -146858,7 +146930,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "UkleshProfileKey"
+              "runtimeProfileSelector": "totw.1931.boss.uklesh-the-frozen"
             }
           ],
           "evidencePacketIds": [],
@@ -146867,13 +146939,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "UkleshProfileKey",
+          "runtimeProfileSelector": "totw.1931.boss.uklesh-the-frozen",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146885,7 +146958,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "UkleshProfileKey",
+      "runtimeProfileSelector": "totw.1931.boss.uklesh-the-frozen",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -146904,7 +146977,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "ca30e9f6266e01b1267e",
+      "coverageKey": "45c5fa1631c9a5d4d45a",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -146921,7 +146994,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "YatilaProfileKey"
+              "runtimeProfileSelector": "totw.647.named.windcaller-yatila"
             }
           ]
         }
@@ -146957,7 +147030,7 @@
               "evidenceScope": "exact capture-backed encounter contract and packet fixture",
               "observationType": "production-owned-exact-pf1931-contract",
               "representativeEvidencePacketIds": [],
-              "runtimeProfileSelector": "YatilaProfileKey"
+              "runtimeProfileSelector": "totw.647.named.windcaller-yatila"
             }
           ],
           "evidencePacketIds": [],
@@ -146966,13 +147039,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "YatilaProfileKey",
+          "runtimeProfileSelector": "totw.647.named.windcaller-yatila",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -146984,7 +147058,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "YatilaProfileKey",
+      "runtimeProfileSelector": "totw.647.named.windcaller-yatila",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-named-encounters",
       "unresolvedReasons": []
@@ -147005,7 +147079,7 @@
       "contentSources": [
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs"
       ],
-      "coverageKey": "f578877364c369ddc435",
+      "coverageKey": "8a03492ad8b48d3be2c4",
       "disabledGameplayCapabilities": [],
       "evidenceFound": [
         {
@@ -147037,7 +147111,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3860|c6653612b9cb",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3890|6e32d7e3db47"
               ],
-              "runtimeProfileSelector": "ReanimatedProfileKey"
+              "runtimeProfileSelector": "totw.647.encounter.re-animator.reanimated-corpse"
             }
           ]
         }
@@ -147103,7 +147177,7 @@
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3860|c6653612b9cb",
                 "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-043204|IN|3890|6e32d7e3db47"
               ],
-              "runtimeProfileSelector": "ReanimatedProfileKey"
+              "runtimeProfileSelector": "totw.647.encounter.re-animator.reanimated-corpse"
             }
           ],
           "evidencePacketIds": [
@@ -147125,13 +147199,14 @@
           "resolutionMode": "production-owned-exact-pf1931-capture-contract",
           "runtimeContractReady": true,
           "runtimeMissingEvidence": [],
-          "runtimeProfileSelector": "ReanimatedProfileKey",
+          "runtimeProfileSelector": "totw.647.encounter.re-animator.reanimated-corpse",
           "runtimeResolverSources": [
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs"
           ]
         }
@@ -147145,7 +147220,7 @@
       "runtimeContractReady": true,
       "runtimeMissingEvidence": [],
       "runtimePlayfieldOrResource": 1931,
-      "runtimeProfileSelector": "ReanimatedProfileKey",
+      "runtimeProfileSelector": "totw.647.encounter.re-animator.reanimated-corpse",
       "runtimeSourceIdentityHint": null,
       "surface": "temple-reanimated-corpse-adds",
       "unresolvedReasons": []

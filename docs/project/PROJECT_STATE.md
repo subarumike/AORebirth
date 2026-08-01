@@ -13,6 +13,10 @@ Primary Codex memory file for AO Rebirth. This top section is the current source
   vendor, interaction, dialogue, quest, mission, and playfield boundary has a
   production owner and focused acceptance coverage. Remaining unknown values
   are explicit non-blocking evidence gaps, not unfinished Arete implementation.
+  The 2026-08-01 reconciliation gate is `60/60`: generated active-coverage
+  source hashes are UTF-8/LF canonical, Temple named selectors are resolved to
+  their actual runtime keys, and all `1,607` fixed actors reconcile as `504`
+  certified plus `1,103` explicitly unresolved without changing runtime behavior.
 
 - **PF127 Subway is the selected post-Arete playfield and is complete for the
   behavior supported by the complete existing repository and capture corpus.**
