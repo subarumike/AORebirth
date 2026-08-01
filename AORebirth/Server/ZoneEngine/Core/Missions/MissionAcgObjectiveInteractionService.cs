@@ -98,6 +98,31 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
+            MissionAcgAcceptedProjection acceptedProjection;
+            if (!MissionAcgAcceptedProjectionRuntime.TryGetByAcceptedQuest(
+                    objective.Binding.AcceptedQuestIdentity.Instance,
+                    out acceptedProjection)
+                || (acceptedProjection.MissionArtifactIdentity != null
+                    && !acceptedProjection.MissionArtifactIdentity.Equals(
+                        withItem.State.MissionItemIdentity)))
+            {
+                return true;
+            }
+
+            if (acceptedProjection.MissionArtifactIdentity == null)
+            {
+                MissionAcgAcceptedProjection updatedProjection;
+                if (!MissionAcgAcceptedProjectionRuntime.TrySetArtifact(
+                    acceptedProjection,
+                    withItem.State.MissionItemIdentity,
+                    System.DateTime.UtcNow,
+                    out updatedProjection,
+                    out failure))
+                {
+                    return true;
+                }
+            }
+
             if (objective.Binding.MissionType == MissionRollType.FindItemReturn)
             {
                 accepted = true;

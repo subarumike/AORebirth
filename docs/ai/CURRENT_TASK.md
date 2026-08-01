@@ -2,6 +2,44 @@
 
 ## Active
 
+TASK ID: GENERATED-MISSION-ACCEPTED-PROJECTION-001
+
+Generated-terminal mission acceptance now freezes one complete accepted
+projection instead of depending on process-local roll data. Version 1 is stored
+under `mission-state/acg-accepted-projections` as 65 deterministic `key=value`
+fields with the complete serialized roll response body encoded as Base64,
+SHA-256 integrity, and atomic replacement. The selected offer is recovered from
+that body and cross-validated against the stored offer index, original offer ID,
+accepted quest ID, owner, binding, rewards, QFU contract, artifacts, expiry,
+and lifecycle fields; malformed, partial, unknown-version, duplicate, or
+conflicting records fail closed.
+
+Acceptance is idempotent by owner plus original offer identity. The offer is
+durably claimed before the binding, objective, key, mission artifact, accepted
+state, or QFU is exposed. Persisted acceptance phases make each later boundary
+recoverable: binding and objective persistence; key and exact Repair/Return
+Item artifact grants; accepted-state commit; and pending/sent QFU delivery.
+Retries and reconnects resume the same accepted quest, bundle, building, PF2,
+key, frozen Repair artifact template/identity, frozen rewards, action fields,
+title/description, and
+type-specific structured QFU rather than allocating or recalculating them.
+
+Offer expiry and accepted-mission expiry are independent: acceptance requires a
+live offer, then starts the existing 48-hour accepted duration. Startup cleans
+expired pre-binding reservations without waiting for owner reconnect, and
+reconnect suppresses the second mission-list QFU when recovery already sent the
+exact pending accepted QFU.
+
+Generated offer IDs use a separate version-1 durable cursor under
+`mission-state/offer-identities`, with collision checks against live offers,
+accepted projections, and bindings. Ambiguous legacy generated accepted-state
+rows cannot reconstruct the complete projection and are rejected rather than
+filled from defaults. Authored quests and true legacy missions keep their
+existing owners. No database schema, reward formula, slider, loot, ACG payload,
+or procedural-generation behavior changes in this stage.
+
+## Previous completed status
+
 TASK ID: GENERATED-MISSION-LEGACY-FALLTHROUGH-001
 
 Generated-terminal mission runtime ownership is being made fail-closed at every

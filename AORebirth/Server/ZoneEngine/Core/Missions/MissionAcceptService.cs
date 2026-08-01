@@ -7,6 +7,7 @@ namespace ZoneEngine.Core.Missions
     using System.Text;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.Network;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -28,7 +29,7 @@ namespace ZoneEngine.Core.Missions
         private const long ClientClockBaseSeconds = 1_201_445_827L;
 
         /// <summary>Mission time window mirrored in the "Remain" countdown (48 hours).</summary>
-        private const int MissionDurationSeconds = 48 * 60 * 60;
+        internal const int MissionDurationSeconds = 48 * 60 * 60;
 
         /// <summary>QuestId type in the captured packet (Quest[0].QuestId.Type).</summary>
         private const int MissionIdentityType = 0x0000DAC3;
@@ -204,6 +205,32 @@ namespace ZoneEngine.Core.Missions
                 return;
             }
 
+            MissionAcgBindingRuntime.Initialize();
+            IZoneClient zoneClient =
+                character.Controller == null
+                    ? null
+                    : character.Controller.Client as IZoneClient;
+            ISet<int> deliveredAcceptedQuestInstances;
+            if (zoneClient != null)
+            {
+                string recoveryFailure;
+                if (!MissionAcgAcceptanceCoordinator.TryRecoverOwned(
+                    zoneClient,
+                    character,
+                    out deliveredAcceptedQuestInstances,
+                    out recoveryFailure))
+                {
+                    MissionDiagnostics.Log(
+                        "ACG-ACCEPT-RECOVERY-PENDING owner={0} reason={1}",
+                        character.Identity.Instance,
+                        recoveryFailure);
+                }
+            }
+            else
+            {
+                deliveredAcceptedQuestInstances = new HashSet<int>();
+            }
+
             List<MissionAcceptedStore.AcceptedMission> all = MissionAcceptedStore.GetAll(character.Identity.Instance);
             if (all.Count == 0)
             {
@@ -215,6 +242,14 @@ namespace ZoneEngine.Core.Missions
             int sent = 0;
             foreach (MissionAcceptedStore.AcceptedMission entry in all)
             {
+                if (entry != null
+                    && entry.QuestIdentity != null
+                    && deliveredAcceptedQuestInstances.Contains(
+                        entry.QuestIdentity.Instance))
+                {
+                    continue;
+                }
+
                 // Resync: push FullUpdate only (no Delete). Delete+single-quest FU was wiping the window.
                 if (SendOneMissionWindow(character, entry.Offer, entry, register: false, deleteBeforeSend: false))
                 {

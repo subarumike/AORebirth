@@ -184,11 +184,40 @@ namespace ZoneEngine.Core.MessageHandlers
                     return;
                 }
 
+                byte[] serializedRollPayload =
+                    MissionRollService.SerializeBody(response);
+                string offerStoreFailure;
+                if (!MissionOfferStore.TryStoreRoll(
+                    character.Identity.Instance,
+                    response,
+                    message,
+                    DateTime.UtcNow,
+                    serializedRollPayload,
+                    out offerStoreFailure))
+                {
+                    client.Server.Info(
+                        client,
+                        "QuestAlternative roll blocked - accepted projection unavailable: {0}",
+                        offerStoreFailure);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                "The mission terminal could not preserve this roll. No credits were deducted.")
+                        });
+                    return;
+                }
+
                 // Capture order: fee deduct feedback, then the 5-offer QuestAlternative.
                 // Never charge unless we have a non-empty roll ready to send.
                 int fee;
                 if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
                 {
+                    MissionOfferStore.DiscardRoll(character.Identity.Instance);
                     client.Server.Info(
                         client,
                         "QuestAlternative roll blocked — need {0} credits",
@@ -197,9 +226,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
 
                 client.SendCompressed(response);
-
-                // Remember what we offered so a following accept (CreateQuest) can look the mission up.
-                MissionOfferStore.StoreRoll(character.Identity.Instance, response.QuestInfos);
 
                 client.Server.Info(
                     client,

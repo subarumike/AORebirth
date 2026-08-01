@@ -1046,6 +1046,50 @@ Final runtime third-party attribution is documented in the root `NOTICE`: CellAO
 - `600 Varmint Woods` static vendor coverage was expanded with 1 approved mapping. Commit `e197b9f` added the source SQL row, the targeted import inserted only that row into `cellao_codex_clean.vendors`, query-back confirmed `39321612 | 600 | 93063 | AdvOA`, and verification showed `DataFileIssues = 0`, `VendorDbIssues = 0`, `ShopInventoryIssues = 0`, and `StatelVendorIssues = 570`. Total uncovered statel vendors dropped from `571` to `570`, and `600 Varmint Woods` dropped from `3` to `2`. Backup: `C:\Users\Mike\Documents\Cellao-Clean\tools-temp\db-backups\vendors_before_600_varmint_woods_20260610_052107.sql`. Rejected candidates `39321600`/`99479` and `39321601`/`99482` remain uncovered until matching `vendortemplate.ItemTemplate` evidence is found. No runtime vendor behavior changed.
 - Surgery clinic and implant flows have documented repaired behavior.
 
+# Durable Accepted Generated-Mission Projection
+
+Generated terminal missions persist a complete version-1 accepted projection
+under `mission-state/acg-accepted-projections`. Each sidecar contains 65
+deterministically ordered `key=value` fields, a Base64 encoding of the complete
+serialized roll-response body, a SHA-256 integrity value, and atomic temp-file
+replacement. Loading rejects unknown versions, malformed or partial fields,
+hash mismatches, invalid selected-offer indices, duplicate accepted quest IDs,
+duplicate owner/original-offer ownership, and any mismatch with the persisted
+bundle, building, live PF2, key, objective, reward, artifact, expiry, or
+lifecycle identities.
+
+The projection freezes the original offer and distinct accepted quest IDs,
+owner/explicit team state, mission type and icon, QL and all sliders, complete
+title and description, action fields, cash/XP/item rewards, issuing terminal,
+exterior entrance, key, exact Repair or Return Item artifact, the frozen Repair
+component low/high template pair, all structured
+type-specific QFU data, binding, expiry, and lifecycle state. Kill, Find Person,
+Find Item, Return Item, and Repair QFUs are reconstructed from this immutable
+accepted source after restart; completion consumes its frozen rewards instead
+of mutable roll templates or recalculation fallbacks.
+
+Acceptance is serialized and idempotent by owner plus original offer identity.
+The selected offer is claimed durably before artifacts or client-visible
+accepted state. Persisted phases cover the offer claim, binding, objective,
+pending/granted key, pending/granted exact artifact, objective exposure,
+accepted commit, and pending/sent QFU delivery. A retry or restart resumes the
+same reservation and exact inventory identities; it cannot allocate another
+accepted quest, PF2, bundle, key, or artifact. Expired pre-binding reservations
+are cleaned autonomously during startup. Reconnect re-registers exact artifacts
+and resends the accepted QFU from the stored projection without rerolling
+rewards or action data, while suppressing a duplicate timer-refresh QFU when
+recovery already delivered it. Offer expiry gates acceptance; a successful
+acceptance starts the existing independent 48-hour mission duration.
+
+Offer identity allocation has its own version-1 atomic SHA-256 cursor at
+`mission-state/offer-identities/generated-offer-id.cursor`. It is restored
+before allocation and collision-checked against current offers, accepted
+projections, and mission bindings. Old generated `MissionAcceptedStore` rows do
+not contain enough information for safe migration; ambiguous rows fail closed
+instead of being rebuilt from defaults. Authored quests and true legacy mission
+paths remain unchanged. This work adds no database/schema, reward-formula,
+slider, loot, ACG-payload, or procedural-generation changes.
+
 # Generated Terminal Mission Token Progress
 
 Generated-terminal mission token progress has an accepted-quest-scoped

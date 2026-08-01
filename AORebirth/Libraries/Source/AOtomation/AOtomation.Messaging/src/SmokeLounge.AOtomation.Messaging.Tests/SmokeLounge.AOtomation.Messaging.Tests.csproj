@@ -84,6 +84,10 @@
     <Compile Include="N3RecoveredContractTests.cs" />
     <Compile Include="MissionAcgLayoutCatalogTests.cs" />
     <Compile Include="MissionAcgBindingPersistenceTests.cs" />
+    <Compile Include="MissionAcgAcceptedProjectionTests.cs" />
+    <Compile Include="MissionAcgAcceptanceIdempotencyContractTests.cs" />
+    <Compile Include="MissionOfferIdentityStoreTests.cs" />
+    <Compile Include="MissionOfferStoreTests.cs" />
     <Compile Include="MissionAcgRuntimeMaterializationTests.cs" />
     <Compile Include="MissionAcgObjectiveCompletionTests.cs" />
     <Compile Include="MissionAcgOperationalRuntimeTests.cs" />
@@ -120,6 +124,18 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingStore.cs">
       <Link>MissionAcgBindingStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAcceptedProjection.cs">
+      <Link>MissionAcgAcceptedProjection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAcceptedProjectionStore.cs">
+      <Link>MissionAcgAcceptedProjectionStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferIdentityStore.cs">
+      <Link>MissionOfferIdentityStore.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferStore.cs">
+      <Link>MissionOfferStore.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgExpiryState.cs">
       <Link>MissionAcgExpiryState.cs</Link>
