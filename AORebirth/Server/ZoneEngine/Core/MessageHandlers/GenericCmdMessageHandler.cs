@@ -97,6 +97,14 @@ namespace ZoneEngine.Core.MessageHandlers
             switch (message.Action)
             {
                 case GenericCmdAction.Get:
+                    if (MissionAcgRuntimeInteractionService.TryHandleGet(
+                        client,
+                        message,
+                        target))
+                    {
+                        break;
+                    }
+
                     // Capture 20260728-095215: right-click PickUp Encrypted Info Capsule Terminal.
                     if (MissionFindItemService.TryHandleWorldPickUp(client, target))
                     {

@@ -681,7 +681,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "if (!state.TryGetNpc(target.Identity.Instance, out npc))");
             StringAssert.Contains(
                 playfield,
-                "MissionAcgBindingRuntime.IsBoundLivePlayfield(");
+                "MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(");
         }
 
         [TestMethod]

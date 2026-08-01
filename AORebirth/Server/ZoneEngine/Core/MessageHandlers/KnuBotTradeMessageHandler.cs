@@ -88,6 +88,12 @@ namespace ZoneEngine.Core.MessageHandlers
                 return;
             }
 
+            if (LeonoraMartyQuestRuntime.TryStageLeonoraTradeItem(client.Controller.Character, message)
+                || ShinySwordQuestRuntime.TryStageSwordTradeItem(client.Controller.Character, message))
+            {
+                return;
+            }
+
             if (ShippingManifestTerminalQuestRuntime.TryStageTerminalTradeItem(
                     client.Controller.Character,
                     message))
@@ -138,6 +144,16 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             if (VaughnHammondQuestRuntime.ShouldSuppressGenericVaughnTradeRemove(
+                    client.Controller.Character,
+                    message))
+            {
+                return;
+            }
+
+            if (LeonoraMartyQuestRuntime.ShouldSuppressGenericLeonoraTradeRemove(
+                    client.Controller.Character,
+                    message)
+                || ShinySwordQuestRuntime.ShouldSuppressGenericSwordTradeRemove(
                     client.Controller.Character,
                     message))
             {

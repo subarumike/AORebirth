@@ -4,6 +4,8 @@ Generated: 2026-06-15
 
 Scope: architecture plan only. This document does not implement quests, generate SQL, change schema, generate game data, or alter runtime behavior.
 
+> Historical planning document. Superseded by commit `a83d689a` and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; consult the current production owners and acceptance matrix rather than treating proposed work below as outstanding.
+
 ## Design Goal
 
 Represent Arete missions as data-driven state machines loaded from captured evidence. The system should support mission offer, active state, progress, completion, removal, and chaining without hardcoding individual missions or guessing missing quest text.

@@ -2,6 +2,7 @@ namespace ZoneEngine.Core.Missions
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -123,6 +124,49 @@ namespace ZoneEngine.Core.Missions
             return TryTakeLatest(characterInstance, out keyInstance);
         }
 
+        public static bool TryTakeExactNonGenerated(
+            int characterInstance,
+            Identity mission,
+            Predicate<int> isGeneratedKey,
+            out int keyInstance)
+        {
+            keyInstance = 0;
+            if (mission == null || (int)mission.Type == 0 || mission.Instance == 0)
+            {
+                return false;
+            }
+
+            int mapped;
+            lock (Sync)
+            {
+                long mk = MissionKey(characterInstance, mission);
+                if (!KeyByMission.TryGetValue(mk, out mapped) || mapped == 0)
+                {
+                    return false;
+                }
+            }
+
+            if (isGeneratedKey != null && isGeneratedKey(mapped))
+            {
+                return false;
+            }
+
+            lock (Sync)
+            {
+                long mk = MissionKey(characterInstance, mission);
+                int current;
+                if (!KeyByMission.TryGetValue(mk, out current) || current != mapped)
+                {
+                    return false;
+                }
+
+                KeyByMission.Remove(mk);
+                RemoveFromStack_NoLock(characterInstance, mapped);
+                keyInstance = mapped;
+                return true;
+            }
+        }
+
         /// <summary>
         /// Removes only the key mapped to the exact accepted mission. It never falls back to a
         /// different mission's latest key.
@@ -202,6 +246,58 @@ namespace ZoneEngine.Core.Missions
                 keys.RemoveAt(lastIndex);
                 return true;
             }
+        }
+
+        public static bool TryTakeLatestNonGenerated(
+            int characterInstance,
+            Predicate<int> isGeneratedKey,
+            out int keyInstance)
+        {
+            keyInstance = 0;
+            List<int> candidates;
+
+            lock (Sync)
+            {
+                List<int> keys;
+                if (!KeysByCharacter.TryGetValue(characterInstance, out keys)
+                    || keys == null)
+                {
+                    return false;
+                }
+
+                candidates = new List<int>(keys);
+            }
+
+            for (int i = candidates.Count - 1; i >= 0; i--)
+            {
+                int candidate = candidates[i];
+                if (isGeneratedKey != null && isGeneratedKey(candidate))
+                {
+                    continue;
+                }
+
+                lock (Sync)
+                {
+                    List<int> keys;
+                    if (!KeysByCharacter.TryGetValue(characterInstance, out keys)
+                        || keys == null)
+                    {
+                        return false;
+                    }
+
+                    int liveIndex = keys.LastIndexOf(candidate);
+                    if (liveIndex < 0)
+                    {
+                        continue;
+                    }
+
+                    keys.RemoveAt(liveIndex);
+                    keyInstance = candidate;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void RemoveFromStack_NoLock(int characterInstance, int keyInstance)

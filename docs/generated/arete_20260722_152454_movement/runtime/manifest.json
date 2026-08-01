@@ -1,27 +1,27 @@
 {
   "behaviors": {
     "chase": {
-      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/chase.csv",
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/chase.csv",
       "runtimeRows": 98,
       "sourceObservations": 98
     },
     "flee": {
-      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/flee.csv",
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/flee.csv",
       "runtimeRows": 22,
       "sourceObservations": 22
     },
     "leash": {
-      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/leash.csv",
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/leash.csv",
       "runtimeRows": 196,
       "sourceObservations": 196
     },
     "patrol": {
-      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/patrol.csv",
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/patrol.csv",
       "runtimeRows": 7208,
       "sourceObservations": 7305
     },
     "spawn": {
-      "path": "AORebirth/Server/ZoneEngine/Content/Captured/Arete/movement/spawn.csv",
+      "path": "docs/generated/arete_20260722_152454_movement/runtime/spawn.csv",
       "runtimeRows": 597,
       "sourceObservations": 608
     }

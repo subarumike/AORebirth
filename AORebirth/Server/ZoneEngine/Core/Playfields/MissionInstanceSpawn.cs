@@ -55,6 +55,16 @@ namespace AORebirth.Core.Playfields
                 return;
             }
 
+            if (MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                playfieldIdentity.Instance))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Error,
+                    "Legacy MissionInstanceSpawn rejected generated mission pf="
+                    + playfieldIdentity.Instance);
+                return;
+            }
+
             MissionShape shape = MissionInstanceShapeCatalog.PickShape(
                 playfieldIdentity.Instance,
                 null);

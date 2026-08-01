@@ -1,0 +1,24 @@
+{
+  "capturedPlayfieldId": 1044525,
+  "collapsedExactDuplicates": 0,
+  "eligibilityOnlyConstraints": 5,
+  "exactMetadataConstraints": 19,
+  "measuredLowerBoundConstraints": 14,
+  "npcFirstAttackStarts": 50,
+  "projectedAttackStarts": 69,
+  "runtimePlayfieldId": 6553,
+  "schemaVersion": 1,
+  "sourceCaptures": [
+    {
+      "captureId": "20260722-104809",
+      "projectedAttackStarts": 18,
+      "uniqueAttackStarts": 18
+    },
+    {
+      "captureId": "20260722-152454",
+      "projectedAttackStarts": 51,
+      "uniqueAttackStarts": 51
+    }
+  ],
+  "uniqueAttackStarts": 69
+}

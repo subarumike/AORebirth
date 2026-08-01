@@ -130,12 +130,22 @@ namespace ZoneEngine.Core.Arete.Quests
 
         public static void PausePatrolForDialogue(ICharacter npc)
         {
-            AreteLeonoraMartyPatrolRuntime.PauseForDialogue(npc);
+            AORebirth.Core.Playfields.Playfield playfield =
+                npc == null ? null : npc.Playfield as AORebirth.Core.Playfields.Playfield;
+            if (playfield != null)
+            {
+                playfield.SuspendCapturedAretePatrol(npc);
+            }
         }
 
         public static void ResumePatrolAfterDialogue(ICharacter npc)
         {
-            AreteLeonoraMartyPatrolRuntime.ResumeAfterDialogue(npc);
+            AORebirth.Core.Playfields.Playfield playfield =
+                npc == null ? null : npc.Playfield as AORebirth.Core.Playfields.Playfield;
+            if (playfield != null)
+            {
+                playfield.ResumeCapturedAretePatrol(npc);
+            }
         }
 
         public static bool TryHandleCreditCardPickup(
@@ -839,17 +849,10 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static bool IsLeonoraNpc(ICharacter source, Identity target)
         {
-            if (target.Type != IdentityType.CanbeAffected || target.Instance == 0)
-            {
-                return false;
-            }
-
-            if (target.Instance == unchecked((int)0x78E0FC74))
-            {
-                return true;
-            }
-
-            if (source?.Playfield == null)
+            if (source?.Playfield == null
+                || source.Playfield.Identity.Instance != AreteLandingPlayfieldId
+                || target.Type != IdentityType.CanbeAffected
+                || target.Instance == 0)
             {
                 return false;
             }

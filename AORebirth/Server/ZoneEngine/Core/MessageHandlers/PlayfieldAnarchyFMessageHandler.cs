@@ -117,6 +117,24 @@ namespace ZoneEngine.Core.MessageHandlers
                 x.PlayfieldX = Playfields.GetPlayfieldX(character.Playfield.Identity.Instance);
                 x.PlayfieldZ = Playfields.GetPlayfieldZ(character.Playfield.Identity.Instance);
 
+                if (TempleWorldInteractionRules.IsTempleProxyArrival(character))
+                {
+                    // Keep the categorical dungeon resource separate from this server's
+                    // mutable playfield owner and retain the official source portal.
+                    x.PlayfieldId1 = new Identity
+                                     {
+                                         Type = (IdentityType)51102,
+                                         Instance = TempleWorldInteractionRules.TemplePlayfieldId
+                                     };
+                    x.Unknown3 = 1;
+                    x.Unknown4 = TempleWorldInteractionRules.TempleGatewayDoorInstance;
+                    x.PlayfieldId2 = new Identity
+                                     {
+                                         Type = IdentityType.Playfield2,
+                                         Instance = character.Playfield.Identity.Instance
+                                     };
+                }
+
                 if (MissionInstanceService.IsMissionInstancePlayfield(character.Playfield.Identity.Instance))
                 {
                     // Remapped live PFs are not in Playfields.xml → GetPlayfieldX/Z returns 100000
@@ -128,19 +146,22 @@ namespace ZoneEngine.Core.MessageHandlers
                     // Live zone-in: PlayfieldId1 = ACGBuildingGeneratorData + stamped shape payload.
                     // Payload MUST match ShapeSourceByPlayfield (doors + NPC XYZ). Foreign ACG piles mobs.
                     int pf = character.Playfield.Identity.Instance;
-                    bool boundMission =
-                        MissionAcgBindingRuntime.IsBoundLivePlayfield(pf);
+                    bool generatedMission =
+                        MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(pf);
                     byte[] payload = MissionInstanceService.GetLiveGeneratorPayload(pf);
                     int buildingInstance =
                         MissionInstanceService.GetLiveBuildingInstance(pf);
+                    if (generatedMission
+                        && (payload == null
+                            || payload.Length == 0
+                            || buildingInstance == 0))
+                    {
+                        throw new InvalidOperationException(
+                            "Generated ACG mission has no exact generator payload or building identity.");
+                    }
+
                     if (payload == null || payload.Length == 0)
                     {
-                        if (boundMission)
-                        {
-                            throw new InvalidOperationException(
-                                "Bound ACG mission has no exact generator payload.");
-                        }
-
                         payload = CreateCapturedMissionGeneratorPayload();
                         buildingInstance = CapturedMissionBuildingInstance;
                     }

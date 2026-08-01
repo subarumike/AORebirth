@@ -6,13 +6,15 @@ Scope: documentation-only inventory of Arete-specific content still owned by `Pl
 
 No production behavior changes were made for this report.
 
+> Historical extraction inventory. Superseded by commit `a83d689a`, the schema-4 full-corpus movement runtime, and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`. Replay-path ownership described below is no longer current.
+
 ## Summary
 
 Most captured Arete robot content has already been moved behind the Playfield content-module boundary:
 
 - `AreteContentModule` supports private Arete PF `6553`.
 - `AreteContentModule` registers captured robot spawns through `PlayfieldContentRegistration.RegisterCapturedNpcSpawns`.
-- `CapturedAreteRobotContentProvider` owns the captured robot spawn rows and patrol replay file references.
+- `CapturedAreteRobotContentProvider` owned captured spawn rows and legacy patrol replay references at the time; current movement ownership is schema 4.
 - `CapturedAreteRobotSpawnOrchestrator` owns the captured robot spawn orchestration.
 
 The main Arete-specific behavior still directly owned by `Playfield` is the legacy DB-spawn suppression for captured cleaning robot test rows in PF `6553`.
@@ -22,7 +24,7 @@ The main Arete-specific behavior still directly owned by `Playfield` is the lega
 | Area | Current owner | Evidence | Classification | Notes |
 | --- | --- | --- | --- | --- |
 | Captured cleaning robot spawn definitions | `CapturedAreteRobotContentProvider` | `SpawnDefinitions`, `RobotName`, `MonsterData`, source identities, HP, level, run speed, spawn/patrol coordinates | Safe content-module candidate | Already outside `Playfield` and registered through `AreteContentModule`. Keep data/provider content-only; do not move combat behavior into the module. |
-| Captured cleaning robot patrol replay references | `CapturedAreteRobotContentProvider` and `NpcPatrolReplayCoordinator` | `PatrolReplayRelativePath`, committed `Content\Captured\Arete\cleaning_robot_patrol_replay.csv`, evidence capture path | Uncertain, needs guardrail first | Replay file reference is content-like, but runtime replay assignment is movement-system-adjacent. Keep coordinator/runtime ownership separate from content data. |
+| Captured cleaning robot patrol replay references | Historical `CapturedAreteRobotContentProvider` and `NpcPatrolReplayCoordinator` path | Superseded `PatrolReplayRelativePath` and runtime CSV | Resolved by schema-4 consolidation | Source evidence is preserved under `docs/generated/arete_20260721_rox_robots_movement/source`; production movement uses only `movement-full`. |
 | Captured cleaning robot spawn orchestration | `CapturedAreteRobotSpawnOrchestrator` via `AreteContentModule` | `SpawnForPlayfield`, `SpawnCapturedAreteCleaningRobot`, `AssignCapturedAreteRobotReplay` | Runtime-system-owned, do not move into content data | The content module can register the orchestration hook, but spawning NPCs, assigning controllers, and broadcasting SCFU are runtime behavior. |
 | Legacy Arete cleaning robot DB-spawn suppression | `Playfield.LoadMobSpawns` / `IsAreteCleaningRobotTestSpawn` | PF `6553`, skipped DB mob IDs `2027138231`, `2027138245`, `2027138246`, `2027138249`, `2027138259` | Safe content-module candidate | Best first extraction candidate. It is Arete-specific content-selection policy currently embedded in generic mob loading. Add a guardrail first so the captured robot spawn count/order stays unchanged. |
 | Generic mob DB loading | `Playfield.LoadMobSpawns` | `MobSpawnDao`, `MobSpawnStatDao`, `NonPlayerCharacterHandler.InstantiateMobSpawn` | Runtime-system-owned, do not move | Generic mob loading is a runtime loader path, not Arete content. Only the Arete-specific exclusion predicate should be considered for extraction. |

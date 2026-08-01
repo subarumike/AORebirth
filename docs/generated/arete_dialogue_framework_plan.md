@@ -4,6 +4,8 @@ Generated: 2026-06-15
 
 Scope: architecture plan only. This document does not implement dialogue, generate NPC content, create SQL, or change runtime behavior.
 
+> Historical planning document. Superseded by commit `a83d689a` and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; consult the current production owners and acceptance matrix rather than treating proposed work below as outstanding.
+
 ## Design Goal
 
 Represent captured Arete NPC dialogue as data that can be loaded, validated, and executed without hardcoding individual NPC scripts. The first target is Rex Larsson, but the framework must be generic enough for the rest of Arete.

@@ -11,7 +11,14 @@
     "dialogue/lolly-the-reet.dialogue.json",
     "dialogue/shipping-manifest-terminal.dialogue.json",
     "dialogue/marco-spida.dialogue.json",
-    "dialogue/vaughn-hammond.dialogue.json"
+    "dialogue/vaughn-hammond.dialogue.json",
+    "dialogue/antonio-stacklund.dialogue.json",
+    "dialogue/karli-cappelleri.dialogue.json",
+    "dialogue/leonora-marty.dialogue.json",
+    "dialogue/patrick-sun.dialogue.json",
+    "dialogue/remi-gallois.dialogue.json",
+    "dialogue/greedy-desert-reet.dialogue.json",
+    "dialogue/captured-june-interactions.dialogue.json"
   ],
   "QuestPacks": [
     "quests/flint-novak.quests.json"

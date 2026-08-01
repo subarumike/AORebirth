@@ -129,6 +129,8 @@
     <Compile Include="Core\Arete\Dialogue\DialogueContentPackValidator.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueContentRegistry.cs" />
     <Compile Include="Core\Arete\Dialogue\ContentDrivenNpcDialogueRouter.cs" />
+    <Compile Include="Core\Arete\Dialogue\CapturedAreteExactInteractionCatalog.cs" />
+    <Compile Include="Core\Arete\Dialogue\CapturedAreteExactInteractionRuntime.cs" />
     <Compile Include="Core\Arete\Dialogue\AreteRexDialogueRouter.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueActionReferenceValidator.cs" />
     <Compile Include="Core\Arete\Dialogue\DialogueMissionActionAdapter.cs" />
@@ -161,6 +163,19 @@
     <Compile Include="Core\Arete\Quests\LoreleiTipSender.cs" />
     <Compile Include="Core\Arete\Quests\LoreleiCombineRules.cs" />
     <Compile Include="Core\Arete\Quests\VaughnHammondQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\AntonioStacklundQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\AntonioStacklundTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\AntonioStacklundCombineRules.cs" />
+    <Compile Include="Core\Arete\Quests\KarliCappelleriQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\KarliCappelleriTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\LeonoraMartyQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\LeonoraMartyTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\PatrickSunQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\PatrickSunTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\RemiGalloisQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\RemiGalloisTipSender.cs" />
+    <Compile Include="Core\Arete\Quests\ShinySwordQuestRuntime.cs" />
+    <Compile Include="Core\Arete\Quests\ShinySwordTipSender.cs" />
     <Compile Include="Core\Arete\Quests\ShippingManifestTerminalQuestRuntime.cs" />
     <Compile Include="Core\Arete\Quests\VernonGodfrayCombineRules.cs" />
     <Compile Include="Core\Arete\Quests\PersonalizedRobotBrainCombineRules.cs" />
@@ -330,6 +345,9 @@
     <Compile Include="Core\Missions\MissionRollFeeRules.cs" />
     <Compile Include="Core\Missions\MissionRollFeeService.cs" />
     <Compile Include="Core\Missions\MissionOfferStore.cs" />
+    <Compile Include="Core\Missions\MissionOfferIdentityStore.cs" />
+    <Compile Include="Core\Missions\MissionLevelGraph.cs" />
+    <Compile Include="Core\Missions\MissionLevelGraphData.g.cs" />
     <Compile Include="Core\Missions\MissionLevelTable.cs" />
     <Compile Include="Core\Missions\MissionKeyStore.cs" />
     <Compile Include="Core\Missions\MissionDiagnostics.cs" />
@@ -362,6 +380,9 @@
     <Compile Include="Core\Missions\MissionAcgLifecyclePolicy.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingRecord.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgAcceptedProjection.cs" />
+    <Compile Include="Core\Missions\MissionAcgAcceptedProjectionStore.cs" />
+    <Compile Include="Core\Missions\MissionAcgAcceptedProjectionRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgAllocationService.cs" />
     <Compile Include="Core\Missions\MissionAcgBindingRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgExpiryState.cs" />
@@ -432,6 +453,7 @@
     <Compile Include="Core\MessageHandlers\CorpseInteractionHandler.cs" />
     <Compile Include="Core\MessageHandlers\CorpseInteractionRules.cs" />
     <Compile Include="Core\MessageHandlers\DespawnMessageHandler.cs" />
+    <Compile Include="Core\MessageHandlers\DoorStatusUpdateMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\DropDynelMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FeedbackMessageHandler.cs" />
     <Compile Include="Core\MessageHandlers\FollowTargetMessageHandler.cs" />
@@ -499,6 +521,8 @@
     <Compile Include="Core\Navigation\NpcChaseNavigationRuntimeService.cs" />
     <Compile Include="Core\Navigation\NpcChaseRouteFollower.cs" />
     <Compile Include="Core\Navigation\NpcChaseRouteState.cs" />
+    <Compile Include="Core\Navigation\OfficialDungeonChaseNavigationProvider.cs" />
+    <Compile Include="Core\Navigation\OfficialDungeonGeometry.cs" />
     <Compile Include="Core\Navigation\Pf127ChaseNavigationProvider.cs" />
     <Compile Include="Core\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Core\PacketHandlers\OrgClient.cs" />
@@ -531,6 +555,10 @@
     <Compile Include="Core\Playfields\CapturedAreteMovementCatalog.cs" />
     <Compile Include="Core\Playfields\CapturedAreteMovementRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs" />
+    <Compile Include="Core\Playfields\AreteAlienAreaMobRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteSandstormMarauderRuntime.cs" />
+    <Compile Include="Core\Playfields\AreteKarliCappelleriPatrolRuntime.cs" />
+    <Compile Include="Core\Playfields\Content\CrashedAlienShipContentModule.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerContentProvider.cs" />
     <Compile Include="Core\Playfields\NascenceCoreHecklerSpawnOrchestrator.cs" />
     <Compile Include="Core\Playfields\NascenceLifeSpawn.cs" />
@@ -560,6 +588,8 @@
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs" />
+    <Compile Include="Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs" />
+    <Compile Include="Core\Playfields\TempleDoorProximityRuntime.cs" />
     <Compile Include="Core\Playfields\DungeonNamedLifecycle.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs" />
@@ -646,6 +676,19 @@
     <Compile Include="Core\Playfields\CapturedAreteLoreleiVendorRuntimeRegistry.cs" />
     <Compile Include="Core\Playfields\CapturedAreteLoreleiVendorRuntimeService.cs" />
     <Compile Include="Core\MessageHandlers\CapturedAreteLoreleiVendorInteractionHandler.cs" />
+    <Compile Include="Core\MessageHandlers\CrashedAlienShipDoorInteractionHandler.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAntonioStacklundVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAntonioStacklundVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteAntonioStacklundVendorRuntimeService.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteAntonioStacklundVendorInteractionHandler.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteRemiGalloisVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteRemiGalloisVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteRemiGalloisVendorRuntimeService.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteRemiGalloisVendorInteractionHandler.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteSarahGreeneVendorContentProvider.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteSarahGreeneVendorRuntimeRegistry.cs" />
+    <Compile Include="Core\Playfields\CapturedAreteSarahGreeneVendorRuntimeService.cs" />
+    <Compile Include="Core\MessageHandlers\CapturedAreteSarahGreeneVendorInteractionHandler.cs" />
     <Compile Include="Core\Playfields\PlayfieldVendorRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs" />
     <Compile Include="Core\Playfields\PlayfieldVisibilityInterestPolicy.cs" />
@@ -752,16 +795,19 @@
       <Link>Config.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
+    <Content Include="Content\Captured\Arete\aggro.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Captured\Arete\movement\*.csv">
+    <Content Include="Content\Captured\Arete\movement-full\*.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\Captured\Arete\movement\manifest.json">
+    <Content Include="Content\Captured\Arete\movement-full\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Captured\Subway\pf127-geometry.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Arete\rex-larsson\manifest.json">
@@ -816,6 +862,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Arete\flint-novak\dialogue\vaughn-hammond.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\antonio-stacklund.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\karli-cappelleri.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\leonora-marty.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\patrick-sun.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\remi-gallois.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\greedy-desert-reet.dialogue.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Arete\flint-novak\dialogue\captured-june-interactions.dialogue.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Arete\flint-novak\quests\flint-novak.quests.json">
@@ -924,9 +991,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\PerkActions.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XML Data\MissionLevels.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML Data\MissionRewards\ItemDb_Clusters.json">

@@ -1,0 +1,1 @@
+ObservationId,CapturedUtc,Sequence,Behavior,Disposition,Confidence,DecisionReasons,Influences,MetadataResolution,NpcFamily,MonsterData,Level,PlayfieldId,Name,RuntimeIdentity,RuntimeGeneration,RouteSignature,CurrentX,CurrentY,CurrentZ,DestinationX,DestinationY,DestinationZ,HorizontalDistance,PathCount

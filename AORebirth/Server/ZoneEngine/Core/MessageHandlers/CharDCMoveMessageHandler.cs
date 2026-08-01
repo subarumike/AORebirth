@@ -152,7 +152,7 @@ namespace ZoneEngine.Core.MessageHandlers
             AreteRoboticGuardDogRuntime.NoteMoveType(client.Controller.Character, rawMoveType);
 
             if (client.Controller.Character.Playfield == null
-                || !ZoneEngine.Core.Missions.MissionAcgBindingRuntime.IsBoundLivePlayfield(
+                || !ZoneEngine.Core.Missions.MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
                     client.Controller.Character.Playfield.Identity.Instance))
             {
                 ZoneEngine.Core.Missions.MissionInstanceDoorReplay.TrySendNearbyOnMove(

@@ -56,6 +56,21 @@ namespace ZoneEngine.Core.Navigation
             get { return this.provider.GeometryVersion; }
         }
 
+        internal bool TryProjectToSurface(
+            ChaseNavigationPoint reference,
+            out ChaseNavigationPoint projected)
+        {
+            projected = default(ChaseNavigationPoint);
+            return !this.disposed
+                   && this.provider.Capability == ChaseNavigationCapability.Supported
+                   && reference.IsFinite
+                   && this.provider.TryProjectToSurface(
+                       reference,
+                       reference.X,
+                       reference.Z,
+                       out projected);
+        }
+
         internal int TotalRouteRequests { get; private set; }
 
         internal int ActiveStateCount

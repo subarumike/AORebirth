@@ -72,7 +72,14 @@ namespace ZoneEngine.Core.Playfields
         // Capture 20260722-233205: first Rollerrat AOS FollowTarget path ~12–18m to player.
         private const float RollerratAutomaticAggroRadiusMeters = 15f;
 
-        private const double RespawnSeconds = 30.0;
+        private const double DefaultRespawnSeconds = 30.0;
+
+        // Captures 20260722-104809/152454: ordinary Desert Reets and
+        // Rollerrats respawn at approximately 40 seconds. Named variants did
+        // not produce equivalent timing evidence and retain the prior default.
+        private const double CapturedDesertReetRespawnSeconds = 40.0;
+
+        private const double CapturedRollerratRespawnSeconds = 40.0;
 
         private const float LollySpawnX = 3360.186f;
 
@@ -288,6 +295,25 @@ namespace ZoneEngine.Core.Playfields
             return allies.ToArray();
         }
 
+        internal static bool IsRegisteredGreedyDesertReet(ICharacter npc)
+        {
+            if (npc == null
+                || npc.Playfield == null
+                || npc.Playfield.Identity.Instance != AreteLandingPlayfieldId
+                || !string.Equals(npc.Name, "Greedy Desert Reet", StringComparison.OrdinalIgnoreCase)
+                || npc.Stats[StatIds.level].Value != 7
+                || npc.Stats[StatIds.monsterdata].Value != CombatTestMobArchetype.IslandReet.MonsterData
+                || npc.Stats[StatIds.npcfamily].Value != CombatTestMobArchetype.IslandReet.NpcFamily)
+            {
+                return false;
+            }
+
+            lock (OasisGate)
+            {
+                return OasisReetInstances.Contains(npc.Identity.Instance);
+            }
+        }
+
         internal static bool TryGetExtendedTextureOverride(string name, out byte[] data)
         {
             if (string.Equals(name, "Lolly the Reet", StringComparison.OrdinalIgnoreCase)
@@ -467,7 +493,8 @@ namespace ZoneEngine.Core.Playfields
                 }
                 else if (reetTimers[i] == DateTime.MaxValue)
                 {
-                    reetTimers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(RespawnSeconds);
+                    reetTimers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(
+                        ResolveRespawnSeconds(DesertReetSlots[i]));
                 }
                 else if (!(reetTimers[i] > DateTime.UtcNow)
                          && SpawnDesertReetSlot(playfield, playfieldIdentity, activateNpc, i) != null)
@@ -493,7 +520,8 @@ namespace ZoneEngine.Core.Playfields
                 }
                 else if (rollerTimers[i] == DateTime.MaxValue)
                 {
-                    rollerTimers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(RespawnSeconds);
+                    rollerTimers[i] = DateTime.UtcNow + TimeSpan.FromSeconds(
+                        ResolveRespawnSeconds(RollerratSlots[i]));
                 }
                 else if (!(rollerTimers[i] > DateTime.UtcNow)
                          && SpawnRollerratSlot(playfield, playfieldIdentity, activateNpc, i) != null)
@@ -510,6 +538,23 @@ namespace ZoneEngine.Core.Playfields
                     DebugInfoDetail.Engine,
                     "LoreleiOasisMobRuntime respawned Lolly pf=" + playfieldIdentity.Instance);
             }
+        }
+
+        private static double ResolveRespawnSeconds(MobSlot slot)
+        {
+            if (slot != null
+                && string.Equals(slot.Name, "Desert Reet", StringComparison.Ordinal))
+            {
+                return CapturedDesertReetRespawnSeconds;
+            }
+
+            if (slot != null
+                && string.Equals(slot.Name, "Rollerrat", StringComparison.Ordinal))
+            {
+                return CapturedRollerratRespawnSeconds;
+            }
+
+            return DefaultRespawnSeconds;
         }
 
         public static void DespawnLolly(ICharacter source)
@@ -685,38 +730,6 @@ namespace ZoneEngine.Core.Playfields
                 isLolly: true);
             controller.AiProfile = NpcAiProfile.Passive;
 
-            controller.SetCapturedPatrolReplaySegments(
-                new[]
-                {
-                    new NpcPatrolReplaySegment(
-                        0.0,
-                        LollySpawnX,
-                        LollySpawnY,
-                        LollySpawnZ,
-                        3359.94f,
-                        3.57f,
-                        620.67f),
-                    new NpcPatrolReplaySegment(
-                        2.0,
-                        3359.94f,
-                        3.57f,
-                        620.67f,
-                        3358.18f,
-                        3.61f,
-                        640.52f),
-                    new NpcPatrolReplaySegment(
-                        0.0,
-                        3358.18f,
-                        3.61f,
-                        640.52f,
-                        LollySpawnX,
-                        LollySpawnY,
-                        LollySpawnZ),
-                },
-                false,
-                true,
-                true);
-            controller.State = CharacterState.Patrolling;
             mob.Coordinates(new Coordinate { x = LollySpawnX, y = LollySpawnY, z = LollySpawnZ });
             mob.DoNotDoTimers = false;
             activateNpc(mob);

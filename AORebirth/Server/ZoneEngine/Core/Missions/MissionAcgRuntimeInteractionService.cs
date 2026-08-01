@@ -25,33 +25,45 @@ namespace ZoneEngine.Core.Missions
             Identity target)
         {
             if (client == null
-                || client.Controller == null
-                || target == null)
+                || client.Controller == null)
             {
                 return false;
             }
 
             ICharacter character = client.Controller.Character;
             if (character == null
-                || character.Playfield == null
-                || !MissionAcgBindingRuntime.IsBoundLivePlayfield(
-                    character.Playfield.Identity.Instance))
+                || character.Playfield == null)
             {
                 return false;
             }
 
-            if (!MissionAcgRuntimeManager.IsRuntimeIdentityCandidate(
-                character.Playfield.Identity.Instance,
-                target))
+            int livePlayfield2 = character.Playfield.Identity.Instance;
+            bool currentPlayfieldClaimed =
+                MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    livePlayfield2);
+            if (!currentPlayfieldClaimed
+                && !ClaimsGeneratedRuntimeIdentity(target))
             {
                 return false;
+            }
+
+            if (!currentPlayfieldClaimed
+                || target == null
+                || !MissionAcgRuntimeManager.IsRuntimeIdentityCandidate(
+                    livePlayfield2,
+                    target))
+            {
+                GenericCmdMessageHandler.Default.AcknowledgeDenied(
+                    character,
+                    message);
+                return true;
             }
 
             MissionAcgMaterializedInstance instance;
             MissionAcgRuntimeObject runtimeObject;
             if (!MissionAcgRuntimeManager.TryResolveObject(
                 character.Identity.Instance,
-                character.Playfield.Identity.Instance,
+                livePlayfield2,
                 target,
                 out instance,
                 out runtimeObject))
@@ -171,6 +183,117 @@ namespace ZoneEngine.Core.Missions
                     GenericCmdMessageHandler.Default.AcknowledgeDenied(character, message);
                     return true;
             }
+        }
+
+        internal static bool TryHandleGet(
+            IZoneClient client,
+            GenericCmdMessage message,
+            Identity target)
+        {
+            if (client == null || client.Controller == null)
+            {
+                return false;
+            }
+
+            ICharacter character = client.Controller.Character;
+            if (character == null || character.Playfield == null)
+            {
+                return false;
+            }
+
+            int livePlayfield2 = character.Playfield.Identity.Instance;
+            bool currentPlayfieldClaimed =
+                MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    livePlayfield2);
+            if (!currentPlayfieldClaimed
+                && !ClaimsGeneratedRuntimeIdentity(target))
+            {
+                return false;
+            }
+
+            MissionAcgMaterializedInstance instance;
+            MissionAcgRuntimeObject runtimeObject;
+            if (!currentPlayfieldClaimed
+                || target == null
+                || !MissionAcgRuntimeManager.IsRuntimeIdentityCandidate(
+                    livePlayfield2,
+                    target)
+                || !MissionAcgRuntimeManager.TryResolveObject(
+                    character.Identity.Instance,
+                    livePlayfield2,
+                    target,
+                    out instance,
+                    out runtimeObject)
+                || runtimeObject.Identity.Kind
+                   != MissionAcgRuntimeObjectKind.StaticObjective)
+            {
+                GenericCmdMessageHandler.Default.AcknowledgeDenied(
+                    character,
+                    message);
+                return true;
+            }
+
+            string spatialFailure;
+            if (!MissionAcgSpatialRuntime.TryValidateInteraction(
+                character,
+                instance,
+                runtimeObject,
+                NpcCombatAttackRules.MaxMeleeCombatDistance,
+                "get-" + runtimeObject.Identity.Kind,
+                out spatialFailure))
+            {
+                GenericCmdMessageHandler.Default.AcknowledgeDenied(
+                    character,
+                    message);
+                return true;
+            }
+
+            bool objectiveAccepted;
+            if (!MissionAcgObjectiveInteractionService.TryHandleRuntimeUse(
+                    client,
+                    instance,
+                    runtimeObject,
+                    out objectiveAccepted)
+                || !objectiveAccepted)
+            {
+                GenericCmdMessageHandler.Default.AcknowledgeDenied(
+                    character,
+                    message);
+            }
+            else
+            {
+                GenericCmdMessageHandler.Default.Acknowledge(
+                    character,
+                    message);
+            }
+
+            return true;
+        }
+
+        internal static bool ClaimsCurrentGeneratedPlayfield(
+            IZoneClient client)
+        {
+            ICharacter character =
+                client != null && client.Controller != null
+                    ? client.Controller.Character
+                    : null;
+            return character != null
+                   && character.Playfield != null
+                   && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                       character.Playfield.Identity.Instance);
+        }
+
+        internal static bool ClaimsGeneratedRuntimeIdentity(Identity target)
+        {
+            int encodedPlayfield;
+            int ordinal;
+            return target != null
+                   && MissionAcgRuntimeMaterializer.TryReverseRuntimeInstance(
+                       target.Instance,
+                       out encodedPlayfield,
+                       out ordinal)
+                   && MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                       encodedPlayfield);
         }
     }
 }

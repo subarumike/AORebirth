@@ -75,6 +75,9 @@ namespace ZoneEngine.Core.MessageHandlers
 
         private const int CapturedPrivateCityTeleportPlayfield2Instance = unchecked((int)0xC000177A);
 
+        // Captures 20260727-055715 / 20260727-Alien- quest-ncu.
+        private const int CapturedCrashedAlienShipSecondaryPlayfieldInstance = 0x00031999;
+
         /// <summary>
         /// </summary>
         /// <param name="character">
@@ -110,6 +113,143 @@ namespace ZoneEngine.Core.MessageHandlers
                     landingDestination,
                     heading,
                     destinationPlayfieldId),
+                false);
+        }
+
+        internal void SendCapturedCrashedAlienShipDoorExit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendCapturedCrashedAlienShipDoorTransfer(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId);
+        }
+
+        internal void SendCapturedCrashedAlienShipDoorEntry(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendCapturedCrashedAlienShipDoorTransfer(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId);
+        }
+
+        private void SendCapturedCrashedAlienShipDoorTransfer(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                (IdentityType)51102,
+                1,
+                0,
+                new Identity
+                {
+                    Type = IdentityType.Playfield3,
+                    Instance = CapturedCrashedAlienShipSecondaryPlayfieldInstance
+                },
+                new byte[0]);
+        }
+
+        internal void SendOfficialDungeonProxyTransfer(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            Identity sourceDoor)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                (IdentityType)51102,
+                1,
+                sourceDoor.Instance,
+                new Identity { Type = (IdentityType)100002, Instance = 1 },
+                new byte[0]);
+        }
+
+        internal void SendOfficialDungeonProxyExit(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            Identity sourceDoor)
+        {
+            this.SendOfficialDungeonProxyTransition(
+                character,
+                envelopeDestination,
+                heading,
+                destinationPlayfieldId,
+                (IdentityType)51100,
+                0,
+                0,
+                new Identity { Type = (IdentityType)100003, Instance = sourceDoor.Instance },
+                new byte[] { 0, 0, 0, 1 });
+        }
+
+        private void SendOfficialDungeonProxyTransition(
+            ICharacter character,
+            Vector3 envelopeDestination,
+            Quaternion heading,
+            int destinationPlayfieldId,
+            IdentityType categoricalPlayfieldType,
+            int gameServerId,
+            int sgId,
+            Identity secondaryPlayfield,
+            byte[] payload)
+        {
+            this.Send(
+                character,
+                x =>
+                {
+                    x.Identity = character.Identity;
+                    x.Unknown = 0;
+                    x.Destination = new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                                    {
+                                        X = (float)envelopeDestination.x,
+                                        Y = (float)envelopeDestination.y,
+                                        Z = (float)envelopeDestination.z
+                                    };
+                    x.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                                {
+                                    X = (float)heading.x,
+                                    Y = (float)heading.y,
+                                    Z = (float)heading.z,
+                                    W = (float)heading.w
+                                };
+                    x.Unknown1 = 0x61;
+                    x.Playfield = new Identity
+                                  {
+                                      Type = categoricalPlayfieldType,
+                                      Instance = destinationPlayfieldId
+                                  };
+                    x.GameServerId = gameServerId;
+                    x.SgId = sgId;
+                    x.ChangePlayfield = new Identity
+                                        {
+                                            Type = IdentityType.Playfield2,
+                                            Instance = destinationPlayfieldId
+                                        };
+                    x.Unknown4 = 0;
+                    x.Unknown5 = 0;
+                    x.Playfield2 = secondaryPlayfield;
+                    x.Payload = payload;
+                },
                 false);
         }
 
@@ -254,10 +394,25 @@ namespace ZoneEngine.Core.MessageHandlers
                 // Match Teleport/PAF: stamped shape building (never a foreign fog-only building).
                 if (IsMissionInstanceDestination(playfield))
                 {
+                    bool generatedMission =
+                        MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                            playfield.Instance);
                     // Match PlayfieldAnarchyF: stamped shape ACG building for this enter.
                     int buildingInstance =
                         ZoneEngine.Core.Missions.MissionInstanceService.GetLiveBuildingInstance(
                             playfield.Instance);
+                    byte[] generatorPayload = generatedMission
+                        ? MissionInstanceService.GetLiveGeneratorPayload(playfield.Instance)
+                        : null;
+                    if (generatedMission
+                        && (buildingInstance == 0
+                            || generatorPayload == null
+                            || generatorPayload.Length == 0))
+                    {
+                        throw new InvalidOperationException(
+                            "Generated ACG mission has no exact building identity or generator payload.");
+                    }
+
                     if (buildingInstance == 0)
                     {
                         buildingInstance = CapturedMissionBuildingInstance;
@@ -291,8 +446,7 @@ namespace ZoneEngine.Core.MessageHandlers
                                    {
                                        Type = (IdentityType)CapturedMissionTeleportPlayfield2Type,
                                        Instance =
-                                           MissionAcgBindingRuntime.IsBoundLivePlayfield(
-                                               playfield.Instance)
+                                           generatedMission
                                                ? playfield.Instance
                                                : CapturedMissionTeleportPlayfield2Instance
                                    };

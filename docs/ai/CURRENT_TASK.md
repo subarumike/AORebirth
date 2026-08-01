@@ -2,6 +2,95 @@
 
 ## Active
 
+TASK ID: GENERATED-MISSION-ACCEPTED-PROJECTION-001
+
+Generated-terminal mission acceptance now freezes one complete accepted
+projection instead of depending on process-local roll data. Version 1 is stored
+under `mission-state/acg-accepted-projections` as 65 deterministic `key=value`
+fields with the complete serialized roll response body encoded as Base64,
+SHA-256 integrity, and atomic replacement. The selected offer is recovered from
+that body and cross-validated against the stored offer index, original offer ID,
+accepted quest ID, owner, binding, rewards, QFU contract, artifacts, expiry,
+and lifecycle fields; malformed, partial, unknown-version, duplicate, or
+conflicting records fail closed.
+
+Acceptance is idempotent by owner plus original offer identity. The offer is
+durably claimed before the binding, objective, key, mission artifact, accepted
+state, or QFU is exposed. Persisted acceptance phases make each later boundary
+recoverable: binding and objective persistence; key and exact Repair/Return
+Item artifact grants; accepted-state commit; and pending/sent QFU delivery.
+Retries and reconnects resume the same accepted quest, bundle, building, PF2,
+key, frozen Repair artifact template/identity, frozen rewards, action fields,
+title/description, and
+type-specific structured QFU rather than allocating or recalculating them.
+
+Offer expiry and accepted-mission expiry are independent: acceptance requires a
+live offer, then starts the existing 48-hour accepted duration. Startup cleans
+expired pre-binding reservations without waiting for owner reconnect, and
+reconnect suppresses the second mission-list QFU when recovery already sent the
+exact pending accepted QFU.
+
+Generated offer IDs use a separate version-1 durable cursor under
+`mission-state/offer-identities`, with collision checks against live offers,
+accepted projections, and bindings. Ambiguous legacy generated accepted-state
+rows cannot reconstruct the complete projection and are rejected rather than
+filled from defaults. Authored quests and true legacy missions keep their
+existing owners. No database schema, reward formula, slider, loot, ACG payload,
+or procedural-generation behavior changes in this stage.
+
+## Previous completed status
+
+TASK ID: GENERATED-MISSION-LEGACY-FALLTHROUGH-001
+
+Generated-terminal mission runtime ownership is being made fail-closed at every
+legacy boundary. An allocated PF2, reversibly encoded runtime identity, exact
+accepted mission artifact, or exact exterior marker that belongs to a generated
+mission may dispatch only through its accepted binding and instance-scoped
+runtime. Missing or invalid generated state is an explicit rejection, never
+permission to continue into replay-era spawn, global/newest mission selection,
+template-only interaction, shared-playfield routing, or legacy completion.
+
+The ownership fence is deliberately exact. The allocator's numeric PF2 range is
+not sufficient because legacy mission instances also allocate within that
+range. True legacy and authored-quest traffic retains its existing handlers.
+This stage does not alter ACG payloads, rewards, sliders, loot, token progress,
+expiry behavior, database schema, or procedural generation.
+
+## Previous completed status
+
+TASK ID: OFFICIAL-MISSION-LEVEL-GRAPH-001
+
+Generated-terminal mission rolling requires one complete validated official
+mission-level graph before it can resolve a mission QL. Runtime data is compiled
+from the canonical checked-in `XML Data/MissionLevels.csv` by
+`tools/generate_mission_level_graph.cmd`; the production ZoneEngine no longer
+searches for or partially reads an external CSV or ODS at runtime.
+
+The generated format contains exactly levels `1..220`, exactly difficulty
+positions `Q0..Q10`, and the unchanged official token column. Its canonical
+LF-normalized source and payload SHA-256 is
+`295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f`.
+The upstream ODS SHA-256 is
+`5efdba9a2e8310253246d82a9e733d90b32bb4b360a035c157f9d81832f4a0e7`;
+its mission cells match the canonical table through level 133, but levels
+134–220 were spreadsheet-coerced into lossy scientific notation, so the ODS is
+provenance rather than an exact full-table regeneration source.
+
+The loader rejects malformed headers or decimal tokens, duplicate rows or
+difficulty cells, missing or extra rows/columns, levels or difficulty indexes
+outside their exact ranges, mission QLs outside `1..250`, token counts outside
+the unchanged `1..9` table range, row/column/token decreases, and any row whose
+neutral `Q5` value does not equal its level. It validates the embedded payload
+hash and full deterministic serialization before atomically publishing one
+immutable snapshot. A failed reload cannot partially replace a valid snapshot;
+without a valid snapshot, mission rolling fails explicitly before any fee is
+charged.
+
+No mission-location selection, sliders, rewards, token progress, expiry, corpse
+state, ACG layout, authored quest, or database behavior changes in that task.
+
+## Earlier completed status
+
 TASK ID: GENERATED-MISSION-TOKEN-PROGRESS-001
 
 Generated-terminal mission token progress is being moved from the process-local
@@ -44,7 +133,7 @@ Durable team token distribution remains deferred because generated mission
 bindings currently have authoritative explicit no-team ownership only. Authored
 quests and unrelated token systems retain their existing paths.
 
-## Previous completed status
+## Earlier completed status
 
 TASK ID: GENERATED-MISSION-LIVE-EXPIRY-001
 

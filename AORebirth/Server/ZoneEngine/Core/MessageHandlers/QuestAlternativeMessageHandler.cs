@@ -85,11 +85,44 @@ namespace ZoneEngine.Core.MessageHandlers
                 int missionQuality;
                 MissionSliderProfile sliderProfile;
                 string sliderError = null;
+                string graphError;
                 if (!MissionLevelTable.TryGetMissionQuality(
                         characterLevel,
                         message.LevelSlider,
-                        out missionQuality)
-                    || !MissionSliderProfile.TryCreate(message, out sliderProfile, out sliderError))
+                        out missionQuality,
+                        out graphError))
+                {
+                    bool graphUnavailable =
+                        !string.IsNullOrEmpty(graphError);
+                    client.Server.Info(
+                        client,
+                        graphUnavailable
+                            ? "QuestAlternative roll blocked — official mission-level graph unavailable lvl={0} slider={1} err={2}"
+                            : "QuestAlternative roll blocked — unsupported difficulty detent lvl={0} slider={1}",
+                        characterLevel,
+                        message.LevelSlider,
+                        graphUnavailable
+                            ? graphError
+                            : string.Empty);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                graphUnavailable
+                                    ? "The mission terminal's official level table is unavailable or invalid. No credits were deducted."
+                                    : "The mission terminal rejected an unsupported difficulty value.")
+                        });
+                    return;
+                }
+
+                if (!MissionSliderProfile.TryCreate(
+                        message,
+                        out sliderProfile,
+                        out sliderError))
                 {
                     client.Server.Info(
                         client,
@@ -151,11 +184,40 @@ namespace ZoneEngine.Core.MessageHandlers
                     return;
                 }
 
+                byte[] serializedRollPayload =
+                    MissionRollService.SerializeBody(response);
+                string offerStoreFailure;
+                if (!MissionOfferStore.TryStoreRoll(
+                    character.Identity.Instance,
+                    response,
+                    message,
+                    DateTime.UtcNow,
+                    serializedRollPayload,
+                    out offerStoreFailure))
+                {
+                    client.Server.Info(
+                        client,
+                        "QuestAlternative roll blocked - accepted projection unavailable: {0}",
+                        offerStoreFailure);
+                    character.Send(
+                        new FormatFeedbackMessage
+                        {
+                            Identity = character.Identity,
+                            Unknown = 1,
+                            Unknown1 = 0,
+                            Unknown2 = 0,
+                            FormattedMessage = TokenBoardRuntime.ToYellowSystemFeedback(
+                                "The mission terminal could not preserve this roll. No credits were deducted.")
+                        });
+                    return;
+                }
+
                 // Capture order: fee deduct feedback, then the 5-offer QuestAlternative.
                 // Never charge unless we have a non-empty roll ready to send.
                 int fee;
                 if (!MissionRollFeeService.TryChargeRollFee(character, out fee))
                 {
+                    MissionOfferStore.DiscardRoll(character.Identity.Instance);
                     client.Server.Info(
                         client,
                         "QuestAlternative roll blocked — need {0} credits",
@@ -164,9 +226,6 @@ namespace ZoneEngine.Core.MessageHandlers
                 }
 
                 client.SendCompressed(response);
-
-                // Remember what we offered so a following accept (CreateQuest) can look the mission up.
-                MissionOfferStore.StoreRoll(character.Identity.Instance, response.QuestInfos);
 
                 client.Server.Info(
                     client,

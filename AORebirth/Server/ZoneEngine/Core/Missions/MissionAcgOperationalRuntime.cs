@@ -278,27 +278,30 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            int targetPlayfield2 = target.Playfield.Identity.Instance;
+            bool generatedPlayfieldClaimed =
+                MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    targetPlayfield2);
             EnsureInitialized();
             MissionAcgOperationalState state;
             lock (Sync)
             {
-                if (!ByPlayfield.TryGetValue(target.Playfield.Identity.Instance, out state))
+                if (!ByPlayfield.TryGetValue(targetPlayfield2, out state))
                 {
+                    if (generatedPlayfieldClaimed)
+                    {
+                        failure = "Generated mission PF2 has no operational combat state.";
+                        return false;
+                    }
+
                     return true;
                 }
 
                 MissionAcgNpcRuntimeState npc;
                 if (!state.TryGetNpc(target.Identity.Instance, out npc))
                 {
-                    if (MissionAcgRuntimeManager.IsRuntimeIdentityCandidate(
-                        target.Playfield.Identity.Instance,
-                        target.Identity))
-                    {
-                        failure = "Runtime identity is not an operational NPC in this instance.";
-                        return false;
-                    }
-
-                    return true;
+                    failure = "Runtime identity is not an operational NPC in this instance.";
+                    return false;
                 }
 
                 if (attacker == null
@@ -731,15 +734,18 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
+            int targetPlayfield2 = target.Playfield.Identity.Instance;
+            bool generatedPlayfieldClaimed =
+                MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(
+                    targetPlayfield2);
             EnsureInitialized();
             lock (Sync)
             {
                 MissionAcgOperationalState state;
                 MissionAcgNpcRuntimeState npc;
-                if (!ByPlayfield.TryGetValue(target.Playfield.Identity.Instance, out state))
+                if (!ByPlayfield.TryGetValue(targetPlayfield2, out state))
                 {
-                    if (MissionAcgAllocationService.IsAllocatableRange(
-                            target.Playfield.Identity.Instance))
+                    if (generatedPlayfieldClaimed)
                     {
                         isOperationalNpc = true;
                         return false;

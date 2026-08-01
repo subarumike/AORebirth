@@ -2,7 +2,6 @@ namespace ZoneEngine.Core.Arete.Quests
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading;
 
     using AORebirth.Core.Entities;
     using AORebirth.Core.Inventory;
@@ -76,8 +75,6 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const string RewardsGrantedFlag = "remi-gallois-rewards-granted";
 
-        private const string KillTargetName = "SANDSTORM Marauder";
-
         private static readonly int[] FinishRewardItemIds =
             {
                 223349,
@@ -122,6 +119,11 @@ namespace ZoneEngine.Core.Arete.Quests
             }
 
             return RootNodeId;
+        }
+
+        public static bool IsCompleted(ICharacter source)
+        {
+            return HasRewardsGranted(source);
         }
 
         public static bool TryHandleDialogueAnswer(ICharacter source, string previousNodeId, int answerIndex)
@@ -217,7 +219,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
         /// <summary>
         /// Capture 20260727-204902: after accept AppendText, emit QuestFullUpdate tip then Hellfyre.
-        /// Tip is also re-sent on accept Goodbye and once more after knubot settles.
+        /// The accept Goodbye may reassert the same tip immediately; no uncaptured timer is used.
         /// </summary>
         public static void EmitAcceptTipAndHellfyre(ICharacter source)
         {
@@ -230,38 +232,6 @@ namespace ZoneEngine.Core.Arete.Quests
             RexQuestPreviewEmissionResult tip = RemiGalloisTipSender.TrySendQuellTipOnly(source);
             Log("quell tip(accept) result=" + tip.Message);
             TryGrantHellfyreLauncher(source);
-            ScheduleQuellTipResend(source);
-        }
-
-        private const int QuellTipResendDelayMilliseconds = 1500;
-
-        private static void ScheduleQuellTipResend(ICharacter source)
-        {
-            if (source == null)
-            {
-                return;
-            }
-
-            ICharacter captured = source;
-            ThreadPool.QueueUserWorkItem(
-                _ =>
-                {
-                    try
-                    {
-                        Thread.Sleep(QuellTipResendDelayMilliseconds);
-                        if (captured.Controller == null || captured.Controller.Client == null)
-                        {
-                            return;
-                        }
-
-                        RexQuestPreviewEmissionResult tip = RemiGalloisTipSender.TrySendQuellTipOnly(captured);
-                        Log("quell tip(delayed) result=" + tip.Message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log("quell tip delayed resend failed err=" + ex.Message);
-                    }
-                });
         }
 
         private static void CompleteQuellAndOfferReturn(ICharacter source)
@@ -279,38 +249,6 @@ namespace ZoneEngine.Core.Arete.Quests
             EnsureQuestActive(source, ReturnQuestId);
             RexQuestPreviewEmissionResult tip = RemiGalloisTipSender.TrySendQuellToReturnHandoff(source);
             Log("quell complete → return tip result=" + tip.Message);
-            ScheduleReturnTipResend(source);
-        }
-
-        private const int ReturnTipResendDelayMilliseconds = 1200;
-
-        private static void ScheduleReturnTipResend(ICharacter source)
-        {
-            if (source == null)
-            {
-                return;
-            }
-
-            ICharacter captured = source;
-            ThreadPool.QueueUserWorkItem(
-                _ =>
-                {
-                    try
-                    {
-                        Thread.Sleep(ReturnTipResendDelayMilliseconds);
-                        if (captured.Controller == null || captured.Controller.Client == null)
-                        {
-                            return;
-                        }
-
-                        RexQuestPreviewEmissionResult tip = RemiGalloisTipSender.TrySendReturnTipOnly(captured);
-                        Log("return tip(delayed) result=" + tip.Message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log("return tip delayed resend failed err=" + ex.Message);
-                    }
-                });
         }
 
         /// <summary>
@@ -800,9 +738,7 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private static bool IsSandstormMarauder(ICharacter target)
         {
-            return target != null
-                   && !string.IsNullOrEmpty(target.Name)
-                   && target.Name.IndexOf(KillTargetName, StringComparison.OrdinalIgnoreCase) >= 0;
+            return AreteSandstormMarauderRuntime.IsRegisteredMarauder(target);
         }
 
         private static int AdvanceLocalKillProgress(int characterId, string observationKey)

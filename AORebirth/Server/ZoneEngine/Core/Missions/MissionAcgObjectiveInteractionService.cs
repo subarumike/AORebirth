@@ -98,6 +98,31 @@ namespace ZoneEngine.Core.Missions
                 return true;
             }
 
+            MissionAcgAcceptedProjection acceptedProjection;
+            if (!MissionAcgAcceptedProjectionRuntime.TryGetByAcceptedQuest(
+                    objective.Binding.AcceptedQuestIdentity.Instance,
+                    out acceptedProjection)
+                || (acceptedProjection.MissionArtifactIdentity != null
+                    && !acceptedProjection.MissionArtifactIdentity.Equals(
+                        withItem.State.MissionItemIdentity)))
+            {
+                return true;
+            }
+
+            if (acceptedProjection.MissionArtifactIdentity == null)
+            {
+                MissionAcgAcceptedProjection updatedProjection;
+                if (!MissionAcgAcceptedProjectionRuntime.TrySetArtifact(
+                    acceptedProjection,
+                    withItem.State.MissionItemIdentity,
+                    System.DateTime.UtcNow,
+                    out updatedProjection,
+                    out failure))
+                {
+                    return true;
+                }
+            }
+
             if (objective.Binding.MissionType == MissionRollType.FindItemReturn)
             {
                 accepted = true;
@@ -412,6 +437,51 @@ namespace ZoneEngine.Core.Missions
             }
 
             return false;
+        }
+
+        internal static bool ClaimsGeneratedUseItemOnItem(
+            IZoneClient client,
+            GenericCmdMessage message)
+        {
+            ICharacter character =
+                client != null && client.Controller != null
+                    ? client.Controller.Character
+                    : null;
+            if (character == null)
+            {
+                return false;
+            }
+
+            if (MissionAcgRuntimeInteractionService.ClaimsCurrentGeneratedPlayfield(
+                client))
+            {
+                return true;
+            }
+
+            if (message == null || message.Target == null)
+            {
+                return false;
+            }
+
+            if (message.Target.Length > 1
+                && MissionAcgRuntimeInteractionService.ClaimsGeneratedRuntimeIdentity(
+                    message.Target[1]))
+            {
+                return true;
+            }
+
+            IItem item;
+            if (message.Target.Length == 0
+                || !TryGetSourceItem(character, message.Target[0], out item)
+                || item == null
+                || item.Identity == null)
+            {
+                return false;
+            }
+
+            MissionAcgIdentityRecord sourceIdentity = ToRecord(item.Identity);
+            return MissionAcgObjectiveRuntime.IsGeneratedMissionItem(sourceIdentity)
+                   || MissionAcgBindingRuntime.IsGeneratedMissionKey(sourceIdentity);
         }
 
         private static bool Complete(

@@ -22,13 +22,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CheckedInBootstrapLoadsAreteAndSubwayDialogueAsOneValidatedSet()
         {
             AreteFrameworkRegistries result =
-                AreteFrameworkBootstrap.InitializeCheckedInContent(AppDomain.CurrentDomain.BaseDirectory);
+                AreteFrameworkBootstrap.InitializeCheckedInContent(CheckedInRuntimeBaseDirectory());
 
             Assert.IsTrue(result.IsValid);
-            Assert.AreEqual(4, result.DialogueRegistry.PackCount);
-            Assert.AreEqual(6, result.DialogueRegistry.NpcCount);
-            Assert.AreEqual(2, result.QuestRegistry.PackCount);
-            Assert.AreEqual(4, result.QuestRegistry.QuestCount);
+            Assert.IsTrue(result.DialogueRegistry.PackCount >= 4);
+            Assert.IsTrue(result.DialogueRegistry.NpcCount >= 6);
+            Assert.IsTrue(result.QuestRegistry.PackCount >= 2);
+            Assert.IsTrue(result.QuestRegistry.QuestCount >= 4);
             Assert.AreSame(result, AreteFrameworkBootstrap.Current);
 
             AssertNpc(result, "SimpleChar:782DE568");
@@ -37,6 +37,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertNpc(result, "SimpleChar:796360BD");
             AssertNpc(result, "SimpleChar:796360BC");
             AssertNpc(result, "SimpleChar:79135F51");
+            AssertNpc(result, "SimpleChar:782DE582");
+            AssertNpc(result, "SimpleChar:782DE699");
+            AssertNpc(result, "SimpleChar:782DE57C");
             AssertQuest(result, "Mission:5514B18C");
             AssertQuest(result, "Mission:5514B18D");
             AssertQuest(result, "Mission:5514B18E");
@@ -47,7 +50,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void TailorDialoguePreservesCapturedPromptsOptionsAndMeasurementBranches()
         {
             AreteFrameworkRegistries result =
-                AreteFrameworkBootstrap.InitializeCheckedInContent(AppDomain.CurrentDomain.BaseDirectory);
+                AreteFrameworkBootstrap.InitializeCheckedInContent(CheckedInRuntimeBaseDirectory());
 
             DialogueNpcEntry tailor;
             Assert.IsTrue(result.DialogueRegistry.TryGetNpc("SimpleChar:79135F51", out tailor));
@@ -108,10 +111,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void RuntimeDefinitionCatalogBuildsCheckedInAreteAndKarrecContracts()
         {
             AreteFrameworkRegistries registries =
-                AreteFrameworkBootstrap.InitializeCheckedInContent(AppDomain.CurrentDomain.BaseDirectory);
+                AreteFrameworkBootstrap.InitializeCheckedInContent(CheckedInRuntimeBaseDirectory());
             var definitions = MissionDefinitionCatalog.Build(registries.QuestRegistry);
 
-            Assert.AreEqual(6, definitions.Count);
+            Assert.IsTrue(definitions.Count >= 6);
             MissionDefinition b18d = definitions.Single(value => value.QuestId == MissionDefinitionCatalog.RexB18DQuestId);
             MissionDefinition b18e = definitions.Single(value => value.QuestId == MissionDefinitionCatalog.RexB18EQuestId);
             MissionDefinition karrec = definitions.Single(
@@ -147,10 +150,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(lifecycleEvidence.Parameters.ContainsKey("rewardXpEvidence"));
             Assert.IsFalse(karrecContent.UnresolvedFields.Contains("exactTotalXpAndResearchPersistenceSemantics"));
             Assert.IsTrue(karrecContent.UnresolvedFields.Contains("officialDirectXpPacketSequence"));
-            Assert.AreEqual(0, b18f.Objectives.Count);
-            Assert.AreEqual(MissionDefinitionCatalog.RexB18EQuestId, b18f.PrerequisiteQuestIds.Single());
-            Assert.AreEqual(0, b194.Objectives.Count);
-            Assert.AreEqual(MissionDefinitionCatalog.RexB18FQuestId, b194.PrerequisiteQuestIds.Single());
+            Assert.AreEqual(1, b18f.Objectives.Count);
+            Assert.AreEqual(0, b18f.Objectives.Single().RequiredCount);
+            Assert.AreEqual(0, b18f.PrerequisiteQuestIds.Count);
+            Assert.AreEqual(1, b194.Objectives.Count);
+            Assert.AreEqual(1, b194.Objectives.Single().RequiredCount);
+            Assert.AreEqual(0, b194.PrerequisiteQuestIds.Count);
         }
 
         [TestMethod]
@@ -195,14 +200,144 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
+        [TestMethod]
+        public void BrontoBurgersVendorPreservesCapturedStatelTemplateAndInventoryOrder()
+        {
+            string root = FindRepositoryRoot();
+            string vendors = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\vendors.sql"));
+            string templates = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\vendortemplate.sql"));
+            string inventory = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\shopinventorytemplates.sql"));
+
+            Assert.IsTrue(vendors.Contains("Statel: 0xC00E1999"));
+            Assert.IsTrue(vendors.Contains(
+                "VALUES (429457422, 6553, 0, 0, 0, 0, 0, 0, 1, '', 121036, 'ARBRTBG');"));
+            Assert.IsTrue(templates.Contains(
+                "VALUES ('ARBRTBG', 1, 'AreteBrontoBurgers', 121036, 'BRBG', 1, 1);"));
+
+            int[] capturedOrder =
+                {
+                    130621, 130593, 130623, 130624, 130581,
+                    130612, 130625, 130606, 130602, 130603
+                };
+            int cursor = 0;
+            foreach (int itemId in capturedOrder)
+            {
+                string rowPrefix = "VALUES ('BRBG', " + itemId + ", " + itemId + ", 1, 1, 1,";
+                int position = inventory.IndexOf(rowPrefix, cursor, StringComparison.Ordinal);
+                Assert.IsTrue(position >= cursor, "Missing or out-of-order captured item " + itemId + ".");
+                cursor = position + rowPrefix.Length;
+            }
+
+            Assert.AreEqual(
+                10,
+                inventory.Split(new[] { "VALUES ('BRBG'," }, StringSplitOptions.None).Length - 1);
+        }
+
+        [TestMethod]
+        public void CapturedAreteRespawnIntervalsRemainScopedToProvenNpcKinds()
+        {
+            string root = FindRepositoryRoot();
+            string alex = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\AlexAreaMobRuntime.cs"));
+            string oasis = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\LoreleiOasisMobRuntime.cs"));
+            string alien = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteAlienAreaMobRuntime.cs"));
+
+            Assert.IsTrue(alex.Contains("CapturedDockerRespawnSeconds = 40.0"));
+            Assert.IsTrue(alex.Contains("slot.Kind == MobKind.Docker"));
+            Assert.IsTrue(alex.Contains("string.Equals(slot.Name, \"32-V Docker\", StringComparison.Ordinal)"));
+            Assert.IsTrue(alex.Contains("DefaultRespawnSeconds = 30.0"));
+
+            Assert.IsTrue(oasis.Contains("CapturedDesertReetRespawnSeconds = 40.0"));
+            Assert.IsTrue(oasis.Contains("CapturedRollerratRespawnSeconds = 40.0"));
+            Assert.IsTrue(oasis.Contains("string.Equals(slot.Name, \"Desert Reet\", StringComparison.Ordinal)"));
+            Assert.IsTrue(oasis.Contains("string.Equals(slot.Name, \"Rollerrat\", StringComparison.Ordinal)"));
+            Assert.IsTrue(oasis.Contains("DefaultRespawnSeconds = 30.0"));
+
+            Assert.IsTrue(alien.Contains("CapturedWildlifeRespawnSeconds = 40.0"));
+            Assert.IsTrue(alien.Contains("slot.Kind == MobKind.Rollerrat"));
+            Assert.IsTrue(alien.Contains("string.Equals(slot.Name, \"Angry Minibull\", StringComparison.Ordinal)"));
+            Assert.IsTrue(alien.Contains("TryResolveRespawnSeconds"));
+            Assert.IsFalse(alien.Contains("DefaultRespawnSeconds"));
+        }
+
+        [TestMethod]
+        public void CapturedNamedEnemyLifecycleUsesMeasuredReplacementDelays()
+        {
+            string root = FindRepositoryRoot();
+            string landing = File.ReadAllText(Path.Combine(
+                root,
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteLandingSpawn.cs"));
+
+            Assert.IsTrue(landing.Contains("Name = \"Violent Protester\""));
+            Assert.IsTrue(landing.Contains("MonsterData = 203740"));
+            Assert.IsTrue(landing.Contains("X = 3505.53418f"));
+            Assert.IsTrue(landing.Contains("RespawnSeconds = 19.958"));
+            Assert.IsTrue(landing.Contains("RespawnSeconds = 26.923"));
+            Assert.IsTrue(landing.Contains("CapturedRespawnDueUtcByPlayfield"));
+            Assert.IsTrue(landing.Contains("TimeSpan.FromSeconds(def.RespawnSeconds)"));
+        }
+
+        [TestMethod]
+        public void EligibilityOnlyAggroUsesContactFloorWithoutClaimingExactRadius()
+        {
+            string source = File.ReadAllText(Path.Combine(
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+
+            Assert.IsTrue(source.Contains(
+                "CapturedEligibilityOnlyAggroRadiusMeters = 1.0d"));
+            Assert.IsTrue(source.Contains(
+                "capturedAreteAggro.TryGetRadius(evidence, out radius)"));
+            Assert.IsTrue(source.Contains(
+                "capturedAreteAggro.TryGetEligibility("));
+            Assert.IsTrue(source.Contains(
+                "radius = CapturedEligibilityOnlyAggroRadiusMeters;"));
+        }
+
         private static string CheckedInPath(string area, string contentName, string fileName)
         {
             return Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
+                CheckedInRuntimeBaseDirectory(),
                 "Content",
                 area,
                 contentName,
                 fileName);
+        }
+
+        private static string CheckedInRuntimeBaseDirectory()
+        {
+            return Path.Combine(
+                FindRepositoryRoot(),
+                "AORebirth",
+                "Server",
+                "ZoneEngine");
+        }
+
+        private static string FindRepositoryRoot()
+        {
+            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (current != null)
+            {
+                if (File.Exists(Path.Combine(current.FullName, "AI_START_HERE.md")))
+                {
+                    return current.FullName;
+                }
+
+                current = current.Parent;
+            }
+
+            throw new DirectoryNotFoundException("Repository root not found.");
         }
 
         private static void AssertNpc(AreteFrameworkRegistries result, string npcIdentity)

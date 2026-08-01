@@ -759,6 +759,15 @@ namespace ZoneEngine.Core.Missions
             high = 0;
             quality = 0;
             count = 0;
+            if (accepted != null && accepted.HasFrozenAcceptedRewards)
+            {
+                low = accepted.FrozenItemRewardLowId;
+                high = accepted.FrozenItemRewardHighId;
+                quality = accepted.FrozenItemRewardQuality;
+                count = accepted.FrozenItemRewardCount;
+                return;
+            }
+
             if (accepted == null
                 || accepted.Offer == null
                 || accepted.Offer.ItemRewards == null

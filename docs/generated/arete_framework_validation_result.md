@@ -4,6 +4,8 @@ Generated: 2026-06-15
 
 Scope: validation harness only. No SQL, schema change, game data change, Arete content pack, Rex Larsson implementation, packet emission, live NPC behavior wiring, external file loading, or KnuBot behavior change was added.
 
+> Historical framework-phase result. Superseded by commit `a83d689a` and `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`; statements about systems not yet implemented describe only this 2026-06-15 validation slice.
+
 ## Inputs Reviewed
 
 - `docs/generated/arete_framework_scaffolding_result.md`
