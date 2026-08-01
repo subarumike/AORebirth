@@ -123,6 +123,8 @@ The authoritative release gate is `tools\run_arete_acceptance_tests.cmd`, follow
 
 Final acceptance result on 2026-07-31: **PASS**. The release gate completed with `56/56` Arete acceptance tests, `57/57` combat-catalog tests, `4/4` active-coverage tests, and `14/14` loot-foundation tests. The approved Debug build completed successfully, and the approved restart restored ChatEngine on ports `6996` and `7012`, LoginEngine on `7500`, and ZoneEngine on `7501`.
 
+Reconciliation result on 2026-08-01: **PASS**. The expanded release gate completed with `60/60` Arete acceptance tests, `57/57` combat-catalog tests, `8/8` active-coverage tests, and `14/14` loot-foundation tests. The active-coverage generator now hashes UTF-8 source text after BOM removal and LF normalization, records that normalization in every content-input manifest row, and resolves PF1931 named encounter constants to their actual runtime profile keys. The regenerated report retains `1,607` fixed actors: `504` certified and `1,103` explicitly unresolved. No supported runtime behavior changed.
+
 ## Evidence-discipline confirmation
 
 No available evidence was ignored because of an invented rule. Cross-capture identity/lifecycle correlation was used where it proved the relationship; independently classified clean observations remained usable even when another observation in the route group was rejected; combat/player influence was retained in chase, flee, and leash rather than discarded; and measured values were preferred over defaults. No new capture, client login, closed-loop requirement, prior-state gate, single-packet-subtype requirement, or repeated observation was required for a behavior already proved by the repository corpus.

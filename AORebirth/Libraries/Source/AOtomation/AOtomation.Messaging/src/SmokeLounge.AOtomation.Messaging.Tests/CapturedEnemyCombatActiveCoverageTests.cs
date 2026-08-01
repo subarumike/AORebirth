@@ -6,6 +6,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Web.Script.Serialization;
 
@@ -360,7 +361,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 StringMember(resolverAudit, "ordinaryProfileSelector"));
             Assert.IsFalse(BoolMember(resolverAudit, "capturedRuntimeIdentityMappingAllowed"));
             Assert.IsFalse(BoolMember(resolverAudit, "crossPlayfieldFallbackAllowed"));
-            Assert.AreEqual(6, ArrayMember(resolverAudit, "owners").Length);
+            Assert.AreEqual(7, ArrayMember(resolverAudit, "owners").Length);
 
             var profiles = ArrayMember(document, "profiles")
                 .Select(value => JsonObject(value, "coverage profile"))
@@ -1081,6 +1082,74 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         runtimeBaselines.Add(runtimeBaseline);
                     }
                 }
+                else if (resolutionMode == Pf1931ProfileResolutionMode)
+                {
+                    if (runtimeProfileSelector
+                        == "totw.647.encounter.re-animator.reanimated-corpse")
+                    {
+                        int[] reanimatedSources =
+                        {
+                            CapturedTempleOfThreeWindsCombatCatalog
+                                .ReanimatedFirstAnchorCaptureSourceIdentity,
+                            CapturedTempleOfThreeWindsCombatCatalog
+                                .ReanimatedSecondAnchorCaptureSourceIdentity
+                        };
+                        foreach (int reanimatedSource in reanimatedSources)
+                        {
+                            CapturedEnemyCombatContract resolvedReanimated;
+                            string reanimatedFailure;
+                            Assert.IsTrue(
+                                CapturedEnemyCombatProfileCatalog.TryResolve(
+                                    resource,
+                                    name,
+                                    monsterData,
+                                    level,
+                                    reanimatedSource,
+                                    CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(
+                                        reanimatedSource),
+                                    out resolvedReanimated,
+                                    out reanimatedFailure),
+                                bindingKey + ": " + reanimatedFailure);
+                            Assert.IsTrue(resolvedReanimated.IsCombatReady, bindingKey);
+                        }
+
+                        continue;
+                    }
+
+                    CapturedEnemyCombatContract ownedTempleContract =
+                        CapturedTempleOfThreeWindsCombatCatalog.For(runtimeProfileSelector);
+                    if (runtimeProfileSelector
+                        == CapturedTempleOfThreeWindsLootDefinitions.UkleshProfileKey)
+                    {
+                        ownedTempleContract = CapturedTempleOfThreeWindsCombatCatalog.UkleshTheFrozen();
+                    }
+                    else if (runtimeProfileSelector
+                             == CapturedTempleOfThreeWindsLootDefinitions.KhalumProfileKey)
+                    {
+                        ownedTempleContract = CapturedTempleOfThreeWindsCombatCatalog.Khalum();
+                    }
+                    else if (runtimeProfileSelector
+                             == CapturedTempleOfThreeWindsLootDefinitions.AzturProfileKey)
+                    {
+                        ownedTempleContract = CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal();
+                    }
+                    if (!ownedTempleContract.Evidence.StartsWith(
+                            "No capture-backed Temple combat contract for ",
+                            StringComparison.Ordinal))
+                    {
+                        Assert.IsTrue(
+                            ownedTempleContract.IsCombatReady
+                            || ownedTempleContract.SpecialAttackSequence != null
+                            || ownedTempleContract.ParallelAttackSequence != null,
+                            bindingKey + " has no executable production-owned Temple combat path.");
+                        continue;
+                    }
+
+                    runtimeBaselines.Add(
+                        CapturedEnemyCombatContract.Unresolved(
+                            "active coverage guard",
+                            true));
+                }
                 else
                 {
                     runtimeBaselines.Add(
@@ -1263,13 +1332,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 serializer.DeserializeObject(File.ReadAllText(path)),
                 "coverage document");
             Dictionary<string, object> combatInventory = ObjectMember(document, "combatInventory");
-            AssertGeneratedInputHash(root, combatInventory, "combat inventory");
+            AssertGeneratedInputHash(root, combatInventory, "combat inventory", false);
             foreach (object inputObject in ArrayMember(document, "contentInputs"))
             {
+                Dictionary<string, object> input = JsonObject(inputObject, "coverage content input");
+                Assert.AreEqual(
+                    "utf8-sig-text-lf",
+                    StringMember(input, "hashNormalization"),
+                    "coverage content input hash normalization changed");
                 AssertGeneratedInputHash(
                     root,
-                    JsonObject(inputObject, "coverage content input"),
-                    "coverage content input");
+                    input,
+                    "coverage content input",
+                    true);
             }
 
             return document;
@@ -1278,7 +1353,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         private static void AssertGeneratedInputHash(
             string root,
             IDictionary<string, object> input,
-            string context)
+            string context,
+            bool normalizeUtf8Text)
         {
             string relativePath = StringMember(input, "path");
             string path = Path.Combine(
@@ -1287,16 +1363,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(File.Exists(path), context + " is missing: " + relativePath);
             Assert.AreEqual(
                 StringMember(input, "sha256"),
-                Sha256File(path),
+                Sha256File(path, normalizeUtf8Text),
                 context + " is stale: " + relativePath);
         }
 
-        private static string Sha256File(string path)
+        private static string Sha256File(string path, bool normalizeUtf8Text)
         {
             using (SHA256 sha256 = SHA256.Create())
-            using (FileStream stream = File.OpenRead(path))
             {
-                return BitConverter.ToString(sha256.ComputeHash(stream))
+                byte[] content = normalizeUtf8Text
+                                     ? Encoding.UTF8.GetBytes(
+                                         File.ReadAllText(path)
+                                             .Replace("\r\n", "\n")
+                                             .Replace("\r", "\n"))
+                                     : File.ReadAllBytes(path);
+                return BitConverter.ToString(sha256.ComputeHash(content))
                     .Replace("-", string.Empty)
                     .ToLowerInvariant();
             }
