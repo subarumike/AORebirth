@@ -5,6 +5,8 @@ namespace ZoneEngine.Core.Missions
     using System.Collections.ObjectModel;
     using System.Globalization;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     internal enum MissionAcgTokenProgressEventPhase
     {
         NotObserved = 0,
@@ -13,6 +15,243 @@ namespace ZoneEngine.Core.Missions
         ClientUpdatePending = 3,
         ClientUpdateSent = 4,
         TerminalFailure = 5
+    }
+
+    internal enum MissionAcgTokenClaimDisposition
+    {
+        UnresolvedBelowFullProgress = 0,
+        ExplicitNone = 1,
+        Eligible = 2
+    }
+
+    /// <summary>
+    /// Frozen evidence-backed token policy output for one exact accepted
+    /// generated mission. It does not grant inventory and is intentionally
+    /// independent of the replay-era process-local tracker.
+    /// </summary>
+    internal sealed class MissionAcgTokenClaimResolution
+    {
+        internal MissionAcgTokenClaimResolution(
+            MissionAcgTokenProgressState progress,
+            MissionAcgTokenClaimDisposition disposition,
+            int tokenLowId,
+            int tokenHighId,
+            int tokenQuality,
+            int tokenCount,
+            string tokenName)
+        {
+            if (progress == null)
+            {
+                throw new ArgumentNullException("progress");
+            }
+
+            if (!Enum.IsDefined(
+                    typeof(MissionAcgTokenClaimDisposition),
+                    disposition))
+            {
+                throw new ArgumentOutOfRangeException("disposition");
+            }
+
+            bool eligible =
+                disposition == MissionAcgTokenClaimDisposition.Eligible;
+            if (eligible
+                != (tokenLowId > 0
+                    && tokenHighId > 0
+                    && tokenQuality == MissionAcgTokenClaimPolicy.TokenQuality
+                    && tokenCount >= MissionLevelGraph.MinimumTokenCount
+                    && tokenCount <= MissionLevelGraph.MaximumTokenCount
+                    && !string.IsNullOrWhiteSpace(tokenName)))
+            {
+                throw new ArgumentException(
+                    "Token claim disposition and frozen item fields disagree.");
+            }
+
+            this.AcceptedQuestIdentity = progress.AcceptedQuestIdentity;
+            this.OwnerIdentity = progress.Binding.OwnerIdentity;
+            this.MissionType = progress.Binding.MissionType;
+            this.AllocatedLivePlayfield2 =
+                progress.Binding.AllocatedLivePlayfield2;
+            this.TotalCountableAmbientSlots =
+                progress.TotalCountableAmbientSlots;
+            this.AppliedCount = progress.AppliedCount;
+            this.Percent = progress.Percent;
+            this.Disposition = disposition;
+            this.TokenLowId = tokenLowId;
+            this.TokenHighId = tokenHighId;
+            this.TokenQuality = tokenQuality;
+            this.TokenCount = tokenCount;
+            this.TokenName = (tokenName ?? string.Empty).Trim();
+        }
+
+        internal MissionAcgIdentityRecord AcceptedQuestIdentity
+        {
+            get;
+            private set;
+        }
+
+        internal MissionAcgIdentityRecord OwnerIdentity { get; private set; }
+
+        internal MissionRollType MissionType { get; private set; }
+
+        internal int AllocatedLivePlayfield2 { get; private set; }
+
+        internal int TotalCountableAmbientSlots { get; private set; }
+
+        internal int AppliedCount { get; private set; }
+
+        internal int Percent { get; private set; }
+
+        internal MissionAcgTokenClaimDisposition Disposition
+        {
+            get;
+            private set;
+        }
+
+        internal int TokenLowId { get; private set; }
+
+        internal int TokenHighId { get; private set; }
+
+        internal int TokenQuality { get; private set; }
+
+        internal int TokenCount { get; private set; }
+
+        internal string TokenName { get; private set; }
+
+        internal bool IsEligible
+        {
+            get
+            {
+                return this.Disposition
+                       == MissionAcgTokenClaimDisposition.Eligible;
+            }
+        }
+
+        internal bool IsExplicitNone
+        {
+            get
+            {
+                return this.Disposition
+                       == MissionAcgTokenClaimDisposition.ExplicitNone;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Conservative generated-mission token claim policy. The preserved
+    /// evidence proves the side item pairs and official level-table count, but
+    /// does not prove the legacy process-local 86-percent threshold. Generated
+    /// claims therefore become eligible only at an exact durable 100 percent.
+    /// </summary>
+    internal static class MissionAcgTokenClaimPolicy
+    {
+        internal const int ClanTokenLowId = 103910;
+
+        internal const int ClanTokenHighId = 103911;
+
+        internal const int OmniTokenLowId = 103908;
+
+        internal const int OmniTokenHighId = 103909;
+
+        internal const int TokenQuality = 1;
+
+        internal static bool TryResolve(
+            MissionAcgTokenProgressState progress,
+            int characterLevelAtClaimFreeze,
+            Side side,
+            out MissionAcgTokenClaimResolution resolution,
+            out string failure)
+        {
+            resolution = null;
+            failure = string.Empty;
+            if (progress == null
+                || !progress.Binding.ExplicitNoTeam
+                || progress.Binding.TeamIdentity != null)
+            {
+                failure =
+                    "Generated token claims currently require exact solo ownership.";
+                return false;
+            }
+
+            if (progress.Lifecycle
+                    != MissionAcgLifecycleState.CompletionStarted
+                || progress.TerminalReason != 0)
+            {
+                failure =
+                    "Generated token claim policy requires durably sealed completion-started progress.";
+                return false;
+            }
+
+            if (progress.Percent < 100)
+            {
+                resolution =
+                    new MissionAcgTokenClaimResolution(
+                        progress,
+                        MissionAcgTokenClaimDisposition
+                            .UnresolvedBelowFullProgress,
+                        0,
+                        0,
+                        0,
+                        0,
+                        string.Empty);
+                return true;
+            }
+
+            if (side == Side.Neutral)
+            {
+                resolution =
+                    new MissionAcgTokenClaimResolution(
+                        progress,
+                        MissionAcgTokenClaimDisposition.ExplicitNone,
+                        0,
+                        0,
+                        0,
+                        0,
+                        string.Empty);
+                return true;
+            }
+
+            int lowId;
+            int highId;
+            string name;
+            if (side == Side.Clan)
+            {
+                lowId = ClanTokenLowId;
+                highId = ClanTokenHighId;
+                name = "Clan Token";
+            }
+            else if (side == Side.Omni)
+            {
+                lowId = OmniTokenLowId;
+                highId = OmniTokenHighId;
+                name = "Omni Token";
+            }
+            else
+            {
+                failure =
+                    "Generated token claim side is not a supported player faction.";
+                return false;
+            }
+
+            int count;
+            if (!MissionLevelTable.TryGetTokenReward(
+                    characterLevelAtClaimFreeze,
+                    out count,
+                    out failure))
+            {
+                return false;
+            }
+
+            resolution =
+                new MissionAcgTokenClaimResolution(
+                    progress,
+                    MissionAcgTokenClaimDisposition.Eligible,
+                    lowId,
+                    highId,
+                    TokenQuality,
+                    count,
+                    name);
+            return true;
+        }
     }
 
     /// <summary>

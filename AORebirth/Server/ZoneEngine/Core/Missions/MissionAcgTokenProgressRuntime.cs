@@ -444,6 +444,74 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        /// <summary>
+        /// Resolves the immutable, durably sealed progress owned by one exact
+        /// accepted generated mission. Completion callers must supply the same
+        /// binding and objective records; no player-, type-, or newest-mission
+        /// lookup participates in this path.
+        /// </summary>
+        internal static bool TryGetSealedProgress(
+            MissionAcgBindingRecord binding,
+            MissionAcgObjectiveRecord objective,
+            out MissionAcgTokenProgressState progress,
+            out string failure)
+        {
+            progress = null;
+            failure = string.Empty;
+            EnsureInitialized();
+            lock (Sync)
+            {
+                if (restorationFailed
+                    || !TryValidateExactObjective(
+                        binding,
+                        objective,
+                        out failure))
+                {
+                    if (string.IsNullOrWhiteSpace(failure))
+                    {
+                        failure =
+                            "Token-progress restoration failed closed.";
+                    }
+
+                    return false;
+                }
+
+                int accepted =
+                    binding.Binding.AcceptedQuestIdentity.Instance;
+                MissionAcgTokenProgressRecord current;
+                if (InvalidAccepted.Contains(accepted)
+                    || !ByAccepted.TryGetValue(accepted, out current)
+                    || current == null
+                    || current.State == null)
+                {
+                    failure =
+                        "Exact valid token-progress state is unavailable for this accepted quest.";
+                    return false;
+                }
+
+                if (!current.State.Matches(
+                        binding.Binding,
+                        objective.Binding,
+                        out failure))
+                {
+                    return false;
+                }
+
+                if (current.State.Lifecycle
+                        != MissionAcgLifecycleState.CompletionStarted
+                    && current.State.Lifecycle
+                       != MissionAcgLifecycleState.Completed)
+                {
+                    failure =
+                        "Token progress has not been durably sealed for completion.";
+                    return false;
+                }
+
+                progress = current.State;
+                return true;
+            }
+        }
+
         internal static void OnBindingStateChanged(
             MissionAcgBindingRecord binding)
         {

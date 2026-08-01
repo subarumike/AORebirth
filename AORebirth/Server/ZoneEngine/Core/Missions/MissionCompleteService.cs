@@ -652,6 +652,102 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
+        internal static long GetCashBalance(ICharacter character)
+        {
+            if (character == null)
+            {
+                return -1;
+            }
+
+            long value = character.Stats[StatIds.cash].BaseValue;
+            return value < 0 ? 0 : value;
+        }
+
+        internal static bool TryPersistFrozenCashTarget(
+            ICharacter character,
+            long expectedBefore,
+            long expectedAfter,
+            out string failure)
+        {
+            failure = string.Empty;
+            if (character == null
+                || expectedBefore < 0
+                || expectedAfter < expectedBefore
+                || expectedAfter > int.MaxValue)
+            {
+                failure = "Frozen credit claim is invalid.";
+                return false;
+            }
+
+            long current = GetCashBalance(character);
+            if (current != expectedBefore)
+            {
+                failure = "Credit balance no longer matches the reserved pre-apply value.";
+                return false;
+            }
+
+            try
+            {
+                character.Stats[StatIds.cash].Set((uint)expectedAfter);
+                character.Stats.Write();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                failure =
+                    "Credit persistence became ambiguous: "
+                    + ex.GetType().Name
+                    + ": "
+                    + ex.Message;
+                return false;
+            }
+        }
+
+        internal static void SendFrozenCashNotification(
+            ICharacter character,
+            long value)
+        {
+            if (character == null || value < 0 || value > int.MaxValue)
+            {
+                return;
+            }
+
+            if (character.Controller != null && character.Controller.Client != null)
+            {
+                character.Controller.Client.SendCompressed(
+                    new StatMessage
+                    {
+                        Identity = character.Identity,
+                        Stats = new[]
+                                {
+                                    new GameTuple<CharacterStat, uint>
+                                    {
+                                        Value1 = (CharacterStat)StatIds.cash,
+                                        Value2 = (uint)value
+                                    }
+                                }
+                    });
+            }
+            else
+            {
+                StatMessageHandler.Default.SendSingle(
+                    character,
+                    (int)StatIds.cash,
+                    (uint)value);
+            }
+        }
+
+        internal static void SendTokenAwardedFeedback(ICharacter character)
+        {
+            if (character != null)
+            {
+                FeedbackMessageHandler.Default.Send(
+                    character,
+                    MissionFeedbackCategoryId,
+                    TokenAwardedFeedbackMessageId);
+            }
+        }
+
         internal static void SendRewardFeedback(ICharacter character, int xp, int cash)
         {
             SendYellowFeedback(

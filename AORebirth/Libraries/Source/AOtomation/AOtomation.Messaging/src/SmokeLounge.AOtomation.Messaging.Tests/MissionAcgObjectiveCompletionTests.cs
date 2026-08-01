@@ -515,20 +515,97 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 WithMissionItem(
                     this.CreateObjective(MissionRollType.FindItemReturn, 50, 600),
                     0x710001);
+            var rewardIdentity =
+                new MissionAcgIdentityRecord(
+                    0x68,
+                    0x650001);
+            var tokenIdentity =
+                new MissionAcgIdentityRecord(
+                    0x68,
+                    0x660001);
+            var inventoryIdentity = new MissionAcgIdentityRecord(0x68, 600);
             source =
                 source.WithState(
-                    source.State.Copy(
-                        lifecycle: MissionAcgObjectiveLifecycle.CompletionStarted,
-                        phase: MissionAcgCompletionPhase.RewardCalculationFrozen,
+                    StateAtPhase(
+                        source.State,
+                        MissionAcgCompletionPhase.MissionCleanupCompleted).Copy(
                         frozenCredits: 1234,
                         frozenXp: 5678,
                         frozenItemLowId: 10,
                         frozenItemHighId: 11,
                         frozenItemQuality: 42,
                         frozenItemCount: 1,
+                        itemState: MissionAcgGrantState.Granted,
                         creditsClaimId: "credits-claim",
                         xpClaimId: "xp-claim",
-                        itemClaimId: "item-claim"));
+                        itemClaimId: "item-claim",
+                        grantedRewardItemInstance: rewardIdentity.Instance,
+                        creditsClaim:
+                            Claim(
+                                MissionAcgDurableClaimPhase.ClientNotificationSent,
+                                "credits-claim",
+                                1234,
+                                0,
+                                0,
+                                0,
+                                0,
+                                null,
+                                null,
+                                100,
+                                1334,
+                                string.Empty,
+                                string.Empty),
+                        xpClaim:
+                            Claim(
+                                MissionAcgDurableClaimPhase.ClientNotificationPending,
+                                "xp-claim",
+                                5678,
+                                0,
+                                0,
+                                0,
+                                0,
+                                null,
+                                null,
+                                0,
+                                0,
+                                "xp-fingerprint",
+                                string.Empty),
+                        itemClaim:
+                            Claim(
+                                MissionAcgDurableClaimPhase.DurablyApplied,
+                                "item-claim",
+                                0,
+                                10,
+                                11,
+                                42,
+                                1,
+                                rewardIdentity,
+                                inventoryIdentity,
+                                0,
+                                0,
+                                string.Empty,
+                                string.Empty),
+                        tokenClaim:
+                            Claim(
+                                MissionAcgDurableClaimPhase.ClientNotificationSent,
+                                "token-claim",
+                                0,
+                                103910,
+                                103911,
+                                1,
+                                3,
+                                tokenIdentity,
+                                inventoryIdentity,
+                                0,
+                                0,
+                                string.Empty,
+                                string.Empty),
+                        rewardFeedbackDelivery: MissionAcgDeliveryPhase.Sent,
+                        missionAccomplishedDelivery: MissionAcgDeliveryPhase.Pending,
+                        action59Delivery: MissionAcgDeliveryPhase.Sent,
+                        questDeleteDelivery: MissionAcgDeliveryPhase.Sent,
+                        missionListRemovalDelivery: MissionAcgDeliveryPhase.Sent,
+                        cleanupHandoffDelivery: MissionAcgDeliveryPhase.Sent));
             var store =
                 new MissionAcgObjectiveStore(
                     Path.Combine(this.root, "mission-state"),
@@ -549,6 +626,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual("credits-claim", actual.State.CreditsClaimId);
             Assert.AreEqual("xp-claim", actual.State.XpClaimId);
             Assert.AreEqual("item-claim", actual.State.ItemClaimId);
+            AssertClaimEqual(source.State.CreditsClaim, actual.State.CreditsClaim);
+            AssertClaimEqual(source.State.XpClaim, actual.State.XpClaim);
+            AssertClaimEqual(source.State.ItemClaim, actual.State.ItemClaim);
+            AssertClaimEqual(source.State.TokenClaim, actual.State.TokenClaim);
+            Assert.AreEqual(
+                MissionAcgDeliveryPhase.Sent,
+                actual.State.RewardFeedbackDelivery);
+            Assert.AreEqual(
+                MissionAcgDeliveryPhase.Pending,
+                actual.State.MissionAccomplishedDelivery);
+            Assert.AreEqual(MissionAcgDeliveryPhase.Sent, actual.State.Action59Delivery);
+            Assert.AreEqual(MissionAcgDeliveryPhase.Sent, actual.State.QuestDeleteDelivery);
+            Assert.AreEqual(
+                MissionAcgDeliveryPhase.Sent,
+                actual.State.MissionListRemovalDelivery);
+            Assert.AreEqual(
+                MissionAcgDeliveryPhase.Sent,
+                actual.State.CleanupHandoffDelivery);
         }
 
         [TestMethod]
@@ -572,8 +667,464 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(store.LoadAll().IsValid);
             File.WriteAllText(path, valid.Replace("ObjectiveTemplateId=", "ObjectiveTemplateId=9"));
             Assert.IsFalse(store.LoadAll().IsValid);
-            File.WriteAllText(path, Rehash(valid.Replace("FormatVersion=1", "FormatVersion=99")));
+            File.WriteAllText(path, Rehash(valid.Replace("FormatVersion=2", "FormatVersion=99")));
             Assert.IsFalse(store.LoadAll().IsValid);
+        }
+
+        [TestMethod]
+        public void LegacyV1ClaimsMigrateGrantedAndFailClosedForPendingApplication()
+        {
+            MissionAcgObjectiveRecord grantedSource =
+                this.CreateObjective(MissionRollType.FindItem, 61, 701);
+            grantedSource =
+                new MissionAcgObjectiveRecord(
+                    grantedSource.Binding.WithFormatVersion(
+                        MissionAcgObjectiveBinding.LegacyFormatVersion),
+                    StateAtPhase(
+                        grantedSource.State,
+                        MissionAcgCompletionPhase.CreditsGranted),
+                    string.Empty);
+            var grantedStore =
+                new MissionAcgObjectiveStore(
+                    Path.Combine(this.root, "legacy-granted"),
+                    this.catalog);
+            MissionAcgObjectiveRecord persisted;
+            string failure;
+            Assert.IsTrue(
+                grantedStore.TryCreate(grantedSource, out persisted, out failure),
+                failure);
+            MissionAcgObjectiveLoadResult grantedLoad = grantedStore.LoadAll();
+            Assert.IsTrue(grantedLoad.IsValid, string.Join(" | ", grantedLoad.Diagnostics));
+            Assert.AreEqual(
+                MissionAcgDurableClaimPhase.DurablyApplied,
+                grantedLoad.Records[0].State.CreditsClaim.Phase);
+            Assert.AreEqual(
+                MissionAcgDurableClaimPhase.EligibleFrozen,
+                grantedLoad.Records[0].State.XpClaim.Phase);
+            Assert.AreEqual(
+                MissionAcgDurableClaimPhase.NotEligible,
+                grantedLoad.Records[0].State.ItemClaim.Phase);
+
+            MissionAcgObjectiveRecord pendingSource =
+                this.CreateObjective(MissionRollType.FindItem, 62, 702);
+            pendingSource =
+                new MissionAcgObjectiveRecord(
+                    pendingSource.Binding.WithFormatVersion(
+                        MissionAcgObjectiveBinding.LegacyFormatVersion),
+                    StateAtPhase(
+                        pendingSource.State,
+                        MissionAcgCompletionPhase.RewardClaimStarted),
+                    string.Empty);
+            var pendingStore =
+                new MissionAcgObjectiveStore(
+                    Path.Combine(this.root, "legacy-pending"),
+                    this.catalog);
+            Assert.IsTrue(
+                pendingStore.TryCreate(pendingSource, out persisted, out failure),
+                failure);
+            MissionAcgObjectiveLoadResult pendingLoad = pendingStore.LoadAll();
+            Assert.IsTrue(pendingLoad.IsValid, string.Join(" | ", pendingLoad.Diagnostics));
+            Assert.AreEqual(
+                MissionAcgDurableClaimPhase.TerminalFailure,
+                pendingLoad.Records[0].State.CreditsClaim.Phase);
+            StringAssert.Contains(
+                pendingLoad.Records[0].State.CreditsClaim.Failure,
+                "pending");
+        }
+
+        [TestMethod]
+        public void ObjectiveStoreCompareAndSwapRejectsAStaleExpectedRecord()
+        {
+            MissionAcgObjectiveRecord source =
+                this.CreateObjective(MissionRollType.FindPerson, 63, 703);
+            var store =
+                new MissionAcgObjectiveStore(
+                    Path.Combine(this.root, "cas"),
+                    this.catalog);
+            MissionAcgObjectiveRecord persisted;
+            string failure;
+            Assert.IsTrue(store.TryCreate(source, out persisted, out failure), failure);
+
+            MissionAcgObjectiveState verified =
+                persisted.State.Copy(
+                    lifecycle: MissionAcgObjectiveLifecycle.Verified,
+                    phase: MissionAcgCompletionPhase.ObjectiveVerified);
+            MissionAcgObjectiveRecord current;
+            Assert.IsTrue(
+                store.TryReplace(
+                    persisted,
+                    persisted.WithState(verified),
+                    out current,
+                    out failure),
+                failure);
+
+            MissionAcgObjectiveRecord rejected;
+            Assert.IsFalse(
+                store.TryReplace(
+                    persisted,
+                    persisted.WithState(
+                        persisted.State.Copy(
+                            lifecycle: MissionAcgObjectiveLifecycle.Verified,
+                            phase: MissionAcgCompletionPhase.ObjectiveVerified,
+                            updatedUtc: DateTime.UtcNow.AddMinutes(1))),
+                    out rejected,
+                    out failure));
+            StringAssert.Contains(failure, "changed after the expected record was read");
+            Assert.AreEqual(
+                MissionAcgCompletionPhase.ObjectiveVerified,
+                store.LoadAll().Records[0].State.Phase);
+        }
+
+        [TestMethod]
+        public void DurableClaimsAndDeliveriesAdvanceMonotonicallyWithFrozenOwnership()
+        {
+            MissionAcgObjectiveState frozen =
+                StateAtPhase(
+                    this.CreateObjective(MissionRollType.FindItem, 64, 704).State,
+                    MissionAcgCompletionPhase.RewardCalculationFrozen);
+            MissionAcgObjectiveState boundary =
+                frozen.Copy(
+                    phase: MissionAcgCompletionPhase.RewardClaimStarted,
+                    creditsState: MissionAcgGrantState.Pending);
+            string failure;
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(frozen, boundary, out failure),
+                failure);
+
+            MissionAcgDurableRewardClaim reservedClaim =
+                boundary.CreditsClaim.Copy(
+                    phase: MissionAcgDurableClaimPhase.ClaimReserved,
+                    preApplyValue: 100,
+                    expectedPostValue: 110);
+            MissionAcgObjectiveState reserved =
+                boundary.Copy(creditsClaim: reservedClaim);
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(boundary, reserved, out failure),
+                failure);
+            MissionAcgObjectiveState pending =
+                reserved.Copy(
+                    creditsClaim:
+                        reservedClaim.Copy(
+                            phase: MissionAcgDurableClaimPhase.ApplicationPending),
+                    rewardFeedbackDelivery: MissionAcgDeliveryPhase.Pending);
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(reserved, pending, out failure),
+                failure);
+            MissionAcgObjectiveState applied =
+                pending.Copy(
+                    creditsClaim:
+                        pending.CreditsClaim.Copy(
+                            phase: MissionAcgDurableClaimPhase.DurablyApplied),
+                    rewardFeedbackDelivery: MissionAcgDeliveryPhase.Sent);
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(pending, applied, out failure),
+                failure);
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(applied, pending, out failure));
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    applied,
+                    applied.Copy(
+                        creditsClaim: applied.CreditsClaim.Copy(amount: 11)),
+                    out failure));
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    applied,
+                    applied.Copy(
+                        rewardFeedbackDelivery: MissionAcgDeliveryPhase.Pending),
+                    out failure));
+
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    boundary,
+                    boundary.Copy(
+                        creditsClaim:
+                            boundary.CreditsClaim.Copy(
+                                phase: MissionAcgDurableClaimPhase.DurablyApplied)),
+                    out failure),
+                "Eligible claims cannot skip reservation and application.");
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    reserved,
+                    reserved.Copy(
+                        creditsClaim:
+                            reserved.CreditsClaim.Copy(
+                                phase: MissionAcgDurableClaimPhase.DurablyApplied)),
+                    out failure),
+                "Reserved claims cannot skip the application-pending checkpoint.");
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    pending,
+                    pending.Copy(
+                        creditsClaim:
+                            pending.CreditsClaim.Copy(
+                                phase:
+                                    MissionAcgDurableClaimPhase.ClientNotificationPending)),
+                    out failure),
+                "Pending claims cannot skip durable application.");
+            MissionAcgObjectiveState notificationPending =
+                applied.Copy(
+                    creditsClaim:
+                        applied.CreditsClaim.Copy(
+                            phase:
+                                MissionAcgDurableClaimPhase.ClientNotificationPending));
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(
+                    applied,
+                    notificationPending,
+                    out failure),
+                failure);
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(
+                    notificationPending,
+                    notificationPending.Copy(
+                        creditsClaim:
+                            notificationPending.CreditsClaim.Copy(
+                                phase:
+                                    MissionAcgDurableClaimPhase.ClientNotificationSent)),
+                    out failure),
+                failure);
+
+            MissionAcgObjectiveState terminal =
+                pending.Copy(
+                    creditsClaim:
+                        pending.CreditsClaim.Copy(
+                            phase: MissionAcgDurableClaimPhase.TerminalFailure,
+                            failure: "ambiguous external application"));
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(pending, terminal, out failure),
+                failure);
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    terminal,
+                    terminal.Copy(
+                        creditsClaim:
+                            terminal.CreditsClaim.Copy(
+                                phase: MissionAcgDurableClaimPhase.ClientNotificationSent)),
+                    out failure));
+        }
+
+        [TestMethod]
+        public void UninitializedClaimsCannotSkipTheFrozenEligibilityBoundary()
+        {
+            MissionAcgObjectiveState initial =
+                this.CreateObjective(MissionRollType.FindItem, 65, 705).State;
+            MissionAcgObjectiveState completionStarted =
+                StateAtPhase(
+                    initial,
+                    MissionAcgCompletionPhase.CompletionStarted);
+            MissionAcgObjectiveState frozen =
+                StateAtPhase(
+                    initial,
+                    MissionAcgCompletionPhase.RewardCalculationFrozen);
+            string failure;
+            Assert.IsTrue(
+                MissionAcgCompletionRules.CanReplace(
+                    completionStarted,
+                    frozen,
+                    out failure),
+                failure);
+
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    completionStarted,
+                    frozen.Copy(
+                        creditsClaim:
+                            frozen.CreditsClaim.Copy(
+                                phase: MissionAcgDurableClaimPhase.ClaimReserved,
+                                preApplyValue: 100,
+                                expectedPostValue: 110)),
+                    out failure));
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    completionStarted,
+                    frozen.Copy(
+                        creditsClaim:
+                            frozen.CreditsClaim.Copy(
+                                phase: MissionAcgDurableClaimPhase.DurablyApplied)),
+                    out failure));
+            Assert.IsFalse(
+                MissionAcgCompletionRules.CanReplace(
+                    completionStarted,
+                    frozen.Copy(
+                        creditsClaim:
+                            frozen.CreditsClaim.Copy(
+                                phase:
+                                    MissionAcgDurableClaimPhase.ClientNotificationSent)),
+                    out failure));
+        }
+
+        [TestMethod]
+        public void CompletionSourceUsesFrozenProjectionExactClaimsAndDurableDeliveryOrdering()
+        {
+            string completion =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgCompletionJournalService.cs");
+            StringAssert.Contains(completion, "!accepted.HasFrozenAcceptedRewards");
+            StringAssert.Contains(completion, "accepted.Projection == null");
+            StringAssert.Contains(completion, "accepted.CashReward");
+            StringAssert.Contains(completion, "accepted.ExperienceReward");
+            StringAssert.Contains(completion, "accepted.FrozenItemRewardLowId");
+            Assert.IsFalse(completion.Contains("ResolveCashReward("));
+            Assert.IsFalse(completion.Contains("ResolveXpReward("));
+            Assert.IsFalse(completion.Contains("TryGrantOfferItemReward("));
+
+            StringAssert.Contains(completion, "return 0x65000000");
+            StringAssert.Contains(completion, "return 0x66000000");
+            StringAssert.Contains(completion, "MissionAcceptedStore.TryRemoveExactPersisted");
+            Assert.IsFalse(completion.Contains("MissionAcceptedStore.Remove("));
+            Assert.IsFalse(completion.Contains("MissionAcgObjectiveRuntime.TryDelete"));
+
+            int listPending =
+                completion.IndexOf(
+                    "missionListRemovalDelivery: MissionAcgDeliveryPhase.Pending",
+                    StringComparison.Ordinal);
+            int listRemove =
+                completion.IndexOf(
+                    "MissionAcceptedStore.TryRemoveExactPersisted",
+                    listPending,
+                    StringComparison.Ordinal);
+            int listSent =
+                completion.IndexOf(
+                    "missionListRemovalDelivery: MissionAcgDeliveryPhase.Sent",
+                    listRemove,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(listPending >= 0 && listRemove > listPending && listSent > listRemove);
+
+            int actionPending =
+                completion.IndexOf(
+                    "action59Delivery: MissionAcgDeliveryPhase.Pending",
+                    StringComparison.Ordinal);
+            int actionSend =
+                completion.IndexOf(
+                    "MissionCompleteService.SendMissionCompleteAction",
+                    actionPending,
+                    StringComparison.Ordinal);
+            int actionSent =
+                completion.IndexOf(
+                    "action59Delivery: MissionAcgDeliveryPhase.Sent",
+                    actionSend,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(actionPending >= 0 && actionSend > actionPending && actionSent > actionSend);
+
+            int deletePending =
+                completion.IndexOf(
+                    "questDeleteDelivery: MissionAcgDeliveryPhase.Pending",
+                    StringComparison.Ordinal);
+            int deleteSend =
+                completion.IndexOf(
+                    "MissionCompleteService.SendQuestDelete",
+                    deletePending,
+                    StringComparison.Ordinal);
+            int deleteSent =
+                completion.IndexOf(
+                    "questDeleteDelivery: MissionAcgDeliveryPhase.Sent",
+                    deleteSend,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(deletePending >= 0 && deleteSend > deletePending && deleteSent > deleteSend);
+        }
+
+        [TestMethod]
+        public void CompletionSourceReconcilesExactItemsAndFailsClosedOnAmbiguousXp()
+        {
+            string completion =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgCompletionJournalService.cs");
+            int inspect =
+                completion.IndexOf(
+                    "MissionKeyGrantService.InspectReservedNamedItem",
+                    StringComparison.Ordinal);
+            int conflict =
+                completion.IndexOf(
+                    "MissionReservedItemLookupResult.Conflict",
+                    inspect,
+                    StringComparison.Ordinal);
+            int grant =
+                completion.IndexOf(
+                    "MissionKeyGrantService.TryGrantReservedNamedItem",
+                    conflict,
+                    StringComparison.Ordinal);
+            int reconcile =
+                completion.IndexOf(
+                    "MissionKeyGrantService.InspectReservedNamedItem",
+                    grant,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(inspect >= 0 && conflict > inspect && grant > conflict && reconcile > grant);
+            StringAssert.Contains(completion, "claim.ReservedItemIdentity.Instance");
+            StringAssert.Contains(completion, "exact reserved reward claim remains pending");
+            StringAssert.Contains(completion, "could not be reconciled by exact identity");
+
+            int xpFingerprint =
+                completion.IndexOf(
+                    "CombatXpRuntimeService.GetDirectXpClaimFingerprint",
+                    StringComparison.Ordinal);
+            int xpAmbiguous =
+                completion.IndexOf(
+                    "XP application is ambiguous because the reserved pre-apply fingerprint changed.",
+                    xpFingerprint,
+                    StringComparison.Ordinal);
+            int xpGrant =
+                completion.IndexOf(
+                    "CombatXpRuntimeService.AwardDirectXp",
+                    xpAmbiguous,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(xpFingerprint >= 0 && xpAmbiguous > xpFingerprint && xpGrant > xpAmbiguous);
+            StringAssert.Contains(completion, "MissionAcgDurableClaimPhase.TerminalFailure");
+
+            string itemOwner =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionKeyGrantService.cs");
+            StringAssert.Contains(
+                itemOwner,
+                "the durable ownership key is owner plus identity instance");
+            StringAssert.Contains(
+                itemOwner,
+                "candidate.Identity.Instance != identityInstance");
+            StringAssert.Contains(itemOwner, "candidate.LowID != lowId");
+            StringAssert.Contains(itemOwner, "candidate.MultipleCount != multipleCount");
+            Assert.IsFalse(
+                itemOwner.Contains(
+                    "(int)candidate.Identity.Type != identityType"));
+        }
+
+        [TestMethod]
+        public void CreditRecoveryDoesNotInferApplicationFromAPersistedPostBalance()
+        {
+            string completion =
+                ReadSource(
+                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgCompletionJournalService.cs");
+            int pendingEntry =
+                completion.IndexOf(
+                    "bool applicationWasAlreadyPending",
+                    StringComparison.Ordinal);
+            int postBalanceAmbiguity =
+                completion.IndexOf(
+                    "Credit application is ambiguous after restart because the production cash owner has no durable claim identity.",
+                    pendingEntry,
+                    StringComparison.Ordinal);
+            int productionWrite =
+                completion.IndexOf(
+                    "MissionCompleteService.TryPersistFrozenCashTarget",
+                    pendingEntry,
+                    StringComparison.Ordinal);
+            int durableApplied =
+                completion.IndexOf(
+                    "phase: MissionAcgDurableClaimPhase.DurablyApplied",
+                    productionWrite,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(pendingEntry >= 0);
+            Assert.IsTrue(postBalanceAmbiguity > pendingEntry);
+            Assert.IsTrue(productionWrite > pendingEntry);
+            Assert.IsTrue(durableApplied > productionWrite);
+            StringAssert.Contains(
+                completion,
+                "current == claim.ExpectedPostValue");
+            StringAssert.Contains(
+                completion,
+                "&& applicationWasAlreadyPending");
+            Assert.IsFalse(
+                completion.Contains(
+                    "else if (current != claim.ExpectedPostValue)"));
         }
 
         [TestMethod]
@@ -678,7 +1229,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             Assert.AreEqual(5, this.catalog.SelectableLayouts.Count);
             Assert.AreEqual(2, MissionAcgInstanceBinding.CurrentFormatVersion);
-            Assert.AreEqual(1, MissionAcgObjectiveBinding.CurrentFormatVersion);
+            Assert.AreEqual(2, MissionAcgObjectiveBinding.CurrentFormatVersion);
             Assert.IsNull(
                 this.catalog.FindBySourcePlayfield2(
                     MissionAcgLayoutCatalogLoader.ExplicitlyIncompleteShapePlayfield2));
@@ -759,7 +1310,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     x => x.Identity.CapturedIdentity.Equals(slot.CapturedIdentity));
             var objectiveBinding =
                 new MissionAcgObjectiveBinding(
-                    1,
+                    MissionAcgObjectiveBinding.CurrentFormatVersion,
                     binding.AcceptedQuestIdentity,
                     binding.OwnerIdentity,
                     null,
@@ -803,6 +1354,56 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     lifecycle: MissionAcgObjectiveLifecycle.ItemPossessed,
                     missionItemIdentity:
                         new MissionAcgIdentityRecord(type, instance)));
+        }
+
+        private static MissionAcgDurableRewardClaim Claim(
+            MissionAcgDurableClaimPhase phase,
+            string claimId,
+            long amount,
+            int itemLowId,
+            int itemHighId,
+            int itemQuality,
+            int itemCount,
+            MissionAcgIdentityRecord reservedItemIdentity,
+            MissionAcgIdentityRecord targetContainerIdentity,
+            long preApplyValue,
+            long expectedPostValue,
+            string preApplyFingerprint,
+            string failure)
+        {
+            return new MissionAcgDurableRewardClaim(
+                phase,
+                claimId,
+                amount,
+                itemLowId,
+                itemHighId,
+                itemQuality,
+                itemCount,
+                reservedItemIdentity,
+                targetContainerIdentity,
+                preApplyValue,
+                expectedPostValue,
+                preApplyFingerprint,
+                failure);
+        }
+
+        private static void AssertClaimEqual(
+            MissionAcgDurableRewardClaim expected,
+            MissionAcgDurableRewardClaim actual)
+        {
+            Assert.AreEqual(expected.Phase, actual.Phase);
+            Assert.AreEqual(expected.ClaimId, actual.ClaimId);
+            Assert.AreEqual(expected.Amount, actual.Amount);
+            Assert.AreEqual(expected.ItemLowId, actual.ItemLowId);
+            Assert.AreEqual(expected.ItemHighId, actual.ItemHighId);
+            Assert.AreEqual(expected.ItemQuality, actual.ItemQuality);
+            Assert.AreEqual(expected.ItemCount, actual.ItemCount);
+            Assert.AreEqual(expected.ReservedItemIdentity, actual.ReservedItemIdentity);
+            Assert.AreEqual(expected.TargetContainerIdentity, actual.TargetContainerIdentity);
+            Assert.AreEqual(expected.PreApplyValue, actual.PreApplyValue);
+            Assert.AreEqual(expected.ExpectedPostValue, actual.ExpectedPostValue);
+            Assert.AreEqual(expected.PreApplyFingerprint, actual.PreApplyFingerprint);
+            Assert.AreEqual(expected.Failure, actual.Failure);
         }
 
         private static MissionAcgObjectiveState NewState(DateTime now)
@@ -858,6 +1459,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 phase >= MissionAcgCompletionPhase.XpGranted
                     ? MissionAcgGrantState.Granted
                     : MissionAcgGrantState.NotStarted;
+            MissionAcgDurableClaimPhase creditsClaimPhase =
+                phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved
+                    ? MissionAcgDurableClaimPhase.ClientNotificationSent
+                    : phase == MissionAcgCompletionPhase.RewardCalculationFrozen
+                    ? MissionAcgDurableClaimPhase.EligibleFrozen
+                    : phase == MissionAcgCompletionPhase.RewardClaimStarted
+                      ? MissionAcgDurableClaimPhase.ApplicationPending
+                      : MissionAcgDurableClaimPhase.DurablyApplied;
+            MissionAcgDurableClaimPhase xpClaimPhase =
+                phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved
+                    ? MissionAcgDurableClaimPhase.ClientNotificationSent
+                    : phase >= MissionAcgCompletionPhase.XpGranted
+                    ? MissionAcgDurableClaimPhase.DurablyApplied
+                    : MissionAcgDurableClaimPhase.EligibleFrozen;
             return initial.Copy(
                 lifecycle:
                     phase == MissionAcgCompletionPhase.MissionCleanupCompleted
@@ -873,6 +1488,72 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 creditsClaimId: "credits",
                 xpClaimId: "xp",
                 itemClaimId: "item",
+                creditsClaim:
+                    Claim(
+                        creditsClaimPhase,
+                        "credits",
+                        10,
+                        0,
+                        0,
+                        0,
+                        0,
+                        null,
+                        null,
+                        phase >= MissionAcgCompletionPhase.RewardClaimStarted ? 100 : 0,
+                        phase >= MissionAcgCompletionPhase.RewardClaimStarted ? 110 : 0,
+                        string.Empty,
+                        string.Empty),
+                xpClaim:
+                    Claim(
+                        xpClaimPhase,
+                        "xp",
+                        20,
+                        0,
+                        0,
+                        0,
+                        0,
+                        null,
+                        null,
+                        0,
+                        0,
+                        phase >= MissionAcgCompletionPhase.RewardClaimStarted
+                            ? "xp-fingerprint"
+                            : string.Empty,
+                        string.Empty),
+                itemClaim:
+                    Claim(
+                        MissionAcgDurableClaimPhase.NotEligible,
+                        "item",
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        null,
+                        null,
+                        0,
+                        0,
+                        string.Empty,
+                        string.Empty),
+                tokenClaim:
+                    MissionAcgDurableRewardClaim.Empty(
+                        MissionAcgDurableClaimPhase.NotEligible),
+                rewardFeedbackDelivery:
+                    phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved
+                        ? MissionAcgDeliveryPhase.Sent
+                        : MissionAcgDeliveryPhase.NotStarted,
+                missionAccomplishedDelivery:
+                    phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved
+                        ? MissionAcgDeliveryPhase.Sent
+                        : MissionAcgDeliveryPhase.NotStarted,
+                action59Delivery:
+                    phase >= MissionAcgCompletionPhase.Action59Sent
+                        ? MissionAcgDeliveryPhase.Sent
+                        : MissionAcgDeliveryPhase.NotStarted,
+                questDeleteDelivery:
+                    phase >= MissionAcgCompletionPhase.QuestDeleteSent
+                        ? MissionAcgDeliveryPhase.Sent
+                        : MissionAcgDeliveryPhase.NotStarted,
                 artifactsRemoved:
                     phase >= MissionAcgCompletionPhase.MissionArtifactsRemoved,
                 action59Sent:

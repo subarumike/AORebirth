@@ -1941,6 +1941,11 @@ namespace ZoneEngine.Core
             LogXpTrace(character, "db-write-after", "source=" + source + " persisted=true");
         }
 
+        internal static string GetDirectXpClaimFingerprint(ICharacter character)
+        {
+            return character == null ? string.Empty : BuildXpStatSnapshot(character);
+        }
+
         private static string BuildXpStatSnapshot(ICharacter character)
         {
             return string.Format(

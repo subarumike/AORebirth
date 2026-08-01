@@ -21,6 +21,113 @@ regenerating or substituting layout evidence.
 
 No database schema or destructive database operation is part of this stage.
 
+## Durable completion and reward-claim recovery
+
+### Capture-backed completion ordering
+
+The five finalized mission captures establish the same relevant completion
+ordering without requiring a speculative packet meaning:
+
+1. the exact bound interaction or target death occurs;
+2. reward feedback is received;
+3. the cash stat changes;
+4. a reward item, when present, is announced by `TemplateAction` and then added
+   by `ContainerAddItem`;
+5. mission-accomplished feedback is received;
+6. character action `59` carries the exact accepted quest identity;
+7. `Quest Delete` carries that same accepted quest identity; and
+8. exact key and mission-artifact removal/despawn follows.
+
+Representative raw-packet ranges are Kill `4434-4441` with key cleanup
+`4448-4450`, Return Item `3530-3537` with item/key cleanup `3541-3545`, Find
+Item `1363-1371`, Repair `4524-4531` with cleanup `4537-4541`, and Find Person
+`2021-2032` with later key cleanup. The Kill corpse remains usable after Quest
+Delete and despawns later, so mission completion is not made conditional on
+opening the corpse.
+
+### Version-2 completion journal
+
+The generated objective/completion sidecar at
+`mission-state/acg-objectives` is version 2. Its deterministic record retains
+the exact objective and accepted-binding ownership and adds per-component cash,
+XP, item, and token claims. Each claim freezes its stable claim identity,
+authoritative inputs, reconciliation observations, exact reserved inventory
+identity where applicable, notification state, and terminal diagnostic. Claim
+phases are `Uninitialized`, `NotEligible`, `EligibleFrozen`, `ClaimReserved`,
+`ApplicationPending`, `DurablyApplied`, `ClientNotificationPending`,
+`ClientNotificationSent`, and `TerminalFailure`.
+
+The body is SHA-256 protected and atomically replaced. In-memory replacement is
+also an exact-record compare-and-swap: a worker may advance only the precise
+record it read, preventing a stale checkpoint from hiding a concurrent expiry,
+abandonment, or cleanup winner. Version-1 records are accepted only through
+explicit migration. Old not-started, explicitly-none, and granted outcomes map
+to safe version-2 states; an old pending grant is intrinsically ambiguous and
+migrates to durable `TerminalFailure` without rerunning its external mutation.
+
+### Kill persisted-death reconciliation
+
+Version-3 operational state records the Kill target death witness before
+objective completion is allowed to rely on it. The witness correlates the exact
+accepted quest, owner, allocated live PF2, runtime target, captured target slot,
+spawn generation, dead/zero-health state, and corpse state. Startup and
+re-entry recovery require every identity to match the active binding, objective
+binding, and immutable layout evidence. A valid witness may persist the missing
+objective-verification transition. It is not a synthetic death event and does
+not recreate the corpse or rerun combat XP, token progress, death callbacks, or
+corpse-credit allocation.
+
+### Frozen reward authority and recovery boundaries
+
+The immutable accepted projection is the sole cash, XP, and item reward source
+for generated completion. Missing frozen reward fields fail closed; mutable roll
+offers and fallback calculations are not consulted.
+
+- Credits freeze the exact balance before application and the clamped expected
+  balance after application. An exact pre-balance may be applied, and the claim
+  advances only when that same invocation confirms the production persistence
+  call. A previously persisted `ApplicationPending` claim observed at its
+  post-balance is not proof that this claim caused the change because the
+  economy owner has no durable claim token; it becomes a terminal ambiguity.
+  Any third balance also fails closed.
+- XP keeps the existing production XP/research award and persistence owner and
+  freezes a pre-application stat fingerprint. If recovery observes the same
+  fingerprint, application remains safe. If it changed before the durable
+  applied checkpoint, the current architecture cannot distinguish this claim
+  from another stat mutation, so it fails closed instead of risking duplicate
+  XP. This is a documented residual crash boundary, not a claim that research
+  routing is completely characterized.
+- Item rewards reserve their exact runtime inventory identity before grant.
+  Inventory persistence owns the exact owner plus instance, template pair, QL,
+  count, and target-container correlation. Recovery tolerates the repository's
+  documented wire `IdentityType` drift after DB reload, but a duplicate instance
+  or conflicting payload fails closed; another item with the same template is
+  not proof of application.
+- Mission tokens use a separate exact reserved item identity and the same
+  reconciliation rule. Eligibility requires durable generated-mission token
+  progress of exactly `100` percent. Clan templates `103910/103911`, Omni
+  templates `103908/103909`, QL `1`, and the count from the validated official
+  mission-level graph remain repository-owned policy. Neutral and below-100
+  outcomes are explicit no-claim states. The preserved finalized capture corpus
+  does not prove the official probability below 100 percent, so no threshold or
+  chance is invented.
+
+### Notifications, exact removal, and retained audit
+
+Reward feedback, mission-accomplished feedback, action 59, Quest Delete, and
+mission-list removal have independently durable pending/sent or pending/removed
+state. Persistence precedes a resumable send. `Sent` means the server attempted
+packet delivery; these captures expose no client acknowledgement and none is
+claimed. Every packet and removal uses the exact accepted quest identity.
+
+Artifact cleanup, objective/runtime cleanup, and PF2 release continue through
+their exact accepted-mission owners. Cleanup cannot remove a same-template item
+or another mission's state, and PF2 release occurs only after the existing
+durable lifecycle conditions are satisfied. The completion sidecar is retained
+as replay-prevention audit state after transient runtime registrations are
+removed. These mechanisms provide explicit durable idempotency around
+server-controlled phases; they are not a distributed exactly-once transaction.
+
 ## Durable accepted-mission projection and idempotent acceptance
 
 The accepted generated mission is now authoritative without retaining a

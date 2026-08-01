@@ -250,6 +250,113 @@ namespace ZoneEngine.Core.Missions
                 "KillTarget");
         }
 
+        internal static bool TryReconcileRestoredPersistedTargetDeath(
+            MissionAcgBindingRecord binding,
+            out bool verified,
+            out string failure)
+        {
+            verified = false;
+            failure = string.Empty;
+            if (binding == null
+                || binding.Binding.MissionType != MissionRollType.KillPerson)
+            {
+                return true;
+            }
+
+            if (binding.State.LifecycleState != MissionAcgLifecycleState.Accepted
+                && binding.State.LifecycleState != MissionAcgLifecycleState.Active)
+            {
+                return true;
+            }
+
+            MissionAcgOperationalState operational;
+            MissionAcgObjectiveRecord objective;
+            if (!MissionAcgOperationalRuntime.TryEnsureState(
+                    binding,
+                    out operational,
+                    out failure)
+                || !MissionAcgObjectiveRuntime.TryGetByAccepted(
+                    binding.Binding.OwnerIdentity.Instance,
+                    binding.Binding.AcceptedQuestIdentity.Instance,
+                    out objective))
+            {
+                if (string.IsNullOrEmpty(failure))
+                {
+                    failure = "Exact restored Kill objective state is unavailable.";
+                }
+
+                return false;
+            }
+
+            if (objective.State.Phase >= MissionAcgCompletionPhase.ObjectiveVerified)
+            {
+                return true;
+            }
+
+            MissionAcgNpcRuntimeState exactTarget = null;
+            for (int i = 0; i < operational.Npcs.Count; i++)
+            {
+                MissionAcgNpcRuntimeState candidate = operational.Npcs[i];
+                if (candidate.RuntimeIdentity.Equals(
+                    objective.Binding.RuntimeObjectiveIdentity))
+                {
+                    exactTarget = candidate;
+                    break;
+                }
+            }
+
+            if (exactTarget == null
+                || exactTarget.LifeState != MissionAcgNpcLifeState.Dead)
+            {
+                return true;
+            }
+
+            if (!MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                binding,
+                operational,
+                objective,
+                exactTarget))
+            {
+                failure =
+                    "Persisted Kill death ownership is incomplete or conflicts with the accepted binding.";
+                return false;
+            }
+
+            var observation = new MissionAcgObjectiveEvent
+                              {
+                                  OwnerInstance = binding.Binding.OwnerIdentity.Instance,
+                                  TeamIdentity = binding.Binding.TeamIdentity,
+                                  AcceptedQuestInstance =
+                                      binding.Binding.AcceptedQuestIdentity.Instance,
+                                  AllocatedLivePlayfield2 =
+                                      binding.Binding.AllocatedLivePlayfield2,
+                                  RuntimeObjectiveIdentity = exactTarget.RuntimeIdentity,
+                                  Interaction = MissionAcgObjectiveInteraction.TargetDeath,
+                                  ObjectiveTemplateId = objective.Binding.ObjectiveTemplateId,
+                                  ObjectiveName = objective.Binding.ObjectiveName,
+                                  ObservationId =
+                                      "persisted-kill-death-"
+                                      + exactTarget.RuntimeIdentity.Instance
+                                      + "-"
+                                      + exactTarget.SpawnGeneration
+                              };
+            MissionAcgBindingRecord claimed;
+            MissionAcgObjectiveRecord durable;
+            if (!MissionAcgCompletionJournalService.TryPersistObjectiveVerification(
+                binding,
+                objective,
+                observation,
+                out claimed,
+                out durable,
+                out failure))
+            {
+                return false;
+            }
+
+            verified = true;
+            return true;
+        }
+
         internal static bool TryResumePersistedTargetDeath(
             IZoneClient client,
             ICharacter character,
@@ -295,6 +402,37 @@ namespace ZoneEngine.Core.Missions
                 }
             }
 
+            if (objective.State.Phase < MissionAcgCompletionPhase.ObjectiveVerified)
+            {
+                if (!MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                        binding,
+                        operational,
+                        objective,
+                        exactTarget))
+                {
+                    return false;
+                }
+
+                // The death/corpse/combat-reward path has already crossed its
+                // durable boundary. Recovery dispatches only the exact Stage 4
+                // objective observation; it never synthesizes another death,
+                // corpse, combat-XP award, token event, or corpse-credit payout.
+                completed = Complete(
+                    client,
+                    character,
+                    binding,
+                    objective,
+                    MissionAcgObjectiveInteraction.TargetDeath,
+                    exactTarget.RuntimeIdentity,
+                    objective.Binding.ObjectiveTemplateId,
+                    objective.Binding.ObjectiveName,
+                    null,
+                    0,
+                    null,
+                    "KillTargetPersistedDeathRecovery");
+                return true;
+            }
+
             if (!MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
                     objective,
                     exactTarget))
@@ -303,16 +441,21 @@ namespace ZoneEngine.Core.Missions
             }
 
             MissionAcceptedStore.AcceptedMission acceptedMission;
+            var acceptedIdentity = new Identity
+                                   {
+                                       Type =
+                                           (IdentityType)objective.Binding
+                                               .AcceptedQuestIdentity.Type,
+                                       Instance =
+                                           objective.Binding.AcceptedQuestIdentity.Instance
+                                   };
             if (!MissionAcceptedStore.TryResolve(
                     character.Identity.Instance,
-                    new Identity
-                    {
-                        Type =
-                            (IdentityType)objective.Binding
-                                .AcceptedQuestIdentity.Type,
-                        Instance =
-                            objective.Binding.AcceptedQuestIdentity.Instance
-                    },
+                    acceptedIdentity,
+                    out acceptedMission)
+                && !MissionAcceptedStore.TryResolveGeneratedProjection(
+                    character.Identity.Instance,
+                    acceptedIdentity,
                     out acceptedMission))
             {
                 return true;

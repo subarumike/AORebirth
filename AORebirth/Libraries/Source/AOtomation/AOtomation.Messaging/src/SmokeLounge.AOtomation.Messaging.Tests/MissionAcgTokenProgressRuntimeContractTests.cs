@@ -376,7 +376,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string verify =
                 ReadMember(
                     completion,
-                    "internal static bool TryVerifyAndComplete(");
+                    "internal static bool TryPersistObjectiveVerification(");
 
             AssertOrdered(
                 verify,
@@ -385,6 +385,30 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "MissionAcgObjectiveLifecycle.Verified",
                 "MissionAcgCompletionPhase.ObjectiveVerified",
                 "MissionAcgExpiryRuntime.ReleaseObjectiveVerificationClaim(");
+        }
+
+        [TestMethod]
+        public void CompletionReadsOnlyExactDurablySealedGeneratedProgress()
+        {
+            string runtime =
+                ReadMissionSource("MissionAcgTokenProgressRuntime.cs");
+            string resolve =
+                ReadMember(
+                    runtime,
+                    "internal static bool TryGetSealedProgress(");
+
+            AssertOrdered(
+                resolve,
+                "TryValidateExactObjective(",
+                "binding.Binding.AcceptedQuestIdentity.Instance",
+                "InvalidAccepted.Contains(",
+                "ByAccepted.TryGetValue(",
+                "current.State.Matches(",
+                "MissionAcgLifecycleState.CompletionStarted");
+            Assert.IsFalse(
+                resolve.Contains("MissionTokenProgressTracker."));
+            Assert.IsFalse(resolve.Contains("MissionTypeCatalog"));
+            Assert.IsFalse(resolve.Contains("GetAll("));
         }
 
         [TestMethod]
@@ -491,7 +515,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void GeneratedProgressAddsNoRewardQfuSchemaOrTeamDistribution()
+        public void GeneratedProgressPolicyDoesNotGrantQfuSchemaOrTeamDistribution()
         {
             string runtime =
                 ReadMissionSource("MissionAcgTokenProgressRuntime.cs");
@@ -503,7 +527,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.IsFalse(generated.Contains("QuestFullUpdate"));
             Assert.IsFalse(generated.Contains("GrantMissionToken"));
-            Assert.IsFalse(generated.Contains("TokenReward"));
+            Assert.IsFalse(generated.Contains("MissionKeyGrantService"));
+            Assert.IsFalse(generated.Contains("BaseInventory"));
+            StringAssert.Contains(
+                state,
+                "MissionAcgTokenClaimDisposition.Eligible");
+            StringAssert.Contains(
+                state,
+                "progress.Percent < 100");
             Assert.IsFalse(generated.Contains("ALTER TABLE"));
             Assert.IsFalse(generated.Contains("CREATE TABLE"));
             StringAssert.Contains(runtime, "TeamIdentity != null");

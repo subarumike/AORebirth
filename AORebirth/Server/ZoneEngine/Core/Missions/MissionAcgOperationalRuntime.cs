@@ -720,15 +720,19 @@ namespace ZoneEngine.Core.Missions
         }
 
         internal static bool TryPrepareNpcDeath(
+            ICharacter attacker,
             ICharacter target,
+            DateTime diedAtUtc,
             bool createCorpse,
             out Identity corpseIdentity,
             out bool isOperationalNpc,
-            out bool deathAlreadyPersisted)
+            out bool deathAlreadyPersisted,
+            out bool persistedDeathWitnessMatchesAttacker)
         {
             corpseIdentity = Identity.None;
             isOperationalNpc = false;
             deathAlreadyPersisted = false;
+            persistedDeathWitnessMatchesAttacker = false;
             if (target == null || target.Playfield == null)
             {
                 return false;
@@ -763,11 +767,32 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 isOperationalNpc = true;
-                if (npc.LifeState == MissionAcgNpcLifeState.Dead
-                    && npc.CorpseIdentity != null)
+                if (state.CleanupState != MissionAcgOperationalCleanupState.Active
+                    || npc.CleanupCompleted)
                 {
-                    corpseIdentity = ToIdentity(npc.CorpseIdentity);
+                    return false;
+                }
+
+                if (npc.LifeState == MissionAcgNpcLifeState.Dead)
+                {
+                    corpseIdentity =
+                        npc.CorpseIdentity == null
+                            ? Identity.None
+                            : ToIdentity(npc.CorpseIdentity);
                     deathAlreadyPersisted = true;
+                    persistedDeathWitnessMatchesAttacker =
+                        attacker != null
+                        && npc.DeathHookCheckpoint
+                           >= MissionAcgNpcDeathHookCheckpoint.DeathPersisted
+                        && npc.DeathCreditedAttackerIdentity != null
+                        && npc.DeathCreditedOwnerIdentity != null
+                        && npc.DeathCreditedAttackerIdentity.Equals(
+                            ToRecord(attacker.Identity))
+                        && npc.DeathCreditedOwnerIdentity.Equals(state.OwnerIdentity)
+                        && npc.DeathCreditedAttackerIdentity.Equals(state.OwnerIdentity)
+                        && npc.DiedAtUtc.HasValue
+                        && npc.CurrentHealth == 0
+                        && npc.DeathSpawnGeneration == npc.SpawnGeneration;
                     return true;
                 }
 
@@ -783,13 +808,19 @@ namespace ZoneEngine.Core.Missions
                             npc.RuntimeIdentity.Instance)
                         : null;
                 MissionAcgOperationalState replacement =
-                    state.ReplaceNpc(npc.WithDeath(corpse), DateTime.UtcNow);
+                    state.ReplaceNpc(
+                        npc.WithDeath(
+                            corpse,
+                            attacker == null ? null : ToRecord(attacker.Identity),
+                            state.OwnerIdentity,
+                            diedAtUtc),
+                        diedAtUtc);
                 if (!TryReplaceStateLocked(state, replacement, "death"))
                 {
                     return false;
                 }
 
-                corpseIdentity = ToIdentity(corpse);
+                corpseIdentity = corpse == null ? Identity.None : ToIdentity(corpse);
                 return true;
             }
         }
@@ -862,6 +893,55 @@ namespace ZoneEngine.Core.Missions
                 }
 
                 return false;
+            }
+        }
+
+        internal static bool TryAdvanceNpcDeathHookCheckpoint(
+            ICharacter target,
+            MissionAcgNpcDeathHookCheckpoint checkpoint)
+        {
+            if (target == null
+                || target.Playfield == null
+                || checkpoint <= MissionAcgNpcDeathHookCheckpoint.DeathPersisted
+                || !Enum.IsDefined(typeof(MissionAcgNpcDeathHookCheckpoint), checkpoint))
+            {
+                return false;
+            }
+
+            EnsureInitialized();
+            lock (Sync)
+            {
+                MissionAcgOperationalState state;
+                MissionAcgNpcRuntimeState npc;
+                if (!ByPlayfield.TryGetValue(target.Playfield.Identity.Instance, out state)
+                    || state.CleanupState != MissionAcgOperationalCleanupState.Active
+                    || !state.TryGetNpc(target.Identity.Instance, out npc)
+                    || !npc.RuntimeIdentity.Equals(ToRecord(target.Identity))
+                    || npc.LifeState != MissionAcgNpcLifeState.Dead
+                    || npc.DeathHookCheckpoint
+                       == MissionAcgNpcDeathHookCheckpoint.None
+                    || npc.DeathSpawnGeneration != npc.SpawnGeneration
+                    || npc.CleanupCompleted)
+                {
+                    return false;
+                }
+
+                if (npc.DeathHookCheckpoint == checkpoint)
+                {
+                    return true;
+                }
+
+                if ((int)checkpoint != (int)npc.DeathHookCheckpoint + 1)
+                {
+                    return false;
+                }
+
+                return TryReplaceStateLocked(
+                    state,
+                    state.ReplaceNpc(
+                        npc.WithDeathHookCheckpoint(checkpoint),
+                        DateTime.UtcNow),
+                    "death-hook-checkpoint");
             }
         }
 
@@ -1318,6 +1398,37 @@ namespace ZoneEngine.Core.Missions
                 restored = migrated;
                 MissionDiagnostics.Log(
                     "ACG-OPERATIONAL-MIGRATE accepted={0}:{1} livePf2={2} from=1 to={3}",
+                    record.Binding.AcceptedQuestIdentity.Type,
+                    record.Binding.AcceptedQuestIdentity.Instance,
+                    record.Binding.AllocatedLivePlayfield2,
+                    MissionAcgOperationalState.CurrentFormatVersion);
+            }
+
+            else if (exists
+                     && restored.FormatVersion
+                        == MissionAcgOperationalState.LegacyDeathWitnessFormatVersion)
+            {
+                MissionAcgOperationalState migrated;
+                if (!MissionAcgOperationalStateMigration.TryUpgradeLegacyDeathWitness(
+                        restored,
+                        expected,
+                        DateTime.UtcNow,
+                        out migrated,
+                        out failure))
+                {
+                    return false;
+                }
+
+                if (!store.TryWrite(migrated, true, out failure))
+                {
+                    failure = "Legacy operational-state death-witness migration failed: "
+                              + failure;
+                    return false;
+                }
+
+                restored = migrated;
+                MissionDiagnostics.Log(
+                    "ACG-OPERATIONAL-MIGRATE accepted={0}:{1} livePf2={2} from=2 to={3} deathWitness=absent-fail-closed",
                     record.Binding.AcceptedQuestIdentity.Type,
                     record.Binding.AcceptedQuestIdentity.Instance,
                     record.Binding.AllocatedLivePlayfield2,

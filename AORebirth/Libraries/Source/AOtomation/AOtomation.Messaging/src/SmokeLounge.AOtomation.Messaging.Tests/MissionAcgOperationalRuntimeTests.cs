@@ -36,10 +36,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void OperationalFormatIsVersionTwoWithExplicitLegacySupport()
+        public void OperationalFormatIsVersionThreeWithExplicitLegacySupport()
         {
             Assert.AreEqual(1, MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion);
-            Assert.AreEqual(2, MissionAcgOperationalState.CurrentFormatVersion);
+            Assert.AreEqual(2, MissionAcgOperationalState.LegacyDeathWitnessFormatVersion);
+            Assert.AreEqual(3, MissionAcgOperationalState.CurrentFormatVersion);
             Assert.AreEqual(1, MissionAcgRuntimeState.CurrentFormatVersion);
             Assert.AreEqual(2, MissionAcgInstanceBinding.CurrentFormatVersion);
         }
@@ -175,6 +176,73 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(
                 restored.Npcs[0].RuntimeIdentity.Instance,
                 restored.Npcs[0].CorpseIdentity.Instance);
+        }
+
+        [TestMethod]
+        public void ExactDeathWitnessAndHookCheckpointSurviveRestart()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(201, this.FirstPf());
+            MissionAcgOperationalState witnessed =
+                this.CreateWitnessedDeathState(
+                    record,
+                    MissionAcgNpcDeathHookCheckpoint.RewardHooksCompleted,
+                    record.Binding.OwnerIdentity);
+            MissionAcgOperationalState restored = this.RoundTrip(record, witnessed);
+            MissionAcgNpcRuntimeState target = restored.Npcs[0];
+            Assert.AreEqual(
+                record.Binding.OwnerIdentity,
+                target.DeathCreditedAttackerIdentity);
+            Assert.AreEqual(
+                record.Binding.OwnerIdentity,
+                target.DeathCreditedOwnerIdentity);
+            Assert.AreEqual(1, target.DeathSpawnGeneration);
+            Assert.IsTrue(target.DiedAtUtc.HasValue);
+            Assert.AreEqual(
+                MissionAcgNpcDeathHookCheckpoint.RewardHooksCompleted,
+                target.DeathHookCheckpoint);
+        }
+
+        [TestMethod]
+        public void LegacyVersionTwoDeadStateMigratesWithoutInventingDeathWitness()
+        {
+            MissionAcgBindingRecord record = this.CreateBinding(202, this.FirstPf());
+            MissionAcgOperationalState current = this.CreateState(record, true, false);
+            MissionAcgOperationalState legacy =
+                WithDifficulty(
+                    current,
+                    MissionAcgOperationalState.LegacyDeathWitnessFormatVersion,
+                    current.Npcs[0].Level,
+                    current.Npcs[0].MaximumHealth,
+                    current.Npcs[0].CurrentHealth);
+            MissionAcgOperationalState expected = this.CreateState(record, false, false);
+            MissionAcgOperationalState migrated;
+            string failure;
+            Assert.IsTrue(
+                MissionAcgOperationalStateMigration.TryUpgradeLegacyDeathWitness(
+                    legacy,
+                    expected,
+                    DateTime.UtcNow,
+                    out migrated,
+                    out failure),
+                failure);
+            Assert.AreEqual(MissionAcgNpcLifeState.Dead, migrated.Npcs[0].LifeState);
+            Assert.AreEqual(
+                MissionAcgNpcDeathHookCheckpoint.None,
+                migrated.Npcs[0].DeathHookCheckpoint);
+            Assert.IsNull(migrated.Npcs[0].DeathCreditedAttackerIdentity);
+
+            MissionAcgObjectiveRecord objective =
+                CreateKillObjective(
+                    record,
+                    migrated.Npcs[0],
+                    MissionAcgObjectiveLifecycle.Exposed,
+                    MissionAcgCompletionPhase.None);
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                    record,
+                    migrated,
+                    objective,
+                    migrated.Npcs[0]));
         }
 
         [TestMethod]
@@ -475,7 +543,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void PersistedKillDeathRequiresDurableObjectiveVerificationToResume()
+        public void PersistedKillDeathRequiresExactWitnessOrDurableVerificationToResume()
         {
             MissionAcgBindingRecord record = this.CreateBinding(34, this.FirstPf());
             MissionAcgOperationalState state = this.CreateState(record, true, false);
@@ -490,6 +558,47 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
                     objective,
                     target));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                    record,
+                    state,
+                    objective,
+                    target));
+
+            MissionAcgOperationalState witnessed =
+                this.CreateWitnessedDeathState(
+                    record,
+                    MissionAcgNpcDeathHookCheckpoint.DeathPersisted,
+                    record.Binding.OwnerIdentity);
+            MissionAcgNpcRuntimeState witnessedTarget = witnessed.Npcs[0];
+            MissionAcgObjectiveRecord unverifiedWitnessed =
+                CreateKillObjective(
+                    record,
+                    witnessedTarget,
+                    MissionAcgObjectiveLifecycle.Exposed,
+                    MissionAcgCompletionPhase.None);
+            Assert.IsTrue(
+                MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                    record,
+                    witnessed,
+                    unverifiedWitnessed,
+                    witnessedTarget));
+
+            MissionAcgOperationalState wrongAttacker =
+                this.CreateWitnessedDeathState(
+                    record,
+                    MissionAcgNpcDeathHookCheckpoint.DeathPersisted,
+                    new MissionAcgIdentityRecord(0xC350, 999999));
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                    record,
+                    wrongAttacker,
+                    CreateKillObjective(
+                        record,
+                        wrongAttacker.Npcs[0],
+                        MissionAcgObjectiveLifecycle.Exposed,
+                        MissionAcgCompletionPhase.None),
+                    wrongAttacker.Npcs[0]));
 
             MissionAcgObjectiveRecord verified =
                 CreateKillObjective(
@@ -505,6 +614,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 MissionAcgCorpsePolicy.IsVerifiedKillDeathRecoveryEligible(
                     verified,
                     target.WithCleanup()));
+
+            var expired =
+                new MissionAcgBindingRecord(
+                    record.Binding,
+                    new MissionAcgInstanceState(
+                        MissionAcgLifecycleState.Expired,
+                        MissionAcgCleanupState.None,
+                        DateTime.UtcNow,
+                        null),
+                    record.RecordPath);
+            Assert.IsFalse(
+                MissionAcgCorpsePolicy.IsPersistedKillDeathWitnessEligible(
+                    expired,
+                    witnessed,
+                    unverifiedWitnessed,
+                    witnessedTarget));
         }
 
         [TestMethod]
@@ -705,10 +830,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "TryResumePersistedTargetDeath");
             StringAssert.Contains(
                 objective,
-                "IsVerifiedKillDeathRecoveryEligible");
+                "IsPersistedKillDeathWitnessEligible");
             StringAssert.Contains(
                 objective,
-                "\"KillTargetRestartRecovery\"");
+                "\"KillTargetPersistedDeathRecovery\"");
+            StringAssert.Contains(
+                npcRuntime,
+                "persistedDeathWitnessMatchesAttacker");
+            StringAssert.Contains(
+                npcRuntime,
+                "RewardHooksStarted");
             StringAssert.Contains(
                 instance,
                 "MissionAcgObjectiveInteractionService.TryResumePersistedTargetDeath(");
@@ -1064,6 +1195,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new[] { chest },
                 MissionAcgOperationalCleanupState.Active,
                 new DateTime(2026, 7, 28, 18, 0, 0, DateTimeKind.Utc));
+        }
+
+        private MissionAcgOperationalState CreateWitnessedDeathState(
+            MissionAcgBindingRecord record,
+            MissionAcgNpcDeathHookCheckpoint checkpoint,
+            MissionAcgIdentityRecord creditedAttacker)
+        {
+            MissionAcgOperationalState state = this.CreateState(record, false, false);
+            MissionAcgNpcRuntimeState npc = state.Npcs[0].WithDeath(
+                new MissionAcgIdentityRecord(
+                    0xC76A,
+                    state.Npcs[0].RuntimeIdentity.Instance),
+                creditedAttacker,
+                record.Binding.OwnerIdentity,
+                new DateTime(2026, 7, 28, 18, 30, 0, DateTimeKind.Utc));
+            while (npc.DeathHookCheckpoint < checkpoint)
+            {
+                npc =
+                    npc.WithDeathHookCheckpoint(
+                        (MissionAcgNpcDeathHookCheckpoint)((int)npc.DeathHookCheckpoint + 1));
+            }
+
+            npc = npc.WithCorpseState(MissionAcgCorpseState.Available);
+            return state.ReplaceNpc(
+                npc,
+                new DateTime(2026, 7, 28, 18, 31, 0, DateTimeKind.Utc));
         }
 
         private static MissionAcgOperationalState WithDifficulty(

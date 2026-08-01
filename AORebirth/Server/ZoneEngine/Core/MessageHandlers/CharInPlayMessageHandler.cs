@@ -185,6 +185,9 @@ namespace ZoneEngine.Core.MessageHandlers
             }
 
             // Backup path — primary resync is ClientConnected after FullCharacter (CharInPlay often missing).
+            ZoneEngine.Core.Missions.MissionAcgLifecycleService.TryCleanupPendingForCharacter(
+                client,
+                client.Controller.Character);
             bool missionWindowResent =
                 ZoneEngine.Core.Missions.MissionAcceptService.TryResendForLogin(client.Controller.Character);
             ZoneEngine.Core.Missions.MissionTokenProgressTracker

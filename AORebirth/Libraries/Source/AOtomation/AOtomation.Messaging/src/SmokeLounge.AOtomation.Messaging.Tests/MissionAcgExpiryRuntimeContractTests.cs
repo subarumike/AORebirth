@@ -392,6 +392,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "MissionAcceptService.TryResendForLogin(",
                     StringComparison.Ordinal);
             Assert.IsTrue(cleanup >= 0 && resend > cleanup);
+
+            string charInPlay =
+                ReadZoneSource("Core/MessageHandlers/CharInPlayMessageHandler.cs");
+            int backupCleanup =
+                charInPlay.IndexOf(
+                    "MissionAcgLifecycleService.TryCleanupPendingForCharacter(",
+                    StringComparison.Ordinal);
+            int backupResend =
+                charInPlay.IndexOf(
+                    "MissionAcceptService.TryResendForLogin(",
+                    StringComparison.Ordinal);
+            Assert.IsTrue(backupCleanup >= 0 && backupResend > backupCleanup);
+
+            string journal =
+                ReadMissionSource("MissionAcgCompletionJournalService.cs");
+            int resumeStart =
+                journal.IndexOf(
+                    "internal static void ResumeForCharacter(",
+                    StringComparison.Ordinal);
+            int resumeEnd =
+                journal.IndexOf(
+                    "internal static bool ResumeForAccepted(",
+                    resumeStart,
+                    StringComparison.Ordinal);
+            Assert.IsTrue(resumeStart >= 0 && resumeEnd > resumeStart);
+            string resume = journal.Substring(resumeStart, resumeEnd - resumeStart);
+            StringAssert.Contains(resume, "TryCompleteVerified(");
+            Assert.IsFalse(resume.Contains("TryVerifyAndComplete("));
+            Assert.IsFalse(resume.Contains("TryPersistObjectiveVerification("));
         }
 
         [TestMethod]

@@ -228,6 +228,8 @@ namespace ZoneEngine.Core.Missions
                 int formatVersion = ParseInt(Require(values, "FormatVersion"), "FormatVersion");
                 if (formatVersion
                         != MissionAcgOperationalState.LegacyCapturedDifficultyFormatVersion
+                    && formatVersion
+                       != MissionAcgOperationalState.LegacyDeathWitnessFormatVersion
                     && formatVersion != MissionAcgOperationalState.CurrentFormatVersion)
                 {
                     failure = "Unknown operational-state format version " + formatVersion + ".";
@@ -256,6 +258,32 @@ namespace ZoneEngine.Core.Missions
                 {
                     string prefix = "Npc." + i.ToString("D3", CultureInfo.InvariantCulture) + ".";
                     MissionAcgIdentityRecord corpse = ParseOptionalIdentity(values, prefix + "Corpse");
+                    MissionAcgIdentityRecord deathCreditedAttacker = null;
+                    MissionAcgIdentityRecord deathCreditedOwner = null;
+                    DateTime? diedAtUtc = null;
+                    int deathSpawnGeneration = 0;
+                    MissionAcgNpcDeathHookCheckpoint deathHookCheckpoint =
+                        MissionAcgNpcDeathHookCheckpoint.None;
+                    if (formatVersion >= MissionAcgOperationalState.CurrentFormatVersion)
+                    {
+                        deathCreditedAttacker =
+                            ParseOptionalIdentity(values, prefix + "DeathCreditedAttacker");
+                        deathCreditedOwner =
+                            ParseOptionalIdentity(values, prefix + "DeathCreditedOwner");
+                        diedAtUtc =
+                            ParseOptionalUtc(
+                                Require(values, prefix + "DiedAtUtc"),
+                                prefix + "DiedAtUtc");
+                        deathSpawnGeneration =
+                            ParseInt(
+                                Require(values, prefix + "DeathSpawnGeneration"),
+                                prefix + "DeathSpawnGeneration");
+                        deathHookCheckpoint =
+                            ParseEnum<MissionAcgNpcDeathHookCheckpoint>(
+                                Require(values, prefix + "DeathHookCheckpoint"),
+                                prefix + "DeathHookCheckpoint");
+                    }
+
                     npcs.Add(
                         new MissionAcgNpcRuntimeState(
                             ParseInt(Require(values, prefix + "CapturedSlot"), prefix + "CapturedSlot"),
@@ -297,7 +325,12 @@ namespace ZoneEngine.Core.Missions
                                 prefix + "SpawnGeneration"),
                             ParseBool(
                                 Require(values, prefix + "CleanupCompleted"),
-                                prefix + "CleanupCompleted")));
+                                prefix + "CleanupCompleted"),
+                            deathCreditedAttacker,
+                            deathCreditedOwner,
+                            diedAtUtc,
+                            deathSpawnGeneration,
+                            deathHookCheckpoint));
                 }
 
                 var chests = new List<MissionAcgChestRuntimeState>(chestCount);
@@ -326,7 +359,11 @@ namespace ZoneEngine.Core.Missions
                                 prefix + "CleanupCompleted")));
                 }
 
-                int expectedFields = 14 + (npcCount * 29) + (chestCount * 10);
+                int npcFieldCount =
+                    formatVersion >= MissionAcgOperationalState.CurrentFormatVersion
+                        ? 38
+                        : 29;
+                int expectedFields = 14 + (npcCount * npcFieldCount) + (chestCount * 10);
                 if (values.Count != expectedFields)
                 {
                     failure = "Operational-state field count is inconsistent.";
@@ -404,6 +441,28 @@ namespace ZoneEngine.Core.Missions
                 values.Add(prefix + "CorpseState", Int((int)npc.CorpseState));
                 values.Add(prefix + "SpawnGeneration", Int(npc.SpawnGeneration));
                 values.Add(prefix + "CleanupCompleted", Bool(npc.CleanupCompleted));
+                if (state.FormatVersion >= MissionAcgOperationalState.CurrentFormatVersion)
+                {
+                    AddOptionalIdentity(
+                        values,
+                        prefix + "DeathCreditedAttacker",
+                        npc.DeathCreditedAttackerIdentity);
+                    AddOptionalIdentity(
+                        values,
+                        prefix + "DeathCreditedOwner",
+                        npc.DeathCreditedOwnerIdentity);
+                    values.Add(
+                        prefix + "DiedAtUtc",
+                        npc.DiedAtUtc.HasValue
+                            ? npc.DiedAtUtc.Value.ToString("o", CultureInfo.InvariantCulture)
+                            : string.Empty);
+                    values.Add(
+                        prefix + "DeathSpawnGeneration",
+                        Int(npc.DeathSpawnGeneration));
+                    values.Add(
+                        prefix + "DeathHookCheckpoint",
+                        Int((int)npc.DeathHookCheckpoint));
+                }
             }
 
             for (int i = 0; i < state.Chests.Count; i++)
@@ -607,6 +666,11 @@ namespace ZoneEngine.Core.Missions
             }
 
             return parsed.Kind == DateTimeKind.Utc ? parsed : parsed.ToUniversalTime();
+        }
+
+        private static DateTime? ParseOptionalUtc(string value, string field)
+        {
+            return value.Length == 0 ? (DateTime?)null : ParseUtc(value, field);
         }
 
         private static string EncodeText(string value)

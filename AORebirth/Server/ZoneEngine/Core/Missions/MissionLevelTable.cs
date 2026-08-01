@@ -206,20 +206,45 @@ namespace ZoneEngine.Core.Missions
         /// </summary>
         public static int GetTokenReward(int characterLevel)
         {
-            EnsureLoaded();
-            MissionLevelGraph graph;
-            string failure;
-            if (!Publication.TryGet(out graph, out failure))
-            {
-                return 0;
-            }
-
             int tokenCount;
-            return graph.TryGetTokenCount(
-                       ClampCharacterLevel(characterLevel),
-                       out tokenCount)
+            string failure;
+            return TryGetTokenReward(
+                       characterLevel,
+                       out tokenCount,
+                       out failure)
                        ? tokenCount
                        : 0;
+        }
+
+        /// <summary>
+        /// Resolves the unchanged official token column without converting a
+        /// missing or invalid graph into a guessed reward.
+        /// </summary>
+        internal static bool TryGetTokenReward(
+            int characterLevel,
+            out int tokenCount,
+            out string failure)
+        {
+            tokenCount = 0;
+            failure = string.Empty;
+            EnsureLoaded();
+            MissionLevelGraph graph;
+            if (!Publication.TryGet(out graph, out failure))
+            {
+                return false;
+            }
+
+            if (!graph.TryGetTokenCount(
+                    ClampCharacterLevel(characterLevel),
+                    out tokenCount))
+            {
+                failure =
+                    "The validated official mission-level graph lacks the requested token cell.";
+                tokenCount = 0;
+                return false;
+            }
+
+            return true;
         }
 
         private static void EnsureLoaded()
