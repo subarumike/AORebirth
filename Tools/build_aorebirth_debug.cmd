@@ -70,6 +70,24 @@ if not "%ZONE_EXIT%"=="0" (
     exit /b %ZONE_EXIT%
 )
 
+echo [AORebirth Build] Building DatabasePreflight...
+"%MSBUILD%" "Tools\DatabasePreflight\DatabasePreflight.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
+set PREFLIGHT_EXIT=%ERRORLEVEL%
+if not "%PREFLIGHT_EXIT%"=="0" (
+    echo [AORebirth Build] DatabasePreflight failed with exit code %PREFLIGHT_EXIT%.
+    popd
+    exit /b %PREFLIGHT_EXIT%
+)
+
+echo [AORebirth Build] Building WebEngine...
+"%MSBUILD%" "AORebirth\Server\WebEngine\WebEngine.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
+set WEB_EXIT=%ERRORLEVEL%
+if not "%WEB_EXIT%"=="0" (
+    echo [AORebirth Build] WebEngine failed with exit code %WEB_EXIT%.
+    popd
+    exit /b %WEB_EXIT%
+)
+
 echo [AORebirth Build] Cleaning stale build processes after successful build...
 taskkill /F /T /IM MSBuild.exe >nul 2>&1
 taskkill /F /T /IM dotnet.exe >nul 2>&1
@@ -144,6 +162,7 @@ call :CheckPackageConfig "AORebirth\Libraries\Source\Cell.Core\packages.config"
 call :CheckPackageConfig "AORebirth\Libraries\Source\Exceptions\packages.config"
 call :CheckPackageConfig "AORebirth\Libraries\Source\Utility\packages.config"
 call :CheckPackageConfig "AORebirth\Server\ZoneEngine\packages.config"
+call :CheckPackageConfig "AORebirth\Server\WebEngine\packages.config"
 
 if "%MISSING_PACKAGES%"=="0" (
     echo [AORebirth Build] All required package folders already exist in AORebirth\packages.
