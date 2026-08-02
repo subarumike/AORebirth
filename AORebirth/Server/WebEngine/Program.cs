@@ -81,16 +81,42 @@ namespace WebEngine
         /// </summary>
         private static HttpServer myServer;
 
+        private static IDisposable webCoreAssetLease;
+
         #endregion
 
         #region Public Methods and Operators
 
         /// <summary>
         /// </summary>
-        public static void StartTheServer()
+        public static bool StartTheServer()
         {
-            myServer.StartServer();
-            Console.WriteLine(locales.ServerConsoleServerIsRunning);
+            if (!AcquireWebCoreAssetLease())
+            {
+                Console.WriteLine("WebCore assets are in use; the WebEngine listener was not started.");
+                Environment.ExitCode = 1;
+                return false;
+            }
+
+            if (!ValidateWebCoreAssets())
+            {
+                ReleaseWebCoreAssetLease();
+                Console.WriteLine("WebCore asset validation failed; the WebEngine listener was not started.");
+                Environment.ExitCode = 1;
+                return false;
+            }
+
+            try
+            {
+                myServer.StartServer();
+                Console.WriteLine(locales.ServerConsoleServerIsRunning);
+                return true;
+            }
+            catch
+            {
+                ReleaseWebCoreAssetLease();
+                throw;
+            }
         }
 
         #endregion
@@ -123,11 +149,16 @@ namespace WebEngine
         /// </param>
         private static string GetArgumentValue(string[] args, string argument)
         {
-            for (int index = 0; index < args.Length - 1; index++)
+            return GetArgumentValue(args, argument, 1);
+        }
+
+        private static string GetArgumentValue(string[] args, string argument, int offset)
+        {
+            for (int index = 0; index < args.Length - offset; index++)
             {
                 if (string.Equals(args[index], argument, StringComparison.OrdinalIgnoreCase))
                 {
-                    return args[index + 1];
+                    return args[index + offset];
                 }
             }
 
@@ -145,6 +176,33 @@ namespace WebEngine
             }
 
             return false;
+        }
+
+        private static bool AcquireWebCoreAssetLease()
+        {
+            if (webCoreAssetLease != null)
+            {
+                return true;
+            }
+
+            try
+            {
+                webCoreAssetLease = WebCoreAssetManager.AcquireRuntimeLease();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void ReleaseWebCoreAssetLease()
+        {
+            if (webCoreAssetLease != null)
+            {
+                webCoreAssetLease.Dispose();
+                webCoreAssetLease = null;
+            }
         }
 
         private static void ConfigureHeadlessConsoleLogging(string[] args)
@@ -215,7 +273,10 @@ namespace WebEngine
         private static void RunHeadless(string[] args)
         {
             Console.WriteLine("Starting WebEngine in headless mode.");
-            StartTheServer();
+            if (!StartTheServer())
+            {
+                return;
+            }
 
             string shutdownFile = GetArgumentValue(args, "/shutdown-file");
             while (!exited)
@@ -296,6 +357,15 @@ namespace WebEngine
                 return false;
             }
 
+            if (!ValidateWebCoreAssets())
+            {
+                Colouring.Push(ConsoleColor.Red);
+                Console.WriteLine("Error validating the configured local WebCore assets.");
+                Colouring.Pop();
+                Colouring.Pop();
+                return false;
+            }
+
             if (!InitializeServerInstance())
             {
                 Colouring.Push(ConsoleColor.Red);
@@ -343,7 +413,6 @@ namespace WebEngine
             consoleCommands.AddEntry("debugnetwork", SetDebugNetwork);
 
             consoleCommands.AddEntry("checkphp", CheckPhp);
-            consoleCommands.AddEntry("checkWebCore", CheckWebCore);
             return true;
         }
 
@@ -431,6 +500,45 @@ namespace WebEngine
             if (HasArgument(args, "/validate-php-runtime"))
             {
                 Environment.ExitCode = ValidatePhpRuntime() ? 0 : 2;
+                return;
+            }
+
+            if (HasArgument(args, "/self-test-webcore-assets"))
+            {
+                Environment.ExitCode = WebCoreAssetManagerSelfTests.Run(Console.Out) ? 0 : 3;
+                return;
+            }
+
+            if (HasArgument(args, "/validate-webcore-manifest"))
+            {
+                WebCoreAssetResult manifestResult = WebCoreAssetManager.ValidateConfiguredManifest();
+                Console.WriteLine(manifestResult.Message);
+                Environment.ExitCode = manifestResult.IsValid ? 0 : 2;
+                return;
+            }
+
+            if (HasArgument(args, "/validate-webcore-assets"))
+            {
+                Environment.ExitCode = ValidateWebCoreAssets() ? 0 : 2;
+                return;
+            }
+
+            if (HasArgument(args, "/import-webcore-assets"))
+            {
+                string archivePath = GetArgumentValue(args, "/import-webcore-assets", 1);
+                string expectedVersion = GetArgumentValue(args, "/import-webcore-assets", 2);
+                if (string.IsNullOrWhiteSpace(archivePath) || string.IsNullOrWhiteSpace(expectedVersion))
+                {
+                    Console.WriteLine("WebCore import requires a local ZIP path and the exact manifest version.");
+                    Environment.ExitCode = 4;
+                    return;
+                }
+
+                WebCoreAssetResult importResult = WebCoreAssetManager.ImportConfiguredArchive(
+                    archivePath,
+                    expectedVersion);
+                Console.WriteLine(importResult.Message);
+                Environment.ExitCode = importResult.IsValid ? 0 : 4;
                 return;
             }
 
@@ -568,14 +676,16 @@ namespace WebEngine
             return result.IsValid;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        private static void CheckWebCore(string[] obj)
+        private static bool ValidateWebCoreAssets()
         {
-            var _checks = new Checks();
-            _checks.CheckWebCore();
+            WebCoreAssetResult result = WebCoreAssetManager.ValidateConfiguredAssets();
+            Console.WriteLine(result.Message);
+            if (result.IsValid)
+            {
+                Config.Instance.CurrentConfig.WebHostRoot = result.AssetRoot;
+            }
+
+            return result.IsValid;
         }
 
         /// <summary>

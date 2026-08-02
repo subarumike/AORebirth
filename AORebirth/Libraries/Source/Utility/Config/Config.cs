@@ -127,11 +127,6 @@ namespace Utility.Config
         /// <summary>
         /// 
         /// </summary>
-        WebCoreRepo,
-
-        /// <summary>
-        /// 
-        /// </summary>
         WebHostDefaultPage,
 
         /// <summary>
@@ -242,8 +237,6 @@ namespace Utility.Config
         public int WebHostPort { get; set; }
 
         public string WebHostRoot { get; set; }
-
-        public string WebCoreRepo { get; set; }
 
         /// <summary>
         /// 
