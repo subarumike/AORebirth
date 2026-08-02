@@ -1,13 +1,53 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Normalize maintained text to LF unless a narrower rule below overrides it.
+* text=auto eol=lf
+
+*.cs text eol=lf diff=csharp
+*.csproj text eol=lf merge=union
+*.sln text eol=lf merge=union
+*.vbproj text eol=lf merge=union
+*.fsproj text eol=lf merge=union
+*.dbproj text eol=lf merge=union
+*.props text eol=lf
+*.targets text eol=lf
+*.config text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.tsv text eol=lf
+*.py text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.sql text eol=lf
+*.txt text eol=lf
+*.hex text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Windows launchers must remain directly executable by cmd.exe.
+*.cmd text eol=crlf
+*.bat text eol=crlf
 
 # Custom for Visual Studio
-*.cs     diff=csharp
-*.sln    merge=union
-*.csproj merge=union
-*.vbproj merge=union
-*.fsproj merge=union
-*.dbproj merge=union
+
+# Binary and archive formats are never line-ending normalized.
+*.bin -text
+*.dll -text
+*.dmp -text
+*.exe -text
+*.gif -text
+*.ico -text
+*.jpeg -text
+*.jpg -text
+*.nupkg -text
+*.odt -text
+*.ods -text
+*.pcap -text
+*.pcapng -text
+*.pdf -text
+*.pdb -text
+*.png -text
+*.zip -text
 
 # Capture-backed PF127 geometry is byte-hash validated and must remain LF-only.
 AORebirth/Server/ZoneEngine/Content/Captured/Subway/pf127-geometry.json text eol=lf
@@ -19,13 +59,13 @@ docs/generated/capture_backed_npc_combat_inventory.json filter=lfs diff=lfs merg
 tools-temp/AOSharpLiveInjector/patches/*.patch whitespace=-blank-at-eol
 
 # Standard to msysgit
-*.doc	 diff=astextplain
-*.DOC	 diff=astextplain
+*.doc  diff=astextplain
+*.DOC  diff=astextplain
 *.docx diff=astextplain
 *.DOCX diff=astextplain
 *.dot  diff=astextplain
 *.DOT  diff=astextplain
 *.pdf  diff=astextplain
-*.PDF	 diff=astextplain
-*.rtf	 diff=astextplain
-*.RTF	 diff=astextplain
+*.PDF  diff=astextplain
+*.rtf  diff=astextplain
+*.RTF  diff=astextplain
