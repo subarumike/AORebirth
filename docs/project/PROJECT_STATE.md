@@ -20,6 +20,9 @@ completion matrices and dated evidence retain detailed provenance.
 - Generated mission graph and mission reproducibility: PASS.
 - Debug server build: PASS.
 - Git LFS and Git object integrity: PASS.
+- WebCore offline-bootstrap security: PASS. Deterministic WebCore assets are
+  36/36, the checked-in production manifest authority parses successfully, and
+  the unchanged final commit/tree passes the complete 12-stage gate twice.
 
 ## Generated combat authority
 
@@ -59,8 +62,14 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 - The mandatory secret scanner rejects likely credentials without echoing
   values. Any credential exposed outside the repository still requires external
   rotation.
-- WebEngine no longer downloads PHP or `php.ini`. It requires a validated local
-  `php-cgi.exe` and remains optional.
+- WebEngine no longer downloads PHP, `php.ini`, or WebCore assets. It requires a
+  validated local `php-cgi.exe` plus an offline-imported `htdocs` tree matching
+  the checked-in manifest for CellAO WebCore commit
+  `765c3850767b63af1cd259bab7f2f7ca3e97adf9`, and remains optional.
+- The pinned WebCore archive is identified by SHA-256
+  `ef297e623040b375e64c543568ca94e44ed7cc59de6fe826ed5e42db95c020ab`;
+  its manifest covers 7,140 files and 26,648,501 bytes and has SHA-256
+  `85c1515d274c2e4051013e89ca6d2a355365d5d01df7d621cc060dfa84e38463`.
 - DotNetZip was removed. Archive extraction uses canonical-path containment;
   Zlib-only runtime paths use the isolated Ionic.Zlib package. Npgsql is 4.0.14.
 - Three obsolete detached worktrees, the unowned Cursor export, 1,877 tracked
@@ -74,9 +83,13 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 ## Remaining debt boundary
 
 - Rotate the previously exposed database credential externally.
-- Install and validate a supported local PHP runtime for WebEngine. The old
-  bootstrap pinned PHP 5.5.10, but compatibility with another version is
-  unproven; WebEngine is not production-safe until that boundary is resolved.
+- Install and validate a maintained local PHP runtime for WebEngine. The old
+  bootstrap pinned PHP 5.5.10; compatibility with a maintained version is
+  unproven, and the historical assets depend on obsolete MySQL/mcrypt/config
+  behavior.
+- Resolve the pinned WebCore snapshot's licensing before redistribution or
+  production use. No license file was found upstream; integrity validation does
+  not grant redistribution rights.
 - Review `_tmp_mail_recovery` before any removal.
 - Continue catalogued unsupported gameplay only with authoritative evidence;
   do not bulk-implement `NotImplementedException` paths or invent defaults for
@@ -90,6 +103,10 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 - Validate database readiness with `preflight-database.cmd` before startup.
 - Build with `tools\build_aorebirth_debug.cmd`.
 - Stop/restart only with the approved root CMD wrappers.
-- Start optional WebEngine only with `start-web-engine.cmd`; stop it with
+- Supply WebCore assets only through the offline import and validation workflow
+  in `docs/project/WEBCORE_ASSET_SUPPLY.md`; never restore a URL-backed archive
+  bootstrap.
+- Start optional WebEngine only with `start-web-engine.cmd`; it validates the
+  database, binary, PHP runtime, and WebCore assets before launch. Stop it with
   `stop-web-engine.cmd`.
 - Do not launch the AO client unless Mike explicitly requests it.

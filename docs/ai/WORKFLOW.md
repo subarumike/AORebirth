@@ -192,10 +192,42 @@ cmd /d /c start-web-engine.cmd
 cmd /d /c stop-web-engine.cmd
 ```
 
-Web startup requires database preflight and a configured local `php-cgi.exe`,
-rejects URL/UNC runtime paths, performs no PHP download, and verifies WebEngine
-owns its configured port. The historical PHP 5.5.10 compatibility requirement
-remains unresolved, so WebEngine is not declared production-safe.
+Web startup requires database preflight, the built WebEngine binary, a
+configured local `php-cgi.exe`, and a manifest-valid local WebCore `htdocs`
+tree. It rejects URL/UNC PHP runtime paths, performs no PHP or WebCore download,
+and verifies WebEngine owns its configured port. The fail-closed order is
+database preflight, binary presence, PHP validation, WebCore manifest/assets
+validation, ownership/port prestart validation, launch, and launched-PID
+ownership verification.
+
+WebCore uses an offline-only operator import. The only accepted upstream pin is
+`765c3850767b63af1cd259bab7f2f7ca3e97adf9`; supply its exact ZIP from a local
+path and run from a CMD rooted at the repository:
+
+```cmd
+cmd /d /c stop-web-engine.cmd
+cmd /d /c import-webcore-assets.cmd "C:\local-only\CellAO-WebCore-765c3850767b63af1cd259bab7f2f7ca3e97adf9.zip" 765c3850767b63af1cd259bab7f2f7ca3e97adf9
+cmd /d /c validate-webcore-assets.cmd
+cmd /d /c Tools\run_web_engine_security_tests.cmd
+```
+
+WebEngine must be fully stopped for import. The wrapper enforces the exact
+WebEngine stopped-state preflight, and the importer holds an exclusive
+runtime/import lease through validation and activation. The command does not
+acquire the ZIP and has no URL fallback. The pinned
+archive SHA-256 is
+`ef297e623040b375e64c543568ca94e44ed7cc59de6fe826ed5e42db95c020ab`;
+the expected archive root is
+`CellAO-WebCore-765c3850767b63af1cd259bab7f2f7ca3e97adf9`. The runtime manifest
+must sit beside `WebEngine.exe` and validate 7,140 files totaling 26,648,501
+bytes under configured `htdocs`. See `docs/project/WEBCORE_ASSET_SUPPLY.md` for
+the exact provenance, manifest hash, update policy, and unresolved license
+boundary.
+
+The historical PHP 5.5.10 compatibility requirement remains unresolved. No
+maintained PHP version has been proven against the assets' obsolete
+PHP/MySQL/mcrypt/config assumptions, and the upstream snapshot has no discovered
+license file. WebEngine remains optional and is not declared production-safe.
 
 ## Mandatory local integration gate
 
@@ -210,9 +242,15 @@ normal NuGet restore access, and the .NET Framework build toolchain used by the
 approved build wrapper. The gate fails closed on a missing prerequisite,
 deterministic engine-management contract failure, generated drift, any
 AOtomation or playfield acceptance failure, mission drift, LFS failure, build
-failure, or final dirty worktree. Engine-management tests use injected
-snapshots and fake database sources; they do not start the AO client, capture
-tooling, production engines, PHP, or a live database.
+failure, or final dirty worktree. Mandatory gate stage 2 includes deterministic
+WebCore import, manifest, installed-tree, startup-order, and no-downloader
+contracts. It runs with outbound proxy variables directed to a denied loopback
+endpoint for proxy-aware clients, and a separate source contract bans network
+APIs and acquisition commands from the WebCore asset manager. This is a
+deterministic no-network-dependency contract, not an OS-level egress sandbox.
+Engine-management tests use injected snapshots, fake database sources, and
+temporary WebCore fixtures; they do not start the AO client, capture tooling,
+production engines, PHP, access a live database, or require network access.
 
 `restart-engines.cmd` is the repo-owned Codex restart entrypoint. Preserve its
 preflight-before-stop ordering and do not bypass it with direct lifecycle

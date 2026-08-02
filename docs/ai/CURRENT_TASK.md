@@ -2,13 +2,14 @@
 
 ## Active
 
-TASK ID: ENGINE-MANAGEMENT-SECURITY-20260802
+TASK ID: WEBCORE-BOOTSTRAP-SECURITY-20260802
 
-The post-baseline engine-management security repair is complete. No gameplay,
-packet, generated artifact, or database-schema behavior changed. Engine status
-now proves PID-to-port ownership, startup is guarded by a read-only database
-preflight, managed rollback/shutdown is PID-scoped, and WebEngine requires an
-explicit local PHP runtime without downloading one.
+The optional WebEngine asset bootstrap reconciliation is complete without
+changing HTTP serving or PHP execution behavior. The historical mutable
+`master.zip` download is replaced by an offline-only operator import pinned to
+CellAO WebCore commit `765c3850767b63af1cd259bab7f2f7ca3e97adf9`.
+Startup requires the checked-in asset manifest and the imported local `htdocs`
+tree to validate before ownership/port checks and launch.
 
 Current acceptance authority:
 
@@ -21,8 +22,12 @@ Current acceptance authority:
 - Active coverage: 1,607 actors, 504 certified, 1,103 explicitly unresolved.
 - Subway, Temple, mission graph, generated mission, Git LFS, Git object
   integrity, secret scan, and debug build gates: PASS.
-- Deterministic engine-management contracts: PASS without credentials, live
-  database access, PHP, network downloads, or real engine startup.
+- Deterministic WebCore asset validation: 36/36 PASS; checked-in manifest
+  authority parsing: PASS; PHP runtime validation:
+  7/7 PASS; engine-management ownership contracts: 22/22 PASS.
+- Mandatory integration gate: 12/12 PASS twice from the unchanged final
+  commit/tree without credentials, live database access, PHP, a network
+  dependency, or real engine startup.
 
 ## Current blockers and debt
 
@@ -32,9 +37,10 @@ Current acceptance authority:
 - No valid local MySQL credential is installed, so live database and engine
   startup verification remains blocked. The environment override must be
   installed externally before running `preflight-database.cmd`.
-- WebEngine remains optional and not production-safe. Its network downloader is
-  removed, but no supported local PHP version has been proven against the
-  historical web assets.
+- WebEngine remains optional and not production-safe. No maintained PHP runtime
+  has been proven against its obsolete PHP/MySQL/mcrypt/config assumptions, and
+  the pinned upstream WebCore snapshot has no upstream license file. The
+  offline import establishes provenance and integrity, not production approval.
 - `_tmp_mail_recovery` remains retained because its unique recovery value has
   not been disproved. It is not an accepted runtime or generator dependency.
 - Unsupported gameplay systems and evidence gaps remain fail-closed; see the
@@ -42,6 +48,8 @@ Current acceptance authority:
 
 ## Authoritative evidence
 
+- `docs/project/WEBCORE_ASSET_SUPPLY.md`
+- `docs/evidence/WEBCORE_BOOTSTRAP_SECURITY_20260802.md`
 - `docs/evidence/ENGINE_MANAGEMENT_SECURITY_20260802.md`
 - `docs/evidence/BASELINE_CLEANUP_20260801.md`
 - `docs/evidence/ARETE_FULL_CORPUS_COMPLETION_20260731.md`
