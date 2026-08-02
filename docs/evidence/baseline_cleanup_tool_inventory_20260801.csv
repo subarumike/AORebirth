@@ -1,0 +1,46 @@
+group,tracked_files,tracked_bytes,classification,disposition
+(root documentation),3,9284,durable documentation,retain
+(root durable reference data),18,18962741,durable evidence/reference,retain
+(root helper scripts),72,184243,maintained and one-off helper scripts,retain pending workflow consolidation
+(root temporary probes),972,10825214,one-off temporary probe/output,remove after manifest
+(root third-party binaries),5,1075952,third-party binary/tool,remove after manifest
+AOSharpCaptureAnalyzer,21,1458281,maintained generator/analyzer,retain; authoritative combat generation
+AOSharpCaptureProtocol,1,59286,maintained generator/analyzer,retain; shared capture protocol
+AOSharpLiveCapture,14,763692,maintained generator/analyzer,retain; approved capture workflow
+AOSharpLiveCapture moj,14,780559,one-off duplicate/probe,remove after manifest
+AOSharpLiveCapture2,13,761333,one-off duplicate/probe,remove after manifest
+AOSharpLiveInjector,4,33676,maintained generator/analyzer,retain; approved capture workflow
+AOSharpMissionCaptureAnalyzer,4,323220,maintained generator/analyzer,retain; approved mission workflow
+AOSharpMissionCaptureAnalyzer proba,2,27937,one-off duplicate/probe,remove after manifest
+CellAOCombatSmokeTests,3,181562,one-off test/probe,retain pending migration to maintained tests
+EasyHookSmokeInjector,2,4623,one-off test/probe,retain pending capture-tool consolidation
+EasyHookSmokePayload,2,2538,one-off test/probe,retain pending capture-tool consolidation
+PerkActionExtract,4,22683,maintained generator/analyzer,retain
+_aosharp_decompile,1,475988,one-off decompilation,remove after manifest
+_tmp_cap_002423_assets,7,34404,temporary generated output,remove after manifest
+_tmp_cap_181214_assets,4,24690,temporary generated output,remove after manifest
+_tmp_cap_224228_assets,13,108236,temporary generated output,remove after manifest
+_tmp_itemcheck,5,10861,temporary generated output,remove after manifest
+_tmp_mail_recovery,23,698210,temporary recovery probe,retain; unique-work review required
+_tmp_mission_shapes_assets,16,91901,temporary generated output,remove after manifest
+ao-client-rdb-hints,2,10104,durable evidence/reference,retain
+ao-dll-function-map,5,528692,durable evidence/reference,retain
+arete-analysis,18,6981295,reproducible generated output,retain pending documented relocation
+arete-framework-validation,60,156923,reproducible generated output,retain pending documented relocation
+current-client-data-verification,16,2766852,maintained generator/analyzer,retain
+enemy-movement-replay,4,12244,reproducible generated output,retain pending documented relocation
+enemy-spawn-coverage,2,8375,reproducible generated output,retain pending documented relocation
+gmi-local-web,20,163385,durable evidence/reference,retain
+icc-rk-local-web,9,21046,durable evidence/reference,retain
+live-combat-chase-observations,2,36447,durable evidence/reference,retain
+live-data-collector,11,91705,maintained generator/analyzer,retain
+live-loot-observations,3,41615,durable evidence/reference,retain
+live-quest-observations,2,22001,durable evidence/reference,retain
+mob-loot-coverage,3,24655,reproducible generated output,retain pending documented relocation
+mysql-restore,1,222,durable evidence/reference,retain; database recovery tooling
+recovered-flint,4,117997,durable evidence/reference,retain
+recovered-flint-extra,8,14721,durable evidence/reference,retain
+recovered-flint-extra2,1,0,durable evidence/reference,retain
+sql-staging,79,3611792,reproducible generated output,retain pending database review
+vendor-captures,35,621824,durable evidence/reference,retain
+ze-full-decompile,825,5709605,one-off decompilation,remove after manifest

@@ -1,2 +1,0 @@
-@echo off
-C:\xampp\mysql\bin\mysql.exe -uroot cellao_codex_clean -e "SELECT Id, Type, Instance, HEX(Instance), Playfield FROM staticdynels WHERE Instance=-1073282272 OR Instance=3221685024 OR HEX(Instance)='C0070320' LIMIT 20; SELECT Id, Type, Instance, HEX(Instance), Playfield FROM staticdynels WHERE Playfield=4680 LIMIT 40; SELECT Id, Type, Instance, HEX(Instance), Playfield FROM staticdynels WHERE Type=57008 AND Playfield=4680 LIMIT 20;"

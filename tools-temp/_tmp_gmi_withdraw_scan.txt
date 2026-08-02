@@ -1,2 +1,0 @@
-n=72
-[('FollowTarget', 16), ('CastNanoSpell', 11), ('Buff', 11), ('CharacterAction', 11), ('Despawn', 4), ('1', 4), ('2', 4), ('11', 4), ('SimpleCharFullUpdate', 3), ('WeaponItemFullUpdate', 3), ('CharDCMove', 1)]

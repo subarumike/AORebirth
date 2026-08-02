@@ -1,2 +1,0 @@
-@echo off
-powershell -NoProfile -Command "$lines = Get-Content 'AORebirth\Built\Debug\ZoneEngineLog.txt'; for ($i=0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match 'Terminal:-1073282272' -and $lines[$i] -match '2026-07-16 13:3') { $start=[Math]::Max(0,$i-2); $end=[Math]::Min($lines.Count-1,$i+25); Write-Host ('==== line '+($i+1)+' ===='); for($j=$start;$j -le $end;$j++){ Write-Host $lines[$j] }; Write-Host '' } }"
