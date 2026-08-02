@@ -96,6 +96,31 @@ The locally modified connection string must never be printed. The tracked starti
 - Debug server build after both dependency changes: PASS.
 - WebEngine still contains an obsolete HTTP bootstrap for PHP 5.5.10 and `php.ini`. It is not changed without an authoritative replacement source and remains explicit security/operational debt.
 
+## Acceptance repair root causes
+
+- Damage-policy failures were stale expectations after accepted policy ownership moved to the current calculation stages; production formulas were preserved and tests were reconciled to the owned policy.
+- Generated combat inventory and fixture failures came from six completed capture sessions that were present in the authoritative corpus but absent from the 375-session generated projection. The generator was correct; its inventory, catalog, fixtures, formula inputs, active coverage, hashes, and manifests were regenerated as one transaction.
+- Cedric Harding (`PF6553`, monster data `165188`, level `6`) is the only newly runtime-ready profile. It is source-bound to capture `20260722-152454` / `0x7989146A`. Conflicting Arete alien observations remain unresolved and fail closed.
+- Rex B18C, PF127 visibility/population, inventory/GenericCmd routing, and playfield lifecycle failures were stale ownership assertions. Tests now verify the actual production owner instead of asserting retired call sites.
+- Four order-dependent failures came from current-directory-dependent content lookup and shared path state. Content roots now resolve deterministically from repository/test-host layouts, so Arete movement, Windcaller Karrec, and dungeon navigation tests pass individually and in the complete suite.
+- Pet observer spawn duplicated an already-owned announcement; the redundant publish was removed. Marcus Pad ambient attacks now use the accepted captured packet factory, and a dead inventory stack-merge action was removed. These are proven reconciliation defects, not new gameplay behavior.
+
+## Generated artifact result
+
+Two consecutive inventory generations are byte-stable. Current counts are 381 sessions, 365 canonical sessions, 3,269 complete chains, 260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions, 101 runtime-ready definitions, 92,147 packets, and 1,486 unresolved observations with zero errors. Active coverage is stable at 1,607 actors, 504 certified, and 1,103 unresolved. Formula analysis is stable at 422 profiles and 67 active bindings.
+
+## Explicit unimplemented-path inventory
+
+The repository currently contains 96 explicit `throw new NotImplementedException` sites. Seventy-two are first-party runtime fail-fast boundaries, 19 are third-party MsgPack test scaffolding, and five are third-party MsgPack implementation fallbacks. The first-party sites group as follows:
+
+- Player/NPC controller interface operations: 48. These are callable only through unsupported controller operations and are not exercised by accepted gameplay paths.
+- Base inventory/stat abstractions: 10. These guard unsupported collection/stat operations; current concrete accepted paths do not dispatch through them.
+- Message/serialization abstractions: seven. These reject unsupported inbound/outbound or unresolved serializer operations.
+- Zone/playfield/environment dispatch: five. These are reachable only for unsupported server/playfield/environment targets and intentionally fail fast.
+- Requirement translation and ISComV2: two. These reject unknown requirement operators or unsupported communication behavior.
+
+No throw was bulk-replaced. The 1037-test acceptance result proves accepted paths do not traverse these boundaries; it does not prove the unsupported APIs are implemented. Broad chase, quest-delete, action-59, anarchy-playfield, perk, research, PvP/tower, team, organization, mission, quest, and pet expansion remains outside this cleanup.
+
 ## Approved workflow commands
 
 All operational commands for this task use the repository-approved Windows CMD wrappers documented in `docs/ai/WORKFLOW.md`. The AO client will not be launched. Build, validation, engine stop/restart, generated-artifact checks, and final acceptance will use their maintained wrappers rather than ad-hoc replacements.
@@ -109,9 +134,9 @@ This section is updated as each phase is completed.
 | Credential remediation and secret scan | Complete | Tracked placeholder restored; environment override and value-redacting scan added. External credential rotation remains required. |
 | Complete suite repair | Complete | 1037/1037 PASS once; two unchanged-final-tree gate runs remain. |
 | Combat inventory reconciliation | Complete | Inventory and all dependent artifacts regenerated; deterministic checks pass. |
-| Line-ending normalization | Pending | One line-ending-only phantom change and missing editor policy identified. |
+| Line-ending normalization | Complete | Explicit LF/CRLF/binary policies and EditorConfig added; renormalization changed no governed artifact; inventory and active-coverage checks remained clean. |
 | Storage and worktree cleanup | Complete | 449 disposable files removed; three reachable clean worktrees removed; Git object store verified and reduced to 128.83 MiB with zero garbage. |
 | Tool/Cursor cleanup | Complete | 1,877 manifested temporary files and the 49-file unowned Cursor export removed; maintained tools/evidence retained. |
 | Dependency advisory repair | Complete | DotNetZip removed, archive traversal rejected, Zlib isolated, Npgsql upgraded to 4.0.14; build PASS. |
-| Documentation/status/gate repair | Pending | Engine status wrapper is missing; task/state documents contain stale status. |
+| Documentation/status/gate repair | Complete | Current state/task condensed with archives; read-only engine status and 11-stage mandatory gate added. |
 | Final gate, two unchanged runs | Pending | Must reach 1037/1037 with all generated checks internally consistent. |
