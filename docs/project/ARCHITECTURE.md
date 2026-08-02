@@ -12,6 +12,8 @@ flowchart LR
     Client --> Chat["ChatEngine"]
     Client --> Zone["ZoneEngine"]
     Web["WebEngine"] --> DB["cellao_codex_clean MySQL"]
+    Assets["Pinned local WebCore htdocs"] --> Web
+    PHP["Validated local php-cgi"] --> Web
     Login --> DB
     Chat --> DB
     Zone --> DB
@@ -114,9 +116,18 @@ The local configuration is MySQL and must use only `cellao_codex_clean`. The pro
 
 ## Asset Pipeline
 
-The repo contains logos, XML data files, documentation generated from enums/stats, and tooling. Client assets come from the installed AO client and external reverse-engineered sources. There is no fully documented build-time asset pipeline in the checked files.
+The repo contains logos, XML data files, documentation generated from enums/stats, and tooling. Client assets come from the installed AO client and external reverse-engineered sources. There is no single build-time pipeline for all of these assets.
 
-TODO: Requires human clarification for the intended final asset/data generation pipeline.
+Optional WebEngine content has a separate, fail-closed supply boundary. The
+runtime contains the HTTP/PHP host but does not fetch website content. An
+operator must supply a local ZIP for the exact CellAO WebCore commit
+`765c3850767b63af1cd259bab7f2f7ca3e97adf9`; the explicit import command checks
+the pinned archive identity and writes the extracted `htdocs` tree locally. A
+checked-in manifest is copied beside `WebEngine.exe` and binds all 7,140 files,
+their sizes and hashes, and the 26,648,501-byte total. Both explicit validation
+and `start-web-engine.cmd` fail closed when the manifest or local tree does not
+match. Runtime startup never downloads or updates this content. See
+`docs/project/WEBCORE_ASSET_SUPPLY.md`.
 
 ## UI Architecture
 
@@ -144,6 +155,8 @@ flowchart TB
     LoginEngine --> AORebirthDatabase
     ChatEngine --> AORebirthDatabase
     WebEngine --> AORebirthDatabase
+    WebEngine --> LocalPhpCgi["Validated local php-cgi"]
+    WebEngine --> PinnedWebCore["Manifest-bound local WebCore assets"]
     AORebirthCore --> AORebirthStats["AORebirth.Stats"]
     AORebirthCore --> AORebirthEnums["AORebirth.Enums"]
     AORebirthDatabase --> Dapper
@@ -157,6 +170,9 @@ flowchart TB
 - Some current-client packet contracts differ from old AO Rebirth assumptions.
 - Movement and NPC behavior need capture/replay validation before more runtime edits.
 - Tests are mostly smoke/source assertions; they are useful but not full simulation coverage.
+- WebEngine remains optional and not production-safe: the pinned WebCore
+  snapshot has unresolved licensing and obsolete PHP/MySQL/mcrypt/config
+  dependencies, and no maintained PHP compatibility has been proven.
 
 ## Hostile NPC Chase Navigation
 
