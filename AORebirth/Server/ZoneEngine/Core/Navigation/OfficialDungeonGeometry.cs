@@ -64,7 +64,29 @@ namespace ZoneEngine.Core.Navigation
         {
             get
             {
-                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RelativePath);
+                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                DirectoryInfo cursor = new DirectoryInfo(Path.GetFullPath(baseDirectory));
+                while (cursor != null)
+                {
+                    string runtimeCandidate = Path.Combine(cursor.FullName, RelativePath);
+                    if (File.Exists(runtimeCandidate))
+                    {
+                        return runtimeCandidate;
+                    }
+
+                    string sourceCandidate = Path.Combine(
+                        cursor.FullName,
+                        @"AORebirth\Server\ZoneEngine",
+                        RelativePath);
+                    if (File.Exists(sourceCandidate))
+                    {
+                        return sourceCandidate;
+                    }
+
+                    cursor = cursor.Parent;
+                }
+
+                return Path.Combine(baseDirectory, RelativePath);
             }
         }
 

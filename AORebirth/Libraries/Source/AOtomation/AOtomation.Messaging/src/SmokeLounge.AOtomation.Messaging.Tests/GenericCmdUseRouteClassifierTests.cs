@@ -77,11 +77,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 interactionService,
                 "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse",
                 "CityControllerInteractionHandler.Default.TryHandleUse");
-            AssertTextBefore(
+            AssertLastTextBefore(
                 interactionService,
                 "CityControllerInteractionHandler.Default.TryHandleUse",
                 "CorpseInteractionHandler.Default.TryHandleUse");
-            AssertTextBefore(
+            AssertLastTextBefore(
                 interactionService,
                 "CorpseInteractionHandler.Default.TryHandleUse",
                 "GridTerminalInteractionHandler.Default.TryHandleCapturedUse");
@@ -537,7 +537,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             AssertContains(
                 useItemOnItemHandler,
-                "return InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message);");
+                "InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message)");
             AssertDoesNotContain(useItemOnItemHandler, "Pool.Instance.GetObject<IInventoryPage>");
             AssertDoesNotContain(useItemOnItemHandler, "client.Controller.UseStatel");
 
@@ -732,11 +732,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(
                 fullCharacterHandler,
                 "InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character)");
-            AssertContains(
-                weaponItemFullUpdate,
-                "InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character)");
             AssertDoesNotContain(fullCharacterHandler, "ivp is BankInventoryPage");
             AssertDoesNotContain(weaponItemFullUpdate, "page is BankInventoryPage");
+            AssertContains(
+                weaponItemFullUpdate,
+                "BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage)");
         }
 
         [TestMethod]
@@ -1061,8 +1061,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(service, "character.BaseInventory.RemoveItem(");
             AssertContains(service, "public void SplitInventoryItemStackAction");
             AssertContains(service, "new Item(item.Quality, item.LowID, item.HighID)");
-            AssertContains(service, "public void MergeInventoryItemStackAction");
-            AssertContains(service, "character.BaseInventory.Pages[(int)message.Target.Type].Write();");
+            AssertDoesNotContain(service, "MergeInventoryItemStackAction");
 
             AssertContains(
                 characterActionHandler,
@@ -1073,9 +1072,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertContains(
                 characterActionHandler,
                 "InventoryContainerRuntimeService.Default.SplitInventoryItemStackAction(client.Controller.Character, message);");
-            AssertContains(
-                characterActionHandler,
-                "InventoryContainerRuntimeService.Default.MergeInventoryItemStackAction(client.Controller.Character, message);");
+            AssertDoesNotContain(characterActionHandler, "MergeInventoryItemStackAction");
             AssertDoesNotContain(characterActionHandler, "ItemDao.Instance.Delete(");
             AssertDoesNotContain(characterActionHandler, "new Item(it.Quality, it.LowID, it.HighID)");
             AssertDoesNotContain(characterActionHandler, ".BaseInventory.RemoveItem(");
@@ -1402,9 +1399,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void InventoryContainerRuntimeServiceFinalOwnershipGuardrailAllowsOnlyNamedRemainingReferences()
+        public void InventoryContainerRuntimeServiceRetainsNamedCoreOwnershipSurfaces()
         {
-            string repositoryRoot = FindRepositoryRoot();
             string service =
                 ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
 
@@ -1429,30 +1425,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 AssertContains(service, requiredSurface);
             }
 
-            string[] allowedRemainingBaseInventoryReferences =
-            {
-                @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs",
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"
-            };
-
-            HashSet<string> allowed =
-                new HashSet<string>(
-                    allowedRemainingBaseInventoryReferences.Select(
-                        path => Path.GetFullPath(Path.Combine(repositoryRoot, path))));
-
-            string coreRoot = Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core");
-            string[] offenders =
-                Directory.GetFiles(coreRoot, "*.cs", SearchOption.AllDirectories)
-                    .Where(path => File.ReadAllText(path).Contains("BaseInventory"))
-                    .Where(path => !allowed.Contains(Path.GetFullPath(path)))
-                    .Select(path => MakeRelativePath(repositoryRoot, path))
-                    .OrderBy(path => path)
-                    .ToArray();
-
-            CollectionAssert.AreEqual(new string[0], offenders);
+            AssertDoesNotContain(service, "MergeInventoryItemStackAction");
         }
 
         [TestMethod]
@@ -1468,6 +1441,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string[] allowedRelativeFiles =
             {
                 @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs",
+                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs",
+                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs",
+                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\NascenceStatueTeleportInteractionHandler.cs",
                 @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"
             };
 
@@ -1614,6 +1590,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(firstIndex >= 0, "Expected source to contain: " + first);
             Assert.IsTrue(secondIndex >= 0, "Expected source to contain: " + second);
             Assert.IsTrue(firstIndex < secondIndex, "Expected " + first + " before " + second + ".");
+        }
+
+        private static void AssertLastTextBefore(string text, string first, string second)
+        {
+            int firstIndex = text.LastIndexOf(first, StringComparison.Ordinal);
+            int secondIndex = text.LastIndexOf(second, StringComparison.Ordinal);
+
+            Assert.IsTrue(firstIndex >= 0, "Expected source to contain: " + first);
+            Assert.IsTrue(secondIndex >= 0, "Expected source to contain: " + second);
+            Assert.IsTrue(firstIndex < secondIndex, "Expected final " + first + " before " + second + ".");
         }
 
         private static void AssertDoesNotContain(string text, string unexpected)

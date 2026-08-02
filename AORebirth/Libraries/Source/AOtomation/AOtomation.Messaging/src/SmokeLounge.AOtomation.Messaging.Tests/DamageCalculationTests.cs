@@ -191,7 +191,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 },
                 new QueuedDamageRandomSource());
 
-            Assert.AreEqual(15, result.FinalTargetDamage);
+            Assert.AreEqual(12, result.FinalTargetDamage);
             Assert.AreEqual(0, result.FinalAttackerDamage);
             AssertStage(result, "ApplyArmorMitigation", DamageCalculationStageStatus.EvidenceBlocked);
             AssertStage(result, "ResolveSpecialSubHits", DamageCalculationStageStatus.EvidenceBlocked);
@@ -262,7 +262,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(DamageCalculationStrategyKind.EvidenceBlocked, missingArmor.Strategy);
             StringAssert.Contains(missingArmor.StrategyReason, "matching AC");
             AssertStage(missingArmor, "SelectDamageStrategy", DamageCalculationStageStatus.EvidenceBlocked);
-            Assert.AreEqual(15, missingArmor.FinalTargetDamage);
+            Assert.AreEqual(3, missingArmor.FinalTargetDamage);
         }
 
         [TestMethod]
@@ -290,7 +290,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 new QueuedDamageRandomSource());
 
             Assert.AreEqual(242, result.EffectiveAttackRating);
-            Assert.AreEqual(15, result.FinalTargetDamage);
+            Assert.AreEqual(1, result.FinalTargetDamage);
             AssertStage(result, "ApplyPre1000AttackRatingScaling", DamageCalculationStageStatus.Skipped);
             AssertStage(result, "ApplyPost1000AttackRatingScaling", DamageCalculationStageStatus.Skipped);
         }

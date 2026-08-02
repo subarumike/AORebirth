@@ -272,15 +272,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void EverySpawnDefinitionResolvesToCheckedInDialogueContent()
         {
             string manifestPath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Content",
-                "Subway",
-                "windcaller-karrec",
-                "manifest.json");
+                FindRepositoryRoot(),
+                @"AORebirth\Server\ZoneEngine\Content\Subway\windcaller-karrec\manifest.json");
             AreteFrameworkRegistries registries =
                 AreteFrameworkBootstrap.LoadManifestSet(new[] { manifestPath });
 
-            Assert.IsTrue(registries.IsValid);
+            Assert.IsTrue(
+                registries.IsValid,
+                string.Join(Environment.NewLine, registries.Validation.Errors));
             foreach (WindcallerKarrecNpcDefinition definition in WindcallerKarrecNpcContent.Definitions)
             {
                 DialogueNpcEntry npc;
@@ -289,6 +288,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     definition.SourceNpcIdentity);
                 Assert.IsNotNull(npc);
             }
+        }
+
+        private static string FindRepositoryRoot()
+        {
+            DirectoryInfo cursor = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (cursor != null)
+            {
+                if (Directory.Exists(Path.Combine(cursor.FullName, ".git")))
+                {
+                    return cursor.FullName;
+                }
+
+                cursor = cursor.Parent;
+            }
+
+            throw new InvalidOperationException("Repository root not found.");
         }
 
         [TestMethod]
