@@ -136,13 +136,34 @@ Do not reintroduce project-level `RestorePackages` targets or `.nuget\NuGet.targ
 
 If a Codex shell command times out during build validation, do not treat timeout exit code `124` as a build failure until checking for orphaned build child processes and stopping them.
 
-Start engines, stop engines, and check engine status through approved `cmd.exe` or Git Bash workflows only. Existing `.ps1` engine launch/status wrappers are deprecated for Codex use until replaced.
+Start engines, stop engines, and check engine status through approved `cmd.exe` or Git Bash workflows only. Use the read-only root wrapper below for status; it requires the Chat, Login, and Zone processes plus their configured listening ports, and reports WebEngine as optional:
+
+```cmd
+cmd /d /c status-engines.cmd
+```
+
+Process presence alone is not a health result. The wrapper exits nonzero unless ChatEngine owns an active process with ports 6996 and 7012 listening, LoginEngine has a process with port 7500 listening, and ZoneEngine has a process with port 7501 listening. WebEngine/8181 is reported but is not required by the normal three-engine workflow.
 
 After a successful rebuild, restart engines with:
 
 ```cmd
 cmd /d /c restart-engines.cmd
 ```
+
+## Mandatory local integration gate
+
+Run the complete deterministic gate from a clean worktree:
+
+```cmd
+cmd /d /c tools\run_mandatory_integration_gate.cmd
+```
+
+Prerequisites are CMD, Git with Git LFS, Python, the repository package cache or
+normal NuGet restore access, and the .NET Framework build toolchain used by the
+approved build wrapper. The gate fails closed on a missing prerequisite,
+generated drift, any AOtomation or playfield acceptance failure, mission drift,
+LFS failure, build failure, or final dirty worktree. It does not start the AO
+client, capture tooling, or engines.
 
 `restart-engines.cmd` is the repo-owned Codex restart entrypoint. It calls the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers and does not add extra polling, diagnostics, or manual lifecycle commands.
 
