@@ -105,6 +105,13 @@ namespace Utility.Config
                             (Config)
                                 new XmlSerializer(typeof(Config)).Deserialize(
                                     new MemoryStream(File.ReadAllBytes("Config.xml")));
+
+                        string mysqlConnection =
+                            Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
+                        if (!string.IsNullOrWhiteSpace(mysqlConnection))
+                        {
+                            this._config.MysqlConnection = mysqlConnection;
+                        }
                     }
                 }
                 catch (Exception ex)
