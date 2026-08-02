@@ -31,6 +31,16 @@ if not "%PHP_EXIT%"=="0" (
     exit /b %PHP_EXIT%
 )
 
+pushd "%~dp0AORebirth\Built\Debug" >nul
+WebEngine.exe /validate-webcore-assets
+set "WEBCORE_EXIT=%ERRORLEVEL%"
+popd >nul
+if not "%WEBCORE_EXIT%"=="0" (
+    echo [AORebirth Web Start] Local WebCore asset validation failed; WebEngine was not started.
+    popd >nul
+    exit /b %WEBCORE_EXIT%
+)
+
 powershell -NoProfile -File "%~dp0start-engines.ps1" -WebOnly
 set "START_EXIT=%ERRORLEVEL%"
 popd >nul
