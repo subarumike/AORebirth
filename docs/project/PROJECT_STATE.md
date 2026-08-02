@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-08-01
+Updated: 2026-08-02
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -51,9 +51,16 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 
 - Tracked configuration contains placeholders only and supports the ignored
   `AO_REBIRTH_MYSQL_CONNECTION` local environment override.
+- The read-only database preflight uses the production configuration/connector
+  path, verifies the exact database and 34-table contract, and blocks startup
+  when any character is still marked online.
+- Engine health is PID-owned: listener PIDs must resolve to the exact expected
+  executables. Managed startup and shutdown never kill by process name alone.
 - The mandatory secret scanner rejects likely credentials without echoing
   values. Any credential exposed outside the repository still requires external
   rotation.
+- WebEngine no longer downloads PHP or `php.ini`. It requires a validated local
+  `php-cgi.exe` and remains optional.
 - DotNetZip was removed. Archive extraction uses canonical-path containment;
   Zlib-only runtime paths use the isolated Ionic.Zlib package. Npgsql is 4.0.14.
 - Three obsolete detached worktrees, the unowned Cursor export, 1,877 tracked
@@ -67,8 +74,9 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 ## Remaining debt boundary
 
 - Rotate the previously exposed database credential externally.
-- Replace or retire WebEngine's obsolete HTTP PHP bootstrap through a separate
-  approved task.
+- Install and validate a supported local PHP runtime for WebEngine. The old
+  bootstrap pinned PHP 5.5.10, but compatibility with another version is
+  unproven; WebEngine is not production-safe until that boundary is resolved.
 - Review `_tmp_mail_recovery` before any removal.
 - Continue catalogued unsupported gameplay only with authoritative evidence;
   do not bulk-implement `NotImplementedException` paths or invent defaults for
@@ -79,6 +87,9 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 
 - Run the complete local gate with `tools\run_mandatory_integration_gate.cmd`.
 - Query live engine process/port health with `status-engines.cmd`.
+- Validate database readiness with `preflight-database.cmd` before startup.
 - Build with `tools\build_aorebirth_debug.cmd`.
 - Stop/restart only with the approved root CMD wrappers.
+- Start optional WebEngine only with `start-web-engine.cmd`; stop it with
+  `stop-web-engine.cmd`.
 - Do not launch the AO client unless Mike explicitly requests it.

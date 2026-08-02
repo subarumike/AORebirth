@@ -120,7 +120,7 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, builds `AORebirth.Core` first, then builds `ZoneEngine`, using:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
 
 ```cmd
 MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
@@ -136,19 +136,66 @@ Do not reintroduce project-level `RestorePackages` targets or `.nuget\NuGet.targ
 
 If a Codex shell command times out during build validation, do not treat timeout exit code `124` as a build failure until checking for orphaned build child processes and stopping them.
 
-Start engines, stop engines, and check engine status through approved `cmd.exe` or Git Bash workflows only. Use the read-only root wrapper below for status; it requires the Chat, Login, and Zone processes plus their configured listening ports, and reports WebEngine as optional:
+Start engines, stop engines, and check engine status through approved `cmd.exe`
+or Git Bash workflows only. Use the read-only root wrapper below for status:
 
 ```cmd
 cmd /d /c status-engines.cmd
 ```
 
-Process presence alone is not a health result. The wrapper exits nonzero unless ChatEngine owns an active process with ports 6996 and 7012 listening, LoginEngine has a process with port 7500 listening, and ZoneEngine has a process with port 7501 listening. WebEngine/8181 is reported but is not required by the normal three-engine workflow.
+The status wrapper reads configured ports, resolves listener PIDs through
+Windows CIM, and correlates each listener with the exact canonical executable
+under `AORebirth\Built\Debug`. It fails closed on missing processes or ports,
+wrong owners, multiple listener PIDs, split multi-port ownership, duplicate
+engine instances, or unavailable executable ownership. Verified mappings are
+ChatEngine `6996` and `7012`, LoginEngine `7500`, ZoneEngine `7501`, and optional
+WebEngine `8181`. An absent WebEngine with a closed port is healthy; any partial
+or conflicting optional-Web state fails.
+
+Useful read-only modes are:
+
+```cmd
+cmd /d /c status-engines.cmd --core
+cmd /d /c status-engines.cmd --web-required
+cmd /d /c status-engines.cmd --prestart WebEngine
+```
+
+Before database-dependent startup, run the read-only preflight:
+
+```cmd
+cmd /d /c preflight-database.cmd
+```
+
+It requires `AO_REBIRTH_MYSQL_CONNECTION` in the current CMD process, opens
+through the production MySQL configuration/connector path, requires
+`cellao_codex_clean`, verifies all 34 required tables and read access, and fails
+if any `characters.Online` value is nonzero. It performs no writes, migrations,
+resets, or schema repair.
 
 After a successful rebuild, restart engines with:
 
 ```cmd
 cmd /d /c restart-engines.cmd
 ```
+
+`start-engines.cmd` and `restart-engines.cmd` run preflight before launch;
+restart runs it before stopping any healthy engine. Startup verifies exact
+launched-PID ownership and rolls back only processes launched by that
+invocation. Managed shutdown trusts only PID metadata whose executable path and
+start time match and never falls back to killing processes by name.
+
+WebEngine remains excluded from normal startup. Its explicit optional workflow
+is:
+
+```cmd
+cmd /d /c start-web-engine.cmd
+cmd /d /c stop-web-engine.cmd
+```
+
+Web startup requires database preflight and a configured local `php-cgi.exe`,
+rejects URL/UNC runtime paths, performs no PHP download, and verifies WebEngine
+owns its configured port. The historical PHP 5.5.10 compatibility requirement
+remains unresolved, so WebEngine is not declared production-safe.
 
 ## Mandatory local integration gate
 
@@ -161,11 +208,15 @@ cmd /d /c tools\run_mandatory_integration_gate.cmd
 Prerequisites are CMD, Git with Git LFS, Python, the repository package cache or
 normal NuGet restore access, and the .NET Framework build toolchain used by the
 approved build wrapper. The gate fails closed on a missing prerequisite,
-generated drift, any AOtomation or playfield acceptance failure, mission drift,
-LFS failure, build failure, or final dirty worktree. It does not start the AO
-client, capture tooling, or engines.
+deterministic engine-management contract failure, generated drift, any
+AOtomation or playfield acceptance failure, mission drift, LFS failure, build
+failure, or final dirty worktree. Engine-management tests use injected
+snapshots and fake database sources; they do not start the AO client, capture
+tooling, production engines, PHP, or a live database.
 
-`restart-engines.cmd` is the repo-owned Codex restart entrypoint. It calls the existing approved `stop-engines.cmd` and `start-engines.cmd` wrappers and does not add extra polling, diagnostics, or manual lifecycle commands.
+`restart-engines.cmd` is the repo-owned Codex restart entrypoint. Preserve its
+preflight-before-stop ordering and do not bypass it with direct lifecycle
+script invocation.
 
 ### Official Mission-Level Graph
 
@@ -238,6 +289,12 @@ The global owner is `ZoneEngine.Core.Navigation`. PF127 is the first enabled pro
 - Use only `cellao_codex_clean`; this is the active legacy database name retained for local compatibility.
 - Keep `AORebirth\Config\Config.xml` free of real credentials. Its checked-in connection string is a non-secret placeholder.
 - Supply the local MySQL connection string to each engine with the `AO_REBIRTH_MYSQL_CONNECTION` environment variable. The environment value overrides only `MysqlConnection` after normal XML deserialization.
+- The override must exist before the CMD process begins because configuration
+  and connector state are cached per engine process.
+- Run `cmd /d /c preflight-database.cmd` before startup. Exit codes are `10`
+  missing override, `11` invalid format, `12` network failure, `13`
+  authentication failure, `14` wrong database, `15` missing schema, `16` read
+  failure, `17` online characters present, and `18` internal contract failure.
 - Run `cmd /d /c Tools\scan_secrets.cmd` before committing configuration or workflow changes. It reports locations, never captured values.
 - Do not change schemas without explicit approval.
 - Do not wipe or mass-edit data without explicit approval.
