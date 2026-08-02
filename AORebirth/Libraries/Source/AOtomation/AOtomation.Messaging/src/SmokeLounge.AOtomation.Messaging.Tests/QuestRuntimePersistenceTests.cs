@@ -410,10 +410,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void B18CPerKillClientFeedbackPolicyRemainsFailClosed()
+        public void B18CPerKillClientFeedbackPolicyCoversOnlyCapturedObjectiveProgress()
         {
-            Assert.IsFalse(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(1, 5));
-            Assert.IsFalse(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(5, 5));
+            Assert.IsFalse(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(0, 5));
+            Assert.IsTrue(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(1, 5));
+            Assert.IsTrue(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(5, 5));
+            Assert.IsFalse(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(6, 5));
+            Assert.IsFalse(RexB18CFeedbackPolicy.ShouldSendPerKillFeedback(1, 0));
         }
 
         private static PersistentMissionService Service(IMissionRepository repository)

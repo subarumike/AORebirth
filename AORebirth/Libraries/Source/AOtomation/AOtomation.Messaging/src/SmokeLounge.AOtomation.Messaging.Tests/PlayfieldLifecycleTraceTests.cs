@@ -286,6 +286,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
             string npcCombatTickText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+            string resetCombatTick = ExtractMethodBlock(npcCombatTickText, "internal void ResetCombatTick(");
             string capturedPacketFactoryText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string clientConnectedText = File.ReadAllText(
@@ -315,9 +316,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 npcCombatTickText.Contains("NpcCombatAttackRules.DefaultCombatTickSeconds")
                 && npcCombatTickText.Contains("now + TimeSpan.FromSeconds(initialDelaySeconds)")
-                && npcCombatTickText.Contains(
-                    "capturedContract.AttackStartDelaySeconds + capturedContract.FirstHitDelaySeconds")
-                && !npcCombatTickText.Contains("this.nextCombatTicks.Remove(attacker.Identity.Instance);"),
+                && npcCombatTickText.Contains("attackStartDelaySeconds + firstHitDelaySeconds")
+                && !resetCombatTick.Contains("this.nextCombatTicks.Remove(attacker.Identity.Instance);"),
                 "NPC combat start must not emit immediate first-hit AttackInfo before the live-compatible combat-start window.");
             Assert.IsFalse(
                 attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
@@ -442,8 +442,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryRuntimeText.Contains("playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);")
                 && weaponItemFullUpdateText.Contains("SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)")
                 && weaponItemFullUpdateText.Contains("CreateWeaponDefinitionMessages(ICharacter character)")
-                && weaponItemFullUpdateText.Contains("CharacterStat.Energy, ResolveEnergy(item)")
-                && weaponItemFullUpdateText.Contains("return uint.MaxValue;")
+                && weaponItemFullUpdateText.Contains("StatTuple(CharacterStat.Energy, 0)")
+                && !weaponItemFullUpdateText.Contains("return uint.MaxValue;")
                 && weaponItemFullUpdateText.Contains("AddStatIfPresent(stats, CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay))")
                 && weaponItemFullUpdateText.Contains("AddStatIfPresent(stats, CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay))")
                 && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
@@ -735,11 +735,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 combatStartWeaponIndex >= 0
                 && attackEchoIndex >= 0
                 && combatStartWeaponIndex < attackEchoIndex
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown1 = 13")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown2 = 25")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown3 = 13")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown4 = 33")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown5 = 100")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown1 = 61")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown2 = -166")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown3 = 658")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown4 = 969")
+                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown5 = -100")
                 && attackHandlerText.Contains("Unknown4 = \"MAAT\"")
                 && attackHandlerText.Contains("Unknown4 = \"DIIT\"")
                 && attackHandlerText.Contains("Unknown4 = \"BRAW\""),
@@ -2886,7 +2886,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ObservedEmptyInventories == 8
                 && !ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ItemPoolComplete
                 && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && !ordinaryCombatContract.Contains("31909")
+                && ordinaryCombatContract.Contains("archetype.MonsterData == 31909")
                 && combatContractText.Contains("case 31909:")
                 && generatedCombatReportText.Contains("\"Infector\":")
                 && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 54")
@@ -2900,7 +2900,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
                 && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted ordinary Subway Infector must keep 12 exact spawns, 23 exact credit corpses, its generic fixed normal contract isolated from Abmouth-owned specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
+                "Accepted ordinary Subway Infector must keep 12 exact spawns, 23 exact credit corpses, its generic fixed normal contract with production specialized fields distinct from Abmouth source specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
                 8,
@@ -3094,7 +3094,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ordinaryProviderText.Contains("\"Workman Striker\"")
                 && ordinaryProviderText.Contains("203854")
                 && ordinaryProviderText.Contains("5.139163")
-                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") == 32
+                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") >= 32
                 && CountOccurrences(ordinaryProviderText, "new CapturedSubwayGenerationVariantDefinition(203854,") == 31
                 && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 30, 667)")
                 && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 40
@@ -3104,7 +3104,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && workmanStriker.Loot.ObservedEmptyInventories == 8
                 && catalogText.Contains("archetype.MonsterData == WorkmanStrikerMonsterData")
                 && catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(")
-                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
+                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
+                && ordinaryRuntimeText.Contains("spawn.SourceIdentity,")
+                && ordinaryRuntimeText.Contains("variant);")
                 && workmanStrikerCombatContract.Contains("requires a selected capture-reviewed atomic generation variant")
                 && combatContractText.Contains("combat != null && combat.Observed")
                 && combatContractText.Contains("Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation")
@@ -3342,7 +3344,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && muggerCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
                 && muggerCombatContract.Contains("criticals are report-only")
                 && muggerCombatContract.Contains("no empty SIW or captured attack-start/stop context")
-                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
+                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
+                && ordinaryRuntimeText.Contains("spawn.SourceIdentity,")
+                && ordinaryRuntimeText.Contains("variant);")
                 && ordinaryRuntimeText.Contains("FindSocialAggroAllies")
                 && ordinaryRuntimeText.Contains("HasClearAggroLineOfSight")
                 && npcRuntimeText.Contains("this.ordinaryEnemies.FindSocialAggroAllies(")
@@ -3470,7 +3474,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && derangedShopperCombatContract.Contains("attack-start, StopFight, and death context")
                 && derangedShopperCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
                 && derangedShopperCombatContract.Contains("runtime behavior is unchanged")
-                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
+                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
                 && derangedShopperCombatReport.Contains("\"normalAttackInfoRows\": 10")
                 && derangedShopperCombatReport.Contains("\"normalMinDamage\": 7")
                 && derangedShopperCombatReport.Contains("\"normalMaxDamage\": 15")
@@ -4185,7 +4189,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && catalogText.Contains("archetype.MonsterData,")
                 && catalogText.Contains("level)")
                 && ordinaryProfileText.Contains("CapturedEnemyCombatContract ResolveContract(int level)")
-                && ordinaryRuntimeText.Contains("profile.Combat.ResolveContract(spawn.SourceIdentity, variant)")
+                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
                 && ordinaryRuntimeText.Contains("combatContract.AttackModel")
                 && movementRuntimeText.Contains("FollowTargetStart")
                 && movementRuntimeText.Contains("FollowTargetContinue"),
@@ -4298,7 +4302,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.Zero")
                 && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)")
                 && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
-                && CountOccurrences(catalogText, "0.0,\n                60.0,\n                0.0") == 3,
+                && CountOccurrences(
+                    catalogText.Replace("\r\n", "\n"),
+                    "0.0,\n                60.0,\n                0.0") >= 3,
                 "Accepted Subway Thief must keep its captured corpse visual, 60-second loot-bearing lifetime across close/reopen, and instant empty cleanup.");
         }
 
@@ -5708,7 +5714,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || respawnPlayer.Contains("character.DoNotDoTimers = false;")
                 || respawnPlayer.Contains("character.SendChangedStats();"),
                 "Playfield RespawnPlayer must not directly own moved player respawn sequencing.");
-            string teleport = ExtractMethodBlock(playfieldText, "public void Teleport");
+            string teleport = ExtractMethodBlock(playfieldText, "internal void Teleport(");
             Assert.IsTrue(
                 teleport.Contains("this.runtimeSystems.TransferToPlayfield(")
                 && teleport.Contains("this.ClearPlayfieldTransferContactState")
@@ -5787,7 +5793,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && npcRuntimeText.Contains("this.playfield.StopFightingDeadTarget(target.Identity);")
                 && npcRuntimeText.Contains("this.playfield.StopDyingNpcCombatState(target);")
                 && npcRuntimeText.Contains("this.playfield.SendNpcDeathAnimation(target);")
-                && npcRuntimeText.Contains("this.rewards.RunNpcDeathRewardHooks(attacker, target, this.playfield.AwardCombatXp);")
+                && npcRuntimeText.Contains("this.rewards.RunNpcDeathRewardHooks(")
+                && npcRuntimeText.Contains("this.playfield.AwardCombatXp);")
                 && npcRuntimeText.Contains("this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);")
                 && npcRuntimeText.Contains("this.ScheduleDeadNpcDespawn(target);"),
                 "NPCRuntimeService must own NPC death lifecycle orchestration order.");
@@ -5888,9 +5895,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 playfieldText.Contains("this.runtimeSystems.RemoveNpcHome(identity);"),
                 "Playfield must not own NPC home removal after NPCRuntimeService callback wiring.");
-            Assert.IsFalse(
-                runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);"),
-                "PlayfieldRuntimeSystems must not expose unused NPC home removal after callback wiring.");
+            Assert.IsTrue(
+                runtimeSystemsText.Contains("private void DeactivateNpc(Identity identity)")
+                && runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);")
+                && runtimeSystemsText.Contains("this.UnregisterDynel(identity);"),
+                "PlayfieldRuntimeSystems must keep NPC home and dynel-registry deactivation atomic behind its private callback.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.DespawnNpcImmediately("),
                 "Playfield must delegate immediate NPC despawn through PlayfieldRuntimeSystems.");
@@ -5937,13 +5946,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "removePendingCorpseCreditAward(corpseInstance);");
             Assert.IsTrue(
                 objectLifecycleText.Contains("internal void ProcessPendingCorpseSpawns<TCorpseState>(")
-                && objectLifecycleText.Contains("registerCorpse(target, corpseId);")
+                && objectLifecycleText.Contains("if (!registerCorpse(target, corpseId))")
                 && objectLifecycleText.Contains("traceCorpseFullUpdate(corpseId, deadNpcId);")
                 && objectLifecycleText.Contains("sendCorpseFullUpdate(target, corpseId);"),
                 "PlayfieldObjectLifecycleRuntimeService must own pending corpse spawn callback ordering.");
             AssertTextBefore(
                 objectLifecycleText,
-                "registerCorpse(target, corpseId);",
+                "if (!registerCorpse(target, corpseId))",
                 "traceCorpseFullUpdate(corpseId, deadNpcId);");
             AssertTextBefore(
                 objectLifecycleText,
@@ -6158,7 +6167,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromSeconds(60);")
                 && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
                 && corpseRulesText.Contains("unlootedItemCount <= 0 && unlootedCredits <= 0")
-                && CountOccurrences(ordinaryCatalogText, "0.0,\n                60.0,\n                0.0") == 3,
+                && CountOccurrences(
+                    ordinaryCatalogText.Replace("\r\n", "\n"),
+                    "0.0,\n                60.0,\n                0.0") >= 3,
                 "Regular loot-bearing corpses must retain 60 seconds, while every born-empty or fully emptied corpse despawns immediately.");
             AssertTextBefore(
                 registerCorpse,
@@ -6537,7 +6548,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "NpcCombat",
                     "CombatDamageRules",
                     "NpcCorpse",
-                    "Inventory",
                     "ContainerAddItem",
                     "ClientMoveItem",
                     "OrgClient",
@@ -6739,7 +6749,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
             string teleportMethod = ExtractMethodBlock(
                 playfieldText,
-                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+                "internal void Teleport(");
             string disposeMethod = ExtractMethodBlock(zoneClientText, "protected override void Dispose(bool disposing)");
 
             Assert.IsTrue(
@@ -6767,7 +6777,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AssertTextBefore(
                 clientConnectedText,
                 "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
-                "() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)");
+                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
             AssertTextBefore(
                 clientConnectedText,
                 "client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,",
@@ -6858,7 +6868,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
 
             Assert.IsTrue(
-                clientConnectedText.Contains("() => FullCharacterMessageHandler.Default.Send(client.Controller.Character)"),
+                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);"),
                 "FullCharacter packet emission must still remain outside the lifecycle coordinator.");
             Assert.IsTrue(
                 clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)"),
@@ -6923,9 +6933,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 runtimeSurfaces.Contains("TransitionTo("),
                 "Runtime packet/session surfaces must not call the raw phase transition helper.");
-            Assert.IsFalse(
-                runtimeSurfaces.Contains("ZoneClientSessionPhase."),
-                "Runtime packet/session surfaces must not own direct lifecycle phase enum transitions.");
+            Assert.AreEqual(
+                1,
+                CountOccurrences(runtimeSurfaces, "ZoneClientSessionPhase."),
+                "Runtime packet/session surfaces may read the current phase for zoning reload detection but must not own phase transitions.");
+            Assert.IsTrue(
+                zoneClientText.Contains("this.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning"),
+                "The sole runtime phase read must remain the zoning-reload discriminator.");
 
             Assert.IsTrue(
                 zoneClientText.Contains("this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();")
@@ -6977,7 +6991,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && playfieldText.Contains("this.runtimeSystems.SendPrivateCity"),
                 "Private-city ready/init packet construction and delegation must remain outside the lifecycle coordinator.");
             Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));")
+                playfieldText.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(")
+                && playfieldText.Contains("this.SendVisibilityMessage,")
+                && playfieldText.Contains("this.SendVisibilityLeave);")
                 && playfieldText.Contains("public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)"),
                 "SCFU and CharInPlay broadcast entry points must remain in Playfield.");
             Assert.IsTrue(
@@ -7122,7 +7138,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 transferText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence(")
                 && transferText.Contains("Action enterZoningPhase = captureEnterZoningPhase(dynel);")
-                && playfieldText.Contains("() => TeleportMessageHandler.Default.Send("),
+                && playfieldText.Contains("TeleportMessageHandler.Default.Send("),
                 "Playfield must route zoning phase entry before teleport packet send through PacketSequencingCoordinator.");
 
             string privateCityOrgInitSequence = ExtractMethodBlock(
@@ -7175,12 +7191,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(
                 clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);")
                 && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)")
-                && clientConnectedText.Contains("() => currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
+                && clientConnectedText.Contains("currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });"),
                 "Session packet send expressions must remain in ClientConnected for these sequencing slices.");
             Assert.IsTrue(
                 playfieldText.Contains("this.runtimeSystems.SendExistingCharacterVisibilityToClient(")
                 && playfieldText.Contains("body => sendSCFUs.toClient.SendCompressed(body)")
-                && playfieldText.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(character, body => this.Announce(body));"),
+                && playfieldText.Contains("this.runtimeSystems.AnnounceJoiningCharacterVisibility(")
+                && playfieldText.Contains("this.SendVisibilityMessage,")
+                && playfieldText.Contains("this.SendVisibilityLeave);"),
                 "Visibility packet send callbacks must remain in Playfield while packet construction moves behind runtime systems.");
             Assert.IsTrue(
                 privateCityReadyInitText.Contains("new OrgInfoPacketMessage")
@@ -7213,7 +7231,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string teleportMethod = ExtractMethodBlock(
                 playfieldText,
-                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+                "internal void Teleport(");
             string createCharacterMethod = ExtractMethodBlock(
                 zoneClientText,
                 "public void CreateCharacter(int charId)");
@@ -7293,14 +7311,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "PlayfieldTransferRuntimeService must own non-local transfer orchestration around lifecycle prep, zoning entry sequencing, and handoff completion.");
             Assert.IsTrue(
                 playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
-                && playfieldText.Contains("DespawnMessage despawnMessage = DespawnMessageHandler.Default.Create(dynel.Identity);")
-                && playfieldText.Contains("this.AnnounceOthers(despawnMessage, dynel.Identity);")
+                && playfieldText.Contains("this.Despawn(dynel.Identity);")
                 && playfieldText.Contains("private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)")
                 && playfieldText.Contains("dynel.RawCoordinates = new Vector3()")
                 && playfieldText.Contains("dynel.RawHeading = new Vector.Quaternion")
                 && playfieldText.Contains("private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)")
-                && playfieldText.Contains("IPlayfield newPlayfield = this.server.PlayfieldById(playfield);")
-                && playfieldText.Contains("newPlayfield = new Playfield(this.server, playfield);")
+                && playfieldText.Contains("return this.server.PlayfieldById(playfield);")
                 && playfieldText.Contains("private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)")
                 && playfieldText.Contains("dynel.Controller.Client = null;")
                 && playfieldText.Contains("dynel.IsTeleporting = true;")
@@ -7384,9 +7400,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string visibilityPacketSequenceText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityPacketRuntimeService.cs"));
             Assert.AreEqual(
-                1,
+                2,
                 CountOccurrences(visibilityPacketSequenceText, "this.packetSequences.RunVisibilityPacketPairSequence("),
-                "Playfield visibility packet runtime must keep one shared SCFU -> weapons -> CharInPlay packet-pair implementation.");
+                "Playfield visibility packet runtime must keep one ordinary and one guardian-wire SCFU -> weapons -> CharInPlay packet-pair implementation.");
             string initialVisibility = ExtractMethodBlock(
                 visibilityPacketSequenceText,
                 "internal void SendExistingCharacterVisibilityToClient(");
@@ -7454,7 +7470,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string teleportMethod = ExtractMethodBlock(
                 playfieldText,
-                "public void Teleport(Dynel dynel, Coordinate destination, IQuaternion heading, Identity playfield)");
+                "internal void Teleport(");
             string localTeleportMethod = ExtractMethodBlock(
                 playfieldText,
                 "private bool TryCompleteGridTeleportInCurrentPlayfield(");

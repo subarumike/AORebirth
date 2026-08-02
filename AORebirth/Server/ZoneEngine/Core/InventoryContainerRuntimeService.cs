@@ -1388,14 +1388,6 @@ namespace ZoneEngine.Core
             character.BaseInventory.Pages[(int)message.Target.Type].Write();
         }
 
-        public void MergeInventoryItemStackAction(ICharacter character, CharacterActionMessage message)
-        {
-            character.BaseInventory.Pages[(int)message.Target.Type][message.Target.Instance].MultipleCount +=
-                character.BaseInventory.Pages[(int)message.Target.Type][message.Parameter2].MultipleCount;
-            character.BaseInventory.Pages[(int)message.Target.Type].Remove(message.Parameter2);
-            character.BaseInventory.Pages[(int)message.Target.Type].Write();
-        }
-
         public bool TryRejectInventoryPageAccess(ICharacter character, IInventoryPage page)
         {
             if (this.RequiresImplantAccess(page) && !this.HasImplantAccess(character))

@@ -298,7 +298,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "formula=",
                         StringComparison.Ordinal);
                 CapturedEnemyCombatProfileDefinition selectedProfile =
-                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Single(
+                    CapturedEnemyCombatProfileCatalog.GetProfilesForTests().SingleOrDefault(
                         value => (mathematicalArchetype
                                       ? value.MatchesArchetypeKey(
                                           profile.ResourceId,
@@ -312,11 +312,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                  && (value.CaptureRuntimeEvidenceSafe
                                      || (resolved.AttackModel
                                          == CapturedEnemyAttackModel.Specialized
-                                         && resolved.UsesProductionSpecializedValues
-                                         && value.MatchesSpecialized(resolved)))
+                                         && value.CaptureEvidenceSafe
+                                         && (!resolved.UsesProductionSpecializedValues
+                                             || value.MatchesSpecialized(resolved))))
                                  && (mathematicalArchetype
                                      || value.Evidence == resolved.Evidence)
                                  && value.ContainsSource(resolved.EvidenceSourceIdentity));
+                Assert.IsNotNull(
+                    selectedProfile,
+                    profile.ProfileId + " resolved without a matching capture fixture profile; evidence source="
+                    + resolved.EvidenceSourceIdentity);
                 CapturedEnemyCombatPacketFixture fixture = fixtures[selectedProfile.ProfileId];
                 CapturedEnemySpecialAttackWeaponPacketFixture saw =
                     fixture.SpecialAttackWeaponPackets.FirstOrDefault(

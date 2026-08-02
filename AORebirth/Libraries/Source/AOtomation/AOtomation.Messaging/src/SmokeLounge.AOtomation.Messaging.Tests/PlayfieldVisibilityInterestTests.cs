@@ -344,9 +344,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             AORebirth.Core.Playfields.OrdinaryEnemySpawnDefinition[] spawns = catalog.GetSpawns();
             var index = NewIndex();
 
-            Assert.AreEqual(321, spawns.Length);
-            Assert.AreEqual(321, spawns.Select(value => value.SourceIdentity).Distinct().Count());
-            Assert.AreEqual(321, spawns.Count(value => value.PlayfieldInstance == 127));
+            Assert.AreEqual(322, spawns.Length);
+            Assert.AreEqual(322, spawns.Select(value => value.SourceIdentity).Distinct().Count());
+            Assert.AreEqual(322, spawns.Count(value => value.PlayfieldInstance == 127));
             foreach (AORebirth.Core.Playfields.OrdinaryEnemySpawnDefinition spawn in spawns)
             {
                 AORebirth.Core.Playfields.OrdinaryEnemyProfile profile;
@@ -355,14 +355,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Upsert(index, Character(spawn.SourceIdentity, spawn.X, spawn.Y, spawn.Z));
             }
 
-            Assert.AreEqual(321, index.Count);
+            Assert.AreEqual(322, index.Count);
             Assert.AreEqual(
-                310,
+                322,
                 spawns.Count(
                     value => value.Disposition
                              == AORebirth.Core.Playfields.OrdinaryEnemyRuntimeDisposition.Active));
             Assert.AreEqual(
-                11,
+                0,
                 spawns.Count(
                     value => value.Disposition
                              == AORebirth.Core.Playfields.OrdinaryEnemyRuntimeDisposition.Quarantined));

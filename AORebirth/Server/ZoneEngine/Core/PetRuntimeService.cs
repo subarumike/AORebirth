@@ -362,11 +362,6 @@ namespace ZoneEngine.Core
                 concretePlayfield.AnnounceSpawnedCharacterVisibility(petCharacter, owner.Identity);
             }
 
-            if (!PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
-            {
-                owner.Playfield.AnnounceOthers(petSpawnUpdate, owner.Identity);
-            }
-
             if (PetSlotClassifier.IsBureaucratCompanionStrain(petSlotStrain)
                 || PetBureaucratGuardianAppearance.IsGuardianNano(summonNanoId))
             {

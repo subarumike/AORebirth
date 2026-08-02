@@ -86,6 +86,70 @@ namespace ZoneEngine.Core.Playfields
 
         private const int NormalAttackInfoHitType = 3;
 
+        private static readonly CapturedEnemyCombatContract MarcusCombatContract =
+            CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260731-174302: Marcus Stone standing flamethrower packet sequence",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    FlamethrowerInitialAttackDelaySeconds,
+                    null,
+                    new CapturedEnemyCombatAttackDefinition(
+                        12,
+                        23,
+                        0,
+                        11.0d,
+                        FlamethrowerRechargeSeconds,
+                        false,
+                        0,
+                        6,
+                        0,
+                        NormalAttackInfoHitType,
+                        0,
+                        0,
+                        true,
+                        FlamethrowerDamageObservations),
+                    new CapturedEnemySpecialAttackDefinition[0],
+                    MarcusSpecialAttackWeaponUnknown1,
+                    MarcusSpecialAttackWeaponUnknown2,
+                    MarcusSpecialAttackWeaponUnknown3,
+                    MarcusSpecialAttackWeaponUnknown4,
+                    MarcusSpecialAttackWeaponUnknown5,
+                    0,
+                    0,
+                    0));
+
+        private static readonly CapturedEnemyCombatContract RobotCombatContract =
+            CapturedEnemyCombatContract.CapturedSpecialSequence(
+                "20260731-174302: Burning Cleaning Robot ambient return attack packet sequence",
+                new CapturedEnemySpecialAttackSequenceDefinition(
+                    RobotInitialAttackDelaySeconds,
+                    null,
+                    new CapturedEnemyCombatAttackDefinition(
+                        RobotMinDamage,
+                        RobotMaxDamage,
+                        0,
+                        NpcCombatAttackRules.MaxMeleeCombatDistance,
+                        RobotRechargeSeconds,
+                        false,
+                        -1,
+                        0,
+                        0,
+                        NormalAttackInfoHitType,
+                        0,
+                        0,
+                        true),
+                    new[]
+                    {
+                        new CapturedEnemySpecialAttackDefinition(43, 43, 43, string.Empty)
+                    },
+                    43,
+                    43,
+                    43,
+                    3,
+                    0,
+                    0,
+                    0,
+                    0));
+
         private static readonly HashSet<int> LinkedPlayfields = new HashSet<int>();
 
         private static readonly Dictionary<int, DateTime> NextRobotRespawnUtc = new Dictionary<int, DateTime>();
@@ -288,42 +352,19 @@ namespace ZoneEngine.Core.Playfields
 
             AnnounceMarcusFlamethrowerTextureVfx(playfield, marcus);
             playfield.Announce(
-                new AttackMessage
-                {
-                    Identity = marcus.Identity,
-                    Unknown = 0,
-                    Target = robot.Identity,
-                    Action = 0
-                });
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    marcus.Identity,
+                    robot.Identity,
+                    MarcusCombatContract));
             playfield.Announce(
-                new SpecialAttackWeaponMessage
-                {
-                    Identity = robot.Identity,
-                    Unknown = 0,
-                    Specials = new[]
-                               {
-                                   new SpecialAttack
-                                   {
-                                       Unknown1 = 43,
-                                       Unknown2 = 43,
-                                       Unknown3 = 43,
-                                       Unknown4 = string.Empty
-                                   }
-                               },
-                    Unknown1 = 43,
-                    Unknown2 = 43,
-                    Unknown3 = 43,
-                    Unknown4 = 3,
-                    Unknown5 = 0
-                });
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    robot.Identity,
+                    RobotCombatContract));
             playfield.Announce(
-                new AttackMessage
-                {
-                    Identity = robot.Identity,
-                    Unknown = 0,
-                    Target = marcus.Identity,
-                    Action = 0
-                });
+                CapturedEnemyCombatPacketFactory.CreateAttack(
+                    robot.Identity,
+                    marcus.Identity,
+                    RobotCombatContract));
 
             DateTime now = DateTime.UtcNow;
             NextMarcusAttackUtc[playfieldIdentity.Instance] =
@@ -366,18 +407,12 @@ namespace ZoneEngine.Core.Playfields
 
             // Capture AttackInfo: Amount / AmmoCount=0 / WeaponSlot=6 / Unk1=0 / HitType=Normal(3) / WeaponInstance=0
             playfield.Announce(
-                new AttackInfoMessage
-                {
-                    Identity = marcus.Identity,
-                    Unknown = 0,
-                    Target = robot.Identity,
-                    Unknown1 = damage,
-                    Unknown2 = 0,
-                    Unknown3 = 6,
-                    Unknown4 = 0,
-                    Unknown5 = NormalAttackInfoHitType,
-                    Unknown6 = 0
-                });
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    marcus.Identity,
+                    robot.Identity,
+                    damage,
+                    0,
+                    MarcusCombatContract.SpecialAttackSequence.RepeatingAttack));
 
             int currentHealth = robot.Stats[StatIds.health].Value;
             int newHealth = Math.Max(0, currentHealth - damage);
@@ -434,18 +469,12 @@ namespace ZoneEngine.Core.Playfields
             int damage = RobotMinDamage
                          + ((int)(DateTime.UtcNow.Ticks & 0xffff) % (RobotMaxDamage - RobotMinDamage + 1));
             playfield.Announce(
-                new AttackInfoMessage
-                {
-                    Identity = robot.Identity,
-                    Unknown = 0,
-                    Target = marcus.Identity,
-                    Unknown1 = damage,
-                    Unknown2 = -1,
-                    Unknown3 = 0,
-                    Unknown4 = 0,
-                    Unknown5 = NormalAttackInfoHitType,
-                    Unknown6 = 0
-                });
+                CapturedEnemyCombatPacketFactory.CreateAttackInfo(
+                    robot.Identity,
+                    marcus.Identity,
+                    damage,
+                    -1,
+                    RobotCombatContract.SpecialAttackSequence.RepeatingAttack));
 
             // Marcus is effectively immortal for this ambient demo (117800 HP); still apply tiny chips.
             int currentHealth = marcus.Stats[StatIds.health].Value;
@@ -489,17 +518,9 @@ namespace ZoneEngine.Core.Playfields
             }
 
             playfield.Announce(
-                new SpecialAttackWeaponMessage
-                {
-                    Identity = marcus.Identity,
-                    Unknown = 0,
-                    Specials = new SpecialAttack[0],
-                    Unknown1 = MarcusSpecialAttackWeaponUnknown1,
-                    Unknown2 = MarcusSpecialAttackWeaponUnknown2,
-                    Unknown3 = MarcusSpecialAttackWeaponUnknown3,
-                    Unknown4 = MarcusSpecialAttackWeaponUnknown4,
-                    Unknown5 = MarcusSpecialAttackWeaponUnknown5
-                });
+                CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(
+                    marcus.Identity,
+                    MarcusCombatContract));
         }
 
         private static void EnsureMarcusFlamethrowerWeaponMesh(Character marcus)

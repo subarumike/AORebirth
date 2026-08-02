@@ -26,9 +26,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CapturedEnemyCombatProfileDefinition[] areteProfiles =
                 CapturedEnemyCombatProfileCatalog.GetProfilesForTests().Where(
                     value => value.ResourceId == 6553).ToArray();
-            Assert.AreEqual(43, areteProfiles.Length);
+            Assert.AreEqual(49, areteProfiles.Length);
             Assert.AreEqual(
-                43,
+                49,
                 areteProfiles.Count(value => value.CaptureEvidenceSafe));
 
             var cases = new[]
@@ -107,11 +107,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void AreteAlienAreaCompleteMultiStreamProfilesResolveFromUnresolvedWithoutGuessedBaseline()
+        public void AreteAlienAreaConflictedMultiStreamProfilesFailClosedWithoutGuessedTiming()
         {
             CapturedEnemyCombatContract rollerrat;
             string failure;
-            Assert.IsTrue(
+            Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     6553,
                     "Rollerrat",
@@ -123,42 +123,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         true),
                     out rollerrat,
                     out failure),
-                failure);
-            Assert.IsTrue(rollerrat.IsCombatReady);
-            Assert.AreEqual(CapturedEnemyAttackModel.Specialized, rollerrat.AttackModel);
-            Assert.IsNotNull(rollerrat.ParallelAttackSequence);
-            Assert.AreEqual(2, rollerrat.ParallelAttackSequence.Streams.Length);
-            Assert.IsTrue(rollerrat.UsesCaptureProvenArchetype);
-            StringAssert.Contains(
-                rollerrat.CaptureProvenArchetypeId,
-                "captured-parallel-streams=2");
-
-            CapturedEnemyParallelAttackStreamDefinition rollerratLew1 =
-                rollerrat.ParallelAttackSequence.Streams.Single(
-                    value => value.Attack.AttackInfoWeaponSlot == 0);
-            Assert.AreEqual(5, rollerratLew1.Attack.MinDamage);
-            Assert.AreEqual(8, rollerratLew1.Attack.MaxDamage);
-            Assert.AreEqual(1279612721, rollerratLew1.Attack.AttackInfoWeaponInstance);
-            Assert.AreEqual(5.092768d, rollerratLew1.InitialDelaySeconds, 0.000001d);
-            Assert.AreEqual(7.20138d, rollerratLew1.Attack.RechargeSeconds, 0.000001d);
-            CollectionAssert.AreEqual(
-                new[] { 7, 8, 5, 8, 5, 5 },
-                rollerratLew1.Attack.CapturedDamageObservations);
-
-            CapturedEnemyParallelAttackStreamDefinition rollerratLew2 =
-                rollerrat.ParallelAttackSequence.Streams.Single(
-                    value => value.Attack.AttackInfoWeaponSlot == 1);
-            Assert.AreEqual(5, rollerratLew2.Attack.MinDamage);
-            Assert.AreEqual(8, rollerratLew2.Attack.MaxDamage);
-            Assert.AreEqual(1279612722, rollerratLew2.Attack.AttackInfoWeaponInstance);
-            Assert.AreEqual(0.240753d, rollerratLew2.InitialDelaySeconds, 0.000001d);
-            Assert.AreEqual(6.550794d, rollerratLew2.Attack.RechargeSeconds, 0.000001d);
-            CollectionAssert.AreEqual(
-                new[] { 8, 5, 8, 5, 5 },
-                rollerratLew2.Attack.CapturedDamageObservations);
+                "The complete corpus adds an ambiguous damage-type-4 terminal stream, so the old two-stream Rollerrat contract must fail closed.");
+            Assert.IsFalse(rollerrat.IsCombatReady);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
 
             CapturedEnemyCombatContract minibull;
-            Assert.IsTrue(
+            Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     6553,
                     "Angry Minibull",
@@ -170,39 +140,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         true),
                     out minibull,
                     out failure),
-                failure);
-            Assert.IsTrue(minibull.IsCombatReady);
-            Assert.AreEqual(CapturedEnemyAttackModel.Specialized, minibull.AttackModel);
-            Assert.IsNotNull(minibull.ParallelAttackSequence);
-            Assert.AreEqual(2, minibull.ParallelAttackSequence.Streams.Length);
-            Assert.IsTrue(minibull.UsesCaptureProvenArchetype);
-            StringAssert.Contains(
-                minibull.CaptureProvenArchetypeId,
-                "captured-parallel-streams=2");
-
-            CapturedEnemyParallelAttackStreamDefinition minibullLew1 =
-                minibull.ParallelAttackSequence.Streams.Single(
-                    value => value.Attack.AttackInfoWeaponSlot == 0);
-            Assert.AreEqual(19, minibullLew1.Attack.MinDamage);
-            Assert.AreEqual(22, minibullLew1.Attack.MaxDamage);
-            Assert.AreEqual(1279612721, minibullLew1.Attack.AttackInfoWeaponInstance);
-            Assert.AreEqual(3.500739d, minibullLew1.InitialDelaySeconds, 0.000001d);
-            Assert.AreEqual(6.01237d, minibullLew1.Attack.RechargeSeconds, 0.000001d);
-            CollectionAssert.AreEqual(
-                new[] { 19, 22 },
-                minibullLew1.Attack.CapturedDamageObservations);
-
-            CapturedEnemyParallelAttackStreamDefinition minibullLew2 =
-                minibull.ParallelAttackSequence.Streams.Single(
-                    value => value.Attack.AttackInfoWeaponSlot == 1);
-            Assert.AreEqual(8, minibullLew2.Attack.MinDamage);
-            Assert.AreEqual(18, minibullLew2.Attack.MaxDamage);
-            Assert.AreEqual(1279612722, minibullLew2.Attack.AttackInfoWeaponInstance);
-            Assert.AreEqual(2.380962d, minibullLew2.InitialDelaySeconds, 0.000001d);
-            Assert.AreEqual(4.831813d, minibullLew2.Attack.RechargeSeconds, 0.000001d);
-            CollectionAssert.AreEqual(
-                new[] { 18, 8 },
-                minibullLew2.Attack.CapturedDamageObservations);
+                "The complete corpus records both zero and 0.0005-second attack-start delays, so Angry Minibull L13 must fail closed.");
+            Assert.IsFalse(minibull.IsCombatReady);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
         }
 
         [TestMethod]
@@ -210,9 +150,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             var cases = new[]
             {
-                new { Name = "Rollerrat", MonsterData = 17687, Level = 6, StreamCount = 2, OneShotCount = 1 },
-                new { Name = "Angry Minibull", MonsterData = 30360, Level = 8, StreamCount = 1, OneShotCount = 1 },
                 new { Name = "Angry Minibull", MonsterData = 30360, Level = 9, StreamCount = 2, OneShotCount = 2 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 10, StreamCount = 2, OneShotCount = 2 },
                 new { Name = "Angry Minibull", MonsterData = 30360, Level = 11, StreamCount = 2, OneShotCount = 2 },
                 new { Name = "Angry Minibull", MonsterData = 30360, Level = 12, StreamCount = 2, OneShotCount = 1 }
             };
@@ -269,7 +208,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             CapturedEnemyCombatContract minibullLevel8;
             string minibullLevel8Failure;
-            Assert.IsTrue(
+            Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     6553,
                     "Angry Minibull",
@@ -279,15 +218,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CapturedEnemyCombatContract.Unresolved("exact partial check", true),
                     out minibullLevel8,
                     out minibullLevel8Failure),
-                minibullLevel8Failure);
-            Assert.AreEqual(
-                0.001d,
-                minibullLevel8.ParallelAttackSequence.AttackStartDelaySeconds,
-                0.000001d);
+                "Angry Minibull L8 has both zero and 0.001-second captured attack-start delays and must fail closed.");
+            Assert.IsFalse(minibullLevel8.IsCombatReady);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(minibullLevel8Failure));
 
             CapturedEnemyCombatContract rollerratLevel6;
             string rollerratFailure;
-            Assert.IsTrue(
+            Assert.IsFalse(
                 CapturedEnemyCombatProfileCatalog.TryResolve(
                     6553,
                     "Rollerrat",
@@ -297,20 +234,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     CapturedEnemyCombatContract.Unresolved("exact partial check", true),
                     out rollerratLevel6,
                     out rollerratFailure),
-                rollerratFailure);
-            CapturedEnemyParallelAttackStreamDefinition rollerratOneShot =
-                rollerratLevel6.ParallelAttackSequence.Streams.Single(value => !value.Repeats);
-            Assert.AreEqual(0, rollerratOneShot.Attack.AttackInfoWeaponSlot);
-            Assert.AreEqual(1279612721, rollerratOneShot.Attack.AttackInfoWeaponInstance);
-            Assert.AreEqual(0.486999d, rollerratOneShot.InitialDelaySeconds, 0.000001d);
-            CollectionAssert.AreEqual(
-                new[] { 5, 8, 5, 5 },
-                rollerratOneShot.Attack.CapturedDamageObservations);
-            CapturedEnemyParallelAttackStreamDefinition rollerratRepeating =
-                rollerratLevel6.ParallelAttackSequence.Streams.Single(value => value.Repeats);
-            Assert.AreEqual(1, rollerratRepeating.Attack.AttackInfoWeaponSlot);
-            Assert.AreEqual(1279612722, rollerratRepeating.Attack.AttackInfoWeaponInstance);
-            Assert.AreEqual(6.317314d, rollerratRepeating.Attack.RechargeSeconds, 0.000001d);
+                "The complete corpus makes the former two-stream Rollerrat L6 projection ambiguous.");
+            Assert.IsFalse(rollerratLevel6.IsCombatReady);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(rollerratFailure));
 
             CapturedEnemyCombatContract minibullLevel12;
             string minibullFailure;
@@ -336,7 +262,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(1279612722, minibullOneShot.Attack.AttackInfoWeaponInstance);
             Assert.AreEqual(1.249285d, minibullOneShot.InitialDelaySeconds, 0.000001d);
             CollectionAssert.AreEqual(
-                new[] { 8, 13, 10 },
+                new[] { 8, 13, 10, 14 },
                 minibullOneShot.Attack.CapturedDamageObservations);
 
             string coordinator = File.ReadAllText(
@@ -373,7 +299,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             var unsupported = new[]
             {
-                new { Name = "Angry Minibull", MonsterData = 30360, Level = 10 },
+                new { Name = "Rollerrat", MonsterData = 17687, Level = 5 },
+                new { Name = "Rollerrat", MonsterData = 17687, Level = 6 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 8 },
+                new { Name = "Angry Minibull", MonsterData = 30360, Level = 13 },
                 new { Name = "Harvey the Bully", MonsterData = 30360, Level = 10 },
                 new { Name = "Saltworm", MonsterData = 17712, Level = 13 },
                 new { Name = "Alien Spider - Zix", MonsterData = 247728, Level = 7 },

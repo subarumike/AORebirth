@@ -244,15 +244,10 @@ namespace ZoneEngine.Core.Playfields
         public static CapturedAreteMovementCatalog LoadDefault()
         {
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string[] candidates =
-            {
-                Path.Combine(baseDirectory, RuntimeDatasetRelativePath),
-                Path.Combine(baseDirectory, RuntimeDatasetSourceRelativePath),
+            foreach (string candidate in EnumerateDefaultCandidates(
+                baseDirectory,
                 RuntimeDatasetRelativePath,
-                RuntimeDatasetSourceRelativePath
-            };
-
-            foreach (string candidate in candidates)
+                RuntimeDatasetSourceRelativePath))
             {
                 if (Directory.Exists(candidate))
                 {
@@ -261,6 +256,28 @@ namespace ZoneEngine.Core.Playfields
             }
 
             return Invalid("runtime-dataset-directory-missing");
+        }
+
+        internal static IEnumerable<string> EnumerateDefaultCandidates(
+            string baseDirectory,
+            params string[] relativePaths)
+        {
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            DirectoryInfo cursor = new DirectoryInfo(Path.GetFullPath(baseDirectory));
+            while (cursor != null)
+            {
+                for (int index = 0; index < relativePaths.Length; index++)
+                {
+                    string candidate = Path.GetFullPath(
+                        Path.Combine(cursor.FullName, relativePaths[index]));
+                    if (seen.Add(candidate))
+                    {
+                        yield return candidate;
+                    }
+                }
+
+                cursor = cursor.Parent;
+            }
         }
 
         public static CapturedAreteMovementCatalog Load(string directory)
@@ -1054,14 +1071,10 @@ namespace ZoneEngine.Core.Playfields
         public static CapturedAreteAggroCatalog LoadDefault()
         {
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string[] candidates =
-            {
-                Path.Combine(baseDirectory, RuntimeRelativePath),
-                Path.Combine(baseDirectory, SourceRelativePath),
+            foreach (string candidate in CapturedAreteMovementCatalog.EnumerateDefaultCandidates(
+                baseDirectory,
                 RuntimeRelativePath,
-                SourceRelativePath
-            };
-            foreach (string candidate in candidates)
+                SourceRelativePath))
             {
                 if (File.Exists(candidate))
                 {
