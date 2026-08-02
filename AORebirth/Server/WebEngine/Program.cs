@@ -287,6 +287,15 @@ namespace WebEngine
                 return false;
             }
 
+            if (!ValidatePhpRuntime())
+            {
+                Colouring.Push(ConsoleColor.Red);
+                Console.WriteLine("Error validating the configured local PHP runtime.");
+                Colouring.Pop();
+                Colouring.Pop();
+                return false;
+            }
+
             if (!InitializeServerInstance())
             {
                 Colouring.Push(ConsoleColor.Red);
@@ -333,7 +342,7 @@ namespace WebEngine
             consoleCommands.AddEntry("quit", ShutDownServer);
             consoleCommands.AddEntry("debugnetwork", SetDebugNetwork);
 
-            consoleCommands.AddEntry("checkphp", CheckPphp);
+            consoleCommands.AddEntry("checkphp", CheckPhp);
             consoleCommands.AddEntry("checkWebCore", CheckWebCore);
             return true;
         }
@@ -413,6 +422,18 @@ namespace WebEngine
         /// </param>
         private static void Main(string[] args)
         {
+            if (HasArgument(args, "/self-test-php-runtime"))
+            {
+                Environment.ExitCode = PhpRuntimeValidatorSelfTests.Run(Console.Out) ? 0 : 3;
+                return;
+            }
+
+            if (HasArgument(args, "/validate-php-runtime"))
+            {
+                Environment.ExitCode = ValidatePhpRuntime() ? 0 : 2;
+                return;
+            }
+
             bool headless = HasArgument(args, "/headless");
             if (headless)
             {
@@ -428,8 +449,14 @@ namespace WebEngine
             if (!Initialize())
             {
                 Console.WriteLine(locales.ErrorInitializingEngine);
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
+                Environment.ExitCode = 1;
+                if (!headless)
+                {
+                    Console.WriteLine("Press enter to exit");
+                    Console.ReadLine();
+                }
+
+                FlushHeadlessConsoleLogging();
             }
             else
             {
@@ -527,10 +554,18 @@ namespace WebEngine
         /// 
         /// </summary>
         /// <param name="obj"></param>
-        private static void CheckPphp(string[] obj)
+        private static void CheckPhp(string[] obj)
         {
-            var _checks = new Checks();
-            _checks.CheckPhp();
+            ValidatePhpRuntime();
+        }
+
+        private static bool ValidatePhpRuntime()
+        {
+            PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate(
+                Config.Instance.CurrentConfig.WebHostPhpPath,
+                AppDomain.CurrentDomain.BaseDirectory);
+            Console.WriteLine(result.Message);
+            return result.IsValid;
         }
 
         /// <summary>
