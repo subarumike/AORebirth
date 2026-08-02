@@ -64,8 +64,17 @@ namespace WebEngine.Handlers
             this.fullFilePath = fileName;
             if (File.Exists(fileName))
             {
+                WebEngine.PhpRuntimeValidationResult runtime = WebEngine.PhpRuntimeValidator.Validate(
+                    _config.Instance.CurrentConfig.WebHostPhpPath,
+                    AppDomain.CurrentDomain.BaseDirectory);
+                if (!runtime.IsValid)
+                {
+                    throw new InvalidOperationException(runtime.Message);
+                }
+
                 Process proc = new Process();
-                proc.StartInfo.FileName = _config.Instance.CurrentConfig.WebHostPhpPath + "\\\\php-cgi.exe";
+                proc.StartInfo.FileName = runtime.ExecutablePath;
+                proc.StartInfo.WorkingDirectory = runtime.RuntimeDirectory;
                 proc.StartInfo.EnvironmentVariables.Add("REMOTE_ADDR", envVariables["remote_addr"]);
                 proc.StartInfo.EnvironmentVariables.Add("SCRIPT_NAME", this.scriptName);
                 proc.StartInfo.EnvironmentVariables.Add("USER_AGENT", envVariables["user_agent"]);
@@ -81,11 +90,11 @@ namespace WebEngine.Handlers
                 proc.StartInfo.EnvironmentVariables.Add("HTTP_RAW_POST_DATA", envVariables["post"]);
                 if (proc.StartInfo.EnvironmentVariables.ContainsKey("PHPRC"))
                 {
-                    proc.StartInfo.EnvironmentVariables["PHPRC"] = _config.Instance.CurrentConfig.WebHostPhpPath;
+                    proc.StartInfo.EnvironmentVariables["PHPRC"] = runtime.RuntimeDirectory;
                 }
                 else
                 {
-                    proc.StartInfo.EnvironmentVariables.Add("PHPRC", _config.Instance.CurrentConfig.WebHostPhpPath);
+                    proc.StartInfo.EnvironmentVariables.Add("PHPRC", runtime.RuntimeDirectory);
                 }
                 proc.StartInfo.UseShellExecute = false;
                 proc.StartInfo.RedirectStandardOutput = true;
