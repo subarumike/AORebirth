@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+  <!-- Copy values into an ignored local environment override; never commit credentials. -->
+  <ListenIP>0.0.0.0</ListenIP>
+  <ChatIP>127.0.0.1</ChatIP>
+  <ZoneIP>127.0.0.1</ZoneIP>
+  <ChatPort>7012</ChatPort>
+  <ZonePort>7501</ZonePort>
+  <LoginPort>7500</LoginPort>
+  <CommPort>6996</CommPort>
+  <SqlLog>true</SqlLog>
+  <LogChat>false</LogChat>
+  <Motd>twidbits.com</Motd>
+  <SQLType>MySql</SQLType>
+  <MysqlConnection>Server=localhost;Database=cellao_codex_clean;Uid=cellaodbuser;Pwd=REPLACE_WITH_LOCAL_PASSWORD</MysqlConnection>
+  <MsSqlConnection>Data Source=localhost;Inital Catalog=cellao;UserID=cellaodbuser;Password=REPLACE_WITH_LOCAL_PASSWORD;Trusted_Connection=false</MsSqlConnection>
+  <PostgreConnection>Server=localhost;User Id=cellaodbuser;Password=REPLACE_WITH_LOCAL_PASSWORD;Database=cellao</PostgreConnection>
+  <Locale>en</Locale>
+  <WebHostName>test.aocell.info</WebHostName>
+  <WebHostPort>8181</WebHostPort>
+  <WebHostRoot>htdocs</WebHostRoot>
+  <WebCoreRepo>https://github.com/CellAO/CellAO-WebCore/archive/master.zip</WebCoreRepo>
+  <WebHostDefaultPage>index.php</WebHostDefaultPage>
+  <WebHostPhpPath>php</WebHostPhpPath>
+</Config>
