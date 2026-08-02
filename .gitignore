@@ -136,5 +136,10 @@ tools-temp/AOSharpCaptureAnalyzer/snapshots/
 tools-temp/AOSharpCaptureAnalyzer/reviewed/
 tools-temp/db-backups/
 .local/
+/diagnostics/
+/tools-temp/ProcDump/
+/tools-temp/_tmp*
+/AORebirth/Cursor/
+*.dmp
 __pycache__/
 .aider*

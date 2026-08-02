@@ -1,2 +1,0 @@
-@echo off
-C:\xampp\mysql\bin\mysql.exe -uroot cellao_codex_clean -e "SELECT playfield, identity_type, identity_instance, HEX(identity_instance), item_id, name FROM staticdynels WHERE identity_instance=-1073282272 OR identity_instance=3221685024 OR CAST(identity_instance AS SIGNED)=-1073282272 LIMIT 20; SELECT playfield, identity_type, identity_instance, item_id FROM staticdynels WHERE playfield=4680 AND (identity_type=57008 OR identity_type=57000 OR identity_instance LIKE '%%107328%%') LIMIT 30;"

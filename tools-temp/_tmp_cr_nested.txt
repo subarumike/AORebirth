@@ -1,2 +1,0 @@
-Loading C:\Users\nermi\source\repos\AORebirth\AORebirth\Built\Debug\items.dat
-Loading data for client version 18.8.62_EP1

@@ -1,1 +1,0 @@
-SELECT id, name FROM cellao_codex_clean.itemnames WHERE id IN (244738,244737,244730,244735,244736,244739,244740,244741);

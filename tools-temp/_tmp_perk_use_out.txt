@@ -1,1 +1,0 @@
-N3 top: [('Stat', 316), ('CharacterAction', 169), ('CharDCMove', 120), ('CastNanoSpell', 101), ('Buff', 100), ('OrgServer', 42), ('FollowTarget', 40), ('WeaponItemFullUpdate', 20), ('SimpleCharFullUpdate', 19), ('Despawn', 18), ('AppearanceUpdate', 9), ('OrgInfoPacket', 8)]

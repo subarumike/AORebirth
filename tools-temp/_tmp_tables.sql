@@ -1,2 +1,0 @@
-SHOW TABLES LIKE '%item%';
-SHOW TABLES LIKE '%inv%';
