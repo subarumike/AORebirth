@@ -29,7 +29,6 @@ def main():
     start_web_cmd = read("start-web-engine.cmd")
     start_ps = read("start-engines.ps1")
     stop_ps = read("stop-engines.ps1")
-    checks = read("AORebirth/Server/WebEngine/Checks.cs")
     validator = read("AORebirth/Server/WebEngine/PhpRuntimeValidator.cs")
     handler = read("AORebirth/Server/WebEngine/Handlers/PHPHandler.cs")
     program = read("AORebirth/Server/WebEngine/Program.cs")
@@ -42,7 +41,14 @@ def main():
     require("running engines were not stopped" in restart_cmd,
             "restart preflight failure must preserve running engines")
 
-    ordered(start_web_cmd, "preflight-database.cmd", "/validate-php-runtime", "-WebOnly")
+    ordered(
+        start_web_cmd,
+        "preflight-database.cmd",
+        'if not exist "%~dp0AORebirth\\Built\\Debug\\WebEngine.exe"',
+        "/validate-php-runtime",
+        "/validate-webcore-assets",
+        'start-engines.ps1" -WebOnly',
+    )
     require("--prestart" in start_ps and "--engine-required" in start_ps,
             "startup must use ownership-safe prestart and launched-PID verification")
     require("Stop-LaunchedEngineProcess" in start_ps and "$launched" in start_ps,
@@ -63,7 +69,7 @@ def main():
         "aocell.info/php.ini",
         "UrlDownloadFileCompleted",
     )
-    php_sources = checks + validator + handler + program
+    php_sources = validator + handler + program
     for token in forbidden_php_download_tokens:
         require(token not in php_sources, "obsolete PHP downloader remains: " + token)
 
@@ -72,6 +78,8 @@ def main():
     require("runtime.ExecutablePath" in handler and "runtime.RuntimeDirectory" in handler,
             "PHP execution must use canonical validated local paths")
     ordered(program, "/self-test-php-runtime", "/validate-php-runtime", "bool headless")
+    ordered(program, "/self-test-webcore-assets", "/validate-webcore-assets", "bool headless")
+    ordered(program, "/import-webcore-assets", "bool headless")
 
     print("[Engine Management Contracts] PASS")
     return 0
