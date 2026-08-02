@@ -35,9 +35,8 @@ namespace WebEngine
 
     using System;
     using System.IO;
+    using System.IO.Compression;
     using System.Net;
-
-    using Ionic.Zip;
 
     using _config = Utility.Config.ConfigReadWrite;
 
@@ -75,14 +74,7 @@ namespace WebEngine
 
         private void Unzip(string file)
         {
-            using (ZipFile zip = ZipFile.Read(file))
-            {
-                foreach (ZipEntry ze in zip)
-                {
-                    ze.Extract(
-                        _config.Instance.CurrentConfig.WebHostPhpPath,
-                        ExtractExistingFileAction.OverwriteSilently);
-                }
+            ExtractArchive(file, _config.Instance.CurrentConfig.WebHostPhpPath);
                 Console.WriteLine("Done.");
                 Console.WriteLine();
                 Console.WriteLine("Deleting " + Convert.ToString(file) + "...");
@@ -94,7 +86,6 @@ namespace WebEngine
                     _config.Instance.CurrentConfig.WebHostPhpPath + @"\php.ini");
                 Directory.CreateDirectory(@"c:\temp");
                 Console.WriteLine("Done.");
-            }
         }
 
         public void CheckWebCore()
@@ -142,13 +133,44 @@ namespace WebEngine
 
         private void Unzip2(string file)
         {
-            using (ZipFile zip = ZipFile.Read(file))
+            ExtractArchive(file, _config.Instance.CurrentConfig.WebHostRoot);
+            Console.WriteLine("Done.");
+        }
+
+        private static void ExtractArchive(string file, string destinationDirectory)
+        {
+            string destinationRoot = Path.GetFullPath(destinationDirectory);
+            if (!destinationRoot.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
             {
-                foreach (ZipEntry ze in zip)
+                destinationRoot += Path.DirectorySeparatorChar;
+            }
+
+            Directory.CreateDirectory(destinationRoot);
+
+            using (ZipArchive archive = ZipFile.OpenRead(file))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
                 {
-                    ze.Extract(_config.Instance.CurrentConfig.WebHostRoot, ExtractExistingFileAction.OverwriteSilently);
+                    string destinationPath = Path.GetFullPath(Path.Combine(destinationRoot, entry.FullName));
+                    if (!destinationPath.StartsWith(destinationRoot, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidDataException("Archive entry escapes the configured extraction directory.");
+                    }
+
+                    if (string.IsNullOrEmpty(entry.Name))
+                    {
+                        Directory.CreateDirectory(destinationPath);
+                        continue;
+                    }
+
+                    string parentDirectory = Path.GetDirectoryName(destinationPath);
+                    if (!string.IsNullOrEmpty(parentDirectory))
+                    {
+                        Directory.CreateDirectory(parentDirectory);
+                    }
+
+                    entry.ExtractToFile(destinationPath, true);
                 }
-                Console.WriteLine("Done.");
             }
         }
     }
