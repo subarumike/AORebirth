@@ -17,9 +17,9 @@
   <!-- Choose your SQL Databse Type here, MySql, MsSql, PostgreSQL-->
   <SQLType>MySql</SQLType>
   <!-- Sql Connection Setup Area -->
-  <MysqlConnection>Server=localhost;Database=cellao_codex_clean;Uid=cellaodbuser;Pwd=password</MysqlConnection>
-  <MsSqlConnection>Data Source=localhost;Inital Catalog=cellao;UserID=cellaodbuser;Password=password;Trusted_Connection=false</MsSqlConnection>
-  <PostgreConnection>Server=localhost;User Id=cellaodbuser;Password=password;Database=cellao</PostgreConnection>
+  <MysqlConnection>Server=localhost;Database=cellao_codex_clean;Uid=cellaodbuser;Pwd=REPLACE_WITH_LOCAL_PASSWORD</MysqlConnection>
+  <MsSqlConnection>Data Source=localhost;Inital Catalog=cellao;UserID=cellaodbuser;Password=REPLACE_WITH_LOCAL_PASSWORD;Trusted_Connection=false</MsSqlConnection>
+  <PostgreConnection>Server=localhost;User Id=cellaodbuser;Password=REPLACE_WITH_LOCAL_PASSWORD;Database=cellao</PostgreConnection>
   <!-- This area is for Locale Settings, en = english, gr = german, ro = Romanian more languages will be supported later, Default = en-->
   <Locale>en</Locale>
   <!-- WebEngine Setup -->

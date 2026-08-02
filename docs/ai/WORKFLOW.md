@@ -215,6 +215,9 @@ The global owner is `ZoneEngine.Core.Navigation`. PF127 is the first enabled pro
 ## Database
 
 - Use only `cellao_codex_clean`; this is the active legacy database name retained for local compatibility.
+- Keep `AORebirth\Config\Config.xml` free of real credentials. Its checked-in connection string is a non-secret placeholder.
+- Supply the local MySQL connection string to each engine with the `AO_REBIRTH_MYSQL_CONNECTION` environment variable. The environment value overrides only `MysqlConnection` after normal XML deserialization.
+- Run `cmd /d /c Tools\scan_secrets.cmd` before committing configuration or workflow changes. It reports locations, never captured values.
 - Do not change schemas without explicit approval.
 - Do not wipe or mass-edit data without explicit approval.
 - Treat checked-in SQL and runtime DB changes as separate surfaces.
