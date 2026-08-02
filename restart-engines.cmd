@@ -7,6 +7,15 @@ if errorlevel 1 (
     exit /b 1
 )
 
+echo [AORebirth Restart] Validating database before stopping any engine...
+call "%~dp0preflight-database.cmd"
+set PREFLIGHT_EXIT=%ERRORLEVEL%
+if not "%PREFLIGHT_EXIT%"=="0" (
+    echo [AORebirth Restart] Database preflight failed with exit code %PREFLIGHT_EXIT%; running engines were not stopped.
+    popd >nul
+    exit /b %PREFLIGHT_EXIT%
+)
+
 echo [AORebirth Restart] Stopping engines...
 call "%~dp0stop-engines.cmd"
 set STOP_EXIT=%ERRORLEVEL%
