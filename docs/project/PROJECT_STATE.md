@@ -47,7 +47,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`d9cd2989721ac8274bc600c0fefba850bbb64ffeb4de92ee08352e6b7ae937d5`.
+`097e36e031d410e005fa541f3573d93bd37352e3f2d44c5456f83116185eda80`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
@@ -64,6 +64,10 @@ round before same-buffer integrity validation and selective template decoding.
 The selective ItemDb reader now skips unrequested nested MessagePack values with
 an explicit work stack, eliminating the recursive native-crash path without
 changing retained templates or the governed formula artifact.
+After round one, a byte-identical active state reuses the prior deterministic
+formula result, preserving the three-round convergence result while eliminating
+the redundant terminal ItemDb traversal. Published runtime-facing bytes remain
+unchanged.
 Cohort validation now binds each JSON decode to the manifest SHA/length, reuses
 the first parsed object instead of reparsing the 124 MB inventory, and retries
 `JSONDecodeError` against the same verified UTF-8 string up to three times. The

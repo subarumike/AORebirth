@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `d9cd2989721ac8274bc600c0fefba850bbb64ffeb4de92ee08352e6b7ae937d5`
+  `097e36e031d410e005fa541f3573d93bd37352e3f2d44c5456f83116185eda80`
 - Combined input identity:
-  `4fab789dfd1c3dbd8f2f7f8bd432f0ebc46bd10a807b73e87d3ac02033bee701`
+  `efca377baa80de2d62ab6bffe847363b02e46dc562ef22bc95e741495365be2c`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -65,6 +65,9 @@ their generation manifest are one coordinated generated cohort.
   matching descriptor receive bounded fresh-process retry. Unrequested nested
   MessagePack values are skipped iteratively so deep containers cannot exhaust
   the Python call stack; fatal diagnostics retain both header and terminal frames.
+- After the first round, an active output that is byte-identical to the prior
+  active state reuses that state's deterministic formula output. The convergence
+  round remains counted while its redundant ItemDb traversal is eliminated.
 - The portable input descriptor is schema 2. It commits durable capture source,
   plan, capture identity, and session state while excluding private shard
   path/hash/length fields that are validated before normalization and are not
