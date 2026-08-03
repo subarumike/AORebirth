@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PhpRuntimeManifest SchemaVersion="1" Id="php-8.5.9-nts-win32-vs17-x64" Authority="The PHP Group official PHP for Windows archive" OfficialUrl="https://downloads.php.net/~windows/releases/archives/php-8.5.9-nts-Win32-vs17-x64.zip" Version="8.5.9" Architecture="x64" ThreadSafety="NTS" Toolchain="VS17" ArchiveFilename="php-8.5.9-nts-Win32-vs17-x64.zip" ArchiveSize="36015210" ArchiveSha256="516c2d72231bd035c8a910120834add0ad208098b790b4909b2cbeb93ce135fc" ArchiveRoot="flat" FileCount="78" DirectoryCount="6" TotalUncompressedBytes="101963340">
+  <Configuration Source="WebEngine.php.ini" InstalledPath="php.ini" Sha256="912685982dccbc19887cc0062535fd1c5e56f23dc61f18f9a365e83b8c4214d7" />
+  <File Path="README.md" Size="5366" Sha256="82549e7bf7ec308e9093ad3efaaaa64362397d79c6dc9253be992bfe09856521" />
+  <File Path="brotlicommon.dll" Size="188416" Sha256="e9673fc05441471721ea7b441d364e0386408227fdd15f9b1c6d817556e53f7f" />
+  <File Path="brotlidec.dll" Size="92160" Sha256="d6aa2b6651696a66ef00e43921aa7629907ca4f2f1a35deeff25ff921bc2eeed" />
+  <File Path="deplister.exe" Size="140800" Sha256="4ac8dee52664f490ba546cba7e8b6f033a61552d86826fac0133394be81bebde" />
+  <Directory Path="dev/" />
+  <File Path="dev/php8.lib" Size="1468506" Sha256="700c27be3e91b61fc06ff35f9de3f5bdb2a319270b6b1cdba351d444979abe30" />
+  <Directory Path="ext/" />
+  <File Path="ext/php_bz2.dll" Size="95232" Sha256="e7fbe86e8ae78e6825911323d1bd05b3737f9a8296823754a9a585a72f39fd5b" />
+  <File Path="ext/php_com_dotnet.dll" Size="93696" Sha256="e698cc6c21ed564f91796386954fcbe226251f53e82ef92779bc128141260a22" />
+  <File Path="ext/php_curl.dll" Size="1067008" Sha256="01583f5417683143a8cf4b045e9f0b5603b53271575b44ad21021fd47e7f40b1" />
+  <File Path="ext/php_dba.dll" Size="161280" Sha256="f681ddef98c70b598a135bb6851b2e5dce747ec1bd1efe3d6bd2321fee5bc1ba" />
+  <File Path="ext/php_dl_test.dll" Size="17920" Sha256="205fb3312de1f4e30f37ff83ed115c551b03fb8a41b856590efd789747d414e3" />
+  <File Path="ext/php_enchant.dll" Size="29184" Sha256="3dfc4f60d473e165edeeaff0965d039857a8591438a508eeeabe69ab58837d8c" />
+  <File Path="ext/php_exif.dll" Size="75776" Sha256="e4f4825e3f19f03aa8fb53ebefa01684351d5c8587cc55ed31bc347557a46385" />
+  <File Path="ext/php_ffi.dll" Size="164352" Sha256="c6ec714940ed56813873f930de6907c1fc939f9cd9a392ec96c42338f78f7b14" />
+  <File Path="ext/php_fileinfo.dll" Size="10466304" Sha256="0fad0bb4a89a3b5b889ad9033dc8ab72316ac054562a6365a77977bf56fcdd0e" />
+  <File Path="ext/php_ftp.dll" Size="65024" Sha256="190c3b69748b48e02e5e79449ce6abf36fe3b9fb76f275428fa67049219843c7" />
+  <File Path="ext/php_gd.dll" Size="10527744" Sha256="a58bc568de02c069aaddc790c7631fcc056d44234cb119633f933b5ba84c1daa" />
+  <File Path="ext/php_gettext.dll" Size="97280" Sha256="43bcc51820f8785302d343e49dfe54c9fcb59628b50dec619cc058a9cb9def77" />
+  <File Path="ext/php_gmp.dll" Size="319488" Sha256="61a6ba2598acfd6f2ba69c79bd85cc6dddb87c4e901703680279a183b757f725" />
+  <File Path="ext/php_intl.dll" Size="510976" Sha256="ca1e5c69ece09ea566a34dffdca7fc50efd65576ff12fab4389c8f5f72ade22e" />
+  <File Path="ext/php_ldap.dll" Size="281088" Sha256="87df937703a883d8fce23fc42e43684f8ff75b785a4b8107e81e94da16682193" />
+  <File Path="ext/php_mbstring.dll" Size="1632768" Sha256="61c81a7539766a9df1abf7ea494d339620a6bf42249ce133f292b35a36b13491" />
+  <File Path="ext/php_mysqli.dll" Size="129024" Sha256="665e2aacdcd6d3953ec1b85fb9211c37e8085a61f6bba75597c69fd915fecf0e" />
+  <File Path="ext/php_odbc.dll" Size="73216" Sha256="eb56f0bd3230ecb5462fab3e53179a7f526d2ac875b25b0cf9f5704fe36126c3" />
+  <File Path="ext/php_openssl.dll" Size="172544" Sha256="9b1cc7359d907f9fb42c92592657bbca9ea4bc9c1e35c7cfa62d2a6b30d9b905" />
+  <File Path="ext/php_pdo_firebird.dll" Size="49152" Sha256="54533a4a738502a3f53aac0e22be32fddacb05b75f71bc3d9a5c291e70e61b45" />
+  <File Path="ext/php_pdo_mysql.dll" Size="38400" Sha256="f96562105a629779ca94fa7829010e57aff2f48cae415d52314eed65695097fb" />
+  <File Path="ext/php_pdo_odbc.dll" Size="35328" Sha256="60c96f3eb52bed628110c1caf75bcbc298749de3de76c040bcecb3b7e238900f" />
+  <File Path="ext/php_pdo_pgsql.dll" Size="56320" Sha256="7062ae1cdd20983603853046d056b09cf92a9da70baeb8878f9091ec72f9588e" />
+  <File Path="ext/php_pdo_sqlite.dll" Size="45056" Sha256="b1ecc166d88662320806d5cc65428179550817db709987edbf5fdfff0b5df345" />
+  <File Path="ext/php_pgsql.dll" Size="131072" Sha256="2bcc591adc72b8c7dcfa63a964f61c7ae6062dab76c1151b59ef1b5b116c8301" />
+  <File Path="ext/php_shmop.dll" Size="18944" Sha256="781950b908e9b7e61a6bdcf2acc662c3f0f04098ddfc3e73a4040ca0d812eb5d" />
+  <File Path="ext/php_snmp.dll" Size="585216" Sha256="826a3fd9eded44f7f1fd244ce9f55a3f436e2e9c0c8bffcca5f79afe31e70dce" />
+  <File Path="ext/php_soap.dll" Size="265728" Sha256="72fce1e407e6fc0f90f5a05c2f7330e8ac37a65a2bb84bd58c1488299f5ab949" />
+  <File Path="ext/php_sockets.dll" Size="89088" Sha256="664a63bdb8b268f411fbf61f8d1657486f334f12701f89d1e0b428817e48b6f4" />
+  <File Path="ext/php_sodium.dll" Size="102912" Sha256="eddcdf34907fa72f1a6b8cd8789125488a8645de3a39246b8a9f289d982b943c" />
+  <File Path="ext/php_sqlite3.dll" Size="62464" Sha256="2c57c9c2063c962d47adc0c8e00500d85ebbdcecd165857f4d1fd02b057c7f0e" />
+  <File Path="ext/php_sysvshm.dll" Size="19968" Sha256="ce324807ed500e5722e7204bd5e99677c85f2eb9a2a70268b635581e2fc71eba" />
+  <File Path="ext/php_tidy.dll" Size="853504" Sha256="fa0c004480d60c9690dd7448ad6f149811b948a309c40f639ce2cc3e994a24ba" />
+  <File Path="ext/php_xsl.dll" Size="300032" Sha256="5eab95a7e47fd0fb3e7ff6ea6d0bb2c7ee9c42a50d1431d033eb50807ba15a7f" />
+  <File Path="ext/php_zend_test.dll" Size="93696" Sha256="43e276e5c634ab802ff91e25c5cdea261572e988dc2bee83eab1b105a5fb5da3" />
+  <File Path="ext/php_zip.dll" Size="417792" Sha256="6671ed5d1b0b70bda818f9dbe5abcbac6d125cd6198724739deacb8000e8996b" />
+  <Directory Path="extras/" />
+  <File Path="extras/sbom/php.cdx.json" Size="287673" Sha256="3d2b767ba57d0c2181b3fb54b3ed1a44f10d44ec83bf88bf7e3e5c6f274df53e" />
+  <File Path="extras/sbom/php.openvex.json" Size="19722" Sha256="dc3bf6d23c05f55ccb4bda6ad4c2429816831113559f4c310b8c1afd460d0680" />
+  <File Path="extras/sbom/php.spdx.json" Size="200546" Sha256="fc8fd7509e8eadd54227689cdc57b931dafbd96843235e9264a517f6e0dfb315" />
+  <Directory Path="extras/ssl/" />
+  <File Path="extras/ssl/legacy.dll" Size="177152" Sha256="db6790c5f5a711cbc2b827a6298fa61ca6845933a36101ddd603df964745f9e1" />
+  <File Path="extras/ssl/openssl.cnf" Size="12411" Sha256="a65a2cb9f4ee8ffdc7ef4f0ac600c0bdafb95b7b1ab457188ac610a62f5ad6b3" />
+  <File Path="glib-2.dll" Size="1799680" Sha256="d74b9352107b5be6659d30e1e9c582a3f41c2837a567d78c099d32d8803cf19c" />
+  <File Path="gmodule-2.dll" Size="19968" Sha256="904a0414bda1e67b85e4886a5e1af4b6fa2da7e6d565b82590d6d1aeb5259d60" />
+  <File Path="gobject-2.dll" Size="321536" Sha256="7834a0f23163be69b1963be7aeaa3fa85f78e8e235ea118e2f6fd2d20e176a28" />
+  <File Path="icudt77.dll" Size="31898624" Sha256="d649c8878be9e8a25c2e074235892ece77371950f8395729cc9158815894a5e7" />
+  <File Path="icuin77.dll" Size="3571200" Sha256="b5e225648c1c7067577a74c41b5371c047af26448eb783b640e7ada7d52fe283" />
+  <File Path="icuio77.dll" Size="62464" Sha256="a3046cdda552b55b5a169d4daee8e06595be01aa2fc6395f84b412a6d639135f" />
+  <File Path="icuuc77.dll" Size="2562560" Sha256="7954ea7a3fe9bb9bbf565212ec388bf3d0831131a16e7518aeb21deddf00948e" />
+  <Directory Path="lib/" />
+  <Directory Path="lib/enchant/" />
+  <File Path="lib/enchant/libenchant2_hunspell.dll" Size="807936" Sha256="384b56e85ebe9f9f91f5298305f55c0a92045d297f49e0c7f0cd912444839d9c" />
+  <File Path="libcrypto-3-x64.dll" Size="7266304" Sha256="4978b06f18c1d092e4f7c8c864cc814db2ff4535baa2de54937348ffe14aae5e" />
+  <File Path="libenchant2.dll" Size="70656" Sha256="dda28ea965456769f5442cc6a529522b60e83880af8965d14539ec45074d0ec6" />
+  <File Path="libpq.dll" Size="323584" Sha256="04de7eb7ea5acc214198b9e7f8c9f0fa71a7d97f50a43ce66ca796a2db30d0c8" />
+  <File Path="libsasl.dll" Size="221184" Sha256="db56a2852abda650ea4341c7804b042119328d2af43e9ebeafdbb37c95594dc3" />
+  <File Path="libsodium.dll" Size="462848" Sha256="de64aa6e9078fb32dcb7f9dd275d0ce121999e961498018b8c0f47d3825a8f65" />
+  <File Path="libsqlite3.dll" Size="1729024" Sha256="0af6881cc25559271dd7c5978fe0f78e89fc682e4387f89f8ea5f7ad2f15f6aa" />
+  <File Path="libssh2.dll" Size="419840" Sha256="1ddfbfff5fa18ea0460995b79f568ac2130ba21be8f3f68ae5d1ddfe19a37599" />
+  <File Path="libssl-3-x64.dll" Size="1315840" Sha256="dd76bebb8a13731a1bd047232c77299e7fa1fe9c8ef6d1563ca059473088630a" />
+  <File Path="license.txt" Size="3272" Sha256="098bdc5b9808fc16bef4b7154e876ac08ca249549727cde3b3f3f3b431e27cca" />
+  <File Path="news.txt" Size="60844" Sha256="c2f8beefddc22e12524764f2f447f63337c9ec13aa989fd861ea53699a4515e2" />
+  <File Path="nghttp2.dll" Size="227328" Sha256="a2b5b3f197c57a3c7368bedb494c3a625e534c0b6075a90cf265fac8bb74b7a4" />
+  <File Path="phar.phar.bat" Size="43" Sha256="ef0f0bd1e919ee96c7d20547f7a823218cd73452f36c47d1a22f2726d5d64308" />
+  <File Path="pharcommand.phar" Size="66006" Sha256="ac0ca5d163dbb61eeeb3144041c9e2430ef3fae9059f895f4f49d67e5264e628" />
+  <File Path="php-cgi.exe" Size="107008" Sha256="151b256f11a05d19e5a8670ea7b2841e51f47e0074e8d29711eed001614a0b4d" />
+  <File Path="php-win.exe" Size="79360" Sha256="372f4ecede9c102b5a4da52b933789cc38b956595402025e0410ecacc5d39d7f" />
+  <File Path="php.exe" Size="185856" Sha256="0eadb9b73bd08467bf1f900f7453115ee55257ddbca8d9174cfbb152261b14ce" />
+  <File Path="php.ini-development" Size="72051" Sha256="b809158db575a44e10f4e8101ea977e25ed505ce02b3f91523c3614d9d8cb3c7" />
+  <File Path="php.ini-production" Size="72187" Sha256="02004cf8c7beda520b2333e2033f5820b7f22b81c3bd2a68de9385dcce88b27d" />
+  <File Path="php8.dll" Size="13674496" Sha256="9dc0ec528f3672f5587dfbeef9bdfb392e334118801452318ec6ff9fabe69542" />
+  <File Path="php8embed.lib" Size="1541488" Sha256="032c41c7935bb5d0f577ab8aa9e86ca1b5d20811c0a1c2ca9f87c95e1c6f8b2a" />
+  <File Path="php8phpdbg.dll" Size="246272" Sha256="387db8cd6ba0e689d87ff9a9391ca6da24811f8b9b7414723417dde6eff4e174" />
+  <File Path="phpdbg.exe" Size="287232" Sha256="54d3338a080c3ba7486775a33c3388426a103bf5f317136f0e04fd25d8596751" />
+  <File Path="readme-redist-bins.txt" Size="746861" Sha256="2cdffea9f21cf90a7affa02770bd35388634d22e948fe541a896ed49590cf748" />
+  <File Path="snapshot.txt" Size="2460" Sha256="5450f8d194fac08ca21c5d08e0f704795d61badab0fd80edbaf27489b13fec3e" />
+</PhpRuntimeManifest>
