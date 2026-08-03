@@ -6,6 +6,18 @@ if "%~2"=="" goto Usage
 
 set "ARCHIVE_PATH=%~f1"
 set "EXPECTED_VERSION=%~2"
+set "COMPATIBILITY_TOOL=%~dp0Tools\webcore_php_compatibility.py"
+
+for %%I in (python.exe) do set "PYTHON_EXE=%%~$PATH:I"
+if not defined PYTHON_EXE (
+    echo [AORebirth WebCore Import] python.exe is unavailable; import was not attempted.
+    exit /b 5
+)
+
+if not exist "%COMPATIBILITY_TOOL%" (
+    echo [AORebirth WebCore Import] The approved compatibility tool is missing; import was not attempted.
+    exit /b 5
+)
 
 call "%~dp0status-engines.cmd" --prestart WebEngine >nul
 set "PRESTART_EXIT=%ERRORLEVEL%"
@@ -25,7 +37,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-WebEngine.exe /import-webcore-assets "%ARCHIVE_PATH%" "%EXPECTED_VERSION%"
+WebEngine.exe /import-webcore-assets "%ARCHIVE_PATH%" "%EXPECTED_VERSION%" "%PYTHON_EXE%" "%COMPATIBILITY_TOOL%"
 set "IMPORT_EXIT=%ERRORLEVEL%"
 popd >nul
 exit /b %IMPORT_EXIT%

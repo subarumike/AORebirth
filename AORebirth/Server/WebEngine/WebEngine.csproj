@@ -59,10 +59,14 @@
     <Compile Include="Handlers\FileHandler.cs" />
     <Compile Include="HttpServer.cs" />
     <Compile Include="Handlers\PHPHandler.cs" />
+    <Compile Include="PHPHandlerSelfTests.cs" />
     <Compile Include="PhpRuntimeValidator.cs" />
     <Compile Include="PhpRuntimeValidatorSelfTests.cs" />
     <Compile Include="WebCoreAssetManager.cs" />
     <Compile Include="WebCoreAssetManagerSelfTests.cs" />
+    <Compile Include="WebCoreCompatibilityManager.cs" />
+    <Compile Include="WebRequestPathPolicy.cs" />
+    <Compile Include="WebRequestPathPolicySelfTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseHeader.cs" />
@@ -106,6 +110,22 @@
     </Content>
     <Content Include="..\..\Config\WebCoreAssets.manifest.xml">
       <Link>WebCoreAssets.manifest.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Config\WebCoreCompatibility.manifest.xml">
+      <Link>WebCoreCompatibility.manifest.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Config\WebCorePatchedAssets.manifest.xml">
+      <Link>WebCorePatchedAssets.manifest.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Config\PhpRuntime.manifest.xml">
+      <Link>PhpRuntime.manifest.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Config\WebEngine.php.ini">
+      <Link>WebEngine.php.ini</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="MimeTypes.xml">

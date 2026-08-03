@@ -2,170 +2,369 @@ namespace WebEngine
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
+    using System.Linq;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Xml.Linq;
 
     internal static class PhpRuntimeValidatorSelfTests
     {
         public static bool Run(TextWriter output)
         {
-            var failures = new List<string>();
-            RunCase("missing configuration fails closed", MissingConfigurationFailsClosed, failures);
-            RunCase("missing runtime fails closed", MissingRuntimeFailsClosed, failures);
-            RunCase("missing executable fails closed", MissingExecutableFailsClosed, failures);
-            RunCase("relative local runtime is accepted", RelativeLocalRuntimeIsAccepted, failures);
-            RunCase("explicit local executable is accepted", ExplicitLocalExecutableIsAccepted, failures);
-            RunCase("network locations are rejected", NetworkLocationsAreRejected, failures);
-            RunCase("malformed paths are rejected", MalformedPathsAreRejected, failures);
+            int passed = 0;
+            int total = 0;
+            string sourceBase = AppDomain.CurrentDomain.BaseDirectory;
 
-            if (failures.Count == 0)
+            RunCase(output, "approved manifest", ref passed, ref total, delegate
             {
-                output.WriteLine("[WebEngine PHP self-test] PASS 7/7");
-                return true;
-            }
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateConfiguredManifest(sourceBase);
+                Require(result.IsValid, result.Message);
+            });
 
-            foreach (string failure in failures)
+            RunCase(output, "approved CLI identity fixture", ref passed, ref total, delegate
             {
-                output.WriteLine("[WebEngine PHP self-test] FAIL " + failure);
-            }
+                PhpCliProbeFacts facts = PhpRuntimeValidator.ParseAndValidateCliFacts(
+                    "8.5.9|8|NTS|cli");
+                Require(facts.Version == "8.5.9" && facts.IntegerSize == 8, "CLI facts changed.");
+            });
 
-            return false;
+            RunCase(output, "wrong PHP version fixture", ref passed, ref total, delegate
+            {
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateCliFacts("8.5.8|8|NTS|cli");
+                }, "A wrong PHP version was accepted.");
+            });
+
+            RunCase(output, "wrong PHP architecture fixture", ref passed, ref total, delegate
+            {
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateCliFacts("8.5.9|4|NTS|cli");
+                }, "A 32-bit PHP identity was accepted.");
+            });
+
+            RunCase(output, "wrong PHP thread-safety fixture", ref passed, ref total, delegate
+            {
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateCliFacts("8.5.9|8|TS|cli");
+                }, "A thread-safe PHP identity was accepted.");
+            });
+
+            RunCase(output, "approved CGI build fixture", ref passed, ref total, delegate
+            {
+                PhpCgiProbeFacts facts = PhpRuntimeValidator.ParseAndValidateCgiVersion(
+                    "PHP 8.5.9 (cgi-fcgi) (built: Jul 29 2026 17:12:39) (NTS Visual C++ 2022 x64)\r\n");
+                Require(facts.Architecture == "x64" && facts.ThreadSafety == "NTS", "CGI facts changed.");
+            });
+
+            RunCase(output, "wrong CGI build architecture fixture", ref passed, ref total, delegate
+            {
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateCgiVersion(
+                        "PHP 8.5.9 (cgi-fcgi) (built: Jul 29 2026 17:12:39) (NTS Visual C++ 2022 x86)\r\n");
+                }, "An x86 PHP CGI build was accepted.");
+            });
+
+            RunCase(output, "approved module fixture", ref passed, ref total, delegate
+            {
+                ISet<string> modules = PhpRuntimeValidator.ParseAndValidateModuleList(
+                    "[PHP Modules]\r\nPDO\r\npdo_mysql\r\ndom\r\nsession\r\nhash\r\njson\r\nfilter\r\nctype\r\n[Zend Modules]\r\n");
+                Require(modules.Contains("pdo_mysql"), "The approved module list changed.");
+            });
+
+            RunCase(output, "missing module fixture", ref passed, ref total, delegate
+            {
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateModuleList(
+                        "[PHP Modules]\r\nPDO\r\ndom\r\nsession\r\nhash\r\njson\r\nfilter\r\nctype\r\n");
+                }, "A PHP module list without pdo_mysql was accepted.");
+            });
+
+            RunCase(output, "approved quoted INI fixture", ref passed, ref total, delegate
+            {
+                string iniPath = Path.Combine(sourceBase, "php", "php.ini");
+                PhpIniProbeFacts facts = PhpRuntimeValidator.ParseAndValidateIniOutput(
+                    BuildIniFixture(iniPath, "(none)"),
+                    iniPath);
+                Require(facts.AdditionalFiles == "(none)", "The approved INI facts changed.");
+            });
+
+            RunCase(output, "malformed quoted INI fixture", ref passed, ref total, delegate
+            {
+                string iniPath = Path.Combine(sourceBase, "php", "php.ini");
+                string malformed = BuildIniFixture(iniPath, "(none)").Replace(
+                    "\"" + Path.GetFullPath(iniPath) + "\"",
+                    "\"" + Path.GetFullPath(iniPath));
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateIniOutput(malformed, iniPath);
+                }, "A malformed quoted PHP INI path was accepted.");
+            });
+
+            RunCase(output, "additional INI fixture", ref passed, ref total, delegate
+            {
+                string iniPath = Path.Combine(sourceBase, "php", "php.ini");
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateIniOutput(
+                        BuildIniFixture(iniPath, Path.Combine(sourceBase, "unapproved.ini")),
+                        iniPath);
+                }, "Additional PHP INI files were accepted.");
+            });
+
+            RunCase(output, "oversized probe fixture", ref passed, ref total, delegate
+            {
+                RequireProbeRejected(delegate
+                {
+                    PhpRuntimeValidator.ParseAndValidateCliFacts(new string('x', 1024 * 1024 + 1));
+                }, "An oversized PHP probe result was accepted.");
+            });
+
+            RunCase(output, "missing manifest", ref passed, ref total, delegate
+            {
+                WithFixture(sourceBase, delegate(string root)
+                {
+                    File.Delete(Path.Combine(root, PhpRuntimeValidator.ManifestFileName));
+                    PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateConfiguredManifest(root);
+                    Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.MissingManifest,
+                        "A missing manifest was accepted.");
+                });
+            });
+
+            RunCase(output, "tampered ini", ref passed, ref total, delegate
+            {
+                WithFixture(sourceBase, delegate(string root)
+                {
+                    File.AppendAllText(Path.Combine(root, PhpRuntimeValidator.ConfigurationFileName), "\r\nexpose_php=On\r\n");
+                    PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateConfiguredManifest(root);
+                    Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.InvalidManifest,
+                        "A tampered php.ini was accepted.");
+                });
+            });
+
+            RunCase(output, "wrong authority", ref passed, ref total, delegate
+            {
+                WithFixture(sourceBase, delegate(string root)
+                {
+                    string path = Path.Combine(root, PhpRuntimeValidator.ManifestFileName);
+                    string xml = File.ReadAllText(path);
+                    File.WriteAllText(path, xml.Replace(
+                        "php-8.5.9-nts-win32-vs17-x64",
+                        "php-8.5.9-ts-win32-vs17-x64"), new UTF8Encoding(false));
+                    PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateConfiguredManifest(root);
+                    Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.InvalidManifest,
+                        "A manifest with the wrong authority was accepted.");
+                });
+            });
+
+            RunCase(output, "manifest hash authority", ref passed, ref total, delegate
+            {
+                WithFixture(sourceBase, delegate(string root)
+                {
+                    string manifestPath = Path.Combine(root, PhpRuntimeValidator.ManifestFileName);
+                    XDocument document = XDocument.Load(manifestPath);
+                    XElement file = document.Root.Elements("File").First();
+                    byte[] payload = Encoding.ASCII.GetBytes("tampered-runtime-image");
+                    file.SetAttributeValue("Size", payload.Length.ToString(CultureInfo.InvariantCulture));
+                    file.SetAttributeValue("Sha256", ComputeSha256(payload));
+                    document.Save(manifestPath);
+
+                    string runtimeRoot = Path.Combine(root, "php");
+                    string installedPath = Path.Combine(
+                        runtimeRoot,
+                        file.Attribute("Path").Value.Replace('/', Path.DirectorySeparatorChar));
+                    Directory.CreateDirectory(Path.GetDirectoryName(installedPath));
+                    File.WriteAllBytes(installedPath, payload);
+
+                    PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes(
+                        runtimeRoot,
+                        root);
+                    Require(
+                        !result.IsValid
+                        && result.Failure == PhpRuntimeValidationFailure.InvalidManifest
+                        && result.Message.IndexOf("SHA-256", StringComparison.Ordinal) >= 0,
+                        "A substituted runtime and matching edited manifest were accepted.");
+                });
+            });
+
+            RunCase(output, "DTD rejection", ref passed, ref total, delegate
+            {
+                WithFixture(sourceBase, delegate(string root)
+                {
+                    string path = Path.Combine(root, PhpRuntimeValidator.ManifestFileName);
+                    File.WriteAllText(path, "<!DOCTYPE x [<!ENTITY y SYSTEM 'file:///c:/windows/win.ini'>]><x>&y;</x>");
+                    PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateConfiguredManifest(root);
+                    Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.InvalidManifest,
+                        "A manifest containing a DTD was accepted.");
+                });
+            });
+
+            RunCase(output, "missing configuration", ref passed, ref total, delegate
+            {
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes(null, sourceBase);
+                Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.MissingConfiguration,
+                    "A missing runtime configuration was accepted.");
+            });
+
+            RunCase(output, "UNC rejection", ref passed, ref total, delegate
+            {
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes(
+                    @"\\server\share\php",
+                    sourceBase);
+                Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.NonLocalPath,
+                    "A UNC runtime was accepted.");
+            });
+
+            RunCase(output, "URI rejection", ref passed, ref total, delegate
+            {
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes(
+                    "https://example.invalid/php",
+                    sourceBase);
+                Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.NonLocalPath,
+                    "A URI runtime was accepted.");
+            });
+
+            RunCase(output, "malformed path", ref passed, ref total, delegate
+            {
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes("bad\0path", sourceBase);
+                Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.InvalidPath,
+                    "A malformed runtime path was accepted.");
+            });
+
+            RunCase(output, "wrong executable", ref passed, ref total, delegate
+            {
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes("php.exe", sourceBase);
+                Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.InvalidPath,
+                    "An arbitrary executable path was accepted.");
+            });
+
+            RunCase(output, "missing directory", ref passed, ref total, delegate
+            {
+                PhpRuntimeValidationResult result = PhpRuntimeValidator.ValidateWithoutProbes(
+                    "missing-php-runtime-for-self-test",
+                    sourceBase);
+                Require(!result.IsValid && result.Failure == PhpRuntimeValidationFailure.MissingDirectory,
+                    "A missing runtime directory was accepted.");
+            });
+
+            RunCase(output, "exclusive lease", ref passed, ref total, delegate
+            {
+                string root = NewTemporaryDirectory();
+                try
+                {
+                    using (IDisposable first = PhpRuntimeValidator.AcquireRuntimeLease("php", root))
+                    {
+                        bool rejected = false;
+                        try
+                        {
+                            using (PhpRuntimeValidator.AcquireRuntimeLease("php", root))
+                            {
+                            }
+                        }
+                        catch (IOException)
+                        {
+                            rejected = true;
+                        }
+
+                        Require(rejected, "A concurrent PHP runtime lease was accepted.");
+                    }
+                }
+                finally
+                {
+                    Directory.Delete(root, true);
+                }
+            });
+
+            output.WriteLine(
+                "PHP runtime self-tests: " + passed.ToString() + "/" + total.ToString() + " PASS");
+            return passed == total;
         }
 
-        private static string CreateTemporaryDirectory()
+        private static string BuildIniFixture(string loadedIniPath, string additionalFiles)
+        {
+            return "Configuration File (php.ini) Path:\r\n"
+                   + "Loaded Configuration File: \"" + Path.GetFullPath(loadedIniPath) + "\"\r\n"
+                   + "Scan for additional .ini files in: (none)\r\n"
+                   + "Additional .ini files parsed: " + additionalFiles + "\r\n";
+        }
+
+        private static void RequireProbeRejected(Action action, string message)
+        {
+            bool rejected = false;
+            try
+            {
+                action();
+            }
+            catch (InvalidDataException)
+            {
+                rejected = true;
+            }
+
+            Require(rejected, message);
+        }
+
+        private static void WithFixture(string sourceBase, Action<string> action)
+        {
+            string root = NewTemporaryDirectory();
+            try
+            {
+                File.Copy(
+                    Path.Combine(sourceBase, PhpRuntimeValidator.ManifestFileName),
+                    Path.Combine(root, PhpRuntimeValidator.ManifestFileName));
+                File.Copy(
+                    Path.Combine(sourceBase, PhpRuntimeValidator.ConfigurationFileName),
+                    Path.Combine(root, PhpRuntimeValidator.ConfigurationFileName));
+                action(root);
+            }
+            finally
+            {
+                Directory.Delete(root, true);
+            }
+        }
+
+        private static string NewTemporaryDirectory()
         {
             string path = Path.Combine(
                 Path.GetTempPath(),
-                "aorebirth-webengine-php-" + Guid.NewGuid().ToString("N"));
+                "AORebirth-PhpRuntimeSelfTest-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(path);
             return path;
         }
 
-        private static void ExplicitLocalExecutableIsAccepted()
+        private static string ComputeSha256(byte[] bytes)
         {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        string executablePath = Path.Combine(root, "php-cgi.exe");
-                        File.WriteAllText(executablePath, "test marker only");
-
-                        PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate(executablePath, root);
-                        Require(result.IsValid, "explicit php-cgi.exe path was rejected");
-                        Require(
-                            string.Equals(result.RuntimeDirectory, Path.GetFullPath(root), StringComparison.OrdinalIgnoreCase),
-                            "runtime directory was not canonicalized");
-                        Require(
-                            string.Equals(result.ExecutablePath, Path.GetFullPath(executablePath), StringComparison.OrdinalIgnoreCase),
-                            "executable path was not canonicalized");
-                    });
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                return string.Concat(
+                    sha256.ComputeHash(bytes).Select(
+                        value => value.ToString("x2", CultureInfo.InvariantCulture)));
+            }
         }
 
-        private static void MalformedPathsAreRejected()
+        private static void RunCase(
+            TextWriter output,
+            string name,
+            ref int passed,
+            ref int total,
+            Action action)
         {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        PhpRuntimeValidationResult malformed = PhpRuntimeValidator.Validate("bad\0path", root);
-                        PhpRuntimeValidationResult wrongExecutable = PhpRuntimeValidator.Validate(
-                            Path.Combine(root, "php.exe"),
-                            root);
-
-                        Require(
-                            !malformed.IsValid && malformed.Failure == PhpRuntimeValidationFailure.InvalidPath,
-                            "malformed path was not rejected");
-                        Require(
-                            !wrongExecutable.IsValid && wrongExecutable.Failure == PhpRuntimeValidationFailure.InvalidPath,
-                            "unexpected executable name was not rejected");
-                    });
-        }
-
-        private static void MissingExecutableFailsClosed()
-        {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        string runtimeDirectory = Path.Combine(root, "php");
-                        Directory.CreateDirectory(runtimeDirectory);
-
-                        PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate(runtimeDirectory, root);
-                        Require(!result.IsValid, "runtime without php-cgi.exe was accepted");
-                        Require(
-                            result.Failure == PhpRuntimeValidationFailure.MissingExecutable,
-                            "runtime without php-cgi.exe returned the wrong failure");
-                    });
-        }
-
-        private static void MissingConfigurationFailsClosed()
-        {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate(null, root);
-                        Require(!result.IsValid, "missing configuration was accepted");
-                        Require(
-                            result.Failure == PhpRuntimeValidationFailure.MissingConfiguration,
-                            "missing configuration returned the wrong failure");
-                    });
-        }
-
-        private static void MissingRuntimeFailsClosed()
-        {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate("php", root);
-                        Require(!result.IsValid, "missing runtime was accepted");
-                        Require(
-                            result.Failure == PhpRuntimeValidationFailure.MissingDirectory,
-                            "missing runtime returned the wrong failure");
-                    });
-        }
-
-        private static void NetworkLocationsAreRejected()
-        {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        string[] invalidPaths =
-                        {
-                            "http://127.0.0.1/php",
-                            "https://127.0.0.1/php",
-                            "file:///C:/php",
-                            @"\\server\share\php",
-                            "//server/share/php"
-                        };
-
-                        foreach (string invalidPath in invalidPaths)
-                        {
-                            PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate(invalidPath, root);
-                            Require(!result.IsValid, "network or URI path was accepted");
-                            Require(
-                                result.Failure == PhpRuntimeValidationFailure.NonLocalPath,
-                                "network or URI path returned the wrong failure");
-                        }
-                    });
-        }
-
-        private static void RelativeLocalRuntimeIsAccepted()
-        {
-            WithTemporaryDirectory(
-                root =>
-                    {
-                        string runtimeDirectory = Path.Combine(root, "runtime", "php");
-                        Directory.CreateDirectory(runtimeDirectory);
-                        string executablePath = Path.Combine(runtimeDirectory, "php-cgi.exe");
-                        File.WriteAllText(executablePath, "test marker only");
-
-                        PhpRuntimeValidationResult result = PhpRuntimeValidator.Validate(
-                            Path.Combine("runtime", "php"),
-                            root);
-                        Require(result.IsValid, "relative local runtime was rejected");
-                        Require(
-                            string.Equals(result.RuntimeDirectory, Path.GetFullPath(runtimeDirectory), StringComparison.OrdinalIgnoreCase),
-                            "relative runtime directory was not canonicalized");
-                        Require(
-                            string.Equals(result.ExecutablePath, Path.GetFullPath(executablePath), StringComparison.OrdinalIgnoreCase),
-                            "relative executable path was not canonicalized");
-                    });
+            total++;
+            try
+            {
+                action();
+                passed++;
+                output.WriteLine("[PASS] " + name);
+            }
+            catch (Exception exception)
+            {
+                output.WriteLine("[FAIL] " + name + ": " + exception.Message);
+            }
         }
 
         private static void Require(bool condition, string message)
@@ -173,34 +372,6 @@ namespace WebEngine
             if (!condition)
             {
                 throw new InvalidOperationException(message);
-            }
-        }
-
-        private static void RunCase(string name, Action test, ICollection<string> failures)
-        {
-            try
-            {
-                test();
-            }
-            catch (Exception ex)
-            {
-                failures.Add(name + " (" + ex.GetType().Name + ")");
-            }
-        }
-
-        private static void WithTemporaryDirectory(Action<string> action)
-        {
-            string root = CreateTemporaryDirectory();
-            try
-            {
-                action(root);
-            }
-            finally
-            {
-                if (Directory.Exists(root))
-                {
-                    Directory.Delete(root, true);
-                }
             }
         }
     }

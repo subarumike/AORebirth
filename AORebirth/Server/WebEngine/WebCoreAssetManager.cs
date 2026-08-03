@@ -116,8 +116,13 @@ namespace WebEngine
                 string assetRoot = ResolveLocalAssetRoot(
                     _config.Instance.CurrentConfig.WebHostRoot,
                     baseDirectory);
-                string manifestPath = Path.Combine(baseDirectory, ManifestFileName);
-                return ValidateAssets(assetRoot, manifestPath, true);
+                WebCoreManifest manifest = WebCoreCompatibilityManager.LoadValidatedAuthority(baseDirectory);
+                string canonicalRoot = CanonicalDirectoryPath(assetRoot);
+                ValidateAssetTree(canonicalRoot, manifest);
+                return Success(
+                    "WebCore assets PASS: root=" + canonicalRoot + " manifest=" + manifest.Id,
+                    canonicalRoot,
+                    manifest.Id);
             }
             catch (Exception exception)
             {
@@ -125,7 +130,11 @@ namespace WebEngine
             }
         }
 
-        public static WebCoreAssetResult ImportConfiguredArchive(string archivePath, string expectedVersion)
+        public static WebCoreAssetResult ImportConfiguredArchive(
+            string archivePath,
+            string expectedVersion,
+            string pythonExecutable,
+            string compatibilityToolPath)
         {
             try
             {
@@ -136,7 +145,15 @@ namespace WebEngine
                         _config.Instance.CurrentConfig.WebHostRoot,
                         baseDirectory);
                     string manifestPath = Path.Combine(baseDirectory, ManifestFileName);
-                    return ImportArchive(archivePath, expectedVersion, assetRoot, manifestPath, null, true);
+                    return ImportArchive(
+                        archivePath,
+                        expectedVersion,
+                        assetRoot,
+                        manifestPath,
+                        null,
+                        true,
+                        pythonExecutable,
+                        compatibilityToolPath);
                 }
             }
             catch (Exception exception)
@@ -205,7 +222,9 @@ namespace WebEngine
             string assetRoot,
             string manifestPath,
             Action beforeActivation,
-            bool requireApprovedAuthority = false)
+            bool requireApprovedAuthority = false,
+            string pythonExecutable = null,
+            string compatibilityToolPath = null)
         {
             string stagingDirectory = null;
             string backupDirectory = null;
@@ -269,6 +288,26 @@ namespace WebEngine
                 }
 
                 ValidateAssetTree(CanonicalDirectoryPath(stagingDirectory), manifest);
+
+                if (requireApprovedAuthority)
+                {
+                    if (string.IsNullOrWhiteSpace(pythonExecutable)
+                        || string.IsNullOrWhiteSpace(compatibilityToolPath))
+                    {
+                        throw new InvalidDataException(
+                            "Production WebCore import requires the approved compatibility tool and a local Python interpreter.");
+                    }
+
+                    WebCoreCompatibilityManager.ApplyWithApprovedTool(
+                        stagingDirectory,
+                        pythonExecutable,
+                        compatibilityToolPath,
+                        Path.GetDirectoryName(Path.GetFullPath(manifestPath)));
+                    WebCoreManifest finalManifest = WebCoreCompatibilityManager.LoadValidatedAuthority(
+                        Path.GetDirectoryName(Path.GetFullPath(manifestPath)));
+                    ValidateAssetTree(CanonicalDirectoryPath(stagingDirectory), finalManifest);
+                    manifest = finalManifest;
+                }
 
                 if (Directory.Exists(canonicalRoot))
                 {
@@ -355,7 +394,7 @@ namespace WebEngine
             }
         }
 
-        private static WebCoreManifest LoadManifest(string manifestPath)
+        internal static WebCoreManifest LoadManifest(string manifestPath)
         {
             if (string.IsNullOrWhiteSpace(manifestPath) || !File.Exists(manifestPath))
             {
@@ -501,7 +540,7 @@ namespace WebEngine
             return manifest;
         }
 
-        private static void ValidateAssetTree(string canonicalRoot, WebCoreManifest manifest)
+        internal static void ValidateAssetTree(string canonicalRoot, WebCoreManifest manifest)
         {
             EnsureExistingAncestorsHaveNoReparsePoints(canonicalRoot);
             if (!Directory.Exists(canonicalRoot))
