@@ -211,13 +211,20 @@ def artifact_descriptor(path: Path, logical_path: PurePosixPath) -> dict[str, An
     }
 
 
+def decode_json_text(raw: str) -> Any:
+    decoder = json.JSONDecoder()
+    decoder.parse_string = json.decoder.py_scanstring
+    decoder.scan_once = json.scanner.py_make_scanner(decoder)
+    return decoder.decode(raw)
+
+
 def load_json_object(path: Path, label: str) -> dict[str, Any]:
     if not path.is_file() or path.is_symlink():
         raise CohortValidationError(f"{label} is missing or is not a regular file")
     try:
         raw = path.read_text(encoding="utf-8")
-        value = json.loads(raw)
-    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        value = decode_json_text(raw)
+    except (OSError, UnicodeError, ValueError) as error:
         raise CohortValidationError(f"{label} is not valid UTF-8 JSON: {error}") from error
     if not isinstance(value, dict):
         raise CohortValidationError(f"{label} must contain one JSON object")
@@ -800,7 +807,7 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
         for marker in (
             "Windows fatal exception: access violation",
             "TypeError: 'str_ascii_iterator' object is not callable",
-            "SystemError: unknown opcode",
+            "SystemError:",
             "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'",
         )
     ):

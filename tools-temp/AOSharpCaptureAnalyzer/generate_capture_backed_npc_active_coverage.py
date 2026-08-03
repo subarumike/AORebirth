@@ -2716,6 +2716,13 @@ def build_non_denominator_audit_records(
     return records, family_summaries
 
 
+def decode_json_text(raw: str) -> Any:
+    decoder = json.JSONDecoder()
+    decoder.parse_string = json.decoder.py_scanstring
+    decoder.scan_once = json.scanner.py_make_scanner(decoder)
+    return decoder.decode(raw)
+
+
 def build_inventory(
     repo_root: Path,
     combat_inventory_path: Path,
@@ -2723,12 +2730,14 @@ def build_inventory(
 ) -> Dict[str, Any]:
     actors = parse_all_actors(repo_root)
     merged = merge_actors(actors)
-    combat_inventory = json.loads(combat_inventory_path.read_text(encoding="utf-8"))
+    combat_inventory = decode_json_text(
+        combat_inventory_path.read_text(encoding="utf-8")
+    )
     mathematical_bindings: Dict[
         Tuple[int, int, int, str, Optional[str]], Mapping[str, Any]
     ] = {}
     if formula_dataset_path is not None and formula_dataset_path.is_file():
-        formula_dataset = json.loads(
+        formula_dataset = decode_json_text(
             formula_dataset_path.read_text(encoding="utf-8")
         )
         formulas = [
