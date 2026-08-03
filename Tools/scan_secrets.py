@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail when repository-visible configuration contains likely plaintext secrets."""
+"""Fail on likely plaintext secrets outside explicitly private local configuration."""
 
 from __future__ import print_function
 
@@ -10,6 +10,7 @@ import sys
 
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+PRIVATE_LOCAL_PATHS = {"AORebirth/Config/Config.xml"}
 ALLOWED_VALUES = {
     "",
     "changeme",
@@ -50,6 +51,8 @@ def normalized(value):
 def main():
     findings = []
     for relative_path in repository_paths():
+        if relative_path.replace("\\", "/") in PRIVATE_LOCAL_PATHS:
+            continue
         absolute_path = os.path.join(ROOT, relative_path)
         try:
             if os.path.getsize(absolute_path) > 5 * 1024 * 1024:

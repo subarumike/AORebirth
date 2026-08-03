@@ -38,9 +38,9 @@ if errorlevel 1 (
 
 set "AO_REBIRTH_MYSQL_CONNECTION="
 call preflight-database.cmd >nul
-set "MISSING_EXIT=%ERRORLEVEL%"
-if not "%MISSING_EXIT%"=="10" (
-    echo [Database Preflight Tests] FAIL: missing-environment contract returned %MISSING_EXIT% instead of 10.
+set "CONFIG_FALLBACK_EXIT=%ERRORLEVEL%"
+if not "%CONFIG_FALLBACK_EXIT%"=="0" (
+    echo [Database Preflight Tests] FAIL: Config.xml fallback returned %CONFIG_FALLBACK_EXIT% instead of 0.
     popd >nul
     exit /b 1
 )
