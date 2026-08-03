@@ -1,5 +1,10 @@
 # WebCore Bootstrap Security Evidence — 2026-08-02
 
+This original asset-bootstrap phase is superseded for maintained-PHP
+compatibility and final acceptance by
+`WEBENGINE_PHP_COMPATIBILITY_20260802.md`. The immutable upstream pin and base
+asset manifest remain authoritative.
+
 ## Scope
 
 This reconciliation covers only the optional WebEngine WebCore asset supply,
@@ -91,10 +96,10 @@ Production integration and validation are complete:
 
 | Validation | Status |
 | --- | --- |
-| Deterministic WebEngine/WebCore security tests | PASS: PHP 7/7; WebCore 36/36; production manifest and source contracts PASS |
+| Deterministic WebEngine/WebCore security tests | Historical bootstrap phase: PHP 7/7; WebCore 36/36; production manifest and source contracts PASS |
 | Engine-management ownership contracts | PASS: 22/22 |
 | Approved debug build | PASS |
-| Complete mandatory integration gate | PASS: 12/12 twice from the unchanged final commit/tree |
+| Complete mandatory integration gate | Historical bootstrap phase: PASS 12/12 twice; current 13-stage results are recorded in the superseding evidence |
 | Final secret scan and clean-worktree check | PASS |
 
 The deterministic focused and complete-gate paths used no database credential,
@@ -107,8 +112,9 @@ acquisition-command path; this was not an OS-level egress sandbox.
 
 - The upstream snapshot contains no discovered license file. Redistribution and
   production use remain unresolved.
-- The assets depend on obsolete PHP/MySQL/mcrypt/config behavior. No maintained
-  PHP compatibility has been proven.
+- The obsolete PHP/MySQL/mcrypt/config dependencies were reconciled
+  deterministically against PHP 8.5.9; see the superseding evidence for the
+  exact dispositions and remaining live-verification boundary.
 - The local environment has no valid MySQL credential, so live database and
   WebEngine startup verification remain externally blocked.
 - Same-volume directory renames provide exception-safe rollback but not a

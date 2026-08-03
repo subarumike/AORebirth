@@ -20,9 +20,10 @@ completion matrices and dated evidence retain detailed provenance.
 - Generated mission graph and mission reproducibility: PASS.
 - Debug server build: PASS.
 - Git LFS and Git object integrity: PASS.
-- WebCore offline-bootstrap security: PASS. Deterministic WebCore assets are
-  36/36, the checked-in production manifest authority parses successfully, and
-  the unchanged final commit/tree passes the complete 12-stage gate twice.
+- WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
+  VS17 runtime and hardened INI are exact-manifest validated; the complete
+  7,140-file WebCore corpus and all 25 PHP files are audited, deterministically
+  patched, final-manifest validated, and PHP 8.5.9 lint clean.
 
 ## Generated combat authority
 
@@ -62,10 +63,11 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 - The mandatory secret scanner rejects likely credentials without echoing
   values. Any credential exposed outside the repository still requires external
   rotation.
-- WebEngine no longer downloads PHP, `php.ini`, or WebCore assets. It requires a
-  validated local `php-cgi.exe` plus an offline-imported `htdocs` tree matching
-  the checked-in manifest for CellAO WebCore commit
-  `765c3850767b63af1cd259bab7f2f7ca3e97adf9`, and remains optional.
+- WebEngine no longer downloads PHP, `php.ini`, or WebCore assets. It requires
+  the complete official PHP 8.5.9 x64 NTS VS17 archive tree, the exact hardened
+  INI, and an offline-imported final `htdocs` tree for CellAO WebCore commit
+  `765c3850767b63af1cd259bab7f2f7ca3e97adf9`. PHP and WebCore are held under
+  exclusive process-lifetime leases and revalidated before listener creation.
 - The pinned WebCore archive is identified by SHA-256
   `ef297e623040b375e64c543568ca94e44ed7cc59de6fe826ed5e42db95c020ab`;
   its manifest covers 7,140 files and 26,648,501 bytes and has SHA-256
@@ -83,10 +85,11 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 ## Remaining debt boundary
 
 - Rotate the previously exposed database credential externally.
-- Install and validate a maintained local PHP runtime for WebEngine. The old
-  bootstrap pinned PHP 5.5.10; compatibility with a maintained version is
-  unproven, and the historical assets depend on obsolete MySQL/mcrypt/config
-  behavior.
+- Perform authorized live WebEngine verification only after a valid disposable
+  database credential is supplied. Current validation intentionally makes no
+  live database connection and invents no credential.
+- Replace or front the plaintext HTTP listener before considering secure-only
+  cookies or production exposure. WebEngine remains development-only.
 - Resolve the pinned WebCore snapshot's licensing before redistribution or
   production use. No license file was found upstream; integrity validation does
   not grant redistribution rights.

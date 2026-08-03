@@ -118,16 +118,18 @@ The local configuration is MySQL and must use only `cellao_codex_clean`. The pro
 
 The repo contains logos, XML data files, documentation generated from enums/stats, and tooling. Client assets come from the installed AO client and external reverse-engineered sources. There is no single build-time pipeline for all of these assets.
 
-Optional WebEngine content has a separate, fail-closed supply boundary. The
-runtime contains the HTTP/PHP host but does not fetch website content. An
-operator must supply a local ZIP for the exact CellAO WebCore commit
-`765c3850767b63af1cd259bab7f2f7ca3e97adf9`; the explicit import command checks
-the pinned archive identity and writes the extracted `htdocs` tree locally. A
-checked-in manifest is copied beside `WebEngine.exe` and binds all 7,140 files,
-their sizes and hashes, and the 26,648,501-byte total. Both explicit validation
-and `start-web-engine.cmd` fail closed when the manifest or local tree does not
-match. Runtime startup never downloads or updates this content. See
-`docs/project/WEBCORE_ASSET_SUPPLY.md`.
+Optional WebEngine has two offline, fail-closed supply boundaries. The PHP
+boundary pins an official PHP 8.5.9 Windows x64 NTS VS17 archive, full file
+inventory, AORebirth `php.ini`, runtime probes, and a process-lifetime lease.
+The content boundary pins the exact CellAO WebCore commit
+`765c3850767b63af1cd259bab7f2f7ca3e97adf9`, validates its untouched 7,140-file
+base tree, applies seven exact input-hash-bound compatibility operations, and
+validates a complete final 7,140-file manifest before activation. Runtime
+startup downloads or updates neither dependency. `WebRequestPathPolicy` exposes
+only four public PHP routes and allowlisted static extensions; historical
+admin/internal/authentication/mutation routes fail closed. See
+`docs/project/WEBCORE_ASSET_SUPPLY.md` and
+`docs/project/PHP_RUNTIME_SUPPLY.md`.
 
 ## UI Architecture
 
@@ -170,9 +172,10 @@ flowchart TB
 - Some current-client packet contracts differ from old AO Rebirth assumptions.
 - Movement and NPC behavior need capture/replay validation before more runtime edits.
 - Tests are mostly smoke/source assertions; they are useful but not full simulation coverage.
-- WebEngine remains optional and not production-safe: the pinned WebCore
-  snapshot has unresolved licensing and obsolete PHP/MySQL/mcrypt/config
-  dependencies, and no maintained PHP compatibility has been proven.
+- WebEngine remains optional and development-only. PHP 8.5.9 identity,
+  configuration, CGI execution, required modules, deterministic WebCore repairs,
+  and all PHP syntax are validated; live database semantics, HTTPS transport,
+  and upstream redistribution rights remain unproven.
 
 ## Hostile NPC Chase Navigation
 
