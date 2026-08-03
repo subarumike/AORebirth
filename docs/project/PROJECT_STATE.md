@@ -23,7 +23,9 @@ completion matrices and dated evidence retain detailed provenance.
 - WebEngine offline PHP/WebCore boundary: PASS. The official PHP 8.5.9 x64 NTS
   VS17 runtime and hardened INI are exact-manifest validated; the complete
   7,140-file WebCore corpus and all 25 PHP files are audited, deterministically
-  patched, final-manifest validated, and PHP 8.5.9 lint clean.
+  patched, final-manifest validated, and PHP 8.5.9 lint clean. Clean commit
+  `f898faa0838cc3918baf29202001e0cc2d0fab56` passed the complete 13-stage gate
+  twice unchanged.
 
 ## Generated combat authority
 

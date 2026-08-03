@@ -148,5 +148,31 @@ backed verification, not production deployment or redistribution.
 
 ## Validation record
 
-Final focused totals, complete gate results, final commit SHA, clean-tree proof,
-and engine/port state are recorded after the unchanged clean commit is tested.
+The clean implementation/documentation commit
+`f898faa0838cc3918baf29202001e0cc2d0fab56` produced the following focused
+results:
+
+| Validation | Result |
+| --- | --- |
+| PHP offline supply fixtures and production authority | 21/21 PASS |
+| WebCore compatibility generator/patch fixtures | 6/6 PASS |
+| WebCore generation `--check` against the exact base corpus | PASS |
+| PHP runtime pure/manifest/lease/probe tests | 25/25 PASS |
+| PHP CGI/DB/environment/response tests | 13/13 PASS |
+| Request path and route policy tests | 15/15 PASS |
+| WebCore asset/import/rollback tests | 36/36 PASS |
+| Real PHP 8.5.9 runtime validation and CGI probe | PASS |
+| Real PHP 8.5.9 lint over all patched PHP files | 25/25 PASS |
+| Engine-management ownership fixtures | 22/22 PASS |
+| Approved debug build | PASS |
+| Secret scan | PASS |
+
+The complete mandatory integration gate passed 13/13 twice on that unchanged,
+clean commit. Existing acceptance remained intact: AOtomation 1,037/1,037;
+Arete 60/60; combat 57/57; active coverage 8/8; loot 14/14; Subway, Temple,
+missions, generated artifacts, engine-management contracts, Git LFS, and debug
+build all PASS. Stage 12 also repeated the complete offline PHP/WebCore fixture
+suite and, because the ignored validated runtime and payload were installed,
+the real runtime validation and all 25 lints. The final evidence-only commit SHA
+and its repeated unchanged-tree gate results are intentionally recorded in the
+handoff because a commit cannot contain its own hash or future test outcome.
