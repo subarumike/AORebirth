@@ -1469,7 +1469,7 @@ def _write_parse_capture_worker_shard(
                 "capture worker shard bytes changed during atomic publication"
             )
         json.loads(persisted)
-    except (OSError, UnicodeError, json.JSONDecodeError, RuntimeError) as error:
+    except (OSError, ValueError, RuntimeError) as error:
         raise RuntimeError(
             f"capture worker shard materialization failed: {error}"
         ) from error
@@ -1634,10 +1634,19 @@ def _is_interpreter_corruption_detail(detail: str) -> bool:
     return (
         "Windows fatal exception: access violation" in detail
         or "TypeError: 'str_ascii_iterator' object is not callable" in detail
-        or ("SystemError:" in detail and "unknown opcode" in detail)
+        or "SystemError:" in detail
         or (
             "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'"
             in detail
+        )
+        or "AttributeError: 'function' object has no attribute 'strip'" in detail
+        or (
+            "decode_npc_lifecycle_capture.py" in detail
+            and ("TypeError:" in detail or "AttributeError:" in detail)
+        )
+        or (
+            "ValueError: invalid literal for int() with base 10:" in detail
+            and ("json\\decoder.py" in detail or "json/decoder.py" in detail)
         )
     )
 
@@ -1723,7 +1732,7 @@ def _load_capture_snapshot_shard(
     )
     try:
         payload = json.loads(payload_bytes)
-    except (UnicodeError, json.JSONDecodeError) as error:
+    except ValueError as error:
         raise _capture_snapshot_materialization_failure(
             snapshot.capture,
             path,
@@ -6991,7 +7000,25 @@ def self_test() -> None:
         "SystemError: unknown opcode 204"
     )
     assert _is_interpreter_corruption_detail(
+        "SystemError: bad format string: O|OO:startswith"
+    )
+    assert _is_interpreter_corruption_detail(
         "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'"
+    )
+    assert _is_interpreter_corruption_detail(
+        "C:\\Python\\Lib\\json\\decoder.py\n"
+        "ValueError: invalid literal for int() with base 10: '0'"
+    )
+    assert _is_interpreter_corruption_detail(
+        "direction = (direction or '').strip().upper()\n"
+        "AttributeError: 'function' object has no attribute 'strip'"
+    )
+    assert _is_interpreter_corruption_detail(
+        "C:\\repo\\tools-temp\\AOSharpLiveCapture\\decode_npc_lifecycle_capture.py\n"
+        "TypeError: 'int' object is not subscriptable"
+    )
+    assert not _is_interpreter_corruption_detail(
+        "TypeError: deterministic capture schema failure"
     )
     assert not _is_interpreter_corruption_detail(
         "ValueError: deterministic capture failure"
@@ -7195,6 +7222,28 @@ def self_test() -> None:
                 )
             )
             assert first_load == second_load
+
+        original_json_loads = json.loads
+
+        def raise_json_value_error(_: object) -> Any:
+            raise ValueError("invalid literal for int() with base 10: '0'")
+
+        json.loads = raise_json_value_error
+        try:
+            try:
+                _load_capture_snapshot_shard(
+                    self_test_snapshots[0],
+                    "self-test-json-value-error",
+                    "a" * 64,
+                )
+            except CaptureShardMaterializationError as error:
+                assert "phase=self-test-json-value-error" in str(error)
+                assert "invalid literal for int() with base 10: '0'" in str(error)
+                assert isinstance(error.__cause__, ValueError)
+            else:
+                raise AssertionError("plain JSON ValueError bypassed shard retry handling")
+        finally:
+            json.loads = original_json_loads
 
         snapshot_plan_core = {
             "schemaVersion": CAPTURE_SNAPSHOT_SCHEMA_VERSION,

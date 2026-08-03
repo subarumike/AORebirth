@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `75420b6f5fcbb5207879c9625017e217a0a90c128b7593d912222edcf56bd57b`
+  `e1c4dc9b66ca46c2d4d4913243511502df7b29f33368b3ca7c9f67599147f0ab`
 - Combined input identity:
-  `72b5435d3bc65d20f3f4947e4e66a401e0806e6b2f98c985c1af7d7b15259de1`
+  `053c6b3b9efee2a8854c189abaa499ef84a1c579622495431a52ab1b63e02d82`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -45,8 +45,12 @@ their generation manifest are one coordinated generated cohort.
   while keeping the formula dataset byte-identical.
 - Active initializer comments are parsed without the repeated regex hot loop;
   capture shards publish atomically with read-back validation and bounded
-  materialization retry; isolated active/formula children retry only recognized
-  native/interpreter-corruption signatures.
+  materialization retry; isolated children retry only recognized native or
+  interpreter-internal failures. Large governed JSON inputs use the standard
+  library's pure-Python scanner after repeated C-scanner corruption.
+- The final focused transaction and pipeline suite is **67/67 PASS**. The final
+  coordinated `--write` and real-corpus `--check` both pass with three
+  fixed-point rounds and byte-identical runtime-facing artifacts.
 - The standalone secret scan and Debug build passed without starting an engine.
 - The final handoff must report five consecutive complete mandatory integration
   gates from one unchanged final commit. Those results are not written back to

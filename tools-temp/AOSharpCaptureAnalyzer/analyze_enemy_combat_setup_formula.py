@@ -250,12 +250,22 @@ class MessagePackReader:
         self.data = data
         self.offset = 0
 
-    def _take(self, size: int) -> bytes:
-        result = self.data[self.offset : self.offset + size]
-        if len(result) != size:
+    def _advance(self, size: int) -> None:
+        if size < 0 or self.offset + size > len(self.data):
             raise ValueError("Unexpected end of MessagePack data")
         self.offset += size
-        return result
+
+    def _take(self, size: int) -> bytes:
+        start = self.offset
+        self._advance(size)
+        return self.data[start : self.offset]
+
+    def _marker(self) -> int:
+        if self.offset >= len(self.data):
+            raise ValueError("Unexpected end of MessagePack data")
+        marker = self.data[self.offset]
+        self.offset += 1
+        return marker
 
     def _uint(self, size: int) -> int:
         return int.from_bytes(self._take(size), "big", signed=False)
@@ -264,7 +274,7 @@ class MessagePackReader:
         return int.from_bytes(self._take(size), "big", signed=True)
 
     def read_array_size(self) -> int:
-        marker = self._uint(1)
+        marker = self._marker()
         if 0x90 <= marker <= 0x9F:
             return marker & 0x0F
         if marker == 0xDC:
@@ -276,7 +286,7 @@ class MessagePackReader:
         )
 
     def read(self) -> Any:
-        marker = self._uint(1)
+        marker = self._marker()
         if marker <= 0x7F:
             return marker
         if marker >= 0xE0:
@@ -322,6 +332,58 @@ class MessagePackReader:
         if marker in (0xDE, 0xDF):
             size = self._uint(2 if marker == 0xDE else 4)
             return {self.read(): self.read() for _ in range(size)}
+        raise ValueError(f"Unsupported MessagePack marker 0x{marker:02X}")
+
+    def skip(self) -> None:
+        """Validate and consume one value without retaining its object graph."""
+        marker = self._marker()
+        if marker <= 0x7F or marker >= 0xE0 or marker in (0xC0, 0xC2, 0xC3):
+            return
+        if 0x80 <= marker <= 0x8F:
+            for _ in range(marker & 0x0F):
+                key = self.read()
+                self.skip()
+                hash(key)
+            return
+        if 0x90 <= marker <= 0x9F:
+            for _ in range(marker & 0x0F):
+                self.skip()
+            return
+        if 0xA0 <= marker <= 0xBF:
+            self._take(marker & 0x1F).decode("utf-8")
+            return
+        scalar_sizes = {
+            0xCA: 4,
+            0xCB: 8,
+            0xCC: 1,
+            0xCD: 2,
+            0xCE: 4,
+            0xCF: 8,
+            0xD0: 1,
+            0xD1: 2,
+            0xD2: 4,
+            0xD3: 8,
+        }
+        scalar_size = scalar_sizes.get(marker)
+        if scalar_size is not None:
+            self._advance(scalar_size)
+            return
+        if marker in (0xD9, 0xDA, 0xDB):
+            size = self._uint({0xD9: 1, 0xDA: 2, 0xDB: 4}[marker])
+            self._take(size).decode("utf-8")
+            return
+        if marker in (0xDC, 0xDD):
+            size = self._uint(2 if marker == 0xDC else 4)
+            for _ in range(size):
+                self.skip()
+            return
+        if marker in (0xDE, 0xDF):
+            size = self._uint(2 if marker == 0xDE else 4)
+            for _ in range(size):
+                key = self.read()
+                self.skip()
+                hash(key)
+            return
         raise ValueError(f"Unsupported MessagePack marker 0x{marker:02X}")
 
 
@@ -375,9 +437,31 @@ def load_item_templates(
             try:
                 template_count = reader.read_array_size()
                 for template_index in range(template_count):
-                    template = reader.read()
-                    template_id = int(template[5])
-                    if requested_ids is None or template_id in requested_ids:
+                    if requested_ids is None:
+                        template = reader.read()
+                        template_id = int(template[5])
+                        templates[template_id] = template
+                        continue
+
+                    template_start = reader.offset
+                    field_count = reader.read_array_size()
+                    if field_count < 6:
+                        raise IndexError(
+                            f"item template {template_index} has fewer than 6 fields"
+                        )
+                    for _ in range(5):
+                        reader.skip()
+                    template_id = int(reader.read())
+                    for _ in range(field_count - 6):
+                        reader.skip()
+                    template_end = reader.offset
+                    if template_id in requested_ids:
+                        reader.offset = template_start
+                        template = reader.read()
+                        if reader.offset != template_end:
+                            raise ValueError(
+                                f"item template {template_index} changed while decoding"
+                            )
                         templates[template_id] = template
                 if reader.offset != len(reader.data):
                     raise ValueError(
@@ -486,9 +570,16 @@ def affine_candidates(
     )
 
 
+def decode_json_text(raw: str) -> Any:
+    decoder = json.JSONDecoder()
+    decoder.parse_string = json.decoder.py_scanstring
+    decoder.scan_once = json.scanner.py_make_scanner(decoder)
+    return decoder.decode(raw)
+
+
 def load_json(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+        return decode_json_text(handle.read())
 
 
 def compact_profile(profile: dict[str, Any]) -> dict[str, Any]:

@@ -59,12 +59,13 @@ The catalog, fixtures, and formula data stayed byte-identical. The active-covera
 
 | Identity | Value |
 | --- | --- |
-| Generation identity | `75420b6f5fcbb5207879c9625017e217a0a90c128b7593d912222edcf56bd57b` |
-| Combined input identity | `72b5435d3bc65d20f3f4947e4e66a401e0806e6b2f98c985c1af7d7b15259de1` |
-| Primary capture snapshot identity | `e08701666e6d55ac6890d8ddffe337a4a36f694cb55255dfa691668b353a1351` |
-| Primary capture manifest SHA-256 | `4d1935f5750845a07b3c49b3baf527016a7c4da11dd806e989a6a714ca3ece8e` |
+| Generation identity | `e1c4dc9b66ca46c2d4d4913243511502df7b29f33368b3ca7c9f67599147f0ab` |
+| Combined input identity | `053c6b3b9efee2a8854c189abaa499ef84a1c579622495431a52ab1b63e02d82` |
+| Rendered manifest SHA-256 | `da88b0e1c2ffe259f3928ecc9cc3c5a05c1c7f62221118b84b66be7826ed0e19` |
+| Primary capture snapshot identity | `b75ffce6d9c69cb79f2afcc46560e7aae8c5e79b82568e1e05320ac0da8d17e7` |
+| Primary capture manifest SHA-256 | `4f6441fe13f66eb0dc949038bf21662d6b7734d6b844fd44c1b4151fd1459e47` |
 | Primary capture manifest byte length | `460040` |
-| Auxiliary snapshot identity | `653a202491faa2b5496ae4e50ee7210630931097d3f39602a98305f35f429e2a` |
+| Auxiliary snapshot identity | `2731b83c7c3c51356cb1bd526eb3ea2098be4ca96030a97bf7126e0ff11c8730` |
 | Active/formula fixed-point rounds | `3` |
 
 The generation identity covers the path-independent manifest identity payload. The separate manifest-file SHA-256 in the artifact table hashes the rendered sixth file and is not expected to equal the generation identity.
@@ -114,14 +115,23 @@ Completed:
   JSON read-back validation, atomic replacement, and bounded materialization
   retry after frozen/live input revalidation. Semantic shard failures remain
   fail-closed without retry.
-- A real-corpus check exposed a Python JSON-decoder corruption signature after
-  an already validated inventory write. Active/formula child retry is bounded
-  to three attempts and only recognizes native exits or the exact observed
-  interpreter-corruption diagnostics; deterministic failures are not retried.
-- Final focused transaction and pipeline suite: **66/66 PASS**.
+- Real-corpus runs exposed impossible CPython object-type mutations and
+  `SystemError` failures in the capture decoder. Worker retry now recognizes
+  decoder-local internal failures while ordinary validation errors remain
+  deterministic and fail closed after the bounded attempt budget.
+- Three consecutive formula attempts then failed inside CPython's C JSON
+  scanner while converting valid one-digit integers. The coordinator, active
+  coverage generator, and formula generator now use the standard library's
+  pure-Python scanner for large governed JSON inputs; the focused test proves
+  the C scanner is not called on that path.
+- The formula ItemDb reader structurally validates unrequested templates and
+  fully materializes only the 42 referenced templates. The 9,000,177-byte
+  formula artifact remains byte-identical at SHA-256
+  `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0`.
+- Final focused transaction and pipeline suite: **67/67 PASS**.
 - Final coordinated `--write` and real-corpus `--check`: **PASS**, generation
-  `75420b6f5fcbb5207879c9625017e217a0a90c128b7593d912222edcf56bd57b`, input
-  `72b5435d3bc65d20f3f4947e4e66a401e0806e6b2f98c985c1af7d7b15259de1`, three
+  `e1c4dc9b66ca46c2d4d4913243511502df7b29f33368b3ca7c9f67599147f0ab`, input
+  `053c6b3b9efee2a8854c189abaa499ef84a1c579622495431a52ab1b63e02d82`, three
   fixed-point rounds.
 
 Final delivery-only results are deliberately not embedded in this tracked evidence file:

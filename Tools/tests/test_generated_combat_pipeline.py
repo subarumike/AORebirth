@@ -43,11 +43,24 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 return bytes((value,))
             if isinstance(value, list) and len(value) <= 0x0F:
                 return bytes((0x90 | len(value),)) + b"".join(pack(row) for row in value)
+            if isinstance(value, dict) and len(value) <= 0x0F:
+                return bytes((0x80 | len(value),)) + b"".join(
+                    pack(key) + pack(item) for key, item in value.items()
+                )
+            if isinstance(value, str):
+                encoded = value.encode("utf-8")
+                if len(encoded) <= 0x1F:
+                    return bytes((0xA0 | len(encoded),)) + encoded
+                if len(encoded) <= 0xFF:
+                    return b"\xD9" + bytes((len(encoded),)) + encoded
             raise AssertionError(f"unsupported fixture value: {value!r}")
 
         slices = (
-            [[1, 0, 0, [], 0, 101], [2, 0, 0, [], 0, 102]],
-            [[3, 0, 0, [], 0, 101]],
+            [
+                [1, 0, 0, [{"ignored": "x" * 80}], 0, 101, 0, 0, 0, 0, 0, {}],
+                [2, 0, 0, [{"ignored": "y" * 80}], 0, 102, 0, 0, 0, 0, 0, {}],
+            ],
+            [[3, 0, 0, [], 0, 101, 0, 0, 0, 0, 0, {}]],
         )
         payload = bytearray(b"\x01v")
         payload.extend(struct.pack("<iii", 0, 0, len(slices)))
@@ -62,12 +75,22 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             items = Path(temporary) / "items.dat"
             items.write_bytes(payload)
-            selected = formula.load_item_templates(items, {101})
+            class CountingReader(formula.MessagePackReader):
+                skipped = 0
+
+                def skip(self):
+                    type(self).skipped += 1
+                    return super().skip()
+
+            with mock.patch.object(formula, "MessagePackReader", CountingReader):
+                selected = formula.load_item_templates(items, {101})
             unfiltered = formula.load_item_templates(items)
 
         self.assertEqual(set(selected), {101})
         self.assertEqual(selected[101][0], 3)
+        self.assertEqual(selected[101], unfiltered[101])
         self.assertEqual(set(unfiltered), {101, 102})
+        self.assertGreater(CountingReader.skipped, 0)
 
     def test_formula_item_loader_rejects_truncated_or_trailing_data(self):
         formula = self._load_module_from_path(
@@ -113,10 +136,47 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "slice 0 is invalid"):
                 formula.load_item_templates(malformed_template, set())
 
+            invalid_skipped_utf8 = root / "invalid-skipped-utf8.dat"
+            invalid_skipped_utf8.write_bytes(
+                database(zlib.compress(b"\x91\x96\xA1\xFF\x00\x00\x00\x00\x65"))
+            )
+            with self.assertRaisesRegex(ValueError, "slice 0 is invalid"):
+                formula.load_item_templates(invalid_skipped_utf8, set())
+
+            unsupported_skipped_value = root / "unsupported-skipped-value.dat"
+            unsupported_skipped_value.write_bytes(
+                database(zlib.compress(b"\x91\x96\xC1\x00\x00\x00\x00\x65"))
+            )
+            with self.assertRaisesRegex(ValueError, "Unsupported MessagePack marker"):
+                formula.load_item_templates(unsupported_skipped_value, set())
+
             trailing_database = root / "trailing-database.dat"
             trailing_database.write_bytes(database(zlib.compress(b"\x90")) + b"\x00")
             with self.assertRaisesRegex(ValueError, "trailing data after"):
                 formula.load_item_templates(trailing_database, set())
+
+    def test_generated_json_readers_bypass_c_scanner(self):
+        formula = self._load_module_from_path(
+            "formula_python_json_scanner_test",
+            Path("tools-temp/AOSharpCaptureAnalyzer/analyze_enemy_combat_setup_formula.py"),
+        )
+        active = self._load_module_from_path(
+            "active_python_json_scanner_test",
+            Path(
+                "tools-temp/AOSharpCaptureAnalyzer/"
+                "generate_capture_backed_npc_active_coverage.py"
+            ),
+        )
+        raw = '{"digit":4,"nested":[{"text":"Arete"}]}'
+        expected = {"digit": 4, "nested": [{"text": "Arete"}]}
+        with mock.patch.object(
+            json, "loads", side_effect=AssertionError("C JSON scanner was used")
+        ):
+            self.assertEqual(pipeline.decode_json_text(raw), expected)
+            self.assertEqual(formula.decode_json_text(raw), expected)
+            self.assertEqual(active.decode_json_text(raw), expected)
+        with self.assertRaises(json.JSONDecodeError):
+            pipeline.decode_json_text(raw + " trailing")
 
     def test_active_coverage_initializer_comments_avoid_regex_hot_loop(self):
         active = self._load_module_from_path(
@@ -661,6 +721,11 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             )
         self.assertEqual(completed.returncode, 0)
         self.assertEqual(launch.call_count, 2)
+        self.assertTrue(
+            pipeline._is_transient_interpreter_failure(
+                1, "SystemError: bad format string: O|OO:startswith"
+            )
+        )
 
         deterministic = CompletedChild(1, "ValueError: deterministic input failure")
         with mock.patch.object(
