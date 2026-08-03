@@ -337,22 +337,6 @@ class MessagePackReader:
 
     def skip(self) -> None:
         """Validate and consume one value without retaining its object graph."""
-        marker = self._marker()
-        if marker <= 0x7F or marker >= 0xE0 or marker in (0xC0, 0xC2, 0xC3):
-            return
-        if 0x80 <= marker <= 0x8F:
-            for _ in range(marker & 0x0F):
-                key = self.read()
-                self.skip()
-                hash(key)
-            return
-        if 0x90 <= marker <= 0x9F:
-            for _ in range(marker & 0x0F):
-                self.skip()
-            return
-        if 0xA0 <= marker <= 0xBF:
-            self._take(marker & 0x1F).decode("utf-8")
-            return
         scalar_sizes = {
             0xCA: 4,
             0xCB: 8,
@@ -365,27 +349,56 @@ class MessagePackReader:
             0xD2: 4,
             0xD3: 8,
         }
-        scalar_size = scalar_sizes.get(marker)
-        if scalar_size is not None:
-            self._advance(scalar_size)
-            return
-        if marker in (0xD9, 0xDA, 0xDB):
-            size = self._uint({0xD9: 1, 0xDA: 2, 0xDB: 4}[marker])
-            self._take(size).decode("utf-8")
-            return
-        if marker in (0xDC, 0xDD):
-            size = self._uint(2 if marker == 0xDC else 4)
-            for _ in range(size):
-                self.skip()
-            return
-        if marker in (0xDE, 0xDF):
-            size = self._uint(2 if marker == 0xDE else 4)
-            for _ in range(size):
-                key = self.read()
-                self.skip()
+        work: list[tuple[str, Any]] = [("value", None)]
+        while work:
+            operation, state = work.pop()
+            if operation == "array":
+                remaining = int(state)
+                if remaining:
+                    work.append(("array", remaining - 1))
+                    work.append(("value", None))
+                continue
+            if operation == "map":
+                remaining = int(state)
+                if remaining:
+                    key = self.read()
+                    work.append(("map-after-value", (remaining, key)))
+                    work.append(("value", None))
+                continue
+            if operation == "map-after-value":
+                remaining, key = state
                 hash(key)
-            return
-        raise ValueError(f"Unsupported MessagePack marker 0x{marker:02X}")
+                if remaining > 1:
+                    work.append(("map", remaining - 1))
+                continue
+
+            marker = self._marker()
+            if marker <= 0x7F or marker >= 0xE0 or marker in (0xC0, 0xC2, 0xC3):
+                continue
+            if 0x80 <= marker <= 0x8F:
+                work.append(("map", marker & 0x0F))
+                continue
+            if 0x90 <= marker <= 0x9F:
+                work.append(("array", marker & 0x0F))
+                continue
+            if 0xA0 <= marker <= 0xBF:
+                self._take(marker & 0x1F).decode("utf-8")
+                continue
+            scalar_size = scalar_sizes.get(marker)
+            if scalar_size is not None:
+                self._advance(scalar_size)
+                continue
+            if marker in (0xD9, 0xDA, 0xDB):
+                size = self._uint({0xD9: 1, 0xDA: 2, 0xDB: 4}[marker])
+                self._take(size).decode("utf-8")
+                continue
+            if marker in (0xDC, 0xDD):
+                work.append(("array", self._uint(2 if marker == 0xDC else 4)))
+                continue
+            if marker in (0xDE, 0xDF):
+                work.append(("map", self._uint(2 if marker == 0xDE else 4)))
+                continue
+            raise ValueError(f"Unsupported MessagePack marker 0x{marker:02X}")
 
 
 class ItemTemplateIntegrityError(ValueError):
