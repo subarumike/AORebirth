@@ -152,11 +152,123 @@ def main():
         "EnsureExistingAncestorsHaveNoReparsePoints(parentDirectory);",
     )
 
+    http_server = read("AORebirth/Server/WebEngine/HttpServer.cs")
+    constructor = http_server[http_server.index("public HttpServer()"):
+                              http_server.index("#endregion", http_server.index("public HttpServer()"))]
+    require("try" not in constructor and "catch" not in constructor,
+            "HttpServer initialization failures must propagate to the startup boundary")
+    ordered(
+        constructor,
+        "XDocument.Load(\"MimeTypes.xml\")",
+        "Convert.ToInt32(_config.Instance.CurrentConfig.WebHostPort)",
+        "new TcpListener(IPAddress.Any, port)",
+    )
+    start_server = http_server[http_server.index("public void StartServer()"):
+                               http_server.index("public void StopServer()")]
+    ordered(
+        start_server,
+        "this.myListener.Start();",
+        "this.isRunning = true;",
+        "new Thread(this.StartListen)",
+        "mainLoop.Start();",
+    )
+    start_listen = http_server[http_server.index("private void StartListen()"):
+                               http_server.index("#endregion", http_server.index("private void StartListen()"))]
+    require("this.myListener.Start();" not in start_listen,
+            "listener binding must complete synchronously at the startup boundary")
+
+    request_thread = http_server[http_server.index("private void HttpThread"):
+                                 http_server.index("private void ProcessHttpRequest")]
+    ordered(
+        request_thread,
+        "this.ProcessHttpRequest(sockets);",
+        "catch (Exception)",
+        "LogUtil.ErrorException(false, \"WebEngine request failed; response=500.\")",
+        "this.SendError500(ref sockets);",
+        "finally",
+        "CloseSocket(sockets);",
+    )
+    require("ex." not in request_thread and "ex.Message" not in request_thread,
+            "the request exception boundary must not log exception details")
+    request_processing = http_server[http_server.index("private void ProcessHttpRequest"):
+                                     http_server.index("// Send content")]
+    require("Encoding.ASCII.GetString(received, 0, i)" in request_processing,
+            "HTTP parsing must not decode bytes beyond the actual bounded receive count")
+    ordered(
+        request_processing,
+        'case "POST":',
+        "this.SendError400(ref sockets);",
+        "return;",
+    )
+    require(request_processing.count('if (REQUESTED_METHOD != "HEAD")') == 2,
+            "HEAD must suppress both PHP and static response bodies")
+
+    send_data = http_server[http_server.index("private void SendData(byte[] data"):
+                            http_server.index("// Overloaded method", http_server.index("private void SendData(byte[] data"))]
+    ordered(
+        send_data,
+        "int offset = 0;",
+        "while (offset < data.Length)",
+        "sockets.Send(data, offset, data.Length - offset, SocketFlags.None)",
+        "if (sent <= 0)",
+        "throw new IOException(\"Socket send made no progress.\")",
+        "offset += sent;",
+    )
+
+    error_response = http_server[http_server.index("private void SendError500"):
+                                 http_server.index("private static void CloseSocket")]
+    require("Content-Length: 21" in error_response and "Connection: close" in error_response,
+            "request failures must return a bounded connection-closing 500 response")
+
     program = read("AORebirth/Server/WebEngine/Program.cs")
-    require(program.count("ReleaseWebCoreAssetLease();") == 2,
-            "a successful WebEngine start must retain the WebCore lease for process lifetime")
+    start_method = program[program.index("public static bool StartTheServer()"):
+                           program.index("#endregion", program.index("public static bool StartTheServer()"))]
+    ordered(
+        start_method,
+        "AcquirePhpRuntimeLease()",
+        "AcquireWebCoreAssetLease()",
+        "ValidatePhpRuntime()",
+        "ValidateWebCoreAssets()",
+        "myServer.StartServer()",
+        "return true;",
+    )
+    successful_tail = start_method[start_method.index("myServer.StartServer()"):
+                                   start_method.index("return true;")]
+    require("ReleaseWebCoreAssetLease();" not in successful_tail
+            and "ReleasePhpRuntimeLease();" not in successful_tail,
+            "a successful WebEngine start must retain both leases for process lifetime")
     require("/validate-webcore-manifest" in program,
             "production must expose deterministic parsing of the checked-in manifest authority")
+    php_validator = read("AORebirth/Server/WebEngine/PhpRuntimeValidator.cs")
+    require("if (!Task.WaitAll(" in php_validator
+            and "probe stream drain timed out" in php_validator,
+            "PHP probe stream drains must enforce their timeout before reading task results")
+    compatibility_manager = read("AORebirth/Server/WebEngine/WebCoreCompatibilityManager.cs")
+    require("if (!Task.WaitAll(" in compatibility_manager
+            and "tool stream drain timed out" in compatibility_manager,
+            "WebCore tool stream drains must enforce their timeout before reading task results")
+    database_check = program[program.index("private static bool CheckDatabase()"):
+                             program.index("private static string GetArgumentValue", program.index("private static bool CheckDatabase()"))]
+    require("PHPHandler.ParseDatabaseConnection" in database_check
+            and "CurrentConfig.MysqlConnection" in database_check,
+            "listener eligibility must validate the configured WebCore database fields without connecting")
+    require("LoginDataDao" not in database_check and "TODO" not in database_check,
+            "the WebCore database preflight must not remain a no-op placeholder")
+    initialize = program[program.index("private static bool Initialize()"):
+                         program.index("private static bool InitializeConsoleCommands()")]
+    ordered(
+        initialize,
+        "ValidatePhpRuntime()",
+        "ValidateWebCoreAssets()",
+        "CheckDatabase()",
+        "InitializeServerInstance()",
+    )
+
+    php_validator = read("AORebirth/Server/WebEngine/PhpRuntimeValidator.cs")
+    for parser in ("ParseAndValidateCliFacts", "ParseAndValidateCgiVersion",
+                   "ParseAndValidateModuleList", "ParseAndValidateIniOutput"):
+        require(parser in php_validator,
+                "PHP runtime probe output must use bounded pure parser: " + parser)
 
     start_web = read("start-web-engine.cmd")
     require("/validate-webcore-assets" in start_web,
@@ -165,6 +277,18 @@ def main():
             "WebEngine startup must retain local PHP validation")
     require("/import-webcore-assets" not in start_web,
             "WebEngine startup must never import WebCore assets implicitly")
+    ordered(
+        start_web,
+        'preflight-database.cmd"',
+        'if not exist "%~dp0AORebirth\\Built\\Debug\\WebEngine.exe"',
+        "WebEngine.exe /validate-php-manifest",
+        "WebEngine.exe /validate-php-runtime",
+        "WebEngine.exe /validate-webcore-manifest",
+        "WebEngine.exe /validate-webcore-compatibility",
+        "WebEngine.exe /validate-webcore-assets",
+        'status-engines.cmd" --prestart WebEngine',
+        'start-engines.ps1" -WebOnly',
+    )
 
     import_webcore = read("import-webcore-assets.cmd")
     require("/import-webcore-assets" in import_webcore,

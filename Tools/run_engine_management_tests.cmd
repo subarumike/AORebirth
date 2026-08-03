@@ -35,8 +35,10 @@ if not "%WEB_MISSING_EXIT%"=="10" (
     goto Fail
 )
 
-call Tools\run_web_engine_security_tests.cmd
-if errorlevel 1 goto Fail
+if /i not "%~1"=="--skip-web-engine-security" (
+    call Tools\run_web_engine_security_tests.cmd
+    if errorlevel 1 goto Fail
+)
 
 python Tools\tests\test_engine_management_contracts.py
 if errorlevel 1 goto Fail
