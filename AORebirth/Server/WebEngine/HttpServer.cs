@@ -33,11 +33,6 @@ namespace WebEngine
 {
     #region Usings ...
 
-    using AO.Core.Encryption;
-
-    using AORebirth.Database.Dao;
-    using AORebirth.Database.Entities;
-
     using System;
     using System.Collections.Generic;
     using System.Globalization;
@@ -46,7 +41,6 @@ namespace WebEngine
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
-    using System.Web;
     using System.Xml.Linq;
 
     using Utility;
@@ -108,24 +102,17 @@ namespace WebEngine
         /// </summary>
         public HttpServer()
         {
-            try
-            {
-                this.xdoc = XDocument.Load("MimeTypes.xml");
+            this.xdoc = XDocument.Load("MimeTypes.xml");
 
-                // define the port
-                int port = Convert.ToInt32(_config.Instance.CurrentConfig.WebHostPort);
+            // define the port
+            int port = Convert.ToInt32(_config.Instance.CurrentConfig.WebHostPort);
 
-                this.serverName = _config.Instance.CurrentConfig.WebHostName;
+            this.serverName = _config.Instance.CurrentConfig.WebHostName;
 
-                // define the directory of the web pages
-                this.serverRoot = _config.Instance.CurrentConfig.WebHostRoot;
+            // define the directory of the web pages
+            this.serverRoot = _config.Instance.CurrentConfig.WebHostRoot;
 
-                this.myListener = new TcpListener(IPAddress.Any, port);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            this.myListener = new TcpListener(IPAddress.Any, port);
         }
 
         #endregion
@@ -137,8 +124,19 @@ namespace WebEngine
         public void StartServer()
         {
             this.stopServer = false;
+            this.myListener.Start();
+            this.isRunning = true;
             Thread mainLoop = new Thread(this.StartListen);
-            mainLoop.Start();
+            try
+            {
+                mainLoop.Start();
+            }
+            catch
+            {
+                this.isRunning = false;
+                this.myListener.Stop();
+                throw;
+            }
         }
 
         /// <summary>
@@ -171,29 +169,49 @@ namespace WebEngine
 
         private void SendError400(ref Socket sockets)
         {
-            try
-            {
-                var error = new Error400();
-                SendData(error.getResponseHeader().getResponseHeaders(), ref sockets);
-                sockets.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+            var error = new Error400();
+            SendData(error.getResponseHeader().getResponseHeaders(), ref sockets);
         }
 
         private void SendError404(ref Socket sockets)
         {
+            var error = new Error404();
+            SendData(error.getResponseHeader().getResponseHeaders(), ref sockets);
+        }
+
+        private void SendError500(ref Socket sockets)
+        {
+            const string Response = "HTTP/1.1 500 Internal Server Error\r\n"
+                                    + "Content-Type: text/plain; charset=us-ascii\r\n"
+                                    + "Content-Length: 21\r\n"
+                                    + "Cache-Control: no-store\r\n"
+                                    + "Connection: close\r\n\r\n"
+                                    + "Internal Server Error";
+
             try
             {
-                var error = new Error404();
-                SendData(error.getResponseHeader().getResponseHeaders(), ref sockets);
+                SendData(Response, ref sockets);
+            }
+            catch (Exception)
+            {
+                // The request boundary has already recorded a fixed, redacted diagnostic.
+            }
+        }
+
+        private static void CloseSocket(Socket sockets)
+        {
+            if (sockets == null)
+            {
+                return;
+            }
+
+            try
+            {
                 sockets.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex);
+                // Closing a failed request must not escape its worker thread.
             }
         }
 
@@ -230,107 +248,42 @@ namespace WebEngine
         }
 
         /// <summary>
-        /// Updates the HTML file processes user interaction.
-        /// </summary>
-        /// <param name="">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        private string ProcessRequest(string queryString)
-        {
-            List<string[]> split = new List<string[]>();
-
-            // Split post/get-arguments to process the data in it
-            queryString = HttpUtility.UrlDecode(queryString);
-            string[] requestPartSplit = queryString.Split(new string[] { "&" }, StringSplitOptions.None);
-            foreach (string t in requestPartSplit)
-            {
-                split.Add(t.Split(new string[] { "=" }, StringSplitOptions.None));
-            }
-
-            // Execute an action based on the input value ('split[0][1]')
-            // It get's sent via get/post request for interaction of websitecontent <-> AO Rebirth Engines
-            if (split[0][0] == "action")
-            {
-                switch (split[0][1])
-                {
-                    case "register":
-                        queryString += "?result=" + RegisterAccount(split);
-                        break;
-            
-                    case "contact":
-                        break;
-            
-                    default:
-                        break;
-                }
-            }
-
-
-            return queryString;
-        }
-
-        private string RegisterAccount(List<string[]> split)
-        {
-            /* 
-             * NOT SQL-INJECTION SAFE YET!
-             * 
-             * To do: Add sql-checks for entries
-             */
-
-            // Check wether everything is filled in or not.
-            if (!string.IsNullOrEmpty(split[1][1]) && !string.IsNullOrEmpty(split[2][1]) && !string.IsNullOrEmpty(split[3][1])
-                            && !string.IsNullOrEmpty(split[4][1]) && !string.IsNullOrEmpty(split[5][1]) && !string.IsNullOrEmpty(split[6][1]))
-            {
-                if (!LoginDataDao.Instance.Exists(split[2][1]))
-                {
-                    // Check Email format
-                    if (TestEmailRegex.TestEmail(split[1][1]))
-                    {
-                        if (split[5][1] == split[6][1])
-                        {
-                            DBLoginData dbchar = new DBLoginData();
-
-                            dbchar.AccountFlags = 0;
-                            dbchar.AllowedCharacters = 12;
-                            dbchar.CreationDate = DateTime.Now;
-                            dbchar.Email = split[1][1];
-                            dbchar.Expansions = 2047;
-                            dbchar.FirstName = split[3][1];
-                            dbchar.Flags = 0;
-                            dbchar.GM = 0;
-                            dbchar.LastName = split[4][1];
-                            dbchar.Password = new LoginEncryption().GeneratePasswordHash(split[5][1]);
-                            dbchar.Username = split[2][1];
-
-                            AORebirth.Database.Dao.LoginDataDao.Instance.Add(dbchar);
-                            Console.WriteLine("Account created.");
-
-                            return "Account created.";
-                        }
-                        return "Passwords are not matching, please retry.";
-                    }
-                    return "Email is wrong, please retry.";
-                }
-                return "Username is already taken, please retry.";
-            }
-            else
-            {
-                return "n/a";
-            }
-        }
-
-        /// <summary>
         /// </summary>
         /// <param name="sockets">
         /// </param>
         private void HttpThread(Socket sockets)
+        {
+            try
+            {
+                this.ProcessHttpRequest(sockets);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    LogUtil.ErrorException(false, "WebEngine request failed; response=500.");
+                }
+                catch (Exception)
+                {
+                    // Logging failure must not escape the per-request boundary.
+                }
+
+                this.SendError500(ref sockets);
+            }
+            finally
+            {
+                CloseSocket(sockets);
+            }
+        }
+
+        private void ProcessHttpRequest(Socket sockets)
         {
             string request = null;
             string requestedFile = string.Empty;
             string mimeType = string.Empty;
             string filePath = string.Empty;
             string queryString = string.Empty;
+            string postData = string.Empty;
             string REQUESTED_METHOD = string.Empty;
             string referer = string.Empty;
             string userAgent = string.Empty;
@@ -348,10 +301,21 @@ namespace WebEngine
                 // get request from the client and decode it
                 var received = new byte[1025];
                 int i = sockets.Receive(received, received.Length, 0);
-                string sBuffer = Encoding.ASCII.GetString(received);
+                if (i <= 0)
+                {
+                    return;
+                }
+
+                string sBuffer = Encoding.ASCII.GetString(received, 0, i);
                 if (string.IsNullOrEmpty(sBuffer))
                 {
-                    sockets.Close();
+                    return;
+                }
+
+                if (sBuffer.IndexOf("\r\n\r\n", StringComparison.Ordinal) < 0
+                    && sBuffer.IndexOf("\n\n", StringComparison.Ordinal) < 0)
+                {
+                    this.SendError400(ref sockets);
                     return;
                 }
 
@@ -397,29 +361,22 @@ namespace WebEngine
                 switch (REQUESTED_METHOD)
                 {
                     case "GET":
+                    case "HEAD":
                         lastPos = request.IndexOf('?');
-                        if (lastPos > 0)
+                        if (lastPos >= 0)
                         {
-                            requestedFile = request.Substring(0, lastPos).Replace("/", "\\");
+                            requestedFile = request.Substring(0, lastPos);
                             queryString = request.Substring(lastPos + 1);
                         }
                         else
                         {
-                            requestedFile = request.Substring(0).Replace("/", "\\");
+                            requestedFile = request;
                         }
 
                         break;
                     case "POST":
-                        requestedFile = request.Replace("/", "\\").Trim();
-                        // Cut off GET requests here, WebEngine puts it into requestedFile,
-                        // which would lead to trying to send files like "index.php?action=someaction"
-                        // Example where this would occur: adding GET requests to the action field of a html form
-                        lastPos = request.IndexOf('?');
-                        requestedFile = request.Substring(0, lastPos).Replace("/", "\\");
-                        queryString = @params[@params.Length - 1].Trim().Replace("\0", "");
-                        break;
-                    case "HEAD":
-                        break;
+                        this.SendError400(ref sockets);
+                        return;
                     default:
                         this.SendError400(ref sockets);
                         return;
@@ -429,31 +386,19 @@ namespace WebEngine
                 
 
                 // Get the full name of the requested file
-                if (requestedFile.EndsWith("\\") || String.IsNullOrEmpty(requestedFile))
+                if (String.IsNullOrEmpty(requestedFile))
                 {
-                    foreach (
-                        String fileName in
-                            new String[] { "index.php", "index.aspx", "index.html", "index.htm", "index.txt" })
-                    {
-                        String tmpFileName = _config.Instance.CurrentConfig.WebHostRoot + "\\" + requestedFile
-                                             + fileName;
-                        if (File.Exists(tmpFileName))
-                        {
-                            requestedFile = requestedFile + fileName;
-                            break;
-                        }
-                    }
-                    if (string.IsNullOrEmpty(requestedFile))
-                    {
-                        this.SendError404(ref sockets);
-                        return;
-                    }
+                    requestedFile = "index.php";
                 }
 
-                // generates a up to date html page per view
-                queryString = ProcessRequest(queryString);
+                WebRequestPathResult pathResult = WebRequestPathPolicy.Resolve(this.serverRoot, requestedFile);
+                if (!pathResult.IsAllowed)
+                {
+                    this.SendError404(ref sockets);
+                    return;
+                }
 
-                filePath = this.serverRoot + "\\" + requestedFile;
+                filePath = pathResult.FullPath;
                 Console.WriteLine("Requested file : {0}", filePath);
 
                 // If there is no such file send error message
@@ -468,50 +413,50 @@ namespace WebEngine
                     mimeType = this.GetMimeType(ext);
 
                     // process web pages
-                    if (ext == ".aspx")
-                    {
-                        var requestOptions = new Dictionary<String, String>
-                                             {
-                                                 { "server_root", this.serverRoot },
-                                                 { "query_string", queryString }
-                                             };
-                        var aspxHandler = new ASPXHandler(requestedFile, requestOptions);
-                    }
-                    else if (ext == ".php" || ext == ".exe")
+                    if (pathResult.Kind == WebRequestFileKind.Php)
                     {
                         var requestOptions = new Dictionary<string, string>();
                         requestOptions.Add("remote_addr", remoteAddress.ToString(CultureInfo.InvariantCulture));
                         requestOptions.Add("user_agent", userAgent);
-                        requestOptions.Add("request_method", REQUESTED_METHOD);
+                        requestOptions.Add("request_method", "GET");
                         requestOptions.Add("referer", referer);
                         requestOptions.Add("server_protocol", serverProtocol);
                         requestOptions.Add("query_string", queryString);
                         requestOptions.Add("cookie", cookie);
-                        requestOptions.Add("post", queryString);
+                        requestOptions.Add("post", postData);
+                        requestOptions.Add("document_root", this.serverRoot);
+                        requestOptions.Add("script_name", "/" + pathResult.RelativePath);
+                        requestOptions.Add("request_uri", "/" + pathResult.RelativePath
+                                                           + (string.IsNullOrEmpty(queryString) ? string.Empty : "?" + queryString));
+                        requestOptions.Add("server_name", _config.Instance.CurrentConfig.WebHostName);
+                        requestOptions.Add("server_port", _config.Instance.CurrentConfig.WebHostPort.ToString(CultureInfo.InvariantCulture));
                         var phpHandler = new PHPHandler(filePath, requestOptions);
                         SendData(phpHandler.getResponseHeaders(), ref sockets);
-                        SendData(phpHandler.getResponseBody(), ref sockets);
+                        if (REQUESTED_METHOD != "HEAD")
+                        {
+                            SendData(phpHandler.getResponseBody(), ref sockets);
+                        }
                     }
                     else
                     {
                         var fileHandler = new FileHandler(filePath);
                         SendData(fileHandler.getResponseHeader(), ref sockets);
-                        SendData(fileHandler.getResponseBody(), ref sockets);
+                        if (REQUESTED_METHOD != "HEAD")
+                        {
+                            SendData(fileHandler.getResponseBody(), ref sockets);
+                        }
                     }
                 }
 
-                sockets.Close();
-
-                Monitor.Enter(this.randObj);
-                logStream = new StreamWriter("WebEngine-Server.log", true);
-
-                // Output to the server log
-                logStream.WriteLine(DateTime.Now.ToString());
-                logStream.WriteLine("Connected to {0}", remoteAddress);
-                logStream.WriteLine("Requested path {0}", request);
-                logStream.Flush();
-                logStream.Close();
-                Monitor.Exit(this.randObj);
+                lock (this.randObj)
+                {
+                    using (logStream = new StreamWriter("WebEngine-Server.log", true))
+                    {
+                        logStream.WriteLine(DateTime.Now.ToString());
+                        logStream.WriteLine("Connected to {0}", remoteAddress);
+                        logStream.WriteLine("Requested path {0}", pathResult.RelativePath);
+                    }
+                }
             }
         }
 
@@ -524,24 +469,21 @@ namespace WebEngine
         /// </param>
         private void SendData(byte[] data, ref Socket sockets)
         {
-            const int NumberOfBytes = 0;
-            try
+            if (data == null)
             {
-                if (sockets.Connected == true)
-                {
-                    if (NumberOfBytes + sockets.Send(data, data.Length, SocketFlags.None) == -1)
-                    {
-                        Console.WriteLine("Error");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Connection is closed");
-                }
+                throw new ArgumentNullException("data");
             }
-            catch (Exception ex)
+
+            int offset = 0;
+            while (offset < data.Length)
             {
-                Console.WriteLine(ex.Message);
+                int sent = sockets.Send(data, offset, data.Length - offset, SocketFlags.None);
+                if (sent <= 0)
+                {
+                    throw new IOException("Socket send made no progress.");
+                }
+
+                offset += sent;
             }
         }
 
@@ -562,8 +504,6 @@ namespace WebEngine
         /// </summary>
         private void StartListen()
         {
-            this.myListener.Start();
-            this.isRunning = true;
             try
             {
                 while (!this.stopServer)
