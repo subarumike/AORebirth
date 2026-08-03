@@ -53,6 +53,8 @@ namespace WebEngine
 
     using Utility;
 
+    using WebEngine.Handlers;
+
     #endregion
 
     /// <summary>
@@ -81,7 +83,11 @@ namespace WebEngine
         /// </summary>
         private static HttpServer myServer;
 
+        private static IDisposable phpRuntimeLease;
+
         private static IDisposable webCoreAssetLease;
+
+        internal static PhpRuntimeValidationResult ValidatedPhpRuntime { get; private set; }
 
         #endregion
 
@@ -91,9 +97,26 @@ namespace WebEngine
         /// </summary>
         public static bool StartTheServer()
         {
+            if (!AcquirePhpRuntimeLease())
+            {
+                Console.WriteLine("PHP runtime is in use; the WebEngine listener was not started.");
+                Environment.ExitCode = 1;
+                return false;
+            }
+
             if (!AcquireWebCoreAssetLease())
             {
+                ReleasePhpRuntimeLease();
                 Console.WriteLine("WebCore assets are in use; the WebEngine listener was not started.");
+                Environment.ExitCode = 1;
+                return false;
+            }
+
+            if (!ValidatePhpRuntime())
+            {
+                ReleaseWebCoreAssetLease();
+                ReleasePhpRuntimeLease();
+                Console.WriteLine("PHP runtime validation failed; the WebEngine listener was not started.");
                 Environment.ExitCode = 1;
                 return false;
             }
@@ -101,6 +124,7 @@ namespace WebEngine
             if (!ValidateWebCoreAssets())
             {
                 ReleaseWebCoreAssetLease();
+                ReleasePhpRuntimeLease();
                 Console.WriteLine("WebCore asset validation failed; the WebEngine listener was not started.");
                 Environment.ExitCode = 1;
                 return false;
@@ -115,6 +139,7 @@ namespace WebEngine
             catch
             {
                 ReleaseWebCoreAssetLease();
+                ReleasePhpRuntimeLease();
                 throw;
             }
         }
@@ -129,18 +154,20 @@ namespace WebEngine
         /// </returns>
         private static bool CheckDatabase()
         {
-            bool result = true;
             try
             {
-                // LoginDataDao.GetAll();
-                // TODO: Add code to load WebCore DB
+                PHPHandler.ParseDatabaseConnection(
+                    Config.Instance.CurrentConfig.MysqlConnection);
+                return true;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                result = false;
+                Console.WriteLine(
+                    "WebCore database configuration validation failed: "
+                    + exception.GetType().Name
+                    + ".");
+                return false;
             }
-
-            return result;
         }
 
         /// <summary>
@@ -193,6 +220,36 @@ namespace WebEngine
             catch
             {
                 return false;
+            }
+        }
+
+        private static bool AcquirePhpRuntimeLease()
+        {
+            if (phpRuntimeLease != null)
+            {
+                return true;
+            }
+
+            try
+            {
+                phpRuntimeLease = PhpRuntimeValidator.AcquireRuntimeLease(
+                    Config.Instance.CurrentConfig.WebHostPhpPath,
+                    AppDomain.CurrentDomain.BaseDirectory);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void ReleasePhpRuntimeLease()
+        {
+            ValidatedPhpRuntime = null;
+            if (phpRuntimeLease != null)
+            {
+                phpRuntimeLease.Dispose();
+                phpRuntimeLease = null;
             }
         }
 
@@ -366,22 +423,22 @@ namespace WebEngine
                 return false;
             }
 
+            if (!CheckDatabase())
+            {
+                Colouring.Push(ConsoleColor.Red);
+
+                Console.WriteLine(locales.ErrorInitializingDatabase);
+                Colouring.Pop();
+                Colouring.Pop();
+                return false;
+            }
+
             if (!InitializeServerInstance())
             {
                 Colouring.Push(ConsoleColor.Red);
                 Console.WriteLine("Error initializing WebServer.");
 
                 Console.WriteLine(locales.ErrorInitializingEngine);
-                Colouring.Pop();
-                Colouring.Pop();
-                return false;
-            }
-
-            if (!CheckDatabase())
-            {
-                Colouring.Push(ConsoleColor.Red);
-
-                Console.WriteLine(locales.ErrorInitializingDatabase);
                 Colouring.Pop();
                 Colouring.Pop();
                 return false;
@@ -497,6 +554,27 @@ namespace WebEngine
                 return;
             }
 
+            if (HasArgument(args, "/validate-php-manifest"))
+            {
+                PhpRuntimeValidationResult manifestResult = PhpRuntimeValidator.ValidateConfiguredManifest(
+                    AppDomain.CurrentDomain.BaseDirectory);
+                Console.WriteLine(manifestResult.Message);
+                Environment.ExitCode = manifestResult.IsValid ? 0 : 2;
+                return;
+            }
+
+            if (HasArgument(args, "/self-test-php-handler"))
+            {
+                Environment.ExitCode = PHPHandlerSelfTests.Run(Console.Out) ? 0 : 3;
+                return;
+            }
+
+            if (HasArgument(args, "/self-test-web-request-policy"))
+            {
+                Environment.ExitCode = WebRequestPathPolicySelfTests.Run(Console.Out) ? 0 : 3;
+                return;
+            }
+
             if (HasArgument(args, "/validate-php-runtime"))
             {
                 Environment.ExitCode = ValidatePhpRuntime() ? 0 : 2;
@@ -517,6 +595,16 @@ namespace WebEngine
                 return;
             }
 
+            if (HasArgument(args, "/validate-webcore-compatibility"))
+            {
+                WebCoreCompatibilityResult compatibilityResult =
+                    WebCoreCompatibilityManager.ValidateConfiguredAuthority(
+                        AppDomain.CurrentDomain.BaseDirectory);
+                Console.WriteLine(compatibilityResult.Message);
+                Environment.ExitCode = compatibilityResult.IsValid ? 0 : 2;
+                return;
+            }
+
             if (HasArgument(args, "/validate-webcore-assets"))
             {
                 Environment.ExitCode = ValidateWebCoreAssets() ? 0 : 2;
@@ -527,16 +615,24 @@ namespace WebEngine
             {
                 string archivePath = GetArgumentValue(args, "/import-webcore-assets", 1);
                 string expectedVersion = GetArgumentValue(args, "/import-webcore-assets", 2);
-                if (string.IsNullOrWhiteSpace(archivePath) || string.IsNullOrWhiteSpace(expectedVersion))
+                string pythonExecutable = GetArgumentValue(args, "/import-webcore-assets", 3);
+                string compatibilityToolPath = GetArgumentValue(args, "/import-webcore-assets", 4);
+                if (string.IsNullOrWhiteSpace(archivePath)
+                    || string.IsNullOrWhiteSpace(expectedVersion)
+                    || string.IsNullOrWhiteSpace(pythonExecutable)
+                    || string.IsNullOrWhiteSpace(compatibilityToolPath))
                 {
-                    Console.WriteLine("WebCore import requires a local ZIP path and the exact manifest version.");
+                    Console.WriteLine(
+                        "WebCore import requires a local ZIP path, exact manifest version, local Python executable, and approved compatibility tool.");
                     Environment.ExitCode = 4;
                     return;
                 }
 
                 WebCoreAssetResult importResult = WebCoreAssetManager.ImportConfiguredArchive(
                     archivePath,
-                    expectedVersion);
+                    expectedVersion,
+                    pythonExecutable,
+                    compatibilityToolPath);
                 Console.WriteLine(importResult.Message);
                 Environment.ExitCode = importResult.IsValid ? 0 : 4;
                 return;
@@ -635,6 +731,8 @@ namespace WebEngine
             }
 
             Console.WriteLine(locales.ServerConsoleServerIsNotRunning);
+            ReleaseWebCoreAssetLease();
+            ReleasePhpRuntimeLease();
             exited = true;
         }
 
@@ -673,6 +771,7 @@ namespace WebEngine
                 Config.Instance.CurrentConfig.WebHostPhpPath,
                 AppDomain.CurrentDomain.BaseDirectory);
             Console.WriteLine(result.Message);
+            ValidatedPhpRuntime = result.IsValid ? result : null;
             return result.IsValid;
         }
 
