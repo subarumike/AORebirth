@@ -128,6 +128,10 @@ class CaptureAggregationInvariantError(RuntimeError):
     """A deterministic aggregate snapshot or cross-reference invariant failed."""
 
 
+class CaptureShardMaterializationError(CaptureAggregationInvariantError):
+    """A worker shard was missing, unreadable, or not valid serialized JSON."""
+
+
 class BoundedChildTimeout(RuntimeError):
     """A supervised child exceeded its deterministic wall-clock bound."""
 
@@ -1452,11 +1456,23 @@ def _write_parse_capture_worker_shard(
         ensure_ascii=True,
         separators=(",", ":"),
         sort_keys=True,
-    )
-    with shard.open("x", encoding="utf-8", newline="\n") as handle:
-        handle.write(payload)
-        handle.flush()
-        os.fsync(handle.fileno())
+    ).encode("utf-8")
+    try:
+        _write_deterministic_temporary_file(
+            shard,
+            payload,
+            "capture worker shard",
+        )
+        persisted = shard.read_bytes()
+        if persisted != payload:
+            raise RuntimeError(
+                "capture worker shard bytes changed during atomic publication"
+            )
+        json.loads(persisted)
+    except (OSError, UnicodeError, json.JSONDecodeError, RuntimeError) as error:
+        raise RuntimeError(
+            f"capture worker shard materialization failed: {error}"
+        ) from error
 
 
 def _path_is_symlink_or_reparse(path: Path) -> bool:
@@ -1626,6 +1642,10 @@ def _is_interpreter_corruption_detail(detail: str) -> bool:
     )
 
 
+def _is_capture_worker_materialization_detail(detail: str) -> bool:
+    return "capture worker shard materialization failed:" in detail
+
+
 def _capture_snapshot_failure(
     capture: str,
     path: Path | str,
@@ -1635,6 +1655,20 @@ def _capture_snapshot_failure(
 ) -> CaptureAggregationInvariantError:
     return CaptureAggregationInvariantError(
         "capture aggregation snapshot invariant failed "
+        f"capture={capture} path={path} phase={phase} "
+        f"snapshot={snapshot_identity}: {reason}"
+    )
+
+
+def _capture_snapshot_materialization_failure(
+    capture: str,
+    path: Path | str,
+    phase: str,
+    snapshot_identity: str,
+    reason: str,
+) -> CaptureShardMaterializationError:
+    return CaptureShardMaterializationError(
+        "capture aggregation snapshot materialization failed "
         f"capture={capture} path={path} phase={phase} "
         f"snapshot={snapshot_identity}: {reason}"
     )
@@ -1661,7 +1695,7 @@ def _read_capture_snapshot_shard_bytes(
             )
         return payload
     except (OSError, RuntimeError) as error:
-        raise _capture_snapshot_failure(
+        raise _capture_snapshot_materialization_failure(
             snapshot.capture,
             path,
             phase,
@@ -1689,6 +1723,15 @@ def _load_capture_snapshot_shard(
     )
     try:
         payload = json.loads(payload_bytes)
+    except (UnicodeError, json.JSONDecodeError) as error:
+        raise _capture_snapshot_materialization_failure(
+            snapshot.capture,
+            path,
+            phase,
+            snapshot_identity,
+            str(error),
+        ) from error
+    try:
         result = _parse_capture_result(payload)
         records, metadata, session, _ = result
         if session.get("capture") != snapshot.capture:
@@ -1701,7 +1744,7 @@ def _load_capture_snapshot_shard(
         if any(generation.capture != snapshot.capture for generation in metadata):
             raise RuntimeError("snapshot shard contains cross-capture metadata")
         return result
-    except (OSError, UnicodeError, json.JSONDecodeError, RuntimeError) as error:
+    except (OSError, RuntimeError) as error:
         raise _capture_snapshot_failure(
             snapshot.capture,
             path,
@@ -1898,29 +1941,55 @@ def parse_capture_isolated_to_snapshot(
                 str(error),
             ) from error
         if completed.returncode == 0:
-            if not shard.is_file():
+            try:
+                if not shard.is_file():
+                    raise CaptureShardMaterializationError(
+                        "capture worker succeeded without writing its shard"
+                    )
+                try:
+                    sha256, byte_length = _stream_file_sha256_and_length(shard)
+                except OSError as error:
+                    raise CaptureShardMaterializationError(str(error)) from error
+                candidate = CaptureShardSnapshot(
+                    capture=capture_key,
+                    path=shard,
+                    relative_path=(
+                        f"{CAPTURE_SNAPSHOT_DIRECTORY_NAME}/capture-{ordinal:06d}.json"
+                    ),
+                    byte_length=byte_length,
+                    sha256=sha256,
+                )
+                _load_capture_snapshot_shard(
+                    candidate,
+                    "capture-worker-result",
+                    snapshot_identity,
+                )
+            except CaptureShardMaterializationError as error:
+                _verify_frozen_capture_inputs(
+                    frozen_capture,
+                    source_entry,
+                    "capture-worker-retry-frozen-input",
+                    snapshot_identity,
+                )
+                _verify_capture_source_entry(
+                    source_entry,
+                    "capture-worker-retry-live-input",
+                    snapshot_identity,
+                    verify_hash=True,
+                )
+                if os.path.lexists(shard):
+                    _reject_symlink_or_reparse(shard, "capture worker shard")
+                    shard.unlink()
+                if attempt < CAPTURE_WORKER_MAX_ATTEMPTS:
+                    continue
                 raise _capture_snapshot_failure(
                     capture_key,
                     shard,
                     "capture-worker-result",
                     snapshot_identity,
-                    "capture worker succeeded without writing its shard",
-                )
-            sha256, byte_length = _stream_file_sha256_and_length(shard)
-            candidate = CaptureShardSnapshot(
-                capture=capture_key,
-                path=shard,
-                relative_path=(
-                    f"{CAPTURE_SNAPSHOT_DIRECTORY_NAME}/capture-{ordinal:06d}.json"
-                ),
-                byte_length=byte_length,
-                sha256=sha256,
-            )
-            _load_capture_snapshot_shard(
-                candidate,
-                "capture-worker-result",
-                snapshot_identity,
-            )
+                    "capture worker shard materialization failed on attempt "
+                    f"{attempt}/{CAPTURE_WORKER_MAX_ATTEMPTS}: {error}",
+                ) from error
             _verify_frozen_capture_inputs(
                 frozen_capture,
                 source_entry,
@@ -1954,13 +2023,18 @@ def parse_capture_isolated_to_snapshot(
 
         detail = _capture_worker_failure_detail(completed)
         cancelled = _is_cancellation_child_failure(completed.returncode)
-        retryable = not cancelled and (_is_native_child_failure(
-            completed.returncode
-        ) or _is_interpreter_corruption_detail(detail))
+        materialization_failure = _is_capture_worker_materialization_detail(detail)
+        retryable = not cancelled and (
+            _is_native_child_failure(completed.returncode)
+            or _is_interpreter_corruption_detail(detail)
+            or materialization_failure
+        )
         if retryable and attempt < CAPTURE_WORKER_MAX_ATTEMPTS:
             continue
         if cancelled:
             kind = "cancelled capture worker"
+        elif materialization_failure:
+            kind = "materialization capture worker"
         elif retryable:
             kind = "native capture worker"
         else:
@@ -6921,6 +6995,12 @@ def self_test() -> None:
     )
     assert not _is_interpreter_corruption_detail(
         "ValueError: deterministic capture failure"
+    )
+    assert _is_capture_worker_materialization_detail(
+        "RuntimeError: capture worker shard materialization failed: malformed JSON"
+    )
+    assert not _is_capture_worker_materialization_detail(
+        "RuntimeError: deterministic capture failure"
     )
     assert AGGREGATE_WORKER_MAX_ATTEMPTS == 3
     historical_generation_key = (

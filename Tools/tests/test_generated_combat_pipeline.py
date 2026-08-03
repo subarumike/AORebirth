@@ -118,6 +118,47 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "trailing data after"):
                 formula.load_item_templates(trailing_database, set())
 
+    def test_active_coverage_initializer_comments_avoid_regex_hot_loop(self):
+        active = self._load_module_from_path(
+            "active_coverage_initializer_test",
+            Path(
+                "tools-temp/AOSharpCaptureAnalyzer/"
+                "generate_capture_backed_npc_active_coverage.py"
+            ),
+        )
+        leading_comments = "".join(
+            " // captured line\r\n /* captured block */"
+            for _ in range(2000)
+        )
+        body = (
+            "new MobSlot {"
+            + leading_comments
+            + '\r\n Name = "Elysium Test",'
+            + "\r\n // level\r\n /* exact */ Level = 200,"
+            + "\r\n Values = new[] { 1, 2, 3 },"
+            + "\r\n }"
+        )
+
+        with mock.patch.object(
+            active.re,
+            "sub",
+            side_effect=AssertionError("initializer parser used re.sub"),
+        ):
+            rows = active.parse_object_initializers(body, "MobSlot")
+
+        self.assertEqual(
+            rows,
+            [
+                {
+                    "Name": '"Elysium Test"',
+                    "Level": "200",
+                    "Values": "new[] { 1, 2, 3 }",
+                }
+            ],
+        )
+        with self.assertRaisesRegex(active.CoverageError, "unterminated"):
+            active.strip_leading_csharp_comments("/* never closed")
+
     def test_generated_json_rejects_checkout_absolute_paths(self):
         portable = {"path": "tools-temp/captures/20260701-000001/packets.hex.log"}
         pipeline._validate_json_bytes(pipeline.canonical_json_bytes(portable))
@@ -581,6 +622,61 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 time.sleep(0.025)
             self.assertFalse(transaction._pid_alive(pids[0]), "timed-out parent survived")
             self.assertFalse(transaction._pid_alive(pids[1]), "timed-out child survived")
+
+    def test_run_checked_retries_only_recognized_interpreter_corruption(self):
+        class Lease:
+            repo_root = Path.cwd()
+
+            @staticmethod
+            def delegation():
+                return {"fixture": True}
+
+        class CompletedChild:
+            def __init__(self, returncode, stderr):
+                self.returncode = returncode
+                self.stderr = stderr
+                self.pid = 1000 + returncode
+
+            def communicate(self, timeout):
+                del timeout
+                return "", self.stderr
+
+        transient = CompletedChild(
+            1,
+            "C:\\Python\\Lib\\json\\decoder.py\n"
+            "ValueError: invalid literal for int() with base 10: '4'",
+        )
+        success = CompletedChild(0, "")
+        with mock.patch.object(
+            pipeline.subprocess,
+            "Popen",
+            side_effect=(transient, success),
+        ) as launch:
+            completed = pipeline.run_checked(
+                ("fixture-child",),
+                repo_root=Path.cwd(),
+                lease=Lease(),
+                label="fixture",
+                retry_interpreter_failures=True,
+            )
+        self.assertEqual(completed.returncode, 0)
+        self.assertEqual(launch.call_count, 2)
+
+        deterministic = CompletedChild(1, "ValueError: deterministic input failure")
+        with mock.patch.object(
+            pipeline.subprocess,
+            "Popen",
+            return_value=deterministic,
+        ) as launch:
+            with self.assertRaisesRegex(pipeline.PipelineError, "attempt 1/3"):
+                pipeline.run_checked(
+                    ("fixture-child",),
+                    repo_root=Path.cwd(),
+                    lease=Lease(),
+                    label="fixture",
+                    retry_interpreter_failures=True,
+                )
+        self.assertEqual(launch.call_count, 1)
 
     def test_transaction_publish_breaks_existing_hardlink_without_mutating_peer(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -661,13 +661,7 @@ def parse_object_initializers(array_body: str, type_name: str) -> List[Dict[str,
         closing = _scan_balanced(array_body, opening, "{", "}")
         assignments: Dict[str, str] = {}
         for item in split_top_level(array_body[opening + 1 : closing]):
-            item = re.sub(
-                r"\A\s*(?:(?://[^\r\n]*(?:\r?\n|$))|(?:/\*.*?\*/\s*))*",
-                "",
-                item,
-                count=1,
-                flags=re.DOTALL,
-            )
+            item = strip_leading_csharp_comments(item)
             if "=" not in item:
                 continue
             key, value = item.split("=", 1)
@@ -677,6 +671,25 @@ def parse_object_initializers(array_body: str, type_name: str) -> List[Dict[str,
             assignments[key] = value.strip()
         rows.append(assignments)
     return rows
+
+
+def strip_leading_csharp_comments(text: str) -> str:
+    index = 0
+    while True:
+        while index < len(text) and text[index].isspace():
+            index += 1
+        if text.startswith("//", index):
+            index += 2
+            while index < len(text) and text[index] not in "\r\n":
+                index += 1
+            continue
+        if text.startswith("/*", index):
+            closing = text.find("*/", index + 2)
+            if closing < 0:
+                raise CoverageError("unterminated leading block comment")
+            index = closing + 2
+            continue
+        return text[index:]
 
 
 def format_identity(value: Optional[int]) -> Optional[str]:

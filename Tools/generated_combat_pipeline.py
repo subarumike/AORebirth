@@ -787,6 +787,31 @@ def _bounded_process_detail(completed: subprocess.CompletedProcess[str]) -> str:
     return detail[-6000:]
 
 
+def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
+    if return_code in {-signal.SIGINT, -signal.SIGTERM}:
+        return False
+    normalized = return_code & 0xFFFFFFFF
+    if normalized == 0xC000013A:
+        return False
+    if return_code < 0 or 0xC0000000 <= normalized <= 0xCFFFFFFF:
+        return True
+    if any(
+        marker in detail
+        for marker in (
+            "Windows fatal exception: access violation",
+            "TypeError: 'str_ascii_iterator' object is not callable",
+            "SystemError: unknown opcode",
+            "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'",
+        )
+    ):
+        return True
+    json_decoder_failure = (
+        "ValueError: invalid literal for int() with base 10:" in detail
+        and ("json\\decoder.py" in detail or "json/decoder.py" in detail)
+    )
+    return json_decoder_failure
+
+
 def _terminate_process_tree(
     process: subprocess.Popen[str], *, grace_seconds: float = 30.0
 ) -> tuple[str, str, str]:
@@ -834,6 +859,7 @@ def run_checked(
     lease: Any,
     label: str = "child",
     environment_overrides: Mapping[str, str] | None = None,
+    retry_interpreter_failures: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     environment = os.environ.copy()
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -843,46 +869,66 @@ def run_checked(
     environment[LEASE_REPO_ROOT_ENVIRONMENT] = str(lease.repo_root)
     if environment_overrides:
         environment.update(environment_overrides)
-    process = subprocess.Popen(
-        list(command),
-        cwd=repo_root,
-        env=environment,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        creationflags=(
-            subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
-        ),
-        start_new_session=os.name != "nt",
-    )
-    try:
-        stdout, stderr = process.communicate(timeout=CHILD_PROCESS_TIMEOUT_SECONDS)
-    except subprocess.TimeoutExpired as error:
-        stdout, stderr, cleanup_detail = _terminate_process_tree(process)
-        detail = "\n".join(value.strip() for value in (stdout, stderr) if value.strip())
-        if cleanup_detail:
-            detail = "\n".join(value for value in (detail, cleanup_detail) if value)
-        suffix = f": {detail[-6000:]}" if detail else ""
-        raise PipelineError(
-            f"generated-combat {label} timed out "
-            f"after {CHILD_PROCESS_TIMEOUT_SECONDS}s pid={process.pid}{suffix}"
-        ) from error
-    completed = subprocess.CompletedProcess(
-        list(command),
-        process.returncode,
-        stdout,
-        stderr,
-    )
-    if completed.returncode != 0:
+    max_attempts = 3 if retry_interpreter_failures else 1
+    for attempt in range(1, max_attempts + 1):
+        process = subprocess.Popen(
+            list(command),
+            cwd=repo_root,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            creationflags=(
+                subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+            ),
+            start_new_session=os.name != "nt",
+        )
+        try:
+            stdout, stderr = process.communicate(
+                timeout=CHILD_PROCESS_TIMEOUT_SECONDS
+            )
+        except subprocess.TimeoutExpired as error:
+            stdout, stderr, cleanup_detail = _terminate_process_tree(process)
+            detail = "\n".join(
+                value.strip() for value in (stdout, stderr) if value.strip()
+            )
+            if cleanup_detail:
+                detail = "\n".join(
+                    value for value in (detail, cleanup_detail) if value
+                )
+            suffix = f": {detail[-6000:]}" if detail else ""
+            raise PipelineError(
+                f"generated-combat {label} timed out "
+                f"after {CHILD_PROCESS_TIMEOUT_SECONDS}s pid={process.pid}{suffix}"
+            ) from error
+        completed = subprocess.CompletedProcess(
+            list(command),
+            process.returncode,
+            stdout,
+            stderr,
+        )
+        if completed.returncode == 0:
+            return completed
         detail = _bounded_process_detail(completed)
+        if (
+            retry_interpreter_failures
+            and attempt < max_attempts
+            and _is_transient_interpreter_failure(completed.returncode, detail)
+        ):
+            continue
         suffix = f": {detail}" if detail else ""
+        attempt_suffix = (
+            f" on attempt {attempt}/{max_attempts}"
+            if retry_interpreter_failures
+            else ""
+        )
         raise PipelineError(
             f"generated-combat {label} failed with exit code "
-            f"{completed.returncode}{suffix}"
+            f"{completed.returncode}{attempt_suffix}{suffix}"
         )
-    return completed
+    raise AssertionError("generated child retry loop exited unexpectedly")
 
 
 def _candidate_artifact_paths(candidate_root: Path) -> dict[str, Path]:
@@ -941,6 +987,7 @@ def _run_active_formula_fixed_point(
             repo_root=repo_root,
             lease=lease,
             label=f"active-coverage round {round_number}",
+            retry_interpreter_failures=True,
         )
         if not active_output.is_file():
             detail = _bounded_process_detail(active_completed)
@@ -970,6 +1017,7 @@ def _run_active_formula_fixed_point(
             repo_root=repo_root,
             lease=lease,
             label=f"formula round {round_number}",
+            retry_interpreter_failures=True,
         )
         if not formula_output.is_file():
             detail = _bounded_process_detail(formula_completed)

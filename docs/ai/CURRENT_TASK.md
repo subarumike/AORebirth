@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `91cbc7ef749c6f1a66f1d527d227105c30130ba0e961099996e62b36f1059a37`
+  `75420b6f5fcbb5207879c9625017e217a0a90c128b7593d912222edcf56bd57b`
 - Combined input identity:
-  `fd60ad21be455b7c91a0f03dfecbe9fb756c3a5cd093e9bc1a9827581be835ec`
+  `72b5435d3bc65d20f3f4947e4e66a401e0806e6b2f98c985c1af7d7b15259de1`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -36,12 +36,17 @@ their generation manifest are one coordinated generated cohort.
 
 ## Final delivery acceptance
 
-- The pre-repair clean-worktree stress matrix passed. A later gate exposed an
-  intermittent formula ItemDb allocation crash; the streaming/selective loader
-  repair now needs the same complete stress matrix on the final commit.
+- The pre-repair clean-worktree stress matrix passed. Later gates exposed
+  intermittent Python failures in the formula ItemDb loader, the active-coverage
+  initializer hot loop, capture-shard publication, and JSON decoding. The
+  bounded repairs now need the same complete stress matrix on the final commit.
 - The repaired loader retains 42 referenced templates instead of 120,842 and
   reduced measured peak Python allocation from 422,936,105 to 11,169,393 bytes
   while keeping the formula dataset byte-identical.
+- Active initializer comments are parsed without the repeated regex hot loop;
+  capture shards publish atomically with read-back validation and bounded
+  materialization retry; isolated active/formula children retry only recognized
+  native/interpreter-corruption signatures.
 - The standalone secret scan and Debug build passed without starting an engine.
 - The final handoff must report five consecutive complete mandatory integration
   gates from one unchanged final commit. Those results are not written back to
