@@ -33,6 +33,7 @@ PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION = 2
 DEFAULT_MAX_FIXED_POINT_ROUNDS = 8
 CHILD_PROCESS_TIMEOUT_SECONDS = 1800
 PRIMARY_AGGREGATION_MAX_ATTEMPTS = 3
+GOVERNED_JSON_READ_MAX_ATTEMPTS = 3
 MAX_ARTIFACT_BYTES = 512 * 1024 * 1024
 GENERATOR_INVENTORY_PROJECTION_KEYS = (
     "schemaVersion",
@@ -288,17 +289,61 @@ def primary_output_signature(
     return sha256_bytes(canonical_json_bytes(descriptors))
 
 
-def load_json_object(path: Path, label: str) -> dict[str, Any]:
+def load_json_object(
+    path: Path,
+    label: str,
+    *,
+    expected_sha256: str | None = None,
+    expected_byte_length: int | None = None,
+) -> dict[str, Any]:
     if not path.is_file() or path.is_symlink():
         raise CohortValidationError(f"{label} is missing or is not a regular file")
+    if (expected_sha256 is None) != (expected_byte_length is None):
+        raise ValueError("JSON integrity expectations must be supplied together")
     try:
-        raw = path.read_text(encoding="utf-8")
-        value = decode_json_text(raw)
-    except (OSError, UnicodeError, ValueError) as error:
-        raise CohortValidationError(f"{label} is not valid UTF-8 JSON: {error}") from error
-    if not isinstance(value, dict):
-        raise CohortValidationError(f"{label} must contain one JSON object")
-    return value
+        payload = path.read_bytes()
+    except OSError as error:
+        raise CohortValidationError(
+            f"{label} is not valid UTF-8 JSON: {error}"
+        ) from error
+    if len(payload) > MAX_ARTIFACT_BYTES:
+        raise CohortValidationError(f"{label} has an invalid byte length")
+    if expected_byte_length is not None and (
+        len(payload) != expected_byte_length
+        or sha256_bytes(payload) != expected_sha256
+    ):
+        raise CohortValidationError(f"{label} is stale or mixed")
+    try:
+        raw = payload.decode("utf-8")
+    except UnicodeError as error:
+        raise CohortValidationError(
+            f"{label} is not valid UTF-8 JSON: {error}"
+        ) from error
+    del payload
+    failure_detail = ""
+    for attempt in range(1, GOVERNED_JSON_READ_MAX_ATTEMPTS + 1):
+        try:
+            value = decode_json_text(raw)
+        except json.JSONDecodeError as error:
+            failure_detail = (
+                f"{error.msg}: line {error.lineno} column {error.colno} "
+                f"(char {error.pos})"
+            )
+            if attempt < GOVERNED_JSON_READ_MAX_ATTEMPTS:
+                continue
+            break
+        except ValueError as error:
+            raise CohortValidationError(
+                f"{label} is not valid UTF-8 JSON: {error}"
+            ) from error
+        if not isinstance(value, dict):
+            raise CohortValidationError(f"{label} must contain one JSON object")
+        return value
+    raise CohortValidationError(
+        f"{label} is not valid UTF-8 JSON after "
+        f"{GOVERNED_JSON_READ_MAX_ATTEMPTS} stable-input parse attempts: "
+        f"{failure_detail}"
+    )
 
 
 def _require_nonnegative_int(value: Any, label: str) -> int:
@@ -1492,6 +1537,7 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
     expected_roles = list(ARTIFACT_RELATIVE_PATHS)
     if [row.get("role") if isinstance(row, dict) else None for row in rows] != expected_roles:
         raise CohortValidationError("generation manifest artifact order or roles are invalid")
+    parsed_json_artifacts: dict[str, dict[str, Any]] = {}
     for row, role in zip(rows, expected_roles):
         if set(row) != {"role", "path", "sha256", "byteLength"}:
             raise CohortValidationError(f"artifact descriptor fields are invalid: {role}")
@@ -1499,29 +1545,30 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
         if row["path"] != logical_path.as_posix():
             raise CohortValidationError(f"artifact target is invalid: {role}")
         path = cohort_root / Path(logical_path)
-        actual = artifact_descriptor(path, logical_path)
-        if any(actual[key] != row[key] for key in actual):
-            raise CohortValidationError(f"artifact is stale or mixed: {logical_path}")
         if role in JSON_ARTIFACT_ROLES:
-            value = load_json_object(path, f"{role} artifact")
-            assert_generated_value_is_path_independent(value, f"{role} artifact")
-        elif _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(path.read_text(encoding="utf-8")):
-            raise CohortValidationError(
-                f"artifact contains an absolute repository-location-dependent path: {logical_path}"
+            value = load_json_object(
+                path,
+                f"{role} artifact",
+                expected_sha256=row["sha256"],
+                expected_byte_length=row["byteLength"],
             )
+            parsed_json_artifacts[role] = value
+            assert_generated_value_is_path_independent(value, f"{role} artifact")
+        else:
+            actual = artifact_descriptor(path, logical_path)
+            if any(actual[key] != row[key] for key in actual):
+                raise CohortValidationError(
+                    f"artifact is stale or mixed: {logical_path}"
+                )
+            if _ABSOLUTE_WINDOWS_PATH_IN_TEXT.search(path.read_text(encoding="utf-8")):
+                raise CohortValidationError(
+                    "artifact contains an absolute repository-location-dependent "
+                    f"path: {logical_path}"
+                )
 
-    inventory = load_json_object(
-        cohort_root / Path(ARTIFACT_RELATIVE_PATHS["inventory"]),
-        "primary inventory",
-    )
-    active = load_json_object(
-        cohort_root / Path(ARTIFACT_RELATIVE_PATHS["activeCoverage"]),
-        "active coverage",
-    )
-    formula = load_json_object(
-        cohort_root / Path(ARTIFACT_RELATIVE_PATHS["formulaDataset"]),
-        "formula dataset",
-    )
+    inventory = parsed_json_artifacts["inventory"]
+    active = parsed_json_artifacts["activeCoverage"]
+    formula = parsed_json_artifacts["formulaDataset"]
     if manifest["counts"] != extract_acceptance_counts(inventory, active, formula):
         raise CohortValidationError("generation manifest counts are stale")
 

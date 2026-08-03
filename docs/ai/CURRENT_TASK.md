@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `b9dc9cd6474ba0cd60ce620f597a99a67c811c7b88b954a76f7f7b6d7794691f`
+  `b78eee7cc868e61928bd12a972e1ca479d236aafb8a4c0edbde29bdda2494a8a`
 - Combined input identity:
-  `9385f328de8f7c6d1c2dc1714286370103601de7d01d0af4e559069099ab4463`
+  `6e478ba16041a2f84c1ad4ab741bf7dd2b6ae6de7287c3fe1dad97c89e18b9e0`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -49,6 +49,10 @@ their generation manifest are one coordinated generated cohort.
   interpreter-internal failures. Large governed JSON inputs initialize only the
   standard library's pure-Python scanner, and every active/formula child parses
   its own fsynced, exact-readback, SHA/length-verified projection copy.
+- Cohort validation binds each JSON parse to the manifest SHA/length, parses
+  each governed artifact once, and retries only `JSONDecodeError` up to three
+  times against the identical verified UTF-8 string. Other failures remain
+  fail-closed without retry.
 - The 2,466,207-byte ItemDb is bound to its frozen auxiliary snapshot SHA/length,
   retained as verified parent bytes, and rematerialized independently for every
   formula round. Integrity mismatches fail closed; only decode failures after a

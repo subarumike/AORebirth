@@ -290,6 +290,65 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 ),
                 expected,
             )
+            transient_decode_error = json.JSONDecodeError(
+                "transient decoder fault", raw, 1
+            )
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=(transient_decode_error, expected),
+            ) as decode:
+                self.assertEqual(
+                    expected,
+                    pipeline.load_json_object(json_path, "retry fixture"),
+                )
+            self.assertEqual([mock.call(raw), mock.call(raw)], decode.call_args_list)
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=(
+                    json.JSONDecodeError("stable invalid JSON", raw, 1)
+                    for _ in range(pipeline.GOVERNED_JSON_READ_MAX_ATTEMPTS)
+                ),
+            ) as decode:
+                with self.assertRaisesRegex(
+                    pipeline.CohortValidationError,
+                    "after 3 stable-input parse attempts",
+                ):
+                    pipeline.load_json_object(json_path, "invalid fixture")
+            self.assertEqual(
+                pipeline.GOVERNED_JSON_READ_MAX_ATTEMPTS, decode.call_count
+            )
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=AssertionError("decoder ran before integrity validation"),
+            ) as decode, self.assertRaisesRegex(
+                pipeline.CohortValidationError, "stale or mixed"
+            ):
+                pipeline.load_json_object(
+                    json_path,
+                    "integrity fixture",
+                    expected_sha256="0" * 64,
+                    expected_byte_length=len(payload),
+                )
+            decode.assert_not_called()
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=SystemError("interpreter fault"),
+            ) as decode, self.assertRaisesRegex(SystemError, "interpreter fault"):
+                pipeline.load_json_object(json_path, "system-error fixture")
+            self.assertEqual(1, decode.call_count)
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                return_value=[],
+            ) as decode, self.assertRaisesRegex(
+                pipeline.CohortValidationError, "one JSON object"
+            ):
+                pipeline.load_json_object(json_path, "non-object fixture")
+            self.assertEqual(1, decode.call_count)
             json_path.write_bytes(payload + b"x")
             with mock.patch.object(
                 formula,
