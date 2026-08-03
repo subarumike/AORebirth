@@ -51,7 +51,7 @@ The starting hashes were recorded before reconciliation. The final hashes are fr
 | `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogFixtures.g.cs` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | Byte-identical |
 | `docs/generated/capture_backed_npc_combat_active_coverage.json` | `89b54335c7407d8cebdf3c4d6e07e2353fe2fcfc870a94e625d304dfcf328254` | `e8088b991e555fe9f46119550db9134f128c06ed27e4790e577fe1016b587078` | Only its inventory-source descriptor changed in the Git diff |
 | `docs/generated/enemy_combat_setup_formula_dataset.json` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | Byte-identical |
-| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `1ddab7ec0392a2405e3c4805259dd3d812cae255c1edda78d94f6c1db52f4d27` | Sixth-file commit marker after final generator hardening |
+| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `e059fc0dde97bb3af91f28289850ee9b1048788612074d37e46041a10b9680dc` | Sixth-file commit marker after final generator hardening |
 
 The catalog, fixtures, and formula data stayed byte-identical. The active-coverage Git diff changes only its recorded inventory SHA-256. No supported runtime C# source was changed for this reconciliation, and the generated runtime catalog stayed byte-identical. Those facts are the boundary for the conclusion that runtime semantics did not change.
 
@@ -59,13 +59,13 @@ The catalog, fixtures, and formula data stayed byte-identical. The active-covera
 
 | Identity | Value |
 | --- | --- |
-| Generation identity | `1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2` |
-| Combined input identity | `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f` |
-| Rendered manifest SHA-256 | `1ddab7ec0392a2405e3c4805259dd3d812cae255c1edda78d94f6c1db52f4d27` |
+| Generation identity | `d9cd2989721ac8274bc600c0fefba850bbb64ffeb4de92ee08352e6b7ae937d5` |
+| Combined input identity | `4fab789dfd1c3dbd8f2f7f8bd432f0ebc46bd10a807b73e87d3ac02033bee701` |
+| Rendered manifest SHA-256 | `e059fc0dde97bb3af91f28289850ee9b1048788612074d37e46041a10b9680dc` |
 | Primary capture snapshot identity | `cf8d193c23263a3797db2dbb25838658f40f826d26a2bf99604b4f6d8dea8056` |
 | Primary capture manifest SHA-256 | `0ba2a6a5a1c02ed0468427f8d5bc20adf403c773b478426b02f6253980030b3d` |
 | Primary capture manifest byte length | `402965` |
-| Auxiliary snapshot identity | `b4f9efe2b90c98fe4fdd155edd84fe9047a72ca50f8025f08c336856224d612c` |
+| Auxiliary snapshot identity | `17bfa86f61c9508eee53e6e88fa8a219c5833895e84e7782bf9ffd6b5fd9aa2f` |
 | Active/formula fixed-point rounds | `3` |
 
 The generation identity covers the path-independent manifest identity payload. The separate manifest-file SHA-256 in the artifact table hashes the rendered sixth file and is not expected to equal the generation identity.
@@ -165,10 +165,18 @@ Completed:
   with an explicit override. CPython 3.14.4 passed the focused suite and a full
   coordinated regeneration; all five runtime-facing artifact hashes remained
   byte-identical while only the manifest runtime/generation identity changed.
+- The next mandatory gate passed the complete 1,037-test AOtomation suite, then
+  its separate Arete wrapper failed before running tests when stdlib `JSONArray`
+  received a string in its integer `end` slot. Because the exact inventory bytes
+  already matched the manifest, the loader now retries only that proven
+  impossible scanner signature (and the previously observed scanner callable
+  signature) when a matching stdlib JSON traceback is present. Arbitrary
+  `TypeError` remains fail-fast. One read lease now spans the complete mandatory
+  gate, eliminating redundant full-corpus parses across its filtered wrappers.
 - Final focused transaction and pipeline suite: **70/70 PASS**.
 - Final coordinated `--write` and `--validate-current`: **PASS**, generation
-  `1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2`, input
-  `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f`, three
+  `d9cd2989721ac8274bc600c0fefba850bbb64ffeb4de92ee08352e6b7ae937d5`, input
+  `4fab789dfd1c3dbd8f2f7f8bd432f0ebc46bd10a807b73e87d3ac02033bee701`, three
   fixed-point rounds. Final clean-commit reproducibility remains delivery-only.
 
 Final delivery-only results are deliberately not embedded in this tracked evidence file:

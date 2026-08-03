@@ -1,6 +1,18 @@
 @echo off
 setlocal EnableExtensions
 
+call "%~dp0select_python_runtime.cmd"
+if errorlevel 1 exit /b 1
+if not "%AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION%"=="" (
+    %AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --_validate-read-delegation
+    if errorlevel 1 exit /b 1
+    goto :generated_combat_read_lease_acquired
+)
+%AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --run-read-lease --read-lease-command-timeout-seconds 14400 -- "%ComSpec%" /d /c "%~f0" %*
+exit /b %errorlevel%
+
+:generated_combat_read_lease_acquired
+
 pushd "%~dp0.." >nul
 if errorlevel 1 (
     echo [AORebirth Gate] FAIL - cannot enter repository root.
@@ -30,8 +42,6 @@ for %%F in (
         goto :fail
     )
 )
-call tools\select_python_runtime.cmd
-if errorlevel 1 goto :fail
 git lfs version >nul 2>nul
 if errorlevel 1 (
     echo [AORebirth Gate] FAIL - Git LFS is unavailable.

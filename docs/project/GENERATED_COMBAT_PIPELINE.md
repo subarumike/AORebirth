@@ -85,6 +85,11 @@ The shared generated-artifact domain uses a bounded multi-reader/single-writer l
 
 Build, AOtomation, mandatory-gate, active-coverage, and formula reads self-route through a read lease. A boolean environment flag is not authority. Forged, missing, stale, cross-checkout, or wrong-mode delegation fails closed.
 
+The mandatory gate holds one read lease across all 13 stages. Nested build and
+AOtomation wrappers validate that live delegation instead of parsing the full
+cohort again. Its supervised command has an explicit four-hour ceiling; normal
+generated children retain the 30-minute process-tree timeout.
+
 Lease and staging state lives below `.git/aorebirth-generated-artifacts`, not beside governed outputs. Cleanup is conservative: only structurally valid state owned by a confirmed-dead process is removed automatically. Live or malformed ownership is retained and reported instead of guessed away. Containment checks reject symlink or reparse-point escapes.
 
 ## Transaction, rollback, and recovery
