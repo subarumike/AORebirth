@@ -1,5 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
+call "%~dp0select_python_runtime.cmd"
+if errorlevel 1 exit /b 1
 
 pushd "%~dp0.." >nul
 if errorlevel 1 (
@@ -40,7 +42,7 @@ if /i not "%~1"=="--skip-web-engine-security" (
     if errorlevel 1 goto Fail
 )
 
-python Tools\tests\test_engine_management_contracts.py
+%AO_REBIRTH_PYTHON% Tools\tests\test_engine_management_contracts.py
 if errorlevel 1 goto Fail
 
 echo [Engine Management Tests] PASS.

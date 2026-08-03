@@ -1,5 +1,7 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
+call "%~dp0select_python_runtime.cmd"
+if errorlevel 1 exit /b 1
 
 set "ROOT=%~dp0.."
 pushd "%ROOT%" >nul
@@ -13,21 +15,21 @@ set "HTTPS_PROXY=http://127.0.0.1:9"
 set "ALL_PROXY=http://127.0.0.1:9"
 set "NO_PROXY="
 
-python Tools\tests\test_webcore_bootstrap_contracts.py
+%AO_REBIRTH_PYTHON% Tools\tests\test_webcore_bootstrap_contracts.py
 if errorlevel 1 (
     echo [WebEngine Security Tests] FAIL: WebCore bootstrap source contract failed.
     popd >nul
     exit /b 1
 )
 
-python -m unittest Tools.tests.test_php_runtime_supply
+%AO_REBIRTH_PYTHON% -m unittest Tools.tests.test_php_runtime_supply
 if errorlevel 1 (
     echo [WebEngine Security Tests] FAIL: PHP runtime supply contract failed.
     popd >nul
     exit /b 1
 )
 
-python -m unittest Tools.tests.test_webcore_php_compatibility
+%AO_REBIRTH_PYTHON% -m unittest Tools.tests.test_webcore_php_compatibility
 if errorlevel 1 (
     echo [WebEngine Security Tests] FAIL: WebCore PHP compatibility contract failed.
     popd >nul

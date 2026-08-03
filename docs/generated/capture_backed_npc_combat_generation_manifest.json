@@ -47,7 +47,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1486
   },
-  "generationIdentity": "3e99136015fb50d47fa9e63732050e09343ecf172b3b6127cd9badd48877b760",
+  "generationIdentity": "1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2",
   "generators": {
     "activeCoverage": {
       "byteLength": 149281,
@@ -101,10 +101,10 @@
   },
   "pipeline": "capture-backed-npc-combat",
   "runtime": {
-    "executableByteLength": 104952,
-    "executableSha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+    "executableByteLength": 106328,
+    "executableSha256": "7ca24f26d6e3f463419ee4f537ddd3acd312c38fe45e678cce08572f26a8bd1a",
     "implementation": "CPython",
-    "version": "3.12.10"
+    "version": "3.14.4"
   },
   "schemaVersion": 1
 }

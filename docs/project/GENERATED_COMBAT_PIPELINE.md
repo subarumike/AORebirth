@@ -67,6 +67,11 @@ legacy `Z_SYNC_FLUSH` slice framing remains accepted.
 
 All children run isolated and unbuffered with Python fault handling enabled. A bounded timeout terminates the complete child process tree and reports the stage label and process identity. Candidate JSON, UTF-8 outputs, descriptors, counts, hashes, identities, and location independence are validated before publication.
 
+Repository-owned generated-combat, acceptance, build, and test wrappers call
+`Tools/select_python_runtime.cmd`. It selects Python 3.14 or newer through the
+Windows launcher and accepts an explicit `AO_REBIRTH_PYTHON` override. The
+selected executable is the runtime recorded in the governed manifest.
+
 ## Concurrency and read consistency
 
 The shared generated-artifact domain uses a bounded multi-reader/single-writer lease:
