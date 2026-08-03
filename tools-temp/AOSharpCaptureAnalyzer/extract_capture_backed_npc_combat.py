@@ -18,6 +18,8 @@ import gc
 import hashlib
 import json
 import os
+import random
+import signal
 import shutil
 import struct
 import subprocess
@@ -30,8 +32,21 @@ from typing import Any, Iterable
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CAPTURE_ROOT = REPO_ROOT / "tools-temp" / "AOSharpLiveCapture" / "bin" / "Debug" / "captures"
-LEGACY_CAPTURE_ROOT = REPO_ROOT / "For Repo"
+PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT = (
+    "AO_REBIRTH_GENERATED_COMBAT_PRIMARY_CAPTURE_REPO_ROOT"
+)
+CAPTURE_REPO_ROOT = Path(
+    os.environ.get(PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT, str(REPO_ROOT))
+).resolve(strict=True)
+CAPTURE_ROOT = (
+    CAPTURE_REPO_ROOT
+    / "tools-temp"
+    / "AOSharpLiveCapture"
+    / "bin"
+    / "Debug"
+    / "captures"
+)
+LEGACY_CAPTURE_ROOT = CAPTURE_REPO_ROOT / "For Repo"
 OUTPUT = REPO_ROOT / "docs" / "generated" / "capture_backed_npc_combat_inventory.json"
 CATALOG_OUTPUT = (
     REPO_ROOT
@@ -53,7 +68,7 @@ FIXTURE_OUTPUT = (
     / "SmokeLounge.AOtomation.Messaging.Tests"
     / "CapturedEnemyCombatProfileCatalogFixtures.g.cs"
 )
-SCFU_ANALYZER = (
+SCFU_ANALYZER_SOURCE = (
     REPO_ROOT
     / "tools-temp"
     / "AOSharpCaptureAnalyzer"
@@ -61,9 +76,31 @@ SCFU_ANALYZER = (
     / "Debug"
     / "AOSharpCaptureAnalyzer.exe"
 )
+SCFU_ANALYZER_OVERRIDE_ENVIRONMENT = (
+    "AO_REBIRTH_GENERATED_COMBAT_PRIMARY_SCFU_ANALYZER"
+)
+SCFU_ANALYZER = Path(
+    os.environ.get(
+        SCFU_ANALYZER_OVERRIDE_ENVIRONMENT,
+        str(SCFU_ANALYZER_SOURCE),
+    )
+).resolve()
 CAPTURE_WORKER_MAX_ATTEMPTS = 3
 AGGREGATE_WORKER_MAX_ATTEMPTS = 3
+CAPTURE_WORKER_TIMEOUT_SECONDS = 600
+AGGREGATE_WORKER_TIMEOUT_SECONDS = 7200
+CHILD_CLEANUP_TIMEOUT_SECONDS = 10
 AGGREGATE_WORKER_SUMMARY_NAME = "aggregate-summary.json"
+AGGREGATE_INPUT_PLAN_NAME = "capture-input-plan.json"
+AGGREGATE_INPUT_SNAPSHOT_NAME = "capture-input-snapshot.json"
+CAPTURE_SNAPSHOT_DIRECTORY_NAME = "capture-shards"
+CAPTURE_SNAPSHOT_SCHEMA_VERSION = 1
+CAPTURE_SNAPSHOT_SOURCE_NAMES = (
+    "capture_info.json",
+    "packets.hex.log",
+    "raw-packets.csv",
+    "scfu-appearance.csv",
+)
 AGGREGATE_WORKER_ARTIFACT_NAMES = {
     "inventory": "capture-backed-npc-combat-inventory.json",
     "catalog": "CapturedEnemyCombatProfileCatalog.g.cs",
@@ -85,6 +122,22 @@ sys.path.insert(0, str(REPO_ROOT / "tools-temp" / "AOSharpLiveCapture"))
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 from decode_npc_lifecycle_capture import load_packet_records  # noqa: E402
 from inventory_aosharp_captures import discover_capture_directories  # noqa: E402
+
+
+class CaptureAggregationInvariantError(RuntimeError):
+    """A deterministic aggregate snapshot or cross-reference invariant failed."""
+
+
+class BoundedChildTimeout(RuntimeError):
+    """A supervised child exceeded its deterministic wall-clock bound."""
+
+
+_SELF_TEST_FAULT_HOOK: Any = None
+
+
+def _invoke_self_test_fault(event: str, context: dict[str, Any]) -> None:
+    if _SELF_TEST_FAULT_HOOK is not None:
+        _SELF_TEST_FAULT_HOOK(event, context)
 
 
 SIMPLE_CHAR = 0x0000C350
@@ -800,7 +853,9 @@ def parse_identity(value: str) -> int | None:
 def load_scfu_projection_rows(
     capture: Path,
     canonical_by_sequence: dict[tuple[str, int], dict[str, Any]],
+    capture_key: str | None = None,
 ) -> tuple[list[dict[str, str]], str, list[dict[str, Any]]]:
+    logical_capture = capture_key or capture.relative_to(CAPTURE_REPO_ROOT).as_posix()
     canonical_scfu = []
     for (direction, sequence), record in sorted(
         canonical_by_sequence.items(),
@@ -882,7 +937,7 @@ def load_scfu_projection_rows(
                 )
             errors = [
                 {
-                    "capture": capture.relative_to(REPO_ROOT).as_posix(),
+                    "capture": logical_capture,
                     "artifact": projection,
                     "sequence": parse_int(first_value(row, "Sequence")),
                     "error": first_value(row, "DecodeError")
@@ -944,9 +999,10 @@ def load_metadata_generations(
     capture_key: str,
     canonical_by_sequence: dict[tuple[str, int], dict[str, Any]],
 ) -> tuple[list[MetadataGeneration], list[dict[str, Any]]]:
+    capture_id = Path(capture_key).name
     generations: list[MetadataGeneration] = []
     rows, projection, errors = load_scfu_projection_rows(
-        capture, canonical_by_sequence
+        capture, canonical_by_sequence, capture_key
     )
     for row_number, row in enumerate(rows, 2):
         if first_value(row, "Direction").upper() != "IN":
@@ -1010,7 +1066,7 @@ def load_metadata_generations(
         generations.append(
             MetadataGeneration(
                 capture=capture_key,
-                capture_id=capture.name,
+                capture_id=capture_id,
                 sequence=sequence,
                 global_ordinal=canonical_record.get("globalOrdinal"),
                 source=source,
@@ -1054,14 +1110,16 @@ def retain_combat_evidence_record(record: dict[str, Any]) -> bool:
 
 def parse_capture(
     capture: Path,
+    capture_key: str | None = None,
 ) -> tuple[list[PacketRecord], list[MetadataGeneration], dict[str, Any], list[dict[str, Any]]]:
-    capture_key = capture.relative_to(REPO_ROOT).as_posix()
+    capture_key = capture_key or capture.relative_to(CAPTURE_REPO_ROOT).as_posix()
+    capture_id = Path(capture_key).name
     raw_records, source_summary = load_packet_records(
         capture, retain_record=retain_combat_evidence_record
     )
     session = {
         "capture": capture_key,
-        "captureId": capture.name,
+        "captureId": capture_id,
         "capabilityStatus": source_summary["capabilityStatus"],
         "canonicalValid": source_summary["canonicalValid"],
         "recaptureRequired": source_summary["recaptureRequired"],
@@ -1131,7 +1189,7 @@ def parse_capture(
             PacketRecord(
                 packet_id=packet_id,
                 capture=capture_key,
-                capture_id=capture.name,
+                capture_id=capture_id,
                 captured_utc=raw_record["timestamp"],
                 direction="IN",
                 sequence=raw_record["sequence"],
@@ -1148,6 +1206,73 @@ def parse_capture(
     return parsed, metadata, session, errors
 
 
+def _portable_capture_session(
+    session: dict[str, Any],
+    capture_source_root: Path | None = None,
+) -> dict[str, Any]:
+    capture_key = session.get("capture")
+    if not isinstance(capture_key, str) or not capture_key:
+        raise RuntimeError("capture session has no canonical logical capture key")
+    result = dict(session)
+    for member_name, source_name in (
+        ("packetLog", "packets.hex.log"),
+        ("rawPacketIndex", "raw-packets.csv"),
+    ):
+        member = result.get(member_name)
+        if member is None:
+            continue
+        if not isinstance(member, dict):
+            raise RuntimeError(f"capture session {member_name} is not an object")
+        portable = dict(member)
+        source_path = portable.get("path")
+        if not isinstance(source_path, str) or not source_path:
+            raise RuntimeError(f"capture session {member_name} path is invalid")
+        unresolved = Path(source_path)
+        _reject_symlink_or_reparse(
+            unresolved,
+            f"capture session {member_name}",
+            include_parent=True,
+        )
+        expected = (Path(capture_key) / source_name).as_posix()
+        if unresolved.name != source_name:
+            raise RuntimeError(
+                f"capture session {member_name} path does not match {expected}"
+            )
+        if capture_source_root is not None:
+            expected_physical = (capture_source_root / source_name).resolve()
+            if unresolved.resolve() != expected_physical:
+                raise RuntimeError(
+                    f"capture session {member_name} path escaped its frozen capture"
+                )
+        portable["path"] = expected
+        result[member_name] = portable
+    return result
+
+
+def _rehydrate_capture_session(
+    session: dict[str, Any], capture_key: str
+) -> dict[str, Any]:
+    result = dict(session)
+    for member_name, source_name in (
+        ("packetLog", "packets.hex.log"),
+        ("rawPacketIndex", "raw-packets.csv"),
+    ):
+        member = result.get(member_name)
+        if member is None:
+            continue
+        if not isinstance(member, dict):
+            raise RuntimeError(f"capture shard {member_name} is not an object")
+        portable = dict(member)
+        expected = (Path(capture_key) / source_name).as_posix()
+        if portable.get("path") != expected:
+            raise RuntimeError(
+                f"capture shard {member_name} path is not canonical"
+            )
+        portable["path"] = str(CAPTURE_REPO_ROOT / Path(expected))
+        result[member_name] = portable
+    return result
+
+
 def _parse_capture_payload(
     result: tuple[
         list[PacketRecord],
@@ -1155,8 +1280,10 @@ def _parse_capture_payload(
         dict[str, Any],
         list[dict[str, Any]],
     ],
+    capture_source_root: Path | None = None,
 ) -> dict[str, Any]:
     records, metadata, session, errors = result
+    portable_session = _portable_capture_session(session, capture_source_root)
     metadata_rows = [
         {
             "capture": value.capture,
@@ -1224,9 +1351,11 @@ def _parse_capture_payload(
             }
         )
     return {
+        "schemaVersion": CAPTURE_SNAPSHOT_SCHEMA_VERSION,
+        "capture": portable_session["capture"],
         "records": record_rows,
         "metadata": metadata_rows,
-        "session": session,
+        "session": portable_session,
         "errors": errors,
     }
 
@@ -1235,6 +1364,9 @@ def _parse_capture_result(
     payload: dict[str, Any],
 ) -> tuple[list[PacketRecord], list[MetadataGeneration], dict[str, Any], list[dict[str, Any]]]:
     try:
+        if payload["schemaVersion"] != CAPTURE_SNAPSHOT_SCHEMA_VERSION:
+            raise ValueError("capture shard schema version is unsupported")
+        capture_key = payload["capture"]
         record_rows = payload["records"]
         metadata_rows = payload["metadata"]
         session = payload["session"]
@@ -1249,6 +1381,11 @@ def _parse_capture_result(
             )
         ):
             raise TypeError("capture shard members have invalid types")
+        if not isinstance(capture_key, str) or not capture_key:
+            raise TypeError("capture shard identity is invalid")
+        if session.get("capture") != capture_key:
+            raise ValueError("capture shard session identity does not match its capture")
+        session = _rehydrate_capture_session(session, capture_key)
         records = []
         for value in record_rows:
             row = dict(value)
@@ -1262,15 +1399,40 @@ def _parse_capture_result(
     return records, metadata, session, errors
 
 
-def _write_parse_capture_worker_shard(capture: Path, shard: Path) -> None:
-    capture = capture.resolve(strict=True)
-    try:
-        capture.relative_to(REPO_ROOT)
-    except ValueError as error:
-        raise RuntimeError(f"capture worker input is outside the repository: {capture}") from error
+@dataclass(frozen=True)
+class CaptureShardSnapshot:
+    capture: str
+    path: Path
+    relative_path: str
+    byte_length: int
+    sha256: str
 
+
+def _write_parse_capture_worker_shard(
+    capture: Path,
+    shard: Path,
+    capture_key: str,
+) -> None:
+    _reject_symlink_or_reparse(
+        capture, "capture worker input", include_parent=True
+    )
+    capture = capture.resolve(strict=True)
+    logical_capture = Path(capture_key)
+    if (
+        not capture_key
+        or logical_capture.is_absolute()
+        or ".." in logical_capture.parts
+        or logical_capture.as_posix() != capture_key
+    ):
+        raise RuntimeError("capture worker logical key is invalid")
+    temporary_root = Path(tempfile.gettempdir()).resolve(strict=True)
+    try:
+        capture.relative_to(temporary_root)
+    except ValueError as error:
+        raise RuntimeError(f"capture worker input is outside temporary staging: {capture}") from error
+
+    _reject_symlink_or_reparse(shard, "capture worker shard", include_parent=True)
     shard = shard.resolve()
-    temporary_root = Path(tempfile.gettempdir()).resolve()
     try:
         shard.relative_to(temporary_root)
     except ValueError as error:
@@ -1282,23 +1444,167 @@ def _write_parse_capture_worker_shard(capture: Path, shard: Path) -> None:
     if shard in {OUTPUT.resolve(), CATALOG_OUTPUT.resolve(), FIXTURE_OUTPUT.resolve()}:
         raise RuntimeError("capture worker cannot write a production generated output")
 
-    shard.write_text(
-        json.dumps(
-            _parse_capture_payload(parse_capture(capture)),
-            ensure_ascii=True,
-            separators=(",", ":"),
-            sort_keys=True,
+    payload = json.dumps(
+        _parse_capture_payload(
+            parse_capture(capture, capture_key),
+            capture,
         ),
-        encoding="utf-8",
-        newline="\n",
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    with shard.open("x", encoding="utf-8", newline="\n") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
+def _path_is_symlink_or_reparse(path: Path) -> bool:
+    if not os.path.lexists(path):
+        return False
+    metadata = os.lstat(path)
+    return bool(
+        path.is_symlink()
+        or getattr(metadata, "st_file_attributes", 0) & 0x400
     )
 
 
+def _reject_symlink_or_reparse(path: Path, label: str, include_parent: bool = False) -> None:
+    candidates = (path, path.parent) if include_parent else (path,)
+    for candidate in candidates:
+        if _path_is_symlink_or_reparse(candidate):
+            raise RuntimeError(f"{label} cannot be a symlink or reparse point: {candidate}")
+
+
+def _generator_script_path() -> Path:
+    script = Path(__file__)
+    if not script.is_absolute():
+        script = REPO_ROOT / script
+    _reject_symlink_or_reparse(
+        script, "capture aggregation generator", include_parent=True
+    )
+    return script.resolve(strict=True)
+
+
+def _remove_owned_directory_tree(
+    owner_root: Path,
+    directory: Path,
+    required_prefix: str,
+) -> None:
+    _reject_symlink_or_reparse(owner_root, "owned temporary root")
+    _reject_symlink_or_reparse(directory, "owned temporary directory")
+    root = owner_root.resolve(strict=True)
+    candidate = directory.resolve(strict=True)
+    if candidate.parent != root or not candidate.name.startswith(required_prefix):
+        raise RuntimeError(f"refusing to remove unowned temporary directory: {candidate}")
+    for current, directories, files in os.walk(candidate, topdown=True, followlinks=False):
+        current_path = Path(current)
+        for name in (*directories, *files):
+            child = current_path / name
+            if _path_is_symlink_or_reparse(child):
+                raise RuntimeError(
+                    f"refusing to remove temporary tree containing a reparse point: {child}"
+                )
+    shutil.rmtree(candidate)
+
+
+def _is_cancellation_child_failure(return_code: int) -> bool:
+    normalized = return_code & 0xFFFFFFFF
+    return normalized == 0xC000013A or return_code in {
+        -signal.SIGINT,
+        -signal.SIGTERM,
+    }
+
+
 def _is_native_child_failure(return_code: int) -> bool:
+    if _is_cancellation_child_failure(return_code):
+        return False
     if return_code < 0:
         return True
     normalized = return_code & 0xFFFFFFFF
     return 0xC0000000 <= normalized <= 0xCFFFFFFF
+
+
+def _terminate_child_process_tree(process: subprocess.Popen[str]) -> None:
+    if process.poll() is not None:
+        return
+    if os.name == "nt":
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=CHILD_CLEANUP_TIMEOUT_SECONDS,
+                check=False,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except (OSError, ProcessLookupError):
+            pass
+    if process.poll() is None:
+        process.kill()
+    try:
+        process.wait(timeout=CHILD_CLEANUP_TIMEOUT_SECONDS)
+    except subprocess.TimeoutExpired as error:
+        raise RuntimeError(
+            f"child process {process.pid} did not terminate after cleanup"
+        ) from error
+
+
+def _run_bounded_child(
+    command: list[str],
+    *,
+    cwd: Path,
+    timeout_seconds: int,
+    label: str,
+    environment: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
+    creationflags = (
+        getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+        if os.name == "nt"
+        else 0
+    )
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        env=environment,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        creationflags=creationflags,
+        start_new_session=os.name != "nt",
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=timeout_seconds)
+    except subprocess.TimeoutExpired as error:
+        _terminate_child_process_tree(process)
+        stdout, stderr = process.communicate()
+        completed = subprocess.CompletedProcess(
+            command,
+            process.returncode if process.returncode is not None else -1,
+            stdout,
+            stderr,
+        )
+        detail = _capture_worker_failure_detail(completed)
+        suffix = f": {detail}" if detail else ""
+        raise BoundedChildTimeout(
+            f"{label} timed out after {timeout_seconds} seconds{suffix}"
+        ) from error
+    except BaseException:
+        _terminate_child_process_tree(process)
+        raise
+    return subprocess.CompletedProcess(
+        command,
+        process.returncode,
+        stdout,
+        stderr,
+    )
 
 
 def _capture_worker_failure_detail(completed: subprocess.CompletedProcess[str]) -> str:
@@ -1308,59 +1614,366 @@ def _capture_worker_failure_detail(completed: subprocess.CompletedProcess[str]) 
     return detail
 
 
-def parse_capture_isolated(
-    capture: Path,
+def _is_interpreter_corruption_detail(detail: str) -> bool:
+    return (
+        "Windows fatal exception: access violation" in detail
+        or "TypeError: 'str_ascii_iterator' object is not callable" in detail
+        or ("SystemError:" in detail and "unknown opcode" in detail)
+        or (
+            "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'"
+            in detail
+        )
+    )
+
+
+def _capture_snapshot_failure(
+    capture: str,
+    path: Path | str,
+    phase: str,
+    snapshot_identity: str,
+    reason: str,
+) -> CaptureAggregationInvariantError:
+    return CaptureAggregationInvariantError(
+        "capture aggregation snapshot invariant failed "
+        f"capture={capture} path={path} phase={phase} "
+        f"snapshot={snapshot_identity}: {reason}"
+    )
+
+
+def _read_capture_snapshot_shard_bytes(
+    snapshot: CaptureShardSnapshot,
+    phase: str,
+    snapshot_identity: str,
+) -> bytes:
+    path = snapshot.path
+    try:
+        _reject_symlink_or_reparse(path, "snapshot shard", include_parent=True)
+        if not path.is_file():
+            raise RuntimeError("snapshot shard is not a regular file")
+        payload = path.read_bytes()
+        actual_length = len(payload)
+        actual_sha256 = hashlib.sha256(payload).hexdigest()
+        if actual_length != snapshot.byte_length or actual_sha256 != snapshot.sha256:
+            raise RuntimeError(
+                "snapshot shard identity changed "
+                f"expectedLength={snapshot.byte_length} actualLength={actual_length} "
+                f"expectedSha256={snapshot.sha256} actualSha256={actual_sha256}"
+            )
+        return payload
+    except (OSError, RuntimeError) as error:
+        raise _capture_snapshot_failure(
+            snapshot.capture,
+            path,
+            phase,
+            snapshot_identity,
+            str(error),
+        ) from error
+
+
+def _verify_capture_snapshot_shard_identity(
+    snapshot: CaptureShardSnapshot,
+    phase: str,
+    snapshot_identity: str,
+) -> None:
+    _read_capture_snapshot_shard_bytes(snapshot, phase, snapshot_identity)
+
+
+def _load_capture_snapshot_shard(
+    snapshot: CaptureShardSnapshot,
+    phase: str,
+    snapshot_identity: str,
 ) -> tuple[list[PacketRecord], list[MetadataGeneration], dict[str, Any], list[dict[str, Any]]]:
+    path = snapshot.path
+    payload_bytes = _read_capture_snapshot_shard_bytes(
+        snapshot, phase, snapshot_identity
+    )
+    try:
+        payload = json.loads(payload_bytes)
+        result = _parse_capture_result(payload)
+        records, metadata, session, _ = result
+        if session.get("capture") != snapshot.capture:
+            raise RuntimeError(
+                "snapshot shard capture identity changed "
+                f"actual={session.get('capture')}"
+            )
+        if any(record.capture != snapshot.capture for record in records):
+            raise RuntimeError("snapshot shard contains a cross-capture packet")
+        if any(generation.capture != snapshot.capture for generation in metadata):
+            raise RuntimeError("snapshot shard contains cross-capture metadata")
+        return result
+    except (OSError, UnicodeError, json.JSONDecodeError, RuntimeError) as error:
+        raise _capture_snapshot_failure(
+            snapshot.capture,
+            path,
+            phase,
+            snapshot_identity,
+            str(error),
+        ) from error
+
+
+def _capture_source_descriptors_by_name(
+    source_entry: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    capture_key = source_entry.get("capture")
+    source_files = source_entry.get("sourceFiles")
+    if not isinstance(capture_key, str) or not isinstance(source_files, list):
+        raise CaptureAggregationInvariantError("capture source entry is malformed")
+    result: dict[str, dict[str, Any]] = {}
+    for descriptor in source_files:
+        if not isinstance(descriptor, dict):
+            raise CaptureAggregationInvariantError("capture source descriptor is malformed")
+        logical_path = descriptor.get("path")
+        if not isinstance(logical_path, str):
+            raise CaptureAggregationInvariantError("capture source path is malformed")
+        relative = Path(logical_path)
+        expected_parent = Path(capture_key)
+        if relative.parent != expected_parent or relative.name not in CAPTURE_SNAPSHOT_SOURCE_NAMES:
+            raise CaptureAggregationInvariantError(
+                f"capture source path is not canonical: {logical_path}"
+            )
+        if relative.name in result:
+            raise CaptureAggregationInvariantError(
+                f"capture source name is duplicated: {relative.name}"
+            )
+        result[relative.name] = descriptor
+    if set(result) != set(CAPTURE_SNAPSHOT_SOURCE_NAMES):
+        raise CaptureAggregationInvariantError("capture source file set is incomplete")
+    return result
+
+
+def _verify_frozen_capture_inputs(
+    frozen_capture: Path,
+    source_entry: dict[str, Any],
+    phase: str,
+    snapshot_identity: str,
+) -> None:
+    descriptors = _capture_source_descriptors_by_name(source_entry)
+    for name in sorted(CAPTURE_SNAPSHOT_SOURCE_NAMES):
+        descriptor = descriptors[name]
+        _verify_snapshot_file_identity(
+            frozen_capture / name,
+            descriptor,
+            str(source_entry["capture"]),
+            phase,
+            snapshot_identity,
+            verify_hash=True,
+        )
+
+
+def _freeze_capture_inputs(
+    snapshot_directory: Path,
+    ordinal: int,
+    source_entry: dict[str, Any],
+    snapshot_identity: str,
+) -> Path:
+    _verify_capture_source_entry(
+        source_entry,
+        "capture-freeze-preflight",
+        snapshot_identity,
+        verify_hash=True,
+    )
+    frozen_capture = Path(tempfile.mkdtemp(
+        prefix=f"frozen-capture-{ordinal:06d}-",
+        dir=snapshot_directory,
+    ))
+    descriptors = _capture_source_descriptors_by_name(source_entry)
+    for name in sorted(CAPTURE_SNAPSHOT_SOURCE_NAMES):
+        descriptor = descriptors[name]
+        if not descriptor["exists"]:
+            continue
+        source = CAPTURE_REPO_ROOT / Path(descriptor["path"])
+        _reject_symlink_or_reparse(source, "capture source", include_parent=True)
+        destination = frozen_capture / name
+        with source.open("rb") as reader, destination.open("xb") as writer:
+            shutil.copyfileobj(reader, writer, 1024 * 1024)
+            writer.flush()
+            os.fsync(writer.fileno())
+        copied = _snapshot_file_identity(destination, descriptor["path"])
+        if copied != descriptor:
+            raise _capture_snapshot_failure(
+                str(source_entry["capture"]),
+                descriptor["path"],
+                "capture-freeze-copy",
+                snapshot_identity,
+                "frozen input copy does not match the initial plan",
+            )
+    _verify_frozen_capture_inputs(
+        frozen_capture,
+        source_entry,
+        "capture-freeze-complete",
+        snapshot_identity,
+    )
+    _invoke_self_test_fault(
+        "after_capture_freeze",
+        {
+            "capture": source_entry["capture"],
+            "directory": str(frozen_capture),
+        },
+    )
+    return frozen_capture
+
+
+def parse_capture_isolated_to_snapshot(
+    capture: Path,
+    snapshot_directory: Path,
+    ordinal: int,
+    source_entry: dict[str, Any],
+    snapshot_identity: str,
+) -> CaptureShardSnapshot:
+    _reject_symlink_or_reparse(
+        capture, "capture source directory", include_parent=True
+    )
     capture = capture.resolve(strict=True)
-    with tempfile.TemporaryDirectory(
-        prefix="aorebirth-npc-combat-capture-worker-"
-    ) as staging_name:
-        shard = Path(staging_name) / "capture-result.json"
+    capture_key = capture.relative_to(CAPTURE_REPO_ROOT).as_posix()
+    if source_entry.get("capture") != capture_key:
+        raise _capture_snapshot_failure(
+            capture_key,
+            capture,
+            "capture-worker-prepare",
+            snapshot_identity,
+            "logical capture key does not match the source plan",
+        )
+    _reject_symlink_or_reparse(
+        snapshot_directory, "capture snapshot directory"
+    )
+    snapshot_directory = snapshot_directory.resolve(strict=True)
+    final_shard = snapshot_directory / f"capture-{ordinal:06d}.json"
+    if os.path.lexists(final_shard):
+        raise _capture_snapshot_failure(
+            capture_key,
+            final_shard,
+            "capture-worker-prepare",
+            snapshot_identity,
+            "immutable snapshot shard target already exists",
+        )
+    frozen_capture = _freeze_capture_inputs(
+        snapshot_directory,
+        ordinal,
+        source_entry,
+        snapshot_identity,
+    )
+    for attempt in range(1, CAPTURE_WORKER_MAX_ATTEMPTS + 1):
+        _verify_frozen_capture_inputs(
+            frozen_capture,
+            source_entry,
+            f"capture-worker-attempt-{attempt}-preflight",
+            snapshot_identity,
+        )
+        shard = snapshot_directory / (
+            f"capture-{ordinal:06d}.attempt-{attempt}.json"
+        )
+        if os.path.lexists(shard):
+            _reject_symlink_or_reparse(shard, "capture worker shard")
+            shard.unlink()
         command = [
             sys.executable,
             "-I",
             "-X",
             "faulthandler",
-            str(Path(__file__).resolve()),
+            str(_generator_script_path()),
             "--_parse-capture-worker",
-            str(capture),
+            str(frozen_capture),
+            "--_parse-capture-key",
+            capture_key,
             "--_parse-capture-shard",
             str(shard),
         ]
-        for attempt in range(1, CAPTURE_WORKER_MAX_ATTEMPTS + 1):
-            shard.unlink(missing_ok=True)
-            completed = subprocess.run(
+        _invoke_self_test_fault(
+            "before_capture_worker_attempt",
+            {"capture": capture_key, "attempt": attempt},
+        )
+        try:
+            completed = _run_bounded_child(
                 command,
                 cwd=REPO_ROOT,
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                check=False,
+                timeout_seconds=CAPTURE_WORKER_TIMEOUT_SECONDS,
+                label=f"capture worker {capture_key} attempt {attempt}",
             )
-            if completed.returncode == 0:
-                if not shard.is_file():
-                    if attempt < CAPTURE_WORKER_MAX_ATTEMPTS:
-                        continue
-                    raise RuntimeError("capture worker succeeded without writing its shard")
-                try:
-                    payload = json.loads(shard.read_text(encoding="utf-8"))
-                    return _parse_capture_result(payload)
-                except (OSError, json.JSONDecodeError, RuntimeError) as error:
-                    if attempt < CAPTURE_WORKER_MAX_ATTEMPTS:
-                        continue
-                    raise RuntimeError(f"invalid capture worker JSON: {error}") from error
+        except BoundedChildTimeout as error:
+            raise _capture_snapshot_failure(
+                capture_key,
+                shard,
+                f"capture-worker-attempt-{attempt}",
+                snapshot_identity,
+                str(error),
+            ) from error
+        if completed.returncode == 0:
+            if not shard.is_file():
+                raise _capture_snapshot_failure(
+                    capture_key,
+                    shard,
+                    "capture-worker-result",
+                    snapshot_identity,
+                    "capture worker succeeded without writing its shard",
+                )
+            sha256, byte_length = _stream_file_sha256_and_length(shard)
+            candidate = CaptureShardSnapshot(
+                capture=capture_key,
+                path=shard,
+                relative_path=(
+                    f"{CAPTURE_SNAPSHOT_DIRECTORY_NAME}/capture-{ordinal:06d}.json"
+                ),
+                byte_length=byte_length,
+                sha256=sha256,
+            )
+            _load_capture_snapshot_shard(
+                candidate,
+                "capture-worker-result",
+                snapshot_identity,
+            )
+            _verify_frozen_capture_inputs(
+                frozen_capture,
+                source_entry,
+                "capture-worker-result-frozen-input",
+                snapshot_identity,
+            )
+            _verify_capture_source_entry(
+                source_entry,
+                "capture-worker-postflight",
+                snapshot_identity,
+                verify_hash=True,
+            )
+            os.replace(shard, final_shard)
+            result = CaptureShardSnapshot(
+                capture=capture_key,
+                path=final_shard,
+                relative_path=candidate.relative_path,
+                byte_length=byte_length,
+                sha256=sha256,
+            )
+            _invoke_self_test_fault(
+                "before_frozen_capture_cleanup",
+                {"capture": capture_key, "directory": str(frozen_capture)},
+            )
+            _remove_owned_directory_tree(
+                snapshot_directory,
+                frozen_capture,
+                f"frozen-capture-{ordinal:06d}-",
+            )
+            return result
 
-            native_failure = _is_native_child_failure(completed.returncode)
-            if attempt < CAPTURE_WORKER_MAX_ATTEMPTS:
-                continue
-            kind = "native capture worker" if native_failure else "capture worker"
-            detail = _capture_worker_failure_detail(completed)
-            suffix = f": {detail}" if detail else ""
-            raise RuntimeError(
-                f"{kind} failed with exit code {completed.returncode} "
-                f"on attempt {attempt}/{CAPTURE_WORKER_MAX_ATTEMPTS}{suffix}"
-            )
+        detail = _capture_worker_failure_detail(completed)
+        cancelled = _is_cancellation_child_failure(completed.returncode)
+        retryable = not cancelled and (_is_native_child_failure(
+            completed.returncode
+        ) or _is_interpreter_corruption_detail(detail))
+        if retryable and attempt < CAPTURE_WORKER_MAX_ATTEMPTS:
+            continue
+        if cancelled:
+            kind = "cancelled capture worker"
+        elif retryable:
+            kind = "native capture worker"
+        else:
+            kind = "deterministic capture worker"
+        suffix = f": {detail}" if detail else ""
+        raise _capture_snapshot_failure(
+            capture_key,
+            shard,
+            f"capture-worker-attempt-{attempt}",
+            snapshot_identity,
+            f"{kind} failed with exit code {completed.returncode} "
+            f"on attempt {attempt}/{CAPTURE_WORKER_MAX_ATTEMPTS}{suffix}",
+        )
     raise AssertionError("capture worker retry loop exited unexpectedly")
 
 
@@ -2971,6 +3584,25 @@ def variant_packet_references(variant: dict[str, Any]) -> set[str]:
     return packet_ids
 
 
+def _metadata_generation_index_for_packet(
+    record: PacketRecord,
+    metadata_index_by_key: dict[str, int],
+    snapshot_identity: str,
+    phase: str,
+) -> int | None:
+    if record.metadata is None:
+        return None
+    generation_key = record.metadata.generation_key
+    if generation_key not in metadata_index_by_key:
+        raise CaptureAggregationInvariantError(
+            "capture aggregation metadata invariant failed "
+            f"missingGenerationKey={generation_key} "
+            f"owningPacket={record.packet_id} owningSession={record.capture} "
+            f"snapshot={snapshot_identity} phase={phase}"
+        )
+    return metadata_index_by_key[generation_key]
+
+
 def compact_packet_evidence(
     profiles: list[dict[str, Any]],
     lifecycle_records: list[PacketRecord],
@@ -2978,6 +3610,8 @@ def compact_packet_evidence(
     packet_by_id: dict[str, PacketRecord],
     sessions: list[dict[str, Any]],
     metadata_generations: list[dict[str, Any]],
+    snapshot_identity: str = "self-test",
+    phase: str = "packet-evidence-compaction",
 ) -> dict[str, Any]:
     groups_by_id: dict[str, dict[str, Any]] = {}
     memberships_by_packet_id: dict[str, set[str]] = defaultdict(set)
@@ -3131,10 +3765,11 @@ def compact_packet_evidence(
             group_index_by_id[group_id]
             for group_id in member_group_ids
         )
-        metadata_index = (
-            metadata_index_by_key[record.metadata.generation_key]
-            if record.metadata is not None
-            else None
+        metadata_index = _metadata_generation_index_for_packet(
+            record,
+            metadata_index_by_key,
+            snapshot_identity,
+            phase,
         )
         row = [
             session_index_by_capture[record.capture],
@@ -3454,31 +4089,493 @@ def _referenced_packet_ids(
             _referenced_packet_ids(member, available_packet_ids, result)
 
 
-def build_inventory() -> dict[str, Any]:
+def _discover_combat_capture_paths() -> list[Path]:
     captures = set(discover_capture_directories(CAPTURE_ROOT))
     if LEGACY_CAPTURE_ROOT.exists():
         captures.update(
             packet_log.parent
             for packet_log in LEGACY_CAPTURE_ROOT.rglob("packets.hex.log")
         )
-    captures = sorted(
+    return sorted(
         captures,
-        key=lambda path: path.relative_to(REPO_ROOT).as_posix(),
+        key=lambda path: path.relative_to(CAPTURE_REPO_ROOT).as_posix(),
     )
+
+
+def _snapshot_file_identity(path: Path, display_path: str) -> dict[str, Any]:
+    _reject_symlink_or_reparse(path, "snapshot source", include_parent=True)
+    path = path.resolve()
+    if not path.exists():
+        return {
+            "path": display_path,
+            "exists": False,
+        }
+    if not path.is_file() or path.is_symlink():
+        raise CaptureAggregationInvariantError(
+            f"snapshot source is not a regular file: {display_path}"
+        )
+    before = path.stat()
+    sha256, byte_length = _stream_file_sha256_and_length(path)
+    after = path.stat()
+    before_identity = (
+        before.st_size,
+        before.st_mtime_ns,
+        getattr(before, "st_ino", 0),
+    )
+    after_identity = (
+        after.st_size,
+        after.st_mtime_ns,
+        getattr(after, "st_ino", 0),
+    )
+    if before_identity != after_identity or byte_length != after.st_size:
+        raise CaptureAggregationInvariantError(
+            f"snapshot source changed while hashing: {display_path}"
+        )
+    return {
+        "path": display_path,
+        "exists": True,
+        "byteLength": byte_length,
+        "sha256": sha256,
+    }
+
+
+def _snapshot_file_descriptor(
+    path: Path, logical_root: Path = REPO_ROOT
+) -> dict[str, Any]:
+    _reject_symlink_or_reparse(path, "snapshot source", include_parent=True)
+    path = path.resolve()
+    relative_path = path.relative_to(logical_root).as_posix()
+    return _snapshot_file_identity(path, relative_path)
+
+
+def _verify_snapshot_file_identity(
+    path: Path,
+    expected: dict[str, Any],
+    capture: str,
+    phase: str,
+    snapshot_identity: str,
+    verify_hash: bool = False,
+) -> None:
+    _reject_symlink_or_reparse(path, "snapshot source", include_parent=True)
+    path = path.resolve()
+    display_path = str(expected.get("path"))
+    try:
+        if not path.exists():
+            actual = {
+                "path": display_path,
+                "exists": False,
+            }
+        else:
+            if not path.is_file() or path.is_symlink():
+                raise RuntimeError("source is not a regular file")
+            if verify_hash:
+                actual = _snapshot_file_identity(path, display_path)
+            else:
+                stat = path.stat()
+                actual = {
+                    "path": display_path,
+                    "exists": True,
+                    "byteLength": stat.st_size,
+                    "sha256": expected.get("sha256"),
+                }
+    except (OSError, RuntimeError) as error:
+        raise _capture_snapshot_failure(
+            capture,
+            display_path,
+            phase,
+            snapshot_identity,
+            f"could not revalidate input source: {error}",
+        ) from error
+    if actual != expected:
+        raise _capture_snapshot_failure(
+            capture,
+            display_path,
+            phase,
+            snapshot_identity,
+            "live input source identity changed",
+        )
+
+
+def _capture_source_entry(capture: Path) -> dict[str, Any]:
+    _reject_symlink_or_reparse(
+        capture, "capture source directory", include_parent=True
+    )
+    capture = capture.resolve()
+    capture_key = capture.relative_to(CAPTURE_REPO_ROOT).as_posix()
+    return {
+        "capture": capture_key,
+        "sourceFiles": [
+            _snapshot_file_descriptor(capture / name, CAPTURE_REPO_ROOT)
+            for name in sorted(CAPTURE_SNAPSHOT_SOURCE_NAMES)
+        ],
+    }
+
+
+def _generator_source_descriptors() -> list[dict[str, Any]]:
+    generator_script = Path(__file__)
+    if not generator_script.is_absolute():
+        generator_script = REPO_ROOT / generator_script
+    paths = {
+        generator_script,
+        REPO_ROOT / "Tools" / "inventory_aosharp_captures.py",
+        REPO_ROOT
+        / "tools-temp"
+        / "AOSharpLiveCapture"
+        / "decode_npc_lifecycle_capture.py",
+        SCFU_ANALYZER_SOURCE,
+    }
+    paths.update(
+        REPO_ROOT / provenance["runtimeBindingSource"]
+        for provenance in RESOURCE_MAPPING_PROVENANCE.values()
+    )
+    return [
+        _snapshot_file_descriptor(path)
+        for path in sorted(paths, key=lambda value: value.relative_to(REPO_ROOT).as_posix())
+    ]
+
+
+def _stage_short_scfu_analyzer(staging_root: Path) -> Path:
+    _reject_symlink_or_reparse(
+        SCFU_ANALYZER_SOURCE.parent,
+        "frozen SCFU analyzer directory",
+        include_parent=True,
+    )
+    staging_root = staging_root.resolve(strict=True)
+    destination_root = staging_root / "a"
+    destination_root.mkdir()
+    source_root = SCFU_ANALYZER_SOURCE.parent.resolve(strict=True)
+    copied = 0
+    for source in sorted(source_root.rglob("*"), key=lambda path: path.as_posix()):
+        _reject_symlink_or_reparse(source, "frozen SCFU analyzer member")
+        if source.is_dir():
+            continue
+        if not source.is_file():
+            raise RuntimeError(f"frozen SCFU analyzer member is not regular: {source}")
+        relative = source.relative_to(source_root)
+        destination = destination_root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with source.open("rb") as reader, destination.open("xb") as writer:
+            shutil.copyfileobj(reader, writer, 1024 * 1024)
+            writer.flush()
+            os.fsync(writer.fileno())
+        if _stream_file_sha256_and_length(destination) != (
+            _stream_file_sha256_and_length(source)
+        ):
+            raise RuntimeError(f"short SCFU analyzer snapshot changed: {relative}")
+        copied += 1
+    executable = destination_root / SCFU_ANALYZER_SOURCE.name
+    if copied == 0 or not executable.is_file():
+        raise RuntimeError("short SCFU analyzer snapshot is incomplete")
+    return executable
+
+
+def _build_capture_source_plan(
+    captures: Iterable[Path] | None = None,
+) -> dict[str, Any]:
+    capture_paths = list(
+        captures if captures is not None else _discover_combat_capture_paths()
+    )
+    for capture_path in capture_paths:
+        _reject_symlink_or_reparse(
+            capture_path, "capture source directory", include_parent=True
+        )
+    capture_paths.sort(
+        key=lambda path: path.resolve().relative_to(CAPTURE_REPO_ROOT).as_posix()
+    )
+    capture_entries = [_capture_source_entry(path) for path in capture_paths]
+    core = {
+        "schemaVersion": CAPTURE_SNAPSHOT_SCHEMA_VERSION,
+        "generatorSources": _generator_source_descriptors(),
+        "captures": capture_entries,
+    }
+    return {
+        **core,
+        "planIdentity": sha256_canonical(core),
+    }
+
+
+def _validate_capture_source_plan(plan: dict[str, Any]) -> None:
+    if plan.get("schemaVersion") != CAPTURE_SNAPSHOT_SCHEMA_VERSION:
+        raise CaptureAggregationInvariantError("capture input plan schema is invalid")
+    captures = plan.get("captures")
+    generator_sources = plan.get("generatorSources")
+    if not isinstance(captures, list) or not isinstance(generator_sources, list):
+        raise CaptureAggregationInvariantError("capture input plan members are invalid")
+    capture_keys = [entry.get("capture") for entry in captures]
+    if not all(isinstance(value, str) and value for value in capture_keys):
+        raise CaptureAggregationInvariantError(
+            "capture input plan contains an invalid capture path"
+        )
+    if capture_keys != sorted(capture_keys) or len(capture_keys) != len(set(capture_keys)):
+        raise CaptureAggregationInvariantError(
+            "capture input plan capture list is not sorted and unique"
+        )
+    generator_paths = [entry.get("path") for entry in generator_sources]
+    if not all(isinstance(value, str) and value for value in generator_paths):
+        raise CaptureAggregationInvariantError(
+            "capture input plan contains an invalid generator source path"
+        )
+    if generator_paths != sorted(generator_paths):
+        raise CaptureAggregationInvariantError(
+            "capture input plan generator sources are not sorted"
+        )
+    for entry in captures:
+        capture_path = Path(entry["capture"])
+        if capture_path.is_absolute() or ".." in capture_path.parts:
+            raise CaptureAggregationInvariantError(
+                f"capture input plan path is unsafe: {entry['capture']}"
+            )
+        source_files = entry.get("sourceFiles")
+        if not isinstance(source_files, list):
+            raise CaptureAggregationInvariantError(
+                f"capture input plan source list is invalid: {entry.get('capture')}"
+            )
+        source_paths = [source.get("path") for source in source_files]
+        if source_paths != sorted(source_paths):
+            raise CaptureAggregationInvariantError(
+                f"capture input plan sources are not sorted: {entry.get('capture')}"
+            )
+    for descriptor in [
+        *generator_sources,
+        *(source for entry in captures for source in entry["sourceFiles"]),
+    ]:
+        if not isinstance(descriptor, dict):
+            raise CaptureAggregationInvariantError(
+                "capture input plan contains a non-object source descriptor"
+            )
+        expected_keys = (
+            {"path", "exists", "byteLength", "sha256"}
+            if descriptor.get("exists") is True
+            else {"path", "exists"}
+        )
+        if set(descriptor) != expected_keys:
+            raise CaptureAggregationInvariantError(
+                f"capture input source descriptor is malformed: {descriptor.get('path')}"
+            )
+        descriptor_path = Path(str(descriptor.get("path")))
+        if descriptor_path.is_absolute() or ".." in descriptor_path.parts:
+            raise CaptureAggregationInvariantError(
+                f"capture input source descriptor path is unsafe: {descriptor.get('path')}"
+            )
+        if descriptor.get("exists") is True:
+            if (
+                type(descriptor["byteLength"]) is not int
+                or descriptor["byteLength"] < 0
+                or not valid_sha256(descriptor["sha256"])
+            ):
+                raise CaptureAggregationInvariantError(
+                    f"capture input source descriptor identity is invalid: {descriptor['path']}"
+                )
+    core = {
+        "schemaVersion": plan["schemaVersion"],
+        "generatorSources": generator_sources,
+        "captures": captures,
+    }
+    expected_identity = sha256_canonical(core)
+    if plan.get("planIdentity") != expected_identity:
+        raise CaptureAggregationInvariantError(
+            "capture input plan identity does not match its content"
+        )
+
+
+def _verify_capture_source_entry(
+    expected: dict[str, Any],
+    phase: str,
+    snapshot_identity: str,
+    verify_hash: bool = False,
+) -> None:
+    capture_key = str(expected.get("capture"))
+    capture_path = CAPTURE_REPO_ROOT / Path(capture_key)
+    _reject_symlink_or_reparse(
+        capture_path, "capture source directory", include_parent=True
+    )
+    capture_path = capture_path.resolve()
+    expected_paths = [
+        (Path(capture_key) / name).as_posix()
+        for name in sorted(CAPTURE_SNAPSHOT_SOURCE_NAMES)
+    ]
+    source_files = expected.get("sourceFiles", [])
+    if [entry.get("path") for entry in source_files] != expected_paths:
+        raise _capture_snapshot_failure(
+            capture_key,
+            capture_path,
+            phase,
+            snapshot_identity,
+            "capture source manifest paths are invalid",
+        )
+    for source in source_files:
+        _verify_snapshot_file_identity(
+            CAPTURE_REPO_ROOT / Path(source["path"]),
+            source,
+            capture_key,
+            phase,
+            snapshot_identity,
+            verify_hash=verify_hash,
+        )
+
+
+def _verify_capture_source_plan(
+    plan: dict[str, Any],
+    phase: str,
+    snapshot_identity: str,
+    verify_hash: bool = False,
+) -> None:
+    _validate_capture_source_plan(plan)
+    expected_captures = [entry["capture"] for entry in plan["captures"]]
+    actual_captures = [
+        path.relative_to(CAPTURE_REPO_ROOT).as_posix()
+        for path in _discover_combat_capture_paths()
+    ]
+    if actual_captures != expected_captures:
+        changed_capture = next(
+            (
+                capture
+                for capture in sorted(set(actual_captures) | set(expected_captures))
+                if (capture in actual_captures) != (capture in expected_captures)
+            ),
+            "<capture-discovery>",
+        )
+        raise _capture_snapshot_failure(
+            changed_capture,
+            changed_capture,
+            phase,
+            snapshot_identity,
+            "live capture discovery changed",
+        )
+    for source in plan["generatorSources"]:
+        _verify_snapshot_file_identity(
+            REPO_ROOT / Path(source["path"]),
+            source,
+            "<generator>",
+            phase,
+            snapshot_identity,
+            verify_hash=verify_hash,
+        )
+    for entry in plan["captures"]:
+        _verify_capture_source_entry(
+            entry,
+            phase,
+            snapshot_identity,
+            verify_hash=verify_hash,
+        )
+
+
+def _capture_session_snapshot_state(session: dict[str, Any]) -> dict[str, Any]:
+    keys = (
+        "capabilityStatus",
+        "canonicalValid",
+        "recaptureRequired",
+        "captureComplete",
+        "positiveEvidenceOnly",
+        "absenceInferenceAllowed",
+        "canonicalPackets",
+        "conflictCount",
+    )
+    return {
+        "disposition": "accepted" if session.get("canonicalValid") else "quarantined",
+        **{key: session.get(key) for key in keys},
+    }
+
+
+def _build_input_snapshot_document(
+    plan: dict[str, Any],
+    snapshots: Iterable[CaptureShardSnapshot],
+    sessions_by_capture: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    source_by_capture = {
+        entry["capture"]: entry["sourceFiles"] for entry in plan["captures"]
+    }
+    capture_entries = []
+    for snapshot in sorted(snapshots, key=lambda value: value.capture):
+        session = sessions_by_capture[snapshot.capture]
+        capture_entries.append(
+            {
+                "capture": snapshot.capture,
+                "captureId": session.get("captureId"),
+                "sourceFiles": source_by_capture[snapshot.capture],
+                "sessionState": _capture_session_snapshot_state(session),
+                "shard": {
+                    "path": snapshot.relative_path,
+                    "byteLength": snapshot.byte_length,
+                    "sha256": snapshot.sha256,
+                },
+            }
+        )
+    core = {
+        "schemaVersion": CAPTURE_SNAPSHOT_SCHEMA_VERSION,
+        "planIdentity": plan["planIdentity"],
+        "generatorSources": plan["generatorSources"],
+        "captures": capture_entries,
+    }
+    return {
+        **core,
+        "snapshotIdentity": sha256_canonical(core),
+    }
+
+
+def _input_snapshot_bytes(document: dict[str, Any]) -> bytes:
+    return (canonical(document) + "\n").encode("utf-8")
+
+
+def build_inventory(
+    snapshot_directory: Path,
+    source_plan: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    _validate_capture_source_plan(source_plan)
+    plan_identity = source_plan["planIdentity"]
+    captures = [
+        CAPTURE_REPO_ROOT / Path(entry["capture"])
+        for entry in source_plan["captures"]
+    ]
+    snapshot_directory.mkdir()
+    snapshots = []
+    for ordinal, (capture, source_entry) in enumerate(
+        zip(captures, source_plan["captures"])
+    ):
+        snapshots.append(
+            parse_capture_isolated_to_snapshot(
+                capture,
+                snapshot_directory,
+                ordinal,
+                source_entry,
+                plan_identity,
+            )
+        )
     all_metadata: list[MetadataGeneration] = []
     sessions = []
     decode_errors = []
-    for capture in captures:
+    sessions_by_capture: dict[str, dict[str, Any]] = {}
+    for snapshot in snapshots:
         try:
-            _, metadata, session, errors = parse_capture_isolated(capture)
+            _, metadata, session, errors = _load_capture_snapshot_shard(
+                snapshot,
+                "metadata-index",
+                plan_identity,
+            )
         except Exception as error:
-            relative_capture = capture.relative_to(REPO_ROOT).as_posix()
             raise RuntimeError(
-                f"capture parsing failed for {relative_capture}: {error}"
+                f"capture parsing failed for {snapshot.capture}: {error}"
             ) from error
+        portable_session = _portable_capture_session(
+            session,
+            CAPTURE_REPO_ROOT / Path(snapshot.capture),
+        )
         all_metadata.extend(metadata)
-        sessions.append(session)
+        sessions.append(portable_session)
+        sessions_by_capture[snapshot.capture] = portable_session
         decode_errors.extend(errors)
+
+    snapshot_document = _build_input_snapshot_document(
+        source_plan,
+        snapshots,
+        sessions_by_capture,
+    )
+    snapshot_identity = snapshot_document["snapshotIdentity"]
+    _verify_capture_source_plan(
+        source_plan,
+        "post-metadata-index",
+        snapshot_identity,
+    )
 
     corpus_metadata: dict[int, list[MetadataGeneration]] = defaultdict(list)
     for generation in all_metadata:
@@ -3490,13 +4587,16 @@ def build_inventory() -> dict[str, Any]:
     lifecycle_records: list[PacketRecord] = []
     packet_by_id: dict[str, PacketRecord] = {}
     relevant_npc_packets_decoded = 0
-    for capture in captures:
+    for snapshot in snapshots:
         try:
-            records, metadata, _, _ = parse_capture_isolated(capture)
+            records, metadata, _, _ = _load_capture_snapshot_shard(
+                snapshot,
+                "correlation",
+                snapshot_identity,
+            )
         except Exception as error:
-            relative_capture = capture.relative_to(REPO_ROOT).as_posix()
             raise RuntimeError(
-                f"capture correlation failed for {relative_capture}: {error}"
+                f"capture correlation failed for {snapshot.capture}: {error}"
             ) from error
 
         local_metadata: dict[tuple[str, int], list[MetadataGeneration]] = defaultdict(
@@ -3598,6 +4698,8 @@ def build_inventory() -> dict[str, Any]:
         packet_by_id,
         sorted_sessions,
         public_metadata_generations,
+        snapshot_identity,
+        "packet-evidence-compaction",
     )
     certified_profiles = [row for row in profiles if row["status"] == "capture-certified"]
     runtime_ready_profiles = [
@@ -3619,7 +4721,7 @@ def build_inventory() -> dict[str, Any]:
     complete_chain_exclusion_audit, recoverable_evidence_blockers = (
         audit_uncertified_complete_chains(profiles)
     )
-    return {
+    inventory = {
         "schemaVersion": 3,
         "generator": "tools-temp/AOSharpCaptureAnalyzer/extract_capture_backed_npc_combat.py",
         "authoritativeInputs": [
@@ -3687,6 +4789,12 @@ def build_inventory() -> dict[str, Any]:
         "profiles": profiles,
         **compact_evidence,
     }
+    _verify_capture_source_plan(
+        source_plan,
+        "inventory-return",
+        snapshot_identity,
+    )
+    return inventory, snapshot_document
 
 
 def canonical_json(value: dict[str, Any]) -> str:
@@ -4094,7 +5202,11 @@ def validate_inventory(inventory: dict[str, Any]) -> None:
             raise ValueError(
                 f"captured realm {captured_realm}: empty runtime mapping provenance"
             )
-        source_path = (REPO_ROOT / binding_source).resolve()
+        source_path = REPO_ROOT / binding_source
+        _reject_symlink_or_reparse(
+            source_path, "runtime binding source", include_parent=True
+        )
+        source_path = source_path.resolve()
         try:
             source_path.relative_to(REPO_ROOT)
         except ValueError as error:
@@ -4974,6 +6086,8 @@ class AggregateWorkerResult:
     directory: Path
     summary: dict[str, int]
     artifacts: dict[str, dict[str, Any]]
+    input_snapshot: dict[str, Any]
+    plan_identity: str
 
 
 def _stream_file_sha256_and_length(path: Path) -> tuple[str, int]:
@@ -4989,7 +6103,250 @@ def _stream_file_sha256_and_length(path: Path) -> tuple[str, int]:
     return checksum.hexdigest(), length
 
 
+def _validate_temporary_path(
+    path: Path,
+    label: str,
+    must_exist: bool,
+) -> Path:
+    _reject_symlink_or_reparse(path, label, include_parent=True)
+    path = path.resolve()
+    temporary_root = Path(tempfile.gettempdir()).resolve(strict=True)
+    try:
+        relative = path.relative_to(temporary_root)
+    except ValueError as error:
+        raise RuntimeError(f"{label} must stay under {temporary_root}") from error
+    if not relative.parts:
+        raise RuntimeError(f"{label} cannot target the temporary root")
+    if not path.parent.is_dir():
+        raise RuntimeError(f"{label} parent is not a regular directory: {path.parent}")
+    if must_exist:
+        if not path.is_file():
+            raise RuntimeError(f"{label} is not a regular file: {path}")
+    elif path.exists() and not path.is_file():
+        raise RuntimeError(f"{label} target is not a regular file: {path}")
+    return path
+
+
+def _write_deterministic_temporary_file(
+    path: Path,
+    payload: bytes,
+    label: str,
+) -> None:
+    path = _validate_temporary_path(path, label, must_exist=False)
+    temporary_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb",
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            dir=path.parent,
+            delete=False,
+        ) as handle:
+            temporary_path = Path(handle.name)
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary_path, path)
+        temporary_path = None
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+
+
+def _load_capture_source_plan(path: Path) -> dict[str, Any]:
+    path = _validate_temporary_path(
+        path,
+        "aggregate input snapshot plan",
+        must_exist=True,
+    )
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            plan = json.load(handle)
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"aggregate input snapshot plan is malformed: {error}") from error
+    if not isinstance(plan, dict):
+        raise RuntimeError("aggregate input snapshot plan is not an object")
+    _validate_capture_source_plan(plan)
+    return plan
+
+
+def _snapshot_plan_from_document(document: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schemaVersion": document["schemaVersion"],
+        "generatorSources": document["generatorSources"],
+        "captures": [
+            {
+                "capture": entry["capture"],
+                "sourceFiles": entry["sourceFiles"],
+            }
+            for entry in document["captures"]
+        ],
+        "planIdentity": document["planIdentity"],
+    }
+
+
+def _validate_input_snapshot_document(
+    document: dict[str, Any],
+    snapshot_root: Path,
+    phase: str,
+    validate_shards: bool = True,
+    parse_shards: bool = False,
+) -> tuple[dict[str, Any], list[CaptureShardSnapshot]]:
+    required_keys = {
+        "schemaVersion",
+        "planIdentity",
+        "snapshotIdentity",
+        "generatorSources",
+        "captures",
+    }
+    if not isinstance(document, dict) or set(document) != required_keys:
+        raise RuntimeError("capture input snapshot schema members are invalid")
+    if document["schemaVersion"] != CAPTURE_SNAPSHOT_SCHEMA_VERSION:
+        raise RuntimeError("capture input snapshot schema version is invalid")
+    captures = document["captures"]
+    if not isinstance(captures, list):
+        raise RuntimeError("capture input snapshot captures are invalid")
+    if not all(isinstance(entry, dict) for entry in captures):
+        raise RuntimeError("capture input snapshot contains a non-object capture")
+    capture_keys = [entry.get("capture") for entry in captures]
+    if capture_keys != sorted(capture_keys) or len(capture_keys) != len(set(capture_keys)):
+        raise RuntimeError("capture input snapshot captures are not sorted and unique")
+    core = {
+        "schemaVersion": document["schemaVersion"],
+        "planIdentity": document["planIdentity"],
+        "generatorSources": document["generatorSources"],
+        "captures": captures,
+    }
+    expected_identity = sha256_canonical(core)
+    if document["snapshotIdentity"] != expected_identity:
+        raise RuntimeError("capture input snapshot identity does not match its content")
+    plan = _snapshot_plan_from_document(document)
+    _validate_capture_source_plan(plan)
+    snapshots = []
+    _reject_symlink_or_reparse(
+        snapshot_root, "capture input snapshot root", include_parent=True
+    )
+    snapshot_root = snapshot_root.resolve(strict=True)
+    for entry in captures:
+        if set(entry) != {
+            "capture",
+            "captureId",
+            "sourceFiles",
+            "sessionState",
+            "shard",
+        }:
+            raise RuntimeError(
+                f"capture input snapshot entry is malformed: {entry.get('capture')}"
+            )
+        shard = entry["shard"]
+        if not isinstance(shard, dict) or set(shard) != {
+            "path",
+            "byteLength",
+            "sha256",
+        }:
+            raise RuntimeError(
+                f"capture input snapshot shard is malformed: {entry['capture']}"
+            )
+        if (
+            not isinstance(entry["capture"], str)
+            or not isinstance(entry["captureId"], str)
+            or not isinstance(entry["sessionState"], dict)
+            or not isinstance(shard["path"], str)
+            or type(shard["byteLength"]) is not int
+            or shard["byteLength"] < 0
+            or not valid_sha256(shard["sha256"])
+        ):
+            raise RuntimeError(
+                f"capture input snapshot entry identity is invalid: {entry.get('capture')}"
+            )
+        relative_path = Path(shard["path"])
+        if relative_path.is_absolute() or ".." in relative_path.parts:
+            raise RuntimeError(
+                f"capture input snapshot shard path is unsafe: {entry['capture']}"
+            )
+        unresolved_shard_path = snapshot_root / relative_path
+        _reject_symlink_or_reparse(
+            unresolved_shard_path,
+            "capture input snapshot shard",
+            include_parent=True,
+        )
+        shard_path = unresolved_shard_path.resolve()
+        try:
+            shard_path.relative_to(snapshot_root)
+        except ValueError as error:
+            raise RuntimeError(
+                f"capture input snapshot shard escaped its root: {entry['capture']}"
+            ) from error
+        snapshot = CaptureShardSnapshot(
+            capture=entry["capture"],
+            path=shard_path,
+            relative_path=shard["path"],
+            byte_length=shard["byteLength"],
+            sha256=shard["sha256"],
+        )
+        if validate_shards:
+            if parse_shards:
+                _, _, session, _ = _load_capture_snapshot_shard(
+                    snapshot,
+                    phase,
+                    document["snapshotIdentity"],
+                )
+                if entry["captureId"] != session.get("captureId"):
+                    raise RuntimeError(
+                        f"capture input snapshot captureId is inconsistent: {entry['capture']}"
+                    )
+                if entry["sessionState"] != _capture_session_snapshot_state(session):
+                    raise RuntimeError(
+                        f"capture input snapshot session state is inconsistent: {entry['capture']}"
+                    )
+            else:
+                _verify_capture_snapshot_shard_identity(
+                    snapshot,
+                    phase,
+                    document["snapshotIdentity"],
+                )
+        snapshots.append(snapshot)
+    return plan, snapshots
+
+
+def _load_and_revalidate_input_snapshot(
+    path: Path,
+    snapshot_root: Path,
+    phase: str,
+    revalidate_live: bool = True,
+    verify_hash: bool = False,
+    validate_shards: bool = False,
+    parse_shards: bool = False,
+) -> dict[str, Any]:
+    path = _validate_temporary_path(
+        path,
+        "capture input snapshot manifest",
+        must_exist=True,
+    )
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            document = json.load(handle)
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"capture input snapshot manifest is malformed: {error}") from error
+    plan, _ = _validate_input_snapshot_document(
+        document,
+        snapshot_root,
+        phase,
+        validate_shards=validate_shards,
+        parse_shards=parse_shards,
+    )
+    if revalidate_live:
+        _verify_capture_source_plan(
+            plan,
+            phase,
+            document["snapshotIdentity"],
+            verify_hash=verify_hash,
+        )
+    return document
+
+
 def _validate_aggregate_worker_directory(directory: Path) -> Path:
+    _reject_symlink_or_reparse(directory, "aggregate worker target")
     directory = directory.resolve(strict=True)
     if not directory.is_dir():
         raise RuntimeError(f"aggregate worker target is not a directory: {directory}")
@@ -5010,16 +6367,30 @@ def _validate_aggregate_worker_directory(directory: Path) -> Path:
         CATALOG_OUTPUT.resolve(),
         FIXTURE_OUTPUT.resolve(),
     }
-    for name in (*AGGREGATE_WORKER_ARTIFACT_NAMES.values(), AGGREGATE_WORKER_SUMMARY_NAME):
+    for name in (
+        *AGGREGATE_WORKER_ARTIFACT_NAMES.values(),
+        AGGREGATE_WORKER_SUMMARY_NAME,
+        AGGREGATE_INPUT_SNAPSHOT_NAME,
+    ):
         target = directory / name
         if target.resolve() in production_outputs:
             raise RuntimeError("aggregate worker cannot write a production generated output")
     return directory
 
 
-def _write_aggregate_worker_outputs(directory: Path) -> None:
+def _write_aggregate_worker_outputs(directory: Path, source_plan_path: Path) -> None:
     directory = _validate_aggregate_worker_directory(directory)
-    inventory = build_inventory()
+    source_plan = _load_capture_source_plan(source_plan_path)
+    _verify_capture_source_plan(
+        source_plan,
+        "aggregate-worker-start",
+        source_plan["planIdentity"],
+        verify_hash=True,
+    )
+    inventory, input_snapshot_document = build_inventory(
+        directory / CAPTURE_SNAPSHOT_DIRECTORY_NAME,
+        source_plan,
+    )
     validate_inventory(inventory)
 
     renderers = {
@@ -5038,6 +6409,47 @@ def _write_aggregate_worker_outputs(directory: Path) -> None:
             "sha256": sha256,
         }
 
+    input_snapshot_path = directory / AGGREGATE_INPUT_SNAPSHOT_NAME
+    plan, _ = _validate_input_snapshot_document(
+        input_snapshot_document,
+        directory,
+        "aggregate-worker-final",
+        validate_shards=True,
+        parse_shards=True,
+    )
+    _verify_capture_source_plan(
+        plan,
+        "aggregate-worker-final",
+        input_snapshot_document["snapshotIdentity"],
+        verify_hash=True,
+    )
+    _write_deterministic_temporary_file(
+        input_snapshot_path,
+        _input_snapshot_bytes(input_snapshot_document),
+        "capture input snapshot manifest",
+    )
+    written_snapshot_document = _load_and_revalidate_input_snapshot(
+        input_snapshot_path,
+        directory,
+        "aggregate-worker-return",
+        validate_shards=True,
+        parse_shards=True,
+    )
+    if (
+        written_snapshot_document["snapshotIdentity"]
+        != input_snapshot_document["snapshotIdentity"]
+    ):
+        raise RuntimeError("aggregate worker input snapshot changed before return")
+    input_snapshot_sha256, input_snapshot_length = (
+        _stream_file_sha256_and_length(input_snapshot_path)
+    )
+    input_snapshot_descriptor = {
+        "file": AGGREGATE_INPUT_SNAPSHOT_NAME,
+        "byteLength": input_snapshot_length,
+        "sha256": input_snapshot_sha256,
+        "snapshotIdentity": input_snapshot_document["snapshotIdentity"],
+    }
+
     inventory_summary = inventory.get("summary")
     if not isinstance(inventory_summary, dict):
         raise RuntimeError("aggregate inventory has no summary")
@@ -5048,9 +6460,10 @@ def _write_aggregate_worker_outputs(directory: Path) -> None:
             raise RuntimeError(f"aggregate inventory summary field is invalid: {key}")
         summary[key] = value
     payload = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "summary": summary,
         "artifacts": artifacts,
+        "inputSnapshot": input_snapshot_descriptor,
     }
     (directory / AGGREGATE_WORKER_SUMMARY_NAME).write_text(
         json.dumps(payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
@@ -5059,10 +6472,17 @@ def _write_aggregate_worker_outputs(directory: Path) -> None:
     )
 
 
-def _load_aggregate_worker_result(directory: Path) -> AggregateWorkerResult:
+def _load_aggregate_worker_result(
+    directory: Path,
+    expected_plan_identity: str | None = None,
+) -> AggregateWorkerResult:
+    _reject_symlink_or_reparse(
+        directory, "aggregate worker result", include_parent=True
+    )
     directory = directory.resolve(strict=True)
     summary_path = directory / AGGREGATE_WORKER_SUMMARY_NAME
-    if not summary_path.is_file() or summary_path.is_symlink():
+    _reject_symlink_or_reparse(summary_path, "aggregate worker summary")
+    if not summary_path.is_file():
         raise RuntimeError("aggregate worker did not write a regular summary file")
     if summary_path.stat().st_size > 1024 * 1024:
         raise RuntimeError("aggregate worker summary exceeds the compact size limit")
@@ -5071,7 +6491,7 @@ def _load_aggregate_worker_result(directory: Path) -> AggregateWorkerResult:
             payload = json.load(handle)
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise RuntimeError(f"aggregate worker summary is malformed: {error}") from error
-    if type(payload) is not dict or payload.get("schemaVersion") != 1:
+    if type(payload) is not dict or payload.get("schemaVersion") != 2:
         raise RuntimeError("aggregate worker summary schema is invalid")
 
     summary = payload.get("summary")
@@ -5108,25 +6528,109 @@ def _load_aggregate_worker_result(directory: Path) -> AggregateWorkerResult:
         ):
             raise RuntimeError(f"aggregate worker {kind} SHA-256 is invalid")
         artifact_path = directory / expected_name
-        if not artifact_path.is_file() or artifact_path.is_symlink():
+        _reject_symlink_or_reparse(
+            artifact_path, f"aggregate worker {kind} artifact"
+        )
+        if not artifact_path.is_file():
             raise RuntimeError(f"aggregate worker {kind} artifact is missing")
         actual_sha256, actual_length = _stream_file_sha256_and_length(artifact_path)
         if actual_length != byte_length or actual_sha256 != sha256:
             raise RuntimeError(f"aggregate worker {kind} artifact is malformed")
         validated_artifacts[kind] = dict(descriptor)
 
+    input_snapshot = payload.get("inputSnapshot")
+    if type(input_snapshot) is not dict or set(input_snapshot) != {
+        "file",
+        "byteLength",
+        "sha256",
+        "snapshotIdentity",
+    }:
+        raise RuntimeError("aggregate worker input snapshot descriptor is invalid")
+    if input_snapshot["file"] != AGGREGATE_INPUT_SNAPSHOT_NAME:
+        raise RuntimeError("aggregate worker input snapshot filename is invalid")
+    if type(input_snapshot["byteLength"]) is not int or input_snapshot["byteLength"] < 0:
+        raise RuntimeError("aggregate worker input snapshot byte length is invalid")
+    if not valid_sha256(input_snapshot["sha256"]):
+        raise RuntimeError("aggregate worker input snapshot SHA-256 is invalid")
+    if not valid_sha256(input_snapshot["snapshotIdentity"]):
+        raise RuntimeError("aggregate worker input snapshot identity is invalid")
+    input_snapshot_path = directory / AGGREGATE_INPUT_SNAPSHOT_NAME
+    _reject_symlink_or_reparse(
+        input_snapshot_path, "aggregate worker input snapshot"
+    )
+    actual_sha256, actual_length = _stream_file_sha256_and_length(
+        input_snapshot_path
+    )
+    if (
+        actual_length != input_snapshot["byteLength"]
+        or actual_sha256 != input_snapshot["sha256"]
+    ):
+        raise RuntimeError("aggregate worker input snapshot manifest is malformed")
+    input_snapshot_document = _load_and_revalidate_input_snapshot(
+        input_snapshot_path,
+        directory,
+        "aggregate-parent-load",
+        revalidate_live=False,
+        validate_shards=True,
+        parse_shards=True,
+    )
+    if (
+        input_snapshot_document["snapshotIdentity"]
+        != input_snapshot["snapshotIdentity"]
+    ):
+        raise RuntimeError("aggregate worker input snapshot identity is inconsistent")
+    plan_identity = input_snapshot_document["planIdentity"]
+    if (
+        expected_plan_identity is not None
+        and plan_identity != expected_plan_identity
+    ):
+        raise RuntimeError(
+            "aggregate worker result plan identity does not match its parent plan"
+        )
+
     return AggregateWorkerResult(
         directory=directory,
         summary={key: summary[key] for key in AGGREGATE_CLI_SUMMARY_KEYS},
         artifacts=validated_artifacts,
+        input_snapshot=dict(input_snapshot),
+        plan_identity=plan_identity,
     )
 
 
 def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
-    script = Path(__file__).resolve()
+    script = _generator_script_path()
+    _reject_symlink_or_reparse(staging_root, "aggregate staging root")
+    staging_root = staging_root.resolve(strict=True)
+    source_plan = _build_capture_source_plan()
+    _validate_capture_source_plan(source_plan)
+    _verify_capture_source_plan(
+        source_plan,
+        "aggregate-parent-plan",
+        source_plan["planIdentity"],
+        verify_hash=True,
+    )
+    source_plan_path = staging_root / AGGREGATE_INPUT_PLAN_NAME
+    source_plan_payload = _input_snapshot_bytes(source_plan)
+    _write_deterministic_temporary_file(
+        source_plan_path,
+        source_plan_payload,
+        "aggregate input snapshot plan",
+    )
     for attempt in range(1, AGGREGATE_WORKER_MAX_ATTEMPTS + 1):
-        attempt_directory = staging_root / f"attempt-{attempt}"
-        attempt_directory.mkdir()
+        _reject_symlink_or_reparse(
+            source_plan_path, "aggregate input snapshot plan", include_parent=True
+        )
+        if source_plan_path.read_bytes() != source_plan_payload:
+            raise RuntimeError("aggregate input snapshot plan changed between attempts")
+        _verify_capture_source_plan(
+            source_plan,
+            f"aggregate-parent-attempt-{attempt}",
+            source_plan["planIdentity"],
+        )
+        attempt_directory = Path(tempfile.mkdtemp(
+            prefix=f"attempt-{attempt}-",
+            dir=staging_root,
+        ))
         command = [
             sys.executable,
             "-I",
@@ -5136,41 +6640,75 @@ def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
             str(script),
             "--_aggregate-worker-directory",
             str(attempt_directory),
+            "--_input-snapshot-plan",
+            str(source_plan_path),
         ]
-        completed = subprocess.run(
-            command,
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            check=False,
+        _invoke_self_test_fault(
+            "before_aggregate_worker_attempt",
+            {"attempt": attempt, "directory": str(attempt_directory)},
         )
+        try:
+            with tempfile.TemporaryDirectory(prefix="aorg-") as analyzer_root_name:
+                child_environment = None
+                if os.name == "nt":
+                    staged_analyzer = _stage_short_scfu_analyzer(
+                        Path(analyzer_root_name)
+                    )
+                    child_environment = os.environ.copy()
+                    child_environment[SCFU_ANALYZER_OVERRIDE_ENVIRONMENT] = str(
+                        staged_analyzer
+                    )
+                completed = _run_bounded_child(
+                    command,
+                    cwd=REPO_ROOT,
+                    timeout_seconds=AGGREGATE_WORKER_TIMEOUT_SECONDS,
+                    label=f"aggregate worker attempt {attempt}",
+                    environment=child_environment,
+                )
+        except BoundedChildTimeout as error:
+            raise RuntimeError(
+                f"deterministic aggregate worker timeout on attempt "
+                f"{attempt}/{AGGREGATE_WORKER_MAX_ATTEMPTS}: {error}"
+            ) from error
         if completed.returncode == 0:
             try:
-                return _load_aggregate_worker_result(attempt_directory)
-            except (OSError, RuntimeError):
-                if attempt < AGGREGATE_WORKER_MAX_ATTEMPTS:
-                    continue
-                raise
+                return _load_aggregate_worker_result(
+                    attempt_directory,
+                    expected_plan_identity=source_plan["planIdentity"],
+                )
+            except (OSError, RuntimeError) as error:
+                raise RuntimeError(
+                    "deterministic aggregate worker result validation failed "
+                    f"on attempt {attempt}/{AGGREGATE_WORKER_MAX_ATTEMPTS}: {error}"
+                ) from error
 
         detail = _capture_worker_failure_detail(completed)
+        cancelled = _is_cancellation_child_failure(completed.returncode)
         native_failure = _is_native_child_failure(completed.returncode)
         interpreter_corruption = (
-            "Windows fatal exception: access violation" in detail
-            or "TypeError: 'str_ascii_iterator' object is not callable" in detail
+            not cancelled and _is_interpreter_corruption_detail(detail)
         )
         suffix = f": {detail}" if detail else ""
         if (
             (native_failure or interpreter_corruption)
             and attempt < AGGREGATE_WORKER_MAX_ATTEMPTS
         ):
+            _invoke_self_test_fault(
+                "before_failed_aggregate_attempt_cleanup",
+                {"attempt": attempt, "directory": str(attempt_directory)},
+            )
+            _remove_owned_directory_tree(
+                staging_root,
+                attempt_directory,
+                f"attempt-{attempt}-",
+            )
             continue
-        kind = (
-            "native aggregate worker"
-            if native_failure or interpreter_corruption
-            else "aggregate worker"
-        )
+        if cancelled:
+            kind = "cancelled aggregate worker"
+        elif native_failure or interpreter_corruption:
+            kind = "native aggregate worker"
+        else:
+            kind = "deterministic aggregate worker"
         raise RuntimeError(
             f"{kind} failed with exit code {completed.returncode} "
             f"on attempt {attempt}/{AGGREGATE_WORKER_MAX_ATTEMPTS}{suffix}"
@@ -5179,15 +6717,36 @@ def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
 
 
 def _artifact_destinations(
-    output: Path, catalog_output: Path, fixture_output: Path
+    output: Path,
+    catalog_output: Path,
+    fixture_output: Path,
+    input_snapshot_manifest: Path | None = None,
 ) -> dict[str, Path]:
     destinations = {
         "inventory": output,
         "catalog": catalog_output,
         "fixtures": fixture_output,
     }
-    if len(set(destinations.values())) != len(destinations):
-        raise RuntimeError("generated output paths must be distinct")
+    collision_paths = [*destinations.values()]
+    if input_snapshot_manifest is not None:
+        collision_paths.append(input_snapshot_manifest)
+    identities = []
+    for path in collision_paths:
+        _reject_symlink_or_reparse(
+            path, "generated output", include_parent=True
+        )
+        identities.append(os.path.normcase(str(path.resolve())))
+    hardlink_collision = any(
+        os.path.lexists(left)
+        and os.path.lexists(right)
+        and os.path.samefile(left, right)
+        for index, left in enumerate(collision_paths)
+        for right in collision_paths[index + 1 :]
+    )
+    if len(set(identities)) != len(identities) or hardlink_collision:
+        raise RuntimeError(
+            "generated outputs and the input snapshot manifest must be distinct"
+        )
     return destinations
 
 
@@ -5249,28 +6808,513 @@ def _write_aggregate_artifacts_atomically(
 def _aggregate_artifact_matches(
     result: AggregateWorkerResult, kind: str, destination: Path
 ) -> bool:
+    source = result.directory / AGGREGATE_WORKER_ARTIFACT_NAMES[kind]
+    _reject_symlink_or_reparse(source, f"aggregate candidate {kind}")
+    _reject_symlink_or_reparse(
+        destination, f"governed golden {kind}", include_parent=True
+    )
+    if not source.is_file() or not destination.is_file():
+        return False
     descriptor = result.artifacts[kind]
+    if source.stat().st_size != descriptor["byteLength"]:
+        return False
+    if destination.stat().st_size != descriptor["byteLength"]:
+        return False
+    with source.open("rb") as candidate, destination.open("rb") as golden:
+        while True:
+            candidate_chunk = candidate.read(1024 * 1024)
+            golden_chunk = golden.read(1024 * 1024)
+            if candidate_chunk != golden_chunk:
+                return False
+            if not candidate_chunk:
+                return True
+
+
+def _revalidate_aggregate_input_snapshot(
+    result: AggregateWorkerResult,
+    phase: str,
+    verify_hash: bool = False,
+) -> dict[str, Any]:
+    path = result.directory / AGGREGATE_INPUT_SNAPSHOT_NAME
+    descriptor = result.input_snapshot
+    actual_sha256, actual_length = _stream_file_sha256_and_length(path)
+    if (
+        actual_length != descriptor["byteLength"]
+        or actual_sha256 != descriptor["sha256"]
+    ):
+        raise RuntimeError(
+            f"aggregate input snapshot changed phase={phase} path={path}"
+        )
+    document = _load_and_revalidate_input_snapshot(
+        path,
+        result.directory,
+        phase,
+        verify_hash=verify_hash,
+    )
+    if document["snapshotIdentity"] != descriptor["snapshotIdentity"]:
+        raise RuntimeError(
+            f"aggregate input snapshot identity changed phase={phase} path={path}"
+        )
+    if document["planIdentity"] != result.plan_identity:
+        raise RuntimeError(
+            f"aggregate input plan identity changed phase={phase} path={path}"
+        )
+    return document
+
+
+def _export_input_snapshot_manifest(
+    result: AggregateWorkerResult,
+    destination: Path,
+) -> None:
+    destination = _validate_temporary_path(
+        destination,
+        "requested input snapshot manifest",
+        must_exist=False,
+    )
+    source = result.directory / AGGREGATE_INPUT_SNAPSHOT_NAME
+    payload = source.read_bytes()
+    _write_deterministic_temporary_file(
+        destination,
+        payload,
+        "requested input snapshot manifest",
+    )
     actual_sha256, actual_length = _stream_file_sha256_and_length(destination)
-    return (
-        actual_length == descriptor["byteLength"]
-        and actual_sha256 == descriptor["sha256"]
+    if (
+        actual_length != result.input_snapshot["byteLength"]
+        or actual_sha256 != result.input_snapshot["sha256"]
+    ):
+        raise RuntimeError(
+            f"requested input snapshot manifest copy did not verify: {destination}"
+        )
+
+
+def _validate_exported_input_snapshot_manifest(path: Path) -> dict[str, Any]:
+    path = _validate_temporary_path(
+        path,
+        "exported input snapshot manifest",
+        must_exist=True,
+    )
+    return _load_and_revalidate_input_snapshot(
+        path,
+        path.parent,
+        "coordinator-publication-validation",
+        verify_hash=True,
+        validate_shards=False,
     )
 
 
 def self_test() -> None:
+    global _SELF_TEST_FAULT_HOOK
+
     assert _is_native_child_failure(-11)
     assert _is_native_child_failure(0xC0000005)
+    assert _is_cancellation_child_failure(0xC000013A)
+    assert _is_cancellation_child_failure(-signal.SIGINT)
+    assert not _is_native_child_failure(0xC000013A)
+    assert not _is_native_child_failure(-signal.SIGINT)
     assert not _is_native_child_failure(1)
+    assert _is_interpreter_corruption_detail(
+        "SystemError: unknown opcode 204"
+    )
+    assert _is_interpreter_corruption_detail(
+        "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'"
+    )
+    assert not _is_interpreter_corruption_detail(
+        "ValueError: deterministic capture failure"
+    )
     assert AGGREGATE_WORKER_MAX_ATTEMPTS == 3
+    historical_generation_key = (
+        "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260529-212034"
+        "|0x788DA39B|scfu=105263"
+    )
+    missing_key_record = type(
+        "MissingKeyRecord",
+        (),
+        {
+            "metadata": type(
+                "MissingKeyMetadata",
+                (),
+                {"generation_key": historical_generation_key},
+            )(),
+            "packet_id": "self-test-packet",
+            "capture": "self-test-session",
+        },
+    )()
+    try:
+        _metadata_generation_index_for_packet(
+            missing_key_record,
+            {},
+            "a" * 64,
+            "self-test-controlled-fault",
+        )
+    except CaptureAggregationInvariantError as error:
+        diagnostic = str(error)
+        assert f"missingGenerationKey={historical_generation_key}" in diagnostic
+        assert "owningPacket=self-test-packet" in diagnostic
+        assert "owningSession=self-test-session" in diagnostic
+        assert f"snapshot={'a' * 64}" in diagnostic
+        assert "phase=self-test-controlled-fault" in diagnostic
+    else:
+        raise AssertionError("missing aggregation key was accepted")
+    try:
+        _run_bounded_child(
+            [sys.executable, "-I", "-c", "import time; time.sleep(30)"],
+            cwd=REPO_ROOT,
+            timeout_seconds=1,
+            label="self-test child",
+        )
+    except BoundedChildTimeout as error:
+        assert "self-test child timed out after 1 seconds" in str(error)
+    else:
+        raise AssertionError("bounded child timeout was not enforced")
+
+    fault_events: list[tuple[str, dict[str, Any]]] = []
+    previous_fault_hook = _SELF_TEST_FAULT_HOOK
+    try:
+        _SELF_TEST_FAULT_HOOK = (
+            lambda event, context: fault_events.append((event, dict(context)))
+        )
+        _invoke_self_test_fault("self-test-fault", {"attempt": 2})
+    finally:
+        _SELF_TEST_FAULT_HOOK = previous_fault_hook
+    assert fault_events == [("self-test-fault", {"attempt": 2})]
+
     with tempfile.TemporaryDirectory(
         prefix="aorebirth-npc-combat-aggregate-self-test-"
     ) as aggregate_test_name:
         aggregate_test_root = Path(aggregate_test_name)
+        logical_capture = (
+            "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260701-000001"
+        )
+        portable_sessions = []
+        for checkout_name in ("checkout-a", "checkout-b"):
+            frozen_capture = aggregate_test_root / checkout_name / Path(logical_capture)
+            frozen_capture.mkdir(parents=True)
+            for source_name in ("packets.hex.log", "raw-packets.csv"):
+                (frozen_capture / source_name).write_bytes(b"")
+            portable_sessions.append(
+                _portable_capture_session(
+                    {
+                        "capture": logical_capture,
+                        "packetLog": {
+                            "path": str(frozen_capture / "packets.hex.log")
+                        },
+                        "rawPacketIndex": {
+                            "path": str(frozen_capture / "raw-packets.csv")
+                        },
+                    },
+                    frozen_capture,
+                )
+            )
+        assert canonical(portable_sessions[0]) == canonical(portable_sessions[1])
+        portable_identity_path = aggregate_test_root / "portable-identity.bin"
+        portable_identity_path.write_bytes(b"portable identity")
+        portable_identity_before = _snapshot_file_identity(
+            portable_identity_path,
+            "self-test/portable-identity.bin",
+        )
+        portable_replacement = aggregate_test_root / "portable-replacement.bin"
+        portable_replacement.write_bytes(b"portable identity")
+        os.replace(portable_replacement, portable_identity_path)
+        portable_identity_after = _snapshot_file_identity(
+            portable_identity_path,
+            "self-test/portable-identity.bin",
+        )
+        assert portable_identity_before == portable_identity_after
+
+        owned_test_root = aggregate_test_root / "owned-retries"
+        owned_test_root.mkdir()
+        owned_attempt = owned_test_root / "attempt-1-self-test"
+        owned_attempt.mkdir()
+        (owned_attempt / "partial-result").write_bytes(b"partial")
+        _remove_owned_directory_tree(
+            owned_test_root,
+            owned_attempt,
+            "attempt-1-",
+        )
+        assert not owned_attempt.exists()
+        unowned_attempt = owned_test_root / "unowned"
+        unowned_attempt.mkdir()
+        try:
+            _remove_owned_directory_tree(
+                owned_test_root,
+                unowned_attempt,
+                "attempt-1-",
+            )
+        except RuntimeError as error:
+            assert "refusing to remove unowned temporary directory" in str(error)
+        else:
+            raise AssertionError("retry cleanup removed an unowned directory")
+        assert unowned_attempt.is_dir()
+
         worker_directory = aggregate_test_root / "worker"
         worker_directory.mkdir()
         assert _validate_aggregate_worker_directory(worker_directory) == (
             worker_directory.resolve()
         )
+
+        randomized_capture_paths = [
+            REPO_ROOT / "__snapshot-self-test__" / "20260701-000003",
+            REPO_ROOT / "__snapshot-self-test__" / "20260701-000001",
+            REPO_ROOT / "__snapshot-self-test__" / "20260701-000002",
+        ]
+        randomized = list(randomized_capture_paths)
+        random.Random(8675309).shuffle(randomized)
+        assert _build_capture_source_plan(randomized) == (
+            _build_capture_source_plan(reversed(randomized_capture_paths))
+        )
+
+        shard_test_root = aggregate_test_root / "snapshot-shard-tests"
+        shard_test_root.mkdir()
+
+        def write_self_test_shard(capture: str, ordinal: int) -> CaptureShardSnapshot:
+            session = {
+                "capture": capture,
+                "captureId": Path(capture).name,
+                "capabilityStatus": "raw_source_complete",
+                "canonicalValid": True,
+                "recaptureRequired": False,
+                "captureComplete": True,
+                "positiveEvidenceOnly": False,
+                "absenceInferenceAllowed": True,
+                "canonicalPackets": 0,
+                "conflictCount": 0,
+            }
+            payload = _parse_capture_payload(([], [], session, []))
+            path = shard_test_root / f"capture-{ordinal:06d}.json"
+            path.write_text(canonical(payload), encoding="utf-8")
+            sha256, byte_length = _stream_file_sha256_and_length(path)
+            return CaptureShardSnapshot(
+                capture=capture,
+                path=path,
+                relative_path=(
+                    "snapshot-shard-tests/"
+                    f"capture-{ordinal:06d}.json"
+                ),
+                byte_length=byte_length,
+                sha256=sha256,
+            )
+
+        self_test_snapshots = [
+            write_self_test_shard("self-test/20260701-000001", 0),
+            write_self_test_shard("self-test/20260701-000002", 1),
+        ]
+        for snapshot in self_test_snapshots:
+            first_load = _parse_capture_payload(
+                _load_capture_snapshot_shard(
+                    snapshot,
+                    "self-test-first-load",
+                    "a" * 64,
+                )
+            )
+            second_load = _parse_capture_payload(
+                _load_capture_snapshot_shard(
+                    snapshot,
+                    "self-test-second-load",
+                    "a" * 64,
+                )
+            )
+            assert first_load == second_load
+
+        snapshot_plan_core = {
+            "schemaVersion": CAPTURE_SNAPSHOT_SCHEMA_VERSION,
+            "generatorSources": [],
+            "captures": [
+                {
+                    "capture": snapshot.capture,
+                    "sourceFiles": [],
+                }
+                for snapshot in self_test_snapshots
+            ],
+        }
+        snapshot_plan = {
+            **snapshot_plan_core,
+            "planIdentity": sha256_canonical(snapshot_plan_core),
+        }
+        snapshot_sessions = {
+            snapshot.capture: _load_capture_snapshot_shard(
+                snapshot,
+                "self-test-session-load",
+                snapshot_plan["planIdentity"],
+            )[2]
+            for snapshot in self_test_snapshots
+        }
+        randomized_snapshots = list(self_test_snapshots)
+        random.Random(314159).shuffle(randomized_snapshots)
+        first_snapshot_document = _build_input_snapshot_document(
+            snapshot_plan,
+            randomized_snapshots,
+            snapshot_sessions,
+        )
+        second_snapshot_document = _build_input_snapshot_document(
+            snapshot_plan,
+            reversed(randomized_snapshots),
+            snapshot_sessions,
+        )
+        assert _input_snapshot_bytes(first_snapshot_document) == (
+            _input_snapshot_bytes(second_snapshot_document)
+        )
+        _validate_input_snapshot_document(
+            first_snapshot_document,
+            aggregate_test_root,
+            "self-test-manifest-cross-check",
+            validate_shards=True,
+            parse_shards=True,
+        )
+        capture_id_mismatch = json.loads(json.dumps(first_snapshot_document))
+        capture_id_mismatch["captures"][0]["captureId"] = "wrong-capture-id"
+        capture_id_core = {
+            key: value
+            for key, value in capture_id_mismatch.items()
+            if key != "snapshotIdentity"
+        }
+        capture_id_mismatch["snapshotIdentity"] = sha256_canonical(capture_id_core)
+        try:
+            _validate_input_snapshot_document(
+                capture_id_mismatch,
+                aggregate_test_root,
+                "self-test-capture-id-mismatch",
+                validate_shards=True,
+                parse_shards=True,
+            )
+        except RuntimeError as error:
+            assert "captureId is inconsistent" in str(error)
+        else:
+            raise AssertionError("manifest captureId mismatch was accepted")
+
+        session_state_mismatch = json.loads(json.dumps(first_snapshot_document))
+        session_state_mismatch["captures"][0]["sessionState"][
+            "canonicalPackets"
+        ] = 99
+        session_state_core = {
+            key: value
+            for key, value in session_state_mismatch.items()
+            if key != "snapshotIdentity"
+        }
+        session_state_mismatch["snapshotIdentity"] = sha256_canonical(
+            session_state_core
+        )
+        try:
+            _validate_input_snapshot_document(
+                session_state_mismatch,
+                aggregate_test_root,
+                "self-test-session-state-mismatch",
+                validate_shards=True,
+                parse_shards=True,
+            )
+        except RuntimeError as error:
+            assert "session state is inconsistent" in str(error)
+        else:
+            raise AssertionError("manifest session state mismatch was accepted")
+
+        tampered_snapshot = self_test_snapshots[0]
+        original_shard_payload = tampered_snapshot.path.read_bytes()
+        tampered_snapshot.path.write_bytes(original_shard_payload + b"tamper")
+        try:
+            _load_capture_snapshot_shard(
+                tampered_snapshot,
+                "self-test-shard-tamper",
+                first_snapshot_document["snapshotIdentity"],
+            )
+        except CaptureAggregationInvariantError as error:
+            assert "snapshot shard identity changed" in str(error)
+            assert "phase=self-test-shard-tamper" in str(error)
+        else:
+            raise AssertionError("tampered capture snapshot shard was accepted")
+        tampered_snapshot.path.write_bytes(b'{"schemaVersion":')
+        partial_sha256, partial_length = _stream_file_sha256_and_length(
+            tampered_snapshot.path
+        )
+        partial_snapshot = CaptureShardSnapshot(
+            capture=tampered_snapshot.capture,
+            path=tampered_snapshot.path,
+            relative_path=tampered_snapshot.relative_path,
+            byte_length=partial_length,
+            sha256=partial_sha256,
+        )
+        try:
+            _load_capture_snapshot_shard(
+                partial_snapshot,
+                "self-test-partial-json",
+                first_snapshot_document["snapshotIdentity"],
+            )
+        except CaptureAggregationInvariantError as error:
+            assert "phase=self-test-partial-json" in str(error)
+        else:
+            raise AssertionError("partial capture snapshot JSON was accepted")
+        tampered_snapshot.path.write_bytes(original_shard_payload)
+
+        mutable_input = aggregate_test_root / "mutable-input.log"
+        mutable_input.write_bytes(b"before")
+        expected_input = _snapshot_file_identity(
+            mutable_input,
+            "self-test/mutable-input.log",
+        )
+        mutable_input.write_bytes(b"after")
+        try:
+            _verify_snapshot_file_identity(
+                mutable_input,
+                expected_input,
+                "self-test/20260701-000001",
+                "self-test-input-change",
+                first_snapshot_document["snapshotIdentity"],
+                verify_hash=True,
+            )
+        except CaptureAggregationInvariantError as error:
+            assert "self-test/mutable-input.log" in str(error)
+            assert "phase=self-test-input-change" in str(error)
+        else:
+            raise AssertionError("changed snapshot input was accepted")
+
+        missing_metadata = MetadataGeneration(
+            capture="self-test/20260701-000001",
+            capture_id="20260701-000001",
+            sequence=7,
+            global_ordinal=7,
+            source=1,
+            name="Self Test",
+            monster_data=2,
+            level=3,
+            captured_realm_id=127,
+            projection="self-test",
+            packet_sha256="0" * 64,
+            scfu_special_attacks="",
+            owner_identity="",
+        )
+        missing_metadata_packet = PacketRecord(
+            packet_id="self-test|IN|8|missing",
+            capture=missing_metadata.capture,
+            capture_id=missing_metadata.capture_id,
+            captured_utc="2026-07-01T00:00:00Z",
+            direction="IN",
+            sequence=8,
+            global_ordinal=8,
+            message_type="AttackInfo",
+            packet_hex="",
+            body_hex="",
+            packet_sha256="0" * 64,
+            body_sha256="0" * 64,
+            canonical_source="self-test",
+            decoded={},
+            metadata=missing_metadata,
+        )
+        try:
+            _metadata_generation_index_for_packet(
+                missing_metadata_packet,
+                {},
+                first_snapshot_document["snapshotIdentity"],
+                "self-test-metadata-key",
+            )
+        except CaptureAggregationInvariantError as error:
+            message = str(error)
+            assert missing_metadata.generation_key in message
+            assert missing_metadata_packet.packet_id in message
+            assert missing_metadata_packet.capture in message
+            assert first_snapshot_document["snapshotIdentity"] in message
+            assert "phase=self-test-metadata-key" in message
+        else:
+            raise AssertionError("missing metadata generation key was accepted")
+
         artifacts: dict[str, dict[str, Any]] = {}
         artifact_payloads: dict[str, bytes] = {}
         for kind, name in AGGREGATE_WORKER_ARTIFACT_NAMES.items():
@@ -5287,12 +7331,40 @@ def self_test() -> None:
         summary = {
             key: index for index, key in enumerate(AGGREGATE_CLI_SUMMARY_KEYS)
         }
+        plan_core = {
+            "schemaVersion": CAPTURE_SNAPSHOT_SCHEMA_VERSION,
+            "generatorSources": [],
+            "captures": [],
+        }
+        empty_plan = {
+            **plan_core,
+            "planIdentity": sha256_canonical(plan_core),
+        }
+        input_snapshot_document = _build_input_snapshot_document(
+            empty_plan,
+            [],
+            {},
+        )
+        input_snapshot_path = worker_directory / AGGREGATE_INPUT_SNAPSHOT_NAME
+        input_snapshot_path.write_bytes(
+            _input_snapshot_bytes(input_snapshot_document)
+        )
+        input_snapshot_sha256, input_snapshot_length = (
+            _stream_file_sha256_and_length(input_snapshot_path)
+        )
+        input_snapshot_descriptor = {
+            "file": AGGREGATE_INPUT_SNAPSHOT_NAME,
+            "byteLength": input_snapshot_length,
+            "sha256": input_snapshot_sha256,
+            "snapshotIdentity": input_snapshot_document["snapshotIdentity"],
+        }
         (worker_directory / AGGREGATE_WORKER_SUMMARY_NAME).write_text(
             json.dumps(
                 {
-                    "schemaVersion": 1,
+                    "schemaVersion": 2,
                     "summary": summary,
                     "artifacts": artifacts,
+                    "inputSnapshot": input_snapshot_descriptor,
                 },
                 ensure_ascii=True,
                 separators=(",", ":"),
@@ -5301,8 +7373,23 @@ def self_test() -> None:
             + "\n",
             encoding="utf-8",
         )
-        aggregate_result = _load_aggregate_worker_result(worker_directory)
+        try:
+            _load_aggregate_worker_result(
+                worker_directory,
+                expected_plan_identity="f" * 64,
+            )
+        except RuntimeError as error:
+            assert "plan identity does not match its parent plan" in str(error)
+        else:
+            raise AssertionError("aggregate result accepted the wrong parent plan")
+        aggregate_result = _load_aggregate_worker_result(
+            worker_directory,
+            expected_plan_identity=empty_plan["planIdentity"],
+        )
         assert aggregate_result.summary == summary
+        exported_snapshot = aggregate_test_root / "exported-input-snapshot.json"
+        _export_input_snapshot_manifest(aggregate_result, exported_snapshot)
+        assert exported_snapshot.read_bytes() == input_snapshot_path.read_bytes()
 
         destination_root = aggregate_test_root / "destinations"
         destinations = _artifact_destinations(
@@ -5310,9 +7397,24 @@ def self_test() -> None:
             destination_root / "catalog.g.cs",
             destination_root / "fixtures.g.cs",
         )
+        try:
+            _artifact_destinations(
+                destination_root / "collision.json",
+                destination_root / "catalog-collision.g.cs",
+                destination_root / "fixtures-collision.g.cs",
+                destination_root / "collision.json",
+            )
+        except RuntimeError as error:
+            assert "input snapshot manifest must be distinct" in str(error)
+        else:
+            raise AssertionError("hidden snapshot output collision was accepted")
         _write_aggregate_artifacts_atomically(aggregate_result, destinations)
         assert all(
             destinations[kind].read_bytes() == artifact_payloads[kind]
+            for kind in AGGREGATE_WORKER_ARTIFACT_NAMES
+        )
+        assert all(
+            _aggregate_artifact_matches(aggregate_result, kind, destinations[kind])
             for kind in AGGREGATE_WORKER_ARTIFACT_NAMES
         )
         destinations["inventory"].write_bytes(b"stale")
@@ -6089,7 +8191,7 @@ def self_test() -> None:
         }
         metadata, _ = load_metadata_generations(
             legacy_arete_capture,
-            legacy_arete_capture.relative_to(REPO_ROOT).as_posix(),
+            legacy_arete_capture.relative_to(CAPTURE_REPO_ROOT).as_posix(),
             canonical_by_sequence,
         )
         assert any(
@@ -6181,36 +8283,124 @@ def main() -> int:
     mode.add_argument(
         "--_aggregate-worker-directory", type=Path, help=argparse.SUPPRESS
     )
+    mode.add_argument(
+        "--_validate-exported-input-snapshot", type=Path, help=argparse.SUPPRESS
+    )
     parser.add_argument(
         "--_parse-capture-shard", type=Path, help=argparse.SUPPRESS
+    )
+    parser.add_argument(
+        "--_parse-capture-key", help=argparse.SUPPRESS
+    )
+    parser.add_argument(
+        "--_input-snapshot-plan", type=Path, help=argparse.SUPPRESS
+    )
+    parser.add_argument(
+        "--_input-snapshot-manifest", type=Path, help=argparse.SUPPRESS
     )
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--catalog-output", type=Path, default=CATALOG_OUTPUT)
     parser.add_argument("--fixture-output", type=Path, default=FIXTURE_OUTPUT)
     args = parser.parse_args()
-    if (args._parse_capture_worker is None) != (args._parse_capture_shard is None):
+    capture_worker_members = (
+        args._parse_capture_worker,
+        args._parse_capture_shard,
+        args._parse_capture_key,
+    )
+    if any(value is not None for value in capture_worker_members) and not all(
+        value is not None for value in capture_worker_members
+    ):
         parser.error(
-            "private capture worker mode requires both its capture and shard arguments"
+            "private capture worker mode requires capture, logical key, and shard arguments"
         )
+    if args._validate_exported_input_snapshot is not None:
+        if args._input_snapshot_manifest is not None:
+            parser.error(
+                "exported input snapshot validation cannot export another manifest"
+            )
+        snapshot = _validate_exported_input_snapshot_manifest(
+            args._validate_exported_input_snapshot
+        )
+        print(
+            "capture-backed NPC combat input snapshot PASS "
+            f"identity={snapshot['snapshotIdentity']}"
+        )
+        return 0
     if args._parse_capture_worker is not None:
+        if args._input_snapshot_plan is not None:
+            parser.error("capture worker mode cannot accept an aggregate input plan")
         _write_parse_capture_worker_shard(
-            args._parse_capture_worker, args._parse_capture_shard
+            args._parse_capture_worker,
+            args._parse_capture_shard,
+            args._parse_capture_key,
         )
         return 0
     if args._aggregate_worker_directory is not None:
-        _write_aggregate_worker_outputs(args._aggregate_worker_directory)
+        if args._input_snapshot_plan is None:
+            parser.error("aggregate worker mode requires its input snapshot plan")
+        if args._input_snapshot_manifest is not None:
+            parser.error("aggregate worker mode cannot export a caller snapshot manifest")
+        _write_aggregate_worker_outputs(
+            args._aggregate_worker_directory,
+            args._input_snapshot_plan,
+        )
         return 0
+    if args._input_snapshot_plan is not None:
+        parser.error("input snapshot plan is private to aggregate worker mode")
     if args.self_test:
+        if args._input_snapshot_manifest is not None:
+            parser.error("self-test mode cannot export an input snapshot manifest")
         self_test()
         return 0
-    output = args.output.resolve()
-    catalog_output = args.catalog_output.resolve()
-    fixture_output = args.fixture_output.resolve()
-    destinations = _artifact_destinations(output, catalog_output, fixture_output)
+    if args._input_snapshot_manifest is not None:
+        _validate_temporary_path(
+            args._input_snapshot_manifest,
+            "requested input snapshot manifest",
+            must_exist=False,
+        )
+    destinations = _artifact_destinations(
+        args.output,
+        args.catalog_output,
+        args.fixture_output,
+        args._input_snapshot_manifest,
+    )
+    governed_outputs = {
+        OUTPUT.resolve(),
+        CATALOG_OUTPUT.resolve(),
+        FIXTURE_OUTPUT.resolve(),
+    }
+    requested_outputs = {
+        args.output.resolve(),
+        args.catalog_output.resolve(),
+        args.fixture_output.resolve(),
+    }
+    governed_alias = any(
+        os.path.lexists(requested)
+        and os.path.lexists(governed)
+        and os.path.samefile(requested, governed)
+        for requested in requested_outputs
+        for governed in governed_outputs
+    )
+    if governed_outputs & requested_outputs or governed_alias:
+        parser.error(
+            "governed generated-combat outputs must be checked or written through "
+            "Tools/generated_combat_pipeline.py"
+        )
+    destinations = {
+        kind: destination.resolve() for kind, destination in destinations.items()
+    }
+    output = destinations["inventory"]
+    catalog_output = destinations["catalog"]
+    fixture_output = destinations["fixtures"]
     with tempfile.TemporaryDirectory(
         prefix="aorebirth-npc-combat-aggregate-parent-"
     ) as staging_name:
         result = _run_aggregate_worker_isolated(Path(staging_name))
+        _revalidate_aggregate_input_snapshot(
+            result,
+            "aggregate-parent-pre-publish" if args.write else "aggregate-parent-pre-check",
+            verify_hash=True,
+        )
         if args.write:
             _write_aggregate_artifacts_atomically(result, destinations)
             verb = "generated"
@@ -6228,6 +8418,15 @@ def main() -> int:
                     print(f"ERROR: {label} is stale: {destination}", file=sys.stderr)
                     return 1
             verb = "deterministic"
+        _revalidate_aggregate_input_snapshot(
+            result,
+            "aggregate-parent-post-publish" if args.write else "aggregate-parent-post-check",
+        )
+        if args._input_snapshot_manifest is not None:
+            _export_input_snapshot_manifest(
+                result,
+                args._input_snapshot_manifest,
+            )
         summary = result.summary
         print(
             "capture-backed NPC combat inventory " + verb

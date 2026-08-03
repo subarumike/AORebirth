@@ -41,6 +41,33 @@ The active-coverage projection contains 1,607 fixed actors: 504 certified and
 fail-closed. The 2026-08-01 reconciliation promoted only Cedric Harding's exact
 PF6553 source-bound profile; no unsupported runtime behavior was added.
 
+The generated combat surface is now one six-file cohort: five semantic artifacts
+plus a manifest commit marker. A multi-reader/single-writer lease protects
+supported readers and serializes writers. Primary captures are parsed once into
+immutable validated shards; all generator/tool inputs are frozen; active coverage
+and formula data converge to one fixed point; and publication is manifest-last,
+rollback-capable, and crash-recoverable. The current generation identity is
+`91cbc7ef749c6f1a66f1d527d227105c30130ba0e961099996e62b36f1059a37`.
+Generated output no longer embeds the local checkout path. Runtime catalog,
+exact-byte fixtures, and formula semantics are byte-identical to the prior
+authority; no supported gameplay behavior changed.
+
+The formula ItemDb reader streams each top-level MessagePack array and retains
+only the 42 templates referenced by the governed PF127/PF1931 profiles instead
+of all 120,842 templates. Measured peak Python allocation fell from 422,936,105
+to 11,169,393 bytes. The governed formula artifact remains byte-identical.
+
+## Known generator concurrency debt
+
+The generated-combat migration does not silently generalize to unrelated
+pipelines. Mission graph, Arete movement promotion/aggregation/verification,
+Subway content generation, legacy loot seed export, and WebCore compatibility
+still have documented snapshot or publication gaps. PHP/WebCore parsers also
+retain hash-then-reopen windows. Dialogue content currently has read-only loaders
+and no executable generator to migrate. These are separate, semantics-preserving
+migrations; details and exact source references are recorded in
+`docs/evidence/GENERATED_COMBAT_CONCURRENCY_20260802.md`.
+
 ## Supported playfields
 
 - Arete is complete for behavior supported by the complete repository and
