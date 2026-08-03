@@ -155,6 +155,72 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "trailing data after"):
                 formula.load_item_templates(trailing_database, set())
 
+            verified_database = root / "verified-database.dat"
+            verified_payload = database(zlib.compress(b"\x90"))
+            verified_database.write_bytes(verified_payload)
+            verified_sha256 = pipeline.sha256_bytes(verified_payload)
+            self.assertEqual(
+                {},
+                formula.load_item_templates(
+                    verified_database,
+                    set(),
+                    expected_sha256=verified_sha256,
+                    expected_byte_length=len(verified_payload),
+                ),
+            )
+            mutated_payload = bytearray(verified_payload)
+            mutated_payload[-1] ^= 1
+            verified_database.write_bytes(mutated_payload)
+            with mock.patch.object(
+                formula.zlib,
+                "decompressobj",
+                side_effect=AssertionError("decompressor ran before integrity validation"),
+            ), self.assertRaisesRegex(
+                formula.ItemTemplateIntegrityError, "SHA-256 mismatch"
+            ) as integrity_error:
+                formula.load_verified_item_templates(
+                    verified_database,
+                    set(),
+                    expected_sha256=verified_sha256,
+                    expected_byte_length=len(verified_payload),
+                )
+            self.assertNotIn(
+                "verified item-template decode failure", str(integrity_error.exception)
+            )
+            verified_database.write_bytes(verified_payload)
+            with mock.patch.object(
+                formula,
+                "MessagePackReader",
+                side_effect=ValueError("injected decoder failure"),
+            ), self.assertRaisesRegex(
+                ValueError,
+                "verified item-template decode failure: injected decoder failure",
+            ):
+                formula.load_verified_item_templates(
+                    verified_database,
+                    set(),
+                    expected_sha256=verified_sha256,
+                    expected_byte_length=len(verified_payload),
+                )
+            verified_database.write_bytes(verified_payload + b"x")
+            with mock.patch.object(
+                formula,
+                "MessagePackReader",
+                side_effect=AssertionError("decoder ran before integrity validation"),
+            ), self.assertRaisesRegex(ValueError, "byte length mismatch"):
+                formula.load_item_templates(
+                    verified_database,
+                    set(),
+                    expected_sha256=verified_sha256,
+                    expected_byte_length=len(verified_payload),
+                )
+            with self.assertRaisesRegex(ValueError, "descriptor is incomplete"):
+                formula.load_item_templates(
+                    verified_database,
+                    set(),
+                    expected_sha256=verified_sha256,
+                )
+
     def test_generated_json_readers_bypass_c_scanner(self):
         formula = self._load_module_from_path(
             "formula_python_json_scanner_test",
@@ -241,6 +307,31 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 verified_path, payload, "test private input"
             )
             self.assertEqual(payload, verified_path.read_bytes())
+            with mock.patch.object(
+                Path, "read_bytes", side_effect=(b"bad", payload)
+            ) as read:
+                self.assertEqual(
+                    payload,
+                    pipeline._read_verified_private_input(
+                        verified_path,
+                        expected_sha256=expected_sha256,
+                        expected_byte_length=len(payload),
+                        label="test private input",
+                    ),
+                )
+            self.assertEqual(2, read.call_count)
+            with mock.patch.object(
+                Path, "read_bytes", side_effect=(b"bad", b"bad", b"bad")
+            ):
+                with self.assertRaisesRegex(
+                    pipeline.PipelineError, "test private input read failed"
+                ):
+                    pipeline._read_verified_private_input(
+                        verified_path,
+                        expected_sha256=expected_sha256,
+                        expected_byte_length=len(payload),
+                        label="test private input",
+                    )
             with mock.patch.object(Path, "read_bytes", return_value=b"corrupt"):
                 with self.assertRaisesRegex(
                     pipeline.PipelineError, "readback verification"
@@ -530,9 +621,11 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
     def test_fixed_point_rematerializes_verified_inventory_per_child_and_round(self):
         inventory_payload = b'{"profiles":[]}'
+        item_database_payload = b"verified-item-database"
         active_payload = b'{"active":1}'
         formula_payload = b'{"formula":1}'
         inventory_paths = []
+        item_database_paths = []
 
         def complete_child(command, **kwargs):
             command = list(command)
@@ -543,6 +636,19 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             else:
                 inventory_flag = "--inventory"
                 output_payload = formula_payload
+                item_database_path = Path(command[command.index("--items") + 1])
+                self.assertEqual(
+                    item_database_payload, item_database_path.read_bytes()
+                )
+                self.assertEqual(
+                    pipeline.sha256_bytes(item_database_payload),
+                    command[command.index("--items-sha256") + 1],
+                )
+                self.assertEqual(
+                    str(len(item_database_payload)),
+                    command[command.index("--items-byte-length") + 1],
+                )
+                item_database_paths.append(item_database_path)
             inventory_path = Path(command[command.index(inventory_flag) + 1])
             self.assertEqual(inventory_payload, inventory_path.read_bytes())
             self.assertEqual(
@@ -567,7 +673,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 frozen_repo_root=root,
                 inventory_payload=inventory_payload,
                 authoritative_inventory_path=root / "authoritative.json",
-                item_database_path=root / "items.dat",
+                item_database_payload=item_database_payload,
                 lease=object(),
                 max_rounds=4,
             )
@@ -576,6 +682,8 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         self.assertEqual(formula_payload, result.state.formula_dataset)
         self.assertEqual(4, len(inventory_paths))
         self.assertEqual(4, len({path for _label, path in inventory_paths}))
+        self.assertEqual(2, len(item_database_paths))
+        self.assertEqual(2, len(set(item_database_paths)))
         self.assertEqual(
             {"round-01", "round-02"},
             {path.parents[1].name for _label, path in inventory_paths},
@@ -1018,6 +1126,13 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 1,
                 "decode_json_text(raw)\n"
                 "json.decoder.JSONDecodeError: Expecting ':' delimiter",
+            )
+        )
+        self.assertTrue(
+            pipeline._is_transient_interpreter_failure(
+                1,
+                "ValueError: verified item-template decode failure: "
+                "item-template slice 5 is invalid: Unexpected end of MessagePack data",
             )
         )
         self.assertEqual(pipeline.PRIMARY_AGGREGATION_MAX_ATTEMPTS, 3)

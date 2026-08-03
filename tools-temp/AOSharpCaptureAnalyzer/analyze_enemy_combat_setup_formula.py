@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import math
 import json
 import os
@@ -387,12 +388,37 @@ class MessagePackReader:
         raise ValueError(f"Unsupported MessagePack marker 0x{marker:02X}")
 
 
+class ItemTemplateIntegrityError(ValueError):
+    pass
+
+
 def load_item_templates(
-    path: Path, template_ids: set[int] | frozenset[int] | None = None
+    path: Path,
+    template_ids: set[int] | frozenset[int] | None = None,
+    *,
+    expected_sha256: str | None = None,
+    expected_byte_length: int | None = None,
 ) -> dict[int, list[Any]]:
+    if (expected_sha256 is None) != (expected_byte_length is None):
+        raise ItemTemplateIntegrityError(
+            "item-template integrity descriptor is incomplete"
+        )
+    payload = path.read_bytes()
+    if expected_byte_length is not None and len(payload) != expected_byte_length:
+        raise ItemTemplateIntegrityError(
+            f"item-template byte length mismatch: expected {expected_byte_length}, "
+            f"found {len(payload)}"
+        )
+    if expected_sha256 is not None:
+        actual_sha256 = hashlib.sha256(payload).hexdigest()
+        if actual_sha256 != expected_sha256:
+            raise ItemTemplateIntegrityError(
+                f"item-template SHA-256 mismatch: expected {expected_sha256}, "
+                f"found {actual_sha256}"
+            )
     requested_ids = None if template_ids is None else frozenset(template_ids)
     templates: dict[int, list[Any]] = {}
-    with path.open("rb") as handle:
+    with io.BytesIO(payload) as handle:
         version_length_bytes = handle.read(1)
         if len(version_length_bytes) != 1:
             raise ValueError("item-template database is missing its version length")
@@ -481,6 +507,26 @@ def load_item_templates(
         if handle.read(1):
             raise ValueError("item-template database has trailing data after its declared slices")
     return templates
+
+
+def load_verified_item_templates(
+    path: Path,
+    template_ids: set[int] | frozenset[int],
+    *,
+    expected_sha256: str,
+    expected_byte_length: int,
+) -> dict[int, list[Any]]:
+    try:
+        return load_item_templates(
+            path,
+            template_ids,
+            expected_sha256=expected_sha256,
+            expected_byte_length=expected_byte_length,
+        )
+    except ItemTemplateIntegrityError:
+        raise
+    except ValueError as error:
+        raise ValueError(f"verified item-template decode failure: {error}") from error
 
 
 def divide_rounded(numerator: int, denominator: int, mode: str) -> int:
@@ -1107,6 +1153,8 @@ def build_formula_dataset(
     inventory: dict[str, Any],
     active_coverage: dict[str, Any],
     item_database_path: Path,
+    item_database_sha256: str | None = None,
+    item_database_byte_length: int | None = None,
 ) -> dict[str, Any]:
     profiles = [
         compact_profile(profile)
@@ -1116,7 +1164,17 @@ def build_formula_dataset(
     referenced_template_ids: set[int] = set()
     for profile in profiles:
         referenced_template_ids.update(collect_template_ids(profile))
-    item_templates = load_item_templates(item_database_path, referenced_template_ids)
+    if item_database_sha256 is not None and item_database_byte_length is not None:
+        item_templates = load_verified_item_templates(
+            item_database_path,
+            referenced_template_ids,
+            expected_sha256=item_database_sha256,
+            expected_byte_length=item_database_byte_length,
+        )
+    else:
+        item_templates = load_item_templates(
+            item_database_path, referenced_template_ids
+        )
     template_rows = []
     for template_id in sorted(referenced_template_ids):
         template = item_templates.get(template_id)
@@ -4538,6 +4596,8 @@ def main() -> int:
     parser.add_argument("--inventory-sha256")
     parser.add_argument("--inventory-byte-length", type=int)
     parser.add_argument("--items", type=Path, default=DEFAULT_ITEMS)
+    parser.add_argument("--items-sha256")
+    parser.add_argument("--items-byte-length", type=int)
     parser.add_argument(
         "--active-coverage", type=Path, default=DEFAULT_ACTIVE_COVERAGE
     )
@@ -4638,7 +4698,12 @@ def main() -> int:
         expected_byte_length=arguments.inventory_byte_length,
     )
     if arguments.inspect_item:
-        templates = load_item_templates(arguments.items, set(arguments.inspect_item))
+        templates = load_item_templates(
+            arguments.items,
+            set(arguments.inspect_item),
+            expected_sha256=arguments.items_sha256,
+            expected_byte_length=arguments.items_byte_length,
+        )
         print(
             json.dumps(
                 {
@@ -4875,6 +4940,8 @@ def main() -> int:
         inventory,
         load_json(arguments.active_coverage),
         arguments.items,
+        arguments.items_sha256,
+        arguments.items_byte_length,
     )
     rendered = canonical_json(dataset)
     formula_binding_count = sum(

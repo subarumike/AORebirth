@@ -918,7 +918,14 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
     governed_json_parse_failure = (
         "json.decoder.JSONDecodeError:" in detail and "decode_json_text" in detail
     )
-    return json_decoder_failure or governed_json_parse_failure
+    verified_item_database_failure = (
+        "verified item-template decode failure:" in detail
+    )
+    return (
+        json_decoder_failure
+        or governed_json_parse_failure
+        or verified_item_database_failure
+    )
 
 
 def _terminate_process_tree(
@@ -1059,6 +1066,31 @@ def _write_verified_private_input(path: Path, payload: bytes, label: str) -> Non
         raise PipelineError(f"{label} failed exact readback verification")
 
 
+def _read_verified_private_input(
+    source: Path,
+    *,
+    expected_sha256: str,
+    expected_byte_length: int,
+    label: str,
+) -> bytes:
+    failures: list[str] = []
+    for attempt in range(1, 4):
+        try:
+            payload = source.read_bytes()
+        except OSError as error:
+            failures.append(f"attempt {attempt}: {type(error).__name__}")
+            continue
+        actual_sha256 = sha256_bytes(payload)
+        if len(payload) != expected_byte_length or actual_sha256 != expected_sha256:
+            failures.append(
+                f"attempt {attempt}: expected {expected_byte_length}/"
+                f"{expected_sha256}, found {len(payload)}/{actual_sha256}"
+            )
+            continue
+        return payload
+    raise PipelineError(f"{label} read failed: {'; '.join(failures)}")
+
+
 def _write_round_seed(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=False)
     _write_verified_private_input(path, payload, "active/formula round seed")
@@ -1070,7 +1102,7 @@ def _run_active_formula_fixed_point(
     frozen_repo_root: Path,
     inventory_payload: bytes,
     authoritative_inventory_path: Path,
-    item_database_path: Path,
+    item_database_payload: bytes,
     lease: Any,
     max_rounds: int,
 ) -> FixedPointResult:
@@ -1080,6 +1112,8 @@ def _run_active_formula_fixed_point(
     initial = PairState(initial_payload, initial_payload)
     inventory_sha256 = sha256_bytes(inventory_payload)
     inventory_byte_length = len(inventory_payload)
+    item_database_sha256 = sha256_bytes(item_database_payload)
+    item_database_byte_length = len(item_database_payload)
 
     def transition(previous: PairState, round_number: int) -> PairState:
         round_root = rounds_root / f"round-{round_number:02d}"
@@ -1089,6 +1123,7 @@ def _run_active_formula_fixed_point(
         formula_inventory_path = (
             round_root / "formula-input" / "combat-inventory.json"
         )
+        formula_item_database_path = round_root / "formula-items" / "items.dat"
         formula_seed = round_root / "formula-seed" / "formula-dataset.json"
         _write_round_seed(active_inventory_path, inventory_payload)
         _write_round_seed(formula_inventory_path, inventory_payload)
@@ -1130,6 +1165,7 @@ def _run_active_formula_fixed_point(
             raise PipelineError(
                 f"active-coverage generator omitted its staged output{suffix}"
             )
+        _write_round_seed(formula_item_database_path, item_database_payload)
         formula_output = round_root / "output" / "formula-dataset.json"
         formula_completed = run_checked(
             (
@@ -1147,7 +1183,11 @@ def _run_active_formula_fixed_point(
                 "--inventory-byte-length",
                 str(inventory_byte_length),
                 "--items",
-                str(item_database_path),
+                str(formula_item_database_path),
+                "--items-sha256",
+                item_database_sha256,
+                "--items-byte-length",
+                str(item_database_byte_length),
                 "--active-coverage",
                 str(active_output),
                 "--output",
@@ -1270,12 +1310,29 @@ def build_candidate_cohort(
     if decode_json_text(inventory_projection_bytes.decode("utf-8")) != inventory_projection:
         raise PipelineError("private generator inventory projection is not canonical")
 
+    item_database_record = next(
+        (
+            record
+            for record in auxiliary_snapshot.records
+            if record.relative_path == ITEM_DATABASE.as_posix()
+        ),
+        None,
+    )
+    if item_database_record is None:
+        raise PipelineError("frozen item database descriptor is missing")
+    item_database_payload = _read_verified_private_input(
+        auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
+        expected_sha256=item_database_record.sha256,
+        expected_byte_length=item_database_record.size,
+        label="frozen item database",
+    )
+
     fixed_point = _run_active_formula_fixed_point(
         repo_root=repo_root,
         frozen_repo_root=frozen_repo_root,
         inventory_payload=inventory_projection_bytes,
         authoritative_inventory_path=authoritative_inventory_path,
-        item_database_path=auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
+        item_database_payload=item_database_payload,
         lease=lease,
         max_rounds=max_rounds,
     )

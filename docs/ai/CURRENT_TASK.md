@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `9f0c9e2a49178135bb7d614534d01192d158273c79d65aa2700925097edf6e72`
+  `b9dc9cd6474ba0cd60ce620f597a99a67c811c7b88b954a76f7f7b6d7794691f`
 - Combined input identity:
-  `fd5043547ae263085fadd4d8199f1c6740f55d88a119baa54f4137b892eb9971`
+  `9385f328de8f7c6d1c2dc1714286370103601de7d01d0af4e559069099ab4463`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -49,13 +49,18 @@ their generation manifest are one coordinated generated cohort.
   interpreter-internal failures. Large governed JSON inputs initialize only the
   standard library's pure-Python scanner, and every active/formula child parses
   its own fsynced, exact-readback, SHA/length-verified projection copy.
+- The 2,466,207-byte ItemDb is bound to its frozen auxiliary snapshot SHA/length,
+  retained as verified parent bytes, and rematerialized independently for every
+  formula round. Integrity mismatches fail closed; only decode failures after a
+  matching descriptor receive bounded fresh-process retry.
 - The portable input descriptor is schema 2. It commits durable capture source,
   plan, capture identity, and session state while excluding private shard
   path/hash/length fields that are validated before normalization and are not
   publication inputs.
 - The final focused transaction and pipeline suite is **70/70 PASS**. The final
-  coordinated `--write`, `--validate-current`, and real-corpus `--check` pass
-  with three fixed-point rounds and byte-identical runtime-facing artifacts.
+  coordinated `--write` and `--validate-current` pass with three fixed-point
+  rounds and byte-identical runtime-facing artifacts. The final clean-commit
+  stress matrix supplies the real-corpus reproducibility checks.
 - The standalone secret scan and Debug build passed without starting an engine.
 - The final handoff must report five consecutive complete mandatory integration
   gates from one unchanged final commit. Those results are not written back to
