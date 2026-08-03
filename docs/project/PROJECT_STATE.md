@@ -47,7 +47,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2`.
+`d9cd2989721ac8274bc600c0fefba850bbb64ffeb4de92ee08352e6b7ae937d5`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
@@ -66,12 +66,16 @@ an explicit work stack, eliminating the recursive native-crash path without
 changing retained templates or the governed formula artifact.
 Cohort validation now binds each JSON decode to the manifest SHA/length, reuses
 the first parsed object instead of reparsing the 124 MB inventory, and retries
-only `JSONDecodeError` against the same verified UTF-8 string up to three times.
+`JSONDecodeError` against the same verified UTF-8 string up to three times. The
+same bound applies only to exact impossible stdlib scanner `TypeError` signatures
+whose traceback proves `json.decoder`/`json.scanner` ownership.
 Repository-owned acceptance, build, test, and generated-combat wrappers select
 Python 3.14 through `Tools/select_python_runtime.cmd`; the selector can be
 overridden with `AO_REBIRTH_PYTHON`. This avoids the locally installed Python
 3.12 runtime whose repeated `python312.dll` access violations prevented stable
 preflight execution. The manifest records the selected CPython 3.14.4 binary.
+Each mandatory gate holds one read lease across all 13 stages, eliminating the
+former full inventory parse before and after every filtered acceptance wrapper.
 
 The formula ItemDb reader streams each top-level MessagePack array and retains
 only the 42 templates referenced by the governed PF127/PF1931 profiles instead

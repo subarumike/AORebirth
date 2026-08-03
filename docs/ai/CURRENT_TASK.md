@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2`
+  `d9cd2989721ac8274bc600c0fefba850bbb64ffeb4de92ee08352e6b7ae937d5`
 - Combined input identity:
-  `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f`
+  `4fab789dfd1c3dbd8f2f7f8bd432f0ebc46bd10a807b73e87d3ac02033bee701`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -51,7 +51,9 @@ their generation manifest are one coordinated generated cohort.
   its own fsynced, exact-readback, SHA/length-verified projection copy.
 - Cohort validation binds each JSON parse to the manifest SHA/length, parses
   each governed artifact once, and retries only `JSONDecodeError` up to three
-  times against the identical verified UTF-8 string. Other failures remain
+  times against the identical verified UTF-8 string. It applies the same bound
+  only to proven impossible stdlib JSON scanner `TypeError` signatures with a
+  matching `json.decoder`/`json.scanner` traceback; unrelated failures remain
   fail-closed without retry.
 - Mandatory, build, test, and generated-combat wrappers select the installed
   Python 3.14 runtime through one shared overrideable selector. This excludes
@@ -75,6 +77,10 @@ their generation manifest are one coordinated generated cohort.
 - The final handoff must report five consecutive complete mandatory integration
   gates from one unchanged final commit. Those results are not written back to
   tracked files so recording them cannot dirty the commit that they validate.
+- One read lease now covers each complete mandatory gate, so its many filtered
+  AOtomation/build invocations validate delegation instead of reparsing the
+  124 MB inventory. The approved gate supervisor has an explicit four-hour
+  bound; generated children retain their existing 30-minute bound.
 - Remove only task-owned temporary evidence, push `master`, and report the
   final commit and gate results.
 

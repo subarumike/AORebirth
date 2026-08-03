@@ -333,6 +333,65 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             self.assertEqual(
                 pipeline.GOVERNED_JSON_READ_MAX_ATTEMPTS, decode.call_count
             )
+            namespace: dict[str, object] = {}
+            exec(
+                compile(
+                    "def JSONArray(_raw):\n"
+                    "    raise TypeError(\"unsupported operand type(s) for -: "
+                    "'str' and 'int'\")\n",
+                    "C:/Python/Lib/json/decoder.py",
+                    "exec",
+                ),
+                namespace,
+            )
+            json_array_fault = namespace["JSONArray"]
+            transient_calls = 0
+
+            def transient_type_error_then_success(value):
+                nonlocal transient_calls
+                transient_calls += 1
+                if transient_calls < 3:
+                    return json_array_fault(value)
+                return expected
+
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=transient_type_error_then_success,
+            ) as decode:
+                self.assertEqual(
+                    expected,
+                    pipeline.load_json_object(json_path, "type-error fixture"),
+                )
+            self.assertEqual(
+                [mock.call(raw), mock.call(raw), mock.call(raw)],
+                decode.call_args_list,
+            )
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=json_array_fault,
+            ) as decode, self.assertRaisesRegex(
+                pipeline.CohortValidationError,
+                "after 3 stable-input parse attempts",
+            ):
+                pipeline.load_json_object(json_path, "type-error exhaustion fixture")
+            self.assertEqual(
+                pipeline.GOVERNED_JSON_READ_MAX_ATTEMPTS, decode.call_count
+            )
+
+            def unrelated_type_error(_value):
+                raise TypeError(
+                    "unsupported operand type(s) for -: 'str' and 'int'"
+                )
+
+            with mock.patch.object(
+                pipeline,
+                "decode_json_text",
+                side_effect=unrelated_type_error,
+            ) as decode, self.assertRaisesRegex(TypeError, "unsupported operand"):
+                pipeline.load_json_object(json_path, "unrelated type-error fixture")
+            self.assertEqual(1, decode.call_count)
             with mock.patch.object(
                 pipeline,
                 "decode_json_text",
@@ -921,9 +980,17 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
     def test_read_lease_supervisor_preserves_command_after_separator(self):
         arguments = pipeline.parse_arguments(
-            ["--run-read-lease", "--", "Tools\\build_aorebirth_debug.cmd", "arg"]
+            [
+                "--run-read-lease",
+                "--read-lease-command-timeout-seconds",
+                "14400",
+                "--",
+                "Tools\\build_aorebirth_debug.cmd",
+                "arg",
+            ]
         )
         self.assertTrue(arguments.run_read_lease)
+        self.assertEqual(14400, arguments.read_lease_command_timeout_seconds)
         self.assertEqual(
             ["--", "Tools\\build_aorebirth_debug.cmd", "arg"],
             arguments.command,

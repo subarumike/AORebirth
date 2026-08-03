@@ -32,6 +32,7 @@ CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION = 1
 PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION = 2
 DEFAULT_MAX_FIXED_POINT_ROUNDS = 8
 CHILD_PROCESS_TIMEOUT_SECONDS = 1800
+MAX_READ_LEASE_COMMAND_TIMEOUT_SECONDS = 4 * 60 * 60
 PRIMARY_AGGREGATION_MAX_ATTEMPTS = 3
 GOVERNED_JSON_READ_MAX_ATTEMPTS = 3
 MAX_ARTIFACT_BYTES = 512 * 1024 * 1024
@@ -248,6 +249,27 @@ def decode_json_text(raw: str) -> Any:
     return value
 
 
+def _is_transient_json_decoder_failure(error: BaseException) -> bool:
+    if isinstance(error, json.JSONDecodeError):
+        return True
+    if not isinstance(error, TypeError) or str(error) not in {
+        "unsupported operand type(s) for -: 'str' and 'int'",
+        "'str_ascii_iterator' object is not callable",
+    }:
+        return False
+    traceback = error.__traceback__
+    while traceback is not None:
+        code = traceback.tb_frame.f_code
+        filename = code.co_filename.replace("\\", "/").casefold()
+        if code.co_name in {"JSONArray", "_scan_once", "scan_once"} and (
+            filename.endswith("/json/decoder.py")
+            or filename.endswith("/json/scanner.py")
+        ):
+            return True
+        traceback = traceback.tb_next
+    return False
+
+
 def build_generator_inventory_projection(inventory: Mapping[str, Any]) -> dict[str, Any]:
     missing = [key for key in GENERATOR_INVENTORY_PROJECTION_KEYS if key not in inventory]
     if missing:
@@ -324,11 +346,16 @@ def load_json_object(
     for attempt in range(1, GOVERNED_JSON_READ_MAX_ATTEMPTS + 1):
         try:
             value = decode_json_text(raw)
-        except json.JSONDecodeError as error:
-            failure_detail = (
-                f"{error.msg}: line {error.lineno} column {error.colno} "
-                f"(char {error.pos})"
-            )
+        except (json.JSONDecodeError, TypeError) as error:
+            if not _is_transient_json_decoder_failure(error):
+                raise
+            if isinstance(error, json.JSONDecodeError):
+                failure_detail = (
+                    f"{error.msg}: line {error.lineno} column {error.colno} "
+                    f"(char {error.pos})"
+                )
+            else:
+                failure_detail = f"{type(error).__name__}: {error}"
             if attempt < GOVERNED_JSON_READ_MAX_ATTEMPTS:
                 continue
             break
@@ -1780,7 +1807,13 @@ def _shared_publish(
     )
 
 
-def _run_supervised_command(command: Sequence[str], repo_root: Path, lease: Any) -> int:
+def _run_supervised_command(
+    command: Sequence[str],
+    repo_root: Path,
+    lease: Any,
+    *,
+    timeout_seconds: int = CHILD_PROCESS_TIMEOUT_SECONDS,
+) -> int:
     if not command:
         raise PipelineError("--run-read-lease requires a command after --")
     actual = list(command)
@@ -1808,12 +1841,12 @@ def _run_supervised_command(command: Sequence[str], repo_root: Path, lease: Any)
         start_new_session=os.name != "nt",
     )
     try:
-        return process.wait(timeout=CHILD_PROCESS_TIMEOUT_SECONDS)
+        return process.wait(timeout=timeout_seconds)
     except subprocess.TimeoutExpired as error:
         _terminate_process_tree(process)
         raise PipelineError(
             "generated-combat read-lease command timed out "
-            f"after {CHILD_PROCESS_TIMEOUT_SECONDS}s pid={process.pid}"
+            f"after {timeout_seconds}s pid={process.pid}"
         ) from error
 
 
@@ -1823,6 +1856,7 @@ def run_pipeline(
     mode: str,
     max_rounds: int,
     command: Sequence[str] = (),
+    read_lease_command_timeout_seconds: int = CHILD_PROCESS_TIMEOUT_SECONDS,
 ) -> int:
     repo_root = repo_root.resolve(strict=True)
     if mode == "validate-read-delegation":
@@ -1845,7 +1879,12 @@ def run_pipeline(
     if mode == "run-read-lease":
         with _shared_lease(repo_root, "read") as lease:
             manifest = validate_cohort(repo_root, verify_toolchain=False)
-            exit_code = _run_supervised_command(command, repo_root, lease)
+            exit_code = _run_supervised_command(
+                command,
+                repo_root,
+                lease,
+                timeout_seconds=read_lease_command_timeout_seconds,
+            )
             after = validate_cohort(repo_root, verify_toolchain=False)
             if after["generationIdentity"] != manifest["generationIdentity"]:
                 raise CohortValidationError(
@@ -1916,6 +1955,11 @@ def parse_arguments(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=int,
         default=DEFAULT_MAX_FIXED_POINT_ROUNDS,
     )
+    parser.add_argument(
+        "--read-lease-command-timeout-seconds",
+        type=int,
+        default=CHILD_PROCESS_TIMEOUT_SECONDS,
+    )
     parser.add_argument("command", nargs=argparse.REMAINDER)
     return parser.parse_args(argv)
 
@@ -1934,11 +1978,31 @@ def main(argv: Sequence[str] | None = None) -> int:
         mode = "validate-read-delegation"
     if mode != "run-read-lease" and arguments.command:
         raise PipelineError("a trailing command is valid only with --run-read-lease")
+    if not (
+        1
+        <= arguments.read_lease_command_timeout_seconds
+        <= MAX_READ_LEASE_COMMAND_TIMEOUT_SECONDS
+    ):
+        raise PipelineError(
+            "read-lease command timeout must be between 1 and "
+            f"{MAX_READ_LEASE_COMMAND_TIMEOUT_SECONDS} seconds"
+        )
+    if (
+        mode != "run-read-lease"
+        and arguments.read_lease_command_timeout_seconds
+        != CHILD_PROCESS_TIMEOUT_SECONDS
+    ):
+        raise PipelineError(
+            "a custom read-lease command timeout is valid only with --run-read-lease"
+        )
     return run_pipeline(
         repo_root=arguments.repo_root,
         mode=mode,
         max_rounds=arguments.max_fixed_point_rounds,
         command=arguments.command,
+        read_lease_command_timeout_seconds=(
+            arguments.read_lease_command_timeout_seconds
+        ),
     )
 
 
