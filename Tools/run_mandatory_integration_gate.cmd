@@ -9,6 +9,7 @@ if errorlevel 1 (
 
 for %%F in (
     "tools\scan_secrets.cmd"
+    "tools\select_python_runtime.cmd"
     "tools\generate_capture_backed_npc_combat_inventory.cmd"
     "tools\generated_artifact_transaction.py"
     "tools\generated_combat_pipeline.py"
@@ -29,11 +30,8 @@ for %%F in (
         goto :fail
     )
 )
-where python >nul 2>nul
-if errorlevel 1 (
-    echo [AORebirth Gate] FAIL - python is unavailable.
-    goto :fail
-)
+call tools\select_python_runtime.cmd
+if errorlevel 1 goto :fail
 git lfs version >nul 2>nul
 if errorlevel 1 (
     echo [AORebirth Gate] FAIL - Git LFS is unavailable.

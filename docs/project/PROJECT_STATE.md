@@ -47,7 +47,7 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`3e99136015fb50d47fa9e63732050e09343ecf172b3b6127cd9badd48877b760`.
+`1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
@@ -67,6 +67,11 @@ changing retained templates or the governed formula artifact.
 Cohort validation now binds each JSON decode to the manifest SHA/length, reuses
 the first parsed object instead of reparsing the 124 MB inventory, and retries
 only `JSONDecodeError` against the same verified UTF-8 string up to three times.
+Repository-owned acceptance, build, test, and generated-combat wrappers select
+Python 3.14 through `Tools/select_python_runtime.cmd`; the selector can be
+overridden with `AO_REBIRTH_PYTHON`. This avoids the locally installed Python
+3.12 runtime whose repeated `python312.dll` access violations prevented stable
+preflight execution. The manifest records the selected CPython 3.14.4 binary.
 
 The formula ItemDb reader streams each top-level MessagePack array and retains
 only the 42 templates referenced by the governed PF127/PF1931 profiles instead

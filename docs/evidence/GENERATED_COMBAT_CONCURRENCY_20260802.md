@@ -51,7 +51,7 @@ The starting hashes were recorded before reconciliation. The final hashes are fr
 | `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogFixtures.g.cs` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | Byte-identical |
 | `docs/generated/capture_backed_npc_combat_active_coverage.json` | `89b54335c7407d8cebdf3c4d6e07e2353fe2fcfc870a94e625d304dfcf328254` | `e8088b991e555fe9f46119550db9134f128c06ed27e4790e577fe1016b587078` | Only its inventory-source descriptor changed in the Git diff |
 | `docs/generated/enemy_combat_setup_formula_dataset.json` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | Byte-identical |
-| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `cdce1ce38823d880e3b4ee891f99df39fb1f8566339b05133b6345fae6aa0171` | Sixth-file commit marker after final generator hardening |
+| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `1ddab7ec0392a2405e3c4805259dd3d812cae255c1edda78d94f6c1db52f4d27` | Sixth-file commit marker after final generator hardening |
 
 The catalog, fixtures, and formula data stayed byte-identical. The active-coverage Git diff changes only its recorded inventory SHA-256. No supported runtime C# source was changed for this reconciliation, and the generated runtime catalog stayed byte-identical. Those facts are the boundary for the conclusion that runtime semantics did not change.
 
@@ -59,9 +59,9 @@ The catalog, fixtures, and formula data stayed byte-identical. The active-covera
 
 | Identity | Value |
 | --- | --- |
-| Generation identity | `3e99136015fb50d47fa9e63732050e09343ecf172b3b6127cd9badd48877b760` |
+| Generation identity | `1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2` |
 | Combined input identity | `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f` |
-| Rendered manifest SHA-256 | `cdce1ce38823d880e3b4ee891f99df39fb1f8566339b05133b6345fae6aa0171` |
+| Rendered manifest SHA-256 | `1ddab7ec0392a2405e3c4805259dd3d812cae255c1edda78d94f6c1db52f4d27` |
 | Primary capture snapshot identity | `cf8d193c23263a3797db2dbb25838658f40f826d26a2bf99604b4f6d8dea8056` |
 | Primary capture manifest SHA-256 | `0ba2a6a5a1c02ed0468427f8d5bc20adf403c773b478426b02f6253980030b3d` |
 | Primary capture manifest byte length | `402965` |
@@ -159,9 +159,15 @@ Completed:
   Child classification uses full output, while bounded diagnostics preserve
   both the faulthandler header and terminal frames instead of tail-truncating
   the decisive status.
+- Two subsequent stress launchers crashed during preflight before any phase,
+  and Windows recorded distinct native `python312.dll` `0xc0000005` fault
+  offsets. The repository wrappers now share one Python 3.14-or-newer selector
+  with an explicit override. CPython 3.14.4 passed the focused suite and a full
+  coordinated regeneration; all five runtime-facing artifact hashes remained
+  byte-identical while only the manifest runtime/generation identity changed.
 - Final focused transaction and pipeline suite: **70/70 PASS**.
 - Final coordinated `--write` and `--validate-current`: **PASS**, generation
-  `3e99136015fb50d47fa9e63732050e09343ecf172b3b6127cd9badd48877b760`, input
+  `1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2`, input
   `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f`, three
   fixed-point rounds. Final clean-commit reproducibility remains delivery-only.
 

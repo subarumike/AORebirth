@@ -25,7 +25,7 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `3e99136015fb50d47fa9e63732050e09343ecf172b3b6127cd9badd48877b760`
+  `1415fb5433328c075835c2f8df64638681f9e2e7ca2f4b5da57c566c27b391e2`
 - Combined input identity:
   `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
@@ -53,6 +53,10 @@ their generation manifest are one coordinated generated cohort.
   each governed artifact once, and retries only `JSONDecodeError` up to three
   times against the identical verified UTF-8 string. Other failures remain
   fail-closed without retry.
+- Mandatory, build, test, and generated-combat wrappers select the installed
+  Python 3.14 runtime through one shared overrideable selector. This excludes
+  the local Python 3.12 installation that repeatedly failed in `python312.dll`
+  with native `0xc0000005` access violations before stress phases began.
 - The 2,466,207-byte ItemDb is bound to its frozen auxiliary snapshot SHA/length,
   retained as verified parent bytes, and rematerialized independently for every
   formula round. Integrity mismatches fail closed; only decode failures after a

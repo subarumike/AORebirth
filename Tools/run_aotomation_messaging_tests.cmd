@@ -1,10 +1,12 @@
 @echo off
+call "%~dp0select_python_runtime.cmd"
+if errorlevel 1 exit /b 1
 if not "%AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION%"=="" (
-    python "%~dp0generated_combat_pipeline.py" --_validate-read-delegation
+    %AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --_validate-read-delegation
     if errorlevel 1 exit /b 1
     goto :generated_combat_read_lease_acquired
 )
-python "%~dp0generated_combat_pipeline.py" --run-read-lease -- "%ComSpec%" /d /c "%~f0" %*
+%AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --run-read-lease -- "%ComSpec%" /d /c "%~f0" %*
 exit /b %errorlevel%
 
 :generated_combat_read_lease_acquired
