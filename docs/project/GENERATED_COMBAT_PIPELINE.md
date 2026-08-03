@@ -56,7 +56,7 @@ Snapshot identities use normalized logical paths plus content descriptors. They 
 
 The primary generator and its analyzer dependencies execute from the frozen auxiliary tree, while capture reads are bound to the primary source plan in the repository. The primary stage produces inventory, runtime catalog, fixtures, and the private capture snapshot manifest in a unique candidate directory.
 
-The coordinator then copies those three primary outputs into the frozen tree and generates active coverage and formula data as a pair. The pair must reach a byte-identical fixed point. A repeated non-identical state is rejected as a deterministic cycle, and failure to converge within the configured bound is rejected. The reconciled cohort converges in three rounds.
+The coordinator then copies those three primary outputs into the frozen tree and generates active coverage and formula data as a pair. The pair must reach a byte-identical fixed point. After round one, if the next active bytes equal the previous active state, the previous formula bytes are reused because they are already the deterministic formula projection of that same active state; the convergence round is still counted. A repeated non-identical state is rejected as a deterministic cycle, and failure to converge within the configured bound is rejected. The reconciled cohort converges in three rounds.
 
 Formula generation streams each top-level MessagePack array in the frozen
 `items.dat` and retains only item templates referenced by the governed PF127 and

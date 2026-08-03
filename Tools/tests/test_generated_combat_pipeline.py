@@ -751,10 +751,10 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         self.assertEqual(3, result.rounds)
         self.assertEqual(states[-1], result.state)
 
-    def test_fixed_point_rematerializes_verified_inventory_per_child_and_round(self):
+    def test_fixed_point_skips_redundant_converged_formula_round(self):
         inventory_payload = b'{"profiles":[]}'
         item_database_payload = b"verified-item-database"
-        active_payload = b'{"active":1}'
+        active_payload = pipeline.canonical_json_bytes({})
         formula_payload = b'{"formula":1}'
         inventory_paths = []
         item_database_paths = []
@@ -809,17 +809,32 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 lease=object(),
                 max_rounds=4,
             )
+            converged_formula_output_exists = (
+                root
+                / "_active-formula-rounds"
+                / "round-02"
+                / "output"
+                / "formula-dataset.json"
+            ).exists()
 
         self.assertEqual(active_payload, result.state.active_coverage)
         self.assertEqual(formula_payload, result.state.formula_dataset)
-        self.assertEqual(4, len(inventory_paths))
-        self.assertEqual(4, len({path for _label, path in inventory_paths}))
-        self.assertEqual(2, len(item_database_paths))
-        self.assertEqual(2, len(set(item_database_paths)))
+        self.assertEqual(3, len(inventory_paths))
+        self.assertEqual(3, len({path for _label, path in inventory_paths}))
+        self.assertEqual(1, len(item_database_paths))
         self.assertEqual(
             {"round-01", "round-02"},
             {path.parents[1].name for _label, path in inventory_paths},
         )
+        self.assertEqual(
+            [
+                "active-coverage round 1",
+                "formula round 1",
+                "active-coverage round 2",
+            ],
+            [label for label, _path in inventory_paths],
+        )
+        self.assertFalse(converged_formula_output_exists)
 
     def test_active_formula_cycle_is_rejected(self):
         initial = pipeline.PairState(b"active-0", b"formula-0")

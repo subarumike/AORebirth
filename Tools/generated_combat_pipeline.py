@@ -1219,7 +1219,6 @@ def _run_active_formula_fixed_point(
         formula_item_database_path = round_root / "formula-items" / "items.dat"
         formula_seed = round_root / "formula-seed" / "formula-dataset.json"
         _write_round_seed(active_inventory_path, inventory_payload)
-        _write_round_seed(formula_inventory_path, inventory_payload)
         _write_round_seed(formula_seed, previous.formula_dataset)
         active_output = round_root / "output" / "active-coverage.json"
         active_output.parent.mkdir(parents=True)
@@ -1258,6 +1257,13 @@ def _run_active_formula_fixed_point(
             raise PipelineError(
                 f"active-coverage generator omitted its staged output{suffix}"
             )
+        active_payload = active_output.read_bytes()
+        if (
+            round_number > 1
+            and active_payload == previous.active_coverage
+        ):
+            return PairState(active_payload, previous.formula_dataset)
+        _write_round_seed(formula_inventory_path, inventory_payload)
         _write_round_seed(formula_item_database_path, item_database_payload)
         formula_output = round_root / "output" / "formula-dataset.json"
         formula_completed = run_checked(
@@ -1297,7 +1303,7 @@ def _run_active_formula_fixed_point(
             raise PipelineError(
                 f"formula generator omitted its staged output{suffix}"
             )
-        return PairState(active_output.read_bytes(), formula_output.read_bytes())
+        return PairState(active_payload, formula_output.read_bytes())
 
     return iterate_pair_to_fixed_point(
         transition,
