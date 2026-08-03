@@ -2,13 +2,11 @@
 
 ## Decision
 
-WebEngine uses Option B: an operator supplies one local ZIP and imports it
-offline. Neither WebEngine nor any repository wrapper downloads, updates, or
-selects WebCore content at runtime. A missing, modified, or differently pinned
-asset tree is a startup failure, not a trigger for network access.
-
-This decision preserves the existing WebEngine HTTP serving and PHP execution
-roles while replacing only the unsafe content-supply mechanism.
+WebEngine uses an operator-supplied local ZIP plus an AORebirth-authored,
+deterministic compatibility overlay. Neither WebEngine nor any repository
+wrapper downloads, updates, or selects WebCore content at runtime. A missing,
+modified, differently pinned, or unpatched asset tree is a startup failure, not
+a trigger for network access.
 
 ## Authoritative pin
 
@@ -21,12 +19,16 @@ roles while replacing only the unsafe content-supply mechanism.
 | Extracted inventory | 7,140 files; 26,648,501 bytes |
 | Canonical manifest SHA-256 | `85c1515d274c2e4051013e89ca6d2a355365d5d01df7d621cc060dfa84e38463` |
 | Checked-in manifest source | `AORebirth/Config/WebCoreAssets.manifest.xml` |
-| Runtime manifest | `WebCoreAssets.manifest.xml` beside `WebEngine.exe` |
+| Compatibility manifest | `AORebirth/Config/WebCoreCompatibility.manifest.xml` |
+| Final installed-tree manifest | `AORebirth/Config/WebCorePatchedAssets.manifest.xml` |
+| Compatibility tool | `Tools/webcore_php_compatibility.py` |
 | Runtime content root | configured `WebHostRoot`, currently `htdocs`, beside `WebEngine.exe` |
 
-The manifest binds the upstream identity and expected file inventory. The
-archive itself and the imported runtime tree are local supply artifacts, not a
-mutable repository bootstrap.
+The base manifest binds the untouched upstream identity and file inventory.
+The compatibility manifest binds each exact input hash, operation ID, output
+hash, and the full final manifest hash. The final manifest binds all 7,140
+installed files. The archive and both base/patched runtime trees are local
+supply artifacts and never enter Git.
 
 ## Why this snapshot
 
@@ -81,10 +83,13 @@ from a CMD rooted at the repository:
 cmd /d /c import-webcore-assets.cmd "C:\local-only\CellAO-WebCore-765c3850767b63af1cd259bab7f2f7ca3e97adf9.zip" 765c3850767b63af1cd259bab7f2f7ca3e97adf9
 ```
 
-The command accepts only a local ZIP plus the explicit exact version. It must
-reject a version other than the maintained pin, an archive whose SHA-256 or root
-does not match, and any result that does not reproduce the maintained manifest.
-It performs no acquisition and has no URL fallback.
+The command accepts only a local ZIP plus the explicit exact version. It rejects
+a version other than the maintained pin, an archive whose SHA-256 or root does
+not match, and any result that does not reproduce the base manifest. While
+retaining the exclusive import lease, it runs the hash-pinned compatibility tool
+against staging, validates every exact patch input/output, validates the
+complete final manifest, and only then activates the patched tree. It performs
+no acquisition and has no URL fallback.
 
 The importer rejects URI, UNC, device, reparse-point, and archive-inside-live-
 root inputs. The configured live root is confined below the WebEngine directory.
@@ -108,6 +113,7 @@ Validate an installed tree directly with:
 
 ```cmd
 cmd /d /c validate-webcore-assets.cmd
+cmd /d /c validate-webcore-php.cmd
 ```
 
 Run the deterministic asset validator self-test with:
@@ -116,22 +122,24 @@ Run the deterministic asset validator self-test with:
 cmd /d /c Tools\run_web_engine_security_tests.cmd
 ```
 
-`/validate-webcore-assets` is the operator check against the runtime manifest
-and imported `htdocs`. `/self-test-webcore-assets` exercises the deterministic
-validation contract without requiring production assets, PHP, a database, or
-network access. The security runner also parses the checked-in 7,140-file
-manifest through the production loader and verifies its repository, full commit,
-archive identity, license-status marker, file count, and byte total.
+`/validate-webcore-assets` checks the complete patched tree against the
+base/compatibility/final authority chain. `validate-webcore-php.cmd` first
+revalidates that tree and the exact PHP runtime, then lints all 25 PHP files.
+`/self-test-webcore-assets` exercises the deterministic import contract without
+requiring production assets, PHP, a database, or network access.
 
 `start-web-engine.cmd` repeats the installed-tree validation. Its fail-closed
 order is:
 
 1. Read-only database preflight.
 2. Required `WebEngine.exe` binary.
-3. Local PHP runtime validation.
-4. WebCore manifest and asset validation.
-5. Exact process/port ownership prestart checks.
-6. Launch and launched-PID ownership verification.
+3. PHP manifest validation.
+4. Complete PHP runtime, module, INI, and real-CGI validation.
+5. WebCore base-manifest validation.
+6. Compatibility and final-manifest validation.
+7. Complete patched installed-tree validation.
+8. Exact process/port stopped-state preflight.
+9. Launch and launched-PID ownership verification.
 
 Failure at any prelaunch step launches no new WebEngine. An already-running
 verified process, or a conflicting process owned outside this workflow, is not
@@ -143,10 +151,16 @@ terminated by the failed start attempt.
   configuration or startup.
 - Do not treat a successful integrity check as permission to redistribute the
   files. No upstream license file was found, so licensing remains unresolved.
-- Do not treat the 2014 password-contract match as proof of modern runtime
-  safety. The assets retain obsolete PHP/MySQL/mcrypt/config assumptions.
-- No maintained PHP version has been proven compatible. WebEngine remains
-  optional and is not production-safe.
+- PHP 8.5.9 executes the approved CGI probe and lints all 25 minimally patched
+  PHP files. This proves syntax, runtime identity, modules, and configuration;
+  it does not prove database-backed semantics.
+- Direct admin, internal, authentication, registration, logout, member, and
+  mutation endpoints are disabled at the HTTP route boundary. Public routes are
+  limited to `about.php`, `index.php`, `notfound.php`, and `support.php`, plus
+  allowlisted static extensions.
+- WebEngine remains optional, development-only, and not production-safe because
+  no live database compatibility test was authorized, transport is plaintext,
+  and upstream licensing is unresolved.
 - A future WebCore revision requires a deliberate compatibility, security, and
   license review; a new exact commit and archive hash; a regenerated checked-in
   manifest; and deterministic test updates. Never advance the pin implicitly.
@@ -159,5 +173,7 @@ terminated by the failed start attempt.
 
 ## Evidence
 
-See `docs/evidence/WEBCORE_BOOTSTRAP_SECURITY_20260802.md` for the reconciliation
-record and validation status.
+See `docs/evidence/WEBCORE_BOOTSTRAP_SECURITY_20260802.md` for the original
+offline-bootstrap reconciliation and
+`docs/evidence/WEBENGINE_PHP_COMPATIBILITY_20260802.md` for the maintained PHP,
+compatibility overlay, lint, and runtime boundary.
