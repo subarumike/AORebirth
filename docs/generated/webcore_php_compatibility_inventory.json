@@ -1,0 +1,809 @@
+{
+  "base_manifest_sha256": "85c1515d274c2e4051013e89ca6d2a355365d5d01df7d621cc060dfa84e38463",
+  "categories": {
+    "arbitrary_upload": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "authentication_bypass": {
+      "base_count": 3,
+      "findings": [
+        {
+          "category": "authentication_bypass",
+          "disposition": "terminate immediately and verify session identity before role comparison",
+          "line": "35-58",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "AUTH_REQUIRED/ADMIN_REQUIRED/GM_REQUIRED redirect without exit",
+          "reachable": "admin, member, and data routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "includes/config.php",
+          "required_patch_action": "terminate immediately and verify session identity before role comparison",
+          "runtime_impact": "denied scripts continue executing",
+          "security_relevance": "critical"
+        }
+      ],
+      "patched_count": 0
+    },
+    "bareword_array_keys": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "bundled_third_party_php_libraries": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "character_set_assumptions": {
+      "base_count": 2,
+      "findings": [
+        {
+          "category": "character_set_assumptions",
+          "disposition": "preserve repository latin1 tables with explicit PDO charset; live non-ASCII validation remains blocked",
+          "line": "header 8; config 19",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "ISO-8859-1 HTML plus PDO DSN without charset",
+          "reachable": "all pages and DB routes",
+          "relative_path": "includes/header.php; includes/config.php",
+          "required_patch_action": "preserve repository latin1 tables with explicit PDO charset; live non-ASCII validation remains blocked",
+          "runtime_impact": "JSON and database conversions depend on implicit encodings",
+          "security_relevance": "high data-integrity boundary"
+        }
+      ],
+      "patched_count": 1
+    },
+    "command_injection": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "cookie_security_flags": {
+      "base_count": 0,
+      "findings": [
+        {
+          "category": "cookie_security_flags",
+          "disposition": "require strict cookie-only HttpOnly SameSite policy in the approved php.ini; Secure requires HTTPS",
+          "line": "8",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "session_start with no source-level cookie policy",
+          "reachable": "all stateful routes",
+          "relative_path": "includes/config.php",
+          "required_patch_action": "require strict cookie-only HttpOnly SameSite policy in the approved php.ini; Secure requires HTTPS",
+          "runtime_impact": "inherits php.ini defaults",
+          "security_relevance": "high"
+        }
+      ],
+      "patched_count": 0
+    },
+    "create_function": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "csrf": {
+      "base_count": 5,
+      "findings": [
+        {
+          "category": "csrf",
+          "disposition": "fail closed at the host boundary; add POST and session-bound tokens before any future route expansion",
+          "line": "registration/logout/account/character/item state routes",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "state changes have no CSRF token; several use GET",
+          "reachable": "all affected routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "register.php; logout.php; includes/data/users.php; includes/data/characters.php; includes/data/items.php",
+          "required_patch_action": "fail closed at the host boundary; add POST and session-bound tokens before any future route expansion",
+          "runtime_impact": "source routes lack CSRF defenses but cannot be reached through WebEngine",
+          "security_relevance": "high to critical"
+        }
+      ],
+      "patched_count": 5
+    },
+    "curly_brace_offsets": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "debug_installer_admin_endpoints": {
+      "base_count": 8,
+      "findings": [
+        {
+          "category": "debug_installer_admin_endpoints",
+          "disposition": "retain the fail-closed host route policy; separately harden before any route expansion",
+          "line": "direct routes",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "historical administrative UI and JSON endpoints",
+          "reachable": "admin and includes routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "admin/*.php; includes/data/users.php; includes/data/characters.php; includes/data/items.php",
+          "required_patch_action": "retain the fail-closed host route policy; separately harden before any route expansion",
+          "runtime_impact": "exposes account, character, inventory, and item-spawn functions",
+          "security_relevance": "critical until separately hardened"
+        }
+      ],
+      "patched_count": 8
+    },
+    "deprecated_php_functions": {
+      "base_count": 4,
+      "findings": [
+        {
+          "category": "deprecated_php_functions",
+          "disposition": "replace the four string-size calls with strlen",
+          "line": "137-140",
+          "maximum_php": "7.1 without warning",
+          "minimum_php": "4.0",
+          "pattern": "sizeof on string",
+          "reachable": "registration form after submission",
+          "relative_path": "register.php",
+          "required_patch_action": "replace the four string-size calls with strlen",
+          "runtime_impact": "warning from PHP 7.2 and TypeError on PHP 8",
+          "security_relevance": "availability"
+        }
+      ],
+      "patched_count": 0
+    },
+    "direct_sql_interpolation": {
+      "base_count": 2,
+      "findings": [
+        {
+          "category": "direct_sql_interpolation",
+          "disposition": "replace with the exact PDO prepared operation",
+          "line": "17-19",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_connect/mysql_select_db/mysql_query",
+          "reachable": "engine.php, login, and registration routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "replace with the exact PDO prepared operation",
+          "runtime_impact": "undefined functions on PHP 7+ if the function is called",
+          "security_relevance": "critical SQL interpolation in an otherwise unreferenced function"
+        },
+        {
+          "category": "direct_sql_interpolation",
+          "disposition": "replace with the shared PDO prepared login query",
+          "line": "11,17,28,50,54,57",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_* login flow",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "replace with the shared PDO prepared login query",
+          "runtime_impact": "normal login fatals on PHP 7+",
+          "security_relevance": "legacy escaping and implicit connection reuse"
+        }
+      ],
+      "patched_count": 0
+    },
+    "dynamic_properties": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "each": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "ereg": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "eval": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "file_uploads": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "get_magic_quotes_gpc": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "get_magic_quotes_gpc",
+          "disposition": "remove with the mysql_* clean function",
+          "line": "25",
+          "maximum_php": "7.4",
+          "minimum_php": "4.0",
+          "pattern": "get_magic_quotes_gpc",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "remove with the mysql_* clean function",
+          "runtime_impact": "undefined function on PHP 8",
+          "security_relevance": "obsolete SQL escaping"
+        }
+      ],
+      "patched_count": 0
+    },
+    "hardcoded_secrets": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "hardcoded_secrets",
+          "disposition": "require the four local environment variables and never persist their values",
+          "line": "3-6",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "hardcoded upstream DB literals including password placeholder",
+          "reachable": "every page through eager PDO",
+          "relative_path": "includes/config.php",
+          "required_patch_action": "require the four local environment variables and never persist their values",
+          "runtime_impact": "cannot safely select an operator database",
+          "security_relevance": "critical credential boundary"
+        }
+      ],
+      "patched_count": 0
+    },
+    "legacy_password_hashing": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "legacy_password_hashing",
+          "disposition": "preserve in this no-schema task; document migration as separate work",
+          "line": "3-109",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "PBKDF2-HMAC-SHA1, 1111-1366 iterations, 30-byte salt/hash",
+          "reachable": "engine.php, process-login.php, and register.php are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "preserve in this no-schema task; document migration as separate work",
+          "runtime_impact": "executes on maintained PHP after entropy repair",
+          "security_relevance": "weak by modern password-storage standards but exact AO persisted contract"
+        }
+      ],
+      "patched_count": 1
+    },
+    "local_remote_file_inclusion": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "magic_quotes": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "magic_quotes",
+          "disposition": "remove with the mysql_* clean function",
+          "line": "25",
+          "maximum_php": "7.4",
+          "minimum_php": "4.0",
+          "pattern": "get_magic_quotes_gpc",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "remove with the mysql_* clean function",
+          "runtime_impact": "undefined function on PHP 8",
+          "security_relevance": "obsolete SQL escaping"
+        }
+      ],
+      "patched_count": 0
+    },
+    "mcrypt_star": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "mcrypt_star",
+          "disposition": "replace with random_bytes while preserving the exact stored format",
+          "line": "30",
+          "maximum_php": "7.1 core",
+          "minimum_php": "4.0",
+          "pattern": "mcrypt_create_iv",
+          "reachable": "engine.php and register.php are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "replace with random_bytes while preserving the exact stored format",
+          "runtime_impact": "registration fatals because mcrypt is unavailable",
+          "security_relevance": "salt entropy boundary"
+        }
+      ],
+      "patched_count": 0
+    },
+    "mysql_star": {
+      "base_count": 9,
+      "findings": [
+        {
+          "category": "mysql_star",
+          "disposition": "replace with the exact PDO prepared operation",
+          "line": "17-19",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_connect/mysql_select_db/mysql_query",
+          "reachable": "engine.php, login, and registration routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "replace with the exact PDO prepared operation",
+          "runtime_impact": "undefined functions on PHP 7+ if the function is called",
+          "security_relevance": "critical SQL interpolation in an otherwise unreferenced function"
+        },
+        {
+          "category": "mysql_star",
+          "disposition": "replace with the shared PDO prepared login query",
+          "line": "11,17,28,50,54,57",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_* login flow",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "replace with the shared PDO prepared login query",
+          "runtime_impact": "normal login fatals on PHP 7+",
+          "security_relevance": "legacy escaping and implicit connection reuse"
+        }
+      ],
+      "patched_count": 0
+    },
+    "mysqli_star": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "old_style_constructors": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "path_construction": {
+      "base_count": 32,
+      "findings": [
+        {
+          "category": "path_construction",
+          "disposition": "set script-directory CGI cwd and constrain open_basedir",
+          "line": "fixed require/include calls and stats.php 23,45",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "relative local includes and fixed DOMDocument paths",
+          "reachable": "normal and direct routes",
+          "relative_path": "19 PHP files",
+          "required_patch_action": "set script-directory CGI cwd and constrain open_basedir",
+          "runtime_impact": "depends on deterministic CGI working directory/open_basedir",
+          "security_relevance": "no user-controlled PHP include or filesystem path found"
+        }
+      ],
+      "patched_count": 32
+    },
+    "path_traversal": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "pdo": {
+      "base_count": 45,
+      "findings": [
+        {
+          "category": "pdo",
+          "disposition": "retain with an explicit latin1 DSN, error mode, and prepared statements",
+          "line": "config 19; register 70-123; users 34-99; characters 24-99; items 35-83; playfields 21-55",
+          "maximum_php": null,
+          "minimum_php": "5.1",
+          "pattern": "PDO constructor and prepare/execute/fetch operations",
+          "reachable": "all files are directly addressable; most are reached by normal/admin UI",
+          "relative_path": "includes/config.php; register.php; includes/data/users.php; includes/data/characters.php; includes/data/items.php; includes/data/playfields.php",
+          "required_patch_action": "retain with an explicit latin1 DSN, error mode, and prepared statements",
+          "runtime_impact": "requires PDO plus pdo_mysql",
+          "security_relevance": "database boundary"
+        }
+      ],
+      "patched_count": 47
+    },
+    "php_extension_dependencies": {
+      "base_count": 7,
+      "findings": [
+        {
+          "category": "php_extension_dependencies",
+          "disposition": "validate the seven extensions; mcrypt is explicitly not required after patching",
+          "line": "PDO/config/data; DOM stats; session/hash/json/filter/ctype throughout",
+          "maximum_php": null,
+          "minimum_php": "8.2",
+          "pattern": "pdo_mysql, dom, session, hash, json, filter, ctype",
+          "reachable": "normal and direct routes",
+          "relative_path": "active PHP inventory",
+          "required_patch_action": "validate the seven extensions; mcrypt is explicitly not required after patching",
+          "runtime_impact": "missing extension causes startup or route failure",
+          "security_relevance": "runtime supply boundary"
+        }
+      ],
+      "patched_count": 7
+    },
+    "register_globals": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "removed_php_functions": {
+      "base_count": 11,
+      "findings": [
+        {
+          "category": "removed_php_functions",
+          "disposition": "replace with the exact PDO prepared operation",
+          "line": "17-19",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_connect/mysql_select_db/mysql_query",
+          "reachable": "engine.php, login, and registration routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "replace with the exact PDO prepared operation",
+          "runtime_impact": "undefined functions on PHP 7+ if the function is called",
+          "security_relevance": "critical SQL interpolation in an otherwise unreferenced function"
+        },
+        {
+          "category": "removed_php_functions",
+          "disposition": "replace with the shared PDO prepared login query",
+          "line": "11,17,28,50,54,57",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_* login flow",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "replace with the shared PDO prepared login query",
+          "runtime_impact": "normal login fatals on PHP 7+",
+          "security_relevance": "legacy escaping and implicit connection reuse"
+        },
+        {
+          "category": "removed_php_functions",
+          "disposition": "replace with random_bytes while preserving the exact stored format",
+          "line": "30",
+          "maximum_php": "7.1 core",
+          "minimum_php": "4.0",
+          "pattern": "mcrypt_create_iv",
+          "reachable": "engine.php and register.php are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "replace with random_bytes while preserving the exact stored format",
+          "runtime_impact": "registration fatals because mcrypt is unavailable",
+          "security_relevance": "salt entropy boundary"
+        },
+        {
+          "category": "removed_php_functions",
+          "disposition": "remove with the mysql_* clean function",
+          "line": "25",
+          "maximum_php": "7.4",
+          "minimum_php": "4.0",
+          "pattern": "get_magic_quotes_gpc",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "remove with the mysql_* clean function",
+          "runtime_impact": "undefined function on PHP 8",
+          "security_relevance": "obsolete SQL escaping"
+        }
+      ],
+      "patched_count": 0
+    },
+    "safe_mode": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "session_fixation": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "session_fixation",
+          "disposition": "regenerate with deletion only after password validation",
+          "line": "56-75",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "session_regenerate_id before password validation without deleting old session",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "regenerate with deletion only after password validation",
+          "runtime_impact": "session transition is not tightly bound to successful authentication",
+          "security_relevance": "high"
+        }
+      ],
+      "patched_count": 0
+    },
+    "session_register": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "session_storage_assumptions": {
+      "base_count": 43,
+      "findings": [
+        {
+          "category": "session_storage_assumptions",
+          "disposition": "validate php.ini session path/strict mode/cookie policy; retain exact session field names",
+          "line": "43 session API/superglobal references",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "default file session storage and cookie settings",
+          "reachable": "all authenticated routes",
+          "relative_path": "includes/config.php; process-login.php; logout.php; auth.php; includes/header.php; member-profile.php",
+          "required_patch_action": "validate php.ini session path/strict mode/cookie policy; retain exact session field names",
+          "runtime_impact": "requires a writable dedicated non-web session path",
+          "security_relevance": "high"
+        }
+      ],
+      "patched_count": 43
+    },
+    "shell_execution": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "short_open_tags": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "short_open_tags",
+          "disposition": "replace with the full PHP opening tag",
+          "line": "56",
+          "maximum_php": "7.4",
+          "minimum_php": "4.0",
+          "pattern": "<? short opening tag",
+          "reachable": "direct route; not selected by the C# 404 handler",
+          "relative_path": "notfound.php",
+          "required_patch_action": "replace with the full PHP opening tag",
+          "runtime_impact": "not parsed on PHP 8",
+          "security_relevance": "source fragment may be emitted"
+        }
+      ],
+      "patched_count": 0
+    },
+    "split": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "sql_injection": {
+      "base_count": 2,
+      "findings": [
+        {
+          "category": "sql_injection",
+          "disposition": "replace with the exact PDO prepared operation",
+          "line": "17-19",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_connect/mysql_select_db/mysql_query",
+          "reachable": "engine.php, login, and registration routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "replace with the exact PDO prepared operation",
+          "runtime_impact": "undefined functions on PHP 7+ if the function is called",
+          "security_relevance": "critical SQL interpolation in an otherwise unreferenced function"
+        },
+        {
+          "category": "sql_injection",
+          "disposition": "replace with the shared PDO prepared login query",
+          "line": "11,17,28,50,54,57",
+          "maximum_php": "5.6",
+          "minimum_php": "4.0",
+          "pattern": "mysql_* login flow",
+          "reachable": "process-login.php is denied by the WebEngine HTTP allowlist",
+          "relative_path": "process-login.php",
+          "required_patch_action": "replace with the shared PDO prepared login query",
+          "runtime_impact": "normal login fatals on PHP 7+",
+          "security_relevance": "legacy escaping and implicit connection reuse"
+        }
+      ],
+      "patched_count": 0
+    },
+    "syntax_errors": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "syntax_errors",
+          "disposition": "remove only the unmatched closing parenthesis so the complete patched payload remains parseable",
+          "line": "24 (getPlayfield)",
+          "maximum_php": null,
+          "minimum_php": "4.0",
+          "pattern": "SQL string closes as FROM `playfields` WHERE `playfields`.\");",
+          "reachable": "denied by the WebEngine HTTP route allowlist",
+          "relative_path": "includes/data/playfields.php",
+          "required_patch_action": "remove only the unmatched closing parenthesis so the complete patched payload remains parseable",
+          "runtime_impact": "PHP parse failure prevents the playfield endpoint from loading",
+          "security_relevance": "availability"
+        }
+      ],
+      "patched_count": 0
+    },
+    "timezone_assumptions": {
+      "base_count": 2,
+      "findings": [
+        {
+          "category": "timezone_assumptions",
+          "disposition": "pin the approved timezone; credential-backed parity remains unverified",
+          "line": "register 26; header 40",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "date() uses runtime timezone",
+          "reachable": "registration and every page header",
+          "relative_path": "register.php; includes/header.php",
+          "required_patch_action": "pin the approved timezone; credential-backed parity remains unverified",
+          "runtime_impact": "account CreationDate and displayed date vary by php.ini",
+          "security_relevance": "medium persisted/display behavior"
+        }
+      ],
+      "patched_count": 2
+    },
+    "unsafe_deserialization": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "unserialized_user_controlled_data": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "variable_includes": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "weak_password_hashing": {
+      "base_count": 1,
+      "findings": [
+        {
+          "category": "weak_password_hashing",
+          "disposition": "preserve in this no-schema task; document migration as separate work",
+          "line": "3-109",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "PBKDF2-HMAC-SHA1, 1111-1366 iterations, 30-byte salt/hash",
+          "reachable": "engine.php, process-login.php, and register.php are denied by the WebEngine HTTP allowlist",
+          "relative_path": "engine.php",
+          "required_patch_action": "preserve in this no-schema task; document migration as separate work",
+          "runtime_impact": "executes on maintained PHP after entropy repair",
+          "security_relevance": "weak by modern password-storage standards but exact AO persisted contract"
+        }
+      ],
+      "patched_count": 1
+    },
+    "windows_path_behavior": {
+      "base_count": 0,
+      "findings": [],
+      "patched_count": 0
+    },
+    "xss": {
+      "base_count": 6,
+      "findings": [
+        {
+          "category": "xss",
+          "disposition": "HTML-escape err/msg/session name in compatibility patch",
+          "line": "31-36,48",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "request/session values emitted into HTML",
+          "reachable": "allowlisted pages that include the shared header",
+          "relative_path": "includes/header.php",
+          "required_patch_action": "HTML-escape err/msg/session name in compatibility patch",
+          "runtime_impact": "script execution in the WebCore origin",
+          "security_relevance": "high"
+        },
+        {
+          "category": "xss",
+          "disposition": "HTML-encode every server-derived output in the exact compatibility transform",
+          "line": "2,35,50",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "SERVER_NAME, REQUEST_URI, and HTTP_REFERER emitted without context encoding",
+          "reachable": "allowlisted notfound.php route",
+          "relative_path": "notfound.php",
+          "required_patch_action": "HTML-encode every server-derived output in the exact compatibility transform",
+          "runtime_impact": "script execution in the allowlisted not-found response",
+          "security_relevance": "high"
+        },
+        {
+          "category": "xss",
+          "disposition": "fail closed at the host boundary; encode by output context before any future route expansion",
+          "line": "profile 39-49; findUser 6,53-80; editUser 2,157,163,179; editCharacter 2,201,216,262",
+          "maximum_php": null,
+          "minimum_php": "5.5",
+          "pattern": "unescaped database/request values in HTML or JavaScript",
+          "reachable": "all affected admin/member routes are denied by the WebEngine HTTP allowlist",
+          "relative_path": "member-profile.php; admin/findUser.php; admin/editUser.php; admin/editCharacter.php",
+          "required_patch_action": "fail closed at the host boundary; encode by output context before any future route expansion",
+          "runtime_impact": "script execution in authenticated/admin/direct contexts",
+          "security_relevance": "high to critical"
+        }
+      ],
+      "patched_count": 4
+    }
+  },
+  "patch_operations": [
+    {
+      "input_sha256": "3b8e5dd745e076d278a31c923a6b4e43d411fb54a7ddf1bca0619385fac04c11",
+      "operation_id": "engine-pdo-and-random-bytes-v1",
+      "output_sha256": "8f9635f09eb46702d3ee98ecf64eaa2135893721b33a69b1ec56e3f0568bcd08",
+      "relative_path": "engine.php"
+    },
+    {
+      "input_sha256": "73caa625e07f956c412fcdc218877d725c993a3a8aabc08209772bc8f69a5915",
+      "operation_id": "process-login-pdo-v1",
+      "output_sha256": "4b155f9de27ff41cd74fb9f39c1b7521c772c16be9046a0f4fac4f4798461210",
+      "relative_path": "process-login.php"
+    },
+    {
+      "input_sha256": "5f8ab5c37b98a993925c731180b6cc82be8b81f8ccb385a8bda7ecacac9eb7fb",
+      "operation_id": "config-env-pdo-session-auth-v1",
+      "output_sha256": "c375de3d2dadba5263ea094e30fd2f8c71123fce1cd718843364211c9ec7742b",
+      "relative_path": "includes/config.php"
+    },
+    {
+      "input_sha256": "8a3d97270c13e848f464ce3ae18e2fe8ec2dba601140b89a81625a0494996fd6",
+      "operation_id": "register-string-length-v1",
+      "output_sha256": "b95a4aca455fd43b10512f3904f71dfae4a5873768d8b3bd9fc0e753aca1ab5f",
+      "relative_path": "register.php"
+    },
+    {
+      "input_sha256": "5b1231bc293f6a74c3f4ffedf14cf41ee742795ebf512400e8eb73bc249e9fe2",
+      "operation_id": "notfound-php8-and-server-html-encoding-v2",
+      "output_sha256": "1a8834c57f07ff47d98c097737f96811e25e8426029ca1476a25d05b4f6425c6",
+      "relative_path": "notfound.php"
+    },
+    {
+      "input_sha256": "c12f87f77bded03e7bda7036b39ff667e854529108ff761737dc50d7b5604c2e",
+      "operation_id": "header-html-encoding-v1",
+      "output_sha256": "08a09d9f41a97b686057baea6c730e14d9bb0fd6da8018a48bd7a3b7185e1b0b",
+      "relative_path": "includes/header.php"
+    },
+    {
+      "input_sha256": "55013f36f6850124a2f26360cd40933356d2a7f5f6b2f31bd0a4045ad192f340",
+      "operation_id": "playfields-sql-syntax-v1",
+      "output_sha256": "f5892905504d05f3f3c7e551f3a760a5ddf5702c89b47dc9ff949418de856d49",
+      "relative_path": "includes/data/playfields.php"
+    }
+  ],
+  "patch_set_id": "cellao-webcore-php85-compatibility-v1",
+  "patch_set_version": "1",
+  "scan_counts": {
+    "create_function": 0,
+    "curly_brace_offsets": 0,
+    "dynamic_properties": 0,
+    "each": 0,
+    "ereg": 0,
+    "eval": 0,
+    "file_uploads": 0,
+    "get_magic_quotes_gpc": 1,
+    "mcrypt_star": 1,
+    "mysql_star": 9,
+    "mysqli_star": 0,
+    "register_globals": 0,
+    "safe_mode": 0,
+    "session_register": 0,
+    "shell_execution": 0,
+    "short_open_tags": 1,
+    "sizeof_string": 4,
+    "split": 0,
+    "unserialized_user_controlled_data": 0
+  },
+  "schema_version": 1,
+  "scope": {
+    "base_total_bytes": 26648501,
+    "file_count": 7140,
+    "patched_file_count": 7,
+    "patched_total_bytes": 26649619,
+    "php_file_count": 25
+  },
+  "security_boundary": {
+    "host_route_policy": {
+      "allowed_php_routes": [
+        "about.php",
+        "index.php",
+        "notfound.php",
+        "support.php"
+      ],
+      "denied_php_routes": [
+        "admin/",
+        "includes/",
+        "auth.php",
+        "engine.php",
+        "logout.php",
+        "member-*.php",
+        "process-login.php",
+        "register.php"
+      ],
+      "state_mutation_and_admin_member_findings": "fail-closed-unreachable"
+    },
+    "live_database_validation": "blocked-no-valid-credential",
+    "production_safe": false,
+    "unresolved": [
+      "live database behavior remains unvalidated without a valid credential",
+      "plain HTTP cannot safely satisfy Secure authenticated-cookie transport",
+      "upstream licensing remains unresolved"
+    ],
+    "webengine_status": "development-only"
+  },
+  "upstream_commit": "765c3850767b63af1cd259bab7f2f7ca3e97adf9"
+}
