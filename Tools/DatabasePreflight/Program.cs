@@ -1,6 +1,7 @@
 namespace AORebirth.Tools.DatabasePreflight
 {
-    using System;
+using System;
+using Utility.Config;
 
     internal static class Program
     {
@@ -18,6 +19,10 @@ namespace AORebirth.Tools.DatabasePreflight
             }
 
             string connectionString = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = ConfigReadWrite.Instance.CurrentConfig.MysqlConnection;
+            }
             return DatabasePreflightCommand.Run(
                 connectionString,
                 new ProductionDatabasePreflightDataSourceFactory(),

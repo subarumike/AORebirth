@@ -166,7 +166,8 @@ Before database-dependent startup, run the read-only preflight:
 cmd /d /c preflight-database.cmd
 ```
 
-It requires `AO_REBIRTH_MYSQL_CONNECTION` in the current CMD process, opens
+It reads the active private-local connection from `AORebirth\Config\Config.xml`
+and honors `AO_REBIRTH_MYSQL_CONNECTION` as an optional process override. It opens
 through the production MySQL configuration/connector path, requires
 `cellao_codex_clean`, verifies all 34 required tables and read access, and fails
 if any `characters.Online` value is nonzero. It performs no writes, migrations,
@@ -337,12 +338,13 @@ The global owner is `ZoneEngine.Core.Navigation`. PF127 is the first enabled pro
 ## Database
 
 - Use only `cellao_codex_clean`; this is the active legacy database name retained for local compatibility.
-- Keep `AORebirth\Config\Config.xml` free of real credentials. Its checked-in connection string is a non-secret placeholder.
-- Supply the local MySQL connection string to each engine with the `AO_REBIRTH_MYSQL_CONNECTION` environment variable. The environment value overrides only `MysqlConnection` after normal XML deserialization.
-- The override must exist before the CMD process begins because configuration
+- Keep the active private-local MySQL connection in `AORebirth\Config\Config.xml`.
+- `AO_REBIRTH_MYSQL_CONNECTION` is optional and overrides only `MysqlConnection`
+  after normal XML deserialization when a process-specific connection is needed.
+- Any override must exist before the CMD process begins because configuration
   and connector state are cached per engine process.
 - Run `cmd /d /c preflight-database.cmd` before startup. Exit codes are `10`
-  missing override, `11` invalid format, `12` network failure, `13`
+  missing connection in both sources, `11` invalid format, `12` network failure, `13`
   authentication failure, `14` wrong database, `15` missing schema, `16` read
   failure, `17` online characters present, and `18` internal contract failure.
 - Run `cmd /d /c Tools\scan_secrets.cmd` before committing configuration or workflow changes. It reports locations, never captured values.

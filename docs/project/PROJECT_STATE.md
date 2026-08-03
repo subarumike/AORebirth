@@ -55,8 +55,9 @@ PF6553 source-bound profile; no unsupported runtime behavior was added.
 
 ## Repository health
 
-- Tracked configuration contains placeholders only and supports the ignored
-  `AO_REBIRTH_MYSQL_CONNECTION` local environment override.
+- The active private-local MySQL connection is tracked in
+  `AORebirth/Config/Config.xml`; `AO_REBIRTH_MYSQL_CONNECTION` remains an
+  optional process-level override.
 - The read-only database preflight uses the production configuration/connector
   path, verifies the exact database and 34-table contract, and blocks startup
   when any character is still marked online.

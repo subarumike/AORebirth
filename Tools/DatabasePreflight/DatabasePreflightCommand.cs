@@ -16,7 +16,7 @@ namespace AORebirth.Tools.DatabasePreflight
     internal enum DatabasePreflightExitCode
     {
         Success = 0,
-        MissingEnvironmentVariable = 10,
+        MissingConnectionString = 10,
         InvalidConnectionString = 11,
         NetworkFailure = 12,
         AuthenticationFailure = 13,
@@ -123,7 +123,7 @@ namespace AORebirth.Tools.DatabasePreflight
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                return Fail(output, DatabasePreflightExitCode.MissingEnvironmentVariable);
+                return Fail(output, DatabasePreflightExitCode.MissingConnectionString);
             }
 
             MySqlConnectionStringBuilder builder;
@@ -146,7 +146,7 @@ namespace AORebirth.Tools.DatabasePreflight
                 return Fail(output, DatabasePreflightExitCode.WrongDatabase);
             }
 
-            output.WriteLine("[Database Preflight] PASS: current-process environment override is present and well formed.");
+            output.WriteLine("[Database Preflight] PASS: MySQL connection is present and well formed.");
 
             IDatabasePreflightDataSource dataSource;
             try
@@ -316,8 +316,8 @@ namespace AORebirth.Tools.DatabasePreflight
         {
             switch (exitCode)
             {
-                case DatabasePreflightExitCode.MissingEnvironmentVariable:
-                    return "AO_REBIRTH_MYSQL_CONNECTION is missing from the current process environment.";
+                case DatabasePreflightExitCode.MissingConnectionString:
+                    return "no MySQL connection was found in AO_REBIRTH_MYSQL_CONNECTION or Config.xml.";
                 case DatabasePreflightExitCode.InvalidConnectionString:
                     return "the connection string format is invalid.";
                 case DatabasePreflightExitCode.NetworkFailure:
