@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `e1c4dc9b66ca46c2d4d4913243511502df7b29f33368b3ca7c9f67599147f0ab`
+  `9f0c9e2a49178135bb7d614534d01192d158273c79d65aa2700925097edf6e72`
 - Combined input identity:
-  `053c6b3b9efee2a8854c189abaa499ef84a1c579622495431a52ab1b63e02d82`
+  `fd5043547ae263085fadd4d8199f1c6740f55d88a119baa54f4137b892eb9971`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -46,11 +46,16 @@ their generation manifest are one coordinated generated cohort.
 - Active initializer comments are parsed without the repeated regex hot loop;
   capture shards publish atomically with read-back validation and bounded
   materialization retry; isolated children retry only recognized native or
-  interpreter-internal failures. Large governed JSON inputs use the standard
-  library's pure-Python scanner after repeated C-scanner corruption.
-- The final focused transaction and pipeline suite is **67/67 PASS**. The final
-  coordinated `--write` and real-corpus `--check` both pass with three
-  fixed-point rounds and byte-identical runtime-facing artifacts.
+  interpreter-internal failures. Large governed JSON inputs initialize only the
+  standard library's pure-Python scanner, and every active/formula child parses
+  its own fsynced, exact-readback, SHA/length-verified projection copy.
+- The portable input descriptor is schema 2. It commits durable capture source,
+  plan, capture identity, and session state while excluding private shard
+  path/hash/length fields that are validated before normalization and are not
+  publication inputs.
+- The final focused transaction and pipeline suite is **70/70 PASS**. The final
+  coordinated `--write`, `--validate-current`, and real-corpus `--check` pass
+  with three fixed-point rounds and byte-identical runtime-facing artifacts.
 - The standalone secret scan and Debug build passed without starting an engine.
 - The final handoff must report five consecutive complete mandatory integration
   gates from one unchanged final commit. Those results are not written back to

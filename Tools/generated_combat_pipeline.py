@@ -28,9 +28,21 @@ from typing import Any, Callable, Iterator, Mapping, Sequence
 
 PIPELINE_NAME = "capture-backed-npc-combat"
 MANIFEST_SCHEMA_VERSION = 1
+CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION = 1
+PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION = 2
 DEFAULT_MAX_FIXED_POINT_ROUNDS = 8
 CHILD_PROCESS_TIMEOUT_SECONDS = 1800
+PRIMARY_AGGREGATION_MAX_ATTEMPTS = 3
 MAX_ARTIFACT_BYTES = 512 * 1024 * 1024
+GENERATOR_INVENTORY_PROJECTION_KEYS = (
+    "schemaVersion",
+    "authoritativeInputs",
+    "sessions",
+    "profiles",
+    "capturedRealmToRuntimeResource",
+    "metadataGenerations",
+    "summary",
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PRIMARY_GENERATOR = Path(
@@ -212,10 +224,68 @@ def artifact_descriptor(path: Path, logical_path: PurePosixPath) -> dict[str, An
 
 
 def decode_json_text(raw: str) -> Any:
-    decoder = json.JSONDecoder()
+    decoder = object.__new__(json.JSONDecoder)
+    decoder.object_hook = None
+    decoder.parse_float = float
+    decoder.parse_int = int
+    decoder.parse_constant = json.decoder._CONSTANTS.__getitem__
+    decoder.strict = True
+    decoder.object_pairs_hook = None
+    decoder.parse_object = json.decoder.JSONObject
+    decoder.parse_array = json.decoder.JSONArray
     decoder.parse_string = json.decoder.py_scanstring
+    decoder.memo = {}
     decoder.scan_once = json.scanner.py_make_scanner(decoder)
-    return decoder.decode(raw)
+    start = 0
+    while start < len(raw) and raw[start] in " \t\r\n":
+        start += 1
+    value, end = decoder.raw_decode(raw, start)
+    while end < len(raw) and raw[end] in " \t\r\n":
+        end += 1
+    if end != len(raw):
+        raise json.JSONDecodeError("Extra data", raw, end)
+    return value
+
+
+def build_generator_inventory_projection(inventory: Mapping[str, Any]) -> dict[str, Any]:
+    missing = [key for key in GENERATOR_INVENTORY_PROJECTION_KEYS if key not in inventory]
+    if missing:
+        raise CohortValidationError(
+            "primary inventory is missing generator projection keys: "
+            + ", ".join(missing)
+        )
+    return {key: inventory[key] for key in GENERATOR_INVENTORY_PROJECTION_KEYS}
+
+
+def primary_output_signature(
+    artifacts: Mapping[str, Path], snapshot_descriptor: Mapping[str, Any]
+) -> str:
+    paths = {
+        "inventory": artifacts["inventory"],
+        "catalog": artifacts["catalog"],
+        "fixtures": artifacts["fixtures"],
+    }
+    descriptors: dict[str, dict[str, Any]] = {}
+    for role, path in paths.items():
+        if not path.is_file() or path.is_symlink():
+            raise CohortValidationError(
+                f"primary {role} output is missing or is not a regular file"
+            )
+        descriptors[role] = {
+            "byteLength": path.stat().st_size,
+            "sha256": sha256_file(path),
+        }
+    descriptors["captureSnapshot"] = {
+        key: snapshot_descriptor[key]
+        for key in (
+            "schemaVersion",
+            "captureSchemaVersion",
+            "captureSnapshotIdentity",
+            "captureManifestSha256",
+            "captureManifestByteLength",
+        )
+    }
+    return sha256_bytes(canonical_json_bytes(descriptors))
 
 
 def load_json_object(path: Path, label: str) -> dict[str, Any]:
@@ -325,6 +395,30 @@ def extract_acceptance_counts(
     }
 
 
+def _normalized_capture_snapshot_document(
+    snapshot: Mapping[str, Any], schema_version: int
+) -> dict[str, Any]:
+    captures = [
+        {
+            "capture": entry["capture"],
+            "captureId": entry["captureId"],
+            "sourceFiles": entry["sourceFiles"],
+            "sessionState": entry["sessionState"],
+        }
+        for entry in snapshot["captures"]
+    ]
+    core = {
+        "schemaVersion": schema_version,
+        "planIdentity": snapshot["planIdentity"],
+        "generatorSources": snapshot["generatorSources"],
+        "captures": captures,
+    }
+    return {
+        **core,
+        "snapshotIdentity": sha256_bytes(identity_json_bytes(core)),
+    }
+
+
 def _portable_snapshot_descriptor(
     snapshot: Mapping[str, Any], auxiliary_input_identity: str
 ) -> dict[str, Any]:
@@ -338,7 +432,7 @@ def _portable_snapshot_descriptor(
     if not isinstance(snapshot, dict) or set(snapshot) != expected_fields:
         raise CohortValidationError("capture input snapshot fields are invalid")
     schema_version = snapshot["schemaVersion"]
-    if schema_version != 1:
+    if schema_version != CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION:
         raise CohortValidationError("capture input snapshot schemaVersion is unsupported")
     for identity_name in ("planIdentity", "snapshotIdentity"):
         if not isinstance(snapshot[identity_name], str) or not re.fullmatch(
@@ -525,20 +619,25 @@ def _portable_snapshot_descriptor(
         raise CohortValidationError(
             "capture input snapshot identity does not match its content"
         )
-    canonical = identity_json_bytes(snapshot)
+    normalized_snapshot = _normalized_capture_snapshot_document(
+        snapshot, schema_version
+    )
+    canonical = identity_json_bytes(normalized_snapshot)
     canonical_sha256 = sha256_bytes(canonical)
-    provided_identity = snapshot["snapshotIdentity"]
+    provided_identity = normalized_snapshot["snapshotIdentity"]
     if not isinstance(auxiliary_input_identity, str) or not re.fullmatch(
         r"[0-9a-f]{64}", auxiliary_input_identity
     ):
         raise CohortValidationError("auxiliary input snapshot identity is invalid")
     combined_core = {
+        "schemaVersion": PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+        "captureSchemaVersion": schema_version,
         "captureSnapshotIdentity": provided_identity,
         "captureManifestSha256": canonical_sha256,
         "auxiliarySnapshotIdentity": auxiliary_input_identity,
     }
     return {
-        "schemaVersion": 1,
+        "schemaVersion": PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION,
         "identity": sha256_bytes(identity_json_bytes(combined_core)),
         "captureSchemaVersion": schema_version,
         "captureSnapshotIdentity": provided_identity,
@@ -816,7 +915,10 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
         "ValueError: invalid literal for int() with base 10:" in detail
         and ("json\\decoder.py" in detail or "json/decoder.py" in detail)
     )
-    return json_decoder_failure
+    governed_json_parse_failure = (
+        "json.decoder.JSONDecodeError:" in detail and "decode_json_text" in detail
+    )
+    return json_decoder_failure or governed_json_parse_failure
 
 
 def _terminate_process_tree(
@@ -948,16 +1050,26 @@ def _candidate_artifact_paths(candidate_root: Path) -> dict[str, Path]:
     return paths
 
 
+def _write_verified_private_input(path: Path, payload: bytes, label: str) -> None:
+    with path.open("xb") as writer:
+        writer.write(payload)
+        writer.flush()
+        os.fsync(writer.fileno())
+    if path.read_bytes() != payload:
+        raise PipelineError(f"{label} failed exact readback verification")
+
+
 def _write_round_seed(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=False)
-    path.write_bytes(payload)
+    _write_verified_private_input(path, payload, "active/formula round seed")
 
 
 def _run_active_formula_fixed_point(
     *,
     repo_root: Path,
     frozen_repo_root: Path,
-    inventory_path: Path,
+    inventory_payload: bytes,
+    authoritative_inventory_path: Path,
     item_database_path: Path,
     lease: Any,
     max_rounds: int,
@@ -966,10 +1078,20 @@ def _run_active_formula_fixed_point(
     rounds_root.mkdir()
     initial_payload = canonical_json_bytes({})
     initial = PairState(initial_payload, initial_payload)
+    inventory_sha256 = sha256_bytes(inventory_payload)
+    inventory_byte_length = len(inventory_payload)
 
     def transition(previous: PairState, round_number: int) -> PairState:
         round_root = rounds_root / f"round-{round_number:02d}"
-        formula_seed = round_root / "input" / "formula-dataset.json"
+        active_inventory_path = (
+            round_root / "active-input" / "combat-inventory.json"
+        )
+        formula_inventory_path = (
+            round_root / "formula-input" / "combat-inventory.json"
+        )
+        formula_seed = round_root / "formula-seed" / "formula-dataset.json"
+        _write_round_seed(active_inventory_path, inventory_payload)
+        _write_round_seed(formula_inventory_path, inventory_payload)
         _write_round_seed(formula_seed, previous.formula_dataset)
         active_output = round_root / "output" / "active-coverage.json"
         active_output.parent.mkdir(parents=True)
@@ -985,7 +1107,13 @@ def _run_active_formula_fixed_point(
                 "--repo-root",
                 str(frozen_repo_root),
                 "--combat-inventory",
-                str(inventory_path),
+                str(active_inventory_path),
+                "--combat-inventory-descriptor",
+                str(authoritative_inventory_path),
+                "--combat-inventory-sha256",
+                inventory_sha256,
+                "--combat-inventory-byte-length",
+                str(inventory_byte_length),
                 "--formula-dataset",
                 str(formula_seed),
                 "--output",
@@ -1013,7 +1141,11 @@ def _run_active_formula_fixed_point(
                 str(frozen_repo_root / FORMULA_GENERATOR),
                 "--write",
                 "--inventory",
-                str(inventory_path),
+                str(formula_inventory_path),
+                "--inventory-sha256",
+                inventory_sha256,
+                "--inventory-byte-length",
+                str(inventory_byte_length),
                 "--items",
                 str(item_database_path),
                 "--active-coverage",
@@ -1063,36 +1195,67 @@ def build_candidate_cohort(
         prefix="aorebirth-generated-combat-input-snapshot-"
     ) as snapshot_root_name:
         snapshot_path = Path(snapshot_root_name) / "capture-input-snapshot.json"
-        run_checked(
-            (
-                sys.executable,
-                "-I",
-                "-u",
-                "-X",
-                "faulthandler",
-                str(auxiliary_snapshot.path_for(PRIMARY_GENERATOR.as_posix())),
-                "--write",
-                "--output",
-                str(artifacts["inventory"]),
-                "--catalog-output",
-                str(artifacts["catalog"]),
-                "--fixture-output",
-                str(artifacts["fixtures"]),
-                PRIMARY_SNAPSHOT_ARGUMENT,
-                str(snapshot_path),
-            ),
-            repo_root=repo_root,
-            lease=lease,
-            label="primary aggregation",
-            environment_overrides={
-                PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT: str(repo_root)
-            },
-        )
-        if not snapshot_path.is_file():
-            raise PipelineError(
-                "primary generator did not emit its input snapshot manifest"
+        accepted_primary_signatures: set[str] = set()
+        observed_primary_signatures: list[str] = []
+        for primary_attempt in range(1, PRIMARY_AGGREGATION_MAX_ATTEMPTS + 1):
+            snapshot_path.unlink(missing_ok=True)
+            run_checked(
+                (
+                    sys.executable,
+                    "-I",
+                    "-u",
+                    "-X",
+                    "faulthandler",
+                    str(auxiliary_snapshot.path_for(PRIMARY_GENERATOR.as_posix())),
+                    "--write",
+                    "--output",
+                    str(artifacts["inventory"]),
+                    "--catalog-output",
+                    str(artifacts["catalog"]),
+                    "--fixture-output",
+                    str(artifacts["fixtures"]),
+                    PRIMARY_SNAPSHOT_ARGUMENT,
+                    str(snapshot_path),
+                ),
+                repo_root=repo_root,
+                lease=lease,
+                label="primary aggregation",
+                environment_overrides={
+                    PRIMARY_CAPTURE_REPO_ROOT_ENVIRONMENT: str(repo_root)
+                },
+                retry_interpreter_failures=True,
             )
-        snapshot = load_json_object(snapshot_path, "capture input snapshot")
+            try:
+                if not snapshot_path.is_file():
+                    raise CohortValidationError(
+                        "capture input snapshot is missing or is not a regular file"
+                    )
+                inventory = load_json_object(artifacts["inventory"], "primary inventory")
+                inventory_projection = build_generator_inventory_projection(inventory)
+                snapshot = load_json_object(snapshot_path, "capture input snapshot")
+                snapshot_descriptor = _portable_snapshot_descriptor(
+                    snapshot, auxiliary_snapshot.identity
+                )
+                signature = primary_output_signature(
+                    artifacts, snapshot_descriptor
+                )
+            except CohortValidationError as error:
+                if primary_attempt < PRIMARY_AGGREGATION_MAX_ATTEMPTS:
+                    continue
+                raise PipelineError(
+                    "primary aggregation output validation failed on attempt "
+                    f"{primary_attempt}/{PRIMARY_AGGREGATION_MAX_ATTEMPTS}: {error}"
+                ) from error
+            observed_primary_signatures.append(signature)
+            if signature in accepted_primary_signatures:
+                break
+            accepted_primary_signatures.add(signature)
+        else:
+            raise PipelineError(
+                "primary aggregation did not produce two matching validated outputs "
+                f"in {PRIMARY_AGGREGATION_MAX_ATTEMPTS} attempts: "
+                + ", ".join(observed_primary_signatures)
+            )
 
     frozen_repo_root = auxiliary_snapshot.snapshot_root
     for role in ("inventory", "catalog", "fixtures"):
@@ -1100,10 +1263,18 @@ def build_candidate_cohort(
         frozen_path.parent.mkdir(parents=True, exist_ok=True)
         frozen_path.write_bytes(artifacts[role].read_bytes())
 
+    authoritative_inventory_path = frozen_repo_root / Path(
+        ARTIFACT_RELATIVE_PATHS["inventory"]
+    )
+    inventory_projection_bytes = canonical_json_bytes(inventory_projection)
+    if decode_json_text(inventory_projection_bytes.decode("utf-8")) != inventory_projection:
+        raise PipelineError("private generator inventory projection is not canonical")
+
     fixed_point = _run_active_formula_fixed_point(
         repo_root=repo_root,
         frozen_repo_root=frozen_repo_root,
-        inventory_path=frozen_repo_root / Path(ARTIFACT_RELATIVE_PATHS["inventory"]),
+        inventory_payload=inventory_projection_bytes,
+        authoritative_inventory_path=authoritative_inventory_path,
         item_database_path=auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
         lease=lease,
         max_rounds=max_rounds,
@@ -1191,11 +1362,19 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
     _require_nonnegative_int(
         input_snapshot["schemaVersion"], "input snapshot descriptor schema version"
     )
-    if input_snapshot["schemaVersion"] != 1:
+    if (
+        input_snapshot["schemaVersion"]
+        != PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION
+    ):
         raise CohortValidationError("input snapshot descriptor schema is unsupported")
     _require_nonnegative_int(
         input_snapshot["captureSchemaVersion"], "capture snapshot schema version"
     )
+    if (
+        input_snapshot["captureSchemaVersion"]
+        != CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION
+    ):
+        raise CohortValidationError("capture snapshot schema is unsupported")
     _require_nonnegative_int(
         input_snapshot["captureManifestByteLength"],
         "capture snapshot manifest byte length",
@@ -1211,6 +1390,8 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
         ):
             raise CohortValidationError(f"input snapshot {key} is invalid")
     combined_snapshot_core = {
+        "schemaVersion": input_snapshot["schemaVersion"],
+        "captureSchemaVersion": input_snapshot["captureSchemaVersion"],
         "captureSnapshotIdentity": input_snapshot["captureSnapshotIdentity"],
         "captureManifestSha256": input_snapshot["captureManifestSha256"],
         "auxiliarySnapshotIdentity": input_snapshot["auxiliarySnapshotIdentity"],

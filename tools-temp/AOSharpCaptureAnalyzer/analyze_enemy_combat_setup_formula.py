@@ -571,15 +571,51 @@ def affine_candidates(
 
 
 def decode_json_text(raw: str) -> Any:
-    decoder = json.JSONDecoder()
+    decoder = object.__new__(json.JSONDecoder)
+    decoder.object_hook = None
+    decoder.parse_float = float
+    decoder.parse_int = int
+    decoder.parse_constant = json.decoder._CONSTANTS.__getitem__
+    decoder.strict = True
+    decoder.object_pairs_hook = None
+    decoder.parse_object = json.decoder.JSONObject
+    decoder.parse_array = json.decoder.JSONArray
     decoder.parse_string = json.decoder.py_scanstring
+    decoder.memo = {}
     decoder.scan_once = json.scanner.py_make_scanner(decoder)
-    return decoder.decode(raw)
+    start = 0
+    while start < len(raw) and raw[start] in " \t\r\n":
+        start += 1
+    value, end = decoder.raw_decode(raw, start)
+    while end < len(raw) and raw[end] in " \t\r\n":
+        end += 1
+    if end != len(raw):
+        raise json.JSONDecodeError("Extra data", raw, end)
+    return value
 
 
-def load_json(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        return decode_json_text(handle.read())
+def load_json(
+    path: Path,
+    *,
+    expected_sha256: str | None = None,
+    expected_byte_length: int | None = None,
+) -> dict[str, Any]:
+    if (expected_sha256 is None) != (expected_byte_length is None):
+        raise ValueError("JSON input integrity descriptor is incomplete")
+    payload = path.read_bytes()
+    if expected_byte_length is not None and len(payload) != expected_byte_length:
+        raise ValueError(
+            f"JSON input byte length mismatch: expected {expected_byte_length}, "
+            f"found {len(payload)}"
+        )
+    if expected_sha256 is not None:
+        actual_sha256 = hashlib.sha256(payload).hexdigest()
+        if actual_sha256 != expected_sha256:
+            raise ValueError(
+                f"JSON input SHA-256 mismatch: expected {expected_sha256}, "
+                f"found {actual_sha256}"
+            )
+    return decode_json_text(payload.decode("utf-8"))
 
 
 def compact_profile(profile: dict[str, Any]) -> dict[str, Any]:
@@ -4499,6 +4535,8 @@ def main() -> int:
     original_arguments = list(sys.argv[1:])
     parser = argparse.ArgumentParser()
     parser.add_argument("--inventory", type=Path, default=DEFAULT_INVENTORY)
+    parser.add_argument("--inventory-sha256")
+    parser.add_argument("--inventory-byte-length", type=int)
     parser.add_argument("--items", type=Path, default=DEFAULT_ITEMS)
     parser.add_argument(
         "--active-coverage", type=Path, default=DEFAULT_ACTIVE_COVERAGE
@@ -4594,7 +4632,11 @@ def main() -> int:
         if delegated_result is not None:
             return delegated_result
 
-    inventory = load_json(arguments.inventory)
+    inventory = load_json(
+        arguments.inventory,
+        expected_sha256=arguments.inventory_sha256,
+        expected_byte_length=arguments.inventory_byte_length,
+    )
     if arguments.inspect_item:
         templates = load_item_templates(arguments.items, set(arguments.inspect_item))
         print(

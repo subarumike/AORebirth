@@ -2717,29 +2717,73 @@ def build_non_denominator_audit_records(
 
 
 def decode_json_text(raw: str) -> Any:
-    decoder = json.JSONDecoder()
+    decoder = object.__new__(json.JSONDecoder)
+    decoder.object_hook = None
+    decoder.parse_float = float
+    decoder.parse_int = int
+    decoder.parse_constant = json.decoder._CONSTANTS.__getitem__
+    decoder.strict = True
+    decoder.object_pairs_hook = None
+    decoder.parse_object = json.decoder.JSONObject
+    decoder.parse_array = json.decoder.JSONArray
     decoder.parse_string = json.decoder.py_scanstring
+    decoder.memo = {}
     decoder.scan_once = json.scanner.py_make_scanner(decoder)
-    return decoder.decode(raw)
+    start = 0
+    while start < len(raw) and raw[start] in " \t\r\n":
+        start += 1
+    value, end = decoder.raw_decode(raw, start)
+    while end < len(raw) and raw[end] in " \t\r\n":
+        end += 1
+    if end != len(raw):
+        raise json.JSONDecodeError("Extra data", raw, end)
+    return value
+
+
+def load_json(
+    path: Path,
+    *,
+    expected_sha256: Optional[str] = None,
+    expected_byte_length: Optional[int] = None,
+) -> Any:
+    if (expected_sha256 is None) != (expected_byte_length is None):
+        raise CoverageError("JSON input integrity descriptor is incomplete")
+    payload = path.read_bytes()
+    if expected_byte_length is not None and len(payload) != expected_byte_length:
+        raise CoverageError(
+            f"JSON input byte length mismatch: expected {expected_byte_length}, "
+            f"found {len(payload)}"
+        )
+    if expected_sha256 is not None:
+        actual_sha256 = hashlib.sha256(payload).hexdigest()
+        if actual_sha256 != expected_sha256:
+            raise CoverageError(
+                f"JSON input SHA-256 mismatch: expected {expected_sha256}, "
+                f"found {actual_sha256}"
+            )
+    return decode_json_text(payload.decode("utf-8"))
 
 
 def build_inventory(
     repo_root: Path,
     combat_inventory_path: Path,
     formula_dataset_path: Optional[Path] = None,
+    combat_inventory_descriptor_path: Optional[Path] = None,
+    combat_inventory_sha256: Optional[str] = None,
+    combat_inventory_byte_length: Optional[int] = None,
 ) -> Dict[str, Any]:
     actors = parse_all_actors(repo_root)
     merged = merge_actors(actors)
-    combat_inventory = decode_json_text(
-        combat_inventory_path.read_text(encoding="utf-8")
+    combat_inventory = load_json(
+        combat_inventory_path,
+        expected_sha256=combat_inventory_sha256,
+        expected_byte_length=combat_inventory_byte_length,
     )
     mathematical_bindings: Dict[
         Tuple[int, int, int, str, Optional[str]], Mapping[str, Any]
     ] = {}
     if formula_dataset_path is not None and formula_dataset_path.is_file():
-        formula_dataset = decode_json_text(
-            formula_dataset_path.read_text(encoding="utf-8")
-        )
+        formula_dataset = load_json(formula_dataset_path)
         formulas = [
             formula_dataset.get("acceptedFormula", {}),
             formula_dataset.get("stimFiendFormula", {}),
@@ -3213,12 +3257,17 @@ def build_inventory(
         ),
     }
 
+    authoritative_inventory_path = (
+        combat_inventory_descriptor_path or combat_inventory_path
+    )
     return {
         "schemaVersion": 1,
         "generator": "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py",
         "combatInventory": {
-            "path": str(combat_inventory_path.relative_to(repo_root)).replace("\\", "/"),
-            "sha256": sha256_file(combat_inventory_path),
+            "path": str(authoritative_inventory_path.relative_to(repo_root)).replace(
+                "\\", "/"
+            ),
+            "sha256": sha256_file(authoritative_inventory_path),
             "schemaVersion": combat_inventory.get("schemaVersion"),
         },
         "contentInputs": source_inputs,
@@ -3392,6 +3441,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--combat-inventory",
         default="docs/generated/capture_backed_npc_combat_inventory.json",
     )
+    parser.add_argument("--combat-inventory-descriptor")
+    parser.add_argument("--combat-inventory-sha256")
+    parser.add_argument("--combat-inventory-byte-length", type=int)
     parser.add_argument(
         "--output",
         default="docs/generated/capture_backed_npc_combat_active_coverage.json",
@@ -3421,6 +3473,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "through Tools/generated_combat_pipeline.py"
         )
     combat_inventory_path = repo_path(repo_root, args.combat_inventory)
+    combat_inventory_descriptor_path = (
+        repo_path(repo_root, args.combat_inventory_descriptor)
+        if args.combat_inventory_descriptor
+        else None
+    )
     formula_dataset_path = repo_path(repo_root, args.formula_dataset)
     governed_inputs = (
         script_repo_root
@@ -3434,7 +3491,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     if any(
         same_file_or_path(candidate, governed)
-        for candidate in (combat_inventory_path, formula_dataset_path)
+        for candidate in (
+            combat_inventory_path,
+            formula_dataset_path,
+            combat_inventory_descriptor_path,
+        )
+        if candidate is not None
         for governed in governed_inputs
     ):
         delegated_result = enter_governed_read_lease(
@@ -3446,6 +3508,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         repo_root,
         combat_inventory_path,
         formula_dataset_path,
+        combat_inventory_descriptor_path,
+        args.combat_inventory_sha256,
+        args.combat_inventory_byte_length,
     )
     rendered = canonical_json(document)
 

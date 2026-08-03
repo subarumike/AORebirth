@@ -47,10 +47,17 @@ supported readers and serializes writers. Primary captures are parsed once into
 immutable validated shards; all generator/tool inputs are frozen; active coverage
 and formula data converge to one fixed point; and publication is manifest-last,
 rollback-capable, and crash-recoverable. The current generation identity is
-`91cbc7ef749c6f1a66f1d527d227105c30130ba0e961099996e62b36f1059a37`.
+`9f0c9e2a49178135bb7d614534d01192d158273c79d65aa2700925097edf6e72`.
 Generated output no longer embeds the local checkout path. Runtime catalog,
 exact-byte fixtures, and formula semantics are byte-identical to the prior
 authority; no supported gameplay behavior changed.
+
+The published input descriptor is schema 2 and hashes only durable capture
+source, plan, identity, and session-state fields. Private shard descriptors stay
+strictly validated inside each primary attempt but do not contaminate the
+published identity. Active/formula children receive independent fsynced,
+read-back-verified private inventory copies and verify SHA-256 and byte length
+over the same bytes they decode with a fully Python-initialized JSON scanner.
 
 The formula ItemDb reader streams each top-level MessagePack array and retains
 only the 42 templates referenced by the governed PF127/PF1931 profiles instead
