@@ -150,6 +150,20 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Unsupported MessagePack marker"):
                 formula.load_item_templates(unsupported_skipped_value, set())
 
+            deep_nested_array = root / "deep-nested-array.dat"
+            depth = sys.getrecursionlimit() + 100
+            deep_template = (
+                b"\x91\x96"
+                + (b"\x91" * depth)
+                + b"\x00"
+                + (b"\x00" * 4)
+                + b"\x65"
+            )
+            deep_nested_array.write_bytes(database(zlib.compress(deep_template)))
+            self.assertEqual(
+                {}, formula.load_item_templates(deep_nested_array, set())
+            )
+
             trailing_database = root / "trailing-database.dat"
             trailing_database.write_bytes(database(zlib.compress(b"\x90")) + b"\x00")
             with self.assertRaisesRegex(ValueError, "trailing data after"):
@@ -1195,6 +1209,56 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             )
         )
         self.assertEqual(pipeline.PRIMARY_AGGREGATION_MAX_ATTEMPTS, 3)
+
+        fatal_head = CompletedChild(
+            1,
+            "Windows fatal exception: access violation\n"
+            + ("recursive frame\n" * 1000)
+            + "terminal frame",
+        )
+        with mock.patch.object(
+            pipeline.subprocess,
+            "Popen",
+            side_effect=(fatal_head, success),
+        ) as launch:
+            completed = pipeline.run_checked(
+                ("fixture-child",),
+                repo_root=Path.cwd(),
+                lease=Lease(),
+                label="fatal-head fixture",
+                retry_interpreter_failures=True,
+            )
+        self.assertEqual(completed.returncode, 0)
+        self.assertEqual(launch.call_count, 2)
+
+        fatal_attempts = tuple(
+            CompletedChild(
+                1,
+                "Windows fatal exception: access violation\n"
+                + ("recursive frame\n" * 1000)
+                + "terminal frame",
+            )
+            for _ in range(3)
+        )
+        with mock.patch.object(
+            pipeline.subprocess,
+            "Popen",
+            side_effect=fatal_attempts,
+        ) as launch:
+            with self.assertRaises(pipeline.PipelineError) as fatal_error:
+                pipeline.run_checked(
+                    ("fixture-child",),
+                    repo_root=Path.cwd(),
+                    lease=Lease(),
+                    label="fatal fixture",
+                    retry_interpreter_failures=True,
+                )
+        self.assertEqual(launch.call_count, 3)
+        self.assertIn("attempt 3/3", str(fatal_error.exception))
+        self.assertIn(
+            "Windows fatal exception: access violation", str(fatal_error.exception)
+        )
+        self.assertIn("terminal frame", str(fatal_error.exception))
 
         deterministic = CompletedChild(1, "ValueError: deterministic input failure")
         with mock.patch.object(

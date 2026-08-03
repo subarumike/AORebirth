@@ -162,9 +162,12 @@ def finish_process(running: RunningProcess) -> dict[str, Any]:
         "stderrTail": stderr[-4000:],
     }
     if running.process.returncode != 0:
+        detail = pipeline._bounded_detail(
+            pipeline._process_output_detail(stdout, stderr)
+        )
         raise StressError(
             f"{running.name} failed with exit code {running.process.returncode}: "
-            f"{stderr[-2000:]}"
+            f"{detail}"
         )
     return record
 

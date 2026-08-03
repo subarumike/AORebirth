@@ -931,11 +931,31 @@ def iterate_pair_to_fixed_point(
     )
 
 
-def _bounded_process_detail(completed: subprocess.CompletedProcess[str]) -> str:
-    detail = "\n".join(
-        value.strip() for value in (completed.stdout, completed.stderr) if value.strip()
+def _process_output_detail(stdout: str, stderr: str) -> str:
+    sections = []
+    for label, value in (("stdout", stdout), ("stderr", stderr)):
+        if value.strip():
+            sections.append(f"{label}:\n{value.strip()}")
+    return "\n".join(sections)
+
+
+def _bounded_detail(detail: str) -> str:
+    head_characters = 2000
+    tail_characters = 3500
+    if len(detail) <= head_characters + tail_characters:
+        return detail
+    omitted = len(detail) - head_characters - tail_characters
+    return (
+        f"{detail[:head_characters]}\n"
+        f"... {omitted} characters omitted ...\n"
+        f"{detail[-tail_characters:]}"
     )
-    return detail[-6000:]
+
+
+def _bounded_process_detail(completed: subprocess.CompletedProcess[str]) -> str:
+    return _bounded_detail(
+        _process_output_detail(completed.stdout, completed.stderr)
+    )
 
 
 def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
@@ -950,6 +970,7 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
         marker in detail
         for marker in (
             "Windows fatal exception: access violation",
+            "Windows fatal exception: stack overflow",
             "TypeError: 'str_ascii_iterator' object is not callable",
             "SystemError:",
             "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'",
@@ -1052,14 +1073,13 @@ def run_checked(
             )
         except subprocess.TimeoutExpired as error:
             stdout, stderr, cleanup_detail = _terminate_process_tree(process)
-            detail = "\n".join(
-                value.strip() for value in (stdout, stderr) if value.strip()
-            )
+            detail = _process_output_detail(stdout, stderr)
             if cleanup_detail:
                 detail = "\n".join(
                     value for value in (detail, cleanup_detail) if value
                 )
-            suffix = f": {detail[-6000:]}" if detail else ""
+            detail = _bounded_detail(detail)
+            suffix = f": {detail}" if detail else ""
             raise PipelineError(
                 f"generated-combat {label} timed out "
                 f"after {CHILD_PROCESS_TIMEOUT_SECONDS}s pid={process.pid}{suffix}"
@@ -1072,13 +1092,14 @@ def run_checked(
         )
         if completed.returncode == 0:
             return completed
-        detail = _bounded_process_detail(completed)
+        full_detail = _process_output_detail(completed.stdout, completed.stderr)
         if (
             retry_interpreter_failures
             and attempt < max_attempts
-            and _is_transient_interpreter_failure(completed.returncode, detail)
+            and _is_transient_interpreter_failure(completed.returncode, full_detail)
         ):
             continue
+        detail = _bounded_detail(full_detail)
         suffix = f": {detail}" if detail else ""
         attempt_suffix = (
             f" on attempt {attempt}/{max_attempts}"

@@ -25,9 +25,9 @@ their generation manifest are one coordinated generated cohort.
 ## Current deterministic cohort
 
 - Generation identity:
-  `b78eee7cc868e61928bd12a972e1ca479d236aafb8a4c0edbde29bdda2494a8a`
+  `3e99136015fb50d47fa9e63732050e09343ecf172b3b6127cd9badd48877b760`
 - Combined input identity:
-  `6e478ba16041a2f84c1ad4ab741bf7dd2b6ae6de7287c3fe1dad97c89e18b9e0`
+  `e2a9e28803e638343bb98ac80c519c596bb0695686b7dc03761153a6cf5ff08f`
 - 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
   260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
   101 runtime-ready definitions, and 1,486 unresolved profiles.
@@ -56,7 +56,9 @@ their generation manifest are one coordinated generated cohort.
 - The 2,466,207-byte ItemDb is bound to its frozen auxiliary snapshot SHA/length,
   retained as verified parent bytes, and rematerialized independently for every
   formula round. Integrity mismatches fail closed; only decode failures after a
-  matching descriptor receive bounded fresh-process retry.
+  matching descriptor receive bounded fresh-process retry. Unrequested nested
+  MessagePack values are skipped iteratively so deep containers cannot exhaust
+  the Python call stack; fatal diagnostics retain both header and terminal frames.
 - The portable input descriptor is schema 2. It commits durable capture source,
   plan, capture identity, and session state while excluding private shard
   path/hash/length fields that are validated before normalization and are not
