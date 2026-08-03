@@ -171,12 +171,114 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         expected = {"digit": 4, "nested": [{"text": "Arete"}]}
         with mock.patch.object(
             json, "loads", side_effect=AssertionError("C JSON scanner was used")
+        ), mock.patch.object(
+            json.scanner,
+            "make_scanner",
+            side_effect=AssertionError("compiled scanner was initialized"),
         ):
             self.assertEqual(pipeline.decode_json_text(raw), expected)
             self.assertEqual(formula.decode_json_text(raw), expected)
             self.assertEqual(active.decode_json_text(raw), expected)
         with self.assertRaises(json.JSONDecodeError):
             pipeline.decode_json_text(raw + " trailing")
+
+        inventory = {
+            key: [] for key in pipeline.GENERATOR_INVENTORY_PROJECTION_KEYS
+        }
+        inventory.update(
+            {
+                "schemaVersion": 1,
+                "summary": {"captureCertifiedProfiles": 1},
+                "packets": [{"packetId": "large-audit-only-packet"}],
+            }
+        )
+        projection = pipeline.build_generator_inventory_projection(inventory)
+        self.assertEqual(
+            tuple(projection), pipeline.GENERATOR_INVENTORY_PROJECTION_KEYS
+        )
+        self.assertNotIn("packets", projection)
+        with self.assertRaisesRegex(
+            pipeline.CohortValidationError, "missing generator projection keys"
+        ):
+            pipeline.build_generator_inventory_projection({"schemaVersion": 1})
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            json_path = root / "input.json"
+            payload = raw.encode("utf-8")
+            json_path.write_bytes(payload)
+            expected_sha256 = pipeline.sha256_bytes(payload)
+            self.assertEqual(
+                formula.load_json(
+                    json_path,
+                    expected_sha256=expected_sha256,
+                    expected_byte_length=len(payload),
+                ),
+                expected,
+            )
+            self.assertEqual(
+                active.load_json(
+                    json_path,
+                    expected_sha256=expected_sha256,
+                    expected_byte_length=len(payload),
+                ),
+                expected,
+            )
+            json_path.write_bytes(payload + b"x")
+            with mock.patch.object(
+                formula,
+                "decode_json_text",
+                side_effect=AssertionError("decoder ran before integrity validation"),
+            ), self.assertRaisesRegex(ValueError, "byte length mismatch"):
+                formula.load_json(
+                    json_path,
+                    expected_sha256=expected_sha256,
+                    expected_byte_length=len(payload),
+                )
+
+            verified_path = root / "verified-private-input.json"
+            pipeline._write_verified_private_input(
+                verified_path, payload, "test private input"
+            )
+            self.assertEqual(payload, verified_path.read_bytes())
+            with mock.patch.object(Path, "read_bytes", return_value=b"corrupt"):
+                with self.assertRaisesRegex(
+                    pipeline.PipelineError, "readback verification"
+                ):
+                    pipeline._write_verified_private_input(
+                        root / "corrupt-private-input.json",
+                        payload,
+                        "test private input",
+                    )
+
+            artifacts = {
+                role: root / f"{role}.out"
+                for role in ("inventory", "catalog", "fixtures")
+            }
+            for role, path in artifacts.items():
+                path.write_text(role, encoding="utf-8")
+            snapshot_descriptor = {
+                "schemaVersion": pipeline.PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+                "captureSchemaVersion": pipeline.CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+                "captureSnapshotIdentity": "a" * 64,
+                "captureManifestSha256": "b" * 64,
+                "captureManifestByteLength": 123,
+            }
+            first = pipeline.primary_output_signature(
+                artifacts, snapshot_descriptor
+            )
+            self.assertEqual(
+                first,
+                pipeline.primary_output_signature(artifacts, snapshot_descriptor),
+            )
+            changed_descriptor = {
+                **snapshot_descriptor,
+                "captureSnapshotIdentity": "c" * 64,
+            }
+            self.assertNotEqual(
+                first,
+                pipeline.primary_output_signature(artifacts, changed_descriptor),
+            )
 
     def test_active_coverage_initializer_comments_avoid_regex_hot_loop(self):
         active = self._load_module_from_path(
@@ -342,6 +444,59 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             ),
         }
 
+    @staticmethod
+    def _snapshot_with_shard(
+        *,
+        capture="captures/test",
+        source_files=None,
+        shard_sha="a" * 64,
+        shard_length=123,
+        canonical_packets=1,
+    ):
+        sources = list(source_files or [])
+        plan_core = {
+            "schemaVersion": pipeline.CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+            "generatorSources": [],
+            "captures": [{"capture": capture, "sourceFiles": sources}],
+        }
+        plan_identity = pipeline.sha256_bytes(
+            pipeline.identity_json_bytes(plan_core)
+        )
+        core = {
+            "schemaVersion": pipeline.CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+            "planIdentity": plan_identity,
+            "generatorSources": [],
+            "captures": [
+                {
+                    "capture": capture,
+                    "captureId": capture.rsplit("/", 1)[-1],
+                    "sourceFiles": sources,
+                    "sessionState": {
+                        "disposition": "accepted",
+                        "capabilityStatus": "raw_source_complete",
+                        "canonicalValid": True,
+                        "recaptureRequired": False,
+                        "captureComplete": True,
+                        "positiveEvidenceOnly": False,
+                        "absenceInferenceAllowed": True,
+                        "canonicalPackets": canonical_packets,
+                        "conflictCount": 0,
+                    },
+                    "shard": {
+                        "path": "capture-shards/capture-000000.json",
+                        "byteLength": shard_length,
+                        "sha256": shard_sha,
+                    },
+                }
+            ],
+        }
+        return {
+            **core,
+            "snapshotIdentity": pipeline.sha256_bytes(
+                pipeline.identity_json_bytes(core)
+            ),
+        }
+
     def _complete_cohort(self, root: Path) -> tuple[dict[str, Path], dict]:
         artifacts = self._write_fixture_artifacts(root)
         manifest, rendered = pipeline.build_generation_manifest(
@@ -372,6 +527,59 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
         self.assertEqual(3, result.rounds)
         self.assertEqual(states[-1], result.state)
+
+    def test_fixed_point_rematerializes_verified_inventory_per_child_and_round(self):
+        inventory_payload = b'{"profiles":[]}'
+        active_payload = b'{"active":1}'
+        formula_payload = b'{"formula":1}'
+        inventory_paths = []
+
+        def complete_child(command, **kwargs):
+            command = list(command)
+            label = kwargs["label"]
+            if label.startswith("active-coverage"):
+                inventory_flag = "--combat-inventory"
+                output_payload = active_payload
+            else:
+                inventory_flag = "--inventory"
+                output_payload = formula_payload
+            inventory_path = Path(command[command.index(inventory_flag) + 1])
+            self.assertEqual(inventory_payload, inventory_path.read_bytes())
+            self.assertEqual(
+                pipeline.sha256_bytes(inventory_payload),
+                command[command.index(inventory_flag + "-sha256") + 1],
+            )
+            self.assertEqual(
+                str(len(inventory_payload)),
+                command[command.index(inventory_flag + "-byte-length") + 1],
+            )
+            inventory_paths.append((label, inventory_path))
+            output_path = Path(command[command.index("--output") + 1])
+            output_path.write_bytes(output_payload)
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(
+            pipeline, "run_checked", side_effect=complete_child
+        ):
+            root = Path(directory)
+            result = pipeline._run_active_formula_fixed_point(
+                repo_root=root,
+                frozen_repo_root=root,
+                inventory_payload=inventory_payload,
+                authoritative_inventory_path=root / "authoritative.json",
+                item_database_path=root / "items.dat",
+                lease=object(),
+                max_rounds=4,
+            )
+
+        self.assertEqual(active_payload, result.state.active_coverage)
+        self.assertEqual(formula_payload, result.state.formula_dataset)
+        self.assertEqual(4, len(inventory_paths))
+        self.assertEqual(4, len({path for _label, path in inventory_paths}))
+        self.assertEqual(
+            {"round-01", "round-02"},
+            {path.parents[1].name for _label, path in inventory_paths},
+        )
 
     def test_active_formula_cycle_is_rejected(self):
         initial = pipeline.PairState(b"active-0", b"formula-0")
@@ -598,6 +806,85 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 ):
                     pipeline._portable_snapshot_descriptor(snapshot, "c" * 64)
 
+    def test_portable_snapshot_normalizes_private_shards_only(self):
+        first_snapshot = self._snapshot_with_shard()
+        second_snapshot = self._snapshot_with_shard(
+            shard_sha="b" * 64, shard_length=456
+        )
+        self.assertNotEqual(
+            first_snapshot["snapshotIdentity"], second_snapshot["snapshotIdentity"]
+        )
+
+        first = pipeline._portable_snapshot_descriptor(first_snapshot, "c" * 64)
+        second = pipeline._portable_snapshot_descriptor(second_snapshot, "c" * 64)
+        self.assertEqual(first, second)
+        self.assertEqual(
+            pipeline.PORTABLE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+            first["schemaVersion"],
+        )
+        self.assertEqual(
+            pipeline.CAPTURE_INPUT_SNAPSHOT_SCHEMA_VERSION,
+            first["captureSchemaVersion"],
+        )
+
+        session_changed = pipeline._portable_snapshot_descriptor(
+            self._snapshot_with_shard(canonical_packets=2), "c" * 64
+        )
+        source_changed = pipeline._portable_snapshot_descriptor(
+            self._snapshot_with_shard(
+                source_files=[
+                    {"path": "captures/test/source.json", "exists": False}
+                ]
+            ),
+            "c" * 64,
+        )
+        capture_changed = pipeline._portable_snapshot_descriptor(
+            self._snapshot_with_shard(capture="captures/other"), "c" * 64
+        )
+        for changed in (session_changed, source_changed, capture_changed):
+            self.assertNotEqual(first, changed)
+
+        malformed = json.loads(json.dumps(first_snapshot))
+        malformed["captures"][0]["shard"]["sha256"] = "f" * 64
+        with self.assertRaisesRegex(
+            pipeline.CohortValidationError, "identity does not match"
+        ):
+            pipeline._portable_snapshot_descriptor(malformed, "c" * 64)
+
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = {
+                role: Path(directory) / role
+                for role in ("inventory", "catalog", "fixtures")
+            }
+            for role, path in artifacts.items():
+                path.write_text(role, encoding="utf-8")
+            self.assertEqual(
+                pipeline.primary_output_signature(artifacts, first),
+                pipeline.primary_output_signature(artifacts, second),
+            )
+            self.assertNotEqual(
+                pipeline.primary_output_signature(artifacts, first),
+                pipeline.primary_output_signature(artifacts, session_changed),
+            )
+
+    def test_manifest_rejects_stale_input_descriptor_schemas(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _artifacts, manifest = self._complete_cohort(root)
+            manifest_path = root / Path(pipeline.MANIFEST_RELATIVE_PATH)
+            failures = (
+                ("schemaVersion", 1, "input snapshot descriptor schema"),
+                ("captureSchemaVersion", 2, "capture snapshot schema"),
+            )
+            for field, value, message in failures:
+                stale = json.loads(json.dumps(manifest))
+                stale["inputSnapshot"][field] = value
+                manifest_path.write_bytes(pipeline.canonical_json_bytes(stale))
+                with self.subTest(field=field), self.assertRaisesRegex(
+                    pipeline.CohortValidationError, message
+                ):
+                    pipeline.validate_cohort(root, verify_toolchain=False)
+
     def test_lease_delegation_rejects_missing_and_forged_but_accepts_live(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -726,6 +1013,14 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 1, "SystemError: bad format string: O|OO:startswith"
             )
         )
+        self.assertTrue(
+            pipeline._is_transient_interpreter_failure(
+                1,
+                "decode_json_text(raw)\n"
+                "json.decoder.JSONDecodeError: Expecting ':' delimiter",
+            )
+        )
+        self.assertEqual(pipeline.PRIMARY_AGGREGATION_MAX_ATTEMPTS, 3)
 
         deterministic = CompletedChild(1, "ValueError: deterministic input failure")
         with mock.patch.object(

@@ -6,7 +6,7 @@ This record covers the intermittent primary capture-aggregation failure, generat
 
 The failure was a generator consistency defect, not a supported runtime behavior mismatch. The primary extractor parsed each live capture twice. Metadata indexing used objects from the first parse; packet correlation used objects from the second. If the observed live/projection generation changed between those passes, a packet's `MetadataGeneration.generation_key` was not present in the first-pass dictionary and the direct lookup raised `KeyError`.
 
-The repair parses each capture once into an immutable validated shard and reuses that shard for metadata indexing and packet correlation. The broader cohort now uses frozen inputs, a shared reader/writer lease, a durable staged transaction, input validation at both publication boundaries, rollback, and recovery. No supported runtime behavior was changed.
+The repair parses each capture once into an immutable validated shard and reuses that shard for metadata indexing and packet correlation. The broader cohort now uses frozen inputs, a shared reader/writer lease, a durable staged transaction, input validation at both publication boundaries, rollback, and recovery. The final portable input descriptor is schema 2: it is derived only after strict validation of the full internal snapshot, then hashes the durable source, plan, capture identity, and session-state projection without private shard path/hash/length fields. No supported runtime behavior was changed.
 
 ## Failure evidence boundaries
 
@@ -51,7 +51,7 @@ The starting hashes were recorded before reconciliation. The final hashes are fr
 | `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogFixtures.g.cs` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | `26b3d5f69c8e976e78ada3b6562467aa093c9b01a51e144cc3beeb0493214793` | Byte-identical |
 | `docs/generated/capture_backed_npc_combat_active_coverage.json` | `89b54335c7407d8cebdf3c4d6e07e2353fe2fcfc870a94e625d304dfcf328254` | `e8088b991e555fe9f46119550db9134f128c06ed27e4790e577fe1016b587078` | Only its inventory-source descriptor changed in the Git diff |
 | `docs/generated/enemy_combat_setup_formula_dataset.json` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0` | Byte-identical |
-| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `82af9c361d743a314dff045ff44893ca36499ead2155ac454bacab19c5bc00fd` | Sixth-file commit marker after final generator hardening |
+| `docs/generated/capture_backed_npc_combat_generation_manifest.json` | Not previously governed | `418b41ca45b75c4869b872e45c781980a599de061b75977ba33622d7f4e970b2` | Sixth-file commit marker after final generator hardening |
 
 The catalog, fixtures, and formula data stayed byte-identical. The active-coverage Git diff changes only its recorded inventory SHA-256. No supported runtime C# source was changed for this reconciliation, and the generated runtime catalog stayed byte-identical. Those facts are the boundary for the conclusion that runtime semantics did not change.
 
@@ -59,13 +59,13 @@ The catalog, fixtures, and formula data stayed byte-identical. The active-covera
 
 | Identity | Value |
 | --- | --- |
-| Generation identity | `e1c4dc9b66ca46c2d4d4913243511502df7b29f33368b3ca7c9f67599147f0ab` |
-| Combined input identity | `053c6b3b9efee2a8854c189abaa499ef84a1c579622495431a52ab1b63e02d82` |
-| Rendered manifest SHA-256 | `da88b0e1c2ffe259f3928ecc9cc3c5a05c1c7f62221118b84b66be7826ed0e19` |
-| Primary capture snapshot identity | `b75ffce6d9c69cb79f2afcc46560e7aae8c5e79b82568e1e05320ac0da8d17e7` |
-| Primary capture manifest SHA-256 | `4f6441fe13f66eb0dc949038bf21662d6b7734d6b844fd44c1b4151fd1459e47` |
-| Primary capture manifest byte length | `460040` |
-| Auxiliary snapshot identity | `2731b83c7c3c51356cb1bd526eb3ea2098be4ca96030a97bf7126e0ff11c8730` |
+| Generation identity | `9f0c9e2a49178135bb7d614534d01192d158273c79d65aa2700925097edf6e72` |
+| Combined input identity | `fd5043547ae263085fadd4d8199f1c6740f55d88a119baa54f4137b892eb9971` |
+| Rendered manifest SHA-256 | `418b41ca45b75c4869b872e45c781980a599de061b75977ba33622d7f4e970b2` |
+| Primary capture snapshot identity | `cf8d193c23263a3797db2dbb25838658f40f826d26a2bf99604b4f6d8dea8056` |
+| Primary capture manifest SHA-256 | `0ba2a6a5a1c02ed0468427f8d5bc20adf403c773b478426b02f6253980030b3d` |
+| Primary capture manifest byte length | `402965` |
+| Auxiliary snapshot identity | `b606ff5b04d8bfe966156e555e3d3cd2859d54e67adb7ab43338fc413d24b613` |
 | Active/formula fixed-point rounds | `3` |
 
 The generation identity covers the path-independent manifest identity payload. The separate manifest-file SHA-256 in the artifact table hashes the rendered sixth file and is not expected to equal the generation identity.
@@ -119,19 +119,28 @@ Completed:
   `SystemError` failures in the capture decoder. Worker retry now recognizes
   decoder-local internal failures while ordinary validation errors remain
   deterministic and fail closed after the bounded attempt budget.
-- Three consecutive formula attempts then failed inside CPython's C JSON
-  scanner while converting valid one-digit integers. The coordinator, active
-  coverage generator, and formula generator now use the standard library's
-  pure-Python scanner for large governed JSON inputs; the focused test proves
-  the C scanner is not called on that path.
+- Real-corpus runs proved that private capture-shard SHA/length values could
+  differ while inventory, catalog, fixtures, active coverage, and formula bytes
+  were identical. Internal shard descriptors and the raw snapshot identity stay
+  fail-closed and strictly validated per attempt. The schema-2 portable input
+  identity hashes the normalized durable projection, so ephemeral private shard
+  serialization can no longer dirty an otherwise identical cohort.
+- Three consecutive formula attempts then failed while parsing a shared private
+  inventory projection that prior fixed-point children had already consumed.
+  The coordinator, active-coverage generator, and formula generator now create
+  the standard library decoder without initializing its compiled scanner. Each
+  child receives a separate round-local fsynced projection copy, verifies exact
+  readback plus expected SHA-256/length over the same buffer it decodes, and
+  retains bounded fresh-process retry only for recognized interpreter faults.
 - The formula ItemDb reader structurally validates unrequested templates and
   fully materializes only the 42 referenced templates. The 9,000,177-byte
   formula artifact remains byte-identical at SHA-256
   `ee121b35f7ccf2df2f6592389ae3674c94a04c772f95824fbd21250b10b71da0`.
-- Final focused transaction and pipeline suite: **67/67 PASS**.
-- Final coordinated `--write` and real-corpus `--check`: **PASS**, generation
-  `e1c4dc9b66ca46c2d4d4913243511502df7b29f33368b3ca7c9f67599147f0ab`, input
-  `053c6b3b9efee2a8854c189abaa499ef84a1c579622495431a52ab1b63e02d82`, three
+- Final focused transaction and pipeline suite: **70/70 PASS**.
+- Final coordinated `--write`, `--validate-current`, and real-corpus `--check`:
+  **PASS**, generation
+  `9f0c9e2a49178135bb7d614534d01192d158273c79d65aa2700925097edf6e72`, input
+  `fd5043547ae263085fadd4d8199f1c6740f55d88a119baa54f4137b892eb9971`, three
   fixed-point rounds.
 
 Final delivery-only results are deliberately not embedded in this tracked evidence file:
