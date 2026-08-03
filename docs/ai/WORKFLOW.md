@@ -237,6 +237,52 @@ WebEngine remains development-only: no valid MySQL credential was available
 for live semantics, transport is plaintext, and upstream licensing is
 unresolved.
 
+## Generated combat cohort
+
+The generated combat inventory, runtime catalog, exact-byte fixtures, active
+coverage, formula dataset, and generation manifest are one governed cohort.
+Never edit a generated member by hand and never invoke a component generator
+against its governed output. Use the coordinator wrapper:
+
+```cmd
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --check
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --write
+cmd /d /c Tools\generate_capture_backed_npc_combat_inventory.cmd --validate-current
+```
+
+With no argument, the wrapper performs `--check`. `--write` takes the exclusive
+generated-artifact lease, captures immutable primary and auxiliary inputs,
+builds the complete candidate, converges active coverage and formula data,
+validates every byte/hash/count/identity, then publishes all five artifacts and
+the manifest as one recoverable transaction. The manifest is the commit marker
+and is replaced last. A changed input before publication or before commit aborts
+and preserves or restores the prior complete cohort.
+
+Supported build, AOtomation, and mandatory-gate readers route themselves through
+the shared generated-artifact read lease. Direct active-coverage and formula
+reads of governed inputs do the same and validate a live same-checkout delegated
+lease. Do not bypass the lease with copied environment variables or a second
+checkout.
+
+Run the focused fault, recovery, delegation, timeout, path-independence, and
+fixture-contention suite with:
+
+```cmd
+cmd /d /c Tools\run_generated_combat_concurrency_tests.cmd
+```
+
+Run the complete clean-worktree sequential/concurrent matrix with:
+
+```cmd
+cmd /d /c Tools\stress_generated_combat_pipeline.cmd
+```
+
+The stress runner performs two real sequential checks under distinct hash seeds,
+two simultaneous real checks, and a held-reader/two-writer transactional fixture.
+It fails on artifact drift, generation-identity drift, Git drift, timeout, or
+lease/staging/transaction residue. See
+`docs/project/GENERATED_COMBAT_PIPELINE.md` for the complete contract.
+
 ## Mandatory local integration gate
 
 Run the complete deterministic gate from a clean worktree:

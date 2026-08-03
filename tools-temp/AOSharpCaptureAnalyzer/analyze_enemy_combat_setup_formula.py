@@ -7,8 +7,10 @@ import argparse
 import hashlib
 import math
 import json
+import os
 import re
 import struct
+import subprocess
 import sys
 import zlib
 from pathlib import Path
@@ -16,6 +18,10 @@ from typing import Any
 
 if hasattr(sys, "set_int_max_str_digits"):
     sys.set_int_max_str_digits(0)
+
+SCRIPT_DIRECTORY = Path(__file__).resolve().parent
+if str(SCRIPT_DIRECTORY) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIRECTORY))
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -257,6 +263,18 @@ class MessagePackReader:
     def _int(self, size: int) -> int:
         return int.from_bytes(self._take(size), "big", signed=True)
 
+    def read_array_size(self) -> int:
+        marker = self._uint(1)
+        if 0x90 <= marker <= 0x9F:
+            return marker & 0x0F
+        if marker == 0xDC:
+            return self._uint(2)
+        if marker == 0xDD:
+            return self._uint(4)
+        raise ValueError(
+            f"item-template MessagePack root must be an array, got marker 0x{marker:02X}"
+        )
+
     def read(self) -> Any:
         marker = self._uint(1)
         if marker <= 0x7F:
@@ -307,20 +325,77 @@ class MessagePackReader:
         raise ValueError(f"Unsupported MessagePack marker 0x{marker:02X}")
 
 
-def load_item_templates(path: Path) -> dict[int, list[Any]]:
+def load_item_templates(
+    path: Path, template_ids: set[int] | frozenset[int] | None = None
+) -> dict[int, list[Any]]:
+    requested_ids = None if template_ids is None else frozenset(template_ids)
     templates: dict[int, list[Any]] = {}
     with path.open("rb") as handle:
-        version_length = handle.read(1)[0]
-        handle.read(version_length)
-        _, _, slice_count = struct.unpack("<iii", handle.read(12))
-        for _ in range(slice_count):
-            compressed_size = struct.unpack("<i", handle.read(4))[0]
+        version_length_bytes = handle.read(1)
+        if len(version_length_bytes) != 1:
+            raise ValueError("item-template database is missing its version length")
+        version_length = version_length_bytes[0]
+        if len(handle.read(version_length)) != version_length:
+            raise ValueError("item-template database has a truncated version")
+        header = handle.read(12)
+        if len(header) != 12:
+            raise ValueError("item-template database has a truncated header")
+        _, _, slice_count = struct.unpack("<iii", header)
+        if slice_count < 0:
+            raise ValueError(f"item-template database has invalid slice count {slice_count}")
+        for slice_index in range(slice_count):
+            size_bytes = handle.read(4)
+            if len(size_bytes) != 4:
+                raise ValueError(
+                    f"item-template slice {slice_index} is missing its compressed size"
+                )
+            compressed_size = struct.unpack("<i", size_bytes)[0]
+            if compressed_size < 0:
+                raise ValueError(
+                    f"item-template slice {slice_index} has invalid compressed size "
+                    f"{compressed_size}"
+                )
+            compressed = handle.read(compressed_size)
+            if len(compressed) != compressed_size:
+                raise ValueError(
+                    f"item-template slice {slice_index} has a truncated compressed payload"
+                )
             decompressor = zlib.decompressobj()
-            decoded = MessagePackReader(
-                decompressor.decompress(handle.read(compressed_size))
-            ).read()
-            for template in decoded:
-                templates[int(template[5])] = template
+            try:
+                decoded = decompressor.decompress(compressed) + decompressor.flush()
+            except zlib.error as error:
+                raise ValueError(
+                    f"item-template slice {slice_index} has invalid zlib data: {error}"
+                ) from error
+            if decompressor.unused_data or decompressor.unconsumed_tail:
+                raise ValueError(
+                    f"item-template slice {slice_index} has trailing compressed data"
+                )
+            reader = MessagePackReader(decoded)
+            try:
+                template_count = reader.read_array_size()
+                for template_index in range(template_count):
+                    template = reader.read()
+                    template_id = int(template[5])
+                    if requested_ids is None or template_id in requested_ids:
+                        templates[template_id] = template
+                if reader.offset != len(reader.data):
+                    raise ValueError(
+                        f"trailing MessagePack data ({len(reader.data) - reader.offset} bytes)"
+                    )
+            except (
+                IndexError,
+                KeyError,
+                OverflowError,
+                TypeError,
+                UnicodeError,
+                ValueError,
+            ) as error:
+                raise ValueError(
+                    f"item-template slice {slice_index} is invalid: {error}"
+                ) from error
+        if handle.read(1):
+            raise ValueError("item-template database has trailing data after its declared slices")
     return templates
 
 
@@ -904,7 +979,7 @@ def melded_patterns_chain_evidence(
 def build_formula_dataset(
     inventory: dict[str, Any],
     active_coverage: dict[str, Any],
-    item_templates: dict[int, list[Any]],
+    item_database_path: Path,
 ) -> dict[str, Any]:
     profiles = [
         compact_profile(profile)
@@ -914,6 +989,7 @@ def build_formula_dataset(
     referenced_template_ids: set[int] = set()
     for profile in profiles:
         referenced_template_ids.update(collect_template_ids(profile))
+    item_templates = load_item_templates(item_database_path, referenced_template_ids)
     template_rows = []
     for template_id in sorted(referenced_template_ids):
         template = item_templates.get(template_id)
@@ -4269,7 +4345,67 @@ def emit_temple_starting_quarantine_constant(
     print(f"# count={len(identities)}")
 
 
+def find_checkout_root(start: Path) -> Path:
+    current = start.resolve()
+    for candidate in (current, *current.parents):
+        if (candidate / "AI_START_HERE.md").is_file() and (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("could not locate AORebirth repository root")
+
+
+def same_file_or_path(left: Path, right: Path) -> bool:
+    if left.resolve() == right.resolve():
+        return True
+    if os.path.lexists(left) and os.path.lexists(right):
+        try:
+            return os.path.samefile(left, right)
+        except OSError:
+            return False
+    return False
+
+
+def enter_governed_read_lease(
+    checkout_root: Path, original_arguments: list[str]
+) -> int | None:
+    delegation_name = "AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION"
+    root_name = "AO_REBIRTH_GENERATED_COMBAT_LEASE_REPO_ROOT"
+    raw_delegation = os.environ.get(delegation_name)
+    raw_root = os.environ.get(root_name)
+    if raw_delegation is None and raw_root is None:
+        command = [
+            sys.executable,
+            str(checkout_root / "Tools" / "generated_combat_pipeline.py"),
+            "--run-read-lease",
+            "--",
+            sys.executable,
+            str(Path(__file__).resolve()),
+            *original_arguments,
+        ]
+        return subprocess.run(command, cwd=checkout_root, check=False).returncode
+    if raw_delegation is None or raw_root is None:
+        raise RuntimeError("generated-combat lease delegation is incomplete")
+    lease_root = Path(raw_root).resolve(strict=True)
+    if lease_root != checkout_root.resolve(strict=True):
+        raise RuntimeError(
+            "generated-combat lease delegation belongs to a different checkout"
+        )
+    sys.path.insert(0, str(lease_root / "Tools"))
+    try:
+        import generated_artifact_transaction as transaction
+
+        delegation = json.loads(raw_delegation)
+        record = transaction.GeneratedArtifactLease.validate_delegation(
+            lease_root, delegation
+        )
+    except Exception as error:
+        raise RuntimeError("generated-combat lease delegation is invalid") from error
+    if record.get("domain") != "capture-backed-npc-combat":
+        raise RuntimeError("generated-combat lease delegation domain is invalid")
+    return None
+
+
 def main() -> int:
+    original_arguments = list(sys.argv[1:])
     parser = argparse.ArgumentParser()
     parser.add_argument("--inventory", type=Path, default=DEFAULT_INVENTORY)
     parser.add_argument("--items", type=Path, default=DEFAULT_ITEMS)
@@ -4299,11 +4435,77 @@ def main() -> int:
     parser.add_argument("--search-stim-formula", action="store_true")
     parser.add_argument("--search-melded-formula", action="store_true")
     parser.add_argument("--search-fragmented-formula", action="store_true")
-    arguments = parser.parse_args()
+    arguments = parser.parse_args(original_arguments)
+
+    checkout_root = find_checkout_root(Path(__file__).resolve().parent)
+
+    special_mode_requested = any(
+        (
+            arguments.inspect_family is not None,
+            bool(arguments.inspect_item),
+            arguments.inspect_monster_data is not None,
+            arguments.inspect_profile_key is not None,
+            arguments.inspect_special_templates is not None,
+            arguments.inspect_temple_cultists,
+            arguments.inspect_temple_active_loadouts,
+            arguments.summarize_temple_active_loadouts,
+            arguments.inspect_temple_noncultist_loadouts,
+            arguments.write_temple_active_loadouts,
+            arguments.inspect_temple_active_coverage,
+            arguments.emit_temple_starting_quarantine_constant,
+            arguments.search_disobedient_formula,
+            arguments.search_stim_formula,
+            arguments.search_melded_formula,
+            arguments.search_fragmented_formula,
+        )
+    )
+    if (arguments.write or arguments.check) and special_mode_requested:
+        parser.error(
+            "--write/--check cannot be combined with inspection, search, or "
+            "Temple loadout modes"
+        )
+    if (
+        not special_mode_requested
+        and same_file_or_path(
+            arguments.output.resolve(),
+            checkout_root
+            / "docs"
+            / "generated"
+            / "enemy_combat_setup_formula_dataset.json",
+        )
+    ):
+        parser.error(
+            "the governed formula dataset must be checked or written through "
+            "Tools/generated_combat_pipeline.py"
+        )
+
+    governed_inputs = (
+        checkout_root
+        / "docs"
+        / "generated"
+        / "capture_backed_npc_combat_inventory.json",
+        checkout_root
+        / "docs"
+        / "generated"
+        / "capture_backed_npc_combat_active_coverage.json",
+    )
+    if any(
+        same_file_or_path(candidate.resolve(), governed)
+        for candidate in (arguments.inventory, arguments.active_coverage)
+        for governed in governed_inputs
+    ):
+        try:
+            delegated_result = enter_governed_read_lease(
+                checkout_root, original_arguments
+            )
+        except RuntimeError as error:
+            parser.error(str(error))
+        if delegated_result is not None:
+            return delegated_result
 
     inventory = load_json(arguments.inventory)
     if arguments.inspect_item:
-        templates = load_item_templates(arguments.items)
+        templates = load_item_templates(arguments.items, set(arguments.inspect_item))
         print(
             json.dumps(
                 {
@@ -4539,7 +4741,7 @@ def main() -> int:
     dataset = build_formula_dataset(
         inventory,
         load_json(arguments.active_coverage),
-        load_item_templates(arguments.items),
+        arguments.items,
     )
     rendered = canonical_json(dataset)
     formula_binding_count = sum(

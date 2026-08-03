@@ -2,54 +2,55 @@
 
 ## Active
 
-Complete and publish the offline WebEngine PHP 8.5.9 / CellAO WebCore
-compatibility boundary. The implementation is fail-closed and does not change
-supported game runtime behavior.
-
-The selected PHP authority is the official x64 NTS VS17 PHP 8.5.9 archive. The
-content authority remains CellAO WebCore commit
-`765c3850767b63af1cd259bab7f2f7ca3e97adf9`. Neither runtime payload is tracked
-in Git or acquired by a server process.
+Complete and publish the generated-combat concurrency reconciliation without
+changing supported runtime behavior. The capture corpus and current runtime are
+authoritative; inventory, catalog, fixtures, active coverage, formula data, and
+their generation manifest are one coordinated generated cohort.
 
 ## Reconciliation scope
 
-- Pin and validate the exact official PHP archive, complete extracted tree,
-  approved INI, required modules, x64/NTS build facts, and a real CGI probe.
-- Audit all 7,140 WebCore files and all 25 PHP files, then apply only the seven
-  deterministic compatibility/security transformations recorded by the
-  checked-in manifests.
-- Expose only the allowlisted read-only PHP routes and approved static file
-  types; reject administrative, authentication, registration, logout, member,
-  mutation, traversal, encoded-separator, and unsupported routes.
-- Hold exclusive PHP and WebCore leases for WebEngine process lifetime, repeat
-  complete validation before listener creation, and keep imports explicit and
-  offline.
-- Run the focused supply, compatibility, security, lint, engine-management,
-  build, secret, and complete 13-stage acceptance paths before publication.
+- Parse each primary capture once into an immutable, validated shard and reuse
+  that shard for metadata indexing and packet correlation.
+- Run the primary, decoder, SCFU analyzer, active-coverage generator, and formula
+  generator from immutable input bytes. The frozen Windows analyzer is copied
+  byte-for-byte to a short owned temporary path before process launch.
+- Serialize writers and protect supported readers with the generated-artifact
+  lease. Publish the complete five-artifact cohort transactionally, with the
+  manifest last, rollback before commit, and validated crash recovery.
+- Reject stale, mixed, partial, location-dependent, or input-mutated candidates
+  with the exact phase and changed-input diagnostic.
+- Keep direct generator writes away from governed outputs and route supported
+  build, AOtomation, and acceptance readers through a shared read lease.
 
-Focused validation is complete. Clean commit
-`f898faa0838cc3918baf29202001e0cc2d0fab56` passed the complete mandatory gate
-13/13 twice unchanged; the final evidence-only publication commit is revalidated
-and reported in the task handoff.
+## Current deterministic cohort
 
-## External blockers and support boundary
+- Generation identity:
+  `91cbc7ef749c6f1a66f1d527d227105c30130ba0e961099996e62b36f1059a37`
+- Combined input identity:
+  `fd60ad21be455b7c91a0f03dfecbe9fb756c3a5cd093e9bc1a9827581be835ec`
+- 381 capture sessions, 365 canonical sessions, 3,269 complete attack chains,
+  260 certified profiles, 96 runtime-ready profiles, 309 semantic definitions,
+  101 runtime-ready definitions, and 1,486 unresolved profiles.
+- 1,607 fixed actors: 504 accepted and 1,103 quarantined. Formula coverage has
+  422 profiles and 67 active bindings. Generator errors are zero.
 
-- No valid disposable WebCore database credential is available. Live database
-  connectivity and credential-backed WebEngine startup remain unverified and
-  must not be simulated with invented values.
-- A previously exposed database credential still requires external rotation.
-- The historical listener is plaintext HTTP, so secure-only cookies cannot be
-  enabled without a transport change. WebEngine remains development-only.
-- No license file was found in the pinned upstream WebCore snapshot. Integrity
-  and compatibility validation do not grant redistribution rights.
+## Final delivery acceptance
+
+- The pre-repair clean-worktree stress matrix passed. A later gate exposed an
+  intermittent formula ItemDb allocation crash; the streaming/selective loader
+  repair now needs the same complete stress matrix on the final commit.
+- The repaired loader retains 42 referenced templates instead of 120,842 and
+  reduced measured peak Python allocation from 422,936,105 to 11,169,393 bytes
+  while keeping the formula dataset byte-identical.
+- The standalone secret scan and Debug build passed without starting an engine.
+- The final handoff must report five consecutive complete mandatory integration
+  gates from one unchanged final commit. Those results are not written back to
+  tracked files so recording them cannot dirty the commit that they validate.
+- Remove only task-owned temporary evidence, push `master`, and report the
+  final commit and gate results.
 
 ## Authoritative evidence
 
-- `docs/evidence/WEBENGINE_PHP_COMPATIBILITY_20260802.md`
-- `docs/project/PHP_RUNTIME_SUPPLY.md`
-- `docs/project/WEBCORE_ASSET_SUPPLY.md`
-- `docs/generated/webcore_php_compatibility_inventory.json`
-- `AORebirth/Config/PhpRuntime.manifest.xml`
-- `AORebirth/Config/WebCoreAssets.manifest.xml`
-- `AORebirth/Config/WebCoreCompatibility.manifest.xml`
-- `AORebirth/Config/WebCorePatchedAssets.manifest.xml`
+- `docs/project/GENERATED_COMBAT_PIPELINE.md`
+- `docs/evidence/GENERATED_COMBAT_CONCURRENCY_20260802.md`
+- `docs/generated/capture_backed_npc_combat_generation_manifest.json`

@@ -18,7 +18,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
+import subprocess
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -3306,7 +3308,59 @@ def find_repo_root(start: Path) -> Path:
     raise CoverageError("could not locate AORebirth repository root")
 
 
+def same_file_or_path(left: Path, right: Path) -> bool:
+    if left.resolve() == right.resolve():
+        return True
+    if os.path.lexists(left) and os.path.lexists(right):
+        try:
+            return os.path.samefile(left, right)
+        except OSError:
+            return False
+    return False
+
+
+def enter_governed_read_lease(
+    checkout_root: Path, original_arguments: Sequence[str]
+) -> int | None:
+    delegation_name = "AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION"
+    root_name = "AO_REBIRTH_GENERATED_COMBAT_LEASE_REPO_ROOT"
+    raw_delegation = os.environ.get(delegation_name)
+    raw_root = os.environ.get(root_name)
+    if raw_delegation is None and raw_root is None:
+        command = [
+            sys.executable,
+            str(checkout_root / "Tools" / "generated_combat_pipeline.py"),
+            "--run-read-lease",
+            "--",
+            sys.executable,
+            str(Path(__file__).resolve()),
+            *original_arguments,
+        ]
+        return subprocess.run(command, cwd=checkout_root, check=False).returncode
+    if raw_delegation is None or raw_root is None:
+        raise CoverageError("generated-combat lease delegation is incomplete")
+    lease_root = Path(raw_root).resolve(strict=True)
+    if lease_root != checkout_root.resolve(strict=True):
+        raise CoverageError(
+            "generated-combat lease delegation belongs to a different checkout"
+        )
+    sys.path.insert(0, str(lease_root / "Tools"))
+    try:
+        import generated_artifact_transaction as transaction
+
+        delegation = json.loads(raw_delegation)
+        record = transaction.GeneratedArtifactLease.validate_delegation(
+            lease_root, delegation
+        )
+    except Exception as error:
+        raise CoverageError("generated-combat lease delegation is invalid") from error
+    if record.get("domain") != "capture-backed-npc-combat":
+        raise CoverageError("generated-combat lease delegation domain is invalid")
+    return None
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    original_arguments = list(sys.argv[1:] if argv is None else argv)
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--write", action="store_true", help="write the generated inventory")
@@ -3324,16 +3378,48 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--formula-dataset",
         default="docs/generated/enemy_combat_setup_formula_dataset.json",
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args(original_arguments)
 
+    script_repo_root = find_repo_root(Path(__file__).resolve().parent)
     repo_root = (
         args.repo_root.resolve()
         if args.repo_root is not None
-        else find_repo_root(Path(__file__).resolve().parent)
+        else script_repo_root
     )
+    output_path = (repo_root / args.output).resolve()
+    governed_output = (
+        script_repo_root
+        / "docs"
+        / "generated"
+        / "capture_backed_npc_combat_active_coverage.json"
+    ).resolve()
+    if same_file_or_path(output_path, governed_output):
+        parser.error(
+            "the governed active-coverage artifact must be checked or written "
+            "through Tools/generated_combat_pipeline.py"
+        )
     combat_inventory_path = repo_path(repo_root, args.combat_inventory)
     formula_dataset_path = repo_path(repo_root, args.formula_dataset)
-    output_path = repo_root / args.output
+    governed_inputs = (
+        script_repo_root
+        / "docs"
+        / "generated"
+        / "capture_backed_npc_combat_inventory.json",
+        script_repo_root
+        / "docs"
+        / "generated"
+        / "enemy_combat_setup_formula_dataset.json",
+    )
+    if any(
+        same_file_or_path(candidate, governed)
+        for candidate in (combat_inventory_path, formula_dataset_path)
+        for governed in governed_inputs
+    ):
+        delegated_result = enter_governed_read_lease(
+            script_repo_root, original_arguments
+        )
+        if delegated_result is not None:
+            return delegated_result
     document = build_inventory(
         repo_root,
         combat_inventory_path,

@@ -10,6 +10,12 @@ if errorlevel 1 (
 for %%F in (
     "tools\scan_secrets.cmd"
     "tools\generate_capture_backed_npc_combat_inventory.cmd"
+    "tools\generated_artifact_transaction.py"
+    "tools\generated_combat_pipeline.py"
+    "tools\run_generated_combat_concurrency_tests.cmd"
+    "tools\stress_generated_combat_pipeline.py"
+    "tools\tests\test_generated_artifact_transaction.py"
+    "tools\tests\test_generated_combat_pipeline.py"
     "tools\run_aotomation_messaging_tests.cmd"
     "tools\run_engine_management_tests.cmd"
     "tools\run_web_engine_security_tests.cmd"
@@ -48,11 +54,9 @@ echo [AORebirth Gate] PASS 2/13 engine management safety contracts
 
 set "CURRENT_STAGE=3/13 generated artifact reproducibility"
 echo [AORebirth Gate] START %CURRENT_STAGE%
+call tools\run_generated_combat_concurrency_tests.cmd
+if errorlevel 1 goto :stage_fail
 call tools\generate_capture_backed_npc_combat_inventory.cmd --check
-if errorlevel 1 goto :stage_fail
-python tools-temp\AOSharpCaptureAnalyzer\generate_capture_backed_npc_active_coverage.py --check
-if errorlevel 1 goto :stage_fail
-python tools-temp\AOSharpCaptureAnalyzer\analyze_enemy_combat_setup_formula.py --check
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 3/13 generated artifact reproducibility
 
