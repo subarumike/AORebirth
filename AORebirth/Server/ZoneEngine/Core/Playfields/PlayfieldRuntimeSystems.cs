@@ -824,6 +824,10 @@ namespace ZoneEngine.Core.Playfields
             if (playfieldIdentity.Instance == 6553)
             {
                 this.npcRuntime.EnsureAreteCapturePopulation();
+                this.vendors.EnsureCapturedAreteAlexAreaVendors(
+                    this.playfield,
+                    playfieldIdentity,
+                    this.dynelRegistry);
                 this.vendors.AttachCapturedAreteMarcoSpidaVendor(
                     this.playfield,
                     playfieldIdentity,
