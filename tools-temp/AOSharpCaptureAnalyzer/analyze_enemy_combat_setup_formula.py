@@ -481,7 +481,6 @@ def load_item_templates(
                         template_id = int(template[5])
                         templates[template_id] = template
                         continue
-
                     template_start = reader.offset
                     field_count = reader.read_array_size()
                     if field_count < 6:
@@ -540,6 +539,53 @@ def load_verified_item_templates(
         raise
     except ValueError as error:
         raise ValueError(f"verified item-template decode failure: {error}") from error
+
+
+def load_item_template_projection(
+    path: Path,
+    template_ids: set[int] | frozenset[int],
+    *,
+    expected_sha256: str,
+    expected_byte_length: int,
+) -> dict[int, dict[str, Any]]:
+    document = load_json(
+        path,
+        expected_sha256=expected_sha256,
+        expected_byte_length=expected_byte_length,
+    )
+    if set(document) != {"templates"} or not isinstance(
+        document["templates"], dict
+    ):
+        raise ValueError("item-template projection root is invalid")
+    templates: dict[int, dict[str, Any]] = {}
+    for raw_template_id, row in document["templates"].items():
+        try:
+            template_id = int(raw_template_id)
+        except (TypeError, ValueError) as error:
+            raise ValueError("item-template projection ID is invalid") from error
+        if not isinstance(row, dict) or set(row) != {
+            "actions",
+            "qualityLevel",
+            "stats",
+        }:
+            raise ValueError(
+                f"item-template projection row {template_id} is invalid"
+            )
+        if not isinstance(row["qualityLevel"], int) or not isinstance(
+            row["stats"], dict
+        ):
+            raise ValueError(
+                f"item-template projection row {template_id} types are invalid"
+            )
+        templates[template_id] = row
+    missing = sorted(set(template_ids) - set(templates))
+    extra = sorted(set(templates) - set(template_ids))
+    if missing or extra:
+        raise ValueError(
+            "item-template projection membership is invalid: "
+            f"missing={missing} extra={extra}"
+        )
+    return templates
 
 
 def divide_rounded(numerator: int, denominator: int, mode: str) -> int:
@@ -1168,6 +1214,10 @@ def build_formula_dataset(
     item_database_path: Path,
     item_database_sha256: str | None = None,
     item_database_byte_length: int | None = None,
+    *,
+    item_template_projection_path: Path | None = None,
+    item_template_projection_sha256: str | None = None,
+    item_template_projection_byte_length: int | None = None,
 ) -> dict[str, Any]:
     profiles = [
         compact_profile(profile)
@@ -1177,7 +1227,20 @@ def build_formula_dataset(
     referenced_template_ids: set[int] = set()
     for profile in profiles:
         referenced_template_ids.update(collect_template_ids(profile))
-    if item_database_sha256 is not None and item_database_byte_length is not None:
+    if item_template_projection_path is not None:
+        if (
+            item_template_projection_sha256 is None
+            or item_template_projection_byte_length is None
+        ):
+            raise ValueError("item-template projection descriptor is incomplete")
+        projected_templates = load_item_template_projection(
+            item_template_projection_path,
+            referenced_template_ids,
+            expected_sha256=item_template_projection_sha256,
+            expected_byte_length=item_template_projection_byte_length,
+        )
+        item_templates = None
+    elif item_database_sha256 is not None and item_database_byte_length is not None:
         item_templates = load_verified_item_templates(
             item_database_path,
             referenced_template_ids,
@@ -1190,6 +1253,24 @@ def build_formula_dataset(
         )
     template_rows = []
     for template_id in sorted(referenced_template_ids):
+        if item_template_projection_path is not None:
+            projected = projected_templates[template_id]
+            template_rows.append(
+                {
+                    "templateId": template_id,
+                    "qualityLevel": projected["qualityLevel"],
+                    "actions": projected["actions"],
+                    "stats": {
+                        str(key): value
+                        for key, value in sorted(
+                            projected["stats"].items(),
+                            key=lambda row: int(row[0]),
+                        )
+                    },
+                }
+            )
+            continue
+        assert item_templates is not None
         template = item_templates.get(template_id)
         if template is None or len(template) < 12:
             continue
@@ -4611,6 +4692,9 @@ def main() -> int:
     parser.add_argument("--items", type=Path, default=DEFAULT_ITEMS)
     parser.add_argument("--items-sha256")
     parser.add_argument("--items-byte-length", type=int)
+    parser.add_argument("--item-template-projection", type=Path)
+    parser.add_argument("--item-template-projection-sha256")
+    parser.add_argument("--item-template-projection-byte-length", type=int)
     parser.add_argument(
         "--active-coverage", type=Path, default=DEFAULT_ACTIVE_COVERAGE
     )
@@ -4955,6 +5039,11 @@ def main() -> int:
         arguments.items,
         arguments.items_sha256,
         arguments.items_byte_length,
+        item_template_projection_path=arguments.item_template_projection,
+        item_template_projection_sha256=arguments.item_template_projection_sha256,
+        item_template_projection_byte_length=(
+            arguments.item_template_projection_byte_length
+        ),
     )
     rendered = canonical_json(dataset)
     formula_binding_count = sum(

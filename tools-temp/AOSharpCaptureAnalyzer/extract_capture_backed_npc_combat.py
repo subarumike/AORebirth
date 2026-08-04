@@ -1648,11 +1648,24 @@ def _is_interpreter_corruption_detail(detail: str) -> bool:
             "ValueError: invalid literal for int() with base 10:" in detail
             and ("json\\decoder.py" in detail or "json/decoder.py" in detail)
         )
+        or (
+            ("TypeError:" in detail or "AttributeError:" in detail)
+            and ("json\\decoder.py" in detail or "json/decoder.py" in detail)
+            and ("json\\scanner.py" in detail or "json/scanner.py" in detail)
+        )
+        or (
+            "extract_capture_backed_npc_combat.py" in detail
+            and "TypeError:" in detail
+            and ("parse_capture" in detail or "decode_" in detail)
+        )
     )
 
 
 def _is_capture_worker_materialization_detail(detail: str) -> bool:
-    return "capture worker shard materialization failed:" in detail
+    return (
+        "capture worker shard materialization failed:" in detail
+        or "capture aggregation snapshot materialization failed " in detail
+    )
 
 
 def _capture_snapshot_failure(
@@ -1919,6 +1932,7 @@ def parse_capture_isolated_to_snapshot(
             shard.unlink()
         command = [
             sys.executable,
+            "-B",
             "-I",
             "-X",
             "faulthandler",
@@ -6716,6 +6730,7 @@ def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
         ))
         command = [
             sys.executable,
+            "-B",
             "-I",
             "-u",
             "-X",
@@ -6771,9 +6786,12 @@ def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
         interpreter_corruption = (
             not cancelled and _is_interpreter_corruption_detail(detail)
         )
+        materialization_failure = (
+            not cancelled and _is_capture_worker_materialization_detail(detail)
+        )
         suffix = f": {detail}" if detail else ""
         if (
-            (native_failure or interpreter_corruption)
+            (native_failure or interpreter_corruption or materialization_failure)
             and attempt < AGGREGATE_WORKER_MAX_ATTEMPTS
         ):
             _invoke_self_test_fault(
@@ -6788,6 +6806,8 @@ def _run_aggregate_worker_isolated(staging_root: Path) -> AggregateWorkerResult:
             continue
         if cancelled:
             kind = "cancelled aggregate worker"
+        elif materialization_failure:
+            kind = "materialization aggregate worker"
         elif native_failure or interpreter_corruption:
             kind = "native aggregate worker"
         else:
@@ -7017,6 +7037,12 @@ def self_test() -> None:
         "C:\\repo\\tools-temp\\AOSharpLiveCapture\\decode_npc_lifecycle_capture.py\n"
         "TypeError: 'int' object is not subscriptable"
     )
+    assert _is_interpreter_corruption_detail(
+        "C:\\repo\\tools-temp\\AOSharpCaptureAnalyzer\\"
+        "extract_capture_backed_npc_combat.py\n"
+        "in decode_special_attack_weapon\n"
+        "TypeError: 'bytes' object does not support item assignment"
+    )
     assert not _is_interpreter_corruption_detail(
         "TypeError: deterministic capture schema failure"
     )
@@ -7025,6 +7051,10 @@ def self_test() -> None:
     )
     assert _is_capture_worker_materialization_detail(
         "RuntimeError: capture worker shard materialization failed: malformed JSON"
+    )
+    assert _is_capture_worker_materialization_detail(
+        "RuntimeError: capture aggregation snapshot materialization failed "
+        "capture=session phase=metadata-index: malformed JSON"
     )
     assert not _is_capture_worker_materialization_detail(
         "RuntimeError: deterministic capture failure"
@@ -7065,7 +7095,7 @@ def self_test() -> None:
         raise AssertionError("missing aggregation key was accepted")
     try:
         _run_bounded_child(
-            [sys.executable, "-I", "-c", "import time; time.sleep(30)"],
+            [sys.executable, "-B", "-I", "-c", "import time; time.sleep(30)"],
             cwd=REPO_ROOT,
             timeout_seconds=1,
             label="self-test child",

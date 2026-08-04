@@ -268,7 +268,83 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         inventory.update(
             {
                 "schemaVersion": 1,
-                "summary": {"captureCertifiedProfiles": 1},
+                "capturedRealmToRuntimeResource": {},
+                "profiles": [
+                    {
+                        "profileKey": (
+                            "resource=127|md=203739|level=1|name=Stim Fiend"
+                        ),
+                        "metadata": {
+                            "monsterData": 203739,
+                            "level": 1,
+                            "name": "Stim Fiend",
+                        },
+                        "variants": [
+                            {
+                                "semanticProfileId": "stim-fiend",
+                                "baseSignature": {"template": 1},
+                                "captureEvidenceSafe": True,
+                                "runtimeContractReady": True,
+                                "runtimeMissingEvidence": [],
+                                "streams": [
+                                    {
+                                        "attackInfoPacketIds": [
+                                            "attack-one",
+                                            "attack-two",
+                                        ]
+                                    }
+                                ],
+                                "mutableSawStateObservations": [],
+                                "rawWireVariantObservations": [
+                                    {
+                                        "sourceIdentity": "0x00000001",
+                                        "specialAttackWeaponPacketId": "saw",
+                                        "auditOnly": "discard",
+                                    }
+                                ],
+                                "auditOnly": "discard",
+                            }
+                        ],
+                        "status": "capture-certified",
+                        "normalCompleteChainCount": 1,
+                        "unsupportedNpcSequenceCount": 0,
+                        "unsupportedSequences": [],
+                        "incompleteObservations": [],
+                        "auditOnly": "discard",
+                    },
+                    {
+                        "profileKey": (
+                            "resource=1931|md=203747|level=20|name=Melded Patterns"
+                        ),
+                        "metadata": {
+                            "monsterData": 203747,
+                            "level": 20,
+                            "name": "Melded Patterns",
+                        },
+                        "variants": [
+                            {
+                                "semanticProfileId": "melded-patterns",
+                                "baseSignature": {"template": 2},
+                                "rawWireVariantObservations": [
+                                    {
+                                        "sourceIdentity": "0x00000002",
+                                        "weaponItemFullUpdatePacketId": "wifu",
+                                        "specialAttackWeaponPacketId": "saw",
+                                        "attackPacketId": "attack",
+                                        "attackInfoPacketId": "attack-info",
+                                        "terminalHit": {"damage": 42},
+                                        "auditOnly": "discard",
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+                "summary": {
+                    "captureCertifiedProfiles": 1,
+                    "captureCertifiedSemanticDefinitions": 1,
+                    "runtimeReadyProfiles": 1,
+                },
                 "packets": [{"packetId": "large-audit-only-packet"}],
             }
         )
@@ -277,10 +353,64 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             tuple(projection), pipeline.GENERATOR_INVENTORY_PROJECTION_KEYS
         )
         self.assertNotIn("packets", projection)
+        self.assertNotIn("auditOnly", projection["profiles"][0])
+        self.assertEqual(
+            ["attack-one", "attack-two"],
+            projection["profiles"][0]["variants"][0]["streams"][0][
+                "attackInfoPacketIds"
+            ],
+        )
+        formula_projection = pipeline.build_formula_inventory_projection(inventory)
+        self.assertEqual(("profiles",), tuple(formula_projection))
+        self.assertEqual(
+            {1, 2},
+            pipeline.collect_referenced_formula_template_ids(
+                {
+                    "profiles": [
+                        {
+                            "profileKey": "resource=127|name=one",
+                            "weaponTemplate": 1,
+                        },
+                        {
+                            "profileKey": "resource=1931|name=two",
+                            "weaponTemplates": [2],
+                        },
+                        {
+                            "profileKey": "resource=999|name=excluded",
+                            "weaponTemplate": 999,
+                        },
+                    ]
+                }
+            ),
+        )
+        self.assertNotIn("auditOnly", formula_projection["profiles"][0])
+        self.assertNotIn(
+            "auditOnly",
+            formula_projection["profiles"][0]["variants"][0][
+                "rawWireVariantObservations"
+            ][0],
+        )
+        self.assertEqual(
+            {
+                "sourceIdentity": "0x00000002",
+                "weaponItemFullUpdatePacketId": "wifu",
+                "specialAttackWeaponPacketId": "saw",
+                "attackPacketId": "attack",
+                "attackInfoPacketId": "attack-info",
+                "terminalHit": {"damage": 42},
+            },
+            formula_projection["profiles"][1]["variants"][0][
+                "rawWireVariantObservations"
+            ][0],
+        )
         with self.assertRaisesRegex(
             pipeline.CohortValidationError, "missing generator projection keys"
         ):
             pipeline.build_generator_inventory_projection({"schemaVersion": 1})
+        with self.assertRaisesRegex(
+            pipeline.CohortValidationError, "missing formula projection key"
+        ):
+            pipeline.build_formula_inventory_projection({"schemaVersion": 1})
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -337,8 +467,8 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             exec(
                 compile(
                     "def JSONArray(_raw):\n"
-                    "    raise TypeError(\"unsupported operand type(s) for -: "
-                    "'str' and 'int'\")\n",
+                    "    raise AttributeError(\"'int' object has no attribute "
+                    "'end'\")\n",
                     "C:/Python/Lib/json/decoder.py",
                     "exec",
                 ),
@@ -347,7 +477,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             json_array_fault = namespace["JSONArray"]
             transient_calls = 0
 
-            def transient_type_error_then_success(value):
+            def transient_decoder_attribute_error_then_success(value):
                 nonlocal transient_calls
                 transient_calls += 1
                 if transient_calls < 3:
@@ -357,7 +487,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             with mock.patch.object(
                 pipeline,
                 "decode_json_text",
-                side_effect=transient_type_error_then_success,
+                side_effect=transient_decoder_attribute_error_then_success,
             ) as decode:
                 self.assertEqual(
                     expected,
@@ -382,14 +512,14 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
 
             def unrelated_type_error(_value):
                 raise TypeError(
-                    "unsupported operand type(s) for -: 'str' and 'int'"
+                    "'in <string>' requires string as left operand, not bool"
                 )
 
             with mock.patch.object(
                 pipeline,
                 "decode_json_text",
                 side_effect=unrelated_type_error,
-            ) as decode, self.assertRaisesRegex(TypeError, "unsupported operand"):
+            ) as decode, self.assertRaisesRegex(TypeError, "left operand"):
                 pipeline.load_json_object(json_path, "unrelated type-error fixture")
             self.assertEqual(1, decode.call_count)
             with mock.patch.object(
@@ -752,43 +882,53 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         self.assertEqual(states[-1], result.state)
 
     def test_fixed_point_skips_redundant_converged_formula_round(self):
-        inventory_payload = b'{"profiles":[]}'
-        item_database_payload = b"verified-item-database"
+        active_inventory_payload = b'{"activeProfiles":[]}'
+        formula_inventory_payload = b'{"profiles":[]}'
+        item_template_projection_payload = b'{"templates":{}}'
         active_payload = pipeline.canonical_json_bytes({})
         formula_payload = b'{"formula":1}'
         inventory_paths = []
-        item_database_paths = []
+        item_projection_paths = []
 
         def complete_child(command, **kwargs):
             command = list(command)
             label = kwargs["label"]
             if label.startswith("active-coverage"):
                 inventory_flag = "--combat-inventory"
+                expected_inventory_payload = active_inventory_payload
                 output_payload = active_payload
             else:
                 inventory_flag = "--inventory"
+                expected_inventory_payload = formula_inventory_payload
                 output_payload = formula_payload
-                item_database_path = Path(command[command.index("--items") + 1])
-                self.assertEqual(
-                    item_database_payload, item_database_path.read_bytes()
+                item_projection_path = Path(
+                    command[command.index("--item-template-projection") + 1]
                 )
                 self.assertEqual(
-                    pipeline.sha256_bytes(item_database_payload),
-                    command[command.index("--items-sha256") + 1],
+                    item_template_projection_payload,
+                    item_projection_path.read_bytes(),
                 )
                 self.assertEqual(
-                    str(len(item_database_payload)),
-                    command[command.index("--items-byte-length") + 1],
+                    pipeline.sha256_bytes(item_template_projection_payload),
+                    command[
+                        command.index("--item-template-projection-sha256") + 1
+                    ],
                 )
-                item_database_paths.append(item_database_path)
+                self.assertEqual(
+                    str(len(item_template_projection_payload)),
+                    command[
+                        command.index("--item-template-projection-byte-length") + 1
+                    ],
+                )
+                item_projection_paths.append(item_projection_path)
             inventory_path = Path(command[command.index(inventory_flag) + 1])
-            self.assertEqual(inventory_payload, inventory_path.read_bytes())
+            self.assertEqual(expected_inventory_payload, inventory_path.read_bytes())
             self.assertEqual(
-                pipeline.sha256_bytes(inventory_payload),
+                pipeline.sha256_bytes(expected_inventory_payload),
                 command[command.index(inventory_flag + "-sha256") + 1],
             )
             self.assertEqual(
-                str(len(inventory_payload)),
+                str(len(expected_inventory_payload)),
                 command[command.index(inventory_flag + "-byte-length") + 1],
             )
             inventory_paths.append((label, inventory_path))
@@ -803,9 +943,10 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             result = pipeline._run_active_formula_fixed_point(
                 repo_root=root,
                 frozen_repo_root=root,
-                inventory_payload=inventory_payload,
+                active_inventory_payload=active_inventory_payload,
+                formula_inventory_payload=formula_inventory_payload,
                 authoritative_inventory_path=root / "authoritative.json",
-                item_database_payload=item_database_payload,
+                item_template_projection_payload=item_template_projection_payload,
                 lease=object(),
                 max_rounds=4,
             )
@@ -821,7 +962,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
         self.assertEqual(formula_payload, result.state.formula_dataset)
         self.assertEqual(3, len(inventory_paths))
         self.assertEqual(3, len({path for _label, path in inventory_paths}))
-        self.assertEqual(1, len(item_database_paths))
+        self.assertEqual(1, len(item_projection_paths))
         self.assertEqual(
             {"round-01", "round-02"},
             {path.parents[1].name for _label, path in inventory_paths},
@@ -835,6 +976,60 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             [label for label, _path in inventory_paths],
         )
         self.assertFalse(converged_formula_output_exists)
+
+    def test_fixed_point_memoizes_proven_terminal_transition(self):
+        active_inventory_payload = b'{"activeProfiles":[]}'
+        formula_inventory_payload = b'{"profiles":[]}'
+        item_template_projection_payload = b'{"templates":{}}'
+        active_payloads = {
+            "active-coverage round 1": b'{"active":1}',
+            "active-coverage round 2": b'{"active":2}',
+        }
+        formula_payload = b'{"formula":1}'
+        labels = []
+
+        def complete_child(command, **kwargs):
+            command = list(command)
+            label = kwargs["label"]
+            labels.append(label)
+            output_path = Path(command[command.index("--output") + 1])
+            output_path.write_bytes(active_payloads.get(label, formula_payload))
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(
+            pipeline, "run_checked", side_effect=complete_child
+        ):
+            root = Path(directory)
+            result = pipeline._run_active_formula_fixed_point(
+                repo_root=root,
+                frozen_repo_root=root,
+                active_inventory_payload=active_inventory_payload,
+                formula_inventory_payload=formula_inventory_payload,
+                authoritative_inventory_path=root / "authoritative.json",
+                item_template_projection_payload=item_template_projection_payload,
+                lease=object(),
+                max_rounds=4,
+            )
+            terminal_round_exists = (
+                root / "_active-formula-rounds" / "round-03"
+            ).exists()
+
+        self.assertEqual(3, result.rounds)
+        self.assertEqual(
+            active_payloads["active-coverage round 2"],
+            result.state.active_coverage,
+        )
+        self.assertEqual(formula_payload, result.state.formula_dataset)
+        self.assertEqual(
+            [
+                "active-coverage round 1",
+                "formula round 1",
+                "active-coverage round 2",
+                "formula round 2",
+            ],
+            labels,
+        )
+        self.assertFalse(terminal_round_exists)
 
     def test_active_formula_cycle_is_rejected(self):
         initial = pipeline.PairState(b"active-0", b"formula-0")
@@ -1281,6 +1476,42 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 1,
                 "decode_json_text(raw)\n"
                 "json.decoder.JSONDecodeError: Expecting ':' delimiter",
+            )
+        )
+        governed_type_error = CompletedChild(
+            1,
+            "decode_json_text(raw)\n"
+            "C:\\Python\\Lib\\json\\scanner.py\n"
+            "C:\\Python\\Lib\\json\\decoder.py\n"
+            "TypeError: 'in <string>' requires string as left operand, not bool",
+        )
+        with mock.patch.object(
+            pipeline.subprocess,
+            "Popen",
+            side_effect=(governed_type_error, success),
+        ) as launch:
+            completed = pipeline.run_checked(
+                ("fixture-child",),
+                repo_root=Path.cwd(),
+                lease=Lease(),
+                label="governed JSON TypeError fixture",
+                retry_interpreter_failures=True,
+            )
+        self.assertEqual(completed.returncode, 0)
+        self.assertEqual(launch.call_count, 2)
+        self.assertFalse(
+            pipeline._is_transient_interpreter_failure(
+                1,
+                "TypeError: 'in <string>' requires string as left operand, not bool",
+            )
+        )
+        self.assertTrue(
+            pipeline._is_transient_interpreter_failure(
+                1,
+                "decode_json_text(raw)\n"
+                "C:\\Python\\Lib\\json\\scanner.py\n"
+                "C:\\Python\\Lib\\json\\decoder.py\n"
+                "AttributeError: 'int' object has no attribute 'end'",
             )
         )
         self.assertTrue(

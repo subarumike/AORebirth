@@ -60,6 +60,9 @@ ITEM_DATABASE = Path("AORebirth/Datafiles/items.dat")
 SCFU_ANALYZER = Path(
     "tools-temp/AOSharpCaptureAnalyzer/bin/Debug/AOSharpCaptureAnalyzer.exe"
 )
+ITEM_TEMPLATE_PROJECTION_SOURCE = Path(
+    "tools-temp/AOSharpCaptureAnalyzer/ItemTemplateProjection.cs"
+)
 FORMULA_STATIC_INPUTS = (
     Path(
         "AORebirth/Server/ZoneEngine/Core/Playfields/"
@@ -119,6 +122,9 @@ GENERATOR_PATHS: dict[str, PurePosixPath] = {
     "primary": PurePosixPath(PRIMARY_GENERATOR.as_posix()),
     "activeCoverage": PurePosixPath(ACTIVE_GENERATOR.as_posix()),
     "formulaDataset": PurePosixPath(FORMULA_GENERATOR.as_posix()),
+    "itemTemplateProjection": PurePosixPath(
+        ITEM_TEMPLATE_PROJECTION_SOURCE.as_posix()
+    ),
     "scfuAnalyzer": PurePosixPath(SCFU_ANALYZER.as_posix()),
 }
 
@@ -252,16 +258,19 @@ def decode_json_text(raw: str) -> Any:
 def _is_transient_json_decoder_failure(error: BaseException) -> bool:
     if isinstance(error, json.JSONDecodeError):
         return True
-    if not isinstance(error, TypeError) or str(error) not in {
-        "unsupported operand type(s) for -: 'str' and 'int'",
-        "'str_ascii_iterator' object is not callable",
-    }:
+    if not isinstance(error, (TypeError, AttributeError)):
         return False
     traceback = error.__traceback__
     while traceback is not None:
         code = traceback.tb_frame.f_code
         filename = code.co_filename.replace("\\", "/").casefold()
-        if code.co_name in {"JSONArray", "_scan_once", "scan_once"} and (
+        if code.co_name in {
+            "JSONObject",
+            "JSONArray",
+            "py_scanstring",
+            "_scan_once",
+            "scan_once",
+        } and (
             filename.endswith("/json/decoder.py")
             or filename.endswith("/json/scanner.py")
         ):
@@ -270,14 +279,388 @@ def _is_transient_json_decoder_failure(error: BaseException) -> bool:
     return False
 
 
-def build_generator_inventory_projection(inventory: Mapping[str, Any]) -> dict[str, Any]:
+def _require_json_mapping(value: Any, label: str) -> Mapping[str, Any]:
+    if not isinstance(value, dict):
+        raise CohortValidationError(f"{label} must be one JSON object")
+    return value
+
+
+def _require_json_list(value: Any, label: str) -> list[Any]:
+    if not isinstance(value, list):
+        raise CohortValidationError(f"{label} must be one JSON array")
+    return value
+
+
+def _present_fields(
+    source: Mapping[str, Any], fields: Sequence[str]
+) -> dict[str, Any]:
+    return {field: source[field] for field in fields if field in source}
+
+
+def _project_active_observation(value: Any, label: str) -> dict[str, Any]:
+    row = _require_json_mapping(value, label)
+    return _present_fields(
+        row,
+        (
+            "classification",
+            "sourceIdentity",
+            "observationCount",
+            "captureSessions",
+            "samplePacketIds",
+            "evidenceFound",
+            "missingEvidence",
+            "conflicts",
+            "runtimeSupport",
+        ),
+    )
+
+
+def _project_active_variant(value: Any, label: str) -> dict[str, Any]:
+    variant = _require_json_mapping(value, label)
+    projected = _present_fields(
+        variant,
+        (
+            "captureCertified",
+            "captureEvidenceSafe",
+            "runtimeContractReady",
+            "captureSessions",
+            "sourceIdentities",
+            "runtimeMissingEvidence",
+            "representativeWifuPacketId",
+            "representativeSawPacketId",
+            "representativeAttackPacketId",
+        ),
+    )
+    if "streams" in variant:
+        streams = _require_json_list(variant["streams"], f"{label}.streams")
+        projected_streams = []
+        for index, value in enumerate(streams):
+            stream = _require_json_mapping(value, f"{label}.streams[{index}]")
+            projected_stream: dict[str, Any] = {}
+            if "attackInfoPacketIds" in stream:
+                packet_ids = _require_json_list(
+                    stream["attackInfoPacketIds"],
+                    f"{label}.streams[{index}].attackInfoPacketIds",
+                )
+                projected_stream["attackInfoPacketIds"] = list(packet_ids)
+            projected_streams.append(projected_stream)
+        projected["streams"] = projected_streams
+    if "rawWireVariantObservations" in variant:
+        rows = _require_json_list(
+            variant["rawWireVariantObservations"],
+            f"{label}.rawWireVariantObservations",
+        )
+        projected["rawWireVariantObservations"] = [None] * len(rows)
+    if "mutableSawStateObservations" in variant:
+        rows = _require_json_list(
+            variant["mutableSawStateObservations"],
+            f"{label}.mutableSawStateObservations",
+        )
+        projected["mutableSawStateObservations"] = [
+            _present_fields(
+                _require_json_mapping(
+                    row, f"{label}.mutableSawStateObservations[{index}]"
+                ),
+                ("unknown5",),
+            )
+            for index, row in enumerate(rows)
+        ]
+    if "runtimeMutableWeaponStateCandidates" in variant:
+        rows = _require_json_list(
+            variant["runtimeMutableWeaponStateCandidates"],
+            f"{label}.runtimeMutableWeaponStateCandidates",
+        )
+        projected["runtimeMutableWeaponStateCandidates"] = [None] * len(rows)
+    return projected
+
+
+def _project_active_profile(value: Any, label: str) -> dict[str, Any]:
+    profile = _require_json_mapping(value, label)
+    if not isinstance(profile.get("profileKey"), str):
+        raise CohortValidationError(f"{label}.profileKey must be one string")
+    projected = _present_fields(
+        profile,
+        (
+            "profileKey",
+            "captureSessionsSearched",
+            "semanticFallbackCaptureProven",
+            "status",
+            "disabledCapability",
+            "conflictedSourceIdentities",
+        ),
+    )
+    if "metadata" in profile:
+        metadata = profile["metadata"]
+        projected["metadata"] = (
+            None
+            if metadata is None
+            else _present_fields(
+                _require_json_mapping(metadata, f"{label}.metadata"), ("level",)
+            )
+        )
+    if "variants" in profile:
+        variants = _require_json_list(profile["variants"], f"{label}.variants")
+        projected["variants"] = [
+            _project_active_variant(row, f"{label}.variants[{index}]")
+            for index, row in enumerate(variants)
+        ]
+    for field in (
+        "incompleteObservations",
+        "nonNormalObservations",
+        "unsupportedSequences",
+    ):
+        if field not in profile:
+            continue
+        rows = _require_json_list(profile[field], f"{label}.{field}")
+        projected[field] = [
+            _project_active_observation(row, f"{label}.{field}[{index}]")
+            for index, row in enumerate(rows)
+        ]
+    return projected
+
+
+def _project_active_metadata(value: Any, label: str) -> dict[str, Any]:
+    metadata = _require_json_mapping(value, label)
+    return _present_fields(
+        metadata,
+        (
+            "capturedRealmId",
+            "monsterData",
+            "level",
+            "name",
+            "capture",
+            "generationKey",
+            "sourceIdentity",
+            "sequence",
+            "packetSha256",
+            "projection",
+        ),
+    )
+
+
+def build_generator_inventory_projection(
+    inventory: Mapping[str, Any],
+) -> dict[str, Any]:
     missing = [key for key in GENERATOR_INVENTORY_PROJECTION_KEYS if key not in inventory]
     if missing:
         raise CohortValidationError(
             "primary inventory is missing generator projection keys: "
             + ", ".join(missing)
         )
-    return {key: inventory[key] for key in GENERATOR_INVENTORY_PROJECTION_KEYS}
+    sessions = _require_json_list(inventory["sessions"], "primary sessions")
+    profiles = _require_json_list(inventory["profiles"], "primary profiles")
+    metadata = _require_json_list(
+        inventory["metadataGenerations"], "primary metadata generations"
+    )
+    authoritative_inputs = _require_json_list(
+        inventory["authoritativeInputs"], "primary authoritative inputs"
+    )
+    realm_map = _require_json_mapping(
+        inventory["capturedRealmToRuntimeResource"], "primary captured realm map"
+    )
+    summary = _require_json_mapping(inventory["summary"], "primary summary")
+    summary_fields = (
+        "captureCertifiedProfiles",
+        "captureCertifiedSemanticDefinitions",
+        "runtimeReadyProfiles",
+    )
+    missing_summary = [field for field in summary_fields if field not in summary]
+    if missing_summary:
+        raise CohortValidationError(
+            "primary summary is missing active projection keys: "
+            + ", ".join(missing_summary)
+        )
+    return {
+        "schemaVersion": inventory["schemaVersion"],
+        "authoritativeInputs": authoritative_inputs,
+        "sessions": [
+            _present_fields(
+                _require_json_mapping(row, f"primary sessions[{index}]"),
+                ("capture",),
+            )
+            for index, row in enumerate(sessions)
+        ],
+        "profiles": [
+            _project_active_profile(row, f"primary profiles[{index}]")
+            for index, row in enumerate(profiles)
+        ],
+        "capturedRealmToRuntimeResource": dict(realm_map),
+        "metadataGenerations": [
+            _project_active_metadata(row, f"primary metadata generations[{index}]")
+            for index, row in enumerate(metadata)
+        ],
+        "summary": {field: summary[field] for field in summary_fields},
+    }
+
+
+FORMULA_COMPACT_OBSERVATION_FIELDS = (
+    "messageType",
+    "classification",
+    "sourceIdentity",
+    "attackerIdentity",
+    "defenderIdentity",
+    "n3SourceIdentity",
+    "n3Unknown",
+    "unknown1",
+    "unknown2",
+    "unknown5",
+    "hitTypeWire",
+    "damageTypeWire",
+    "packetOrderProven",
+    "observationCount",
+    "captureSessions",
+    "missingEvidence",
+    "evidenceFound",
+)
+
+
+def _profile_resource(profile_key: str) -> int | None:
+    match = re.search(r"(?:^|\|)resource=(\d+)(?:\||$)", profile_key)
+    return int(match.group(1)) if match else None
+
+
+def _project_formula_variant(
+    value: Any, label: str, *, scope_profile: bool, raw_chain_profile: bool
+) -> dict[str, Any]:
+    variant = _require_json_mapping(value, label)
+    projected = _present_fields(variant, ("semanticProfileId", "baseSignature"))
+    if scope_profile:
+        projected.update(
+            _present_fields(
+                variant,
+                (
+                    "captureEvidenceSafe",
+                    "runtimeContractReady",
+                    "runtimeMissingEvidence",
+                    "streams",
+                    "mutableSawStateObservations",
+                ),
+            )
+        )
+    if raw_chain_profile and "rawWireVariantObservations" in variant:
+        rows = _require_json_list(
+            variant["rawWireVariantObservations"],
+            f"{label}.rawWireVariantObservations",
+        )
+        projected["rawWireVariantObservations"] = [
+            _present_fields(
+                _require_json_mapping(
+                    row, f"{label}.rawWireVariantObservations[{index}]"
+                ),
+                (
+                    "sourceIdentity",
+                    "weaponItemFullUpdatePacketId",
+                    "specialAttackWeaponPacketId",
+                    "attackPacketId",
+                    "attackInfoPacketId",
+                    "terminalHit",
+                ),
+            )
+            for index, row in enumerate(rows)
+        ]
+    return projected
+
+
+def _project_formula_profile(value: Any, label: str) -> dict[str, Any]:
+    profile = _require_json_mapping(value, label)
+    profile_key = profile.get("profileKey")
+    if not isinstance(profile_key, str):
+        raise CohortValidationError(f"{label}.profileKey must be one string")
+    resource = _profile_resource(profile_key)
+    scope_profile = resource in (127, 1931)
+    metadata = profile.get("metadata")
+    metadata_map = (
+        _require_json_mapping(metadata, f"{label}.metadata")
+        if metadata is not None
+        else {}
+    )
+    raw_chain_profile = (
+        resource == 127 and "|md=203739|" in profile_key
+    ) or (
+        metadata_map.get("monsterData") == 203747
+        and metadata_map.get("name") == "Melded Patterns"
+    )
+    projected: dict[str, Any] = {"profileKey": profile_key}
+    if "metadata" in profile:
+        projected["metadata"] = metadata
+    variants = _require_json_list(profile.get("variants", []), f"{label}.variants")
+    projected["variants"] = [
+        _project_formula_variant(
+            row,
+            f"{label}.variants[{index}]",
+            scope_profile=scope_profile,
+            raw_chain_profile=raw_chain_profile,
+        )
+        for index, row in enumerate(variants)
+    ]
+    if scope_profile:
+        projected.update(
+            _present_fields(
+                profile,
+                ("status", "normalCompleteChainCount", "unsupportedNpcSequenceCount"),
+            )
+        )
+        for field in ("unsupportedSequences", "incompleteObservations"):
+            rows = _require_json_list(profile.get(field, []), f"{label}.{field}")
+            projected[field] = [
+                _present_fields(
+                    _require_json_mapping(row, f"{label}.{field}[{index}]"),
+                    FORMULA_COMPACT_OBSERVATION_FIELDS,
+                )
+                for index, row in enumerate(rows)
+            ]
+    return projected
+
+
+def build_formula_inventory_projection(
+    inventory: Mapping[str, Any],
+) -> dict[str, Any]:
+    if "profiles" not in inventory:
+        raise CohortValidationError(
+            "primary inventory is missing formula projection key: profiles"
+        )
+    profiles = _require_json_list(inventory["profiles"], "primary profiles")
+    return {
+        "profiles": [
+            _project_formula_profile(row, f"primary profiles[{index}]")
+            for index, row in enumerate(profiles)
+        ]
+    }
+
+
+def collect_formula_template_ids(value: Any) -> set[int]:
+    result: set[int] = set()
+    if isinstance(value, dict):
+        for key, child in value.items():
+            normalized = key.lower()
+            if normalized.endswith("template") and isinstance(child, int):
+                result.add(child)
+            elif normalized.endswith("templates") and isinstance(child, list):
+                result.update(item for item in child if isinstance(item, int))
+            result.update(collect_formula_template_ids(child))
+    elif isinstance(value, list):
+        for child in value:
+            result.update(collect_formula_template_ids(child))
+    return result
+
+
+def collect_referenced_formula_template_ids(
+    formula_inventory_projection: Mapping[str, Any],
+) -> set[int]:
+    profiles = _require_json_list(
+        formula_inventory_projection.get("profiles"),
+        "formula inventory profiles",
+    )
+    scoped_profiles = []
+    for index, value in enumerate(profiles):
+        profile = _require_json_mapping(value, f"formula profiles[{index}]")
+        match = re.search(
+            r"(?:^|\|)resource=(\d+)(?:\||$)",
+            str(profile.get("profileKey", "")),
+        )
+        if match and int(match.group(1)) in (127, 1931):
+            scoped_profiles.append(profile)
+    return collect_formula_template_ids(scoped_profiles)
 
 
 def primary_output_signature(
@@ -346,7 +729,7 @@ def load_json_object(
     for attempt in range(1, GOVERNED_JSON_READ_MAX_ATTEMPTS + 1):
         try:
             value = decode_json_text(raw)
-        except (json.JSONDecodeError, TypeError) as error:
+        except (json.JSONDecodeError, TypeError, AttributeError) as error:
             if not _is_transient_json_decoder_failure(error):
                 raise
             if isinstance(error, json.JSONDecodeError):
@@ -998,7 +1381,6 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
         for marker in (
             "Windows fatal exception: access violation",
             "Windows fatal exception: stack overflow",
-            "TypeError: 'str_ascii_iterator' object is not callable",
             "SystemError:",
             "AttributeError: 'datetime.timezone' object has no attribute 'astimezone'",
         )
@@ -1011,12 +1393,19 @@ def _is_transient_interpreter_failure(return_code: int, detail: str) -> bool:
     governed_json_parse_failure = (
         "json.decoder.JSONDecodeError:" in detail and "decode_json_text" in detail
     )
+    governed_json_internal_failure = (
+        ("TypeError:" in detail or "AttributeError:" in detail)
+        and "decode_json_text" in detail
+        and ("json\\decoder.py" in detail or "json/decoder.py" in detail)
+        and ("json\\scanner.py" in detail or "json/scanner.py" in detail)
+    )
     verified_item_database_failure = (
         "verified item-template decode failure:" in detail
     )
     return (
         json_decoder_failure
         or governed_json_parse_failure
+        or governed_json_internal_failure
         or verified_item_database_failure
     )
 
@@ -1189,13 +1578,63 @@ def _write_round_seed(path: Path, payload: bytes) -> None:
     _write_verified_private_input(path, payload, "active/formula round seed")
 
 
+def _build_item_template_projection(
+    *,
+    repo_root: Path,
+    frozen_repo_root: Path,
+    formula_inventory_projection: Mapping[str, Any],
+    item_database_path: Path,
+    item_database_sha256: str,
+    item_database_byte_length: int,
+    lease: Any,
+) -> bytes:
+    template_ids = sorted(
+        collect_referenced_formula_template_ids(formula_inventory_projection)
+    )
+    if not template_ids:
+        raise PipelineError("formula inventory references no item templates")
+    output = frozen_repo_root / "_item-template-projection" / "templates.json"
+    output.parent.mkdir()
+    completed = run_checked(
+        (
+            str(repo_root / SCFU_ANALYZER),
+            "--project-item-templates",
+            str(item_database_path),
+            item_database_sha256,
+            str(item_database_byte_length),
+            ",".join(str(template_id) for template_id in template_ids),
+            str(output),
+        ),
+        repo_root=repo_root,
+        lease=lease,
+        label="item-template projection",
+    )
+    if not output.is_file():
+        detail = _bounded_process_detail(completed)
+        suffix = f": {detail}" if detail else ""
+        raise PipelineError(f"item-template projector omitted its output{suffix}")
+    document = load_json_object(output, "item-template projection")
+    raw_templates = document.get("templates")
+    if not isinstance(raw_templates, dict):
+        raise PipelineError("item-template projection root is invalid")
+    actual_ids: set[int] = set()
+    try:
+        actual_ids = {int(value) for value in raw_templates}
+    except (TypeError, ValueError) as error:
+        raise PipelineError("item-template projection contains an invalid ID") from error
+    if actual_ids != set(template_ids):
+        raise PipelineError("item-template projection membership is incomplete")
+    return canonical_json_bytes(document)
+
+
 def _run_active_formula_fixed_point(
     *,
     repo_root: Path,
     frozen_repo_root: Path,
-    inventory_payload: bytes,
+    active_inventory_payload: bytes,
+    formula_inventory_payload: bytes,
     authoritative_inventory_path: Path,
-    item_database_payload: bytes,
+    item_template_projection_payload: bytes,
     lease: Any,
     max_rounds: int,
 ) -> FixedPointResult:
@@ -1203,12 +1642,22 @@ def _run_active_formula_fixed_point(
     rounds_root.mkdir()
     initial_payload = canonical_json_bytes({})
     initial = PairState(initial_payload, initial_payload)
-    inventory_sha256 = sha256_bytes(inventory_payload)
-    inventory_byte_length = len(inventory_payload)
-    item_database_sha256 = sha256_bytes(item_database_payload)
-    item_database_byte_length = len(item_database_payload)
+    active_inventory_sha256 = sha256_bytes(active_inventory_payload)
+    active_inventory_byte_length = len(active_inventory_payload)
+    formula_inventory_sha256 = sha256_bytes(formula_inventory_payload)
+    formula_inventory_byte_length = len(formula_inventory_payload)
+    item_template_projection_sha256 = sha256_bytes(
+        item_template_projection_payload
+    )
+    item_template_projection_byte_length = len(item_template_projection_payload)
+    memoized_identity_transition: PairState | None = None
 
     def transition(previous: PairState, round_number: int) -> PairState:
+        nonlocal memoized_identity_transition
+        if memoized_identity_transition is not None:
+            if memoized_identity_transition != previous:
+                raise PipelineError("fixed-point memoization state is stale")
+            return memoized_identity_transition
         round_root = rounds_root / f"round-{round_number:02d}"
         active_inventory_path = (
             round_root / "active-input" / "combat-inventory.json"
@@ -1216,15 +1665,18 @@ def _run_active_formula_fixed_point(
         formula_inventory_path = (
             round_root / "formula-input" / "combat-inventory.json"
         )
-        formula_item_database_path = round_root / "formula-items" / "items.dat"
+        formula_item_projection_path = (
+            round_root / "formula-items" / "item-template-projection.json"
+        )
         formula_seed = round_root / "formula-seed" / "formula-dataset.json"
-        _write_round_seed(active_inventory_path, inventory_payload)
+        _write_round_seed(active_inventory_path, active_inventory_payload)
         _write_round_seed(formula_seed, previous.formula_dataset)
         active_output = round_root / "output" / "active-coverage.json"
         active_output.parent.mkdir(parents=True)
         active_completed = run_checked(
             (
                 sys.executable,
+                "-B",
                 "-I",
                 "-u",
                 "-X",
@@ -1238,9 +1690,9 @@ def _run_active_formula_fixed_point(
                 "--combat-inventory-descriptor",
                 str(authoritative_inventory_path),
                 "--combat-inventory-sha256",
-                inventory_sha256,
+                active_inventory_sha256,
                 "--combat-inventory-byte-length",
-                str(inventory_byte_length),
+                str(active_inventory_byte_length),
                 "--formula-dataset",
                 str(formula_seed),
                 "--output",
@@ -1263,12 +1715,15 @@ def _run_active_formula_fixed_point(
             and active_payload == previous.active_coverage
         ):
             return PairState(active_payload, previous.formula_dataset)
-        _write_round_seed(formula_inventory_path, inventory_payload)
-        _write_round_seed(formula_item_database_path, item_database_payload)
+        _write_round_seed(formula_inventory_path, formula_inventory_payload)
+        _write_round_seed(
+            formula_item_projection_path, item_template_projection_payload
+        )
         formula_output = round_root / "output" / "formula-dataset.json"
         formula_completed = run_checked(
             (
                 sys.executable,
+                "-B",
                 "-I",
                 "-u",
                 "-X",
@@ -1278,15 +1733,15 @@ def _run_active_formula_fixed_point(
                 "--inventory",
                 str(formula_inventory_path),
                 "--inventory-sha256",
-                inventory_sha256,
+                formula_inventory_sha256,
                 "--inventory-byte-length",
-                str(inventory_byte_length),
-                "--items",
-                str(formula_item_database_path),
-                "--items-sha256",
-                item_database_sha256,
-                "--items-byte-length",
-                str(item_database_byte_length),
+                str(formula_inventory_byte_length),
+                "--item-template-projection",
+                str(formula_item_projection_path),
+                "--item-template-projection-sha256",
+                item_template_projection_sha256,
+                "--item-template-projection-byte-length",
+                str(item_template_projection_byte_length),
                 "--active-coverage",
                 str(active_output),
                 "--output",
@@ -1303,7 +1758,14 @@ def _run_active_formula_fixed_point(
             raise PipelineError(
                 f"formula generator omitted its staged output{suffix}"
             )
-        return PairState(active_payload, formula_output.read_bytes())
+        formula_payload = formula_output.read_bytes()
+        current = PairState(active_payload, formula_payload)
+        if formula_payload == previous.formula_dataset:
+            # current.active = f(previous.formula) and current.formula =
+            # g(current.active). Equal formula bytes therefore prove the next
+            # transition is exactly current without launching either child.
+            memoized_identity_transition = current
+        return current
 
     return iterate_pair_to_fixed_point(
         transition,
@@ -1341,6 +1803,7 @@ def build_candidate_cohort(
             run_checked(
                 (
                     sys.executable,
+                    "-B",
                     "-I",
                     "-u",
                     "-X",
@@ -1370,7 +1833,12 @@ def build_candidate_cohort(
                         "capture input snapshot is missing or is not a regular file"
                     )
                 inventory = load_json_object(artifacts["inventory"], "primary inventory")
-                inventory_projection = build_generator_inventory_projection(inventory)
+                active_inventory_projection = build_generator_inventory_projection(
+                    inventory
+                )
+                formula_inventory_projection = build_formula_inventory_projection(
+                    inventory
+                )
                 snapshot = load_json_object(snapshot_path, "capture input snapshot")
                 snapshot_descriptor = _portable_snapshot_descriptor(
                     snapshot, auxiliary_snapshot.identity
@@ -1405,9 +1873,22 @@ def build_candidate_cohort(
     authoritative_inventory_path = frozen_repo_root / Path(
         ARTIFACT_RELATIVE_PATHS["inventory"]
     )
-    inventory_projection_bytes = canonical_json_bytes(inventory_projection)
-    if decode_json_text(inventory_projection_bytes.decode("utf-8")) != inventory_projection:
-        raise PipelineError("private generator inventory projection is not canonical")
+    active_inventory_projection_bytes = canonical_json_bytes(
+        active_inventory_projection
+    )
+    if (
+        decode_json_text(active_inventory_projection_bytes.decode("utf-8"))
+        != active_inventory_projection
+    ):
+        raise PipelineError("private active inventory projection is not canonical")
+    formula_inventory_projection_bytes = canonical_json_bytes(
+        formula_inventory_projection
+    )
+    if (
+        decode_json_text(formula_inventory_projection_bytes.decode("utf-8"))
+        != formula_inventory_projection
+    ):
+        raise PipelineError("private formula inventory projection is not canonical")
 
     item_database_record = next(
         (
@@ -1425,13 +1906,23 @@ def build_candidate_cohort(
         expected_byte_length=item_database_record.size,
         label="frozen item database",
     )
+    item_template_projection_payload = _build_item_template_projection(
+        repo_root=repo_root,
+        frozen_repo_root=frozen_repo_root,
+        formula_inventory_projection=formula_inventory_projection,
+        item_database_path=auxiliary_snapshot.path_for(ITEM_DATABASE.as_posix()),
+        item_database_sha256=item_database_record.sha256,
+        item_database_byte_length=item_database_record.size,
+        lease=lease,
+    )
 
     fixed_point = _run_active_formula_fixed_point(
         repo_root=repo_root,
         frozen_repo_root=frozen_repo_root,
-        inventory_payload=inventory_projection_bytes,
+        active_inventory_payload=active_inventory_projection_bytes,
+        formula_inventory_payload=formula_inventory_projection_bytes,
         authoritative_inventory_path=authoritative_inventory_path,
-        item_database_payload=item_database_payload,
+        item_template_projection_payload=item_template_projection_payload,
         lease=lease,
         max_rounds=max_rounds,
     )
@@ -1769,6 +2260,7 @@ def revalidate_candidate_inputs(
         run_checked(
             (
                 sys.executable,
+                "-B",
                 "-I",
                 "-u",
                 "-X",

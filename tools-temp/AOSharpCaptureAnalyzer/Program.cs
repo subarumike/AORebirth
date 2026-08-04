@@ -80,6 +80,20 @@ namespace AOSharpCaptureAnalyzer
                 return Pf127CaptureSnapshot.RunSelfTest();
             }
 
+            if (args.Length == 6
+                && string.Equals(
+                    args[0],
+                    "--project-item-templates",
+                    StringComparison.Ordinal))
+            {
+                return ItemTemplateProjection.Run(
+                    args[1],
+                    args[2],
+                    args[3],
+                    args[4],
+                    args[5]);
+            }
+
             if (args.Length == 3
                 && string.Equals(
                     args[0],
@@ -104,6 +118,7 @@ namespace AOSharpCaptureAnalyzer
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test-pf127-los-promotion");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --self-test-pf127-capture-snapshot");
+                Console.Error.WriteLine("       AOSharpCaptureAnalyzer --project-item-templates <items.dat> <sha256> <byte-length> <comma-separated-template-ids> <output-json>");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --snapshot-pf127-capture <live-capture-folder> <new-snapshot-folder>");
                 Console.Error.WriteLine("       AOSharpCaptureAnalyzer --promote-pf127-los <capture-folder> [reviewed-json-output]");
                 return 2;

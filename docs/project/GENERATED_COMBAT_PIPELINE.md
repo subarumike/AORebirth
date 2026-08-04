@@ -56,19 +56,22 @@ Snapshot identities use normalized logical paths plus content descriptors. They 
 
 The primary generator and its analyzer dependencies execute from the frozen auxiliary tree, while capture reads are bound to the primary source plan in the repository. The primary stage produces inventory, runtime catalog, fixtures, and the private capture snapshot manifest in a unique candidate directory.
 
-The coordinator then copies those three primary outputs into the frozen tree and generates active coverage and formula data as a pair. The pair must reach a byte-identical fixed point. After round one, if the next active bytes equal the previous active state, the previous formula bytes are reused because they are already the deterministic formula projection of that same active state; the convergence round is still counted. A repeated non-identical state is rejected as a deterministic cycle, and failure to converge within the configured bound is rejected. The reconciled cohort converges in three rounds.
+The coordinator then copies those three primary outputs into the frozen tree and derives separate exact private projections for active and formula generation from the validated authoritative inventory. Each projection is written durably, read back, and bound to the SHA-256 and byte length verified by its child over the exact bytes decoded. Projection preserves every consumed value, including complete `attackInfoPacketIds` arrays; it does not replace packet evidence with samples or counts. The full inventory remains the published authority and the source named and hashed by generated output.
 
-Formula generation streams each top-level MessagePack array in the frozen
-`items.dat` and retains only item templates referenced by the governed PF127 and
-PF1931 profiles. It preserves duplicate-ID last-record-wins behavior and rejects
-truncated sizes, invalid zlib data, malformed roots/templates, unused compressed
-tails, trailing MessagePack bytes, and trailing database bytes. The repository's
-legacy `Z_SYNC_FLUSH` slice framing remains accepted.
+Active coverage and formula data are generated as a pair that must reach a byte-identical fixed point. After a completed transition, formula equality proves the next active result is identical because active generation receives the same formula bytes, and therefore proves the next formula result and complete pair are identical as well. Only that proven identity transition is memoized; its convergence round remains counted while both redundant children are skipped. A repeated non-identical state is rejected as a deterministic cycle, and failure to converge within the configured bound is rejected. The reconciled cohort converges in three rounds.
 
-All children run isolated and unbuffered with Python fault handling enabled. A bounded timeout terminates the complete child process tree and reports the stage label and process identity. Candidate JSON, UTF-8 outputs, descriptors, counts, hashes, identities, and location independence are validated before publication.
+Formula generation does not parse the full `items.dat` in Python. The coordinator
+verifies the frozen ItemDb descriptor, then invokes the repository's C#
+`MessagePackZip` reader to extract exactly the item templates referenced by the
+governed PF127 and PF1931 profiles. The resulting private JSON projection is
+canonicalized and bound to the SHA-256 and byte length verified by every formula
+child. The C# reader is the same typed MessagePack path used by the runtime and
+retains support for the repository's legacy `Z_SYNC_FLUSH` slice framing.
+
+All children run isolated and unbuffered with Python fault handling enabled. A bounded timeout terminates the complete child process tree and reports the stage label and process identity. Verified UTF-8 JSON may receive bounded retry for `JSONDecodeError` and for impossible stdlib `TypeError` or `AttributeError` failures only when the traceback proves `json.decoder`/`json.scanner` ownership. Deterministic validation failures and unrelated exceptions fail closed. Candidate JSON, UTF-8 outputs, descriptors, counts, hashes, identities, and location independence are validated before publication.
 
 Repository-owned generated-combat, acceptance, build, and test wrappers call
-`Tools/select_python_runtime.cmd`. It selects Python 3.14 or newer through the
+`Tools/select_python_runtime.cmd`. It selects the governed CPython 3.13.14 runtime through the
 Windows launcher and accepts an explicit `AO_REBIRTH_PYTHON` override. The
 selected executable is the runtime recorded in the governed manifest.
 
