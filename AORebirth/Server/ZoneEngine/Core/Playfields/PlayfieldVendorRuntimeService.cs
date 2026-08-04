@@ -107,6 +107,14 @@ namespace ZoneEngine.Core.Playfields
             this.capturedAreteSarah.Attach(playfield, playfieldIdentity, dynelRegistry);
         }
 
+        internal void EnsureCapturedAreteAlexAreaVendors(
+            Playfield playfield,
+            Identity playfieldIdentity,
+            PlayfieldDynelRegistry dynelRegistry)
+        {
+            this.capturedAreteAlexArea.EnsurePresent(playfield, playfieldIdentity, dynelRegistry);
+        }
+
         internal void AttachCapturedAreteMarcoSpidaVendor(
             Playfield playfield,
             Identity playfieldIdentity,

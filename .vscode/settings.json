@@ -1,0 +1,10 @@
+{
+  "git.enabled": true,
+  "git.autofetch": true,
+  "git.confirmSync": true,
+  "git.openRepositoryInParentFolders": "always",
+  "github.gitProtocol": "https",
+  "git.defaultBranchName": "master",
+  "git.branchProtection": ["master"],
+  "git.detectSubmodules": true
+}
