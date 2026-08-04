@@ -19,6 +19,7 @@ if (-not [string]::IsNullOrEmpty($processPath)) {
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $engineDir = Join-Path $root "AORebirth\Built\Debug"
+$configPath = Join-Path $root "AORebirth\Config\Config.xml"
 $logDir = Join-Path $root "logs\engines"
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
@@ -51,12 +52,14 @@ function Invoke-EngineStatusProbe {
         [switch]$Quiet
     )
 
+    $probeArguments = @("--config", $configPath, "--engine-dir", $engineDir) + $Arguments
+
     if ($Quiet) {
-        & $cscript //nologo $statusProbe @Arguments *> $null
+        & $cscript //nologo $statusProbe @probeArguments *> $null
         $probeExit = $LASTEXITCODE
     }
     else {
-        $probeOutput = @(& $cscript //nologo $statusProbe @Arguments)
+        $probeOutput = @(& $cscript //nologo $statusProbe @probeArguments)
         $probeExit = $LASTEXITCODE
         foreach ($line in $probeOutput) {
             Write-Host $line

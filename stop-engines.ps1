@@ -8,6 +8,7 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $logDir = Join-Path $root "logs\engines"
 $engineDir = Join-Path $root "AORebirth\Built\Debug"
+$configPath = Join-Path $root "AORebirth\Config\Config.xml"
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
 $failed = $false
@@ -118,10 +119,10 @@ foreach ($engine in $engines) {
                     [System.Globalization.DateTimeStyles]::RoundtripKind)
                 $startDifferenceSeconds = [Math]::Abs(
                     ($metadataProcess.StartTime.ToUniversalTime() - $recordedStart.ToUniversalTime()).TotalSeconds)
-                if ([string]$metadata.Engine -ieq $engine.Name
-                    -and $actualPath -ieq $expectedPath
-                    -and $recordedPath -ieq $expectedPath
-                    -and $startDifferenceSeconds -le 5) {
+                if ([string]$metadata.Engine -ieq $engine.Name -and
+                    $actualPath -ieq $expectedPath -and
+                    $recordedPath -ieq $expectedPath -and
+                    $startDifferenceSeconds -le 5) {
                     $metadataIsTrusted = $true
                 }
                 else {
@@ -162,7 +163,7 @@ foreach ($engine in $engines) {
         Remove-Item -LiteralPath $shutdownFile -Force
     }
 
-    & $cscript //nologo $statusProbe --prestart $engine.Name
+    & $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name
     $releaseExit = $LASTEXITCODE
     if ($releaseExit -ne 0) {
         Write-Warning "$($engine.Name) is not fully stopped with its ports released; no unmanaged process was killed."
